@@ -107,6 +107,33 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_equal 'Admin rights required', flash[:error]
   end
 
+  test 'should get new fair data station enabled shows tab' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    with_config_value(:fair_data_station_enabled, true) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#extended-metadata-type-tabs' do
+      assert_select 'li', count: 2
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl'
+    end
+  end
+
+  test 'should get new fair data station disabled shows no tab' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    with_config_value(:fair_data_station_enabled, false) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#extended-metadata-type-tabs' do
+      assert_select 'li', count: 1
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl', count: 0
+    end
+  end
+
+
   test 'should create successfully' do
     person = FactoryBot.create(:admin)
     login_as(person)
@@ -286,7 +313,9 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      with_config_value(:fair_data_station_enabled, true) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
     end
     assert_redirected_to :root
     assert_equal 'Admin rights required', flash[:error]
@@ -300,7 +329,9 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      with_config_value(:fair_data_station_enabled, true) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
     end
     assert_response :success
     assert_equal 4, assigns(:jsons).count
@@ -322,7 +353,9 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      with_config_value(:fair_data_station_enabled, true) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
     end
     assert_response :success
     assert_equal 2, assigns(:jsons).count
@@ -348,12 +381,30 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      with_config_value(:fair_data_station_enabled, true) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
     end
     assert_response :success
     assert_select 'p.alert.alert-info', text:/There were no new Extended Metadata Types identified as needing to be created./
     assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
     assert_select 'input.btn[type="submit"][value="Create"]', count: 0
+  end
+
+  test 'cannot create from ttl if fair data station disabled' do
+    person = FactoryBot.create(:admin)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      with_config_value(:fair_data_station_enabled, false) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
+    end
+    assert_redirected_to :root
+    assert_equal 'Fair data station are disabled', flash[:error]
   end
 
 

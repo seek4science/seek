@@ -1,6 +1,8 @@
 class ExtendedMetadataTypesController < ApplicationController
   respond_to :json, :html
   skip_before_action :project_membership_required
+
+  before_action :fair_data_station_enabled?, only:[:create_from_fair_ds_ttl]
   before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
   before_action :find_requested_item, only: [:administer_update, :show, :destroy]
   include Seek::IndexPager

@@ -27,9 +27,26 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil assigns(:sample_types)
   end
 
-  test 'should get new' do
-    get :new
+  test 'should get new fair data station enabled shows tab' do
+    with_config_value(:fair_data_station_enabled, true) do
+      get :new
+    end
     assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 3
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl'
+    end
+  end
+
+  test 'should get new fair data station disabled no tab' do
+    with_config_value(:fair_data_station_enabled, false) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 2
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl', count: 0
+    end
   end
 
   test 'should create sample_type' do
@@ -448,8 +465,10 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
         assert_no_difference('ContentBlob.count') do
-          post :create_from_fair_ds_ttl,
-               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
         end
       end
     end
@@ -478,8 +497,10 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('SampleType.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create_from_fair_ds_ttl,
-               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
         end
       end
     end
@@ -487,6 +508,24 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_template :new
     assert_equal 'No Sample type metadata could be found.', flash.now[:error]
     refute_empty assigns(:sample_type).errors
+  end
+
+  test 'cannot create from fair data station ttl if disabled' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, false) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal 'Fair data station are disabled', flash[:error]
   end
 
 

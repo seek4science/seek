@@ -5,6 +5,7 @@ class SampleTypesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :samples_enabled?
+  before_action :fair_data_station_enabled?, only:[:create_from_fair_ds_ttl]
   before_action :check_no_created_samples, only: [:destroy]
   before_action :check_if_locked, only: %i[edit manage manage_update update]
   before_action :find_and_authorize_requested_item, except: %i[create batch_upload index new template_details]
