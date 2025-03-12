@@ -4,7 +4,6 @@ class InstitutionsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include MockHelper
 
   def setup
     login_as(:quentin)
@@ -34,47 +33,53 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_redirected_to institution_path(assigns(:institution))
   end
 
-  def test_should_create_institution
-    ror_mock
-
-    assert_difference('Institution.count') do
-      post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'00h69cf80' } }
+  def test_should_create_institution_with_ror_id
+    VCR.use_cassette("ror/fetch_by_id") do
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { ror_id:'03vek6s52' } }
+      end
     end
     assert_redirected_to institution_path(assigns(:institution))
-    assert_equal 'test', assigns(:institution).title
-    assert_equal 'FI', assigns(:institution).country
-    assert_equal '00h69cf80', assigns(:institution).ror_id
+    assert_equal 'Harvard University', assigns(:institution).title
+    assert_equal 'US', assigns(:institution).country
+    assert_equal '03vek6s52', assigns(:institution).ror_id
   end
 
+  def test_should_create_institution_with_title
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'test' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'test', assigns(:institution).title
+  end
+
+
   def test_can_not_create_institution_with_invalid_ror_id
-
+    VCR.use_cassette("ror/fetch_invalid_id") do
       assert_no_difference('Institution.count') do
-        post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'3333' } }
+        post :create, params: { institution: { title: 'test', ror_id: 'invalid_id' } }
       end
-      assert_equal assigns(:institution).errors[:ror_id].first, 'ID must be a valid ROR ID format.'
-
-      assert_no_difference('Institution.count') do
-        post :create, params: { institution: { title: 'test', country: 'FI', ror_id:'P1C2O3C4T' } }
-      end
-      assert_equal assigns(:institution).errors[:ror_id].first, 'ID does not match any existing ROR organization.'
+    end
+    assert_equal assigns(:institution).errors[:ror_id].first, "'invalid_id' is not a valid ROR ID"
   end
 
 
   def test_can_not_create_institution_with_the_title_or_ror_id_that_already_exists
+    VCR.use_cassette("ror/existing_institution") do
+      FactoryBot.create(:institution, title: 'Harvard University', ror_id: '03vek6s52')
 
-    ror_mock
-    FactoryBot.create(:institution, title: 'my Institution', ror_id:'00h69cf80')
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { title: 'Harvard University' } }
+      end
+      assert_equal assigns(:institution).errors[:title].first, 'has already been taken'
 
-    assert_no_difference('Institution.count') do
-      post :create, params: { institution: { title: 'my Institution'} }
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { ror_id: '03vek6s52' } }
+      end
+      assert_equal assigns(:institution).errors[:ror_id].first, 'has already been taken'
     end
-    assert_equal assigns(:institution).errors[:title].first, 'has already been taken'
-
-    assert_no_difference('Institution.count') do
-      post :create, params: { institution: { title: 'my Institution new', ror_id:'00h69cf80'} }
-    end
-    assert_equal assigns(:institution).errors[:ror_id].first, 'has already been taken'
-
   end
 
   def test_should_show_institution

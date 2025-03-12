@@ -8,7 +8,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @person = FactoryBot.create(:max_person, description: 'a lovely person')
     @project = @person.projects.first
     @current_time = Time.now.utc
-    ror_mock
   end
 
   test 'data catalogue' do
@@ -682,10 +681,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'institution' do
-    institution = travel_to(@current_time) do
-      institution = FactoryBot.create(:max_institution)
-      disable_authorization_checks { institution.save! }
-      institution
+    institution = VCR.use_cassette("ror/max_institution") do
+      travel_to(@current_time) do
+        institution = FactoryBot.create(:max_institution)
+        disable_authorization_checks { institution.save! }
+        institution
+      end
     end
 
     expected = {
@@ -693,13 +694,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@type' => 'ResearchOrganization',
       'dct:conformsTo' => 'https://schema.org/ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
-      'name' => 'A Maximal Institution',
-      'url' => 'http://www.mib.ac.uk/',
-      'address' => {
-        'address_country' => 'GB',
-        'address_locality' => 'Manchester',
-        'street_address' => 'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom'
-      }
+      "name"=>"University of Manchester",
+      'url' => 'http://www.manchester.ac.uk/',
+      "address"=>{"address_country"=>"GB", "address_locality"=>"Manchester", "street_address"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
     }
 
     json = JSON.parse(institution.to_schema_ld)
