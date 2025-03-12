@@ -11,8 +11,7 @@ module Seek
         super.except(:title, :description)
       end
 
-      def detect_sample_type
-        property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] }
+      def detect_sample_type(property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
         # group sample_type_ids by the number of matching attributes
         groups = SampleAttribute.select(:sample_type_id).where(pid: property_ids).group(:sample_type_id).count
 
@@ -29,6 +28,17 @@ module Seek
         end.sort_by { |x| x[0] }
 
         candidates.first&.last
+      end
+
+      def find_exact_matching_sample_type
+        property_ids = all_additional_potential_annotation_predicates
+        property_ids |= [@schema.title.to_s, @schema.description.to_s]
+        sample_type = detect_sample_type(property_ids)
+        if sample_type && sample_type.sample_attributes.count == property_ids.count
+          sample_type
+        else
+          nil
+        end
       end
 
       def populate_seek_sample(seek_sample)
