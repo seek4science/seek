@@ -1084,6 +1084,7 @@ DEPENDENCIES
   pry-remote
   psych
   puma (~> 5.6)
+  rack (>= 2.2.13)
   rack-attack (~> 6.6.0)
   rack-cors
   rack-mini-profiler (~> 2.0)
