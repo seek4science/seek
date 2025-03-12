@@ -12,6 +12,13 @@ module Ror
       request("organizations?query=#{encoded_query}")
     end
 
+    # define a method to extract the ror id from the link "https://ror.org/04rcqnp59"
+
+    def extract_ror_id(ror_link)
+      return nil unless ror_link.is_a?(String) && ror_link.match?(%r{\Ahttps://ror\.org/\w+\z})
+      ror_link.split('/').last
+    end
+
     # Fetch institution details by ROR ID
     def fetch_by_id(ror_id)
       request("organizations/#{ror_id}")
@@ -24,7 +31,12 @@ module Ror
       response = @endpoint[path].get(accept: 'application/json')
       JSON.parse(response.body)
     rescue RestClient::ExceptionWithResponse => e
-      { error: "ROR API error: #{e.response}" }
+      error_response = JSON.parse(e.response.body) rescue nil
+      if error_response && error_response["errors"]
+        { error: error_response["errors"].join(", ") }
+      else
+        { error: e.message }
+      end
     rescue StandardError => e
       { error: "Unexpected error: #{e.message}" }
     end
