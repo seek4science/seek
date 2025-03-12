@@ -238,6 +238,12 @@ class ProjectsController < ApplicationController
       @institution = Institution.new(inst_params)
     end
 
+    unless @institution.valid?
+      flash.now[:error] = "Institution is not valid: #{@institution.errors.full_messages.join(', ')}"
+      render action: :guided_create, status: :unprocessable_entity
+      return
+    end
+
     # A Programme has been selected, or it is a Site Managed Programme
     if params[:programme_id].present?
 
