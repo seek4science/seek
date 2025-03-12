@@ -302,4 +302,22 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     exact_match = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
     assert_equal exact_match, study.find_exact_matching_extended_metadata_type
   end
+
+  test 'find_exact_matching_sample_type' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+
+    assert_nil sample.find_exact_matching_sample_type
+    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title:'partial matching')
+    partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
+    partial_sample_type.reload
+    assert_equal 5, partial_sample_type.sample_attributes.count
+    assert_nil sample.find_exact_matching_sample_type
+
+    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    assert_equal exact_match, sample.find_exact_matching_sample_type
+  end
+
+
 end

@@ -61,7 +61,7 @@ class SampleTypesController < ApplicationController
     build_sample_type_from_fair_ds_ttl
     @sample_type.contributor = User.current_user.person
 
-    @tab = 'from-fds-ttl'
+    @tab = 'from-fair-ds-ttl'
 
     respond_to do |format|
       if @sample_type && @sample_type.valid? && @sample_type.save
