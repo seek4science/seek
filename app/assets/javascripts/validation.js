@@ -3,11 +3,11 @@
 // These methods are bound to the form submit buttons and return false if the form is invalid,
 //   halting event propagation and preventing the form from being submitted.
 
-function validateResourceFields(resourceName) {
+function validateResourceFields(resourceName, parentId=null) {
     var isNewResource = !!document.getElementById('upload-panel');
 
     // Check new resource has at least a file/URL
-    if (isNewResource && !validateUploadFormFields()) {
+    if (isNewResource && !validateUploadFormFields(resourceName, parentId)) {
         return false;
     }
 
@@ -23,8 +23,13 @@ function validateResourceFields(resourceName) {
     return true;
 }
 
-function validateUploadFormFields() {
-    var files= $j('input[type="file"][name="content_blobs[][data]"], input[type="hidden"][name="content_blobs[][data_url]"]');
+function validateUploadFormFields(resourceName=null, parentId=null) {
+    if (parentId) {
+        var files= $j(`#${parentId} input[type="file"][name="content_blobs[][data]"], input[type="hidden"][name="content_blobs[][data_url]"]`);
+    }
+    else {
+        var files= $j('input[type="file"][name="content_blobs[][data]"], input[type="hidden"][name="content_blobs[][data_url]"]');
+    }
 
     var hasFiles = files.toArray().some(function (f) { return f.value }); // Count non-blank file fields
     var valid = true;
@@ -52,6 +57,8 @@ function validateUploadFormFields() {
 
     return valid;
 }
+
+
 
 function validateUploadNewVersion() {
     return validateUploadFormFields();

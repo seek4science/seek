@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects
+    uri: https://test-fe.cbu.uib.no/nels-api/sbi/projects/91123122/datasets/91123528
     body:
       encoding: US-ASCII
       string: ''
@@ -23,18 +23,16 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 28 Jul 2017 08:57:28 GMT
+      - Fri, 28 Jul 2017 09:00:48 GMT
       Content-Length:
-      - '304'
+      - '222'
       Connection:
       - close
       Content-Type:
       - text/plain; charset=UTF-8
     body:
       encoding: UTF-8
-      string: '[{"id":91123122,"name":"seek_pilot1","description":"Seek pilot project
-        1","contact_person":"Kidane M. Tekle","creation_date":"2017-05-17T22:00:00Z"},{"id":91123123,"name":"seek_pilot2","description":"Second
-        pilot project for seek","contact_person":"Kidane M. Tekle","creation_date":"2017-05-17T22:00:00Z"}]'
+      string: '{"creationtime":1510046899000,"id":91123528,"name":"Illumina-sequencing-dataset","islocked":true,"type":"Illumina_seq_data","owner_name":"","description":"test","subtypes":[{"type":"analysis","size":0},{"type":"reads","size":0}]}'
     http_version: 
-  recorded_at: Fri, 28 Jul 2017 08:57:28 GMT
+  recorded_at: Fri, 28 Jul 2017 09:00:49 GMT
 recorded_with: VCR 2.9.3

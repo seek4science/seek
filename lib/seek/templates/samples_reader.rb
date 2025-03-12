@@ -13,7 +13,7 @@ module Seek
         cells = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row[@index=1]/ss:cell")
         cells.collect do |cell|
           unless (heading = cell.content).blank?
-            ColumnDetails.new(heading, cell.attributes['column'].to_i)
+            ColumnDetails.new(heading.strip, cell.attributes['column'].to_i)
           end
         end.compact
       end
