@@ -2184,6 +2184,21 @@ class SopsControllerTest < ActionController::TestCase
     get :dynamic_table_typeahead, params: { assay_id: assay.id, query: '12' }, format: :json
     results = JSON.parse(response.body)['results']
     assert_equal results.count, 0
+
+    # Query 'assay'
+    # study_id is 'undefined'
+    # Should return 5 sops linked to assay: nr. 16 to 20 like before
+    get :dynamic_table_typeahead, params: { study_id: 'undefined', assay_id: assay.id, query: 'assay' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 5
+
+
+    # Query '1'
+    # assay_id is 'null'
+    # Should return 2 sops linked to study: nr. 1 and 10 like before
+    get :dynamic_table_typeahead, params: { study_id: study.id, assay_id: 'null', query: '1' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 2
   end
 
   private
