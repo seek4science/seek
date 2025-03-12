@@ -33,5 +33,19 @@ class RorClientTest < ActiveSupport::TestCase
     end
   end
 
+  def test_fetch_by_invalid_id_with_vcr
+    VCR.use_cassette('ror/fetch_invalid_id') do
+      response = @client.fetch_by_id('invalid_id')
+      assert_equal "'invalid_id' is not a valid ROR ID", response[:error]
+    end
+  end
+
+  test "returns an empty result when querying a nonexistent institution" do
+    VCR.use_cassette("ror/ror_nonexistent_institution") do
+      response = @client.query_name('nonexistentuniversity123')
+      assert_equal 0, response["number_of_results"]
+      assert_empty response["items"]
+    end
+  end
 
 end
