@@ -57,13 +57,15 @@ class SopsController < ApplicationController
   end
 
   def dynamic_table_typeahead
-    return if params[:study_id].blank? && params[:assay_id].blank?
+    study_id = params[:study_id] if params[:study_id].present? && !%w[null undefined].include?(params[:study_id].to_s)
+    assay_id = params[:assay_id] if params[:assay_id].present? && !%w[null undefined].include?(params[:assay_id].to_s)
+    return if study_id.blank? && assay_id.blank?
 
     query = params[:query] || ''
-    asset = if params[:study_id].present?
-              Study.authorized_for('view').detect { |study| study.id.to_s == params[:study_id] }
+    asset = if study_id.present?
+              Study.authorized_for('view').detect { |study| study.id.to_s == study_id.to_s }
             else
-              Assay.authorized_for('view').detect { |assay| assay.id.to_s == params[:assay_id] }
+              Assay.authorized_for('view').detect { |assay| assay.id.to_s == assay_id.to_s }
             end
 
     sops = asset&.sops || []
