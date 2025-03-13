@@ -58,13 +58,15 @@ class SampleTypesController < ApplicationController
   end
 
   def create_from_fair_ds_ttl
-    build_sample_type_from_fair_ds_ttl
-    @sample_type.contributor = User.current_user.person
+    build_or_detect_sample_type_from_fair_ds_ttl
 
     @tab = 'from-fair-ds-ttl'
 
     respond_to do |format|
-      if @sample_type && @sample_type.valid? && @sample_type.save
+      if @existing_sample_type
+        flash[:error] = "An exact matching #{t('sample_type')} already exists, and now shown."
+        format.html { redirect_to sample_type_path(@existing_sample_type) }
+      elsif @sample_type && @sample_type.valid? && @sample_type.save
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
       else
         format.html { render action: 'new' }
@@ -201,7 +203,7 @@ class SampleTypesController < ApplicationController
     @sample_type.build_attributes_from_template
   end
 
-  def build_sample_type_from_fair_ds_ttl
+  def build_or_detect_sample_type_from_fair_ds_ttl
     @sample_type = SampleType.new(sample_type_params)
     blob_params = params[:content_blobs]
 
@@ -214,32 +216,36 @@ class SampleTypesController < ApplicationController
       end
     end
     if fds_sample && fds_sample.all_additional_potential_annotation_details.any?
-      string_attribute_type = SampleAttributeType.where(title: 'String').first
-      @sample_type.sample_attributes.build({
-                                             title: 'Title',
-                                             description: '',
-                                             pid: RDF::Vocab::SCHEMA.name,
-                                             sample_attribute_type: string_attribute_type,
-                                             required: true,
-                                             is_title: true
-                                           })
-      @sample_type.sample_attributes.build({
-                                             title: 'Description',
-                                             description: '',
-                                             pid: RDF::Vocab::SCHEMA.description,
-                                             sample_attribute_type: string_attribute_type
-                                           })
-      fds_sample.all_additional_potential_annotation_details.each do |details|
+      @existing_sample_type = fds_sample.find_exact_matching_sample_type
+      unless @existing_sample_type
+        string_attribute_type = SampleAttributeType.where(title: 'String').first
         @sample_type.sample_attributes.build({
-                                               title: details.label,
-                                               description: details.description,
-                                               pid: details.property_id,
+                                               title: 'Title',
+                                               description: '',
+                                               pid: RDF::Vocab::SCHEMA.name,
                                                sample_attribute_type: string_attribute_type,
-                                               required: details.required
+                                               required: true,
+                                               is_title: true
                                              })
+        @sample_type.sample_attributes.build({
+                                               title: 'Description',
+                                               description: '',
+                                               pid: RDF::Vocab::SCHEMA.description,
+                                               sample_attribute_type: string_attribute_type
+                                             })
+        fds_sample.all_additional_potential_annotation_details.each do |details|
+          @sample_type.sample_attributes.build({
+                                                 title: details.label,
+                                                 description: details.description,
+                                                 pid: details.property_id,
+                                                 sample_attribute_type: string_attribute_type,
+                                                 required: details.required
+                                               })
+        end
       end
+
     else
-      flash.now[:error] = 'No Sample type metadata could be found.'
+      flash.now[:error] = "No #{t('sample_type')} metadata could be found."
     end
 
   end
