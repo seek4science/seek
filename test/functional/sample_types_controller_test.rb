@@ -477,6 +477,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_redirected_to edit_sample_type_path(sample_type)
     assert_empty sample_type.errors
     refute sample_type.uploaded_template?
+    assert_equal @person, sample_type.contributor
     assert_equal 'Hello!', sample_type.title
 
     assert_equal sample_type, ActivityLog.last.activity_loggable
@@ -489,6 +490,27 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     expected = ["Title", "Description", "biosafety level", "scientific name", "ncbi taxonomy id", "collection date"].sort
     assert_equal expected, sample_type.sample_attributes.collect(&:title).sort
+  end
+
+  test 'create from fair data station ttl but exact match exists' do
+    original_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, contributor: @person)
+    assert original_sample_type.can_view?
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    existing_sample_type = assigns(:existing_sample_type)
+    assert_redirected_to sample_type_path(existing_sample_type)
+    assert_equal 'An exact matching Sample type already exists, and now shown.', flash[:error]
   end
 
   test 'create from empty fair data station ttl' do
