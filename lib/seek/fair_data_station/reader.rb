@@ -25,10 +25,9 @@ module Seek
         study = inv&.studies&.first
         obs_unit = study&.observation_units&.first
         assay = study&.assays&.first
-        necessary = [inv, study, obs_unit, assay].compact.select do |type|
+        [inv, study, obs_unit, assay].compact.select do |type|
           type.all_additional_potential_annotation_predicates.any?
         end
-        necessary
       end
     end
   end

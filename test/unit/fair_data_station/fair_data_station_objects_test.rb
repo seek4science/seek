@@ -2,36 +2,35 @@ require 'test_helper'
 
 # test the objects that represent Inv, Study, Obs Unit, Sample and Assay
 class FairDataStationObjectsTest < ActiveSupport::TestCase
-
-  test 'detect extended metadata type' do
+  test 'find closest matching extended metadata type' do
     virtual_demo_assay = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
     seek_test_case_assay = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
     FactoryBot.create(:simple_assay_extended_metadata_type)
     FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
     FactoryBot.create(:simple_observation_unit_extended_metadata_type)
-    writer = Seek::FairDataStation::Writer.new
+    Seek::FairDataStation::Writer.new
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assay = inv.studies.first.assays.first
-    seek_assay = ::Assay.new
-    detected_type = assay.detect_extended_metadata_type
+    ::Assay.new
+    detected_type = assay.find_closest_matching_extended_metadata_type
     assert_equal seek_test_case_assay, detected_type
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assay = inv.studies.first.assays.first
-    detected_type = assay.detect_extended_metadata_type
+    detected_type = assay.find_closest_matching_extended_metadata_type
     assert_equal virtual_demo_assay, detected_type
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     obs_unit = inv.studies.first.observation_units.first
-    detected_type = obs_unit.detect_extended_metadata_type
+    detected_type = obs_unit.find_closest_matching_extended_metadata_type
     assert_nil detected_type
 
     inpensim_obs_unit = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
-    detected_type = obs_unit.detect_extended_metadata_type
+    detected_type = obs_unit.find_closest_matching_extended_metadata_type
     assert_equal inpensim_obs_unit, detected_type
   end
 
@@ -126,35 +125,13 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
                  sample.all_additional_potential_annotation_predicates.sort
   end
 
-  test 'candidates_for_extended_metadata and validate generated json' do
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
-    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
-    assert_equal 4, candidates.count
-    assert_equal %w[Investigation Study ObservationUnit Assay], candidates.collect(&:type_name)
-    candidates.each do |candidate|
-      assert_nothing_raised do
-        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
-      end
-    end
-
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
-    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
-    assert_equal 2, candidates.count
-    assert_equal %w[Study Assay], candidates.collect(&:type_name)
-    candidates.each do |candidate|
-      assert_nothing_raised do
-        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
-      end
-    end
-  end
-
   test 'find_exact_matching_extended_metadata_type' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     study = inv.studies.first
 
     assert_nil study.find_exact_matching_extended_metadata_type
-    partial_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata, title:'partial matching')
+    partial_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata, title: 'partial matching')
     partial_emt.extended_metadata_attributes.delete(partial_emt.extended_metadata_attributes.last)
     partial_emt.reload
     assert_equal 2, partial_emt.extended_metadata_attributes.count
@@ -170,7 +147,7 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     sample = inv.studies.first.observation_units.first.samples.first
 
     assert_nil sample.find_exact_matching_sample_type
-    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title:'partial matching')
+    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title: 'partial matching')
     partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
     partial_sample_type.reload
     assert_equal 5, partial_sample_type.sample_attributes.count
@@ -179,5 +156,4 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type)
     assert_equal exact_match, sample.find_exact_matching_sample_type
   end
-
 end

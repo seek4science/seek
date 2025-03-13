@@ -40,6 +40,20 @@ module Seek
         find_annotation_value(@fair.packageName)
       end
 
+      def external_id
+        identifier
+      end
+
+      def type_name
+        self.class.name.demodulize
+      end
+
+      def populate
+        fetch_children.collect do |child|
+          add_child(child)
+        end
+      end
+
       def annotations
         @annotations ||= query_annotations
       end
@@ -48,12 +62,6 @@ module Seek
         annotations.reject do |annotation|
           core_annotations.include?(annotation[0])
         end
-      end
-
-      def find_annotation_value(property)
-        annotations.detect do |ann|
-          ann[0] == property
-        end&.[](1)
       end
 
       # get more details about an annotation from the given property uri
@@ -115,17 +123,6 @@ module Seek
         json
       end
 
-      def populate
-        fetch_children.collect do |child|
-          add_child(child)
-        end
-      end
-
-      def add_child(child)
-        @children << child_class.new(child, graph)
-        @children.last.populate
-      end
-
       def datasets
         sparql = SPARQL::Client.new(graph)
         query = sparql.select.where(
@@ -134,23 +131,6 @@ module Seek
         query.execute.collect do |solution|
           Seek::FairDataStation::DataSet.new(solution.dataset, graph)
         end
-      end
-
-      def fetch_children
-        sparql = SPARQL::Client.new(graph)
-        query = sparql.select.where(
-          [resource_uri, @jerm.hasPart, :child]
-        )
-
-        query.execute.collect(&:child)
-      end
-
-      def external_id
-        identifier
-      end
-
-      def seek_attributes
-        { title: title, description: description, external_identifier: external_id }
       end
 
       def populate_extended_metadata(seek_resource)
@@ -167,16 +147,15 @@ module Seek
       # finds and returns an EMT if there is an exact match
       def find_exact_matching_extended_metadata_type
         property_ids = all_additional_potential_annotation_predicates
-        emt = detect_extended_metadata_type(property_ids)
-        if emt && emt.extended_metadata_attributes.count == property_ids.count
-          emt
-        else
-          nil
-        end
+        emt = find_closest_matching_extended_metadata_type(property_ids)
+        return unless emt && emt.extended_metadata_attributes.count == property_ids.count
+
+        emt
       end
 
-      def detect_extended_metadata_type(property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
-
+      def find_closest_matching_extended_metadata_type(property_ids = additional_metadata_annotations.collect do |annotation|
+        annotation[0]
+      end)
         # collect and sort those with the most properties that match, eliminating any where no properties match
         candidates = ::ExtendedMetadataType.where(supported_type: type_name).includes(:extended_metadata_attributes).collect do |emt|
           extended_metadata_property_ids = emt.deep_extended_metadata_attributes.collect(&:pid).compact_blank
@@ -192,11 +171,25 @@ module Seek
         candidates.first&.last
       end
 
-      def type_name
-        self.class.name.demodulize
+      def seek_attributes
+        { title: title, description: description, external_identifier: external_id }
       end
 
       private
+
+      def fetch_children
+        sparql = SPARQL::Client.new(graph)
+        query = sparql.select.where(
+          [resource_uri, @jerm.hasPart, :child]
+        )
+
+        query.execute.collect(&:child)
+      end
+
+      def add_child(child)
+        @children << child_class.new(child, graph)
+        @children.last.populate
+      end
 
       def populate_seek_extended_metadata_for_property(extended_metadata_type, data, property_id, value)
         attribute = extended_metadata_type.extended_metadata_attributes.where(pid: property_id).first
@@ -233,11 +226,17 @@ module Seek
         sparql = SPARQL::Client.new(graph)
         query = sparql.select.where(
           [:object, RDF.type, RDF::URI(rdf_type_uri)],
-          %i[object property value]
+          [:object, :property, :value]
         )
         query.execute.collect do |solution|
           solution.property.to_s
         end.uniq
+      end
+
+      def find_annotation_value(property)
+        annotations.detect do |ann|
+          ann[0] == property
+        end&.[](1)
       end
 
       def rdf_type_uri
