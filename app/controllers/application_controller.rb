@@ -10,7 +10,6 @@ class ApplicationController < ActionController::Base
 
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
-  include Recaptcha::Verify
   include CommonSweepers
   include ResourceHelper
 
