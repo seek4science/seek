@@ -2141,7 +2141,7 @@ class ProjectsControllerTest < ActionController::TestCase
         params = {
           programme_id: programme.id,
           project: { title: '', description: 'description', web_page: 'invalid' },
-          institution: { title: 'new inst', country: 'xyz' }
+          institution: { title: 'new inst', country: 'GB' }
         }
         assert_no_enqueued_emails do
           assert_no_difference('Project.count') do
@@ -2156,7 +2156,6 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_response :unprocessable_entity
         assert flash[:error].include?("Title can't be blank")
         assert flash[:error].include?("Web page is not a valid URL")
-        assert flash[:error].include?("Country isn't a valid country or code")
         assert_equal 'new inst', assigns(:institution).title
         assert_equal 'description', assigns(:project).description
         assert_equal '', assigns(:project).title
@@ -2299,10 +2298,10 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
-          project: { title: 'The Project', description:'description', web_page:'web_page'},
-          institution: {id: ['the inst'], title: 'the inst', ror_id: '027m9bs27', web_page: 'the page', city: 'London', country: 'GB'},
-          programme_id: '',
-          programme: {title: 'the prog'}
+        project: { title: 'The Project', description:'description', web_page:'https://example.com'},
+        institution: {id: ['the inst'], title: 'the inst', web_page: 'https://example.com', city: 'London', country: 'GB'},
+        programme_id: '',
+        programme: {title: 'the prog'}
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
@@ -2318,21 +2317,12 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert flash[:notice]
-
-      assert_select 'p', text: /You have described a new Institution with the following details:/
-      assert_select 'li', text: /Title: the inst/
-      assert_select 'li', text: /United Kingdom/
-      assert_select 'li', text: /027m9bs27/
-      assert_select 'li', text: /London/
-      assert_select 'li', text: /the page/
-
-
       log = ProjectCreationMessageLog.last
       details = log.parsed_details
 
       assert_equal 'GB',details.institution.country
       assert_equal 'London',details.institution.city
-      assert_equal 'the page',details.institution.web_page
+      assert_equal 'https://example.com',details.institution.web_page
       assert_equal 'the inst',details.institution.title
       assert_nil details.institution.id
 
@@ -2342,6 +2332,37 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_equal 'the prog',details.programme.title
       assert_nil details.programme.id
+    end
+  end
+
+  test 'Project creation request with institution errors should not trigger emails or logs' do
+    FactoryBot.create(:admin)
+    person = FactoryBot.create(:person_not_in_project)
+    programme = FactoryBot.create(:programme)
+    assert Person.admins.count > 1
+    login_as(person)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+        project: { title: 'The Project', description:'description', web_page:'https://example.com'},
+        institution: {title: 'the inst', web_page: 'invaid', city: 'London', country: 'XY'},
+        programme_id: '',
+        programme: {title: 'the prog'}
+      }
+      assert_no_enqueued_emails do
+        assert_no_difference('ProjectCreationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+      end
+
+      assert_response :unprocessable_entity
+      assert flash[:error]
+      assert_match /Institution is not valid: Web page is not a valid URL, Country isn't a valid country or code/, flash[:error]
     end
   end
 
@@ -2408,7 +2429,7 @@ class ProjectsControllerTest < ActionController::TestCase
       with_config_value(:managed_programme_id, managed_programme.id) do
         params = {
           project: { title: '', description: 'description', web_page: 'https://example.com' },
-          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'XY' },
+          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'GB' },
           programme_id: '',
           programme: { title: 'A Cool Programme' }
         }
@@ -2429,7 +2450,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
         assert flash[:error].include?("The Project is invalid, Title can't be blank")
         assert flash[:error].include?("The Programme is invalid, Title has already been taken")
-        assert flash[:error].include?("The Institution is invalid, Country isn't a valid country or code")
         assert_equal 'the inst', assigns(:institution).title
         assert_equal 'https://example.com/inst', assigns(:institution).web_page
         assert_equal 'description', assigns(:project).description
@@ -2446,8 +2466,8 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     with_config_value(:programmes_enabled, false) do
       params = {
-        project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: ['the inst'], title:'the inst',web_page:'the page',city:'London',country:'GB'}
+        project: { title: 'The Project',description:'description',web_page:'http://www.example.com'},
+        institution: {title:'the inst',web_page:'http://www.example.com',city:'London',country:'GB'}
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
@@ -2466,7 +2486,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_equal 'GB',details.institution.country
       assert_equal 'London',details.institution.city
-      assert_equal 'the page',details.institution.web_page
+      assert_equal 'http://www.example.com',details.institution.web_page
       assert_equal 'the inst',details.institution.title
       assert_nil details.institution.id
 
@@ -3002,14 +3022,14 @@ class ProjectsControllerTest < ActionController::TestCase
     get :administer_create_project_request, params:{message_log_id:log.id}
 
     assert_response :success
-    assert_select 'div', text: /They wish to be associated with A Maximal Institution/
+    assert_select 'div', text: /They wish to be associated with University of Manchester/
 
     institution2 = Institution.new(title: institution_existing.title)
     log2 = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution2)
     get :administer_create_project_request, params:{message_log_id:log2.id}
 
     assert_response :success
-    assert_select 'div', text: /They wish to be associated with A Maximal Institution/
+    assert_select 'div', text: /They wish to be associated with University of Manchester/
 
 
   end
