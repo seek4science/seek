@@ -192,7 +192,7 @@ module Seek
       end
 
       def populate_extended_metadata(seek_entity, datastation_entity)
-        if (emt = datastation_entity.detect_extended_metadata_type)
+        if (emt = datastation_entity.find_closest_matching_extended_metadata_type)
           seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
           update_extended_metadata(seek_entity, datastation_entity)
         end
@@ -207,7 +207,7 @@ module Seek
       end
 
       def populate_sample(seek_sample, datastation_sample)
-        if (sample_type = datastation_sample.detect_sample_type)
+        if (sample_type = datastation_sample.find_closest_matching_sample_type)
           seek_sample.sample_type = sample_type
           update_sample_metadata(seek_sample, datastation_sample)
         end
