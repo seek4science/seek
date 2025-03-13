@@ -317,4 +317,56 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal expected, actual
   end
 
+
+  test 'should query institution name via ror' do
+    VCR.use_cassette("ror/query_harvard_by_name") do
+      get :ror_search, params: { query: 'Harvard' }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert res.key?('items'), 'Response should contain items key'
+      assert res['items'].is_a?(Array), 'Items should be an array'
+      assert res['items'].any?, 'Items array should not be empty'
+    end
+  end
+
+
+  test 'should fetch institution metadata with ror id' do
+    VCR.use_cassette("ror/fetch_by_id") do
+      get :ror_search, params: { ror_id: '03vek6s52' }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_equal 'https://ror.org/03vek6s52', res['id']
+      assert_equal 'Harvard University', res['name']
+      assert_equal 'Cambridge', res.dig('addresses', 0, 'city')
+      assert_equal 'US', res.dig('country', 'country_code')
+      assert_equal 'https://www.harvard.edu', res.dig('links', 0)
+    end
+  end
+
+
+  test 'should return an empty result when querying a nonexistent institution' do
+    VCR.use_cassette("ror/ror_nonexistent_institution") do
+      get :ror_search, params: { query: 'nonexistentuniversity123' }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_equal 0, res["number_of_results"]
+      assert_empty res["items"]
+    end
+  end
+
+  test 'should return an error when ror id is invalid' do
+    VCR.use_cassette("ror/fetch_invalid_id") do
+      get :ror_search, params: { ror_id: 'invalid_id' }
+      assert_response :internal_server_error
+      assert_includes response.body, "'invalid_id' is not a valid ROR ID"
+    end
+  end
+
+  test 'should return an error when ror id is missing' do
+    get :ror_search
+    assert_response :bad_request
+    assert_equal({ error: 'Missing ROR ID' }.to_json, response.body)
+  end
+
+
 end
