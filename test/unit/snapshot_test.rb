@@ -37,6 +37,19 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal 2, s2.snapshot_number
   end
 
+  test 'snapshot title and description correctly set' do
+    s1 = @investigation.create_snapshot(title: 'My snapshot title', description: 'My description')
+    assert_equal 'My snapshot title', s1.title
+    assert_equal 'My description', s1.description
+  end
+
+  test 'zenodo metadata uses resource title and description' do
+    s1 = @investigation.create_snapshot(title: 'My snapshot title', description: 'My description')
+    zm = s1.zenodo_metadata
+    assert_equal 'i1', zm[:title]
+    assert_equal 'not blank', zm[:description]
+  end
+
   test 'sha1 and md5 checksum' do
     s1 = @investigation.create_snapshot
     refute_nil s1.md5sum
@@ -74,8 +87,8 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert_equal 'New title', @investigation.title
     assert_equal 'New description', @investigation.description
-    assert_equal old_title, snapshot.title
-    assert_equal old_description, snapshot.description
+    assert_equal old_title, snapshot.metadata['title']
+    assert_equal old_description, snapshot.metadata['description']
   end
 
   test 'generates sensible DOI' do
@@ -248,7 +261,6 @@ class SnapshotTest < ActiveSupport::TestCase
   test 'study snapshot' do
     snapshot = @study.create_snapshot
 
-    assert_equal 's1', snapshot.title
     assert_equal 2, snapshot.metadata['assays'].count
     assert_equal 2, snapshot.metadata['assays'].find { |a| a['title'] == 'a1' }['assets'].count
     assert_equal 1, snapshot.metadata['assays'].find { |a| a['title'] == 'a2' }['assets'].count
@@ -266,7 +278,6 @@ class SnapshotTest < ActiveSupport::TestCase
 
     snapshot = @assay.create_snapshot
 
-    assert_equal 'a1', snapshot.title
     assert_equal 2, snapshot.metadata['assets'].count
 
     titles = extract_keys(snapshot.metadata, 'title')
@@ -326,6 +337,26 @@ class SnapshotTest < ActiveSupport::TestCase
         snapshot = @assay.create_snapshot
       end
     end
+  end
+
+  test 'validates resource has creators on snapshot creation' do
+    i = FactoryBot.create(:investigation)
+    assert i.creators.empty?
+    snap = i.create_snapshot
+    refute snap.valid?
+    assert snap.errors.added?(:base, 'At least one creator is required. To add, go to Actions -> Manage Investigation.')
+  end
+
+  test 'does not validate resource has creators on snapshot update' do
+    snap = @investigation.create_snapshot
+    assert snap.valid?
+
+    disable_authorization_checks do
+      @investigation.creators = []
+    end
+
+    assert @investigation.reload.creators.empty?
+    assert snap.valid?
   end
 
   private

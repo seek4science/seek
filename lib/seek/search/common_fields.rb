@@ -34,7 +34,7 @@ module Seek
           private 
 
           def strip_markdown text
-            CommonMarker.render_doc(text || '').to_plaintext
+            Commonmarker.parse(text || '').to_plaintext
           end
         end
       end

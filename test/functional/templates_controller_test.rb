@@ -20,12 +20,12 @@ class TemplatesControllerTest < ActionController::TestCase
     refute_nil @project
     login_as(@person)
     @template = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person)
-    @string_type = SampleAttributeType.find_by(title: "String").nil? ? FactoryBot.create(:string_sample_attribute_type, title: "string") : SampleAttributeType.find_by(title: "String")
-    @int_type = SampleAttributeType.find_by(title: "Integer").nil? ? FactoryBot.create(:integer_sample_attribute_type) : SampleAttributeType.find_by(title: "Integer")
-    @registered_sample_attribute_type = SampleAttributeType.find_by(title: "Registered Sample").nil? ? FactoryBot.create(:sample_sample_attribute_type) : SampleAttributeType.find_by(title: "Registered Sample")
-    @registered_sample_multi_attribute_type = SampleAttributeType.find_by(title: "Registered Sample List").nil? ? FactoryBot.create(:sample_multi_sample_attribute_type) : SampleAttributeType.find_by(title: "Registered Sample List")
-    @controlled_vocab_type = SampleAttributeType.find_by(title: "Controlled Vocabulary").nil? ? FactoryBot.create(:controlled_vocab_attribute_type) : SampleAttributeType.find_by(title: "Controlled Vocabulary")
-    @controlled_vocab_list_type = SampleAttributeType.find_by(title: "Controlled Vocabulary List").nil? ? FactoryBot.create(:cv_list_attribute_type) : SampleAttributeType.find_by(title: "Controlled Vocabulary List")
+    @string_type = SampleAttributeType.find_by(title: "String") || FactoryBot.create(:string_sample_attribute_type, title: "String")
+    @int_type = SampleAttributeType.find_by(title: "Integer") || FactoryBot.create(:integer_sample_attribute_type, title: "Integer")
+    @registered_sample_attribute_type = SampleAttributeType.find_by(title: "Registered Sample") || FactoryBot.create(:sample_sample_attribute_type, title: "Registered Sample")
+    @registered_sample_multi_attribute_type = SampleAttributeType.find_by(title: "Registered Sample List") || FactoryBot.create(:sample_multi_sample_attribute_type, title: "Registered Sample List")
+    @controlled_vocab_type = SampleAttributeType.find_by(title: "Controlled Vocabulary") || FactoryBot.create(:controlled_vocab_attribute_type, title: "Controlled Vocabulary")
+    @controlled_vocab_list_type = SampleAttributeType.find_by(title: "Controlled Vocabulary List") || FactoryBot.create(:cv_list_attribute_type, title: "Controlled Vocabulary List")
     @default_isa_tag = FactoryBot.create(:default_isa_tag)
   end
 

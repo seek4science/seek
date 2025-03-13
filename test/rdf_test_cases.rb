@@ -35,6 +35,8 @@ module RdfTestCases
       logout
       get :show, params: { id: private_rdf_test_object, format: 'rdf' }
       assert_response :forbidden
+    else
+      assert true
     end
   end
 

@@ -9,6 +9,7 @@ class SamplesController < ApplicationController
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
   before_action :check_if_locked_sample_type, only: %i[edit new create update]
+  before_action :authorize_sample_type, only: %i[new create]
   before_action :templates_enabled?, only: [:query, :query_form]
 
   before_action :auth_to_create, only: %i[new create batch_create]
@@ -371,4 +372,17 @@ class SamplesController < ApplicationController
     flash[:error] = 'This sample type is locked. You cannot edit the sample.'
     redirect_to sample_types_path(sample_type)
   end
+
+  def authorize_sample_type
+    id = params[:sample_type_id] || params.dig(:sample, :sample_type_id)
+    return unless id
+
+    sample_type = SampleType.find(id)
+    unless sample_type.can_view?
+      flash[:error] = "You are not authorized to use this #{t('sample_type')}"
+      redirect_to root_path
+    end
+
+  end
+
 end

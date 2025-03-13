@@ -8,7 +8,6 @@ module Seek
 
       def initialize(resource)
         @resource = resource
-        @bundled_resources = []
       end
 
       # :call-seq
@@ -32,44 +31,44 @@ module Seek
       end
 
       # Recursively store metadata/files of this resource and its children.
-      def bundle(resource, parents = [])
+      def bundle(resource, bundled = Set.new, parents = [])
+        return if bundled.include?(resource)
+        return unless resource.permitted_for_research_object?
+        bundled << resource
         store_reference(resource, parents)
         store_metadata(resource, parents)
         store_files(resource, parents) if resource.is_asset?
-        subentries(resource).select(&:permitted_for_research_object?).each do |child|
-          bundle(child, (parents + [resource]))
+        children(resource).each do |child|
+          bundle(child, bundled, (parents + [resource]))
         end
       end
 
-      # Gather child resources of the given resource
-      def subentries(resource)
-        s = case resource
-            when Investigation
-              resource.studies + resource.assets
-            when Study
-              resource.assays + resource.assets
-            when Assay
-              resource.assets
-            else
-              []
-                     end
-        remove_duplicates(s)
+      def children(resource)
+        case resource
+        when Investigation
+          resource.studies + resource.assets
+        when Study
+          resource.assays + resource.assets
+        when Assay
+          resource.assets
+        else
+          []
+        end
       end
 
-      def all_subentries(resource)
-        subentries(resource).map do |sub|
-          all_subentries(sub)
-        end + [resource]
-      end
+      def included_items(resource = @resource, included = Set.new, excluded = Set.new, parent_excluded = false)
+        return if included.include?(resource) || excluded.include?(resource)
+        permitted = !parent_excluded && resource.permitted_for_research_object?
+        if permitted
+          included << resource
+        else
+          excluded << resource
+        end
+        children(resource).each do |child|
+          included_items(child, included, excluded, !permitted)
+        end
 
-      # collects the entries contained by the resource for inclusion in
-      # the research object
-      def gather_entries(show_all = false)
-        # This will break when used for non-ISA things:
-        entries = all_subentries(@resource).flatten
-        entries = entries.select(&:permitted_for_research_object?) unless show_all
-
-        entries
+        [included, excluded]
       end
 
       private
@@ -126,13 +125,6 @@ module Seek
       def temp_file(filename, prefix = '')
         dir = Dir.mktmpdir(prefix)
         open(File.join(dir, filename), 'w+')
-      end
-
-      def remove_duplicates(resources)
-        unique_resources = resources - @bundled_resources
-        @bundled_resources += unique_resources
-
-        unique_resources
       end
     end
   end

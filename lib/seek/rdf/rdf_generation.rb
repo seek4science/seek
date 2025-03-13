@@ -160,7 +160,7 @@ module Seek
         methods = %i[data_files sops models publications
                      data_file_masters sop_masters model_masters
                      assets
-                     assays studies investigations
+                     assays studies investigations observation_units
                      institutions creators owners owner contributors contributor projects events presentations organisms strains]
         methods.each do |method|
           next unless respond_to?(method)

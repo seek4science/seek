@@ -49,7 +49,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :forbidden
-    validate_json response.body, '#/components/schemas/forbiddenResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
     blob = pres.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -70,7 +70,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :bad_request
-    validate_json response.body, '#/components/schemas/badRequestResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/badRequestResponse') }
     blob = pres.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0

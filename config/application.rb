@@ -33,6 +33,15 @@ module SEEK
 
     config.autoload_lib(ignore: %w[extensions])
 
+    # The following fixes `uninitialized constant ROCrate::ReadException` etc. when classes are reloaded in development mode.
+    overrides = "#{Rails.root}/lib/overrides"
+    Rails.autoloaders.main.ignore(overrides)
+    config.to_prepare do
+      Dir.glob("#{overrides}/**/*.rb").sort.each do |file|
+        load(file)
+      end
+    end
+
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password,"rack.request.form_vars"]
 

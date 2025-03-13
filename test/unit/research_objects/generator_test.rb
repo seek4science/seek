@@ -53,6 +53,51 @@ class GeneratorTest < ActiveSupport::TestCase
     file = Seek::ResearchObjects::Generator.new(assay).generate
   end
 
+  test 'check inclusion' do
+    inv = investigation
+
+    included, excluded = Seek::ResearchObjects::Generator.new(inv).included_items
+    assert_empty excluded
+    inc = included.group_by { |a| a.class.name }
+    assert_equal 1, inc.delete('Investigation').count
+    assert_equal 1, inc.delete('Study').count
+    assert_equal 2, inc.delete('Assay').count
+    assert_equal 1, inc.delete('Publication').count
+    assert_equal 2, inc.delete('Sop').count
+    assert_equal 1, inc.delete('DataFile').count
+    assert_equal 3, inc.delete('Model').count
+    assert_empty inc
+
+    # Make 1 model private
+    disable_authorization_checks do
+      @assay_asset5.asset.policy.update!(access_type: Policy::NO_ACCESS)
+    end
+    included, excluded = Seek::ResearchObjects::Generator.new(inv.reload).included_items
+    inc = included.group_by { |a| a.class.name }
+    exc = excluded.group_by { |a| a.class.name }
+    assert_equal 2, inc['Model'].count
+    assert_equal 1, exc['Model'].count
+
+    # Make study private, which should excluded all descendents
+    disable_authorization_checks do
+      inv.studies.first.policy.update!(access_type: Policy::NO_ACCESS)
+    end
+
+    included, excluded = Seek::ResearchObjects::Generator.new(inv.reload).included_items
+    inc = included.group_by { |a| a.class.name }
+    assert_equal 1, inc.delete('Investigation').count
+    assert_empty inc
+
+    exc = excluded.group_by { |a| a.class.name }
+    assert_equal 1, exc.delete('Study').count
+    assert_equal 2, exc.delete('Assay').count
+    assert_equal 1, exc.delete('Publication').count
+    assert_equal 2, exc.delete('Sop').count
+    assert_equal 1, exc.delete('DataFile').count
+    assert_equal 3, exc.delete('Model').count
+    assert_empty exc
+  end
+
   private
 
   def check_contents(file, inv)

@@ -34,17 +34,14 @@ module Seek
         if rdf_repository_configured?
           Seek::Rdf::RdfRepository.instance.uris_of_items_related_to(self).each do |uri|
             begin
-              puts uri
               route = SEEK::Application.routes.recognize_path(uri)
-              puts route
               if !route.nil? && !route[:id].nil?
                 klass = route[:controller].singularize.camelize.constantize
-                puts klass
                 id = route[:id]
                 items << klass.find(id)
               end
-            rescue Exception => e
-              puts e
+            rescue ActionController::RoutingError => e
+              Rails.logger.info('Error determining route, probably not a resource', e)
             end
           end
         end

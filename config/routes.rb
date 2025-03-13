@@ -81,7 +81,7 @@ SEEK::Application.routes.draw do
   end
 
   concern :has_snapshots do
-    resources :snapshots, only: [:show, :new, :create, :destroy], concerns: [:has_doi] do
+    resources :snapshots, concerns: [:has_doi] do
       member do
         get :download
         get :export, action: :export_preview
