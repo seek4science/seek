@@ -12,9 +12,6 @@ class Institution < ApplicationRecord
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
 
-
-  validates :ror_id, uniqueness: true, allow_blank: true
-
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
   has_many :programmes, -> { distinct }, through: :projects, inverse_of: :institutions
