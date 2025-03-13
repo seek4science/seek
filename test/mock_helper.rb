@@ -104,50 +104,12 @@ module MockHelper
   end
 
   def ror_mock
-    stub_request(:get, "https://api.ror.org/organizations/00h69cf80")
+    file_path = "#{Rails.root}/test/fixtures/files/mocking/ror_response.json"
+    stub_request(:get, "https://api.ror.org/organizations/027m9bs27")
       .to_return(
         status: 200,
-        body: {
-          id: "https://ror.org/00h69cf80",
-          name: "Hyogo Institute for Traumatic Stress",
-          email_address: nil,
-          ip_addresses: [],
-          established: 2004,
-          types: ["Healthcare"],
-          relationships: [],
-          addresses: [
-            {
-              lat: 34.6913,
-              lng: 135.183,
-              state: nil,
-              state_code: nil,
-              city: "Kobe",
-              geonames_city: {
-                id: 1859171,
-                city: "Kobe",
-                geonames_admin1: { name: "Hyōgo", code: "JP.28" },
-                license: {
-                  attribution: "Data from geonames.org under a CC-BY 3.0 license",
-                  license: "http://creativecommons.org/licenses/by/3.0/"
-                }
-              },
-              primary: false,
-              line: nil,
-              country_geonames_id: nil
-            }
-          ],
-          links: ["http://www.j-hits.org/english/"],
-          acronyms: ["HITS"],
-          status: "active",
-          wikipedia_url: nil,
-          country: { country_name: "Japan", country_code: "JP" },
-          external_ids: {
-            ISNI: { all: ["0000 0004 0466 6360"] },
-            GRID: { preferred: "grid.474282.f", all: "grid.474282.f" }
-          }
-        }.to_json,
+        body: File.read(file_path),
         headers: { 'Content-Type' => 'application/json' }
       )
-
   end
 end
