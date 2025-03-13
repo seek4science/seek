@@ -925,6 +925,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.integer "avatar_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
+    t.string "ror_id"
   end
 
   create_table "investigation_auth_lookup", force: :cascade do |t|

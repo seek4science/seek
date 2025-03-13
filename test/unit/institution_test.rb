@@ -1,7 +1,14 @@
 require 'test_helper'
 
 class InstitutionTest < ActiveSupport::TestCase
+
+  include MockHelper
+
   fixtures :institutions, :projects, :work_groups, :users, :group_memberships, :people
+
+  def setup
+    ror_mock
+  end
   # Replace this with your real tests.
 
   def test_delete_inst_deletes_workgroup
@@ -70,6 +77,7 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
+
     i = FactoryBot.create(:institution)
     assert i.valid?
 
@@ -110,6 +118,23 @@ class InstitutionTest < ActiveSupport::TestCase
 
     i.web_page = 'http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110'
     assert i.valid?
+
+    i.ror_id='027m9bs27'
+    assert i.valid?
+
+    i.ror_id = ''
+    assert i.valid?
+
+    i.ror_id = '1121'
+    assert !i.valid?
+
+    i.ror_id = '1121-1121-1121'
+    assert !i.valid?
+
+    #duplicate ror_id
+    existing_institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
+    new_institution = FactoryBot.build(:institution, ror_id: existing_institution.ror_id)
+    assert_not new_institution.valid?
   end
 
   test 'test uuid generated' do
@@ -235,4 +260,20 @@ class InstitutionTest < ActiveSupport::TestCase
     institution.reload
     assert_equal 'DE',institution.country
   end
+
+  test 'fetch_ror_details is called before validation' do
+    institution = Institution.new(ror_id: '027m9bs27')
+    institution.valid?
+    assert_equal 'University of Manchester', institution.title
+    assert_equal 'Manchester', institution.city
+    assert_equal 'GB', institution.country
+    assert_equal 'http://www.manchester.ac.uk/', institution.web_page
+  end
+
+  test 'fetch_ror_details adds error if ROR ID is invalid' do
+    institution = Institution.new(ror_id: 'invalid_id')
+    institution.valid?
+    assert_includes institution.errors[:ror_id], "'invalid_id' is not a valid ROR ID"
+  end
+
 end
