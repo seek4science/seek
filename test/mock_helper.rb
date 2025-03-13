@@ -111,5 +111,14 @@ module MockHelper
         body: File.read(file_path),
         headers: { 'Content-Type' => 'application/json' }
       )
+
+    stub_request(:get, "https://api.ror.org/organizations/invalid_id")
+      .to_return(
+        status: 400,
+        body: {
+          errors: ["'invalid_id' is not a valid ROR ID"]
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )
   end
 end

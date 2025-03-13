@@ -5,6 +5,10 @@ class InstitutionTest < ActiveSupport::TestCase
   include MockHelper
 
   fixtures :institutions, :projects, :work_groups, :users, :group_memberships, :people
+
+  def setup
+    ror_mock
+  end
   # Replace this with your real tests.
 
   def test_delete_inst_deletes_workgroup
@@ -73,7 +77,7 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    ror_mock
+
     i = FactoryBot.create(:institution)
     assert i.valid?
 
@@ -256,4 +260,20 @@ class InstitutionTest < ActiveSupport::TestCase
     institution.reload
     assert_equal 'DE',institution.country
   end
+
+  test 'fetch_ror_details is called before validation' do
+    institution = Institution.new(ror_id: '027m9bs27')
+    institution.valid?
+    assert_equal 'University of Manchester', institution.title
+    assert_equal 'Manchester', institution.city
+    assert_equal 'GB', institution.country
+    assert_equal 'http://www.manchester.ac.uk/', institution.web_page
+  end
+
+  test 'fetch_ror_details adds error if ROR ID is invalid' do
+    institution = Institution.new(ror_id: 'invalid_id')
+    institution.valid?
+    assert_includes institution.errors[:ror_id], "'invalid_id' is not a valid ROR ID"
+  end
+
 end
