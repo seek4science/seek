@@ -34,6 +34,8 @@
         let switchFormTarget = function () {
             let form = $j('#new_sample_type');
             let id = $j('.tab-pane.active', form)[0].id;
+            $j('.tab-pane :input', form).attr('disabled', true);
+            $j('.tab-pane.active :input', form).attr('disabled', false);
 
             if (id == 'from-template') {
                 form[0].action = '<%= create_from_template_sample_types_path -%>';
