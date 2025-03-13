@@ -174,4 +174,25 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal 0, sample.datasets.count
   end
 
+  test 'candidates_for_extended_metadata and validate generated json' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
+    assert_equal 4, candidates.count
+    assert_equal %w[Investigation Study ObservationUnit Assay], candidates.collect(&:type_name)
+    candidates.each do |candidate|
+      assert_nothing_raised do
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
+      end
+    end
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
+    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
+    assert_equal 2, candidates.count
+    assert_equal %w[Study Assay], candidates.collect(&:type_name)
+    candidates.each do |candidate|
+      assert_nothing_raised do
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
+      end
+    end
+  end
 end
