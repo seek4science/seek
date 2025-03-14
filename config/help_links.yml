@@ -31,7 +31,7 @@ Document: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Presentation: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Event: https://docs.seek4science.org/help/user-guide/general-attributes.html#events
 clipboard_api_mozilla: https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
-ExtendedMetadataType: https://docs.seek4science.org/tech/extended-metadata
-extended_metadata_technical_overview: https://github.com/seek4science/seek-documentation/blob/gh-pages-extended_metadata-type/tech/extended_metadata/extended-metadata-type.md
-extended_metadata_type_json_schema: https://github.com/seek4science/seek-documentation/blob/gh-pages-extended_metadata-type/tech/extended_metadata/extended_metadata_type_schema.json
-extended_metadata_type_example: https://github.com/seek4science/seek-documentation/blob/gh-pages-extended_metadata-type/tech/extended_metadata/a-complete-example.md
+ExtendedMetadataType: https://docs.seek4science.org/tech/extended-metadata/extended-metadata-type.html
+extended_metadata_technical_overview: https://docs.seek4science.org/tech/extended-metadata/extended-metadata-type.html
+extended_metadata_type_json_schema: https://docs.seek4science.org/tech/extended-metadata/extended-metadata-type-schema.json
+extended_metadata_type_example: https://docs.seek4science.org/tech/extended-metadata/a-complete-example.html
