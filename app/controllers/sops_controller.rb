@@ -63,9 +63,11 @@ class SopsController < ApplicationController
 
     query = params[:query] || ''
     asset = if study_id.present?
-              Study.authorized_for('view').detect { |study| study.id.to_s == study_id.to_s }
+              study = Study.includes(:sops).find(study_id)
+              study if study&.can_view?
             else
-              Assay.authorized_for('view').detect { |assay| assay.id.to_s == assay_id.to_s }
+              assay = Assay.includes(:sops).find(assay_id)
+              assay if assay&.can_view?
             end
 
     sops = asset&.sops || []
