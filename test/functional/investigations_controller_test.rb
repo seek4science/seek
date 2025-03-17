@@ -1435,7 +1435,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     FactoryBot.create(:fairdata_test_case_study_extended_metadata)
     FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
     FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
-    FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
     FactoryBot.create(:experimental_assay_class)
 
     contributor = FactoryBot.create(:person)
