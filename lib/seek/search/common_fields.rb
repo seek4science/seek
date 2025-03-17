@@ -33,8 +33,8 @@ module Seek
 
           private 
 
-          def strip_markdown text
-            Commonmarker.parse(text || '').to_plaintext
+          def strip_markdown(text)
+            Seek::Markdown.render(text || '')
           end
         end
       end
