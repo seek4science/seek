@@ -2193,12 +2193,33 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal results.count, 5
 
 
-    # Query '1'
-    # assay_id is 'null'
-    # Should return 2 sops linked to study: nr. 1 and 10 like before
-    get :dynamic_table_typeahead, params: { study_id: study.id, assay_id: 'null', query: '1' }, format: :json
-    results = JSON.parse(response.body)['results']
-    assert_equal results.count, 2
+    # Query ''
+    # assay_id and study_id are 'null'
+    # Should return an error
+    get :dynamic_table_typeahead, params: { study_id: 'null', assay_id: 'null', query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "Invalid parameters! Either study id 'null' or assay id 'null' must be a valid id."
+
+    # Query ''
+    # study_id is unexisting id and assay_id is 'undefined'
+    # Should return an error
+    random_study_id = (Study.last.id + 15653).to_s
+    get :dynamic_table_typeahead, params: { study_id: random_study_id, assay_id: 'undefined', query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "Couldn't find Study with 'id'=#{random_study_id}"
+
+    # Query ''
+    # study_id is 'undefined' id and assay_id is not permitted to be viewed
+    # Should return an error
+    random_person = FactoryBot.create(:person)
+    login_as(random_person)
+    get :dynamic_table_typeahead, params: { study_id: 'undefined', assay_id: assay.id, query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "No asset could be linked to the provided parameters. Make sure you have at least viewing permission for assay ID '#{assay.id}'."
+
   end
 
   private

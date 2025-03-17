@@ -59,7 +59,10 @@ class SopsController < ApplicationController
   def dynamic_table_typeahead
     study_id = params[:study_id] if params[:study_id].present? && !%w[null undefined].include?(params[:study_id].to_s)
     assay_id = params[:assay_id] if params[:assay_id].present? && !%w[null undefined].include?(params[:assay_id].to_s)
-    return if study_id.blank? && assay_id.blank?
+
+    if study_id.blank? && assay_id.blank?
+      raise "Invalid parameters! Either study id '#{params[:study_id]}' or assay id '#{params[:assay_id]}' must be a valid id."
+    end
 
     query = params[:query] || ''
     asset = if study_id.present?
@@ -70,12 +73,18 @@ class SopsController < ApplicationController
               assay if assay&.can_view?
             end
 
-    sops = asset&.sops || []
+    raise "No asset could be linked to the provided parameters. Make sure you have at least viewing permission for #{study_id.present? ? "study ID '#{study_id}'" : "assay ID '#{assay_id}'."}" if asset.nil?
+
+    sops = asset.sops || []
     filtered_sops = sops.select { |sop| sop.title&.downcase&.include?(query.downcase) }
     items = filtered_sops.collect { |sop| { id: sop.id, text: sop.title } }
 
     respond_to do |format|
       format.json { render json: { results: items }.to_json }
+    end
+  rescue Exception=>e
+    respond_to do |format|
+      format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
 
