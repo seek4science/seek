@@ -116,14 +116,14 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     sample = inv.studies.first.observation_units.first.samples.first
 
     assert_nil sample.find_exact_matching_sample_type
-    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title: 'partial matching', policy: FactoryBot.create(:public_policy))
+    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title: 'partial matching')
     assert partial_sample_type.can_view?
     partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
     partial_sample_type.reload
     assert_equal 5, partial_sample_type.sample_attributes.count
     assert_nil sample.find_exact_matching_sample_type
 
-    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:public_policy))
+    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type)
     assert exact_match.can_view?
     assert_equal exact_match, sample.find_exact_matching_sample_type
   end
@@ -169,14 +169,14 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     refute private_sample_type.can_view?
     #    assert_nil sample.find_closest_matching_sample_type
 
-    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:public_policy))
+    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
     assert partial_sample_type.can_view?
     partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
     partial_sample_type.reload
     assert_equal 5, partial_sample_type.sample_attributes.count
     #  assert_equal partial_sample_type, sample.find_closest_matching_sample_type
 
-    less_close_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:public_policy))
+    less_close_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
     assert less_close_sample_type.can_view?
     less_close_sample_type.sample_attributes.delete(less_close_sample_type.sample_attributes.last)
     less_close_sample_type.sample_attributes.delete(less_close_sample_type.sample_attributes.last)

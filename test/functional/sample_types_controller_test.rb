@@ -514,7 +514,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'create from fair data station ttl ignore private exact match' do
-    private_matching_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    private_matching_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
     refute private_matching_sample_type.can_view?
     blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
     FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
