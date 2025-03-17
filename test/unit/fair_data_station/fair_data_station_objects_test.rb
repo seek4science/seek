@@ -2,37 +2,6 @@ require 'test_helper'
 
 # test the objects that represent Inv, Study, Obs Unit, Sample and Assay
 class FairDataStationObjectsTest < ActiveSupport::TestCase
-  test 'find closest matching extended metadata type' do
-    virtual_demo_assay = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
-    seek_test_case_assay = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
-    FactoryBot.create(:simple_assay_extended_metadata_type)
-    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
-    FactoryBot.create(:simple_observation_unit_extended_metadata_type)
-    Seek::FairDataStation::Writer.new
-
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
-    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    assay = inv.studies.first.assays.first
-    ::Assay.new
-    detected_type = assay.find_closest_matching_extended_metadata_type
-    assert_equal seek_test_case_assay, detected_type
-
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
-    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    assay = inv.studies.first.assays.first
-    detected_type = assay.find_closest_matching_extended_metadata_type
-    assert_equal virtual_demo_assay, detected_type
-
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
-    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    obs_unit = inv.studies.first.observation_units.first
-    detected_type = obs_unit.find_closest_matching_extended_metadata_type
-    assert_nil detected_type
-
-    inpensim_obs_unit = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
-    detected_type = obs_unit.find_closest_matching_extended_metadata_type
-    assert_equal inpensim_obs_unit, detected_type
-  end
 
   test 'get annotation details' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
@@ -147,13 +116,83 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     sample = inv.studies.first.observation_units.first.samples.first
 
     assert_nil sample.find_exact_matching_sample_type
-    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title: 'partial matching')
+    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title: 'partial matching', policy: FactoryBot.create(:public_policy))
+    assert partial_sample_type.can_view?
     partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
     partial_sample_type.reload
     assert_equal 5, partial_sample_type.sample_attributes.count
     assert_nil sample.find_exact_matching_sample_type
 
-    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:public_policy))
+    assert exact_match.can_view?
     assert_equal exact_match, sample.find_exact_matching_sample_type
+  end
+
+  test 'find closest matching extended metadata type' do
+    virtual_demo_assay = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
+    seek_test_case_assay = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:simple_assay_extended_metadata_type)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:simple_observation_unit_extended_metadata_type)
+    Seek::FairDataStation::Writer.new
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    assay = inv.studies.first.assays.first
+    ::Assay.new
+    detected_type = assay.find_closest_matching_extended_metadata_type
+    assert_equal seek_test_case_assay, detected_type
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    assay = inv.studies.first.assays.first
+    detected_type = assay.find_closest_matching_extended_metadata_type
+    assert_equal virtual_demo_assay, detected_type
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    obs_unit = inv.studies.first.observation_units.first
+    detected_type = obs_unit.find_closest_matching_extended_metadata_type
+    assert_nil detected_type
+
+    inpensim_obs_unit = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
+    detected_type = obs_unit.find_closest_matching_extended_metadata_type
+    assert_equal inpensim_obs_unit, detected_type
+  end
+
+  test 'find closest matching sample type' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+
+    private_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
+    refute private_sample_type.can_view?
+    #    assert_nil sample.find_closest_matching_sample_type
+
+    partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:public_policy))
+    assert partial_sample_type.can_view?
+    partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
+    partial_sample_type.reload
+    assert_equal 5, partial_sample_type.sample_attributes.count
+    #  assert_equal partial_sample_type, sample.find_closest_matching_sample_type
+
+    less_close_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:public_policy))
+    assert less_close_sample_type.can_view?
+    less_close_sample_type.sample_attributes.delete(less_close_sample_type.sample_attributes.last)
+    less_close_sample_type.sample_attributes.delete(less_close_sample_type.sample_attributes.last)
+    less_close_sample_type.reload
+    assert_equal 4, less_close_sample_type.sample_attributes.count
+
+    assert_equal partial_sample_type, sample.find_closest_matching_sample_type
+  end
+
+  test 'find_exact_matching_sample_type dont pick if private' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+
+    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
+    refute exact_match.can_view?
+    assert_nil sample.find_exact_matching_sample_type
   end
 end

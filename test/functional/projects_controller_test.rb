@@ -5250,7 +5250,7 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'import from fairdata station ttl' do
 
     person = FactoryBot.create(:person)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type, policy: FactoryBot.create(:public_policy))
     project = person.projects.first
     another_person = FactoryBot.create(:person)
     login_as(person)
