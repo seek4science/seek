@@ -2208,7 +2208,7 @@ class SopsControllerTest < ActionController::TestCase
     get :dynamic_table_typeahead, params: { study_id: random_study_id, assay_id: 'undefined', query: '' }, format: :json
     assert_response :unprocessable_entity
     results = JSON.parse(response.body)['error']
-    assert_equal results, "Couldn't find Study with 'id'=#{random_study_id}"
+    assert_equal results, "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for study ID '#{random_study_id}'."
 
     # Query ''
     # study_id is 'undefined' id and assay_id is not permitted to be viewed
@@ -2218,7 +2218,7 @@ class SopsControllerTest < ActionController::TestCase
     get :dynamic_table_typeahead, params: { study_id: 'undefined', assay_id: assay.id, query: '' }, format: :json
     assert_response :unprocessable_entity
     results = JSON.parse(response.body)['error']
-    assert_equal results, "No asset could be linked to the provided parameters. Make sure you have at least viewing permission for assay ID '#{assay.id}'."
+    assert_equal results, "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for assay ID '#{assay.id}'."
 
   end
 

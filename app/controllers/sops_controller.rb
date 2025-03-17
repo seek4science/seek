@@ -66,14 +66,14 @@ class SopsController < ApplicationController
 
     query = params[:query] || ''
     asset = if study_id.present?
-              study = Study.includes(:sops).find(study_id)
+              study = Study.includes(:sops).find_by_id(study_id)
               study if study&.can_view?
             else
-              assay = Assay.includes(:sops).find(assay_id)
+              assay = Assay.includes(:sops).find_by_id(assay_id)
               assay if assay&.can_view?
             end
 
-    raise "No asset could be linked to the provided parameters. Make sure you have at least viewing permission for #{study_id.present? ? "study ID '#{study_id}'" : "assay ID '#{assay_id}'."}" if asset.nil?
+    raise "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for #{study_id.present? ? "study ID '#{study_id}'." : "assay ID '#{assay_id}'."}" if asset.nil?
 
     sops = asset.sops || []
     filtered_sops = sops.select { |sop| sop.title&.downcase&.include?(query.downcase) }
