@@ -516,4 +516,12 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal [sample1, sample2].sort_by(&:id), df_ext_attr.related_samples.sort_by(&:id)
   end
 
+  test 'search field formatting methods' do
+    df = FactoryBot.create(:data_file, description: 'Hello\nWorld\n\n> quote')
+    FactoryBot.create(:tag, annotatable: df, source: df.contributor, value: 'aaa')
+    FactoryBot.create(:tag, annotatable: df, source: df.contributor, value: 'bbb')
+    assert_equal "<p>Hello\\nWorld\\n\\n&gt; quote</p>", df.send(:strip_markdown, df.description)
+    assert_equal ['aaa', 'bbb'], df.send(:searchable_tags)
+  end
+
 end
