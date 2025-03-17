@@ -12,20 +12,16 @@ module Seek
       end
 
       def find_closest_matching_sample_type(property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
-        # group sample_type_ids by the number of matching attributes
-        groups = SampleAttribute.select(:sample_type_id).where(pid: property_ids).group(:sample_type_id).count
-
-        # pick those with the max number of matches
-        max = groups.values.max
-        sample_type_ids = groups.filter { |_id, matches| matches == max }.keys
-
-        # pick the candidate that has the least number of mismatched attributes
-        candidates = sample_type_ids.collect do |sample_type_id|
-          sample_type = SampleType.find(sample_type_id)
-          ids = sample_type.sample_attributes.collect(&:pid)
-          score = (ids - property_ids).length
-          [score, sample_type]
-        end.sort_by { |x| x[0] }
+        candidates = SampleType.includes(:sample_attributes).authorized_for(:view).collect do |sample_type|
+          sample_type_property_ids = sample_type.sample_attributes.collect(&:pid).compact_blank
+          intersection = (property_ids & sample_type_property_ids)
+          difference = (property_ids | sample_type_property_ids) - intersection
+          emt = nil if intersection.empty?
+          [intersection.length, difference.length, sample_type]
+        end.sort_by do |x|
+          # order by the number of properties matched coming top, but downgraded by the number of differences
+          [-x[0], x[1]]
+        end
 
         candidates.first&.last
       end
