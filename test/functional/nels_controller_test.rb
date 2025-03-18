@@ -231,7 +231,32 @@ class NelsControllerTest < ActionController::TestCase
       assert_response :success
       json = JSON.parse(@response.body)
       assert_equal 'pegion.png', json['filename']
-      assert json['file_path'].start_with?('/tmp/nels-download-')
+      refute_nil json['file_key']
+      path = "/tmp/nels-download-#{json['file_key']}"
+      assert File.exist?(path)
+      File.delete(path)
+    end
+  end
+
+  test 'fetch file valid key' do
+    key = UUID.generate
+    path = "/tmp/nels-download-#{key}"
+    file = File.new(path, 'wb')
+    file.write('wibble')
+    file.close
+    assert File.exist?(path)
+    get :fetch_file, params: {filename:'wibble.txt', file_key: key}
+    assert_response :success
+    assert_equal 'wibble', @response.body
+    assert_equal "attachment; filename=\"wibble.txt\"; filename*=UTF-8''wibble.txt", @response.header['Content-Disposition']
+    refute File.exist?(path)
+  end
+
+  test 'fetch file invalid key' do
+    key = UUID.generate
+
+    assert_raises Nels::Rest::Client::FetchFileError, match: /temp copy of file doesnt exist/ do
+      get :fetch_file, params: {filename:'wibble.txt', file_key: key}
     end
   end
 

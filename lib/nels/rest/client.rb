@@ -244,7 +244,7 @@ module Nels
         download_url = response['url']
         Rails.logger.info("Download url: #{download_url}")
 
-        tmp_file = Tempfile.new('nels-download-')
+        tmp_file = File.new("/tmp/nels-download-#{UUID.generate}", 'wb')
         URI.open(download_url) do |stream|
           File.open(tmp_file.path, 'wb') do |file|
             file.write(stream.read)
