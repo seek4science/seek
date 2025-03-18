@@ -23,6 +23,9 @@
     <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
     <%= button_link_to("Asset report", 'report', asset_report_project_path(item), 'data-tooltip' => tooltip(tooltip_text)) -%>
 <% end -%>
+<% if show_nels_button_for_project?(item) %>
+  <%= button_link_to('Explore NeLS data', 'nels_logo_small', nels_path()) %>
+<% end %>
 
 <% if request_join_project_button_enabled?(item) %>
     <span id="request_membership_button">
