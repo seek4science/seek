@@ -148,7 +148,8 @@ class NelsController < ApplicationController
     unless key =~ /^[0-9a-z-]+$/
       raise Nels::Rest::Client::FetchFileError, 'Invalid file key'
     end
-    path = File.join("/tmp","nels-download-#{key}")
+    sanitized_key = key.gsub(/[^0-9a-z-]/, '')
+    path = File.join("/tmp", "nels-download-#{sanitized_key}")
     raise Nels::Rest::Client::FetchFileError, 'temp copy of file doesnt exist' unless File.exist?(path)
 
     # send_data blocks and allows the file to be cleaned up afterwards
