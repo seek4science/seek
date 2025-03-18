@@ -132,8 +132,6 @@ module Nels
             end
           end
         end
-
-        expected_folder = File.join(current_path, new_folder)
       end
 
       # UPLOAD FILE FLOW

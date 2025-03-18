@@ -126,7 +126,10 @@ class NelsRestClientTest < ActiveSupport::TestCase
 
   test 'create dataset' do
     VCR.use_cassette('nels/create_dataset') do
-      @rest_client.create_dataset(1_125_299, 225, 'test dataset', 'testing creating a dataset')
+      assert_nothing_raised do
+        res = @rest_client.create_dataset(1_125_299, 225, 'test dataset', 'testing creating a dataset')
+        assert_equal 200, res.code
+      end
     end
   end
 
@@ -138,7 +141,9 @@ class NelsRestClientTest < ActiveSupport::TestCase
     end
 
     VCR.use_cassette('nels/sbi_storage_list_create_folder') do
-      @rest_client.create_folder(1_125_299, 1_125_261, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/', 'test')
+      assert_nothing_raised do
+        @rest_client.create_folder(1_125_299, 1_125_261, 'Storebioinfo/seek_pilot3/Demo Dataset/Analysis/', 'test')
+      end
     end
 
   ensure
