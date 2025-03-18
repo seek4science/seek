@@ -242,7 +242,7 @@ module Nels
         download_url = response['url']
         Rails.logger.info("Download url: #{download_url}")
 
-        tmp_file = File.new("/tmp/nels-download-#{UUID.generate}", 'wb')
+        tmp_file = File.new(File.join("/tmp","nels-download-#{UUID.generate}"), 'wb')
 
         File.open(tmp_file.path, 'wb') do |file|
           block = proc { |response|
