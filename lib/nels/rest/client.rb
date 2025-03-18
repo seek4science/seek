@@ -245,11 +245,17 @@ module Nels
         Rails.logger.info("Download url: #{download_url}")
 
         tmp_file = File.new("/tmp/nels-download-#{UUID.generate}", 'wb')
-        URI.open(download_url) do |stream|
-          File.open(tmp_file.path, 'wb') do |file|
-            file.write(stream.read)
-          end
+
+        File.open(tmp_file.path, 'wb') do |file|
+          block = proc { |response|
+            response.read_body do |chunk|
+              file.write chunk
+            end
+          }
+          RestClient::Request.execute(:method => :get, :url => download_url, block: block)
         end
+
+
         [file_name, tmp_file.path]
       end
 
