@@ -129,7 +129,7 @@ class ProjectsController < ApplicationController
     validation_error_msg=nil;
 
     if params[:accept_request]=='1'
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
 
       if @institution.id
@@ -184,7 +184,7 @@ class ProjectsController < ApplicationController
     raise 'no projects defined' if @projects.empty?
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
@@ -228,10 +228,20 @@ class ProjectsController < ApplicationController
     proj_params = params.require(:project).permit([:title, :web_page, :description])
     @project = Project.new(proj_params)
 
-    @institution = Institution.find_by_id(params[:institution][:id])
+
+    @institution = Institution.find_by_id(params[:institution][:id]) ||
+      (params[:institution][:ror_id].present? && Institution.find_by(ror_id: params[:institution][:ror_id])) ||
+      Institution.find_by(title: params[:institution][:title])
+
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:title, :web_page, :city, :country])
+      inst_params = params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
+    end
+
+    unless @institution.valid?
+      flash.now[:error] = "Institution is not valid: #{@institution.errors.full_messages.join(', ')}"
+      render action: :guided_create, status: :unprocessable_entity
+      return
     end
 
     # A Programme has been selected, or it is a Site Managed Programme
@@ -341,7 +351,7 @@ class ProjectsController < ApplicationController
     # Create institution
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
+      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
@@ -718,12 +728,11 @@ class ProjectsController < ApplicationController
 
   def respond_create_project_request
     requester = @message_log.sender
-
     if params['accept_request']=='1'
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
+        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id]))
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
@@ -784,7 +793,7 @@ class ProjectsController < ApplicationController
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country]))
+        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id]))
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
@@ -1091,10 +1100,15 @@ class ProjectsController < ApplicationController
     @project = details.project
     @institution = details.institution
     @people = details.people
+    if @institution&.new_record?
+      existing_institution =
+        if @institution.ror_id.present?
+          Institution.find_by(ror_id: @institution.ror_id)
+        elsif @institution.title.present?
+          Institution.find_by(title: @institution.title)
+        end
 
-    if @institution.new_record?
-      # override with existing institution if already exists with same title, it could have been created since the request was made
-      @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
+      @institution = existing_institution if existing_institution.present?
     end
   end
 

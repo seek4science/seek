@@ -63,7 +63,7 @@ module Seek
 
         def seek_id_uris
           values_for_property(:seekID, :literal).select do |uri|
-            valid = uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
+            valid = uri =~ URI::ABS_URI
             add_warning(:id_not_a_valid_uri, uri) unless valid || uri.blank?
             valid
           end

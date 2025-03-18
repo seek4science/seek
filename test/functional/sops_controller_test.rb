@@ -2184,6 +2184,42 @@ class SopsControllerTest < ActionController::TestCase
     get :dynamic_table_typeahead, params: { assay_id: assay.id, query: '12' }, format: :json
     results = JSON.parse(response.body)['results']
     assert_equal results.count, 0
+
+    # Query 'assay'
+    # study_id is 'undefined'
+    # Should return 5 sops linked to assay: nr. 16 to 20 like before
+    get :dynamic_table_typeahead, params: { study_id: 'undefined', assay_id: assay.id, query: 'assay' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 5
+
+
+    # Query ''
+    # assay_id and study_id are 'null'
+    # Should return an error
+    get :dynamic_table_typeahead, params: { study_id: 'null', assay_id: 'null', query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "Invalid parameters! Either study id 'null' or assay id 'null' must be a valid id."
+
+    # Query ''
+    # study_id is unexisting id and assay_id is 'undefined'
+    # Should return an error
+    random_study_id = (Study.last.id + 15653).to_s
+    get :dynamic_table_typeahead, params: { study_id: random_study_id, assay_id: 'undefined', query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for study ID '#{random_study_id}'."
+
+    # Query ''
+    # study_id is 'undefined' id and assay_id is not permitted to be viewed
+    # Should return an error
+    random_person = FactoryBot.create(:person)
+    login_as(random_person)
+    get :dynamic_table_typeahead, params: { study_id: 'undefined', assay_id: assay.id, query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for assay ID '#{assay.id}'."
+
   end
 
   private

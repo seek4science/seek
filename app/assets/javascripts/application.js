@@ -83,4 +83,4 @@
 //= require copasi/copasi_simulation
 //= require plotly-2.27.0.min
 //= require extended_metadata_type
-
+//= require institution-ror-typeahead

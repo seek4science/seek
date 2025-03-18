@@ -57,6 +57,11 @@ const typeaheadSopsUrl = "<%= dynamic_table_typeahead_sops_path(study_id: '__STU
 const typeaheadDataFilesUrl = "<%= typeahead_data_files_path %>";
 const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
 
+// Checking if settings are enabled
+const registeredSopsEnabled = <%= Seek::Config.sops_enabled %>;
+const registeredDataFilesEnabled = <%= Seek::Config.data_files_enabled %>;
+const registeredOrganismsEnabled = <%= Seek::Config.organisms_enabled %>;
+
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
   if (!e.is(":checked")) {
@@ -107,7 +112,22 @@ const handleSelect = (e) => {
         }
 
         if (isRegisteredSop) {
+            if (!registeredSopsEnabled) {
+                alert("A 'Registered SOP' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
+            }
             registeredSopUrl = typeaheadSopsUrl.replace('__STUDY_ID__', options.studyId).replace('__ASSAY_ID__', options.assayId);
+        }
+
+        if (isRegisteredDataFile) {
+            if (!registeredDataFilesEnabled) {
+                alert("A 'Registered Data File' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
+            }
+        }
+
+        if (isRegisteredStrain) {
+            if(!registeredOrganismsEnabled) {
+                alert("A 'Registered Strain' attribute has been detected but the 'organisms' setting has been disabled. Please contact the administrator to enable the setting.")
+            }
         }
 
         c["render"] = function(data_, type, full, meta) {

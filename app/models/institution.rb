@@ -5,7 +5,10 @@ class Institution < ApplicationRecord
 
   auto_strip_attributes :web_page
 
+  before_validation :fetch_ror_details, if: -> { ror_id.present? && ror_id_changed? }
+
   validates :title, uniqueness: true
+  validates :ror_id, uniqueness: true, allow_blank: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
 
@@ -53,4 +56,26 @@ class Institution < ApplicationRecord
       CountryCodes.country(country)
     end
   end
+
+  private
+
+  def fetch_ror_details
+
+    ror_client = Ror::Client.new
+    response = ror_client.fetch_by_id(ror_id)
+
+    if response[:error]
+      errors.add(:ror_id, response[:error])
+      return
+    end
+
+    self.title = response['name']
+    self.city = response.dig('addresses', 0, 'city')
+    self.country = response.dig('country', 'country_code')
+    self.web_page = response.dig('links', 0)
+
+  end
+
+
+
 end

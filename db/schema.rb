@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -925,6 +925,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.integer "avatar_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
+    t.string "ror_id"
   end
 
   create_table "investigation_auth_lookup", force: :cascade do |t|
@@ -2017,11 +2018,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_12_145346) do
     t.boolean "can_delete", default: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_strain_user_id_asset_id_can_view"
     t.index ["user_id", "can_view"], name: "index_strain_auth_lookup_on_user_id_and_can_view"
-  end
-
-  create_table "strain_descendants", id: false, force: :cascade do |t|
-    t.integer "ancestor_id"
-    t.integer "descendant_id"
   end
 
   create_table "strains", id: :integer, force: :cascade do |t|
