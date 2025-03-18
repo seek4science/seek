@@ -250,7 +250,7 @@ module Nels
               file.write chunk
             end
           }
-          RestClient::Request.execute(:method => :get, :url => download_url, block: block)
+          RestClient::Request.execute(:method => :get, :url => download_url, block_response: block)
         end
 
 
