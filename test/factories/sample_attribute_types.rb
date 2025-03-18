@@ -189,6 +189,18 @@ FactoryBot.define do
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'JSON',iri: 'http://edamontology.org/format_3464', parent_iri:'http://edamontology.org/format_1915')
     end
   end
+
+  factory(:disciplines_controlled_vocab, parent: :sample_controlled_vocab) do
+    title { 'Disciplines' }
+    ols_root_term_uris { 'http://disciplineontology.org/discipline_1' }
+    key { SampleControlledVocab::SystemVocabs.database_key_for_property(:disciplines) }
+    source_ontology { 'discipline' }
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Discipline', iri: 'http://disciplineontology.org/discipline_1', parent_iri:'')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Biology', iri: 'http://disciplineontology.org/discipline_2', parent_iri: 'http://disciplineontology.org/discipline_1')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Chemistry', iri: 'http://disciplineontology.org/discipline_3', parent_iri: 'http://disciplineontology.org/discipline_1')
+    end
+  end
   
   factory(:efo_ontology, class: SampleControlledVocab) do
     sequence(:title) { |n| "EFO ontology #{n}" }

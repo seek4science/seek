@@ -14,7 +14,7 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent
 
-  has_controlled_vocab_annotations :topics, :operations
+  has_controlled_vocab_annotations :topics, :operations, :disciplines
 
   validates :projects, presence: true, projects: { self: true }
 
@@ -285,5 +285,11 @@ class Workflow < ApplicationRecord
 
   def self.find_by_source_url(source_url)
     joins(:source_link).where('asset_links.url' => source_url)
+  end
+
+  def discipline_annotation_labels
+    mine = controlled_vocab_annotation_labels(:disciplines)
+    return projects.first.discipline_annotation_labels if mine.empty? && projects.first
+    mine
   end
 end

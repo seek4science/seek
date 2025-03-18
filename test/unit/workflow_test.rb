@@ -958,4 +958,30 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal 0, policy.permissions.count
     end
   end
+
+  test 'inherits discipline from project' do
+    FactoryBot.create(:disciplines_controlled_vocab) unless SampleControlledVocab::SystemVocabs.disciplines_controlled_vocab
+
+    workflow = FactoryBot.create(:workflow)
+    project = workflow.projects.first
+
+    assert_empty workflow.discipline_annotation_labels
+    assert_empty project.discipline_annotation_labels
+
+    User.with_current_user(workflow.contributor.user) do
+      project.discipline_annotations = 'Biology'
+      project.save!
+    end
+
+    assert_equal ['Biology'], project.discipline_annotation_labels
+    assert_equal ['Biology'], workflow.discipline_annotation_labels
+
+    User.with_current_user(workflow.contributor.user) do
+      workflow.discipline_annotations = 'Chemistry'
+      workflow.save!
+    end
+
+    assert_equal ['Biology'], project.discipline_annotation_labels
+    assert_equal ['Chemistry'], workflow.discipline_annotation_labels
+  end
 end
