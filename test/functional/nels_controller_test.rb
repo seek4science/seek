@@ -252,10 +252,18 @@ class NelsControllerTest < ActionController::TestCase
     refute File.exist?(path)
   end
 
-  test 'fetch file invalid key' do
+  test 'fetch file missing file' do
     key = UUID.generate
 
     assert_raises Nels::Rest::Client::FetchFileError, match: /temp copy of file doesnt exist/ do
+      get :fetch_file, params: {filename:'wibble.txt', file_key: key}
+    end
+  end
+
+  test 'fetch file invalid key' do
+    key = '18b6dbe0/../etc/passwd'
+
+    assert_raises Nels::Rest::Client::FetchFileError, match: /Invalid file key/ do
       get :fetch_file, params: {filename:'wibble.txt', file_key: key}
     end
   end

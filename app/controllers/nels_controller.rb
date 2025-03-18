@@ -146,6 +146,9 @@ class NelsController < ApplicationController
     key = params[:file_key]
     path = "/tmp/nels-download-#{key}"
 
+    unless key =~ /^[0-9a-z-]+$/
+      raise Nels::Rest::Client::FetchFileError, 'Invalid file key'
+    end
     raise Nels::Rest::Client::FetchFileError, 'temp copy of file doesnt exist' unless File.exist?(path)
 
     # send_data blocks and allows the file to be cleaned up afterwards
