@@ -21,7 +21,7 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="from-fair-ds-ttl">
         <div class="form-group">
-          <label class="required">FAIR Data Station Turtle(.ttl) file to upload</label>
+          <label class="required"><%= t('fair_data_station.upload_file_label') %></label>
           <div class="form-group">
             <%= file_field_tag "emt_fair_ds_ttl_file", accept: '.ttl', class: 'form-control' -%>
           </div>
