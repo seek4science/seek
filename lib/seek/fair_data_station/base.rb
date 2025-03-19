@@ -71,8 +71,8 @@ module Seek
         query = RDF::Query.new do
           pattern [RDF::Resource.new(property), RDF::RDFS.label, :label]
           pattern [RDF::Resource.new(property), RDF::Vocab::SCHEMA.description, :description], optional: true
-          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valuePattern, :pattern], optional: true
-          pattern [RDF::URI.new(property), RDF::Vocab::SCHEMA.valueRequired, :required], optional: true
+          pattern [RDF::Resource.new(property), RDF::Vocab::SCHEMA.valuePattern, :pattern], optional: true
+          pattern [RDF::Resource.new(property), RDF::Vocab::SCHEMA.valueRequired, :required], optional: true
         end
         solution = query.execute(graph).first
         if solution && solution[:label].present?
