@@ -2,7 +2,7 @@
 
 <%= form_tag submit_fairdata_station_investigation_path(@investigation), multipart: true do %>
 
-  <%= panel('FAIR Data Station turtle (ttl) metadata file') do %>
+  <%= panel(t('fair_data_station.upload_file_label')) do %>
 
     <%= file_field_tag "datastation_data", accept: '.ttl' -%>
 

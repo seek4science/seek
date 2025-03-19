@@ -17,30 +17,37 @@
     <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-template' -%>>
       <a href="#from-template" aria-controls="manual" role="tab" data-toggle="tab">Use spreadsheet template</a>
     </li>
+    <% if Seek::Config.fair_data_station_enabled %>
+        <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-fair-ds-ttl' -%>>
+          <a href="#from-fair-ds-ttl" aria-controls="manual" role="tab" data-toggle="tab">Use FAIR Data Station RDF</a>
+        </li>
+     <% end %>
   </ul>
 
   <%= render partial: 'sample_types/form', locals: { tab: tab } %>
 </div>
 
 <script>
-  $j(document).ready(function () {
-    // A function to switch the form action depending on which tab is selected.
-    // Also disables form elements in the hidden tab.
-    var switchFormTarget = function () {
-      var form = $j('#new_sample_type');
-      var id = $j('.tab-pane.active', form)[0].id;
-      $j('.tab-pane :input', form).attr('disabled', true);
-      $j('.tab-pane.active :input', form).attr('disabled', false);
+    $j(document).ready(function () {
+        // A function to switch the form action depending on which tab is selected.
+        // Also disables form elements in the hidden tab.
+        let switchFormTarget = function () {
+            let form = $j('#new_sample_type');
+            let id = $j('.tab-pane.active', form)[0].id;
+            $j('.tab-pane :input', form).attr('disabled', true);
+            $j('.tab-pane.active :input', form).attr('disabled', false);
 
-      if (id == 'from-template') {
-        form[0].action = '<%= create_from_template_sample_types_path -%>';
-      } else {
-        form[0].action = '<%= sample_types_path -%>';
-      }
-    };
+            if (id == 'from-template') {
+                form[0].action = '<%= create_from_template_sample_types_path -%>';
+            } else if (id == 'from-fair-ds-ttl') {
+                form[0].action = '<%= create_from_fair_ds_ttl_sample_types_path -%>';
+            } else {
+                form[0].action = '<%= sample_types_path -%>';
+            }
+        };
 
-    $j('#sample-type-tabs a[data-toggle="tab"]').on('shown.bs.tab', switchFormTarget);
+        $j('#sample-type-tabs a[data-toggle="tab"]').on('shown.bs.tab', switchFormTarget);
 
-    switchFormTarget();
-  });
+        switchFormTarget();
+    });
 </script>

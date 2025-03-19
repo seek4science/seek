@@ -19,6 +19,16 @@ module Seek
           inv
         end
       end
+
+      def candidates_for_extended_metadata(path)
+        inv = parse_graph(path).first
+        study = inv&.studies&.first
+        obs_unit = study&.observation_units&.first
+        assay = study&.assays&.first
+        [inv, study, obs_unit, assay].compact.select do |type|
+          type.all_additional_potential_annotation_predicates.any?
+        end
+      end
     end
   end
 end

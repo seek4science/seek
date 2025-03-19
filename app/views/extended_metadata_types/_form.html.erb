@@ -1,26 +1,61 @@
-<%= form_tag extended_metadata_types_path, method: "post", id: "extended_metadata_type_upload_from", multipart: true do -%>
-  <%= folding_panel("JSON file", false, body_options: { id: 'add_extended_metadata_type_file_fold_content'},
-                    help_text:  "Here you can upload #{t('extended_metadata_type')} JSON file to populate the #{t('extended_metadata_type').pluralize()}.") do %>
+<div>
+  <ul id="extended-metadata-type-tabs" class="nav nav-tabs" role="tablist">
+    <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-json' -%>>
+      <a href="#from-json" aria-controls="from-json" role="tab" data-toggle="tab">JSON file</a>
+    </li>
+    <% if Seek::Config.fair_data_station_enabled %>
+      <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-fair-ds-ttl' -%>>
+        <a href="#from-fair-ds-ttl" aria-controls="from-fair-ds-ttl" role="tab" data-toggle="tab">FAIR Data Station RDF file</a>
+      </li>
+    <% end %>
+  </ul>
+  <%= form_tag extended_metadata_types_path, method: "post", id: "extended_metadata_type_upload_from", multipart: true do %>
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="from-json">
+        <div class="form-group">
+          <label class="required">JSON file to upload</label>
 
-    <div role="tabpanel" data-role="seek-upload-field">
-      <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="upload-field-tab active">
-          <a data-role="seek-upload-field-tab" data-tab-target="local-file" role="tab" data-toggle="tab">Local file</a>
-        </li>
-      </ul>
-      <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
+            <%= file_field_tag "emt_json_file", accept: 'application/json', class: 'form-control' -%>
+
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="from-fair-ds-ttl">
+        <div class="form-group">
+          <label class="required"><%= t('fair_data_station.upload_file_label') %></label>
           <div class="form-group">
-            <%= file_field_tag "emt_json_file", accept: 'application/json' -%>
+            <%= file_field_tag "emt_fair_ds_ttl_file", accept: '.ttl', class: 'form-control' -%>
           </div>
         </div>
       </div>
     </div>
 
+    <input value="Upload" type="submit" class="btn btn-primary" >
+    or
+    <%= cancel_button admin_path-%>
+
   <% end %>
 
+</div>
 
-  <input value="Upload" type="submit" class="btn btn-primary" >
-  or
-  <%= cancel_button admin_path-%>
-<% end -%>
+<script>
+    $j(document).ready(function () {
+        // A function to switch the form action depending on which tab is selected.
+        // Also disables form elements in the hidden tab.
+        let switchFormTarget = function () {
+            let form = $j('#extended_metadata_type_upload_from');
+            let id = $j('.tab-pane.active', form)[0].id;
+            $j('.tab-pane :input', form).attr('disabled', true);
+            $j('.tab-pane.active :input', form).attr('disabled', false);
+
+            if (id == 'from-json') {
+                form[0].action = '<%= extended_metadata_types_path -%>';
+            } else if (id == 'from-fair-ds-ttl') {
+                form[0].action = '<%= create_from_fair_ds_ttl_extended_metadata_types_path -%>';
+            }
+        };
+
+        $j('#extended-metadata-type-tabs a[data-toggle="tab"]').on('shown.bs.tab', switchFormTarget);
+
+        switchFormTarget();
+    });
+</script>
