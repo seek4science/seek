@@ -72,11 +72,11 @@ gem 'open4'
 gem 'openid_connect'
 gem 'openseek-api'
 gem 'pg'
-gem 'private_address_check'# Rails 5 upgrade
+gem 'private_address_check'
 gem 'progress_bar'
 gem 'psych'
 gem 'puma'
-gem 'rack', '~> 2.2.13' # Rack 3 causes errors when running functional tests that call multiple actions in a single test
+gem 'rack'
 gem 'rack-attack'
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails-html-sanitizer'
