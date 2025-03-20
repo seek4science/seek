@@ -13,6 +13,9 @@ CellSys:
 copasi:
   title: Copasi
 
+morpheus:
+  title: Morpheus
+
 CPLEX:
   title: CPLEX Interactive Optimizer
 
