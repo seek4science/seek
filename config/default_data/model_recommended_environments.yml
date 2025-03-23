@@ -13,9 +13,6 @@ CellSys:
 copasi:
   title: Copasi
 
-morpheus:
-  title: Morpheus
-
 CPLEX:
   title: CPLEX Interactive Optimizer
 
@@ -48,6 +45,9 @@ MeVisLab:
 
 MoBi:
   title: MoBi
+
+morpheus:
+  title: Morpheus
 
 PathwayLab:
   title: PathwayLab
