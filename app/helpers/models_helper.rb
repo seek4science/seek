@@ -44,7 +44,7 @@ module ModelsHelper
   end
 
   def show_morpheus_button?
-    Seek::Config.morpheus_enabled && (@display_model.policy.access_type == Policy::ALL_USERS) && @display_model.is_morpheus_supported?
+    Seek::Config.morpheus_enabled && @display_model.is_morpheus_supported? && @display_model.is_downloadable? && @display_model.can_download?(nil)
   end
 
 end
