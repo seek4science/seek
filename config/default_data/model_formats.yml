@@ -7,9 +7,6 @@ CellML:
 Copasi:
   title: Copasi
 
-Morpheus:
-  title: Morpheus
-
 FieldML:
   title: FieldML
 
@@ -30,6 +27,9 @@ MathML:
 
 Matlab:
   title: Matlab package
+
+Morpheus:
+  title: Morpheus
 
 MFAML:
   title: MFAML
