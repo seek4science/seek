@@ -11,6 +11,6 @@
 <% if vocab %>
   <div class="form-group">
     <label><%= title -%></label>
-    <%= controlled_vocab_form_field(vocab, "#{resource.class.model_name.singular}[#{param_key}]", values, 10 ) -%>
+    <%= controlled_vocab_form_field(vocab, "#{resource.class.model_name.singular}[#{param_key}]", values, false, 10 ) -%>
   </div>
 <% end %>

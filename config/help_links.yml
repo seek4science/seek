@@ -21,7 +21,7 @@ Investigation: https://docs.seek4science.org/help/isa-guide.html
 Study: https://docs.seek4science.org/help/isa-guide.html
 Assay: https://docs.seek4science.org/help/isa-guide.html
 DataFile: https://docs.seek4science.org/help/user-guide/general-attributes.html#data-files
-Sop: https://docs.seek4science.org/help/user-guide/general-attributes.html#sops 
+Sop: https://docs.seek4science.org/help/user-guide/general-attributes.html#sops
 Publication: https://docs.seek4science.org/help/user-guide/general-attributes.html#publications
 Sample: https://docs.seek4science.org/help/user-guide/samples.html
 SampleType: https://docs.seek4science.org/help/user-guide/create-sample-type.html
@@ -30,3 +30,8 @@ Model: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Document: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Presentation: https://docs.seek4science.org/help/user-guide/adding-assets.html
 Event: https://docs.seek4science.org/help/user-guide/general-attributes.html#events
+clipboard_api_mozilla: https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
+ExtendedMetadataType: https://docs.seek4science.org/tech/extended-metadata/extended-metadata-type.html
+extended_metadata_technical_overview: https://docs.seek4science.org/tech/extended-metadata/extended-metadata-type.html
+extended_metadata_type_json_schema: https://docs.seek4science.org/tech/extended-metadata/extended-metadata-type-schema.json
+extended_metadata_type_example: https://docs.seek4science.org/tech/extended-metadata/a-complete-example.html

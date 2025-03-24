@@ -46,7 +46,7 @@ project_news_enabled:
 project_news_feed_urls:
 community_news_enabled:
 community_news_feed_urls:
-blacklisted_feeds:
+denylisted_feeds:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
@@ -60,15 +60,18 @@ copasi_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
 piwik_analytics_tracking_notice:
+custom_analytics_snippet_enabled:
+custom_analytics_snippet:
+custom_analytics_tracking_notice:
+custom_analytics_name:
 seek_video_link:
 scales:
 delete_asset_version_enabled:
 recaptcha_enabled:
-publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
-project_single_page_advanced_enabled:
-sample_type_template_enabled:
+isa_json_compliance_enabled:
+project_single_page_folders_enabled:
 experimental_features_enabled:
 pdf_conversion_enabled:
 admin_impersonation_enabled:
@@ -202,6 +205,7 @@ data_files_enabled:
 documents_enabled:
 events_enabled:
 isa_enabled:
+observation_units_enabled:
 models_enabled:
 organisms_enabled:
 programmes_enabled:
@@ -222,6 +226,7 @@ omniauth_elixir_aai_enabled:
 omniauth_elixir_aai_client_id:
 omniauth_elixir_aai_secret:
   encrypt: true
+omniauth_elixir_aai_legacy_mode:
 omniauth_ldap_enabled:
 omniauth_ldap_config:
   encrypt: true
@@ -229,16 +234,23 @@ omniauth_github_enabled:
 omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
+omniauth_oidc_enabled:
+omniauth_oidc_name:
+omniauth_oidc_image_id:
+omniauth_oidc_issuer:
+omniauth_oidc_client_id:
+omniauth_oidc_secret:
+  encrypt: true
 ga4gh_trs_api_enabled:
-custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i
 life_monitor_enabled:
 life_monitor_url:
 life_monitor_client_id:
 life_monitor_client_secret:
-galaxy_instance_name:
-galaxy_instance_trs_import_url:
+life_monitor_ui_url:
+galaxy_instance_default:
+galaxy_instance_trs_server:
 # Controlled vocabs
 cv_dropdown_limit:
   convert: :to_i
@@ -253,5 +265,12 @@ fair_signposting_enabled:
 bio_tools_enabled:
 require_cookie_consent:
 galaxy_tool_sources:
+metadata_license:
 regular_job_offset:
   convert: :to_i
+auto_activate_programmes:
+auto_activate_site_managed_projects:
+fair_data_station_enabled:
+sandbox_instance_url:
+sandbox_instance_name:
+scraper_config:

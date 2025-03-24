@@ -24,6 +24,11 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     assert regular
     assert_equal [RegularMaintenanceJob::RUN_PERIOD, { at: '1:00am' }], regular[:every]
 
+    # AuthLookupMaintenanceJob
+    auth = pop_task(runners, "AuthLookupMaintenanceJob.perform_later")
+    assert auth
+    assert_equal [AuthLookupMaintenanceJob::RUN_PERIOD, { at: '1:00am' }], auth[:every]
+
     # LifeMonitor status
     lm_status = pop_task(runners, "LifeMonitorStatusJob.perform_later")
     assert lm_status
@@ -48,6 +53,11 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     tool_map_refresh = pop_task(runners, "Galaxy::ToolMap.instance.refresh")
     assert tool_map_refresh
     assert_equal [1.day, { at: '3:00am' }], tool_map_refresh[:every]
+
+    # Data dumps
+    data_dump = pop_task(runners, 'Seek::BioSchema::DataDump.generate_dumps')
+    assert data_dump
+    assert_equal [1.day, { at: '12:10 am' }], data_dump[:every]
 
     assert_empty runners, "Found untested runner(s) in schedule"
   end

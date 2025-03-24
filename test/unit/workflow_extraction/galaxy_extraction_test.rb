@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GalaxyExtractionTest < ActiveSupport::TestCase
   setup do
-    @galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    @galaxy = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
   end
 
   test 'extracts metadata from Galaxy workflow file' do
@@ -73,5 +73,22 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
     metadata = extractor.metadata
 
     assert_equal [{ bio_tools_id: 'multiqc', name: 'MultiQC' }], metadata[:tools_attributes]
+  end
+
+  test 'extracts execution instance URL' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.ga",
+                     'http://galaxy.instance/api/workflows/abcdxyz/download?format=json-download'
+    git_version = FactoryBot.create(:git_version)
+    disable_authorization_checks do
+      git_version.add_remote_file('1-PreProcessing.ga', 'http://galaxy.instance/published/workflow?id=abcdxyz')
+      git_version.fetch_remote_file('1-PreProcessing.ga')
+      git_version.save!
+    end
+    remote_blob = git_version.get_blob('1-PreProcessing.ga')
+
+    extractor = Seek::WorkflowExtractors::Galaxy.new(remote_blob)
+    metadata = extractor.metadata
+
+    assert_equal 'http://galaxy.instance/', metadata[:execution_instance_url]
   end
 end

@@ -1,6 +1,6 @@
 <% sample.sample_type.sample_attributes.each do |attribute| %>
     <p>
-      <label><%= sample_attribute_display_title(attribute) %>:</label>
+      <label><%= sample_attribute_display_title(attribute) %> : </label>
       <%= display_attribute(sample, attribute, link: true) %>
     </p>
 <% end %>

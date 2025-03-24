@@ -14,9 +14,9 @@ module Seek
           identifier
         end
 
-        # the rdf indentifier for the resource, which is its URL
+        # the rdf identifier for the resource, which is its URL
         def identifier
-          rdf_resource
+          rdf_resource.to_s
         end
 
         # If the resource has an avatar, then returns the image url

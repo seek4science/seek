@@ -12,7 +12,7 @@ class NelsIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'fills metadata when registering a data file' do
-    @assay.investigation.projects << Factory(:project)
+    @assay.investigation.projects << FactoryBot.create(:project)
     projects = @assay.reload.projects
 
     assert_no_difference('DataFile.count') do

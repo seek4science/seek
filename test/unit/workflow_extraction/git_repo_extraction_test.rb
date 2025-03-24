@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GitRepoExtractionTest < ActiveSupport::TestCase
   test 'extracts metadata from CFF' do
-    workflow = Factory(:remote_git_workflow)
+    workflow = FactoryBot.create(:remote_git_workflow)
 
     gv = disable_authorization_checks do
       x = workflow.latest_git_version.next_version(name: 'cff', ref: 'refs/remotes/origin/cff',
@@ -43,5 +43,30 @@ class GitRepoExtractionTest < ActiveSupport::TestCase
     assert_equal 'University of Somewhere', third[:affiliation]
     assert third[:orcid].blank?
     assert_equal 2, third[:pos]
+  end
+
+  test 'extracts license from LICENSE file' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    git_version = workflow.git_version
+    disable_authorization_checks do
+      git_version.add_file('LICENSE', open_fixture_file('MIT-LICENSE'))
+      git_version.save!
+    end
+
+    extractor = Seek::WorkflowExtractors::GitRepo.new(workflow.git_version)
+    metadata = extractor.metadata
+
+    assert_equal 'MIT', metadata[:license]
+
+    git_version = workflow.git_version
+    disable_authorization_checks do
+      git_version.add_file('LICENSE', open_fixture_file('BSD-LICENSE'))
+      git_version.save!
+    end
+
+    extractor = Seek::WorkflowExtractors::GitRepo.new(workflow.git_version)
+    metadata = extractor.metadata
+
+    assert_equal 'BSD-3-Clause', metadata[:license]
   end
 end

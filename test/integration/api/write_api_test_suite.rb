@@ -28,7 +28,7 @@ module WriteApiTestSuite
     end
 
     assert_difference(-> { model.count }, -1) do
-      delete member_url(res)
+      delete member_url(res), headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
 
@@ -40,12 +40,12 @@ module WriteApiTestSuite
 
   test 'unauthorized user cannot update resource' do
     res = private_resource
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     body = api_max_post_body
     body["data"]["id"] = id.to_s
     body["data"]["attributes"]["title"] = "updated by an unauthorized"
 
-    patch member_url(res), params: body, as: :json
+    patch member_url(res), params: body, headers: { 'Authorization' => write_access_auth }
 
     assert_response :forbidden
     validate_json response.body, '#/components/schemas/forbiddenResponse'
@@ -53,9 +53,9 @@ module WriteApiTestSuite
 
   test 'unauthorized user cannot delete resource' do
     res = private_resource
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     assert_no_difference(-> { model.count }) do
-      delete member_url(res)
+      delete member_url(res), headers: { 'Authorization' => write_access_auth }
 
       assert_response :forbidden
       validate_json response.body, '#/components/schemas/forbiddenResponse'
@@ -67,7 +67,7 @@ module WriteApiTestSuite
     body['data']['id'] = '100000000'
 
     assert_no_difference(-> { model.count }) do
-      post collection_url, params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }, as: :json
 
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
@@ -80,7 +80,7 @@ module WriteApiTestSuite
     body['data']['type'] = 'wrong'
 
     assert_no_difference(-> { model.count }) do
-      post collection_url, params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       assert_match "The specified data:type does not match the URL's object (#{body['data']['type']} vs. #{plural_name})", response.body
@@ -92,7 +92,7 @@ module WriteApiTestSuite
     body['data'].delete('type')
 
     assert_no_difference(-> { model.count }) do
-      post collection_url, params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       assert_match "A POST/PUT request must specify a data:type", response.body
@@ -103,7 +103,7 @@ module WriteApiTestSuite
     body = load_template("patch_min_#{singular_name}.json.erb", id: '100000000')
 
     assert_no_difference(-> { model.count }) do
-      put member_url(resource), params: body, as: :json
+      put member_url(resource), params: body, headers: { 'Authorization' => write_access_auth }, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       assert_match "id specified by the PUT request does not match object-id in the JSON input", response.body
@@ -115,7 +115,7 @@ module WriteApiTestSuite
     body['data']['type'] = 'wrong'
 
     assert_no_difference(-> { model.count }) do
-      put member_url(resource), params: body, as: :json
+      put member_url(resource), params: body, headers: { 'Authorization' => write_access_auth }, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       assert_match "The specified data:type does not match the URL's object (#{body['data']['type']} vs. #{plural_name})", response.body
@@ -127,7 +127,7 @@ module WriteApiTestSuite
     body['data'].delete('type')
 
     assert_no_difference(-> { model.count }) do
-      put member_url(resource), params: body, as: :json
+      put member_url(resource), params: body, headers: { 'Authorization' => write_access_auth }, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       assert_match "A POST/PUT request must specify a data:type", response.body
@@ -138,7 +138,7 @@ module WriteApiTestSuite
     skip unless write_examples?
 
     template = load_template("post_max_#{singular_name}.json.erb")
-    post collection_url, params: template, as: :json
+    post collection_url, params: template, headers: { 'Authorization' => write_access_auth }, as: :json
     assert_response :success
 
     write_examples(JSON.pretty_generate(template), "#{singular_name.camelize(:lower)}Post.json")
@@ -149,7 +149,7 @@ module WriteApiTestSuite
     skip unless write_examples?
 
     template = load_template("patch_max_#{singular_name}.json.erb")
-    patch member_url(resource), params: template, as: :json
+    patch member_url(resource), params: template, headers: { 'Authorization' => write_access_auth }, as: :json
     assert_response :success
 
     write_examples(JSON.pretty_generate(template), "#{singular_name.camelize(:lower)}Patch.json")

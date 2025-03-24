@@ -7,7 +7,7 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.events_enabled
   end
   test 'jerm_disabled' do
-    assert !Seek::Config.jerm_enabled
+    refute Seek::Config.jerm_enabled
   end
   test 'solr enabled' do
     assert Seek::Config.solr_enabled
@@ -53,14 +53,14 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
-  test 'blacklisted feeds' do
-    Seek::Config.blacklisted_feeds = { 'http://google.com' => Time.parse('1 Sep 2014'), 'http://fish.com' => Time.parse('1 June 2014') }
-    assert_equal Time.parse('1 Sep 2014'), Seek::Config.blacklisted_feeds['http://google.com']
-    assert_equal Time.parse('1 June 2014'), Seek::Config.blacklisted_feeds['http://fish.com']
+  test 'denylisted feeds' do
+    Seek::Config.denylisted_feeds = { 'http://google.com' => Time.parse('1 Sep 2014'), 'http://fish.com' => Time.parse('1 June 2014') }
+    assert_equal Time.parse('1 Sep 2014'), Seek::Config.denylisted_feeds['http://google.com']
+    assert_equal Time.parse('1 June 2014'), Seek::Config.denylisted_feeds['http://fish.com']
   end
 
   test 'filestore_location' do
-    cb = Factory :content_blob
+    cb = FactoryBot.create :content_blob
 
     assert_equal 'tmp/testing-filestore', Seek::Config.filestore_path
     assert_equal "#{Rails.root}/tmp/testing-filestore/assets", Seek::Config.asset_filestore_path
@@ -136,7 +136,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'smtp_settings authentication' do
-    assert_equal :plain, Seek::Config.smtp_settings('authentication')
+    assert_equal '', Seek::Config.smtp_settings('authentication')
   end
   test 'noreply_sender' do
     assert_equal 'no-reply@sysmo-db.org', Seek::Config.noreply_sender
@@ -175,6 +175,16 @@ class ConfigTest < ActiveSupport::TestCase
   end
   test 'piwik_analytics_url' do
     assert_equal 'localhost/piwik/', Seek::Config.piwik_analytics_url
+  end
+
+  test 'custom_analytics_enabled' do
+    assert !Seek::Config.custom_analytics_snippet_enabled
+  end
+  test 'custom analytics name' do
+    assert_equal 'Custom name', Seek::Config.custom_analytics_name
+  end
+  test 'custom analytics snippet' do
+    assert_equal '<script id="custom-tracking-script"></script>', Seek::Config.custom_analytics_snippet
   end
 
   # homepage settings
@@ -399,10 +409,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'A new description', Seek::Config.registration_disabled_description
   end
 
-  test 'publish_button_enabled' do
-    assert Seek::Config.publish_button_enabled
-  end
-
   test 'recaptcha enabled' do
     assert Seek::Config.recaptcha_enabled
   end
@@ -481,8 +487,8 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'project-specific setting' do
-    many_bananas_project = Factory(:project)
-    no_bananas_project = Factory(:project)
+    many_bananas_project = FactoryBot.create(:project)
+    no_bananas_project = FactoryBot.create(:project)
     many_bananas_project.settings.set('banana_count', 10)
     no_bananas_project.settings.set('banana_count', 0)
 
@@ -491,7 +497,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'project-specific settings can be accessed in various ways' do
-    many_bananas_project = Factory(:project)
+    many_bananas_project = FactoryBot.create(:project)
     many_bananas_project.settings.set('banana_count', 10)
 
     assert_equal 10, many_bananas_project.settings.get('banana_count')
@@ -499,8 +505,8 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'project-specific settings do no conflict with global settings' do
-    many_bananas_project = Factory(:project)
-    no_bananas_project = Factory(:project)
+    many_bananas_project = FactoryBot.create(:project)
+    no_bananas_project = FactoryBot.create(:project)
     many_bananas_project.settings.set('banana_count', 10)
     Settings.global.set('banana_count', 5)
     no_bananas_project.settings.set('banana_count', 0)
@@ -601,8 +607,8 @@ class ConfigTest < ActiveSupport::TestCase
             config = Seek::Config.omniauth_elixir_aai_config
             assert_equal 'abc', config[:client_options][:identifier]
             assert_equal '123', config[:client_options][:secret]
-            assert_equal '/identities/auth/elixir_aai/callback', config[:callback_path]
-            assert_equal 'https://secure.website:3001/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+            assert_equal '/auth/elixir_aai/callback', config[:callback_path]
+            assert_equal 'https://secure.website:3001/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
           end
         end
       end
@@ -610,9 +616,28 @@ class ConfigTest < ActiveSupport::TestCase
     with_config_value(:site_base_host, 'http://localhost') do
       with_relative_root('/seeks/seek1') do
         config = Seek::Config.omniauth_elixir_aai_config
-        assert_equal '/seeks/seek1/identities/auth/elixir_aai/callback', config[:callback_path]
-        assert_equal 'http://localhost/seeks/seek1/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+        refute Seek::Config.omniauth_elixir_aai_legacy_mode
+        assert_equal '/seeks/seek1/auth/elixir_aai/callback', config[:callback_path]
+        assert_equal 'http://localhost/seeks/seek1/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+        assert_equal 'https://login.aai.lifescience-ri.eu/oidc/',config[:issuer]
+        with_config_value(:omniauth_elixir_aai_legacy_mode, true) do
+          assert Seek::Config.omniauth_elixir_aai_legacy_mode
+          config = Seek::Config.omniauth_elixir_aai_config
+          assert_equal '/seeks/seek1/identities/auth/elixir_aai/callback', config[:callback_path]
+          assert_equal 'http://localhost/seeks/seek1/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+          assert_equal 'https://login.elixir-czech.org/oidc/', config[:issuer]
+        end
       end
+    end
+  end
+
+  test 'templates enabled' do
+    with_config_value(:isa_json_compliance_enabled, false) do
+      refute Seek::Config.templates_enabled
+    end
+
+    with_config_value(:isa_json_compliance_enabled, true) do
+      assert Seek::Config.templates_enabled
     end
   end
 end

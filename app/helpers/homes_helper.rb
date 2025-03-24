@@ -200,7 +200,7 @@ module HomesHelper
       },
       {
         key: 'front_page_integration_ols',
-        url: 'https://www.ebi.ac.uk/ols/index',
+        url: "#{Ebi::OlsClient::ROOT_URL}",
         label: 'Ontologies'
       },
       {

@@ -4,7 +4,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'should get empty OAuth sessions lists' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     login_as(user)
 
     get :index, params: { user_id: user.id }
@@ -13,8 +13,8 @@ class OauthSessionsControllerTest < ActionController::TestCase
   end
 
   test "shouldn't get OAuth session list for other user" do
-    user = Factory(:user)
-    other_user = Factory(:user)
+    user = FactoryBot.create(:user)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     get :index, params: { user_id: user.id }
@@ -24,7 +24,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
   end
 
   test 'should list OAuth sessions' do
-    oauth_session = Factory(:oauth_session)
+    oauth_session = FactoryBot.create(:oauth_session)
     login_as(oauth_session.user)
 
     get :index, params: { user_id: oauth_session.user.id }
@@ -35,7 +35,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
   end
 
   test 'should delete OAuth session' do
-    oauth_session = Factory(:oauth_session)
+    oauth_session = FactoryBot.create(:oauth_session)
     user = oauth_session.user
     login_as(user)
 
@@ -47,8 +47,8 @@ class OauthSessionsControllerTest < ActionController::TestCase
   end
 
   test "shouldn't delete other users' OAuth session" do
-    oauth_session = Factory(:oauth_session)
-    other_user = Factory(:user)
+    oauth_session = FactoryBot.create(:oauth_session)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     assert_no_difference('OauthSession.count') do

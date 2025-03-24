@@ -1,13 +1,12 @@
 require 'test_helper'
 
 class TagsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
 
   fixtures :all
 
   def setup
-    login_as Factory(:user, person: Factory(:person))
+    login_as FactoryBot.create(:user, person: FactoryBot.create(:person))
   end
 
   test 'handles invalid tag id' do
@@ -18,9 +17,8 @@ class TagsControllerTest < ActionController::TestCase
     assert_redirected_to all_anns_path
   end
 
-
   test 'show for sample_type_tag' do
-    st = Factory(:simple_sample_type, contributor: User.current_user.person, tags: 'fish, peas')
+    st = FactoryBot.create(:simple_sample_type, contributor: User.current_user.person, tags: 'fish, peas')
     assert_equal 2, st.tags.count
     assert st.can_view?
 
@@ -33,8 +31,8 @@ class TagsControllerTest < ActionController::TestCase
   end
 
   test 'show for expertise tag' do
-    p = Factory :person
-    exp = Factory :expertise, value: 'golf', source: p.user, annotatable: p
+    p = FactoryBot.create :person
+    exp = FactoryBot.create :expertise, value: 'golf', source: p.user, annotatable: p
     get :show, params: { id: exp.value }
     assert_response :success
     assert_select 'div#notice_flash', text: /1 item tagged with 'golf'/, count: 1
@@ -44,8 +42,8 @@ class TagsControllerTest < ActionController::TestCase
   end
 
   test 'show for tools tag' do
-    p = Factory :person
-    tool = Factory :tool, value: 'spade', source: p.user, annotatable: p
+    p = FactoryBot.create :person
+    tool = FactoryBot.create :tool, value: 'spade', source: p.user, annotatable: p
     get :show, params: { id: tool.value }
     assert_response :success
     assert_select 'div.list_items_container' do
@@ -54,9 +52,9 @@ class TagsControllerTest < ActionController::TestCase
   end
 
   test 'show for general tag' do
-    df = Factory :data_file, policy: Factory(:public_policy)
-    private_df = Factory :data_file, policy: Factory(:private_policy)
-    tag = Factory :tag, value: 'a tag', source: User.current_user, annotatable: df
+    df = FactoryBot.create :data_file, policy: FactoryBot.create(:public_policy)
+    private_df = FactoryBot.create :data_file, policy: FactoryBot.create(:private_policy)
+    tag = FactoryBot.create :tag, value: 'a tag', source: User.current_user, annotatable: df
     get :show, params: { id: tag.value }
     assert_response :success
     assert_select 'div.list_items_container' do
@@ -66,20 +64,20 @@ class TagsControllerTest < ActionController::TestCase
   end
 
   test 'index' do
-    p = Factory :person
+    p = FactoryBot.create :person
 
-    df = Factory :data_file, contributor: p
-    df2 = Factory :data_file, contributor: p
-    p2 = Factory :person
-    tool = Factory :tool, value: 'fork', source: p.user, annotatable: p
-    exp = Factory :expertise, value: 'fishing', source: p.user, annotatable: p
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
+    df = FactoryBot.create :data_file, contributor: p
+    df2 = FactoryBot.create :data_file, contributor: p
+    p2 = FactoryBot.create :person
+    tool = FactoryBot.create :tool, value: 'fork', source: p.user, annotatable: p
+    exp = FactoryBot.create :expertise, value: 'fishing', source: p.user, annotatable: p
+    tag = FactoryBot.create :tag, value: 'twinkle', source: p.user, annotatable: df
 
     # to make sure tags only appear once
-    tag2 = Factory :tag, value: tag.value, source: p2.user, annotatable: df2
+    tag2 = FactoryBot.create :tag, value: tag.value, source: p2.user, annotatable: df2
 
     # to make sure only tools, tags and expertise are included
-    bogus = Factory :tag, value: 'frog', source: p.user, annotatable: df, attribute_name: 'bogus'
+    bogus = FactoryBot.create :tag, value: 'frog', source: p.user, annotatable: df, attribute_name: 'bogus'
 
     login_as p.user
     get :index
@@ -94,9 +92,9 @@ class TagsControllerTest < ActionController::TestCase
   end
 
   test 'dont show duplicates for same tag for expertise and tools' do
-    p = Factory :person
-    tool = Factory :tool, value: 'xxxxx', source: p.user, annotatable: p
-    exp = Factory :expertise, value: 'xxxxx', source: p.user, annotatable: p
+    p = FactoryBot.create :person
+    tool = FactoryBot.create :tool, value: 'xxxxx', source: p.user, annotatable: p
+    exp = FactoryBot.create :expertise, value: 'xxxxx', source: p.user, annotatable: p
 
     login_as p.user
     get :index
@@ -109,45 +107,31 @@ class TagsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'latest with no attributes defined' do
-    AnnotationAttribute.destroy_all
-    assert_empty AnnotationAttribute.all
-
-    get :latest, format: 'json'
-    assert_response :success
-    assert_empty JSON.parse(@response.body)
-  end
-
-  test 'latest' do
-    p = Factory :person
-
-    df = Factory :data_file, contributor: p
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
-
-    get :latest, format: 'json'
-    assert_response :success
-    assert_includes JSON.parse(@response.body), 'twinkle'
-  end
-
   test 'can query' do
-    p = Factory :person
+    p = FactoryBot.create :person
 
-    df = Factory :data_file, contributor: p
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
+    df = FactoryBot.create :data_file, contributor: p
+    tag = FactoryBot.create :tag, value: 'twinkle', source: p.user, annotatable: df
 
-    get :query, params: { format: 'json', query: 'twi' }
+    get :query, params: { format: 'json', q: 'twi' }
     assert_response :success
-    assert_includes JSON.parse(@response.body), 'twinkle'
+    expected = { results: [{ id: 'twinkle', text: 'twinkle' }] }.with_indifferent_access
+    assert_equal expected, JSON.parse(@response.body)
+
+    get :query, params: { format: 'json', q: 'wink' }
+    assert_response :success
+    expected = { results: [{ id: 'twinkle', text: 'twinkle' }] }.with_indifferent_access
+    assert_equal expected, JSON.parse(@response.body)
   end
 
   test 'can handle empty response from query' do
-    p = Factory :person
+    p = FactoryBot.create :person
 
-    df = Factory :data_file, contributor: p
-    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
+    df = FactoryBot.create :data_file, contributor: p
+    tag = FactoryBot.create :tag, value: 'twinkle', source: p.user, annotatable: df
 
-    get :query, params: { format: 'json', query: 'zzzxxxyyyqqq' }
+    get :query, params: { format: 'json', q: 'zzzxxxyyyqqq' }
     assert_response :success
-    assert_empty JSON.parse(@response.body)
+    assert_empty JSON.parse(@response.body)['results']
   end
 end

@@ -75,7 +75,7 @@ module Seek
           stderr.close
         end
 
-        if status.success?
+        if status.success? && packed_cwl_string.length.positive?
           cwl_string = packed_cwl_string
         else
           cwl_string ||= @io.read
@@ -190,7 +190,7 @@ module Seek
                 f << (value.is_a?(String) ? { 'type' => value } : value).merge('name' => name)
               end
             end
-            t['fields'] = f.map { |fi| normalise_type(fi['type'], tabs + ' ') }
+            t['fields'] = f.flat_map { |fi| normalise_type(fi['type'], tabs + ' ') }
           end
 
           t

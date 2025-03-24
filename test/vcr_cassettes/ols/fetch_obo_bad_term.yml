@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://www.ebi.ac.uk/ols/api/ontologies/ro/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252Fbanana
+    uri: https://www.ebi.ac.uk/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252Fbanana
     body:
       encoding: US-ASCII
       string: ''
@@ -10,7 +10,7 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - rest-client/2.1.0 (linux x86_64) ruby/2.7.5p203
+      - rest-client/2.1.0 (linux x86_64) ruby/3.1.4p223
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Host:
@@ -18,204 +18,31 @@ http_interactions:
   response:
     status:
       code: 404
-      message: Not Found
+      message: ''
     headers:
-      Server:
-      - Apache-Coyote/1.1
+      Vary:
+      - Access-Control-Request-Headers
+      - Access-Control-Request-Method
+      - Origin
       Content-Type:
-      - text/html;charset=UTF-8
+      - application/json
       Strict-Transport-Security:
       - max-age=0
       Date:
-      - Tue, 08 Feb 2022 15:42:26 GMT
-      X-Application-Context:
-      - application:8080
+      - Mon, 23 Oct 2023 09:24:44 GMT
       Transfer-Encoding:
       - chunked
-      Content-Language:
-      - en-GB
+      Content-Disposition:
+      - inline;filename=f.txt
     body:
       encoding: UTF-8
-      string: "<!DOCTYPE html>\n\n<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/
-        -->\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en\"/> <![endif]-->\n<!--[if
-        IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en\"/> <![endif]-->\n<!--[if
-        IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en\"/> <![endif]-->\n<!--
-        Consider adding an manifest.appcache: h5bp.com/d/Offline -->\n<!--[if gt IE
-        8]><!--> <html class=\"no-js\" lang=\"en\"> <!--<![endif]-->\n\n\n<head>\n
-        \   \n\n    <!-- Your [project-name] here -->\n    <meta content=\"Ontology
-        Xref Service\" name=\"author\" />\n    <meta content=\"true\" name=\"HandheldFriendly\"
-        />\n    <meta content=\"width\" name=\"MobileOptimized\" />\n    <meta content=\"width=device-width,initial-scale=1\"
-        name=\"viewport\" />\n    <meta content=\"#70BDBD\" name=\"theme-color\" />
-        <!-- Android Chrome mobile browser tab color -->\n\n    <!-- Add information
-        on the life cycle of this page -->\n    <meta content=\"Henriette Harmse\"
-        name=\"ebi:owner\" /> <!-- Who should be contacted about changes -->\n    <meta
-        content=\"365\" name=\"ebi:review-cycle\" /> <!-- In days, how often should
-        the content be reviewed -->\n\n    <!-- If you link to any other sites frequently,
-        consider optimising performance with a DNS prefetch -->\n    <link href=\"//embl.de\"
-        rel=\"dns-prefetch\" />\n\n    <!-- If you have custom icon, replace these
-        as appropriate.\n     You can generate them at realfavicongenerator.net -->\n
-        \   <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/favicon.ico\"
-        rel=\"icon\" type=\"image/x-icon\" />\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/favicon-32x32.png\"
-        rel=\"icon\" type=\"image/png\" />\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/android-chrome-192x192.png\"
-        rel=\"icon\" sizes=\"192x192\" type=\"image/png\" /> <!-- Android (192px)
-        -->\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-114x114.png\"
-        rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" /> <!-- For iPhone
-        4 Retina display (114px) -->\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-72x72.png\"
-        rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" /> <!-- For iPad (72px)
-        -->\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-144x144.png\"
-        rel=\"apple-touch-icon-precomposed\" sizes=\"144x144\" /> <!-- For iPad retinat
-        (144px) -->\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-57x57.png\"
-        rel=\"apple-touch-icon-precomposed\" /> <!-- For iPhone (57px) -->\n    <link
-        color=\"#ffffff\" href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/safari-pinned-tab.svg\"
-        rel=\"mask-icon\" /> <!-- Safari icon for pinned tab -->\n    <meta content=\"#2b5797\"
-        name=\"msapplication-TileColor\" /> <!-- MS Icons -->\n    <meta content=\"//wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/mstile-144x144.png\"
-        name=\"msapplication-TileImage\" />\n\n\n    <!-- CSS: implied media=all -->\n
-        \   <!-- CSS concatenated and minified via ant build script -->\n\n    <!--
-        Deactivating the old include\n    <link rel=\"stylesheet\" href=\"https://ebi.emblstatic.net//web_guidelines/EBI-Framework/v1.2/libraries/foundation-6/css/foundation.min.css\"
-        type=\"text/css\" media=\"all\" />\n    <link rel=\"stylesheet\" href=\"https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/css/ebi-global.css\"
-        type=\"text/css\" media=\"all\" />\n    <link rel=\"stylesheet\" href=\"https://ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css\"
-        type=\"text/css\" media=\"all\" />\n    -->\n\n    <!--\n        <link rel=\"stylesheet\"
-        href=\"https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/libraries/foundation-6/css/foundation.min.css\"
-        type=\"text/css\" media=\"all\" />\n        <link rel=\"stylesheet\" href=\"https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/css/ebi-global.css\"
-        type=\"text/css\" media=\"all\" />\n        <link rel=\"stylesheet\" href=\"https://www.ebi.ac.uk/web_guidelines/EBI-Icon-fonts/v1.1/fonts.css\"
-        type=\"text/css\" media=\"all\" />\n    -->\n\n\n    <!-- Trying to get v1.3
-        working -->\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css\"
-        media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css\"
-        media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.3/fonts.css\"
-        media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n    <link href=\"https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css\"
-        rel=\"stylesheet\" type=\"text/css\" />\n\n    <!--\n    <link rel=\"stylesheet\"
-        href=\"https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.2/libraries/foundation-6/css/foundation.css\"
-        />\n    <link rel=\"stylesheet\" href=\"https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css\"
-        type=\"text/css\" media=\"all\" />\n    -->\n\n    <!-- jstree -->\n    <link
-        href=\"/ols/js/jstree/themes/proton/style.min.css\" media=\"screen\" rel=\"stylesheet\"
-        type=\"text/css\" />\n\n    <!-- Use this CSS file for any custom styling
-        -->\n    <!-- Css taken from old oxo\n    <link rel=\"stylesheet\" href=\"//www.ebi.ac.uk/web_guidelines/css/compliance/develop/embl-petrol-colours.css\"
-        type=\"text/css\" media=\"screen\"/>\n    -->\n\n    <!-- Temporary remove
-        \ style\n    <link rel=\"stylesheet\" href=\"https://www.ebi.ac.uk/ols/css/ols.css\"
-        type=\"text/css\" media=\"screen\"/>\n    <link rel=\"stylesheet\" href=\"https://www.ebi.ac.uk/ols/css/ols-colors.css\"
-        \ type=\"text/css\" media=\"screen\"/>\n    <link rel=\"stylesheet\" href=\"../static/css/oxo.css\"
-        th:href=\"@{/css/oxo.css}\" type=\"text/css\" media=\"screen\"/>\n\n    <link
-        rel=\"stylesheet\" href=\"../static/css/oxo.css\" th:href=\"@{/css/oxo.css}\"
-        type=\"text/css\" media=\"screen\"/>\n    <link rel=\"stylesheet\" href=\"../static/css/oxo-d3.css\"
-        th:href=\"@{/css/oxo-d3.css}\" type=\"text/css\" media=\"screen\"/>\n    <link
-        rel=\"stylesheet\" th:href=\"@{/webjars/select2/4.0.0/dist/css/select2.min.css}\"
-        href=\"/webjars/select2/4.0.0/dist/css/select2.min.css\"  type=\"text/css\"
-        media=\"screen\"/>\n    <link rel=\"stylesheet\" href=\"//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css\"
-        type=\"text/css\" media=\"screen\"/>\n    -->\n\n    <!--  bootstrap though!\n
-        \   <link  rel=\"stylesheet\" th:href=\"@{/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css}\"
-        href=\"/webjars/bootstrap-slider/5.3.1/css/bootstrap-slider.min.css\"  type=\"text/css\"
-        media=\"screen\"/>\n    -->\n    <!--    bootstrap css needed?    -->\n    <!--\n
-        \   <link rel=\"stylesheet\" href=\"https://www.ebi.ac.uk/ols/css/bootstrap/3.3/css/bootstrap.min.css\"
-        type=\"text/css\" media=\"screen\"/>\n    -->\n\n    <!-- If you have a custom
-        header image or colour -->\n    <!--\n    <meta name=\"ebi:localmasthead-color\"
-        content=\"#000\" /> - ->\n    <meta name=\"ebi:localmasthead-image\" content=\"/img/images/background.jpg\"/>\n
-        \   <meta name=\"ebi:masthead-image\"  content=\"img/background.jpg\"/>-->\n\n
-        \   <meta name=\"ebi:masthead-color\" content=\"#0080FF\" />\n    <meta name=\"ebi:masthead-image\"
-        content=\"/ols/img/background_trial.jpg\" />\n\n\n    <link href=\"/ols/css/new_ols.css\"
-        media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />\n\n    <!-- you can
-        replace this with theme-[projectname].css. See http://www.ebi.ac.uk/web/style/colour
-        for details of how to do this -->\n    <!-- also inform ES so we can host
-        your colour palette file -->\n\n    <!--link rel=\"stylesheet\" href=\"https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/css/theme-embl-petrol.css\"
-        type=\"text/css\" media=\"all\" /-->\n\n    <!-- for production the above
-        can be replaced with -->\n    <!--link rel=\"stylesheet\" href=\"//www.ebi.ac.uk/web_guidelines/css/compliance/mini/ebi-fluid-embl.css\"
-        /-->\n    <!-- end CSS -->\n\n    <!-- All JavaScript at the bottom, except
-        for Modernizr - - >\n    <script src=\"https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/libraries/modernizr/modernizr.custom.49274.js\"></script>\n
-        \   -->\n    \n    \n    \n    \n\n    <!-- TABLE css (originally from ontology.html,
-        already commented out)\n    <link rel=\"stylesheet\" href=\"../static/css/diachron/tablesort-blue/style.css\"\n
-        \         th:href=\"@{../css/diachron/tablesort-blue/style.css}\" type=\"text/css\"
-        media=\"screen\" />\n    <link rel=\"stylesheet\" href=\"//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css\"
-        />\n    <link rel=\"stylesheet\" href=\"//cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css\"
-        /-->\n    \n\n    <!-- originally from browse.html -->\n    \n\n    <!-- originally
-        from search.html -->\n    \n\n    <!-- originally from graph.html -->\n    \n
-        \   \n    <!-- THIS is for the VIS BUTTONS -->\n    \n\n    <!-- Also needed?
-        (originally from ontology.html, already commented out)\n    <link rel=\"stylesheet\"
-        href=\"../static/css/bootstrap/3.3/css/bootstrap.min.css\" th:href=\"@{../css/bootstrap/3.3/css/bootstrap.min.css}\"
-        type=\"text/css\" media=\"screen\" /-->\n\n    <link href=\"https://cdn.jsdelivr.net/npm/icheck-bootstrap@3.0.1/icheck-bootstrap.min.css\"
-        rel=\"stylesheet\" />\n\n<head></head>\n    <title id=\"pageTitle\">Ontology
-        Lookup Service &lt; EMBL-EBI</title>\n    <!-- A few keywords that relate
-        to the content of THIS PAGE (not the whole project)\n    <meta name=\"keywords\"
-        content=\"biosamples, europe, EBI\" />\n    <!- - Describe what this page
-        is about - ->\n    <meta name=\"description\" content=\"EMBL-EBI\" />\n    <meta
-        name=\"ebi:last-review\" content=\"2016-12-20\" />\n    <!- - The last time
-        the content was reviewed - ->\n    <meta name=\"ebi:expiry\" content=\"2017-12-20\"
-        />\n    <!- - When this content is no longer relevant -->\n</head>\n\n\n<body>\n\n
-        \   <div id=\"skip-to\">\n        <a href=\"#main-content-area\">Skip to main
-        content</a>\n    </div>\n\n\t\n    <div id=\"header-content\">\n        <div
-        data-sticky-container=\"true\">\n            <header class=\"masthead\" data-btm-anchor=\"main-content-area:bottom\"\"
-        data-sticky=\"true\" data-sticky-on=\"large\" data-top-anchor=\"main-content-area:top\"
-        id=\"masthead\">\n                <div class=\"masthead-inner row\">\n                    <!--
-        local-title -->\n                    <div class=\"columns medium-12\" id=\"local-title\">\n
-        \                       <!--<h1><a href=\"../../\" title=\"Back to Oxo homepage\">Ontology
-        Xref Service</a></h1>-->\n                        <a href=\"/ols/\" title=\"Back
-        to OLS homepage\">\n                            <img style=\"height:100px;\"
-        src=\"/ols/img/OLS_logo_2017.png\" />\n                        </a>\n                    </div>\n\n
-        \                   <!-- /local-title -->\n                    <!-- local-nav
-        -->\n                    <nav>\n                        <ul class=\"dropdown
-        menu float-left\" data-description=\"navigational\">\n                            <li
-        class=\"\"><a href=\"/ols/index\">Home</a></li>\n                            <li
-        class=\"\"><a href=\"/ols/ontologies\">Ontologies</a></li>\n                            <li
-        class=\"\"><a href=\"/ols/docs\">Documentation</a></li>\n                            <li
-        class=\"\"><a href=\"/ols/about\">About</a></li>\n                        </ul>\n
-        \                   </nav>\n                    <!-- /local-nav -->\n                </div>\n
-        \           </header>\n        </div>\n\n    </div>\n\n\n<section id=\"main-content-area\"
-        role=\"main\">\n<div class=\"row\">\n    <h2 class=\"strapline\">Ontology
-        Lookup Service</h2>\n    <p class=\"alert-info bootstrap-alert error\">\n
-        \       Something went wrong! Use the issue tracker or the support mail below
-        to report any bugs or give feedback.\n    </p>\n    \n    \n    \n    <ul>\n
-        \       <li><a href=\" https://github.com/EBISPOT/OLS/issues\">Issue Tracker</a></li>\n
-        \       <li><a href=\"mailto: ols-support@ebi.ac.uk\"> ols-support@ebi.ac.uk</a></li>\n
-        \   </ul>\n\n    \n\n    <p>\n        Cause unknown (no exception details
-        available)</p>\n</div>\n</section>\n\n\n    <!-- Optional local footer (insert
-        citation / project-specific copyright / etc here -->\n    <!--\n    <footer
-        id=\"local-footer\" class=\"local-footer\" role=\"local-footer\">\n      <div
-        class=\"row\">\n        <span class=\"reference\">How to reference this page:
-        ...</span>\n      </div>\n    </footer>\n    -->\n    <!-- End optional local
-        footer -->\n    \n    <script src=\"//ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js\"></script>\n\n
-        \   <footer>\n        <!-- https://www.ebi.ac.uk/style-lab/websites/patterns/banner-elixir.html\n
-        \       <div id=\"elixir-banner\" data-color=\"none\" data-name=\"This service\"
-        data-description=\"I am a super cool service\" data-more-information-link=\"https://www.elixir-europe.org/about-us/who-we-are/nodes/embl-ebi\"
-        data-use-basic-styles=\"true\"></div>\n        -->\n        \n\n        <div
-        class=\"row\">\n            <div class=\"footer-link-list\">\n                <ul
-        class=\"link-list\">\n                    <li class=\"link-list-item\"><a
-        href=\"/ols/imprint\">Imprint</a></li>\n                    <li class=\"link-list-item\"><a
-        href=\"/ols/dataprotection\">Data Protection</a></li>\n                    <li
-        class=\"link-list-item\"><a href=\"http://www.ebi.ac.uk\">EMBL-EBI</a></li>\n
-        \                   <li class=\"link-list-item\"><a href=\"https://www.ebi.ac.uk/ols\">OLS</a></li>\n
-        \               </ul>\n            </div>\n        </div>\n\n        <div
-        class=\"row\">\n            <div class=\"ols-logo\">\n                <a href=\"
-        https://www.ebi.ac.uk/\" title=\"Go to EMBL-EBI homepage\">\n                    <img
-        style=\"\" src=\"/ols/img/OLS_logo_2017.png\" />\n                </a>\n                \n
-        \           </div>\n        </div>\n    </footer>\n\n    \n\n    <!-- JavaScript
-        -->\n\n    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall
-        back to local if offline -->\n    <!--\n    <script>window.jQuery || document.write('<script
-        src=\"../js/libs/jquery-1.10.2.min.js\"><\\/script>')</script>\n    We include
-        Jquery from war below, then we'd don't need this line  .... -->\n    <script
-        src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js\"></script>\n\n
-        \   <script>\n        (function (i, s, o, g, r, a, m) {\n            i['GoogleAnalyticsObject']
-        = r;\n            i[r] = i[r] || function () {\n                (i[r].q =
-        i[r].q || []).push(arguments)\n            }, i[r].l = 1 * new Date();\n            a
-        = s.createElement(o),\n                m = s.getElementsByTagName(o)[0];\n
-        \           a.async = 1;\n            a.src = g;\n            m.parentNode.insertBefore(a,
-        m)\n        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js',
-        'ga');\n        ga('create', 'UA-69391170-2', 'auto');\n        ga('send',
-        'pageview');\n        ga('set', 'anonymizeIp', true);\n    </script>\n\n    <!--
-        Using other URL for v1.3 does not change anything -->\n    \n    <script>\n
-        \       var masthead = document.getElementById('masthead');\n        // check
-        for both ebi: and ebi- formatted meta tags\n        var mastheadColor = document.querySelector(\"meta[name='ebi:masthead-color']\")
-        || document.querySelector(\"meta[name='ebi-masthead-color']\");\n        var
-        mastheadImage = document.querySelector(\"meta[name='ebi:masthead-image']\")
-        || document.querySelector(\"meta[name='ebi-masthead-image']\");\n\n        if
-        (mastheadColor != null) {\n            masthead.style.backgroundColor = mastheadColor.getAttribute(\"content\");\n
-        \           masthead.className += ' meta-background-color';\n        }\n        if
-        (mastheadImage != null) {\n            masthead.style.backgroundImage = 'url('
-        + mastheadImage.getAttribute(\"content\") + ')';\n            masthead.className
-        += ' meta-background-image';\n        }\n    </script>\n    <script src=\"//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js\"></script>\n
-        \   <script src=\"//www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js\"></script>\n
-        \   <script type=\"text/JavaScript\">$(document).foundation();</script>\n
-        \   <script type=\"text/JavaScript\">$(document).foundationExtendEBI();</script>\n\n
-        \   <!--<script type=\"text/javascript\" th:src=\"@{/webjars/d3js/3.5.17/d3.min.js}\"
-        src=\"/webjars/d3js/3.5.17/d3.min.js\"></script>\n        <script type=\"text/javascript\"
-        th:src=\"@{/webjars/select2/4.0.0/dist/js/select2.min.js}\" src=\"/webjars/select2/4.0.0/dist/js/select2.min.js\"></script>-->\n\n\n\n</body></html>"
+      string: |-
+        {
+          "timestamp" : "2023-10-23T09:24:44.255+00:00",
+          "status" : 404,
+          "error" : "Not Found",
+          "path" : "/ols4/api/ontologies/go/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252Fbanana"
+        }
     http_version: 
-  recorded_at: Tue, 08 Feb 2022 15:42:27 GMT
+  recorded_at: Mon, 23 Oct 2023 09:24:44 GMT
 recorded_with: VCR 2.9.3

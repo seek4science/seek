@@ -12,7 +12,7 @@ var SampleTypes = {
             helper: SampleTypes.fixHelper,
             handle: '.attribute-handle'
         }).on('sortupdate', function() {
-            SampleTypes.recalculatePositions();
+            SampleTypes.recalculatePositions(selector);
         });
     },
 
@@ -72,13 +72,11 @@ var SampleTypes = {
     attributeTypeChanged: function (e, resetSelection=true) {
         //check if it is a controlled vocab, and change the state of the controlled vocab selector if need be
         var use_cv = $j(this).find(':selected').data('use-cv');
-				var is_ontology = $j(this).find(':selected').data('is-ontology');
         var cv_element = $j(this).siblings('.controlled-vocab-block');
         if (use_cv) {
-					var cv_selection = cv_element.find('.controlled-vocab-selection')
-					cv_selection.find('option').show()
-					cv_selection.find(`option[data-is-ontology="${!is_ontology}"]`).hide()
-					if (resetSelection) cv_selection.find('option:selected').prop("selected", false)
+					var cv_selection = cv_element.find('.controlled-vocab-selection');
+					cv_selection.find('option').show();
+					if (resetSelection) cv_selection.find('option:selected').prop("selected", false);
           cv_element.show();
         }
         else {
@@ -98,6 +96,16 @@ var SampleTypes = {
         else {
             seek_sample_element.hide();
         }
+    },
+
+    expandIRI: function () {
+        var termIRI = $j(this).next('.term-iri');
+        termIRI.toggleClass('visible');
     }
 
 };
+
+
+$j(document).ready(function() {
+    $j('.term-label').on('click', SampleTypes.expandIRI);
+});

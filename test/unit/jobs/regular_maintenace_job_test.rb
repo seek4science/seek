@@ -9,18 +9,18 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert_equal 4.hours, RegularMaintenanceJob::RUN_PERIOD
   end
 
-  test 'cleans content blobs' do
-    assert_equal 8.hours, RegularMaintenanceJob::BLOB_GRACE_PERIOD
+  test 'removes dangling content blobs' do
+    assert_equal 8.hours, RegularMaintenanceJob::REMOVE_DANGLING_BLOB_GRACE_PERIOD
     to_go, keep1, keep2, keep3, keep4 = nil
     travel_to(9.hours.ago) do
-      to_go = Factory(:content_blob)
-      keep1 = Factory(:data_file).content_blob
-      keep2 = Factory(:investigation).create_snapshot.content_blob
-      keep3 = Factory(:strain_sample_type).content_blob
+      to_go = FactoryBot.create(:content_blob)
+      keep1 = FactoryBot.create(:data_file).content_blob
+      keep2 = FactoryBot.create(:investigation, creators: [FactoryBot.create(:person)]).create_snapshot.content_blob
+      keep3 = FactoryBot.create(:strain_sample_type).content_blob
     end
 
     travel_to(7.hours.ago) do
-      keep4 = Factory(:content_blob)
+      keep4 = FactoryBot.create(:content_blob)
     end
 
     assert_difference('ContentBlob.count', -1) do
@@ -34,17 +34,45 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert ContentBlob.exists?(keep4.id)
   end
 
+  test 'remove deleted content blobs' do
+    assert_equal 24.hours, RegularMaintenanceJob::REMOVE_DELETED_BLOB_GRACE_PERIOD
+    to_go, to_keep1, to_keep2, to_keep3 = nil
+
+    travel_to(25.hours.ago) do
+      to_go = FactoryBot.create(:content_blob, deleted: true, asset_type:'Sop', asset_id: 99999)
+      to_keep1 = FactoryBot.create(:content_blob, asset_type:'Sop', asset_id: 99999)
+      to_keep2 = FactoryBot.create(:content_blob, deleted:true, asset: FactoryBot.create(:sop))
+    end
+    travel_to(23.hours.ago) do
+      to_keep3 = FactoryBot.create(:content_blob, deleted: true, asset: FactoryBot.create(:sop))
+    end
+
+    assert to_go.deleted?
+    assert to_keep2.deleted?
+    assert to_keep3.deleted?
+    refute to_keep1.deleted?
+
+    assert_difference('ContentBlob.count',-1) do
+      RegularMaintenanceJob.perform_now
+    end
+
+    refute ContentBlob.exists?(to_go.id)
+    assert ContentBlob.exists?(to_keep1.id)
+    assert ContentBlob.exists?(to_keep2.id)
+    assert ContentBlob.exists?(to_keep3.id)
+  end
+
   test 'remove old unregistered users' do
     assert_equal 1.week, RegularMaintenanceJob::USER_GRACE_PERIOD
     to_go, keep1, keep2 = nil
     travel_to(2.weeks.ago) do
-      to_go = Factory(:brand_new_user)
+      to_go = FactoryBot.create(:brand_new_user)
       assert_nil to_go.person
-      keep1 = Factory(:person).user
+      keep1 = FactoryBot.create(:person).user
     end
 
     travel_to(5.days.ago) do
-      keep2 = Factory(:brand_new_user)
+      keep2 = FactoryBot.create(:brand_new_user)
       assert_nil keep2.person
     end
 
@@ -62,7 +90,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert_equal 3, RegularMaintenanceJob::MAX_ACTIVATION_EMAILS
     assert_equal 4.hours, RegularMaintenanceJob::RESEND_ACTIVATION_EMAIL_DELAY
     # person 1 - not activated, and 2 messages sent 5 hours ago
-    person1 = Factory(:not_activated_person)
+    person1 = FactoryBot.create(:not_activated_person)
     refute person1.user.active?
     travel_to(5.hours.ago) do
       ActivationEmailMessageLog.log_activation_email(person1)
@@ -70,7 +98,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     end
 
     # person 2 - not activated, but 3 messages sent over 1 day ago
-    person2 = Factory(:not_activated_person)
+    person2 = FactoryBot.create(:not_activated_person)
     travel_to(2.days.ago) do
       ActivationEmailMessageLog.log_activation_email(person2)
       ActivationEmailMessageLog.log_activation_email(person2)
@@ -78,7 +106,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     end
 
     # person 3 - not activated, but 2 message sent, one 1 days ago but the latest 1 hour ago
-    person3 = Factory(:not_activated_person)
+    person3 = FactoryBot.create(:not_activated_person)
     travel_to(1.day.ago) do
       ActivationEmailMessageLog.log_activation_email(person3)
     end
@@ -87,14 +115,14 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     end
 
     # person 4 - not activated, and no message logs
-    person4 = Factory(:not_activated_person)
+    person4 = FactoryBot.create(:not_activated_person)
 
     # person5 - an activated person, with no logs
-    person5 = Factory(:person)
+    person5 = FactoryBot.create(:person)
     assert person5.user.active?
 
     # an invalid user with missing person id, to test it is protected against
-    user = Factory(:brand_new_user,person_id:Person.last.id+1)
+    user = FactoryBot.create(:brand_new_user,person_id:Person.last.id+1)
 
     # only person 1 and person 4 should have emails resent
     assert_enqueued_emails(2) do
@@ -126,69 +154,10 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert_equal [person3, person4].sort, logs.collect(&:subject).sort
   end
 
-  test 'check authlookup consistency' do
-    #ensure a consistent initial state
-    disable_authorization_checks do
-      Seek::Util.authorized_types.each(&:destroy_all)
-      Seek::Util.authorized_types.each(&:clear_lookup_table)
-    end
-
-    User.destroy_all
-    p = Factory(:person)
-    p2 = Factory(:person)
-    u = Factory(:brand_new_user)
-
-    assert_nil u.person
-
-    with_config_value(:auth_lookup_enabled, true) do
-      assert AuthLookupUpdateQueue.queue_enabled?
-
-      doc1 = Factory(:document)
-      doc2 = Factory(:document)
-      AuthLookupUpdateJob.perform_now
-
-      assert Document.lookup_table_consistent?(p.user)
-      assert Document.lookup_table_consistent?(p2.user)
-      assert Document.lookup_table_consistent?(nil)
-
-      assert_no_enqueued_jobs do
-        assert_no_difference('AuthLookupUpdateQueue.count') do
-          RegularMaintenanceJob.perform_now
-        end
-      end
-
-      # delete a record
-      Document.lookup_class.where(user_id:p.user.id,asset_id:doc1.id).last.delete
-
-      #duplicate a record
-      Document.lookup_class.where(user_id:p2.user.id, asset_id:doc2.id).last.dup.save!
-
-      refute Document.lookup_table_consistent?(p.user)
-      refute Document.lookup_table_consistent?(p2.user)
-
-      #gets immmediately updated for anonymous user
-      assert Document.lookup_table_consistent?(nil)
-
-      assert_enqueued_jobs(1) do
-        assert_difference('AuthLookupUpdateQueue.count',1) do
-          RegularMaintenanceJob.perform_now
-        end
-      end
-
-      # double check it will be fixed when the job runs
-      AuthLookupUpdateJob.perform_now
-      assert Document.lookup_table_consistent?(p.user)
-      assert Document.lookup_table_consistent?(p2.user)
-      assert Document.lookup_table_consistent?(nil)
-    end
-
-
-  end
-
   test 'cleans redundant repositories' do
-    redundant = Factory(:blank_repository, created_at: 5.years.ago)
-    redundant_but_in_grace = Factory(:blank_repository, created_at: 1.second.ago)
-    not_redundant = Factory(:git_version).git_repository
+    redundant = FactoryBot.create(:blank_repository, created_at: 5.years.ago)
+    redundant_but_in_grace = FactoryBot.create(:blank_repository, created_at: 1.second.ago)
+    not_redundant = FactoryBot.create(:git_version).git_repository
 
     assert_difference('Git::Repository.count', -1) do
       RegularMaintenanceJob.perform_now

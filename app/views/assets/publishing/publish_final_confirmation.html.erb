@@ -1,21 +1,74 @@
 <%= show_title "Confirm publishing" -%>
-<p>
-  You are about the publish the following items.
-</p>
-<%= form_tag :action => :publish do %>
-  <ul class="publishing_options">
-    <% @items_for_publishing.each do |item| %>
-      <%= hidden_field_tag publishing_item_param(item), 1 %>
+
+<% unless @items_for_immediate_publishing.empty? -%>
+  <h2>The following items will be published:</h2>
+  <div class="alert alert-info">
+    <p> Select "Confirm" to make the following item(s) immediately accessible to the public. </p>
+  </div>
+  <ul class="publishing_options" id="publish_immediately" style="margin-left: 2em">
+    <% @items_for_immediate_publishing.each do |item| %>
       <li class="type_and_title">
         <%= text_for_resource item -%>: <%= link_to item.title, item -%>
       </li>
     <% end %>
   </ul>
+<% end -%>
+
+<% unless @waiting_for_publish_items.empty? -%>
+  <h2>The following items require approval:</h2>
+  <div class="alert alert-warning">
+    <p>
+      One or more of the items to be published are associated with a <%= t('project') -%>
+      that has chosen to use the protection of the <%= t('asset_gatekeeper').downcase %>.
+      The <%= t('asset_gatekeeper').downcase %> is a person that needs to approve items before they are finally published.
+    </p>
+    <p>
+      When you click "Confirm" an email will be sent to that person, and they will either approve or reject the publication.
+      Once this has happened, you will be notified back via an email.
+    </p>
+  </div>
+  <ul class="publishing_options" id="waiting_approval" style="margin-left: 2em">
+    <% @waiting_for_publish_items.each do |item| %>
+      <li class="type_and_title"><%= text_for_resource item -%>
+        :&nbsp;<%= link_to item.title, item, target: "_blank" -%></li>
+      <ul><li class="secondary">Approval required from: <%= item.asset_gatekeepers.collect { |m| link_to(m.title, m) }.join(" or ").html_safe -%></li></ul>
+      <br/>
+  <% end %>
+  </ul>
+<% end -%>
+
+<% unless @items_cannot_publish.blank? -%>
+  <h2>The following items cannot be published:</h2>
+  <div class="alert alert-danger">
+    <p> One or more of the items you selected cannot be published.</p>
+    <p>
+      It is likely that the item(s) are associated with a <%= t('project') -%>
+      that has chosen to use the protection of the <%= t('asset_gatekeeper').downcase %>,
+      and an existing request is either waiting approval or it has been rejected.
+      Visit the item(s) page to confirm this.
+    </p>
+    <p>If you think this is not the case, please contact your system's administrator.</p>
+  </div>
+  <ul class="publishing_options" id="cannot_publish" style="margin-left: 2em">
+    <% @items_cannot_publish.each do |item| %>
+      <li class="type_and_title"><%= text_for_resource item -%>
+        :&nbsp;<%= link_to item.title, item, target: "_blank" -%></li>
+      <br/>
+    <% end %>
+  </ul>
+<% end -%>
+
+<%= form_tag action: :publish do %>
+  <div style="display:none;">
+    <% @items_for_publishing.each do |item| %>
+      <%= hidden_field_tag publishing_item_param(item), 1 %>
+      <br/>
+    <% end %>
+  </div>
   <br/>
 
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-
-  <%= submit_tag "Confirm",data: { disable_with: 'Confirm' }, :class => 'btn btn-primary' -%>
+  <%= submit_tag "Confirm", data: { disable_with: 'Confirm' }, class: 'btn btn-primary' -%>
   or
   <%= cancel_button(resource) %>
 <% end %>

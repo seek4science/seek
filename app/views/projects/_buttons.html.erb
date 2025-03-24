@@ -1,7 +1,13 @@
-<% if !displaying_single_page? && Seek::Config.project_single_page_enabled %>
-  <span>
-    <%= button_link_to("Single Page", 'sop', single_page_path(item.id)) -%>
-  </span>
+<% if Seek::Config.project_single_page_enabled %>
+  <% if !displaying_single_page? %>
+    <span title="<%= t("info_text.single_page") %>">
+      <%= button_link_to(t("single_page"), 'sop', single_page_path(item.id)) -%>
+    </span>
+  <% else %>
+    <span title="<%= t('info_text.default_view') %>">
+      <%= button_link_to(t('default_view'), 'sop', project_path(item.id)) -%>
+    </span>
+  <% end %>
 <% end -%>
 <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(item) %>
     <%= button_link_to("Organize", 'organise', project_folders_path(item.id)) -%>
@@ -9,11 +15,11 @@
 <% if can_browse_openbis?(item) %>
     <%= button_link_to("Browse openBIS", :openbis_square, openbis_endpoint_path(item.openbis_endpoints.last),{icon_options:{height:'18px'}}) %>
 <% end %>
-<% if item.try(:has_member?,current_user) %>
+<% if item.has_member?(current_user) %>
     <%= button_link_to("Dashboard", 'project_dashboard', dashboard_project_stats_path(item)) %>
 <% end -%>
 <%= button_link_to('Overview', 'graph_nodes', overview_project_path(item)) -%>
-<% if item.try(:has_member?,current_user) || admin_logged_in? -%>
+<% if item.has_member?(current_user) || admin_logged_in? -%>
     <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
     <%= button_link_to("Asset report", 'report', asset_report_project_path(item), 'data-tooltip' => tooltip(tooltip_text)) -%>
 <% end -%>
@@ -31,11 +37,11 @@
     </span>
 <% end -%>
 
-<% if item.can_edit? -%>
+<% if item.can_edit? && item.has_member?(current_user) -%>
   <% if displaying_single_page? %>
-    <%= button_link_to("Create #{t('investigation')}", 'new', new_investigation_path("investigation[project_id]": item.id, single_page: params[:id])) %> 
+    <%= button_link_to("Design #{t('investigation')}", 'new', new_investigation_path("investigation[project_id]": item.id, single_page: params[:id])) %>
   <% else -%>
-    <%= add_new_item_to_dropdown(item) %> 
+    <%= add_new_item_to_dropdown(item) %>
   <% end -%>
 <% end -%>
 
@@ -43,7 +49,6 @@
   <% if item.can_edit? -%>
     <% if item.can_manage? -%>
       <li><%= image_tag_for_key('manage', edit_project_path(item), "Manage #{t('project')}", nil, "Manage #{t('project')}") -%></li>
-      <li><%= image_tag_for_key('graph_nodes', populate_project_path(item), "Populate", nil, "Populate #{t('project')}") -%></li>
       <li><%= image_tag_for_key "group_edit", admin_members_project_path(item), "Administer", nil, "Administer #{t('project')} members" -%></li>
       <li><%= image_tag_for_key "group_edit", admin_member_roles_project_path(item), "Administer", nil, "Administer #{t('project')} members roles" -%></li>
       <% if OpenbisEndpoint.can_create? %>
@@ -57,8 +62,16 @@
       <%= order_icon(item,current_user, order_investigations_project_path(item), item.investigations, 'investigation') %>
     <% end %>
 
+    <% if Seek::Config.fair_data_station_enabled %>
+      <li>
+        <%= image_tag_for_key('import', import_from_fairdata_station_project_path(item), "Import from FAIR Data Station", nil, "Import from FAIR Data Station") -%>
+      </li>
+    <% end %>
+
     <% if admin_logged_in? || item.can_manage? -%>
       <%= delete_icon(item,current_user,"Any members will also be removed from the #{t('project')}, are you sure?") %>
     <% end -%>
+
+
   <% end -%>
 <% end -%>

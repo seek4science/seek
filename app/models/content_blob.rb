@@ -25,9 +25,6 @@ class ContentBlob < ApplicationRecord
   # Store HTTP headers to stop SEEK performing multiple requests when getting info
   attr_writer :headers
 
-  # Flag to decide whether a remote file should be retrieved and stored in SEEK
-  attr_accessor :make_local_copy
-
   acts_as_uniquely_identifiable
 
   # this action saves the contents of @data or the contents contained within the @tmp_io_object to the storage file.
@@ -248,7 +245,7 @@ class ContentBlob < ApplicationRecord
   has_task :remote_content_fetch
 
   def content_path(opts = {})
-    opts.reverse_merge!(action: 'download', disposition: 'inline')
+    opts.reverse_merge!(action: 'download')
     Seek::Util.routes.polymorphic_path([asset, self], opts)
   end
 

@@ -15,7 +15,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::TitleTrimmer
   include Seek::ActsAsAsset
   include Seek::ActsAsISA
-  include HasCustomMetadata
+  include HasExtendedMetadata
   include Seek::Doi::ActsAsDoiMintable
   include Seek::Doi::ActsAsDoiParent
   include Seek::ResearchObjects::ActsAsSnapshottable
@@ -26,6 +26,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::RelatedItems
   include HasTasks
   include HasControlledVocabularyAnnotations
+  include HasExternalIdentifier
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -93,6 +94,13 @@ class ApplicationRecord < ActiveRecord::Base
 
   def supports_doi?
     self.class.supports_doi?
+  end
+
+  def self.supports_spreadsheet_explore?
+    false
+  end
+  def supports_spreadsheet_explore?
+    self.class.supports_spreadsheet_explore?
   end
 
   def self.with_search_query(q)
@@ -182,5 +190,13 @@ class ApplicationRecord < ActiveRecord::Base
 
   def updated_last_by
     ActivityLog.where(activity_loggable:self, action:'update').last&.culprit&.person
+  end
+
+  def supports_extended_metadata?
+    self.class.supports_extended_metadata?
+  end
+
+  def self.supports_extended_metadata?
+    reflect_on_association(:extended_metadata).present?
   end
 end

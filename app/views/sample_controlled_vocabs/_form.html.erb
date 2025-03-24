@@ -19,7 +19,7 @@
   <%= panel('Ontology') do %>
 
     <div class="help-block">
-      You can, optionally, populate the terms from an ontology available from the <%= link_to('Ontology Lookup Service','https://www.ebi.ac.uk/ols/index',target: :_blank) %>.
+      You can, optionally, populate the terms from an ontology available from the <%= link_to('Ontology Lookup Service',"#{Ebi::OlsClient::ROOT_URL}",target: :_blank) %>.
       To do so, select the ontology below, and then choose the root term - from which itself and all children will be added to the terms. You can choose the root term by following the
       link provide to browse the ontology.
       <br/>
@@ -31,7 +31,7 @@
 
     <div class="form-group">
       <label>Ontology</label>
-      <%= f.select :source_ontology, Ebi::OlsClient.ontology_choices, { include_blank: 'No Ontology' }, class: 'form-control' -%>
+      <%= select_cv_source_ontology(@sample_controlled_vocab) %>
       <br/>
 
       <div id='ontology-root-uri' style="display:none;">
@@ -39,17 +39,19 @@
           You have selected the <a id="selected-ols-link" href="" target="_blank"></a> ontology,
           click the link to browse on the Ontology Lookup Service in another tab and find the suitable root term URI.
           You should then copy that URI into the field below.
+          If you wish to include terms from more than one root, then add the URI's separated by a comma (,).
         </div>
+
         <div>
-          <label>Root term</label>
-          <%= f.text_field :ols_root_term_uri, :class => 'form-control', :placeholder => 'e.g. http://www.ebi.ac.uk/efo/EFO_0000635' %>
+          <label>Root terms</label>
+          <%= f.text_field :ols_root_term_uris, :class => 'form-control', :placeholder => 'e.g. http://www.ebi.ac.uk/efo/EFO_0000635' %>
         </div>
 
         <div class="checkbox">
           <label>
             <%= check_box_tag(:include_root_term, '1', false, name: nil, autocomplete: 'off') %>
-            <strong>Include root term?</strong>
-            <p class="help-block">If checked, the selected root term will be included in the list of options. Otherwise, only children of the root term will be included.</p>
+            <strong>Include root terms?</strong>
+            <p class="help-block">If checked, the selected roots term will be included in the list of options. Otherwise, only children of the root terms will be included.</p>
           </label>
         </div>
 
@@ -67,7 +69,7 @@
 
     <div id='controlled-vocab-terms'>
       <div id='controlled-vocab-terms-fixed'>
-        <table id="new-terms" class="table" style="width:100%;">
+        <table id='new-terms' class='table'>
           <thead>
           <th>Label<span class="required">*</span></th>
           <th>URI</th>
@@ -76,24 +78,10 @@
           </thead>
           <tbody>
           <% @sample_controlled_vocab.sample_controlled_vocab_terms.each_with_index do |term, index| %>
-            <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
-
-              <tr class="sample-cv-term" data-index="<%= index %>">
-                <td><%= terms_f.text_field :label, :class => 'form-control', readonly:term.ontology_based? %></td>
-                <td><%= terms_f.text_field :iri, :class => 'form-control', readonly:term.ontology_based? %></td>
-                <td><%= terms_f.text_field :parent_iri, :class => 'form-control', readonly:term.ontology_based? %></td>
-                <td>
-                  <div class="btn-group" data-toggle="buttons">
-                    <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>
-                    <label class="btn btn-danger">
-                      Remove
-                      <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '1', false,
-                                        :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][#{index}][_destroy]" %>
-                    </label>
-                  </div>
-
-                </td>
-              </tr>
+            <% if term.ontology_based? %>
+              <%= render partial:'sample_controlled_vocabs/term_form_row_disabled', locals:{index: index, term: term} %>
+            <% else %>
+              <%= render partial:'sample_controlled_vocabs/term_form_row', locals:{index: index, term: term} %>
             <% end %>
           <% end %>
           <tr id='add-term-button-row'>
@@ -103,11 +91,7 @@
         </table>
       </div>
       <div>
-        <%
-          options = {id: 'add-term'}
-          options.merge!({disabled:true, disabled_reason:t('controlled_vocabs.add_new_term_disabled_reason')}) if @sample_controlled_vocab.ontology_based?
-        %>
-        <%= button_link_to('Add new term', 'add', '#', options) %>
+        <%= button_link_to('Add new term', 'add', '#', id: 'add-term') %>
         <%= button_link_to('Remove all terms', 'destroy', '#', :id => 'clear-terms', class:'btn btn-danger') %>
       </div>
     </div>

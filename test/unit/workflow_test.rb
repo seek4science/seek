@@ -3,7 +3,7 @@ require 'minitest/mock'
 
 class WorkflowTest < ActiveSupport::TestCase
   test 'validations' do
-    workflow = Factory :workflow
+    workflow = FactoryBot.create :workflow
     workflow.title = ''
 
     assert !workflow.valid?
@@ -12,12 +12,12 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test "new workflow's version is 1" do
-    workflow = Factory :workflow
+    workflow = FactoryBot.create :workflow
     assert_equal 1, workflow.version
   end
 
   test 'can create new version of workflow' do
-    workflow = Factory :workflow
+    workflow = FactoryBot.create :workflow
     old_attrs = workflow.attributes
 
     disable_authorization_checks do
@@ -41,24 +41,24 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'sop association' do
-    workflow = Factory :workflow
+    workflow = FactoryBot.create :workflow
     assert workflow.sops.empty?
 
     User.with_current_user(workflow.contributor.user) do
       assert_difference 'workflow.sops.count' do
-        workflow.sops << Factory(:sop, contributor:workflow.contributor)
+        workflow.sops << FactoryBot.create(:sop, contributor:workflow.contributor)
       end
     end
   end
 
   test 'has uuid' do
-    workflow = Factory :workflow
+    workflow = FactoryBot.create :workflow
     assert_not_nil workflow.uuid
   end
 
   test 'generates fresh RO-Crate for individual workflow' do
-    workflow = Factory(:cwl_workflow, license: 'MIT', other_creators: 'Jane Smith, John Smith')
-    creator = Factory(:person)
+    workflow = FactoryBot.create(:cwl_workflow, license: 'MIT', other_creators: 'Jane Smith, John Smith')
+    creator = FactoryBot.create(:person)
     workflow.creators << creator
     assert workflow.should_generate_crate?
 
@@ -80,7 +80,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates fresh RO-Crate for workflow/diagram/abstract workflow' do
-    workflow = Factory(:generated_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
     assert workflow.should_generate_crate?
 
     crate = workflow.ro_crate
@@ -94,7 +94,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'serves existing RO-Crate for RO-Crate workflow' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
     refute workflow.should_generate_crate?
 
     crate = workflow.ro_crate
@@ -105,7 +105,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'can get and set source URL' do
-    workflow = Factory(:workflow)
+    workflow = FactoryBot.create(:workflow)
 
     assert_no_difference('AssetLink.count') do
       workflow.source_link_url = 'https://github.com/seek4science/cool-workflow'
@@ -116,11 +116,10 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_equal 'https://github.com/seek4science/cool-workflow', workflow.source_link_url
-    assert_equal 'https://github.com/seek4science/cool-workflow', workflow.source_link.url
   end
 
   test 'can clear source URL' do
-    workflow = Factory(:workflow, source_link_url: 'https://github.com/seek4science/cool-workflow')
+    workflow = FactoryBot.create(:workflow, source_link_url: 'https://github.com/seek4science/cool-workflow')
     assert workflow.source_link
     assert workflow.source_link_url
 
@@ -133,10 +132,11 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_nil workflow.reload.source_link
+    assert_nil workflow.reload.source_link_url
   end
 
   test 'generates RO-Crate and diagram for workflow/abstract workflow' do
-    workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+    workflow = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
     assert workflow.should_generate_crate?
     crate = nil
 
@@ -148,13 +148,13 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates RO-Crate and gracefully handles diagram error for workflow/abstract workflow' do
-    bad_generator = MiniTest::Mock.new
+    bad_generator = Minitest::Mock.new
     def bad_generator.write_graph(struct)
       raise 'oh dear'
     end
 
     Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
-      workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+      workflow = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?
       crate = nil
 
@@ -168,7 +168,7 @@ class WorkflowTest < ActiveSupport::TestCase
 
   test 'create a workflow using a workflow class that does not have an extractor' do
     workflow_class = WorkflowClass.create(title: 'New Type', key: 'newtype')
-    workflow = Factory(:workflow, workflow_class: workflow_class)
+    workflow = FactoryBot.create(:workflow, workflow_class: workflow_class)
 
     assert workflow.valid?
   end
@@ -177,8 +177,8 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = nil
     with_config_value(:life_monitor_enabled, true) do
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
-        workflow = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
-                           policy: Factory(:public_policy))
+        workflow = FactoryBot.create(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
+                           policy: FactoryBot.create(:public_policy))
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
       end
@@ -200,8 +200,8 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = nil
     with_config_value(:life_monitor_enabled, true) do
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
-        workflow = Factory(:ro_crate_git_workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
-                           policy: Factory(:public_policy))
+        workflow = FactoryBot.create(:ro_crate_git_workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011',
+                           policy: FactoryBot.create(:public_policy))
         assert workflow.latest_git_version.has_tests?
         assert workflow.can_download?(nil)
       end
@@ -222,7 +222,7 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'does not create life monitor submission job if life monitor disabled' do
     with_config_value(:life_monitor_enabled, false) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy))
+        workflow = FactoryBot.create(:workflow_with_tests, policy: FactoryBot.create(:public_policy))
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
       end
@@ -232,7 +232,7 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'does not create life monitor submission job if no tests' do
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow, policy: Factory(:public_policy))
+        workflow = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
         refute workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
       end
@@ -242,7 +242,7 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'does not create life monitor submission job if no tests in git workflow' do
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+        workflow = FactoryBot.create(:ro_crate_git_workflow, policy: FactoryBot.create(:public_policy))
         refute workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
       end
@@ -252,7 +252,7 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'does not create life monitor submission job if workflow not publicly accessible' do
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        workflow = Factory(:workflow_with_tests, policy: Factory(:private_policy))
+        workflow = FactoryBot.create(:workflow_with_tests, policy: FactoryBot.create(:private_policy))
         assert workflow.latest_version.has_tests?
         refute workflow.can_download?(nil)
       end
@@ -263,14 +263,14 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = nil
     with_config_value(:life_monitor_enabled, true) do
       assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        workflow = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: Factory(:private_policy))
+        workflow = FactoryBot.create(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: FactoryBot.create(:private_policy))
         User.current_user = workflow.contributor.user
         assert workflow.latest_version.has_tests?
         refute workflow.can_download?(nil)
       end
 
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
-        workflow.policy = Factory(:public_policy)
+        workflow.policy = FactoryBot.create(:public_policy)
         disable_authorization_checks { workflow.save! }
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
@@ -289,7 +289,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'does not resubmit if workflow is already on life monitor' do
-    workflow = Factory(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: Factory(:public_policy))
+    workflow = FactoryBot.create(:workflow_with_tests, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('life_monitor/get_token') do
       VCR.use_cassette('life_monitor/existing_workflow_get') do
@@ -302,7 +302,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'test_status is not carried over to new versions' do
-    workflow = Factory(:workflow_with_tests)
+    workflow = FactoryBot.create(:workflow_with_tests)
     disable_authorization_checks { workflow.update_test_status(:all_passing) }
     v1 = workflow.find_version(1)
     assert_equal :all_passing, v1.test_status
@@ -319,7 +319,7 @@ class WorkflowTest < ActiveSupport::TestCase
 
   test 'update test status' do
     # Default latest version
-    workflow = Factory(:workflow_with_tests, test_status: nil)
+    workflow = FactoryBot.create(:workflow_with_tests, test_status: nil)
     v1 = workflow.find_version(1)
     disable_authorization_checks { workflow.save_as_new_version }
     v2 = workflow.find_version(2)
@@ -331,7 +331,7 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_failing, v2.reload.test_status
 
     # Explicit latest version
-    workflow = Factory(:workflow_with_tests, test_status: nil)
+    workflow = FactoryBot.create(:workflow_with_tests, test_status: nil)
     v1 = workflow.find_version(1)
     disable_authorization_checks { workflow.save_as_new_version }
     v2 = workflow.find_version(2)
@@ -343,7 +343,7 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_failing, v2.reload.test_status
 
     # Explicit non-latest version
-    workflow = Factory(:workflow_with_tests, test_status: nil)
+    workflow = FactoryBot.create(:workflow_with_tests, test_status: nil)
     v1 = workflow.find_version(1)
     disable_authorization_checks { workflow.save_as_new_version }
     v2 = workflow.find_version(2)
@@ -356,7 +356,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'test_status is not carried over to new git versions' do
-    workflow = Factory(:ro_crate_git_workflow)
+    workflow = FactoryBot.create(:ro_crate_git_workflow)
     disable_authorization_checks { workflow.update_test_status(:all_passing) }
     v1 = workflow.find_version(1)
     assert_equal :all_passing, v1.test_status
@@ -373,7 +373,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'test_status is preserved when freezing git versions' do
-    workflow = Factory(:local_ro_crate_git_workflow_with_tests)
+    workflow = FactoryBot.create(:local_ro_crate_git_workflow_with_tests)
 
     disable_authorization_checks { workflow.update_test_status(:all_passing) }
     v1 = workflow.find_version(1)
@@ -394,7 +394,7 @@ class WorkflowTest < ActiveSupport::TestCase
 
   test 'update test status for git versioned workflows' do
     # Default latest version
-    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    workflow = FactoryBot.create(:local_ro_crate_git_workflow, test_status: nil)
     v1 = workflow.find_version(1)
     disable_authorization_checks { workflow.save_as_new_git_version }
     v2 = workflow.find_version(2)
@@ -406,7 +406,7 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_failing, v2.reload.test_status
 
     # Explicit latest version
-    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    workflow = FactoryBot.create(:local_ro_crate_git_workflow, test_status: nil)
     v1 = workflow.find_version(1)
     disable_authorization_checks { workflow.save_as_new_git_version }
     v2 = workflow.find_version(2)
@@ -418,7 +418,7 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_failing, v2.reload.test_status
 
     # Explicit non-latest version
-    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    workflow = FactoryBot.create(:local_ro_crate_git_workflow, test_status: nil)
     v1 = workflow.find_version(1)
     disable_authorization_checks { workflow.save_as_new_git_version }
     v2 = workflow.find_version(2)
@@ -431,7 +431,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'updating test status does not trigger life monitor submission job' do
-    workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    workflow = FactoryBot.create(:workflow_with_tests, policy: FactoryBot.create(:public_policy), test_status: nil)
     assert_nil workflow.reload.test_status
     assert_nil workflow.latest_version.reload.test_status
     with_config_value(:life_monitor_enabled, true) do
@@ -442,7 +442,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'updating other workflow fields does trigger life monitor submission job' do
-    workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    workflow = FactoryBot.create(:workflow_with_tests, policy: FactoryBot.create(:public_policy), test_status: nil)
     assert_nil workflow.reload.test_status
     assert_nil workflow.latest_version.reload.test_status
     with_config_value(:life_monitor_enabled, true) do
@@ -453,7 +453,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'updating test status does not trigger life monitor submission job for git workflow' do
-    workflow = Factory(:local_ro_crate_git_workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    workflow = FactoryBot.create(:local_ro_crate_git_workflow_with_tests, policy: FactoryBot.create(:public_policy), test_status: nil)
     assert_nil workflow.reload.test_status
     assert_nil workflow.latest_version.reload.test_status
     with_config_value(:life_monitor_enabled, true) do
@@ -464,7 +464,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'updating other workflow fields does trigger life monitor submission job for git workflow' do
-    workflow = Factory(:local_ro_crate_git_workflow_with_tests, policy: Factory(:public_policy), test_status: nil)
+    workflow = FactoryBot.create(:local_ro_crate_git_workflow_with_tests, policy: FactoryBot.create(:public_policy), test_status: nil)
     assert_nil workflow.reload.test_status
     assert_nil workflow.latest_version.reload.test_status
     with_config_value(:life_monitor_enabled, true) do
@@ -475,7 +475,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'changing main workflow path refreshes internals structure' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     v = workflow.git_version
 
     disable_authorization_checks do
@@ -501,8 +501,26 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal 31, v.outputs.length
   end
 
+  test 'setting main workflow path for first time refreshes internals structure' do
+    workflow = FactoryBot.create(:annotationless_local_git_workflow)
+    v = workflow.git_version
+
+    assert_nil v.main_workflow_path
+
+    disable_authorization_checks do
+      v.main_workflow_path = 'concat_two_files.ga'
+      assert v.main_workflow_path_changed?
+      v.save!
+    end
+
+    assert_equal 'concat_two_files.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.length
+    assert_equal 1, v.steps.length
+    assert_equal 1, v.outputs.length
+  end
+
   test 'changing diagram path clears the cached diagram' do
-    workflow = Factory(:local_git_workflow)
+    workflow = FactoryBot.create(:local_git_workflow)
     v = workflow.git_version
     original_diagram = v.diagram
     assert original_diagram
@@ -530,8 +548,8 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'adding diagram path clears the cached auto-generated diagram' do
-    workflow = Factory(:annotationless_local_git_workflow,
-                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+    workflow = FactoryBot.create(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class))
 
     v = workflow.git_version
     disable_authorization_checks do
@@ -571,8 +589,8 @@ class WorkflowTest < ActiveSupport::TestCase
 
 
   test 'removing diagram path reverts to the auto-generated diagram' do
-    workflow = Factory(:annotationless_local_git_workflow,
-                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+    workflow = FactoryBot.create(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class))
 
     v = workflow.git_version
     disable_authorization_checks do
@@ -612,8 +630,8 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates RO-Crate for workflow with auto-generated diagram' do
-    workflow = Factory(:annotationless_local_git_workflow,
-                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+    workflow = FactoryBot.create(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class))
 
     v = workflow.git_version
     disable_authorization_checks do
@@ -635,7 +653,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'search terms for git workflows' do
-    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    workflow = FactoryBot.create(:annotationless_local_git_workflow, workflow_class: FactoryBot.create(:unextractable_workflow_class))
 
     v = nil
     disable_authorization_checks do
@@ -657,7 +675,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'updating workflow synchronizes metadata on git version' do
-    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    workflow = FactoryBot.create(:annotationless_local_git_workflow, workflow_class: FactoryBot.create(:unextractable_workflow_class))
     assert workflow.git_version.mutable
     disable_authorization_checks do
       workflow.update!(title: 'new title')
@@ -667,7 +685,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'updating workflow synchronizes metadata on immutable git version' do
-    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    workflow = FactoryBot.create(:annotationless_local_git_workflow, workflow_class: FactoryBot.create(:unextractable_workflow_class))
     disable_authorization_checks do
       workflow.git_version.lock
       refute workflow.git_version.mutable
@@ -678,13 +696,13 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'tags and ontology annotations in json api' do
-    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
-    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+    FactoryBot.create(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    FactoryBot.create(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
 
     workflow = User.with_current_user(user) do
-      Factory(:max_workflow, contributor: user.person)
+      FactoryBot.create(:max_workflow, contributor: user.person)
     end
 
     json = WorkflowSerializer.new(workflow).as_json
@@ -696,7 +714,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'ontology annotation properties'do
-    wf = Factory(:workflow)
+    wf = FactoryBot.create(:workflow)
 
     assert wf.supports_controlled_vocab_annotations?
     assert wf.supports_controlled_vocab_annotations?(:topics)
@@ -711,7 +729,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'associate tools with workflow' do
-    wf = Factory(:workflow)
+    wf = FactoryBot.create(:workflow)
 
     assert_difference('BioToolsLink.count', 3) do
       wf.tools_attributes = [
@@ -727,7 +745,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'associating tools with workflow does not create duplicate annotation records' do
-    wf = Factory(:workflow)
+    wf = FactoryBot.create(:workflow)
     disable_authorization_checks do
       wf.tools_attributes = [
         { bio_tools_id: 'thing-doer', name: 'ThingDoer'},
@@ -752,6 +770,192 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal 'ThingDoer!!!', thing_doer.reload.name, 'Should update name of tool'
       assert_equal %w[database-accessor javascript thing-doer],
                    wf.bio_tools_links.pluck(:bio_tools_id).sort
+    end
+  end
+
+  test 'cannot delete workflow with doi' do
+    workflow = FactoryBot.create(:workflow)
+    v = workflow.latest_version
+    User.with_current_user(workflow.contributor.user) do
+      assert workflow.state_allows_delete?
+      assert workflow.can_delete?
+
+      assert v.update(doi: '10.81082/dev-workflowhub.workflow.136.1')
+
+      refute workflow.state_allows_delete?
+      refute workflow.can_delete?
+    end
+  end
+
+  test 'cannot delete git workflow with doi' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    v = workflow.git_version
+    User.with_current_user(workflow.contributor.user) do
+      assert workflow.state_allows_delete?
+      assert workflow.can_delete?
+
+      assert v.update(doi: '10.81082/dev-workflowhub.workflow.136.1')
+
+      refute workflow.state_allows_delete?
+      refute workflow.can_delete?
+    end
+  end
+
+  test 'sets deleted_contributor after contributor deleted' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    assert_nil workflow.deleted_contributor
+    refute workflow.has_deleted_contributor?
+
+    disable_authorization_checks do
+      workflow.contributor.destroy!
+    end
+
+    workflow.reload
+    assert workflow.deleted_contributor
+    assert workflow.has_deleted_contributor?
+  end
+
+  test 'sets maturity level' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    disable_authorization_checks do
+      workflow.maturity_level = :released
+      assert workflow.save
+      assert_equal :released, workflow.maturity_level
+
+      workflow.maturity_level = :work_in_progress
+      assert workflow.save
+      assert_equal :work_in_progress, workflow.maturity_level
+
+      workflow.maturity_level = :deprecated
+      assert workflow.save
+      assert_equal :deprecated, workflow.maturity_level
+
+      workflow.maturity_level = :something
+      assert workflow.save
+      assert_nil workflow.maturity_level
+    end
+  end
+
+  test 'can get and set execution instance URL' do
+    workflow = FactoryBot.create(:workflow)
+
+    assert_no_difference('AssetLink.count') do
+      workflow.execution_instance_url = 'https://mygalaxy.instance/'
+    end
+
+    assert_difference('AssetLink.count', 1) do
+      disable_authorization_checks { workflow.save! }
+    end
+
+    assert_equal 'https://mygalaxy.instance/', workflow.execution_instance_url
+  end
+
+  test 'can clear execution instance URL' do
+    workflow = FactoryBot.create(:workflow, execution_instance_url: 'https://mygalaxy.instance/')
+    assert workflow.execution_instance
+    assert workflow.execution_instance_url
+
+    assert_no_difference('AssetLink.count') do
+      workflow.execution_instance_url = nil
+    end
+
+    assert_difference('AssetLink.count', -1) do
+      disable_authorization_checks { workflow.save! }
+    end
+
+    assert_nil workflow.reload.execution_instance
+    assert_nil workflow.reload.execution_instance_url
+  end
+
+  test 'can_run?' do
+    assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy)).can_run?
+    assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy), execution_instance_url: 'https://mygalaxy.instance/').can_run?
+    refute FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:private_policy)).can_run?
+    refute FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).can_run?
+  end
+
+  test 'run_url' do
+    # Using default
+    with_config_value(:galaxy_instance_default, 'http://default-galaxy-instance.com') do
+      default = FactoryBot.create(:generated_galaxy_ro_crate_workflow)
+      trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{default.id}/versions/1")
+      assert_equal "http://default-galaxy-instance.com/workflows/trs_import?trs_url=#{trs_url}&run_form=true", default.run_url
+    end
+
+    # With explicit execution instance
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/')
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.run_url
+
+    # Versions
+    disable_authorization_checks do
+      workflow.save_as_new_version('new version')
+    end
+    v2_trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/2")
+    assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{v2_trs_url}&run_form=true", workflow.run_url
+    assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.find_version(1).run_url
+
+    # Galaxy instance with sub-URI
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/galaxy/')
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    assert_equal "https://mygalaxy.instance/galaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.run_url
+
+    # Not supported for non-galaxy currently
+    assert_nil FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).run_url
+  end
+
+  test 'applies instance default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = false
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::ACCESSIBLE, policy.access_type
+      assert_equal 0, policy.permissions.count
+    end
+  end
+
+  test 'applies project default policy' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.save!
+      project.default_policy.permissions << Permission.new(contributor: admin, access_type: Policy::MANAGING)
+    end
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::NO_ACCESS, policy.access_type
+      assert_equal 1, policy.permissions.count
+      assert_equal admin, policy.permissions.first.contributor
+      assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    end
+  end
+
+  test 'does not apply project default policy if it does not exist' do
+    admin = FactoryBot.create(:project_administrator)
+    project = admin.projects.first
+    disable_authorization_checks do
+      project.use_default_policy = true
+      project.save!
+    end
+    assert_nil project.default_policy
+
+    with_config_value(:default_all_visitors_access_type, Policy::ACCESSIBLE) do
+      workflow = FactoryBot.create(:workflow, projects: [project])
+      policy = workflow.policy
+      assert_equal Policy::ACCESSIBLE, policy.access_type
+      assert_equal 0, policy.permissions.count
     end
   end
 end

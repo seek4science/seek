@@ -5,7 +5,7 @@
   def make_file(uuid,name)
      fixture_file = "#{Rails.root}/test/fixtures/files/#{name}"
      dir = "#{Seek::Config.asset_filestore_path}"
-     FileUtils.mkdir_p(dir) unless File.exists?(dir)
+     FileUtils.mkdir_p(dir) unless File.exist?(dir)
      destination = "#{dir}/#{uuid}.dat"
      FileUtils.cp(fixture_file,destination)
   end
@@ -104,9 +104,9 @@ sop_with_public_download_and_no_custom_sharing_blob:
   content_type: "text/plain"
   asset_version: 1
 
-sop_that_uses_whitelist_blacklist_and_custom_sharing_blob:
+sop_that_uses_allowlist_denylist_and_custom_sharing_blob:
   uuid: <%=  init_blob('little_file.txt') %>
-  asset: sop_that_uses_whitelist_blacklist_and_custom_sharing (Sop)
+  asset: sop_that_uses_allowlist_denylist_and_custom_sharing (Sop)
   original_filename: "little_file.txt"
   content_type: "text/plain"
   asset_version: 1

@@ -88,6 +88,7 @@ columns:
     required: [ ]
     default: [ published_date, journal ]
     additional_allowed: [ abstract, citation, bookmark, publisher, editor, url ]
+    blocked: [ license ]
 
   sample_type:
     required: [ ]
@@ -110,3 +111,7 @@ columns:
     default: [ web_page ]
     additional_allowed: [ start_date, end_date, topic_annotation_values ]
 
+  sample:
+    required: [ ]
+    default: [ sample_type ]
+    additional_allowed: [ ]

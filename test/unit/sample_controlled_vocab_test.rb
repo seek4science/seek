@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SampleControlledVocabTest < ActiveSupport::TestCase
   test 'association with terms' do
-    User.with_current_user(Factory(:project_administrator).user) do
+    User.with_current_user(FactoryBot.create(:project_administrator).user) do
       vocab = SampleControlledVocab.new(title: 'test')
       vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
       vocab.save!
@@ -12,7 +12,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'labels' do
-    User.with_current_user(Factory(:project_administrator).user) do
+    User.with_current_user(FactoryBot.create(:project_administrator).user) do
       vocab = SampleControlledVocab.new(title: 'test')
       vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
       vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'sprout')
@@ -22,7 +22,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    User.with_current_user(Factory(:project_administrator).user) do
+    User.with_current_user(FactoryBot.create(:project_administrator).user) do
       vocab = SampleControlledVocab.new
       refute vocab.valid?
       vocab.title = 'test'
@@ -35,8 +35,34 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
   end
 
+  test 'validate ols ols_root_term_uris' do
+    vocab = SampleControlledVocab.new(title: 'multiple uris')
+    assert vocab.valid?
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395'
+    assert vocab.valid?
+    vocab.ols_root_term_uris = 'wibble'
+    refute vocab.valid?
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035'
+    assert vocab.valid?
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035,   http://purl.obolibrary.org/obo/GO_0090396'
+    assert vocab.valid?
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035, http://purl.obolibrary.org/obo/GO_0090396', vocab.ols_root_term_uris
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, wibble'
+    refute vocab.valid?
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, '
+    assert vocab.valid?
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395', vocab.ols_root_term_uris
+
+    vocab.ols_root_term_uris = 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035,  '
+    assert vocab.valid?
+    assert_equal 'http://purl.obolibrary.org/obo/GO_0090395, http://purl.obolibrary.org/obo/GO_0085035', vocab.ols_root_term_uris
+  end
+
   test 'validate unique key' do
-    User.with_current_user(Factory(:project_administrator).user) do
+    User.with_current_user(FactoryBot.create(:project_administrator).user) do
       SampleControlledVocab.create(title: 'no key')
       SampleControlledVocab.create(title: 'blank key',key:'')
       vocab = SampleControlledVocab.new(title: 'test')
@@ -57,21 +83,21 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'apples factory' do
-    apples = Factory(:apples_sample_controlled_vocab)
+    apples = FactoryBot.create(:apples_sample_controlled_vocab)
     assert apples.title.start_with?('apples controlled vocab')
     assert_equal ['Golden Delicious', 'Granny Smith', 'Bramley', "Cox's Orange Pippin"].sort, apples.labels.sort
   end
 
   test 'includes term?' do
-    apples = Factory(:apples_sample_controlled_vocab)
+    apples = FactoryBot.create(:apples_sample_controlled_vocab)
     assert apples.includes_term?('Bramley')
     refute apples.includes_term?('Fish')
   end
 
   test 'destroy' do
-    cv = Factory(:apples_sample_controlled_vocab)
+    cv = FactoryBot.create(:apples_sample_controlled_vocab)
 
-    User.with_current_user(Factory(:project_administrator).user) do
+    User.with_current_user(FactoryBot.create(:project_administrator).user) do
       assert cv.can_delete?
       assert_difference('SampleControlledVocab.count', -1) do
         assert_difference('SampleControlledVocabTerm.count', -4) do
@@ -82,8 +108,8 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'cannot destroy if linked to sample type' do
-    type = Factory(:apples_controlled_vocab_sample_type)
-    User.with_current_user(Factory(:project_administrator).user) do
+    type = FactoryBot.create(:apples_controlled_vocab_sample_type)
+    User.with_current_user(FactoryBot.create(:project_administrator).user) do
       cv = type.sample_attributes.first.sample_controlled_vocab
       refute cv.can_delete?
       assert_no_difference('SampleControlledVocab.count') do
@@ -95,11 +121,11 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'can delete?' do
-    cv = Factory(:apples_sample_controlled_vocab)
-    cv_with_sample_type = Factory(:apples_controlled_vocab_sample_type).sample_attributes.first.sample_controlled_vocab
-    admin = Factory(:admin)
-    proj_admin = Factory(:project_administrator)
-    person = Factory(:person)
+    cv = FactoryBot.create(:apples_sample_controlled_vocab)
+    cv_with_sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type).sample_attributes.first.sample_controlled_vocab
+    admin = FactoryBot.create(:admin)
+    proj_admin = FactoryBot.create(:project_administrator)
+    person = FactoryBot.create(:person)
 
     with_config_value :project_admin_sample_type_restriction, false do
       assert cv.can_delete?(admin.user)
@@ -122,8 +148,8 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
 
   #tests a peculiar error that was occuring with sqlite3, where the controlled vocab was the same between factory created sample types
   test 'controlled vocab sample type factory' do
-    type = Factory.create(:apples_controlled_vocab_sample_type, title: 'test1')
-    type2 = Factory.create(:apples_controlled_vocab_sample_type, title: 'test2')
+    type = FactoryBot.create(:apples_controlled_vocab_sample_type, title: 'test1')
+    type2 = FactoryBot.create(:apples_controlled_vocab_sample_type, title: 'test2')
 
     refute_equal type.id, type2.id, 'sample type ids should be different'
 
@@ -133,23 +159,23 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'can edit' do
-    admin = Factory(:admin)
-    person = Factory(:person)
-    cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test')
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:person)
+    cv = FactoryBot.create(:apples_sample_controlled_vocab, title: 'for can_edit test')
     with_config_value :project_admin_sample_type_restriction, false do
       assert_empty cv.samples
       refute cv.can_edit? # nobody logged in
       User.with_current_user(person) do
         assert cv.can_edit?
 
-        type = Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
+        type = FactoryBot.create(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
         cv_with_sample_type = type.sample_attributes.first.sample_controlled_vocab
         assert_empty cv_with_sample_type.samples
         assert cv_with_sample_type.can_edit?
 
         # cannot edit if linked to samples
-        contributor=Factory(:person)
-        sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
+        contributor=FactoryBot.create(:person)
+        sample = Sample.new(sample_type: FactoryBot.create(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
                             title: 'testing cv can edit', project_ids: person.projects.collect(&:id), contributor: person)
         sample.set_attribute_value(:apples, 'Bramley')
         disable_authorization_checks do
@@ -164,7 +190,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
 
     # need to be a project administrator if restriction configured
     with_config_value :project_admin_sample_type_restriction, true do
-      project_admin = Factory(:project_administrator)
+      project_admin = FactoryBot.create(:project_administrator)
       assert_empty cv.samples
       refute cv.can_edit?(person.user)
       User.with_current_user(person.user) do
@@ -184,11 +210,11 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'admin can edit system controlled vocab' do
-    admin = Factory(:admin)
-    person = Factory(:person)
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:person)
 
-    vocab = Factory(:apples_sample_controlled_vocab)
-    sys_vocab = Factory(:topics_controlled_vocab)
+    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
+    sys_vocab = FactoryBot.create(:topics_controlled_vocab)
 
     refute vocab.system_vocab?
     assert sys_vocab.system_vocab?
@@ -201,11 +227,11 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'admin can edit even if there are samples' do
-    contributor=Factory(:person)
-    another_person = Factory(:person)
-    admin = Factory(:admin)
+    contributor=FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person)
+    admin = FactoryBot.create(:admin)
 
-    sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
+    sample = Sample.new(sample_type: FactoryBot.create(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
                         title: 'testing cv can edit', project_ids: contributor.projects.collect(&:id), contributor: contributor)
     sample.set_attribute_value(:apples, 'Bramley')
     disable_authorization_checks do
@@ -220,9 +246,9 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'can create' do
-    admin = Factory(:admin)
-    none_admin = Factory(:person)
-    proj_admin = Factory(:project_administrator)
+    admin = FactoryBot.create(:admin)
+    none_admin = FactoryBot.create(:person)
+    proj_admin = FactoryBot.create(:project_administrator)
     refute SampleControlledVocab.can_create?
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user none_admin.user do
@@ -253,7 +279,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'trigger regeneration of sample type templates when saved' do
-    type = Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
+    type = FactoryBot.create(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
     cv = type.sample_attributes.first.sample_controlled_vocab
     refute_nil cv
     refute cv.new_record?
@@ -279,11 +305,19 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'ontology based?' do
-    vocab = Factory(:apples_sample_controlled_vocab)
+    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
     refute vocab.ontology_based?
 
-    vocab = Factory(:topics_controlled_vocab)
+    vocab = FactoryBot.create(:topics_controlled_vocab)
     assert vocab.ontology_based?
+  end
+
+  test 'should not allow to add term with same label' do
+    vocab = FactoryBot.create(:apples_sample_controlled_vocab)
+    vocab.sample_controlled_vocab_terms.create(label: 'Golden Delicious')
+    assert_raises ActiveRecord::RecordInvalid do
+      vocab.sample_controlled_vocab_terms.create!(label: 'Golden Delicious')
+    end
   end
 
 end

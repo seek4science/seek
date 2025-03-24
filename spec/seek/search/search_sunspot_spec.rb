@@ -1,9 +1,9 @@
 require 'rails_helper'
-require 'factory_girl'
+require 'factory_bot'
 require_relative '../../../test/factories_helper.rb'
 include FactoriesHelper
 
-FactoryGirl.find_definitions
+FactoryBot.find_definitions
 
 #acts_as_asset
 describe DataFile do

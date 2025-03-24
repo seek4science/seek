@@ -24,7 +24,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'should return 406 when requesting RDF' do
-    event = Factory :event, contributor: User.current_user.person
+    event = FactoryBot.create :event, contributor: User.current_user.person
     assert event.can_view?
 
     get :show, params: { id: event, format: :rdf }
@@ -33,10 +33,10 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'should have no avatar element in list' do
-    e = Factory :event,
-                contributor: Factory(:person, first_name: 'Dont', last_name: 'Display Person'),
-                project_ids: [Factory(:project, title: 'Dont Display Project').id],
-                policy: Factory(:public_policy)
+    e = FactoryBot.create :event,
+                contributor: FactoryBot.create(:person, first_name: 'Dont', last_name: 'Display Person'),
+                project_ids: [FactoryBot.create(:project, title: 'Dont Display Project').id],
+                policy: FactoryBot.create(:public_policy)
     get :index
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item' do
@@ -46,13 +46,15 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'index should not show contributor or project' do
-    e = Factory :event,
-                contributor: Factory(:person, first_name: 'Dont', last_name: 'Display Person'),
-                project_ids: [Factory(:project, title: 'Dont Display Project').id],
-                policy: Factory(:public_policy)
+    e = FactoryBot.create :event,
+                contributor: FactoryBot.create(:person, first_name: 'Dont', last_name: 'Display Person'),
+                project_ids: [FactoryBot.create(:project, title: 'Dont Display Project').id],
+                policy: FactoryBot.create(:public_policy)
     get :index
-    assert !(/Dont Display Person/ =~ @response.body)
-    assert !(/Dont Display Project/ =~ @response.body)
+
+    assert_select '.list_items_container .list_item'
+    assert_select '.list_items_container .list_item', text:/Don't Display Person/, count:0
+    assert_select '.list_items_container .list_item', text:/Don't Display Project/, count:0
   end
 
   test "shouldn't show hidden items in index" do
@@ -138,8 +140,8 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   # test "should not add invisible data_file" do
-  #  e = Factory :event, :contributor => User.current_user.person
-  #  df = Factory :data_file, :contributor => Factory(:person), :policy => Factory(:private_policy)
+  #  e = FactoryBot.create :event, :contributor => User.current_user.person
+  #  df = FactoryBot.create :data_file, :contributor => FactoryBot.create(:person), :policy => FactoryBot.create(:private_policy)
   #  put :update, :id => e.id, :data_file_ids => ["#{df.id}"], :event => {}
   #
   #  assert_redirected_to e
@@ -147,8 +149,8 @@ class EventsControllerTest < ActionController::TestCase
   # end
   #
   # test "should not lose invisible data_files when updating" do
-  #  e = Factory :event, :contributor => User.current_user,
-  #              :data_files => [Factory(:data_file, :contributor => Factory(:user), :policy => Factory(:private_policy))]
+  #  e = FactoryBot.create :event, :contributor => User.current_user,
+  #              :data_files => [FactoryBot.create(:data_file, :contributor => FactoryBot.create(:user), :policy => FactoryBot.create(:private_policy))]
   #  put :update, :id => e.id, :data_file_ids => []
   #
   #  assert_redirected_to e
@@ -168,11 +170,62 @@ class EventsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+
+  test 'create, update and show an event with extended metadata' do
+    cmt = FactoryBot.create(:simple_event_extended_metadata_type)
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('Event.count') do
+        assert_difference('ExtendedMetadata.count') do
+          post :create, params: { event: { title: 'Barn Raising', start_date: DateTime.now, project_ids: [@project.id], country:'FR',
+                                           extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                                          data:{ 'age': 22,'name':'fred'}}}
+          }
+        end
+      end
+    end
+
+    event = assigns(:event)
+
+    cm = event.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal 'fred',cm.get_attribute_value('name')
+    assert_equal 22,cm.get_attribute_value('age')
+    assert_nil cm.get_attribute_value('date')
+
+    get :show, params: { id: event }
+    assert_response :success
+
+    assert_select 'div.extended_metadata',text:/fred/, count:1
+    assert_select 'div.extended_metadata',text:/22/, count:1
+
+    # test update
+    old_id = cm.id
+    assert_no_difference('Event.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: event.id, event: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                      data: {
+                                                                                        "age": 20,
+                                                                                        "name": 'max'
+                                                                                      } }
+        }
+        }
+      end
+    end
+
+    assert new_event = assigns(:event)
+    assert_equal 'new title', new_event.title
+    assert_equal 'max', new_event.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_event.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_event.extended_metadata.id
+  end
+
   test 'programme events through nested routing' do
     assert_routing 'programmes/2/events', controller: 'events', action: 'index', programme_id: '2'
-    programme = Factory(:programme)
-    event = Factory(:event, projects: programme.projects, policy: Factory(:public_policy))
-    event2 = Factory(:event, policy: Factory(:public_policy))
+    programme = FactoryBot.create(:programme)
+    event = FactoryBot.create(:event, projects: programme.projects, policy: FactoryBot.create(:public_policy))
+    event2 = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
 
     get :index, params: { programme_id: programme.id }
 
@@ -184,7 +237,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'should create event with associated data file' do
-    data_file = Factory(:data_file)
+    data_file = FactoryBot.create(:data_file)
     assert_difference('Event.count', 1) do
       post :create, params: { event: valid_event.merge(data_file_ids: [data_file.id]), sharing: valid_sharing }
     end
@@ -194,7 +247,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'should create event and link to document' do
     person = User.current_user.person
-    doc = Factory(:document, contributor:person)
+    doc = FactoryBot.create(:document, contributor:person)
 
     assert_difference('Event.count', 1) do
       post :create, params: { event: valid_event.merge(document_ids: [doc.id.to_s]), sharing: valid_sharing }
@@ -205,7 +258,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'should not create event with link to none visible document' do
-    doc = Factory(:document)
+    doc = FactoryBot.create(:document)
     refute doc.can_view?
 
     assert_no_difference('Event.count') do
@@ -216,8 +269,8 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'should update with link to document' do
     person = User.current_user.person
-    doc = Factory(:document, contributor:person)
-    event = Factory(:event,documents:[Factory(:document,contributor:person)],contributor:person)
+    doc = FactoryBot.create(:document, contributor:person)
+    event = FactoryBot.create(:event,documents:[FactoryBot.create(:document,contributor:person)],contributor:person)
     refute_empty event.documents
     refute_includes event.documents, doc
     put :update, params: { id: event.id, event: {document_ids:[doc.id.to_s]} }
@@ -230,8 +283,8 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    event = Factory(:event, contributor:person)
+    person = FactoryBot.create(:person)
+    event = FactoryBot.create(:event, contributor:person)
     login_as(person)
     assert event.can_manage?
     get :manage, params: {id: event}
@@ -250,8 +303,8 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    event = Factory(:event, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    event = FactoryBot.create(:event, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert event.can_edit?
     refute event.can_manage?
@@ -261,14 +314,14 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    event = Factory(:event, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    event = FactoryBot.create(:event, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert event.can_manage?
@@ -292,17 +345,17 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
 
-    event = Factory(:event, projects:[proj1], policy:Factory(:private_policy,
-                                                                           permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    event = FactoryBot.create(:event, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                                           permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute event.can_manage?
@@ -329,11 +382,11 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test 'should not duplicate related programmes' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    projects = [Factory(:project),Factory(:project)]
-    programme = Factory(:programme,projects:projects)
-    event = Factory(:event, projects:projects, policy:Factory(:public_policy))
+    projects = [FactoryBot.create(:project),FactoryBot.create(:project)]
+    programme = FactoryBot.create(:programme,projects:projects)
+    event = FactoryBot.create(:event, projects:projects, policy:FactoryBot.create(:public_policy))
 
     get :show, params: { id: event }
     assert_response :success
@@ -341,5 +394,11 @@ class EventsControllerTest < ActionController::TestCase
     assert_select('div.related-items div#programmes div.list_item_title a[href=?]',programme_path(programme),count:1)
   end
 
-
+  test 'do not get index if feature disabled' do
+    with_config_value(:events_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
 end

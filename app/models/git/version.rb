@@ -11,7 +11,7 @@ module Git
     has_many :remote_source_annotations, -> { where(key: 'remote_source') }, autosave: true,
              inverse_of: :git_version, dependent: :destroy, class_name: 'Git::Annotation', foreign_key: :git_version_id
 
-    before_create :set_version
+    before_validation :set_version, on: :create
     before_validation :set_git_info, on: :create
     before_validation :set_default_visibility, on: :create
     before_validation :assign_contributor, on: :create
@@ -22,11 +22,14 @@ module Git
     accepts_nested_attributes_for :git_annotations
 
     store :resource_attributes, coder: JSON
+    validates :name, length: { minimum: 1 }
     validates :git_repository, presence: true
     validate :git_repository_linkable
 
     include Git::Operations
     include Seek::UrlValidation
+    acts_as_favouritable
+
 
     alias_method :parent, :resource # ExplicitVersioning compatibility
 

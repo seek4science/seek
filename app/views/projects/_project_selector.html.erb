@@ -6,6 +6,7 @@
 <%
   allow_nil ||= false
   allow_all ||= false
+  allow_only_administered ||= false
   resource ||= nil
 
   selected_projects = resource ? resource.projects : []
@@ -13,13 +14,14 @@
     possible_projects = Project.all
   else
     possible_projects = []
-    possible_projects |= User.current_user.person.current_projects
+    possible_projects |= current_person.current_projects
     if resource
       possible_projects |= resource.projects
       possible_projects |= resource.contributor.current_projects if resource.respond_to?(:contributor) && resource.contributor
     end
   end
 
+  possible_projects = possible_projects.select { |p| current_person.is_project_administrator? p } if allow_only_administered
   possible_projects = possible_projects - selected_projects
 
   possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|
@@ -30,7 +32,7 @@
   title = t('project').pluralize
   title += '<span class="required">*</span>'.html_safe unless allow_nil
 
-  object_type_text = resource.class.name.underscore.humanize
+  object_type_text = text_for_resource(resource)
 %>
 
 <%= folding_panel(title, false, id: "add_projects_form",
@@ -106,8 +108,7 @@
                 var licenseSelect = $j('#license-select');
                 if (licenseSelect.length && licenseSelect.data('canOverwrite') &&
                     $j('option[value="'+Sharing.defaultLicenses[project.id]+'"]', licenseSelect).length) {
-                    licenseSelect.val(Sharing.defaultLicenses[project.id]);
-                    zenodoExport.setLicenseUrl();
+                    licenseSelect.val(Sharing.defaultLicenses[project.id]).change();
                 }
             }
             this.possibilities.splice(i, 1);
@@ -119,12 +120,13 @@
   });
 
   $j(document).ready(function () {
-      <% if params[:project_ids] && resource && resource.new_record? %>
-      // Auto select projects from params if this is a new object
-      <% params[:project_ids].each do |project_id| %>
-      Sharing.projectsSelector.add(<%= project_id %>, true);
+    // Auto select projects from params[:project_ids] or params[resource][:project_ids] if this is a new object
+    <% if resource&.new_record? %>
+      <% project_ids = (params[:project_ids] || params.dig(controller_name.singularize, :project_ids) || []).compact_blank %>
+      <% project_ids.each do |project_id| %>
+        Sharing.projectsSelector.add(<%= project_id %>, true);
       <% end %>
-      <% end %>
+    <% end %>
     // Auto select project if there is only one
     if (Sharing.projectsSelector.possibilities.length === 1 &&
         Sharing.projectsSelector.selected.length === 0) {

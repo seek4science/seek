@@ -1,30 +1,32 @@
-# Programme
-#
-
-
-Factory.define(:programme) do |f|
-  f.sequence(:title) { |n| "A Programme: #{n}" }
-  f.projects { [Factory(:project)] }
-  f.after_create do |p|
-    p.is_activated = true
-    p.save
+FactoryBot.define do
+  # Programme
+  #
+  
+  
+  factory(:programme) do
+    sequence(:title) { |n| "A Programme: #{n}" }
+    projects { [FactoryBot.create(:project)] }
+    after(:create) do |p|
+      p.is_activated = true
+      p.save
+    end
   end
-end
-
-Factory.define(:min_programme, class: Programme) do |f|
-  f.title "A Minimal Programme"
-end
-
-Factory.define(:max_programme, class: Programme) do |f|
-  f.title "A Maximal Programme"
-  f.description "A very exciting programme"
-  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-  f.web_page "http://www.synbiochem.co.uk"
-  f.funding_details "Someone is funding this for me"
-  f.projects { [Factory(:max_project)] }
-  f.programme_administrators { [Factory(:person)] }
-  f.after_create do |p|
-    p.annotate_with(['DFG'], 'funding_code', p.programme_administrators.first)
-    p.save!
+  
+  factory(:min_programme, class: Programme) do
+    title { "A Minimal Programme" }
+  end
+  
+  factory(:max_programme, class: Programme) do
+    title { "A Maximal Programme" }
+    description { "A very exciting programme" }
+    discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
+    web_page { "http://www.synbiochem.co.uk" }
+    funding_details { "Someone is funding this for me" }
+    projects { [FactoryBot.create(:max_project)] }
+    programme_administrators { [FactoryBot.create(:person)] }
+    after(:create) do |p|
+      p.annotate_with(['DFG'], 'funding_code', p.programme_administrators.first)
+      p.save!
+    end
   end
 end

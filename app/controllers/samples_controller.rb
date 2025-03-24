@@ -8,12 +8,16 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :check_if_locked_sample_type, only: %i[edit new create update]
+  before_action :authorize_sample_type, only: %i[new create]
   before_action :templates_enabled?, only: [:query, :query_form]
-  
-  before_action :auth_to_create, only: [:new, :create]
 
-  
+  before_action :auth_to_create, only: %i[new create batch_create]
+
   include Seek::IsaGraphExtensions
+  include Seek::Publishing::PublishingCommon
+
+  api_actions :index, :show, :create, :update, :destroy, :batch_create
 
   def index
     # There must be better ways of coding this
@@ -40,10 +44,11 @@ class SamplesController < ApplicationController
 
   def new
     if params[:sample_type_id]
-      @sample = Sample.new(sample_type_id: params[:sample_type_id])
+      @sample = Sample.new(sample_type_id: params[:sample_type_id], project_ids: params[:project_ids])
       respond_with(@sample)
     else
-      redirect_to select_sample_types_path
+      project_ids_param = params[:sample] ? params[:sample][:project_ids] : {}
+      redirect_to select_sample_types_path(act: :create, project_ids: project_ids_param)
     end
   end
 
@@ -70,11 +75,17 @@ class SamplesController < ApplicationController
     respond_to do |format|
       format.html
       format.json {render json: @sample, include: [params[:include]]}
+      format.rdf { render template: 'rdf/show' }
     end
   end
 
   def edit
     @sample = Sample.find(params[:id])
+    if !@sample.originating_data_file.nil? && @sample.edit_count.zero?
+      flash.now[:error] = '<strong>Warning:</strong> This sample was extracted from a datafile.
+                           If you edit the sample, it will no longer correspond to the original source data.<br/>
+                           Unless you cancel, a label will be added to the sample\'s source field to indicate it is no longer valid.'.html_safe
+    end
     respond_with(@sample)
   end
 
@@ -166,6 +177,7 @@ class SamplesController < ApplicationController
         begin
           converted_params = param_converter.convert(par)
           sample = Sample.find(par[:id])
+          raise 'shouldnt get this far without manage rights' unless sample.can_manage?
           sample = update_sample_with_params(converted_params, sample)
           saved = sample.save
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
@@ -197,46 +209,61 @@ class SamplesController < ApplicationController
   end
 
   def typeahead
+    query = params[:q] || ''
     sample_type = SampleType.find(params[:linked_sample_type_id])
     results = sample_type.samples.where("LOWER(title) like :query",
-              query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
+              query: "%#{query.downcase}%").limit(params[:limit] || 100).authorized_for(:view)
     items = results.map do |sa|
       { id: sa.id,
-        name: sa.title }
+        text: sa.title }
     end
 
     respond_to do |format|
-      format.json { render json: items.to_json }
+      format.json { render json: { results: items}.to_json }
     end
   end
 
   def query
     project_ids = params[:project_ids]&.map(&:to_i)
-
+    attribute_filter_value = params[:template_attribute_value]&.downcase
     @result = params[:template_id].present? ?
       Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
 
-    if params[:template_attribute_id].present? && params[:template_attribute_value].present?
-      attribute_title = TemplateAttribute.find(params[:template_attribute_id]).title
-      @result = @result.select { |s| s.get_attribute_value(attribute_title)&.include?(params[:template_attribute_value]) }
+    if params[:template_attribute_id].present? && attribute_filter_value.present?
+      template_attribute = TemplateAttribute.find(params[:template_attribute_id])
+      @result = @result.select do |s|
+        sample_attribute = s.sample_type.sample_attributes.detect { |sa| template_attribute.sample_attributes.include? sa }
+        sample_attribute_title = sample_attribute&.title
+        if sample_attribute&.sample_attribute_type&.seek_sample_multi?
+          attr_value = s.get_attribute_value(sample_attribute_title)
+          attr_value&.any? { |v| v[:title].downcase.include?(attribute_filter_value) }
+        elsif sample_attribute&.sample_attribute_type&.seek_sample?
+          s.get_attribute_value(sample_attribute_title)[:title]&.downcase&.include?(attribute_filter_value)
+        elsif sample_attribute&.sample_attribute_type&.seek_cv_list?
+          attr_value = s.get_attribute_value(sample_attribute_title)
+          attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
+        else
+          s.get_attribute_value(sample_attribute_title)&.downcase&.include?(attribute_filter_value)
+        end
+      end
     end
 
-    if params[:input_template_id].present? # linked
-      title =
-        TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
-      @result = find_samples(@result, :linked_samples,
-        { attribute_id: params[:input_attribute_id],
+    if params[:input_template_id].present? && params[:input_attribute_id].present? # linked
+      input_template_attribute =
+        TemplateAttribute.find(params[:input_attribute_id])
+      @result = filter_linked_samples(@result, :linked_samples,
+                                      { attribute_id: params[:input_attribute_id],
           attribute_value: params[:input_attribute_value],
-          template_id: params[:input_template_id] }, title)
+          template_id: params[:input_template_id] }, input_template_attribute)
     end
 
-    if params[:output_template_id].present? # linking
-      title =
-        TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
-      @result = find_samples(@result, :linking_samples,
-        { attribute_id: params[:output_attribute_id],
+    if params[:output_template_id].present? && params[:output_attribute_id].present? # linking
+      output_template_attribute =
+        TemplateAttribute.find(params[:output_attribute_id])
+      @result = filter_linked_samples(@result, :linking_samples,
+                                      { attribute_id: params[:output_attribute_id],
           attribute_value: params[:output_attribute_value],
-          template_id: params[:output_template_id] }, title)
+          template_id: params[:output_template_id] }, output_template_attribute)
     end
 
     @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
@@ -264,15 +291,15 @@ class SamplesController < ApplicationController
 
     if sample_type
       sample_type.sample_attributes.each do |attr|
-        if attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
-          sample_type_param_keys << { attr.title=>[]}
+        if attr.sample_attribute_type.controlled_vocab? || attr.sample_attribute_type.seek_sample_multi? || attr.sample_attribute_type.seek_sample?
+          sample_type_param_keys << { attr.title => [] }
           sample_type_param_keys << attr.title.to_sym
-          else
-            sample_type_param_keys << attr.title.to_sym
+        else
+          sample_type_param_keys << attr.title.to_sym
         end
       end
     end
-    parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
+    parameters.require(:sample).permit(:sample_type_id, *creator_related_params, :observation_unit_id,
                               { project_ids: [] }, { data: sample_type_param_keys },
                               { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
@@ -288,18 +315,7 @@ class SamplesController < ApplicationController
   end
 
   def find_index_assets
-    if params[:data_file_id]
-      @data_file = DataFile.find(params[:data_file_id])
-
-      unless @data_file.can_view?
-        flash[:error] = 'You are not authorize to view samples from this data file'
-        respond_to do |format|
-          format.html { redirect_to data_file_path(@data_file) }
-        end
-      end
-
-      @samples = @data_file.extracted_samples.includes(sample_type: :sample_attributes).authorized_for('view')
-    elsif params[:sample_type_id]
+    if params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = @sample_type.samples.authorized_for('view')
     elsif params[:template_id]
@@ -310,20 +326,63 @@ class SamplesController < ApplicationController
     end
   end
 
-  def find_samples(samples, link, options, title)
+  # Filters linked samples based on the provided options and template attribute title.
+  #
+  # @param samples [Array<Sample>] the list of samples to filter
+  # @param link [Symbol] the method to call on each sample to get the linked samples (:linked_samples or :linking_samples)
+  # @param options [Hash] the options for filtering
+  # @option options [Integer] :template_id the ID of the template to filter by
+  # @option options [String] :attribute_value the value of the attribute to filter by
+  # @option options [Integer] :attribute_id the ID of the attribute to filter by
+  # @param template_attribute_title [String] the title of the template attribute to filter by
+  # @return [Array<Sample>] the filtered list of samples
+  def filter_linked_samples(samples, link, options, template_attribute)
+    raise ArgumentError, "Invalid linking method provided. '#{link.to_s}' is not allowed!" unless %i[linked_samples linking_samples].include? link
+
+    template_attribute_title = template_attribute&.title
     samples.select do |s|
       s.send(link).any? do |x|
         selected = x.sample_type.template_id == options[:template_id].to_i
-        selected = x.get_attribute_value(title)&.include?(options[:attribute_value]) if title.present? && selected
-        selected || find_samples([x], link, options, title).present?
+        if template_attribute.sample_attribute_type.seek_sample_multi?
+          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v[:title].downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
+        elsif  template_attribute.sample_attribute_type.seek_sample?
+          selected = x.get_attribute_value(template_attribute_title)&[:title].downcase&.include?(options[:attribute_value]) if template_attribute.present? && selected
+        elsif template_attribute.sample_attribute_type.seek_cv_list?
+          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v.downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
+        else
+          selected = x.get_attribute_value(template_attribute_title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
+        end
+        selected || filter_linked_samples([x], link, options, template_attribute).present?
       end
     end
   end
-
   def templates_enabled?
-    unless Seek::Config.sample_type_template_enabled
+    unless Seek::Config.isa_json_compliance_enabled
       flash[:error] = 'Not available'
       redirect_to select_sample_types_path
     end
   end
+
+  def check_if_locked_sample_type
+    return unless params[:sample_type_id]
+
+    sample_type = SampleType.find(params[:sample_type_id])
+    return unless sample_type&.locked?
+
+    flash[:error] = 'This sample type is locked. You cannot edit the sample.'
+    redirect_to sample_types_path(sample_type)
+  end
+
+  def authorize_sample_type
+    id = params[:sample_type_id] || params.dig(:sample, :sample_type_id)
+    return unless id
+
+    sample_type = SampleType.find(id)
+    unless sample_type.can_view?
+      flash[:error] = "You are not authorized to use this #{t('sample_type')}"
+      redirect_to root_path
+    end
+
+  end
+
 end

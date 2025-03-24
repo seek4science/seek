@@ -2,9 +2,10 @@
 <% options = {} %>
 <% url = nil %>
 <% asset = content_blob.asset %>
+<% asset_version = content_blob.asset_version %>
 
 <% if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
-  <% if content_blob.is_content_viewable? %>
+  <% if content_blob.is_content_viewable? && !content_blob.is_supported_spreadsheet_format? %>
     <%# Use fancy lightbox thing for displaying images in page %>
     <% if content_blob.is_image? %>
       <% zoom_width = content_blob.width.to_i.clamp(Seek::ActsAsFleximageExtension::STANDARD_SIZE,
@@ -16,6 +17,13 @@
     <% else %>
       <% url = polymorphic_path([asset, content_blob], action: 'view_content', code: params[:code]) %>
       <% options = { title: 'View contents of this file' } %>
+    <% end %>
+  <% elsif asset.supports_spreadsheet_explore? && content_blob.is_supported_spreadsheet_format? %>
+    <% if content_blob.is_extractable_spreadsheet? %>
+      <% url = polymorphic_path([asset], action: 'explore', code: params[:code], version: asset_version) %>
+      <% options = { title: 'Explore the contents of this file' } %>
+    <% else %>
+      <% options = { disabled_reason: "This spreadsheet is too big to be explored (larger than #{Seek::Config.max_extractable_spreadsheet_size} MB), or the file does not exist." } %>
     <% end %>
   <% elsif !asset.is_a?(Model) && asset.is_downloadable_asset? %>
     <% if content_blob.file_exists? %>

@@ -53,9 +53,18 @@ module Seek
     def is_extractable_spreadsheet?(blob = self)
       blob.file_exists? && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
     end
+    
+    # is any zipped format, that can be extracted from
+    def is_unzippable_datafile?(blob = self)
+      blob.file_exists? && (is_zip?(blob))
+    end
 
     def is_in_simulatable_size_limit?(blob = self)
       !blob.file_size.nil? && blob.file_size < MAX_SIMULATABLE_SIZE
+    end
+    
+    def is_zip?(blob = self)
+      blob.content_type_file_extensions.include?('zip')
     end
 
     def is_xlsx?(blob = self)
@@ -106,6 +115,10 @@ module Seek
       blob.content_type.try(:split, '/').try(:first) == 'image'
     end
 
+    def is_cff?(blob = self)
+      blob.content_type_file_extensions.include?('cff')
+    end
+
     def is_image_convertable?(blob = self)
       (IMAGE_CONVERTABLE_FORMAT & blob.content_type_file_extensions).any?
     end
@@ -132,6 +145,10 @@ module Seek
 
     def is_jupyter_notebook?(blob = self)
       blob.content_type_file_extensions.include?('ipynb')
+    end
+
+    def is_svg?(blob = self)
+      blob.content_type_file_extensions.include?('svg')
     end
 
     def unknown_file_type?(blob = self)

@@ -3,7 +3,7 @@ require 'test_helper'
 class SampleTypeUpdateJobTest < ActiveSupport::TestCase
   def setup
     SampleType.skip_callback(:save, :after, :queue_sample_type_update_job)
-    @sample_type = Factory(:simple_sample_type)
+    @sample_type = FactoryBot.create(:simple_sample_type)
     SampleType.set_callback(:save, :after, :queue_sample_type_update_job)
   end
 
@@ -75,11 +75,11 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
   end
 
   def sample_type_with_samples
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
 
     sample_type = User.with_current_user(person.user) do
       project = person.projects.first
-      sample_type = Factory(:patient_sample_type, project_ids: [project.id])
+      sample_type = FactoryBot.create(:patient_sample_type, project_ids: [project.id])
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
       sample.set_attribute_value('full name', 'Fred Blogs')
       sample.set_attribute_value(:age, 22)

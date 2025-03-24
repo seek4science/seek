@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_12_143407) do
+ActiveRecord::Schema.define(version: 2024_10_15_093333) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -189,6 +189,9 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "deleted_contributor"
     t.integer "sample_type_id"
     t.integer "position"
+    t.integer "assay_stream_id"
+    t.string "external_identifier", limit: 2048
+    t.index ["assay_stream_id"], name: "index_assays_on_assay_stream_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -311,6 +314,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "avatar_id"
+    t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
     t.index ["avatar_id"], name: "index_collections_on_avatar_id"
     t.index ["contributor_id"], name: "index_collections_on_contributor_id"
     t.index ["policy_id"], name: "index_collections_on_policy_id"
@@ -345,6 +350,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.bigint "file_size"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean "deleted", default: false
+    t.boolean "make_local_copy", default: false
     t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
   end
 
@@ -362,35 +369,6 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.integer "age_at_sampling"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "custom_metadata", force: :cascade do |t|
-    t.text "json_metadata"
-    t.string "item_type"
-    t.bigint "item_id"
-    t.bigint "custom_metadata_type_id"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
-    t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
-  end
-
-  create_table "custom_metadata_attributes", force: :cascade do |t|
-    t.bigint "custom_metadata_type_id"
-    t.bigint "sample_attribute_type_id"
-    t.boolean "required", default: false
-    t.integer "pos"
-    t.string "title"
-    t.bigint "sample_controlled_vocab_id"
-    t.text "description"
-    t.string "label"
-    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
-    t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
-    t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
-  end
-
-  create_table "custom_metadata_types", force: :cascade do |t|
-    t.string "title"
-    t.integer "contributor_id"
-    t.text "supported_type"
   end
 
   create_table "data_file_auth_lookup", force: :cascade do |t|
@@ -450,6 +428,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
     t.integer "file_template_id"
+    t.integer "zip_origin_id"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
@@ -550,6 +530,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "updated_at"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_documents_on_contributor"
   end
 
@@ -640,6 +621,40 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "updated_at"
     t.integer "sop_version"
     t.index ["sop_id"], name: "index_experimental_conditions_on_sop_id"
+  end
+
+  create_table "extended_metadata", force: :cascade do |t|
+    t.text "json_metadata"
+    t.string "item_type"
+    t.bigint "item_id"
+    t.bigint "extended_metadata_type_id"
+    t.integer "extended_metadata_attribute_id"
+    t.index ["extended_metadata_type_id"], name: "index_extended_metadata_on_extended_metadata_type_id"
+    t.index ["item_type", "item_id"], name: "index_extended_metadata_on_item_type_and_item_id"
+  end
+
+  create_table "extended_metadata_attributes", force: :cascade do |t|
+    t.bigint "extended_metadata_type_id"
+    t.bigint "sample_attribute_type_id"
+    t.boolean "required", default: false
+    t.integer "pos"
+    t.string "title"
+    t.bigint "sample_controlled_vocab_id"
+    t.text "description"
+    t.string "label"
+    t.integer "linked_extended_metadata_type_id"
+    t.boolean "allow_cv_free_text", default: false
+    t.string "pid"
+    t.index ["extended_metadata_type_id"], name: "index_extended_metadata_attributes_on_extended_metadata_type_id"
+    t.index ["sample_attribute_type_id"], name: "index_extended_metadata_attributes_on_sample_attribute_type_id"
+    t.index ["sample_controlled_vocab_id"], name: "index_extended_metadata_attributes_on_sample_cv_id"
+  end
+
+  create_table "extended_metadata_types", force: :cascade do |t|
+    t.string "title"
+    t.integer "contributor_id"
+    t.text "supported_type"
+    t.boolean "enabled", default: true
   end
 
   create_table "external_assets", id: :integer, force: :cascade do |t|
@@ -742,6 +757,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "external_identifier", limit: 2048
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -805,7 +821,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "resource_attributes"
+    t.text "resource_attributes", size: :medium
     t.bigint "git_repository_id"
     t.integer "visibility"
     t.string "doi"
@@ -936,6 +952,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
+    t.boolean "is_isa_json_compliant"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|
@@ -1076,6 +1094,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "license"
     t.string "deleted_contributor"
     t.integer "human_disease_id"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_models_on_contributor"
   end
 
@@ -1184,6 +1203,44 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
+  end
+
+  create_table "observation_unit_assets", id: false, force: :cascade do |t|
+    t.bigint "observation_unit_id"
+    t.string "asset_type"
+    t.bigint "asset_id"
+    t.index ["asset_type", "asset_id"], name: "index_observation_unit_assets_on_asset"
+    t.index ["observation_unit_id"], name: "index_observation_unit_assets_on_observation_unit_id"
+  end
+
+  create_table "observation_unit_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_obs_unit_auth_lookup_user_id_asset_id"
+    t.index ["user_id", "can_view"], name: "index_obs_unit_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "observation_units", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.string "identifier"
+    t.bigint "organism_id"
+    t.bigint "extended_metadata_type_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "contributor_id"
+    t.string "uuid"
+    t.string "deleted_contributor"
+    t.text "other_creators"
+    t.bigint "study_id"
+    t.bigint "policy_id"
+    t.string "first_letter", limit: 1
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "observed_variable_sets", force: :cascade do |t|
@@ -1312,6 +1369,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.bigint "file_template_id"
     t.bigint "project_id"
     t.integer "data_file_id"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
@@ -1330,8 +1388,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "name"
     t.integer "sharing_scope", limit: 1
     t.integer "access_type", limit: 1
-    t.boolean "use_whitelist"
-    t.boolean "use_blacklist"
+    t.boolean "use_allowlist"
+    t.boolean "use_denylist"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1384,6 +1442,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.integer "policy_id"
     t.string "license"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "presentations_projects", id: false, force: :cascade do |t|
@@ -1607,6 +1666,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.integer "version", default: 1
     t.string "license"
     t.text "other_creators"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
@@ -1707,7 +1767,10 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "pid"
     t.text "description"
     t.integer "isa_tag_id"
+    t.boolean "allow_cv_free_text", default: false
+    t.integer "template_attribute_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
+    t.index ["template_attribute_id"], name: "index_sample_attributes_on_template_attribute_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
 
@@ -1739,12 +1802,10 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
     t.string "source_ontology"
-    t.string "ols_root_term_uri"
-    t.boolean "required"
+    t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
     t.integer "template_id"
-    t.boolean "custom_input", default: false
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
@@ -1753,6 +1814,20 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "resource_type"
     t.index ["resource_id", "resource_type"], name: "index_sample_resource_links_on_resource_id_and_resource_type"
     t.index ["sample_id"], name: "index_sample_resource_links_on_sample_id"
+  end
+
+  create_table "sample_type_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
   end
 
   create_table "sample_types", id: :integer, force: :cascade do |t|
@@ -1767,6 +1842,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "deleted_contributor"
     t.integer "template_id"
     t.text "other_creators"
+    t.integer "policy_id"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
@@ -1789,6 +1866,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "other_creators"
     t.integer "originating_data_file_id"
     t.string "deleted_contributor"
+    t.bigint "observation_unit_id"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "saved_searches", id: :integer, force: :cascade do |t|
@@ -1900,7 +1979,15 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "doi"
     t.string "license"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_sops_on_contributor"
+  end
+
+  create_table "sops_studies", force: :cascade do |t|
+    t.bigint "sop_id"
+    t.bigint "study_id"
+    t.index ["sop_id"], name: "index_sops_studies_on_sop_id"
+    t.index ["study_id"], name: "index_sops_studies_on_study_id"
   end
 
   create_table "sops_workflows", id: false, force: :cascade do |t|
@@ -1952,6 +2039,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "uuid"
     t.string "first_letter"
     t.string "deleted_contributor"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "studied_factor_links", id: :integer, force: :cascade do |t|
@@ -1991,7 +2079,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.integer "sop_id"
+    t.string "external_identifier", limit: 2048
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -2086,7 +2174,11 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.integer "pos"
     t.boolean "is_title", default: false
     t.integer "isa_tag_id"
-    t.string "iri"
+    t.string "pid"
+    t.boolean "allow_cv_free_text", default: false
+    t.integer "linked_sample_type_id"
+    t.integer "parent_attribute_id"
+    t.index ["parent_attribute_id"], name: "index_template_attributes_on_parent_attribute_id"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 
@@ -2104,7 +2196,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
 
   create_table "templates", force: :cascade do |t|
     t.string "title"
-    t.string "group", default: "other"
+    t.string "group", default: "Project specific templates"
     t.integer "group_order"
     t.string "temporary_name"
     t.string "version"
@@ -2113,8 +2205,8 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "isa_technology_type"
     t.string "isa_protocol_type"
     t.string "repo_schema_id"
-    t.string "organism", default: "other"
-    t.string "level", default: "other"
+    t.string "organism", default: "any"
+    t.string "level"
     t.text "description"
     t.integer "policy_id"
     t.integer "contributor_id"
@@ -2125,6 +2217,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.string "uuid"
     t.string "first_letter", limit: 1
     t.text "other_creators"
+    t.string "external_identifier", limit: 2048
     t.index ["title", "group"], name: "index_templates_title_group"
   end
 
@@ -2263,6 +2356,7 @@ ActiveRecord::Schema.define(version: 2022_12_12_143407) do
     t.integer "workflow_class_id"
     t.integer "maturity_level"
     t.integer "test_status"
+    t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "128",
+    "id": "763",
     "type": "studies",
     "attributes": {
       "policy": {
@@ -11,11 +11,19 @@
       },
       "discussion_links": [
         {
-          "id": "60",
+          "id": "267",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
+      "extended_attributes": {
+        "extended_metadata_type_id": "446",
+        "attribute_map": {
+          "age": 44,
+          "name": "Fred Bloggs",
+          "date": "2024-01-01"
+        }
+      },
       "snapshots": [
 
       ],
@@ -26,7 +34,7 @@
       "position": null,
       "creators": [
         {
-          "profile": "/people/655",
+          "profile": "/people/4885",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -38,7 +46,7 @@
       "creators": {
         "data": [
           {
-            "id": "655",
+            "id": "4885",
             "type": "people"
           }
         ]
@@ -46,7 +54,7 @@
       "submitter": {
         "data": [
           {
-            "id": "653",
+            "id": "4883",
             "type": "people"
           }
         ]
@@ -54,11 +62,11 @@
       "people": {
         "data": [
           {
-            "id": "653",
+            "id": "4883",
             "type": "people"
           },
           {
-            "id": "655",
+            "id": "4885",
             "type": "people"
           }
         ]
@@ -66,21 +74,21 @@
       "projects": {
         "data": [
           {
-            "id": "717",
+            "id": "4809",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "141",
+          "id": "854",
           "type": "investigations"
         }
       },
       "assays": {
         "data": [
           {
-            "id": "108",
+            "id": "610",
             "type": "assays"
           }
         ]
@@ -88,7 +96,7 @@
       "data_files": {
         "data": [
           {
-            "id": "44",
+            "id": "294",
             "type": "data_files"
           }
         ]
@@ -96,7 +104,7 @@
       "models": {
         "data": [
           {
-            "id": "109",
+            "id": "246",
             "type": "models"
           }
         ]
@@ -104,7 +112,7 @@
       "sops": {
         "data": [
           {
-            "id": "42",
+            "id": "248",
             "type": "sops"
           }
         ]
@@ -112,7 +120,7 @@
       "publications": {
         "data": [
           {
-            "id": "59",
+            "id": "330",
             "type": "publications"
           }
         ]
@@ -120,21 +128,21 @@
       "documents": {
         "data": [
           {
-            "id": "52",
+            "id": "289",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/studies/128"
+      "self": "/studies/763"
     },
     "meta": {
-      "created": "2022-06-07T14:14:08.000Z",
-      "modified": "2022-06-07T14:14:08.000Z",
+      "created": "2024-11-20T10:22:17.000Z",
+      "modified": "2024-11-20T10:22:17.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "04ee13c0-c89a-013a-0f7e-0a81884ed284"
+      "uuid": "3de9b220-8957-013d-24a2-0a81884ed284"
     }
   },
   "jsonapi": {

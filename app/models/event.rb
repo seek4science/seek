@@ -23,6 +23,7 @@ class Event < ApplicationRecord
   acts_as_authorized
   acts_as_uniquely_identifiable
   acts_as_favouritable
+  has_extended_metadata
 
   # load the configuration for the pagination
   grouped_pagination
@@ -38,6 +39,9 @@ class Event < ApplicationRecord
   validates :url, url: {allow_nil: true, allow_blank: true}
 
   validates :country, country:true, allow_blank: true
+
+  has_filter :country
+  has_filter start_date: Seek::Filtering::DateFilter.new(field: :start_date)
 
   validate :validate_data_files
   def validate_data_files

@@ -12,20 +12,20 @@ class BatchPublishingTest < ActionController::TestCase
     login_as(@user)
   end
 
-  test 'should have the -Publish your assets- only on your own profile' do
+  test 'should have the -Publish your items- only on your own profile' do
     get :show, params: { id: User.current_user.person }
     assert_response :success
-    assert_select 'a[href=?]', batch_publishing_preview_person_path, text: /Publish your assets/
+    assert_select 'a[href=?]', batch_publishing_preview_person_path, text: /Publish your items/
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
     assert_nil flash[:error]
 
     # not yourself
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     get :show, params: { id: a_person }
     assert_response :success
-    assert_select 'a', text: /Publish your assets/, count: 0
+    assert_select 'a', text: /Publish your items/, count: 0
 
     get :batch_publishing_preview, params: { id: a_person.id }
     assert_redirected_to :root
@@ -44,48 +44,123 @@ class BatchPublishingTest < ActionController::TestCase
       assert a.can_publish?, 'The asset must not be publishable for this test to succeed'
       assert a.gatekeeper_required?, "This asset must require gatekeeper's approval for this test to succeed"
     end
+
     total_asset_count = (publish_immediately_assets + gatekeeper_required_assets).count
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
+    assert_select 'div#sorted_by_type,#sorted_by_isa', count: 2 do |sorted_by|
+      sorted_by.each do |sorted_by_block|
+        assert_select sorted_by_block, '.batch-selection-asset', count: total_asset_count + 1 do # event will also be shown
+          publish_immediately_assets.each do |a|
+            assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
+          end
+          gatekeeper_required_assets.each do |a|
+            assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
+          end
+          assert_select 'img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
+        end
 
-    assert_select '.type_and_title', count: total_asset_count do
-      publish_immediately_assets.each do |a|
-        assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
-      end
-      gatekeeper_required_assets.each do |a|
-        assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
-      end
-      assert_select '.type_and_title img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
-    end
-
-    assert_select '.parent-btn-checkbox', text: /Publish/, count: total_asset_count do
-      publish_immediately_assets.each do |a|
-        assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
-      end
-      gatekeeper_required_assets.each do |a|
-        assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
+        assert_select sorted_by_block, '.parent-btn-checkbox', count: total_asset_count + 1 do # event will also be shown
+          publish_immediately_assets.each do |a|
+            assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
+          end
+          gatekeeper_required_assets.each do |a|
+            assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
+          end
+        end
       end
     end
   end
 
-  test 'do not have not-publishable items in batch_publishing_preview' do
-    published_item = Factory(:data_file,
-                             contributor: User.current_user.person,
-                             policy: Factory(:public_policy))
-    assert !published_item.can_publish?, 'This data file must not be publishable for the test to succeed'
+  test 'Cannot select already-published items in batch_publishing_preview' do
+    published_item = FactoryBot.create(:data_file,
+                                       contributor: User.current_user.person,
+                                       policy: FactoryBot.create(:public_policy))
+    assert published_item.is_published?
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
     assert_response :success
 
-    assert_select "input[type='checkbox'][id=?]", "publish_#{published_item.class.name}_#{published_item.id}",
-                  count: 0
+    assert_select '.batch-selection-asset .type_and_title a[href=?]', data_file_path(published_item)
+    assert_select "input[type='checkbox'].#{published_item.class.name}_#{published_item.id}", count: 0
+  end
+
+  test 'publish_final_confirmation' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = User.current_user.person
+    gatekept_project = gatekeeper.projects.first
+    publishable = FactoryBot.create(:data_file, projects: [person.projects.first], contributor: person)
+    gatekept = FactoryBot.create(:data_file, projects: [gatekept_project], contributor: person)
+    waiting = FactoryBot.create(:data_file, projects: [gatekept_project], contributor: person)
+    ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL, waiting, nil, person.user)
+
+    login_as(person.user)
+    assert publishable.can_publish?
+    assert gatekept.can_publish?
+    assert gatekept.gatekeeper_required?
+    assert !waiting.can_publish?
+
+    params = { publish: {} }
+    [publishable, gatekept, waiting].each do |asset|
+      params[:publish][asset.class.name] ||= {}
+      params[:publish][asset.class.name][asset.id.to_s] = '1'
+    end
+
+    get :check_gatekeeper_required, params: params.merge(id: person.id)
+    assert_response :success
+
+    # Publishable shown in immediate publishing section
+    assert_select 'h2', text: /The following items will be published:/, count: 1
+    assert_select 'div.alert-info', text: /immediately accessible to the public/, count: 1
+    assert_select 'ul.publishing_options#publish_immediately', count: 1 do
+      assert_select 'li.type_and_title', count: 1 do
+        assert_select 'a[href=?]', data_file_path(publishable), text: publishable.title
+      end
+    end
+    # Gatekept explains waiting approval
+    assert_select 'h2', text: /The following items require approval:/, count: 1
+    assert_select 'div.alert-warning', text: /an email will be sent to that person, and they will either approve or reject/, count: 1
+    assert_select 'ul.publishing_options#waiting_approval', count: 1 do
+      assert_select 'li.type_and_title', count: 1 do
+        assert_select 'a[href=?]', data_file_path(gatekept), text: gatekept.title
+      end
+    end
+
+    # If not-publishable warning is issued
+    assert_select 'h2', text: /The following items cannot be published:/, count: 1
+    assert_select 'div.alert-danger', text: /One or more of the items you selected cannot be published/, count: 1
+    assert_select 'ul.publishing_options#cannot_publish', count: 1 do
+      assert_select 'li.type_and_title', count: 1 do
+        assert_select 'a[href=?]', data_file_path(waiting), text: waiting.title
+      end
+    end
+  end
+
+  test 'Events are skipped *in publish related items' do
+    person = User.current_user.person
+    assay = FactoryBot.create(:assay, contributor: person)
+    df = FactoryBot.create(:data_file, projects: [person.projects.first], assays: [assay], contributor: person)
+    event = FactoryBot.create(:event, contributor: person)
+    login_as(person.user)
+    assert df.can_publish?
+    assert event.can_publish?
+
+    params = { publish: {} }
+    [df, event].each do |asset|
+      params[:publish][asset.class.name] ||= {}
+      params[:publish][asset.class.name][asset.id.to_s] = '1'
+    end
+
+    get :check_related_items, params: params.merge(id: person.id)
+    assert_response :success
+
   end
 
   test 'do not have not_publishable_type item in batch_publishing_preview' do
-    item = Factory(:publication,
+    item = FactoryBot.create(:publication,
                    contributor: User.current_user.person,
-                   policy: Factory(:public_policy))
+                   policy: FactoryBot.create(:public_policy))
     refute item.can_publish?, 'This item must not be publishable for the test to be meaningful'
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
@@ -146,9 +221,9 @@ class BatchPublishingTest < ActionController::TestCase
   # The following tests are for generating your asset list that you requested to make published are still waiting for approval
   test 'should have the -Your assets waiting for approval- button only on your profile' do
     # not yourself
-    gatekeeper = Factory(:asset_gatekeeper)
-    me = Factory(:person, group_memberships: [Factory(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
-    another_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    me = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
+    another_person = FactoryBot.create(:person, group_memberships: [FactoryBot.create(:group_membership, work_group: gatekeeper.group_memberships.first.work_group)])
 
     login_as(me)
 
@@ -167,7 +242,7 @@ class BatchPublishingTest < ActionController::TestCase
     assert_response :success
     assert_nil flash[:error]
 
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     get :waiting_approval_assets, params: { id: a_person }
     assert_redirected_to :root
     assert_not_nil flash[:error]
@@ -175,7 +250,7 @@ class BatchPublishingTest < ActionController::TestCase
 
   test 'get waiting_approval_assets' do
     df, model, sop = waiting_approval_assets_for User.current_user
-    not_requested_df = Factory(:data_file, contributor: User.current_user.person)
+    not_requested_df = FactoryBot.create(:data_file, contributor: User.current_user.person)
 
     get :waiting_approval_assets, params: { id: User.current_user.person }
 
@@ -192,35 +267,119 @@ class BatchPublishingTest < ActionController::TestCase
     assert_select 'a[href=?]', data_file_path(not_requested_df), count: 0
   end
 
+  test 'authorization for cancel_publishing_request' do
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    gatekept_project = gatekeeper.projects.first
+    a_person = FactoryBot.create(:person)
+    a_person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
+    df = FactoryBot.create(:data_file, contributor: a_person, projects: [gatekept_project])
+    df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: a_person.user)
+    another_person = FactoryBot.create(:person)
+    another_person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
+    df2 = FactoryBot.create(:data_file, contributor: another_person, projects: [gatekept_project])
+    df2.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: another_person.user)
+    df2.policy.permissions << FactoryBot.create(:permission, contributor: a_person, access_type: Policy::MANAGING)
+
+    # Another person cannot access cancel_publishing_request using someone else's id
+    login_as(another_person)
+    assert_enqueued_emails 0 do
+      post :cancel_publishing_request, params: { id: a_person,
+                                                asset_id: df.id,
+                                                asset_class: df.class }
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+    end
+
+    # Another person cannot access cancel_publishing_request without manage rights
+    login_as(another_person)
+    assert_enqueued_emails 0 do
+      post :cancel_publishing_request, params: { id: another_person,
+                                                asset_id: df.id,
+                                                asset_class: df.class }
+      assert_redirected_to :root
+      assert_not_nil flash[:error]
+    end
+
+    # A person who created publish request can cancel_publishing_request
+    login_as(a_person)
+    get :waiting_approval_assets, params: { id: a_person }
+    assert_select '.type_and_title', count: 1 do
+      assert_select 'a[href=?]', data_file_path(df)
+    end
+    assert_enqueued_emails 1 do
+      post :cancel_publishing_request, params: { id: a_person,
+                                                asset_id: df.id,
+                                                asset_class: df.class }
+      assert_redirected_to waiting_approval_assets_person_path(a_person)
+      assert_nil flash[:error]
+      assert_not_nil flash[:notice]
+    end
+
+    # A person with manage rights can cancel_publishing_request, even if not the one who requested
+    get :waiting_approval_assets, params: { id: a_person }
+    assert_select '.type_and_title', count: 0
+    assert df2.can_manage?
+    assert_enqueued_emails 1 do
+      post :cancel_publishing_request, params: { id: a_person,
+                                                 asset_id: df2.id,
+                                                 asset_class: df2.class }
+      assert_nil flash[:error]
+      assert_not_nil flash[:notice]
+    end
+  end
+
+  test 'cancel_publishing_request' do
+    df, model, sop = waiting_approval_assets_for User.current_user
+    sop.resource_publish_logs.create(publish_state: ResourcePublishLog::REJECTED, user: User.current_user)
+
+    get :waiting_approval_assets, params: { id: User.current_user.person }
+
+    assert_select '.cancel_publish_request', count: 3 do
+      assert_select 'a[href=?]', cancel_publishing_request_person_path(User.current_user.person,asset_id: df.id, asset_class: df.class)
+      assert_select 'a[href=?]', cancel_publishing_request_person_path(User.current_user.person,asset_id: model.id, asset_class: model.class)
+      assert_select 'a[href=?]', cancel_publishing_request_person_path(User.current_user.person,asset_id: sop.id, asset_class: sop.class)
+    end
+
+    get :cancel_publishing_request, params: { id: User.current_user.person,
+                                              asset_id: model.id,
+                                              asset_class: model.class }
+    assert_redirected_to waiting_approval_assets_person_path(User.current_user.person)
+    assert_nil flash[:error]
+    assert_equal "Cancelled request to publish for: #{model.title}", flash[:notice]
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, df.last_publishing_log.publish_state
+    assert_equal ResourcePublishLog::UNPUBLISHED, model.last_publishing_log.publish_state
+    assert_equal ResourcePublishLog::REJECTED, sop.last_publishing_log.publish_state
+  end
+
   private
 
   def create_publish_immediately_assets
     publishable_types = Seek::Util.authorized_types.select { |c| c.first.try(:is_in_isa_publishable?) }
     publishable_types.collect do |klass|
-      Factory(klass.name.underscore.to_sym, contributor: User.current_user.person)
+      FactoryBot.create(klass.name.underscore.to_sym, contributor: User.current_user.person)
     end
   end
 
   def create_gatekeeper_required_assets
     publishable_types = Seek::Util.authorized_types.select { |c| c.first.try(:is_in_isa_publishable?) }
     publishable_types.collect do |klass|
-      gatekeeper = Factory(:asset_gatekeeper)
+      gatekeeper = FactoryBot.create(:asset_gatekeeper)
       gatekept_project = gatekeeper.projects.first
-      @user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
-      Factory(klass.name.underscore.to_sym, contributor: @user.person, projects: [gatekept_project])
+      @user.person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
+      FactoryBot.create(klass.name.underscore.to_sym, contributor: @user.person, projects: [gatekept_project])
     end
   end
 
   def waiting_approval_assets_for(user)
-    gatekeeper = Factory(:asset_gatekeeper)
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
     gatekept_project = gatekeeper.projects.first
-    user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+    user.person.add_to_project_and_institution(gatekept_project, FactoryBot.create(:institution))
 
-    df = Factory(:data_file, contributor: user.person, projects: [gatekept_project])
+    df = FactoryBot.create(:data_file, contributor: user.person, projects: [gatekept_project])
     df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
-    model = Factory(:model, contributor: user.person, projects: [gatekept_project])
+    model = FactoryBot.create(:model, contributor: user.person, projects: [gatekept_project])
     model.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
-    sop = Factory(:sop, contributor: user.person, projects: [gatekept_project])
+    sop = FactoryBot.create(:sop, contributor: user.person, projects: [gatekept_project])
     sop.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: user)
     [df, model, sop]
   end

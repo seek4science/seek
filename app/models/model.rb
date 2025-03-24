@@ -20,7 +20,7 @@ class Model < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   include Seek::Models::ModelExtraction
 
@@ -30,7 +30,7 @@ class Model < ApplicationRecord
   has_many :model_images, inverse_of: :model
   belongs_to :model_image, inverse_of: :model
 
-  has_many :content_blobs, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
+  has_many :content_blobs, -> (r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
 
   belongs_to :organism
   belongs_to :human_disease
@@ -109,6 +109,18 @@ class Model < ApplicationRecord
     else
       super
     end
+  end
+
+  def can_run?
+    can_run_jws? || can_run_copasi?
+  end
+
+  def can_run_jws?
+    Seek::Config.jws_enabled && can_download? && is_jws_supported?
+  end
+
+  def can_run_copasi?
+    Seek::Config.copasi_enabled && can_download? && is_copasi_supported?
   end
 
   private

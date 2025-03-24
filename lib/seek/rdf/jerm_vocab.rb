@@ -29,13 +29,15 @@ module Seek
           Model => :Model,
           Sop => :SOP,
           Person => :Person,
+          ObservationUnit => 'http://purl.org/ppeo/PPEO.owl#observation_unit',
           Organism => :Organism,
           Project => :Project,
           Programme => :Programme,
           Study => :Study,
           Investigation => :Investigation,
           Publication => :Publication,
-          Strain => :Strain
+          Strain => :Strain,
+          Sample => :Sample
         }
       end
 

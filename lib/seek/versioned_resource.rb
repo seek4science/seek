@@ -27,6 +27,8 @@ module Seek #:nodoc:
         include Seek::VersionedResource::InstanceMethods
         include Seek::Permissions::SpecialContributors
 
+        include Seek::Data::SpreadsheetExplorerRepresentation
+
         delegate :tag_counts, :managers, :attributions, :creators, :assets_creators, :is_asset?,
                  :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
                  :show_contributor_avatars?, :can_see_hidden_item?, :related_people, to: :parent
@@ -55,12 +57,6 @@ module Seek #:nodoc:
         define_method "can_#{action}?" do |user = User.current_user|
           self.parent.can_perform?(action, user)
         end
-      end
-
-      # assumes all versioned resources are also taggable
-
-      def contains_downloadable_items?
-        all_content_blobs.compact.any?(&:is_downloadable?)
       end
 
       def all_content_blobs

@@ -6,7 +6,7 @@ class InstitutionApiTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    @institution = Factory(:institution)
+    @institution = FactoryBot.create(:institution)
   end
 
   def populate_extra_attributes(hash)
@@ -20,10 +20,10 @@ class InstitutionApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'normal user cannot create institution' do
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     body = api_max_post_body
     assert_no_difference('Institution.count') do
-      post collection_url, params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
     end
   end
 end

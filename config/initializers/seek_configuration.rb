@@ -8,7 +8,7 @@ def load_seek_config_defaults!
   Seek::Config.default :sycamore_enabled,false
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
-  Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
+  Seek::Config.default :smtp, { address: '', port: '25', domain: '', authentication: '', user_name: '', password: '', enable_starttls_auto: false }
   Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
   Seek::Config.default :support_email_address, ''
   Seek::Config.default :solr_enabled, false
@@ -16,7 +16,7 @@ def load_seek_config_defaults!
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
-  Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
+  Seek::Config.default :external_help_url,"https://docs.seek4science.org/help/user-guide/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :error_grouping_enabled,true
@@ -33,6 +33,10 @@ def load_seek_config_defaults!
   Seek::Config.default :piwik_analytics_id_site, 1
   Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
   Seek::Config.default :piwik_analytics_tracking_notice, true
+  Seek::Config.default :custom_analytics_snippet_enabled, false
+  Seek::Config.default :custom_analytics_name, 'Custom name'
+  Seek::Config.default :custom_analytics_snippet, '<script id="custom-tracking-script"></script>'
+  Seek::Config.default :custom_analytics_tracking_notice, true
   Seek::Config.default :bioportal_api_key,''
   Seek::Config.default :project_news_enabled,false
   Seek::Config.default :project_news_feed_urls,''
@@ -43,12 +47,11 @@ def load_seek_config_defaults!
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
   Seek::Config.default :home_description_position, 'side'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
-  Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_single_page_enabled, false
-  Seek::Config.default :project_single_page_advanced_enabled, false
-  Seek::Config.default :sample_type_template_enabled, false
+  Seek::Config.default :isa_json_compliance_enabled, false
+  Seek::Config.default :project_single_page_folders_enabled, false
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
@@ -79,6 +82,7 @@ def load_seek_config_defaults!
   Seek::Config.default :data_files_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :isa_enabled, true
+  Seek::Config.default :observation_units_enabled, false
   Seek::Config.default :models_enabled,true
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :programmes_enabled, false
@@ -94,6 +98,8 @@ def load_seek_config_defaults!
   #Observered variables
   Seek::Config.default :observed_variables_enabled, false
   Seek::Config.default :observed_variable_sets_enabled,false
+
+  Seek::Config.default :fair_data_station_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -135,7 +141,7 @@ def load_seek_config_defaults!
   Seek::Config.default :contact_link, ''
 
   Seek::Config.default :funding_link, ''
-  
+
   #Terms and conditions page
   Settings.defaults[:terms_enabled]= false
   Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions_example'))
@@ -234,6 +240,8 @@ def load_seek_config_defaults!
     password: '',
     bind_dn: ''
   }
+  Seek::Config.default :omniauth_oidc_enabled, false
+  Seek::Config.default :omniauth_oidc_name, 'OpenID Connect Provider'
 
   Seek::Config.default :openbis_enabled,false
   Seek::Config.default :openbis_download_limit, 2.gigabytes
@@ -242,6 +250,7 @@ def load_seek_config_defaults!
   Seek::Config.default :openbis_check_new_arrivals, true
 
   Seek::Config.default :default_license, 'CC-BY-4.0'
+  Seek::Config.default :metadata_license, 'CC-BY-4.0'
 
   Seek::Config.default :nels_api_url, 'https://test-fe.cbu.uib.no/nels-api'
   Seek::Config.default :nels_oauth_url, 'https://test-fe.cbu.uib.no/oauth2'
@@ -255,8 +264,26 @@ def load_seek_config_defaults!
 
   Seek::Config.default :life_monitor_enabled, false
   Seek::Config.default :life_monitor_url, 'https://api.lifemonitor.eu/'
+  Seek::Config.default :life_monitor_ui_url, 'https://app.lifemonitor.eu/'
   Seek::Config.default :git_support_enabled, false
   Seek::Config.default :bio_tools_enabled, false
+  Seek::Config.default :scraper_config, [
+    {
+      project_title: 'iwc',
+      class: 'IwcScraper',
+      options: {
+        organization: 'iwc-workflows',
+        main_branch: 'main'
+      }
+    },
+    {
+      project_title: 'nf-core',
+      class: 'NfcoreScraper',
+      options: {
+        organization: 'nf-core'
+      }
+    }
+  ]
 
   load_seek_testing_defaults! if Rails.env.test?
 end

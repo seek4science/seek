@@ -1,10 +1,9 @@
 class Assay < ApplicationRecord
-
   include Seek::Ontologies::AssayOntologyTypes
 
-  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  enum status: %i[planned running completed cancelled failed]
   belongs_to :assignee, class_name: 'Person'
-  
+
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
@@ -24,7 +23,10 @@ class Assay < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
-  belongs_to :sample_type 
+  belongs_to :sample_type
+
+  has_many :child_assays, class_name: 'Assay', foreign_key: 'assay_stream_id', dependent: :destroy
+  belongs_to :assay_stream, class_name: 'Assay', optional: true
 
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
@@ -45,17 +47,20 @@ class Assay < ApplicationRecord
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
   has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document', inverse_of: :assays
+  has_many :observation_units, through: :samples
+
 
   has_one :investigation, through: :study
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
-  validates :assay_type_uri, presence:true
+  validates :assay_type_uri, presence: true
   validates_with AssayTypeUriValidator
-  validates :technology_type_uri, absence:true, if: :is_modelling?
+  validates :technology_type_uri, absence: true, if: :is_modelling?
   validates_with TechnologyTypeUriValidator
   validates_presence_of :contributor
   validates_presence_of :assay_class
   validates :study, presence: { message: 'must be selected and valid' }, projects: true
+  validate :study_matches_observation_units_if_present
 
   before_validation :default_assay_and_technology_type
 
@@ -65,6 +70,58 @@ class Assay < ApplicationRecord
   has_filter :assay_class, :assay_type, :technology_type
 
   enforce_authorization_on_association :study, :view
+
+  # the associated projects from the Investigation.
+  # Overrides the :through :study, as that relies on being saved to the database first, causing validation issues
+  def projects
+    study&.projects || []
+  end
+
+  def is_assay_stream?
+    assay_class&.is_assay_stream?
+  end
+
+  def previous_linked_sample_type
+    return unless is_isa_json_compliant?
+
+    if is_assay_stream? || first_assay_in_stream?
+      study.sample_types.second
+    else
+      sample_type.previous_linked_sample_type
+    end
+  end
+
+  def has_linked_child_assay?
+    return false unless is_isa_json_compliant?
+
+    if is_assay_stream?
+      child_assays.any?
+    else
+      sample_type&.linked_sample_attributes&.any?
+    end
+  end
+
+  def next_linked_child_assay
+    return unless has_linked_child_assay?
+
+    if is_assay_stream?
+      first_assay_in_stream
+    else
+      sample_type.next_linked_sample_types.map(&:assays).flatten.detect { |a| a.assay_stream_id == assay_stream_id }
+    end
+  end
+
+  def first_assay_in_stream
+    if is_assay_stream?
+      child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    else
+      assay_stream.child_assays.detect { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
+    end
+  end
+
+  def first_assay_in_stream?
+    self == first_assay_in_stream
+  end
 
   def default_contributor
     User.current_user.try :person
@@ -77,7 +134,11 @@ class Assay < ApplicationRecord
   end
 
   def state_allows_delete?(*args)
-    assets.empty? && publications.empty? && super
+    assets.empty? && publications.empty? && associated_samples_through_sample_type.empty? && super
+  end
+
+  def is_isa_json_compliant?
+    investigation.is_isa_json_compliant? && (!sample_type.nil? || is_assay_stream?)
   end
 
   # returns true if this is a modelling class of assay
@@ -90,6 +151,10 @@ class Assay < ApplicationRecord
     !assay_class.nil? && assay_class.key == 'EXP'
   end
 
+  def associated_samples_through_sample_type
+    sample_type.nil? || sample_type.samples.nil? ? [] : sample_type.samples
+  end
+
   # Create or update relationship of this assay to another, with a specific relationship type and version
   def associate(asset, options = {})
     if asset.is_a?(Organism)
@@ -99,9 +164,7 @@ class Assay < ApplicationRecord
     else
       assay_asset = assay_assets.detect { |aa| aa.asset == asset }
 
-      if assay_asset.nil?
-        assay_asset = assay_assets.build
-      end
+      assay_asset = assay_assets.build if assay_asset.nil?
 
       assay_asset.asset = asset
       assay_asset.version = asset.version if asset && asset.respond_to?(:version)
@@ -120,12 +183,12 @@ class Assay < ApplicationRecord
   end
 
   def self.simple_associated_asset_types
-    [:models, :sops, :publications, :documents]
+    %i[models sops publications documents]
   end
 
   # Associations where there is additional metadata on the association, i.e. `direction`
   def self.complex_associated_asset_types
-    [:data_files, :samples, :placeholders]
+    %i[data_files samples placeholders]
   end
 
   def assets
@@ -162,7 +225,9 @@ class Assay < ApplicationRecord
   def clone_with_associations
     new_object = dup
     new_object.policy = policy.deep_copy
-    new_object.assay_assets = assay_assets.select { |aa| self.class.complex_associated_asset_types.include?(aa.asset_type.underscore.pluralize.to_sym) }.map(&:dup)
+    new_object.assay_assets = assay_assets.select do |aa|
+      self.class.complex_associated_asset_types.include?(aa.asset_type.underscore.pluralize.to_sym)
+    end.map(&:dup)
     self.class.simple_associated_asset_types.each do |type|
       new_object.send("#{type}=", try(type))
     end
@@ -183,7 +248,8 @@ class Assay < ApplicationRecord
   # organism may be either an ID or Organism instance
   # strain_id should be the id of the strain
   # culture_growth should be the culture growth instance
-  def associate_organism(organism, strain_id = nil, culture_growth_type = nil, tissue_and_cell_type_id = nil, tissue_and_cell_type_title = nil)
+  def associate_organism(organism, strain_id = nil, culture_growth_type = nil, tissue_and_cell_type_id = nil,
+                         tissue_and_cell_type_title = nil)
     organism = Organism.find(organism) if organism.is_a?(Numeric) || organism.is_a?(String)
     strain = organism.strains.find_by_id(strain_id)
     tissue_and_cell_type = nil
@@ -193,22 +259,22 @@ class Assay < ApplicationRecord
       tissue_and_cell_type = TissueAndCellType.where(title: tissue_and_cell_type_title).first_or_create!
     end
 
-    unless AssayOrganism.exists_for?(self, organism, strain, culture_growth_type, tissue_and_cell_type)
-      assay_organism = AssayOrganism.new(assay: self, organism: organism, culture_growth_type: culture_growth_type,
-                                         strain: strain, tissue_and_cell_type: tissue_and_cell_type)
-      assay_organisms << assay_organism
-    end
+    return if AssayOrganism.exists_for?(self, organism, strain, culture_growth_type, tissue_and_cell_type)
+
+    assay_organism = AssayOrganism.new(assay: self, organism:, culture_growth_type:,
+                                       strain:, tissue_and_cell_type:)
+    assay_organisms << assay_organism
   end
 
   # Associates a human disease with the assay
   # human disease may be either an ID or HumanDisease instance
   def associate_human_disease(human_disease)
     human_disease = HumanDisease.find(human_disease) if human_disease.is_a?(Numeric) || human_disease.is_a?(String)
-    assay_human_disease = AssayHumanDisease.new(assay: self, human_disease: human_disease)
+    assay_human_disease = AssayHumanDisease.new(assay: self, human_disease:)
 
-    unless AssayHumanDisease.exists_for?(human_disease, self)
-      assay_human_diseases << assay_human_disease
-    end
+    return if AssayHumanDisease.exists_for?(human_disease, self)
+
+    assay_human_diseases << assay_human_disease
   end
 
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
@@ -220,15 +286,15 @@ class Assay < ApplicationRecord
     external_asset ? external_asset.search_terms : []
   end
 
-  def samples_attributes= attributes
+  def samples_attributes=(attributes)
     set_assay_assets_for('Sample', attributes)
   end
 
-  def data_files_attributes= attributes
+  def data_files_attributes=(attributes)
     set_assay_assets_for('DataFile', attributes)
   end
 
-  def placeholders_attributes= attributes
+  def placeholders_attributes=(attributes)
     set_assay_assets_for('Placeholder', attributes)
   end
 
@@ -238,8 +304,18 @@ class Assay < ApplicationRecord
 
   private
 
+  def study_matches_observation_units_if_present
+    return if samples.empty?
+    samples.each do |sample|
+      if sample.observation_unit && sample.observation_unit.study != study
+          errors.add(:study, 'must match the associated observation unit')
+          return false
+      end
+    end
+  end
+
   def set_assay_assets_for(type, attributes)
-    type_assay_assets, other_assay_assets = self.assay_assets.partition { |aa| aa.asset_type == type }
+    type_assay_assets, other_assay_assets = assay_assets.partition { |aa| aa.asset_type == type }
     new_type_assay_assets = []
 
     attributes.each do |attrs|
@@ -248,15 +324,13 @@ class Assay < ApplicationRecord
       if existing
         new_type_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
       else
-        aa = self.assay_assets.build(attrs)
-        if aa.asset && aa.asset.can_view?
-          new_type_assay_assets << aa
-        end
+        aa = assay_assets.build(attrs)
+        new_type_assay_assets << aa if aa.asset && aa.asset.can_view?
       end
     end
 
     self.assay_assets = (other_assay_assets + new_type_assay_assets)
-    self.assay_assets
+    assay_assets
   end
 
   def related_publication_ids
@@ -265,5 +339,9 @@ class Assay < ApplicationRecord
 
   def related_sop_ids
     sop_ids
+  end
+
+  def related_data_file_ids
+    data_file_ids
   end
 end

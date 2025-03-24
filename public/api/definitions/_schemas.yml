@@ -167,6 +167,17 @@ assetLinkPatchList:
     anyOf:
       - $ref: "#/components/schemas/assetLink"
       - $ref: "#/components/schemas/assetLinkCreate"
+extendedMetadata:
+  type: object
+  properties:
+    extended_metadata_type_id:
+      type: string
+    attribute_map:
+      $ref: "#/components/schemas/attributeMap"
+  required:
+    - extended_metadata_type_id
+    - attribute_map
+  additionalProperties: false
 snapshotSkeleton:
   type: object
   properties:
@@ -427,6 +438,8 @@ contributedTypeAttributes:
       $ref: "#/components/schemas/assetsCreatorsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
+    extended_attributes:
+      $ref: "#/components/schemas/extendedMetadata"
   required:
     - title
     - license
@@ -460,6 +473,8 @@ collectionAttributes:
       $ref: "#/components/schemas/assetsCreatorsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
+    extended_attributes:
+      $ref: "#/components/schemas/extendedMetadata"
   required:
     - title
     - license
@@ -505,6 +520,8 @@ modelAttributes:
       $ref: "#/components/schemas/nullableNonEmptyString"
     policy:
       $ref: "#/components/schemas/policy"
+    extended_attributes:
+      $ref: "#/components/schemas/extendedMetadata"
     other_creators:
       $ref: "#/components/schemas/nullableOtherCreatorsString"
     creators:
@@ -811,10 +828,12 @@ projectMembersList:
       - person_id
       - institution_id
     additionalProperties: false
-sampleAttributeMap:
+attributeMap:
   type: object
-  additionalProperties:
-    type: string
+  additionalProperties: true
+extendedMetadataAttributeMap:
+  type: object
+  additionalProperties: true
 # --- Types ---
 anyType:
   type: string
@@ -832,6 +851,7 @@ anyType:
     - institutions
     - investigations
     - models
+    - observation_units
     - organisms
     - people
     - presentations
@@ -844,6 +864,7 @@ anyType:
     - sops
     - studies
     - workflows
+    - extended_metadata_types
 assetType:
   type: string
   minLength: 1
@@ -1027,7 +1048,10 @@ sampleAttributeBaseType:
     - SeekStrain
     - SeekSample
     - CV
+    - CVList
     - SeekDataFile
+    - SeekSop
+    - SeekSampleMulti
 sampleAttributeTypeType:
   type: string
   minLength: 1
@@ -1103,6 +1127,8 @@ assayPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - assay_class
@@ -1193,6 +1219,8 @@ assayPatch:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1252,6 +1280,8 @@ collectionPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -1304,6 +1334,8 @@ collectionPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1403,6 +1435,10 @@ dataFilePost:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
+            data_type_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            data_format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -1419,6 +1455,8 @@ dataFilePost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -1466,6 +1504,10 @@ dataFilePatch:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
+            data_type_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            data_format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -1480,6 +1522,8 @@ dataFilePatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1535,6 +1579,8 @@ documentPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -1592,6 +1638,8 @@ documentPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1643,6 +1691,8 @@ eventPost:
               $ref: "#/components/schemas/nullableDateTimeString"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - start_date
@@ -1702,6 +1752,8 @@ eventPatch:
               $ref: "#/components/schemas/dateTimeString"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1819,6 +1871,8 @@ investigationPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -1869,6 +1923,8 @@ investigationPatch:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -1924,6 +1980,8 @@ modelPost:
               $ref: "#/components/schemas/nullableNonEmptyString"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -1989,6 +2047,8 @@ modelPatch:
               $ref: "#/components/schemas/nullableNonEmptyString"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -2130,6 +2190,8 @@ presentationPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -2189,6 +2251,8 @@ presentationPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -2328,6 +2392,8 @@ projectPost:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
           required:
@@ -2379,6 +2445,8 @@ projectPatch:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
           additionalProperties: false
@@ -2415,7 +2483,7 @@ samplePost:
             other_creators:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             attribute_map:
-              $ref: "#/components/schemas/sampleAttributeMap"
+              $ref: "#/components/schemas/attributeMap"
             policy:
               $ref: "#/components/schemas/policy"
             discussion_links:
@@ -2470,7 +2538,7 @@ samplePatch:
             other_creators:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             attribute_map:
-              $ref: "#/components/schemas/sampleAttributeMap"
+              $ref: "#/components/schemas/attributeMap"
             policy:
               $ref: "#/components/schemas/policy"
             discussion_links:
@@ -2518,6 +2586,10 @@ sampleTypePost:
               $ref: "#/components/schemas/nonEmptyString"
             description:
               $ref: "#/components/schemas/nullableNonEmptyString"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
             sample_attributes:
               type: array
               minItems: 1
@@ -2565,6 +2637,10 @@ sampleTypePatch:
               $ref: "#/components/schemas/nonEmptyString"
             description:
               $ref: "#/components/schemas/nullableNonEmptyString"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
             sample_attributes:
               type: array
               minItems: 1
@@ -2621,9 +2697,9 @@ sampleTypeSampleAttributePost:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
   required:
     - title
     - sample_attribute_type
@@ -2660,9 +2736,9 @@ sampleTypeSampleAttributePatch:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     _destroy:
       type: boolean
   required: []
@@ -2696,6 +2772,8 @@ sopPost:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - content_blobs
@@ -2753,6 +2831,8 @@ sopPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           additionalProperties: false
         relationships:
           type: object
@@ -2800,6 +2880,8 @@ studyPost:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -2850,6 +2932,8 @@ studyPatch:
               $ref: "#/components/schemas/assetsCreatorsList"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
           additionalProperties: false
@@ -2889,6 +2973,8 @@ workflowPost:
               $ref: "#/components/schemas/ontologyTermsList"
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -2967,6 +3053,8 @@ workflowPatch:
               $ref: "#/components/schemas/ontologyTermsList"
             operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
             description:
@@ -3157,6 +3245,8 @@ assayResponse:
               $ref: "#/components/schemas/assetLinkList"
             position:
               $ref: "#/components/schemas/nullableInteger"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - assay_class
@@ -3390,7 +3480,60 @@ dataFileResponse:
         type:
           $ref: "#/components/schemas/dataFileType"
         attributes:
-          $ref: "#/components/schemas/contributedTypeAttributes"
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tags"
+            data_type_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            data_format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            latest_version:
+              type: number
+            versions:
+              type: array
+              minItems: 1
+              uniqueItems: true
+              items:
+                $ref: "#/components/schemas/version"
+            version:
+              type: number
+            revision_comments:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            doi:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            created_at:
+              $ref: "#/components/schemas/dateTimeString"
+            updated_at:
+              $ref: "#/components/schemas/dateTimeString"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
+          required:
+            - title
+            - license
+            - latest_version
+            - versions
+            - version
+            - created_at
+            - updated_at
+            - content_blobs
+          additionalProperties: false
         relationships:
           type: object
           properties:
@@ -3543,6 +3686,8 @@ eventResponse:
               $ref: "#/components/schemas/nullableDateTimeString"
             policy:
               $ref: "#/components/schemas/policy"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
             - description
@@ -3680,6 +3825,8 @@ investigationResponse:
               $ref: "#/components/schemas/assetLinkList"
             position:
               $ref: "#/components/schemas/nullableInteger"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
           required:
             - title
           additionalProperties: false
@@ -4148,6 +4295,8 @@ projectResponse:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            extended_attributes:
+              $ref: "#/components/schemas/extendedMetadata"
             topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             start_date:
@@ -4419,7 +4568,7 @@ sampleResponse:
             other_creators:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             attribute_map:
-              $ref: "#/components/schemas/sampleAttributeMap"
+              $ref: "#/components/schemas/attributeMap"
             policy:
               $ref: "#/components/schemas/policy"
             creators:
@@ -4501,6 +4650,10 @@ sampleTypeResponse:
               $ref: "#/components/schemas/nonEmptyString"
             description:
               $ref: "#/components/schemas/nullableNonEmptyString"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
             sample_attributes:
               $ref: "#/components/schemas/sampleTypeSampleAttributesResponse"
             tags:
@@ -4581,12 +4734,108 @@ sampleTypeSampleAttributeResponse:
     is_title:
       type: boolean
     sample_controlled_vocab_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
-      $ref: "#/components/schemas/nullableInteger"
+      $ref: "#/components/schemas/nullableNonEmptyString"
   required:
     - title
     - sample_attribute_type
+  additionalProperties: false
+extendedMetadataTypeResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/nonEmptyString"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            supported_type:
+              $ref: "#/components/schemas/nonEmptyString"
+            enabled:
+              type: boolean
+            extended_metadata_attributes:
+              $ref: "#/components/schemas/extendedMetadataTypeExtendedMetadataAttributesResponse"
+          required:
+            - title
+            - supported_type
+            - enabled
+            - extended_metadata_attributes
+        links:
+          $ref: "#/components/schemas/links"
+        meta:
+          type: object
+          properties:
+            base_url:
+              $ref: "#/components/schemas/uriString"
+            api_version:
+              $ref: "#/components/schemas/nonEmptyString"
+          required:
+            - base_url
+            - api_version
+          additionalProperties: false
+      required:
+        - id
+        - type
+        - attributes
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+      - data
+      - jsonapi
+  additionalProperties: false
+extendedMetadataTypeExtendedMetadataAttributesResponse:
+  type: array
+  minItems: 1
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/extendedMetadataTypeExtendedMetadataAttributeResponse"
+extendedMetadataTypeExtendedMetadataAttributeResponse:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    label:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    pid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+        base_type:
+          $ref: "#/components/schemas/sampleAttributeBaseType"
+        regexp:
+          $ref: "#/components/schemas/nonEmptyString"
+    required:
+      type: boolean
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    sample_controlled_vocab_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    linked_extended_metadata_type_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - id
+    - title
+    - sample_attribute_type
+    - required
   additionalProperties: false
 searchResponse:
   type: object
@@ -4697,6 +4946,8 @@ studyResponse:
               $ref: "#/components/schemas/policy"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            extended_attributes:
+                $ref: "#/components/schemas/extendedMetadata"
             position:
               $ref: "#/components/schemas/nullableInteger"
           required:
@@ -4841,6 +5092,8 @@ workflowResponse:
                     $ref: "#/components/schemas/workflowOutput"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            tools:
+              $ref: "#/components/schemas/workflowtoolsList"
           required:
             - title
             - workflow_class
@@ -4919,3 +5172,17 @@ workflowResponse:
     - data
     - jsonapi
   additionalProperties: false
+workflowtoolsList:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/workflowtool"
+workflowtool:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/uriString"
+    name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - id

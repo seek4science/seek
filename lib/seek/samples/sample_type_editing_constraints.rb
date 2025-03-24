@@ -5,6 +5,7 @@ module Seek
     class SampleTypeEditingConstraints
       attr_reader :sample_type
       delegate :samples, to: :sample_type
+      delegate :is_isa_json_compliant?, to: :sample_type
 
       def initialize(sample_type)
         fail Exception.new('Sample type cannot be nil') unless sample_type
@@ -20,21 +21,25 @@ module Seek
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
       def allow_required?(attr)
         if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
+          return true if attr.new_record? && @sample_type.new_record?
+          return false if inherited?(attr)
+
           attr = attr.accessor_name
         end
-        if attr
-          !blanks?(attr)
-        else
-          !samples?
-        end
+
+        return !samples? unless attr
+        return !blanks?(attr) if samples?
+
+        true
       end
 
       # an attribute could be removed if all are currently blank
       # attr can be the attribute accessor name, or the attribute itself
       def allow_attribute_removal?(attr)
         if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
+          return true if attr.new_record? && !inherited?(attr)
+          return false if inherited?(attr) && attr.required?
+
           attr = attr.accessor_name
         end
         if attr
@@ -44,30 +49,34 @@ module Seek
         end
       end
 
-      # whether a new attribtue can be created
+      # This method was left in so it can be changed in the future
+      # Currently, it always returns true
+      # see https://github.com/seek4science/seek/pull/2032#discussion_r1813137258
       def allow_new_attribute?
-        !samples?
+        true
       end
-
-      # whether the name of the attribute can be changed
-      def allow_name_change?(attr)
+      # whether the type for the attribute can be changed
+      def allow_type_change?(attr)
         if attr.is_a?(SampleAttribute)
           return true if attr.new_record?
+          return false if inherited?(attr)
+
           attr = attr.accessor_name
         end
         if attr
-          !samples?
+          all_blank?(attr)
         else
           true
         end
       end
 
-      # whether the type for the attribute can be changed
-      def allow_type_change?(attr)
+      def allow_isa_tag_change?(attr)
         if attr.is_a?(SampleAttribute)
-          return true if attr.new_record?
+          return false if inherited?(attr)
+
           attr = attr.accessor_name
         end
+
         if attr
           all_blank?(attr)
         else
@@ -81,12 +90,16 @@ module Seek
 
       private
 
+      def inherited?(attr)
+        attr&.inherited_from_template_attribute? && is_isa_json_compliant?
+      end
+
       def blanks?(attr)
-        analysis_hash[attr.to_sym][:has_blanks]
+        !analysis_hash.key?(attr.to_sym) || analysis_hash[attr.to_sym][:has_blanks]
       end
 
       def all_blank?(attr)
-        analysis_hash[attr.to_sym][:all_blank]
+        !analysis_hash.key?(attr.to_sym) || analysis_hash[attr.to_sym][:all_blank]
       end
 
       def analysis_hash

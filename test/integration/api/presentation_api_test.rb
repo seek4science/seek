@@ -7,22 +7,26 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    @creator = Factory(:person)
-    @publication = Factory(:publication, projects: [@project])
-    @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
-    @presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    @workflow = Factory(:workflow, projects: [@project], policy: Factory(:public_policy))
+    @creator = FactoryBot.create(:person)
+    @publication = FactoryBot.create(:publication, projects: [@project])
+    @event = FactoryBot.create(:event, projects: [@project], policy: FactoryBot.create(:public_policy))
+    @presentation = FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
+    @workflow = FactoryBot.create(:workflow, projects: [@project], policy: FactoryBot.create(:public_policy))
   end
 
   test 'can add content to API-created presentation' do
-    pres = Factory(:api_pdf_presentation, contributor: current_person)
+    pres = FactoryBot.create(:api_pdf_presentation, contributor: current_person)
 
     assert pres.content_blob.no_content?
     assert pres.can_download?(@current_user)
     assert pres.can_edit?(@current_user)
 
     original_md5 = pres.content_blob.md5sum
-    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put presentation_content_blob_path(pres, pres.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :success
     blob = pres.content_blob.reload
@@ -32,13 +36,17 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created presentation without permission' do
-    pres = Factory(:api_pdf_presentation, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
+    pres = FactoryBot.create(:api_pdf_presentation, policy: FactoryBot.create(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
     assert pres.content_blob.no_content?
     assert pres.can_download?(@current_user)
     refute pres.can_edit?(@current_user)
 
-    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put presentation_content_blob_path(pres, pres.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :forbidden
     validate_json response.body, '#/components/schemas/forbiddenResponse'
@@ -48,14 +56,18 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created presentation that already has content' do
-    pres = Factory(:presentation, contributor: current_person)
+    pres = FactoryBot.create(:presentation, contributor: current_person)
 
     refute pres.content_blob.no_content?
     assert pres.can_download?(@current_user)
     assert pres.can_edit?(@current_user)
 
     original_md5 = pres.content_blob.md5sum
-    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
+    put presentation_content_blob_path(pres, pres.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :bad_request
     validate_json response.body, '#/components/schemas/badRequestResponse'
@@ -78,7 +90,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     to_post = load_template('post_bad_presentation.json.erb')
 
     assert_no_difference(-> { model.count }) do
-      post "/#{plural_name}.json", params: to_post
+      post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       # assert_response :unprocessable_entity
       # validate_json response.body, '#/components/schemas/errors'
     end

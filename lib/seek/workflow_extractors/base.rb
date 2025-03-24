@@ -12,7 +12,13 @@ module Seek
       end
 
       def metadata
-        { }
+        m = {}
+
+        if @io.respond_to?(:remote_content_handler)
+          m.merge!(extract_source_metadata(@io.remote_content_handler))
+        end
+
+        m
       end
 
       def has_tests?
@@ -40,6 +46,18 @@ module Seek
       end
 
       private
+
+      def extract_license(licensee_project)
+        license = nil
+        begin
+          ::Licensee::License # Reference License class otherwise it cannot find ::Licensee::InvalidLicense
+          license = licensee_project&.license&.spdx_id
+        rescue ::Licensee::InvalidLicense
+        rescue ::Licensee::Projects::GitProject::InvalidRepository => e
+          raise e unless Rails.env.production?
+        end
+        license
+      end
 
       # Extract author from a string or a Hash complying to schema.org's `Person`
       def extract_author(obj)
@@ -71,6 +89,24 @@ module Seek
         end
 
         author
+      end
+
+      def extract_source_metadata(handler)
+        m = {}
+        return m unless handler
+        source_url = nil
+        if handler.respond_to?(:repository_url)
+          source_url = handler.repository_url
+        elsif handler.respond_to?(:display_url)
+          source_url = handler.display_url
+        end
+        m[:source_link_url] = source_url
+
+        if handler.respond_to?(:execution_instance_url)
+          m[:execution_instance_url] = handler.execution_instance_url
+        end
+
+        m
       end
     end
   end

@@ -21,7 +21,7 @@ module Seek
         r = sheet.rows[1]
 
         if r.cell(1).value.blank?
-          flash[:error]= "Unable to find header cells in #{datafile.title}" 
+          flash[:error]= "Unable to find header cells in #{datafile.title}"
           return
         end
 
@@ -78,7 +78,7 @@ module Seek
             assay_position = 1
             investigation.save!
           end
-          
+
           if r.cell(study_index)&.value.present?
             if investigation.blank?
               flash[:error]= "Study specified without Investigation in #{datafile.title} at row #{r.index}"
@@ -111,7 +111,7 @@ module Seek
             set_description(assay, r, description_index)
             assay.position = assay_position
             assay_position += 1
-            assay.assay_class = AssayClass.for_type('experimental')
+            assay.assay_class = AssayClass.experimental
 
             set_assignees(assay, r, assignee_indices)
 
@@ -134,7 +134,7 @@ module Seek
         end
         object.description = description
       end
-      
+
       def set_assignees(assay, r, assignee_indices)
         assignees = []
         assignee_indices.each do |x|
@@ -154,7 +154,7 @@ module Seek
         end
         assay.creators = known_creators
         assay.other_creators = other_creators.join(';')
-      end  
+      end
 
       def set_protocol(assay, r, protocol_index)
         protocol_string = r.cell(protocol_index)&.value&.to_s.strip

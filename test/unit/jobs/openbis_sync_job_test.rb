@@ -3,15 +3,15 @@ require 'openbis_test_helper'
 
 class OpenbisSyncJobTest < ActiveSupport::TestCase
   def setup
-    Factory :experimental_assay_class
+    FactoryBot.create :experimental_assay_class
     mock_openbis_calls
 
     @batch_size = 3
-    @endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
+    @endpoint = FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60)
     @endpoint.assay_types = ['TZ_FAIR_ASSAY', 'EXPERIMENTAL_STEP'] #needed for automatic picking up of assays
     assert @endpoint.save
     @job = OpenbisSyncJob.new(@endpoint, @batch_size)
-    @person = Factory(:person, project: @endpoint.project)
+    @person = FactoryBot.create(:person, project: @endpoint.project)
     User.current_user = nil # @person.user
   end
 
@@ -234,8 +234,8 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'queue_timed_jobs creates jobs for each endpoint needing sync' do
-    endpoint2 = Factory(:openbis_endpoint, refresh_period_mins: 60, space_perm_id: 'API-SPACE2')
-    no_sync_needed = Factory(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.seconds.ago)
+    endpoint2 = FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60, space_perm_id: 'API-SPACE2')
+    no_sync_needed = FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60, last_sync: 2.seconds.ago)
 
     assert endpoint2.save
     assert @endpoint.due_sync?
@@ -263,7 +263,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
 
   test 'queue_timed_jobs does nothing if autosync disabled' do
     with_config_value(:openbis_autosync, false) do
-      endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
+      endpoint = FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60)
       assert endpoint.due_sync?
 
       assert_no_enqueued_jobs(only: OpenbisSyncJob) do
@@ -274,7 +274,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
 
   test 'queue_timed_jobs does nothing if openbis disabled' do
     with_config_value(:openbis_enabled, false) do
-      endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
+      endpoint = FactoryBot.create(:openbis_endpoint, refresh_period_mins: 60)
       assert endpoint.due_sync?
 
       assert_no_enqueued_jobs(only: OpenbisSyncJob) do
@@ -284,7 +284,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'perform_job does nothing on synchronized assets' do
-    assay = Factory :assay, contributor: @person
+    assay = FactoryBot.create :assay, contributor: @person
     assert assay.data_files.empty?
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -308,7 +308,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'perform_job refresh content and dependencies on non-synchronized assay like asset' do
-    assay = Factory :assay, contributor: @person
+    assay = FactoryBot.create :assay, contributor: @person
     assert_empty assay.data_files
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -336,7 +336,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'perform_job refresh content and dependencies on non-synchronized study like asset' do
-    study = Factory :study, contributor: @person
+    study = FactoryBot.create :study, contributor: @person
     assert_empty study.assays
     assert_empty study.related_data_files
 
@@ -373,7 +373,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
 
 
   test 'perform_job always update mod stamp even if no content change' do
-    assay = Factory :assay
+    assay = FactoryBot.create :assay
 
     # normal sample
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -409,7 +409,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'perform_job always update mod stamp even if errors' do
-    assay = Factory :assay, contributor: @person
+    assay = FactoryBot.create :assay, contributor: @person
 
     # normal sample
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -457,7 +457,7 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
   end
 
   test 'perform_job sets fatal if failures larger than threshold' do
-    assay = Factory :assay, contributor: @person
+    assay = FactoryBot.create :assay, contributor: @person
 
     # normal sample
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')

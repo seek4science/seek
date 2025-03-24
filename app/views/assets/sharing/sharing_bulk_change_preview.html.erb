@@ -1,5 +1,4 @@
 <%= show_title "New sharing policy and permissions" -%>
-
 <%= form_tag :action => :batch_sharing_permission_changed do %>
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
   <%= folding_panel('Sharing', false, id: 'sharing_form',
@@ -14,7 +13,7 @@
 
     <ul class="sharing_options">
       <% @items_for_sharing.each do |item| %>
-        <%= hidden_field_tag sharing_item_param(item), 1 %>
+        <%= hidden_field_tag publishing_item_param(item), 1 %>
         <li class="type_and_title">
           <%= text_for_resource item -%>: <%= link_to item.title, item -%>
           <% if  item.try(:is_downloadable?) %>
@@ -31,7 +30,6 @@
        <%= render partial: 'sharing/permissions_table', locals: { object: Study.new, policy: Policy.new, projects: [] } %>
     <% end %>
   <% end %>
-
   <%= submit_tag "Confirm", data: { disable_with: 'Confirm....' }, :class => 'btn btn-primary confirm-button', disabled: true  -%>
   or
   <%= cancel_button(resource) %>

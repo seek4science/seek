@@ -6,7 +6,7 @@ class ModelImagesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'get model image' do
-    model = Factory(:model_with_image, policy: Factory(:public_policy))
+    model = FactoryBot.create(:model_with_image, policy: FactoryBot.create(:public_policy))
     get :show, params: { model_id: model.id, id: model.model_image.id }
     assert_response :success
     assert_equal 'image/png', @response.header['Content-Type']
@@ -16,7 +16,7 @@ class ModelImagesControllerTest < ActionController::TestCase
   end
 
   test 'get model image with size' do
-    model = Factory(:model_with_image, policy: Factory(:public_policy))
+    model = FactoryBot.create(:model_with_image, policy: FactoryBot.create(:public_policy))
     get :show, params: { model_id: model.id, id: model.model_image.id, size: '10x10' }
     assert_response :success
     assert_equal 'image/png', @response.header['Content-Type']
@@ -26,7 +26,7 @@ class ModelImagesControllerTest < ActionController::TestCase
   end
 
   test 'model_image is authorised by model' do
-    model = Factory(:model_with_image, policy: Factory(:private_policy))
+    model = FactoryBot.create(:model_with_image, policy: FactoryBot.create(:private_policy))
     get :show, params: { model_id: model.id, id: model.model_image.id }
     assert_redirected_to root_path
     assert_not_nil flash[:error]
@@ -34,7 +34,7 @@ class ModelImagesControllerTest < ActionController::TestCase
   end
 
   test 'get the maximum size for the image' do
-    model = Factory(:model_with_image, policy: Factory(:public_policy))
+    model = FactoryBot.create(:model_with_image, policy: FactoryBot.create(:public_policy))
     get :show, params: { model_id: model.id, id: model.model_image.id, size: '5000x5000' }
     assert_response :success
     assert_equal 'image/png', @response.header['Content-Type']

@@ -4,7 +4,6 @@ class FileTemplate < ApplicationRecord
 
   include Seek::Annotatable
 
-  include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
@@ -12,18 +11,17 @@ class FileTemplate < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   has_controlled_vocab_annotations :data_types, :data_formats
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-  has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
 
   has_many :data_files, inverse_of: :file_template
   has_many :placeholders, inverse_of: :file_template
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
-    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable
@@ -36,8 +34,16 @@ class FileTemplate < ApplicationRecord
     true
   end
 
+  def supports_spreadsheet_explore?
+    true
+  end
+
   def self.user_creatable?
     Seek::Config.file_templates_enabled
+  end
+
+  def self.supports_extended_metadata?
+    false
   end
   
 end

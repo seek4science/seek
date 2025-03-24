@@ -21,7 +21,6 @@
 //= require typeahead.js.js
 //= require bootstrap-tagsinput
 //= require bootstrap-multiselect
-//= require tags_input
 //= require objects_input
 //= require handlebars.runtime
 //= require handlebars_helpers
@@ -51,13 +50,14 @@
 //= require DataTables-1.11.3/buttons.html5
 //= require DataTables-1.11.3/autoFill.bootstrap
 //= require samples
+//= require datafiles
 //= require jstree
 //= require clipboard
 //= require openbis
 //= require calendar
 //= require inplace
 //= require strain
-//= require checkbox
+//= require batch_asset_selection
 //= require cytoscape.js-2.5.0/cytoscape
 //= require cytoscape_isa_graph
 //= require bives
@@ -76,3 +76,11 @@
 //= require git
 //= require jquery.splitter/jquery.splitter.min
 //= require select2.full.min
+//= require licenses
+//= require svg-pan-zoom-3.6.1/svg-pan-zoom.min
+//= require copasi/copasi
+//= require copasi/copasijs
+//= require copasi/copasi_simulation
+//= require plotly-2.27.0.min
+//= require extended_metadata_type
+

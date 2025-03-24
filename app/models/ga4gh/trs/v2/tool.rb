@@ -23,7 +23,7 @@ module Ga4gh
         end
 
         def versions
-          all_versions.map { |v| ToolVersion.new(self, v) }
+          @workflow.versions.map { |v| ToolVersion.new(self, v) }
         end
 
         def toolclass

@@ -6,6 +6,7 @@ class StudiesController < ApplicationController
   before_action :studies_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[edit update destroy manage manage_update show new_object_based_on_existing_one]
+  before_action :delete_linked_sample_types, only: [:destroy]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   # defined in the application controller
@@ -39,8 +40,12 @@ class StudiesController < ApplicationController
 
   def edit
     @study = Study.find(params[:id])
-    respond_to do |format|
-      format.html
+    if @study.is_isa_json_compliant?
+      redirect_to edit_isa_study_path(@study)
+    else
+      respond_to do |format|
+        format.html
+      end
     end
   end
 
@@ -69,7 +74,7 @@ class StudiesController < ApplicationController
          format.html { redirect_to(@study) }
        end
     else
-      @study.attributes = study_params
+      @study.assign_attributes(study_params)
       update_sharing_policies @study
       update_annotations(params[:tag_list], @study)
       update_relationships(@study, params)
@@ -87,6 +92,17 @@ class StudiesController < ApplicationController
     end
   end
 
+  def delete_linked_sample_types
+    return unless @study.is_isa_json_compliant?
+    return if @study.sample_types.empty?
+
+    # The study sample types must be destroyed in reversed order
+    # otherwise the first sample type won't be removed becaused it is linked from the second
+    study_st_ids = @study.sample_types.map(&:id).sort { |a, b| b <=> a }
+    SampleType.destroy(study_st_ids)
+  end
+
+
   def show
     @study = Study.find(params[:id])
 
@@ -102,6 +118,7 @@ class StudiesController < ApplicationController
     update_sharing_policies @study
     update_annotations(params[:tag_list], @study)
     update_relationships(@study, params)
+
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save
       respond_to do |format|
@@ -115,7 +132,7 @@ class StudiesController < ApplicationController
         format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
       end
     end
-  end  
+  end
 
   def check_assays_are_for_this_study
     study_id = params[:id]
@@ -186,10 +203,10 @@ class StudiesController < ApplicationController
 
   def batch_create
     # create method will be called for each study
-    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
+    # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: FactoryBot.create(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
-    metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
+    metadata_types = ExtendedMetadataType.where(title: ExtendedMetadataType::MIAPPE_TITLE, supported_type: 'Study').last
     studies_length = params[:studies][:title].length
     studies_uploaded = false
     data_file_uploaded = false
@@ -198,15 +215,15 @@ class StudiesController < ApplicationController
       study_params = {
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
-        investigation_id: params[:study][:investigation_id],        
-        custom_metadata: CustomMetadata.new(
-          custom_metadata_type: metadata_types,
+        investigation_id: params[:study][:investigation_id],
+        extended_metadata: ExtendedMetadata.new(
+          extended_metadata_type: metadata_types,
           data: metadata
         )
       }
       @study = Study.new(study_params)
       StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
-      if @study.valid? && @study.save! && @study.custom_metadata.valid?
+      if @study.valid? && @study.save! && @study.extended_metadata.valid?
         studies_uploaded = true if @study.save
       end
       data_file_uploaded = create_batch_assay_asset(params, index)
@@ -250,7 +267,7 @@ class StudiesController < ApplicationController
     data_file_names.length.times do |data_file_index|
 
       study_metadata_id = params[:studies][:id][index]
-      study_id = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
+      study_id = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
       assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
       data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
       assay_params = {
@@ -331,15 +348,13 @@ class StudiesController < ApplicationController
       metadata_id = JSON.parse(study.gsub("=>",":"))["metadata_id"].to_i
 
       Study.where(id: study_id).delete_all
-      CustomMetadata.where(id: metadata_id).delete_all
+      ExtendedMetadata.where(id: metadata_id).delete_all
       assays = Assay.where(study_id: study_id)
       assays.each do |assay|
         AssayAsset.where(assay_id: assay.id).delete_all
       end
       assays.delete_all
-
     end
-
   end
 
   private
@@ -347,6 +362,6 @@ class StudiesController < ApplicationController
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
-                                  { custom_metadata_attributes: determine_custom_metadata_keys })
+                                  { extended_metadata_attributes: determine_extended_metadata_keys })
   end
 end

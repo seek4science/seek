@@ -16,5 +16,5 @@ fi
 echo "deleting seek-search container and seek-solr-data-volume volume"
 docker rm seek-search > /dev/null
 echo "deleted container"
-docker volume rm seek-solr-data-volume /dev/null
+docker volume rm seek-solr-data-volume > /dev/null
 echo "deleted volume"

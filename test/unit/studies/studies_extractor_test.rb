@@ -6,7 +6,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     @zip_file = "#{Rails.root}/test/fixtures/files/study_batch.zip"
     user_uuid = 'user_uuid'
     @data_files, @studies = StudyBatchUpload.unzip_batch @zip_file, user_uuid
-     #Factory(:study_template_content_blob)
+     #FactoryBot.create(:study_template_content_blob)
   end
 
   test 'check extracted files' do
@@ -18,15 +18,15 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
     assert_same 3, data_files.count
     assert_same 1, studies.count
-    assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
-    assert_same true, File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
+    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
+    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
 
     FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
   end
 
   test 'read study file' do
 
-    Factory(:study_custom_metadata_type_for_MIAPPE)
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     user_uuid = 'user_uuid'
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
@@ -39,7 +39,8 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   test 'extract study correctly' do
     user_uuid = 'user_uuid'
-    Factory(:study_custom_metadata_type_for_MIAPPE)
+    extended_metadata_type = FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    assert_equal 'MIAPPE metadata v1.1', extended_metadata_type.title, 'must match the seed data title'
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
@@ -49,13 +50,13 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     assert_same 3, studies.count
 
     assert_equal 'Clonal test of mapping pedigree 0504B in nursery', studies[0].title
-    assert_equal 'POPYOMICS-POP2-F', studies[0].custom_metadata.data[:id]
+    assert_equal 'POPYOMICS-POP2-F', studies[0].extended_metadata.data[:id]
 
     assert_equal 'Clonal test of mapping pedigree 0504B in nursery', studies[1].title
-    assert_equal 'POPYOMICS-POP2-I', studies[1].custom_metadata.data[:id]
+    assert_equal 'POPYOMICS-POP2-I', studies[1].extended_metadata.data[:id]
 
     assert_equal 'Clonal test of mapping pedigree 0504B in nursery', studies[2].title
-    assert_equal 'POPYOMICS-POP2-UK', studies[2].custom_metadata.data[:id]
+    assert_equal 'POPYOMICS-POP2-UK', studies[2].extended_metadata.data[:id]
 
     FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
     #@extractor.extract
@@ -82,7 +83,7 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   test 'get right licence from file' do
     user_uuid = 'user_uuid'
-    Factory(:study_custom_metadata_type_for_MIAPPE)
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     studies_file = ContentBlob.new
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s

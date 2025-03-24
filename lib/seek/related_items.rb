@@ -5,10 +5,10 @@ module Seek
     RELATABLE_TYPES = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile',
                        'Document', 'Model', 'Sop', 'Publication', 'Presentation', 'Event', 'Organism', 'Strain',
                        'SampleType', 'Sample', 'Workflow', 'Collection', 'HumanDisease', 'FileTemplate', 'Placeholder',
-                       'Template'].freeze
+                       'Template', 'ObservationUnit'].freeze
 
     # special cases of associations to be skipped { self: relatable_type  }
-    RELATABLE_TYPES_BLACKLIST = {
+    RELATABLE_TYPES_DENYLIST = {
       Person: 'Person',
       Template: 'Organism'
     }.with_indifferent_access.freeze
@@ -17,7 +17,7 @@ module Seek
       def related_type_methods
         @related_type_methods ||= {}.tap do |hash|
           RELATABLE_TYPES.each do |type|
-            next if RELATABLE_TYPES_BLACKLIST[self.name] == type
+            next if RELATABLE_TYPES_DENYLIST[self.name] == type
 
             method_name = type.underscore.pluralize
 

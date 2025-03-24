@@ -51,6 +51,7 @@ module Seek
   end
 
   class IsaGraphGenerator
+    MIN_AGGREGATED_CHILDREN = 5
     def initialize(object)
       @object = object
     end
@@ -126,11 +127,15 @@ module Seek
         associations(object)[:aggregated_children].each do |type, method|
           associations = resolve_association(object, method)
           next unless associations.any?
-          agg = Seek::ObjectAggregation.new(object, type, associations)
-          agg_node = Seek::IsaGraphNode.new(agg)
-          agg_node.can_view = true
-          nodes << agg_node
-          edges << [object, agg]
+          if associations.count > MIN_AGGREGATED_CHILDREN
+            agg = Seek::ObjectAggregation.new(object, type, associations)
+            agg_node = Seek::IsaGraphNode.new(agg)
+            agg_node.can_view = true
+            nodes << agg_node
+            edges << [object, agg]
+          else
+            children |= associations
+          end
         end
       end
 
@@ -158,10 +163,10 @@ module Seek
     end
 
     def resolve_association(object, association)
-      if object.respond_to?('related_' + association.to_s)
-        associations = object.send('related_' + association.to_s)
-      elsif object.respond_to?(association)
+      if object.respond_to?(association)
         associations = object.send(association)
+      elsif object.respond_to?('related_' + association.to_s)
+        associations = object.send('related_' + association.to_s)
       else
         return []
       end
@@ -188,21 +193,15 @@ module Seek
         }
       when Study
         {
-          children: [:positioned_assays],
-          parents: [:investigation],
-          related: [:publications]
+          children: [:positioned_assays, :observation_units],
+          related: [:publications, :sops],
+          parents: [:investigation]
         }
       when Assay
         {
           children: %i[data_files models sops publications documents placeholders],
           parents: [:study],
-          # related: [:publications],
           aggregated_children: { samples: :samples }
-          # data_files: :data_files,
-          # models: :models,
-          # sops: :sops,
-          # documents: :documents,
-          # publications: :publications
         }
       when Publication
         {
@@ -218,6 +217,12 @@ module Seek
       when Event
         {
           parents: %i[presentations publications data_files documents]
+        }
+      when ObservationUnit
+        {
+          parents: %i[study],
+          children: %i[data_files],
+          aggregated_children: { samples: :samples }
         }
       else
         {}

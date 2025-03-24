@@ -7,9 +7,12 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'creatable types' do
-    types = Seek::Util.user_creatable_types
-    # How to enable Placeholder?
-    expected = [Collection, DataFile, Document, FileTemplate, Model, Placeholder, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
+    expected = [Collection, DataFile, Document, FileTemplate, Model, ObservationUnit, Placeholder, Presentation, 
+Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
+
+    types = with_config_value :isa_json_compliance_enabled, true do
+      Seek::Util.user_creatable_types
+    end
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
@@ -19,21 +22,29 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    # How to enable Placeholder?
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
-    actual = Seek::Util.authorized_types.map(&:name).sort
+
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, ObservationUnit, Placeholder, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template, SampleType].map(&:name).sort
+    actual = with_config_value :isa_json_compliance_enabled, true do
+      Seek::Util.authorized_types.map(&:name).sort
+    end
+
     assert_equal expected, actual
   end
 
   test 'rdf capable types' do
     types = Seek::Util.rdf_capable_types
-    expected = %w[Assay DataFile Investigation Model Organism Person Programme Project Publication Sop Strain Study]
+    expected = %w[Assay DataFile Investigation Model ObservationUnit Organism Person Programme Project Publication 
+Sample Sop Strain Study]
     assert_equal expected, types.collect(&:name).sort
   end
 
   test 'searchable types' do
-    types = Seek::Util.searchable_types
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, 
+Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
+
+    types = with_config_value :isa_json_compliance_enabled, true do
+      Seek::Util.searchable_types
+    end
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
@@ -42,16 +53,26 @@ class UtilTest < ActiveSupport::TestCase
     assert_equal expected.sort_by(&:to_s), types.sort_by(&:to_s)
 
     with_config_value :events_enabled, false do
-      Seek::Util.clear_cached
-      types = Seek::Util.searchable_types
-      assert_equal (expected - [Event]).map(&:to_s).sort, types.map(&:to_s).sort
+      with_config_value :isa_json_compliance_enabled, true do
+        Seek::Util.clear_cached
+        types = Seek::Util.searchable_types
+        assert_equal (expected - [Event]).map(&:to_s).sort, types.map(&:to_s).sort
+      end
     end
 
     with_config_value :programmes_enabled, false do
-      Seek::Util.clear_cached
-      types = Seek::Util.searchable_types
-     assert_equal (expected - [Programme]).map(&:to_s).sort, types.map(&:to_s).sort
+      with_config_value :isa_json_compliance_enabled, true do
+        Seek::Util.clear_cached
+        types = Seek::Util.searchable_types
+        assert_equal (expected - [Programme]).map(&:to_s).sort, types.map(&:to_s).sort
+      end
     end
+
+    with_config_value :isa_json_compliance_enabled, false do
+      types = Seek::Util.searchable_types
+      assert_equal (expected - [Template]).map(&:to_s).sort, types.map(&:to_s).sort
+    end
+
   end
 
   test 'multi-file assets' do
@@ -93,26 +114,31 @@ class UtilTest < ActiveSupport::TestCase
               assert Seek::Util.asset_types.include?(Workflow)
               assert Seek::Util.user_creatable_types.include?(Workflow)
               assert Seek::Util.searchable_types.include?(Workflow)
+              assert Seek::Util.lookup_class('Workflow', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Event)
               assert Seek::Util.authorized_types.include?(Event)
               assert Seek::Util.user_creatable_types.include?(Event)
               assert Seek::Util.searchable_types.include?(Event)
+              assert Seek::Util.lookup_class('Event', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Sample)
               assert Seek::Util.authorized_types.include?(Sample)
               assert Seek::Util.asset_types.include?(Sample)
               assert Seek::Util.user_creatable_types.include?(Sample)
               assert Seek::Util.searchable_types.include?(Sample)
+              assert Seek::Util.lookup_class('Sample', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Programme)
               assert Seek::Util.searchable_types.include?(Programme)
+              assert Seek::Util.lookup_class('Programme', raise: false)
 
               assert Seek::Util.persistent_classes.include?(Publication)
               assert Seek::Util.authorized_types.include?(Publication)
               assert Seek::Util.asset_types.include?(Publication)
               assert Seek::Util.user_creatable_types.include?(Publication)
               assert Seek::Util.searchable_types.include?(Publication)
+              assert Seek::Util.lookup_class('Publication', raise: false)
 
               with_config_value :workflows_enabled, false do
                 Seek::Util.clear_cached
@@ -121,6 +147,7 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.asset_types.include?(Workflow)
                 refute Seek::Util.user_creatable_types.include?(Workflow)
                 refute Seek::Util.searchable_types.include?(Workflow)
+                assert_nil Seek::Util.lookup_class('Workflow', raise: false)
               end
 
               with_config_value :events_enabled, false do
@@ -129,6 +156,7 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.authorized_types.include?(Event)
                 refute Seek::Util.user_creatable_types.include?(Event)
                 refute Seek::Util.searchable_types.include?(Event)
+                assert_nil Seek::Util.lookup_class('Event', raise: false)
               end
 
               with_config_value :samples_enabled, false do
@@ -138,12 +166,14 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.asset_types.include?(Sample)
                 refute Seek::Util.user_creatable_types.include?(Sample)
                 refute Seek::Util.searchable_types.include?(Sample)
+                assert_nil Seek::Util.lookup_class('Sample', raise: false)
               end
 
               with_config_value :programmes_enabled, false do
                 Seek::Util.clear_cached
                 refute Seek::Util.persistent_classes.include?(Programme)
                 refute Seek::Util.searchable_types.include?(Programme)
+                assert_nil Seek::Util.lookup_class('Programme', raise: false)
               end
 
               with_config_value :publications_enabled, false do
@@ -153,6 +183,7 @@ class UtilTest < ActiveSupport::TestCase
                 refute Seek::Util.asset_types.include?(Publication)
                 refute Seek::Util.user_creatable_types.include?(Publication)
                 refute Seek::Util.searchable_types.include?(Publication)
+                assert_nil Seek::Util.lookup_class('Publication', raise: false)
               end
 
             end
@@ -160,8 +191,24 @@ class UtilTest < ActiveSupport::TestCase
         end
       end
     end
-
-
-
   end
+
+  test 'lookup_class' do
+    assert Seek::Util.lookup_class('Publication', raise: false)
+    assert Seek::Util.lookup_class('Workflow', raise: false)
+    assert_nil Seek::Util.lookup_class('String', raise: false)
+    assert_nil Seek::Util.lookup_class('WorkflowInternals::Structure', raise: false)
+    assert_nil Seek::Util.lookup_class('gdfghdfhdfhdfhdfhdfh', raise: false)
+    exception = assert_raises(NameError) do
+      Seek::Util.lookup_class('String')
+    end
+    assert_includes exception.message, 'not an appropriate class'
+  end
+
+  test 'extended_metadata_supported_types returns correct models' do
+    supported_types = Seek::Util.extended_metadata_supported_types.map(&:name)
+    expected_types = %w[Assay Collection DataFile Document Event ExtendedMetadata Investigation Model ObservationUnit Presentation Project Sop Study]
+    assert_equal expected_types.sort, supported_types.sort
+  end
+
 end

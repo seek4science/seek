@@ -1,7 +1,7 @@
 class CountriesController < ApplicationController
   # GET /countries/:country_name
   def show
-    country_code = CountryCodes.force_code(helpers.white_list(params[:country_code]))
+    country_code = CountryCodes.force_code(helpers.sanitized_text(params[:country_code]))
     @country = CountryCodes.country(country_code)
     @institutions = if @country
                       Institution.where(country:country_code.upcase)

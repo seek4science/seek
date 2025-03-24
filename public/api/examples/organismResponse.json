@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "5",
+    "id": "78",
     "type": "organisms",
     "attributes": {
       "title": "A Maximal Organism",
@@ -11,7 +11,7 @@
       "projects": {
         "data": [
           {
-            "id": "108",
+            "id": "2372",
             "type": "projects"
           }
         ]
@@ -19,7 +19,7 @@
       "assays": {
         "data": [
           {
-            "id": "10",
+            "id": "248",
             "type": "assays"
           }
         ]
@@ -27,21 +27,21 @@
       "models": {
         "data": [
           {
-            "id": "8",
+            "id": "112",
             "type": "models"
           }
         ]
       }
     },
     "links": {
-      "self": "/organisms/5"
+      "self": "/organisms/78"
     },
     "meta": {
-      "created": "2022-06-07T14:12:34.000Z",
-      "modified": "2022-06-07T14:12:34.000Z",
+      "created": "2024-11-20T10:16:26.000Z",
+      "modified": "2024-11-20T10:16:26.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "cd394ea0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "6c9350d0-8956-013d-24a2-0a81884ed284"
     }
   },
   "jsonapi": {

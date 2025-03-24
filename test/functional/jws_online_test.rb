@@ -8,25 +8,27 @@ class JwsOnlineTest < ActionController::TestCase
   include JwsOnlineTestHelper
 
   test 'simulate button visibility' do
-    model = Factory(:teusink_model, policy: Factory(:public_policy))
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: model }
     assert_response :success
     assert_select '#buttons a[href=?]', simulate_model_path(model, version: 1)
 
-    model = Factory(:non_sbml_xml_model, policy: Factory(:public_policy))
+    model = FactoryBot.create(:non_sbml_xml_model, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: model }
     assert_response :success
     assert_select '#buttons a[href=?]', simulate_model_path(model, version: 1), count: 0
 
-    model = Factory(:teusink_model, policy: Factory(:publicly_viewable_policy))
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:publicly_viewable_policy))
     get :show, params: { id: model }
     assert_response :success
     assert_select '#buttons a[href=?]', simulate_model_path(model, version: 1), count: 0
   end
 
   test 'simulate' do
-    model = Factory(:teusink_model, policy: Factory(:public_policy))
-    get :simulate, params: { id: model.id, version: model.version, constraint_based:'1' }
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:public_policy))
+    assert_difference('model.run_count', 1) do
+      get :simulate, params: { id: model.id, version: model.version, constraint_based: '1' }
+    end
     assert_response :success
     assert assigns(:simulate_url)
 
@@ -37,10 +39,32 @@ class JwsOnlineTest < ActionController::TestCase
   end
 
   test 'simulate no constraint defined' do
-    model = Factory(:teusink_model, policy: Factory(:public_policy))
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:public_policy))
     get :simulate, params: { id: model.id, version: model.version }
     assert_response :success
     refute assigns(:simulate_url)
     assert_select 'input[@type=checkbox]#constraint_based',count: 1
+  end
+
+  test 'do not simulate non-jws model' do
+    model = FactoryBot.create(:non_sbml_xml_model, policy: FactoryBot.create(:public_policy))
+
+    assert_no_difference('model.run_count') do
+      get :simulate, params: { id: model.id, version: model.version, constraint_based: '1' }
+    end
+
+    assert_redirected_to root_url
+    assert flash[:error].include?('JWS Online-compatible')
+  end
+
+  test 'do not log event before simulation is run' do
+    model = FactoryBot.create(:teusink_model, policy: FactoryBot.create(:public_policy))
+
+    assert_no_difference('model.run_count') do
+      get :simulate, params: { id: model.id, version: model.version } # `constraint_based` param is missing
+    end
+
+    assert_response :success
+    assert_select 'div', text: /JWS Online needs information.+/
   end
 end

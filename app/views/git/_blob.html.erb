@@ -8,8 +8,13 @@
 
 <div>
   <div class="pull-right">
-    <%= button_link_to('Download', 'download', polymorphic_path([@parent_resource, :git_download], version: @git_version.version, path: @blob.path)) %>
-    <%= button_link_to('Raw', 'markup', polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path)) %>
+    <% if @blob.fetched? %>
+      <%= button_link_to('Download', 'download', polymorphic_path([@parent_resource, :git_download], version: @git_version.version, path: @blob.path)) %>
+      <%= button_link_to('Raw', 'markup', polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path)) %>
+    <% end %>
+    <% if @blob.remote? %>
+      <%= button_link_to('External Link', 'external_link', @blob.url, target: :_blank) %>
+    <% end %>
     <% if @git_version.can_edit? %>
       <% if @git_version.mutable? %>
         <%= button_link_to('Move/rename', 'move', '#', { 'data-toggle' => 'modal', 'data-target' => '#git-move-modal' }) %>
@@ -25,7 +30,9 @@
   </div>
 
   <strong>Path: </strong> <%= @blob.path -%><br/>
-  <strong>Size: </strong> <%= number_to_human_size @blob.size -%><br/>
+  <% if @blob.fetched? %>
+    <strong>Size: </strong> <%= number_to_human_size @blob.size -%><br/>
+  <% end %>
   <div class="hidden">
     <strong>SHA: </strong> <code><%= @blob.oid %></code><br/>
   </div>

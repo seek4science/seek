@@ -6,33 +6,35 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
 
   def setup
     user_login
-    Factory(:cwl_workflow_class) # Make sure the CWL class is present
+    FactoryBot.create(:cwl_workflow_class) # Make sure the CWL class is present
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
-    study = Factory(:study, investigation: investigation, contributor: current_person)
-    Factory(:topics_controlled_vocab)
-    Factory(:operations_controlled_vocab)
-    @assay = Factory(:assay, study: study, contributor: current_person)
-    @creator = Factory(:person)
-    @publication = Factory(:publication, projects: [@project])
-    @presentation = Factory(:presentation, projects: [@project], contributor: current_person)
-    @data_file = Factory(:data_file, projects: [@project], contributor: current_person)
-    @document = Factory(:document, projects: [@project], contributor: current_person)
-    @sop = Factory(:sop, projects: [@project], contributor: current_person)
-    @workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: current_person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: current_person)
+    FactoryBot.create(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+    FactoryBot.create(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    @assay = FactoryBot.create(:assay, study: study, contributor: current_person)
+    @creator = FactoryBot.create(:person)
+    @publication = FactoryBot.create(:publication, projects: [@project])
+    @presentation = FactoryBot.create(:presentation, projects: [@project], contributor: current_person)
+    @data_file = FactoryBot.create(:data_file, projects: [@project], contributor: current_person)
+    @document = FactoryBot.create(:document, projects: [@project], contributor: current_person)
+    @sop = FactoryBot.create(:sop, projects: [@project], contributor: current_person)
+    @workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created workflow' do
-    wf = Factory(:api_cwl_workflow, contributor: current_person)
+    wf = FactoryBot.create(:api_cwl_workflow, contributor: current_person)
 
     assert wf.content_blob.no_content?
     assert wf.can_download?(@current_user)
     assert wf.can_edit?(@current_user)
 
     original_md5 = wf.content_blob.md5sum
-    put workflow_content_blob_path(wf, wf.content_blob),
-        headers: { 'Accept' => 'application/json',
-                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2', 'workflows', 'rp2-to-rp2path.cwl')) }
+    put workflow_content_blob_path(wf, wf.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2', 'workflows', 'rp2-to-rp2path.cwl')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :success
     blob = wf.content_blob.reload
@@ -48,5 +50,23 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
 
     template = load_template('post_remote_workflow.json.erb')
     api_post_test(template)
+  end
+
+  test 'can lookup tool names if only id provided' do
+    VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
+      template = load_template('post_tooled_workflow.json.erb')
+
+      post '/workflows.json', params: template, as: :json, headers: { 'Authorization' => write_access_auth }
+      assert_response :success
+
+      validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
+      res = JSON.parse(response.body)
+      tools = res['data']['attributes']['tools']
+      assert_equal 3, tools.length
+      assert_equal('MultiQC', tools.detect { |t| t['id'] == 'https://bio.tools/multiqc' }['name'])
+      assert_equal('European Nucleotide Archive (ENA)', tools.detect { |t| t['id'] == 'https://bio.tools/ena' }['name'])
+      assert_equal('Ruby!!!', tools.detect { |t| t['id'] == 'https://bio.tools/bioruby' }['name'])
+      assert_nil tools.detect { |t| t['id'] == 'https://ignore.me/galaxy' }
+    end
   end
 end

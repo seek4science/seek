@@ -23,7 +23,7 @@ A response for a **Study** such as that for a <a href="#create">**Create**</a>, 
 * References to <a href="#sops">**Sops**</a> that belong to the **Study**
 * References to <a href="#publications">**Publications**</a> that belong to the **Study**
 
-
+**Studies** have support for [Extended Metadata](/api#section/Extended-Metadata)
 
 
 

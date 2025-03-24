@@ -9,12 +9,14 @@ class DataFilesController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :data_files_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :create_content_blob,
                                                              :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
+  before_action :check_already_unzipped, only: :unzip
   before_action :forbid_new_version_if_samples, :only => :create_version
 
   before_action :oauth_client, only: :retrieve_nels_sample_metadata
@@ -37,7 +39,9 @@ class DataFilesController < ApplicationController
       redirect_to destroy_samples_confirm_data_file_path(@data_file)
     else
       if params[:destroy_extracted_samples] == '1'
-        @data_file.extracted_samples.destroy_all
+        @data_file.extracted_sample_ids.each_slice(500) do |ids|
+          SamplesBatchDeleteJob.perform_later(ids)
+        end
       end
       super
     end
@@ -128,35 +132,6 @@ class DataFilesController < ApplicationController
       ft = FileTemplate.find(params[:file_template_id])
     end
   end
-  
-  def explore
-    #drop invalid explore params
-    [:page_rows, :page, :sheet].each do |param|
-      if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
-        params.delete(param)
-      end
-    end
-    if @display_data_file.contains_extractable_spreadsheet?
-      begin
-        @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_data_file.content_blob.cache_key}") do
-          @display_data_file.spreadsheet
-        end
-        respond_to do |format|
-          format.html
-        end
-      rescue SysMODB::SpreadsheetExtractionException
-        respond_to do |format|
-          flash[:error] = "There was an error when processing the #{t('data_file')} to explore, perhaps it isn't a valid Excel spreadsheet"
-          format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
-        end
-      end
-    else
-      respond_to do |format|
-        flash[:error] = "Unable to explore contents of this #{t('data_file')}"
-        format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
-      end
-    end
-  end
 
   def filter
     scope = DataFile
@@ -170,15 +145,23 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def samples_table
+  def extracted_samples
+    @samples = @data_file.extracted_samples.includes(:sample_type).authorized_for(:view)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def extracted_samples_table
+    samples = @data_file.extracted_samples.includes(:sample_type).authorized_for(:view)
     respond_to do |format|
       format.html do
         render(partial: 'samples/table_view', locals: {
-                 samples: @data_file.extracted_samples.includes(:sample_type),
-                 source_url: samples_table_data_file_path(@data_file)
+                 samples: samples,
+                 source_url: extracted_samples_table_data_file_path(@data_file)
                })
       end
-      format.json { @samples = @data_file.extracted_samples.select([:id, :title, :json_metadata]) }
+      format.json { @samples = samples }
     end
   end
 
@@ -189,12 +172,59 @@ class DataFilesController < ApplicationController
       format.html
     end
   end
+  
+  def unzip
+    if params[:confirm]
+      UnzipDataFilePersistJob.new(@data_file, User.current_user, assay_ids: params["assay_ids"]).queue_job
+      flash[:notice] = 'Started creating unzipped data files'
+    else
+      @data_file.unzip_persistence_task.destroy if @data_file.unzip_persistence_task&.success?
+      UnzipDataFileJob.new(@data_file).queue_job
+
+    end
+
+    respond_to do |format|
+      format.html { redirect_to @data_file }
+    end
+  end
+
+  def unzip_status
+    job_status = @data_file.unzip_task.status
+    respond_to do |format|
+      format.html { render partial: 'data_files/unzip_status', locals: { data_file: @data_file, job_status: job_status } }
+    end
+  end
+
+  def unzip_persistence_status
+    job_status = @data_file.unzip_persistence_task.status
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/unzip_persistence_status', locals: { data_file: @data_file, job_status: job_status, previous_status: params[:previous_status] } }
+    end
+  end
+
+  def confirm_unzip
+    @datafiles, @rejected_datafiles = Seek::DataFiles::Unzipper.new(@data_file).fetch.partition(&:valid?)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def cancel_unzip
+    Seek::DataFiles::Unzipper.new(@data_file).clear
+
+    respond_to do |format|
+      flash[:notice] = 'Unzip cancelled'
+      format.html { redirect_to @data_file }
+    end
+  end
 
   def extract_samples
     if params[:confirm]
-      SampleDataPersistJob.new(@data_file, @sample_type, assay_ids: params["assay_ids"]).queue_job
+      SampleDataPersistJob.new(@data_file, @sample_type, User.current_user, assay_ids: params["assay_ids"]).queue_job
       flash[:notice] = 'Started creating extracted samples'
     else
+      @data_file.sample_persistence_task.destroy if @data_file.sample_persistence_task&.success?
       SampleDataExtractionJob.new(@data_file, @sample_type).queue_job
     end
 
@@ -440,6 +470,19 @@ class DataFilesController < ApplicationController
     end
   end
 
+  # ajax call to check if data file has matching sample type ( used to check if button should be shown)
+  def has_matching_sample_type
+    return false unless @data_file.content_blob && SampleType.any?
+    key = ['has_matching_sample_type', @data_file.content_blob, SampleType.order(:updated_at).last.template, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size]
+    result = Rails.cache.fetch(key) do
+      @data_file.matching_sample_type?
+    end
+
+    respond_to do |format|
+      format.json { render json: { result: result} }
+    end
+  end
+
   protected
 
   def get_sample_type
@@ -480,6 +523,15 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def check_already_unzipped
+    if @data_file.unzipped_files.any?
+      flash[:error] = 'Already unzipped this data file'
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
   private
 
   def data_file_params
@@ -488,8 +540,10 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      :file_template_id, :data_format_annotations, :data_type_annotations,
-                                      { publication_ids: [] }, { workflow_ids: [] },
+                                      :file_template_id,
+                                      { data_format_annotations: [] }, { data_type_annotations: [] },
+                                      { publication_ids: [] }, { workflow_ids: [] },{ observation_unit_ids: [] },
+                                      { extended_metadata_attributes: determine_extended_metadata_keys },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

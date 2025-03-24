@@ -1,13 +1,12 @@
 require_dependency 'seek/util'
 
 class DataFile < ApplicationRecord
-  include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   has_controlled_vocab_annotations :data_types, :data_formats
 
@@ -16,11 +15,19 @@ class DataFile < ApplicationRecord
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, as: :asset, foreign_key: :asset_id
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   belongs_to :file_template
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
+  has_many :sample_resource_links, -> { where(resource_type: 'DataFile') }, foreign_key: :resource_id
+  has_many :linked_samples, through: :sample_resource_links, source: :sample
+  
+  has_many :unzipped_files, class_name: 'DataFile', foreign_key: :zip_origin_id
+  belongs_to :zip_origin, class_name: 'DataFile', optional: true
+
+  has_many :observation_unit_assets, dependent: :delete_all, as: :asset, foreign_key: :asset_id, autosave: true, inverse_of: :asset
+  has_many :observation_units, through: :observation_unit_assets
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
@@ -43,7 +50,6 @@ class DataFile < ApplicationRecord
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'file_template_id']) do
 
-    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
     acts_as_favouritable
@@ -107,20 +113,57 @@ class DataFile < ApplicationRecord
     true
   end
 
-  # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
-  def sample_template?
+  def supports_spreadsheet_explore?
+    true
+  end
+  
+  def zipped_folder?
     return false if external_asset.is_a? OpenbisExternalAsset
-    possible_sample_types.any?
-  rescue SysMODB::SpreadsheetExtractionException
-    false
+    content_blob&.is_unzippable_datafile?
   end
 
-  def possible_sample_types(user = User.current_user)
-    content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob,user) : []
+  def matching_sample_type?
+    return false if external_asset.is_a? OpenbisExternalAsset
+
+    possible_sample_types.any?
   end
+
+  # returns all matching sample types
+  def possible_sample_types(user = User.current_user)
+    SampleType.sample_types_matching_content_blob(content_blob,user)
+  end
+
 
   def related_samples
-    extracted_samples
+    extracted_samples + linked_samples
+  end
+
+  
+  def related_data_files
+    zip_origin.nil? ? unzipped_files : [zip_origin] + unzipped_files
+  end
+
+  def unzip(tmp_dir)
+    unzip_folder = Zip::File.open(content_blob.filepath)
+    FileUtils.rm_r(tmp_dir) if File.exist?(tmp_dir)
+    Dir.mkdir(tmp_dir)
+    unzipped =[]
+    unzip_folder.entries.each do |file|
+      if file.ftype == :file
+        file_name = File.basename(file.name)
+        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
+        data_file_params = {
+          title: file_name,
+            license: license,
+            projects: projects,
+            description: '',
+            contributor_id: contributor.id,
+            zip_origin_id: self.id
+        }
+        unzipped << DataFile.new(data_file_params)
+      end
+    end
+    unzipped
   end
 
   # Extracts samples using the given sample_type
@@ -148,7 +191,7 @@ class DataFile < ApplicationRecord
       sample.project_ids = project_ids
       sample.contributor = contributor
       sample.originating_data_file = self
-      sample.policy = policy
+      sample.policy = policy.deep_copy
       sample.save if sample.valid? && confirm
 
       extracted << sample
@@ -227,4 +270,6 @@ class DataFile < ApplicationRecord
 
   has_task :sample_extraction
   has_task :sample_persistence
+  has_task :unzip
+  has_task :unzip_persistence
 end

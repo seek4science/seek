@@ -7,11 +7,12 @@ class AuthLookup < ActiveRecord::Base
 
   def self.prepare
     c = count
-    if c != (User.count + 1)  # 1 entry for each user + anonymous
-      delete_all unless c.zero?
+    user_c = User.where.not(person_id: nil).count
+    if c != (user_c + 1)  # 1 entry for each user + anonymous
+      in_batches(of: 100000, order: :desc) { |r| r.delete_all } unless c.zero?
 
       # Only need to specify user ID on insert, since all permission fields are `false` by default.
-      import [:user_id], ([0] + User.pluck(:id)).map { |i| [i] },
+      import [:user_id], ([0] + User.where.not(person_id: nil).pluck(:id)).map { |i| [i] },
              validate: false,
              batch_size: Seek::Util.bulk_insert_batch_size
     else
@@ -29,7 +30,7 @@ class AuthLookup < ActiveRecord::Base
       updates["can_#{a}"] = permission[index] if overwrite || permission[index]
     end
 
-    update_all(updates) unless updates.empty?
+    in_batches(of: 100000, order: :desc) { |r| r.update_all(updates) } unless updates.empty?
   end
 
   def as_array

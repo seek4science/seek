@@ -7,25 +7,25 @@ class ModelApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    @organism = Factory(:organism)
+    @organism = FactoryBot.create(:organism)
     @project.organisms << @organism
-    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
-    study = Factory(:study, investigation: investigation, contributor: current_person)
-    @assay = Factory(:assay, study: study, contributor: current_person)
-    @creator = Factory(:person)
-    @publication = Factory(:publication, projects: [@project])
-    @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: current_person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: current_person)
+    @assay = FactoryBot.create(:assay, study: study, contributor: current_person)
+    @creator = FactoryBot.create(:person)
+    @publication = FactoryBot.create(:publication, projects: [@project])
+    @event = FactoryBot.create(:event, projects: [@project], policy: FactoryBot.create(:public_policy))
     ModelType.where(title: 'Linear equations').first_or_create
     ModelFormat.where(title: 'SBML').first_or_create
     RecommendedModelEnvironment.where(title: 'JWS Online').first_or_create
-    @model = Factory(:model, policy: Factory(:public_policy),
+    @model = FactoryBot.create(:model, policy: FactoryBot.create(:public_policy),
                      contributor: current_person, creators: [@creator],
-                     discussion_links: [Factory(:discussion_link)])
+                     discussion_links: [FactoryBot.create(:discussion_link)])
     @discussion_link = @model.discussion_links.first
   end
 
   test 'can add content to API-created model' do
-    model = Factory(:api_model, contributor: current_person)
+    model = FactoryBot.create(:api_model, contributor: current_person)
 
     assert model.content_blobs.all?(&:no_content?)
     assert model.can_download?(@current_user)
@@ -35,7 +35,11 @@ class ModelApiTest < ActionDispatch::IntegrationTest
     xml_blob = model.content_blobs.last
 
     original_md5 = pdf_blob.md5sum
-    put model_content_blob_path(model, pdf_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put model_content_blob_path(model, pdf_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :success
     blob = pdf_blob.reload
@@ -54,7 +58,7 @@ class ModelApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created model without permission' do
-    model = Factory(:api_model, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
+    model = FactoryBot.create(:api_model, policy: FactoryBot.create(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
     assert model.content_blobs.all?(&:no_content?)
     assert model.can_download?(@current_user)
@@ -63,7 +67,11 @@ class ModelApiTest < ActionDispatch::IntegrationTest
     pdf_blob = model.content_blobs.first
 
     original_md5 = pdf_blob.md5sum
-    put model_content_blob_path(model, pdf_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put model_content_blob_path(model, pdf_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :forbidden
     validate_json response.body, '#/components/schemas/forbiddenResponse'
@@ -73,7 +81,7 @@ class ModelApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created model that already has content' do
-    model = Factory(:model, contributor: current_person)
+    model = FactoryBot.create(:model, contributor: current_person)
 
     pdf_blob = model.content_blobs.first
 
@@ -82,7 +90,11 @@ class ModelApiTest < ActionDispatch::IntegrationTest
     assert model.can_edit?(@current_user)
 
     original_md5 = pdf_blob.md5sum
-    put model_content_blob_path(model, pdf_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put model_content_blob_path(model, pdf_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :bad_request
     validate_json response.body, '#/components/schemas/badRequestResponse'
@@ -108,7 +120,7 @@ class ModelApiTest < ActionDispatch::IntegrationTest
     to_post = load_template('post_bad_model.json.erb')
 
     assert_no_difference(-> { model.count }) do
-      post "/#{plural_name}.json", params: to_post
+      post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       assert_response :unprocessable_entity
       validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
     end

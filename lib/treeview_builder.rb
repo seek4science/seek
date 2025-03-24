@@ -6,7 +6,7 @@ class TreeviewBuilder
     @folders = folders
   end
 
-  SP_ADVANCED_ENABLED = Seek::Config.project_single_page_advanced_enabled
+  SP_ADVANCED_ENABLED = Seek::Config.isa_json_compliance_enabled
   BOLD = { 'style': 'font-weight:bold' }.freeze
 
   def build_tree_data
@@ -14,16 +14,31 @@ class TreeviewBuilder
     investigation_items = []
 
     @project.investigations.map do |investigation|
-      investigation.studies.map do |study|
-        assay_items = study.assays.map { |assay| build_assay_item(assay) }
-        study_items << build_study_item(study, assay_items)
+      if investigation.is_isa_json_compliant?
+        investigation.studies.map do |study|
+          assay_stream_items = study.assay_streams.sort_by{ |stream| stream.position }.map do |assay_stream|
+            assay_items = assay_stream.child_assays.order(:position).map do |child_assay|
+              build_assay_item(child_assay)
+            end
+            build_assay_stream_item(assay_stream, assay_items)
+          end
+
+          study_items << build_study_item(study, assay_stream_items)
+        end
+      else
+        investigation.studies.map do |study|
+          assay_items = study.assays.map { |assay| build_assay_item(assay) }
+          study_items << build_study_item(study, assay_items)
+        end
       end
       investigation_items << build_investigation_item(investigation, study_items)
       study_items = []
     end
 
     # Documents folder
+    if Seek::Config.project_single_page_folders_enabled
     @folders.reverse_each.map { |f| investigation_items.unshift(folder_node(f)) } if @folders.respond_to? :each
+    end
     sanitize(JSON[[build_project_item(@project, investigation_items)]])
   end
 
@@ -37,7 +52,8 @@ class TreeviewBuilder
   end
 
   def create_node(obj)
-    unless obj[:resource].can_view?
+    can_view = obj[:resource].can_view?
+    unless can_view
       obj[:text] = 'hidden item'
       obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
     end
@@ -69,11 +85,13 @@ class TreeviewBuilder
     return [] unless SP_ADVANCED_ENABLED
 
     elements = []
-    if study.sop.present? && study.sample_types.any?
+    if study.sample_types.any?
       elements << create_node({ text: 'Sources table', _type: 'source_table', _id: study.sample_types.first.id,
                                 resource: study.sample_types.first, children: [create_sample_node(study.sample_types.first)] })
-      elements << create_node({ text: 'Protocol', _type: 'study_protocol', _id: study.sop.id,
-                                resource: study.sop })
+      if study.sops.present?
+        elements << create_node({ text: 'Protocol', _type: 'study_protocol', _id: study.sops.first.id,
+                                  resource: study.sops.first })
+      end
       elements << create_node({ text: 'Samples table', _type: 'study_samples_table', _id: study.sample_types.second.id,
                                 resource: study.sample_types.first, children: [create_sample_node(study.sample_types.second)] })
       elements << create_node({ text: 'Experiment overview', _type: 'study_experiment_overview', _id: study.id,
@@ -87,9 +105,11 @@ class TreeviewBuilder
     return [] unless SP_ADVANCED_ENABLED
 
     elements = []
-    if assay.sops.any? && assay.sample_type.present?
-      elements << create_node({ text: 'Protocol', _type: 'assay_protocol', _id: assay.sops.first.id,
-                                resource: assay.sops.first })
+    if assay.sample_type.present?
+      if assay.sops.any?
+        elements << create_node({ text: 'Protocol', _type: 'assay_protocol', _id: assay.sops.first.id,
+                                  resource: assay.sops.first })
+      end
       elements << create_node({ text: 'Samples table', _type: 'assay_samples_table', _id: assay.sample_type.id,
                                 resource: assay.sample_type, children: [create_sample_node(assay.sample_type)] })
       elements << create_node({ text: 'Experiment overview', _type: 'assay_experiment_overview', _id: assay.id,
@@ -112,6 +132,11 @@ class TreeviewBuilder
   def build_study_item(study, assay_items)
     create_node({ text: study.title, _type: 'study', _id: study.id, a_attr: BOLD, label: 'Study',
                   children: isa_study_elements(study) + assay_items, resource: study })
+  end
+
+  def build_assay_stream_item(assay_stream, child_assays)
+    create_node({ text: assay_stream.title, _type: 'assay', label: 'Assay Stream', _id: assay_stream.id, a_attr: BOLD,
+                  children: isa_assay_elements(assay_stream) + child_assays, resource: assay_stream })
   end
 
   def build_assay_item(assay)

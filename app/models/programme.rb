@@ -24,7 +24,8 @@ class Programme < ApplicationRecord
   has_many :investigations, -> { distinct }, through: :projects
   has_many :studies, -> { distinct }, through: :investigations
   has_many :assays, -> { distinct }, through: :studies
-  %i[data_files documents models sops presentations events publications samples workflows].each do |type|
+  has_many :observation_units, -> { distinct }, through: :studies
+  %i[data_files documents models sops presentations events publications samples workflows collections].each do |type|
     has_many type, -> { distinct }, through: :projects
   end
   has_many :programme_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:programme_administrator)) }, as: :scope, class_name: 'Role', inverse_of: :scope
@@ -73,7 +74,7 @@ class Programme < ApplicationRecord
   end
 
   def assets
-    (data_files + models + sops + presentations + events + publications + documents).uniq.compact
+    data_files | sops | models | publications | presentations | documents | workflows | collections
   end
 
   def has_member?(user_or_person)
@@ -96,12 +97,9 @@ class Programme < ApplicationRecord
     !(activation_rejection_reason.nil? || is_activated?)
   end
 
-  # callback, activates if current user is an admin or nil, otherwise it needs activating
   def activate
-    if can_activate?
-      update_attribute(:is_activated, true)
-      update_attribute(:activation_rejection_reason, nil)
-    end
+    update_attribute(:is_activated, true)
+    update_attribute(:activation_rejection_reason, nil)
   end
 
   def can_activate?(user = User.current_user)

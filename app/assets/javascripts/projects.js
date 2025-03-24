@@ -4,13 +4,13 @@ var Projects = {
     membershipChanges: [],
     actions: {
         add: function () {
-            var people = $j('#people_ids').tagsinput('items');
-            var institution_tag = $j('#institution_id').tagsinput('items')[0];
+            var people = $j('select#people_ids').select2('data');
+            var institution_tag = $j('select#institution_id').select2('data')[0];
             var institution_id = '';
             var institution_title = '';
             if (institution_tag) {
                 institution_id = institution_tag.id;
-                institution_title = institution_tag.name;
+                institution_title = institution_tag.text;
             }
 
             var errors = [];
@@ -23,7 +23,7 @@ var Projects = {
                 $j.each(people, function (index, value) {
                     if(Projects.getPersonIndex(Projects.memberships, value.id, institution_id) == -1) {
                         var change = {
-                            person: { id: value.id, name: value.name },
+                            person: { id: value.id, name: value.text },
                             institution: { id: institution_id, title: institution_title },
                             action: 'added',
                             membershipData: JSON.stringify({
@@ -34,14 +34,12 @@ var Projects = {
                         Projects.addChange(change);
                         peopleToRemove.push({ id: value.id });
                     } else {
-                        errors.push(value.name + ' is already a member of the project through that institution.');
+                        errors.push(value.text + ' is already a member of the project through that institution.');
                     }
                 });
 
-                $j('#institution_id').tagsinput('remove', {id: institution_id})
-
-                for(var i = 0; i < peopleToRemove.length; i++)
-                    $j('#people_ids').tagsinput('remove', peopleToRemove[i]);
+               $j('select#institution_id').val([]).change();
+               $j('select#people_ids').val([]).change();
             }
 
             if(errors.length > 0)

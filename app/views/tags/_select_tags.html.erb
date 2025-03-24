@@ -6,20 +6,18 @@
     suggested_limit - optional - is the number of tags to show in the suggested tags box. defaults to 7. If zero the suggested tag box won't be show.
  %>
 <%
-   all_tags.sort_by(&:text)
    type ||= 'tag'
    input_name = "#{name}_list"
    existing_tags ||= item_tags.map {|t| t.text}
+   suggested_limit ||= 30
+   suggested_tags = all_tags.sort { |a, b| b.tag_count <=> a.tag_count }[0...suggested_limit]
+   suggested_tags.sort! { |a, b| a.text <=> b.text }
 %>
 
-<%= tags_input(input_name, existing_tags, :typeahead => {:type => type}) %>
+<%# need to preload the suggested tags by passing to values, to allow them to be programmaticly added. If just fetched from ajax query it doesn't work %>
+<%= tags_input(input_name, existing_tags, :typeahead => {:type => type, values: suggested_tags.map{|t| {id:t.text, text:t.text} } }, class: 'form-control') %>
 
 <% cache "suggestions_for_#{name}", skip_digest: true do %>
-    <%
-       suggested_limit ||= 30
-       suggested_tags = all_tags.sort { |a, b| b.tag_count <=> a.tag_count }[0...suggested_limit]
-       suggested_tags.sort! { |a, b| a.text <=> b.text }
-    %>
     <% if suggested_limit > 0 && suggested_tags.count > 0 -%>
         <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
           <%= link_to(("View suggestions" + expand_image("0.3em")).html_safe, '#',
@@ -31,7 +29,7 @@
               <div class="popularity">
                 <% unless suggested_tags.blank? -%>
                     <% ann_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-                        <%= link_to tag.text, "javascript:$j('##{input_name}').tagsinput('add', '#{tag.text}');", :class => css_class -%>
+                        <%= link_to tag.text, "#", 'data-role':'seek-suggested-tags', 'data-tag-input': input_name, :class => css_class -%>
                     <% end -%>
                 <% end -%>
               </div>

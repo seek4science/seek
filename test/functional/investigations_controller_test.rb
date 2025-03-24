@@ -24,7 +24,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should respond to ro for research object' do
-    inv = Factory :investigation, contributor: User.current_user.person
+    inv = FactoryBot.create :investigation, contributor: User.current_user.person
     get :show, params: { id: inv, format: 'ro' }
     assert_response :success
     assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"; filename*=UTF-8''investigation-#{inv.id}.ro.zip", @response.header['Content-Disposition']
@@ -33,25 +33,25 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show aggregated publications linked to assay' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     study=nil
     User.with_current_user(person.user) do
-      assay1 = Factory :assay, policy: Factory(:public_policy),contributor:person
-      assay2 = Factory :assay, policy: Factory(:public_policy),contributor:person
+      assay1 = FactoryBot.create :assay, policy: FactoryBot.create(:public_policy),contributor:person
+      assay2 = FactoryBot.create :assay, policy: FactoryBot.create(:public_policy),contributor:person
 
-      pub1 = Factory :publication, title: 'pub 1',contributor:person, publication_type: Factory(:journal)
-      pub2 = Factory :publication, title: 'pub 2',contributor:person, publication_type: Factory(:journal)
-      pub3 = Factory :publication, title: 'pub 3',contributor:person, publication_type: Factory(:journal)
-      Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
-      Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+      pub1 = FactoryBot.create :publication, title: 'pub 1',contributor:person, publication_type: FactoryBot.create(:journal)
+      pub2 = FactoryBot.create :publication, title: 'pub 2',contributor:person, publication_type: FactoryBot.create(:journal)
+      pub3 = FactoryBot.create :publication, title: 'pub 3',contributor:person, publication_type: FactoryBot.create(:journal)
+      FactoryBot.create :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
+      FactoryBot.create :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
-      Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
-      Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
+      FactoryBot.create :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+      FactoryBot.create :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
 
-      investigation = Factory(:investigation, policy: Factory(:public_policy),contributor:person)
-      study = Factory(:study, policy: Factory(:public_policy),
-                              assays: [assay1, assay2],
-                              investigation: investigation,contributor:person)
+      investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy),contributor:person)
+      study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy),
+                                assays: [assay1, assay2],
+                                investigation: investigation,contributor:person)
     end
 
 
@@ -98,8 +98,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test "shouldn't show edit for unauthorized user" do
-    i = Factory(:investigation, policy: Factory(:private_policy))
-    login_as(Factory(:user))
+    i = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy))
+    login_as(FactoryBot.create(:user))
     get :edit, params: { id: i }
     assert_redirected_to investigation_path(i)
     assert flash[:error]
@@ -115,18 +115,18 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should create' do
-    login_as(Factory :user)
+    login_as(FactoryBot.create :user)
     assert_difference('Investigation.count') do
-      put :create, params: { investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), sharing: valid_sharing }
+      put :create, params: { investigation: FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), sharing: valid_sharing }
     end
     assert assigns(:investigation)
     assert !assigns(:investigation).new_record?
   end
 
   test 'should create an investigations and associate it with a publication without publication type' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     project = user.person.projects.first
-    p = Factory(:publication)
+    p = FactoryBot.create(:publication)
     p.publication_type_id = nil
     disable_authorization_checks { p.save! }
     login_as(user)
@@ -140,13 +140,13 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should create with policy' do
-    user = Factory(:user)
+    user = FactoryBot.create(:user)
     project = user.person.projects.first
-    another_project = Factory(:project)
+    another_project = FactoryBot.create(:project)
     login_as(user)
     assert_difference('Investigation.count') do
-      post :create, params: { investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), policy_attributes: { access_type: Policy::ACCESSIBLE,
-                                                                                                                                                                     permissions_attributes: project_permissions([project, another_project], Policy::EDITING) } }
+      post :create, params: { investigation: FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]), policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                                                                                                                                                        permissions_attributes: project_permissions([project, another_project], Policy::EDITING) } }
     end
 
     investigation = assigns(:investigation)
@@ -160,7 +160,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should fall back to form when no title validation fails' do
-    login_as(Factory :user)
+    login_as(FactoryBot.create :user)
 
     assert_no_difference('Investigation.count') do
       post :create, params: { investigation: { project_ids: [User.current_user.person.projects.first.id] } }
@@ -173,7 +173,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should fall back to form when no projects validation fails' do
-    login_as(Factory :user)
+    login_as(FactoryBot.create :user)
 
     assert_no_difference('Investigation.count') do
       post :create, params: { investigation: { title: 'investigation with no projects' } }
@@ -186,8 +186,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'no edit button in show for unauthorized user' do
-    login_as(Factory(:user))
-    get :show, params: { id: Factory(:investigation, policy: Factory(:private_policy)) }
+    login_as(FactoryBot.create(:user))
+    get :show, params: { id: FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy)) }
     assert_select 'a', text: /Edit #{I18n.t('investigation')}/i, count: 0
   end
 
@@ -197,8 +197,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'no add study button for person that cannot edit' do
-    inv = Factory(:investigation)
-    login_as(Factory(:user))
+    inv = FactoryBot.create(:investigation)
+    login_as(FactoryBot.create(:user))
 
     assert !inv.can_edit?
 
@@ -207,23 +207,23 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test "unauthorized user can't edit investigation" do
-    i = Factory(:investigation, policy: Factory(:private_policy))
-    login_as(Factory(:user))
+    i = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy))
+    login_as(FactoryBot.create(:user))
     get :edit, params: { id: i }
     assert_redirected_to investigation_path(i)
     assert flash[:error]
   end
 
   test "unauthorized users can't update investigation" do
-    i = Factory(:investigation, policy: Factory(:private_policy))
-    login_as(Factory(:user))
+    i = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy))
+    login_as(FactoryBot.create(:user))
     put :update, params: { id: i.id, investigation: { title: 'test' } }
 
     assert_redirected_to investigation_path(i)
   end
 
   test 'should destroy investigation' do
-    i = Factory(:investigation, contributor: User.current_user.person)
+    i = FactoryBot.create(:investigation, contributor: User.current_user.person)
     assert_difference('Investigation.count', -1) do
       delete :destroy, params: { id: i.id }
     end
@@ -232,8 +232,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'unauthorized user should not destroy investigation' do
-    i = Factory(:investigation, policy: Factory(:private_policy))
-    login_as(Factory(:user))
+    i = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy))
+    login_as(FactoryBot.create(:user))
     assert_no_difference('Investigation.count') do
       delete :destroy, params: { id: i.id }
     end
@@ -251,7 +251,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'option to delete investigation without study' do
-    get :show, params: { id: Factory(:investigation, contributor: User.current_user.person).id }
+    get :show, params: { id: FactoryBot.create(:investigation, contributor: User.current_user.person).id }
     assert_select 'a', text: /Delete #{I18n.t('investigation')}/i, count: 1
   end
 
@@ -261,8 +261,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'no option to delete investigation when unauthorized' do
-    i = Factory :investigation, policy: Factory(:private_policy)
-    login_as Factory(:user)
+    i = FactoryBot.create :investigation, policy: FactoryBot.create(:private_policy)
+    login_as FactoryBot.create(:user)
     get :show, params: { id: i.id }
     assert_select 'a', text: /Delete #{I18n.t('investigation')}/i, count: 0
   end
@@ -275,21 +275,21 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'object based on existing one' do
-    inv = Factory :investigation, title: 'the inv', policy: Factory(:public_policy)
+    inv = FactoryBot.create :investigation, title: 'the inv', policy: FactoryBot.create(:public_policy)
     get :new_object_based_on_existing_one, params: { id: inv.id }
     assert_response :success
     assert_select '#investigation_title[value=?]', 'the inv'
   end
 
   test 'object based on existing one when unauthorised' do
-    inv = Factory :investigation, title: 'the inv', policy: Factory(:private_policy), contributor: Factory(:person)
+    inv = FactoryBot.create :investigation, title: 'the inv', policy: FactoryBot.create(:private_policy), contributor: FactoryBot.create(:person)
     refute inv.can_view?
     get :new_object_based_on_existing_one, params: { id: inv.id }
     assert_response :forbidden
   end
 
   test 'new object based on existing one when can view but not logged in' do
-    inv = Factory(:investigation, policy: Factory(:public_policy))
+    inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
     logout
     assert inv.can_view?
     get :new_object_based_on_existing_one, params: { id: inv.id }
@@ -304,7 +304,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show the contributor avatar' do
-    investigation = Factory(:investigation, policy: Factory(:public_policy))
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: investigation }
     assert_response :success
     assert_select '.author-list-item' do
@@ -315,8 +315,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should add creators' do
-    investigation = Factory(:investigation, policy: Factory(:public_policy))
-    creator = Factory(:person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+    creator = FactoryBot.create(:person)
     assert investigation.creators.empty?
 
     put :update, params: { id: investigation.id, investigation: { title: investigation.title, creator_ids: [creator.id] } }
@@ -326,7 +326,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should not have creators association box when editing' do
-    investigation = Factory(:investigation, policy: Factory(:public_policy))
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
 
     get :edit, params: { id: investigation.id }
     assert_response :success
@@ -334,8 +334,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show creators' do
-    investigation = Factory(:investigation, policy: Factory(:public_policy))
-    creator = Factory(:person)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+    creator = FactoryBot.create(:person)
     investigation.creators = [creator]
     investigation.save
     investigation.reload
@@ -347,7 +347,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show other creators' do
-    investigation = Factory(:investigation, policy: Factory(:public_policy))
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
     other_creators = 'john smith'
     investigation.other_creators = other_creators
     investigation.save
@@ -360,10 +360,10 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test 'programme investigations through nested routing' do
     assert_routing 'programmes/2/investigations', controller: 'investigations', action: 'index', programme_id: '2'
-    programme = Factory(:programme)
-    person = Factory(:person,project:programme.projects.first)
-    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy),contributor:person)
-    investigation2 = Factory(:investigation, policy: Factory(:public_policy))
+    programme = FactoryBot.create(:programme)
+    person = FactoryBot.create(:person,project:programme.projects.first)
+    investigation = FactoryBot.create(:investigation, projects: programme.projects, policy: FactoryBot.create(:public_policy),contributor:person)
+    investigation2 = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
 
     get :index, params: { programme_id: programme.id }
 
@@ -375,8 +375,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'send publish approval request' do
-    gatekeeper = Factory(:asset_gatekeeper)
-    investigation = Factory(:investigation, projects: [gatekeeper.projects.first], policy: Factory(:private_policy),contributor:Factory(:person,project:gatekeeper.projects.first))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    investigation = FactoryBot.create(:investigation, projects: [gatekeeper.projects.first], policy: FactoryBot.create(:private_policy),contributor:FactoryBot.create(:person,project:gatekeeper.projects.first))
     login_as(investigation.contributor)
 
     refute investigation.can_view?(nil)
@@ -387,14 +387,14 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     refute investigation.can_view?(nil)
 
-    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), investigation
+    assert_includes ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper), investigation
   end
 
   test 'dont send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do # They're the same for ISA things
-    gatekeeper = Factory(:asset_gatekeeper)
-    person = Factory(:person,project:gatekeeper.projects.first)
-    investigation = Factory(:investigation, projects: gatekeeper.projects, contributor:person,
-                                            policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    gatekeeper = FactoryBot.create(:asset_gatekeeper)
+    person = FactoryBot.create(:person,project:gatekeeper.projects.first)
+    investigation = FactoryBot.create(:investigation, projects: gatekeeper.projects, contributor:person,
+                                      policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
     login_as(person)
 
     assert investigation.is_published?
@@ -403,14 +403,14 @@ class InvestigationsControllerTest < ActionController::TestCase
       put :update, params: { investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE } }
     end
 
-    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+    assert_empty ResourcePublishLog.requested_approval_assets_for_gatekeeper(gatekeeper)
   end
 
   test 'can delete an investigation with subscriptions' do
-    i = Factory(:investigation, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    p = Factory(:person)
-    Factory(:subscription, person: i.contributor, subscribable: i)
-    Factory(:subscription, person: p, subscribable: i)
+    i = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    p = FactoryBot.create(:person)
+    FactoryBot.create(:subscription, person: i.contributor, subscribable: i)
+    FactoryBot.create(:subscription, person: p, subscribable: i)
 
     login_as(i.contributor)
 
@@ -424,8 +424,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'shows how to create snapshot to get a citation' do
-    study = Factory(:study)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [study], contributor:study.contributor)
+    study = FactoryBot.create(:study)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy), studies: [study], contributor:study.contributor)
     login_as(investigation.contributor)
 
     refute investigation.snapshots.any?
@@ -437,9 +437,9 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'shows how to publish investigation to get a citation' do
-    study = Factory(:study)
-    investigation = Factory(:investigation, policy: Factory(:private_policy),
-                                            studies: [study], contributor:study.contributor)
+    study = FactoryBot.create(:study)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy),
+                                      studies: [study], contributor:study.contributor)
     login_as(investigation.contributor)
 
     refute investigation.permitted_for_research_object?
@@ -451,9 +451,9 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'shows how to get a citation for a snapshotted investigation' do
-    study = Factory(:study)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy),
-                                            studies: [study], contributor:study.contributor)
+    study = FactoryBot.create(:study)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      studies: [study], contributor:study.contributor, creators: [study.contributor])
 
     login_as(investigation.contributor)
     investigation.create_snapshot
@@ -469,11 +469,12 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'does not show how to get a citation if no manage permission' do
-    person = Factory(:person)
-    another_person = Factory(:person,project:person.projects.first)
-    study = Factory(:study,contributor:another_person)
-    investigation = Factory(:investigation, projects:another_person.projects, contributor:another_person,
-                                            policy: Factory(:publicly_viewable_policy), studies: [study])
+    person = FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person,project:person.projects.first)
+    study = FactoryBot.create(:study,contributor:another_person)
+    investigation = FactoryBot.create(:investigation, projects:another_person.projects, contributor:another_person,
+                                      policy: FactoryBot.create(:publicly_viewable_policy), studies: [study],
+                                      creators: [another_person])
 
     login_as(person)
     investigation.create_snapshot
@@ -494,8 +495,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    investigation = Factory(:investigation, contributor:person)
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, contributor:person)
     login_as(person)
     assert investigation.can_manage?
     get :manage, params: { id: investigation }
@@ -511,8 +512,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    investigation = Factory(:investigation, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert investigation.can_edit?
     refute investigation.can_manage?
@@ -522,28 +523,28 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    investigation = Factory(:investigation, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+    investigation = FactoryBot.create(:investigation, contributor:person, projects:[proj1], policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert investigation.can_manage?
 
     patch :manage_update, params: { id: investigation,
-                                   investigation: {
-                                     creator_ids: [other_creator.id],
-                                     project_ids: [proj1.id, proj2.id]
-                                 },
-                                   policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
-                                 } }
+                                    investigation: {
+                                      creator_ids: [other_creator.id],
+                                      project_ids: [proj1.id, proj2.id]
+                                    },
+                                    policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
+                                    } }
 
     assert_redirected_to investigation
 
@@ -558,20 +559,20 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    person = Factory(:person, project:proj1)
+    proj1=FactoryBot.create(:project)
+    proj2=FactoryBot.create(:project)
+    person = FactoryBot.create(:person, project:proj1)
     person.add_to_project_and_institution(proj2,person.institutions.first)
     person.save!
 
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
     other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
     other_creator.save!
 
-    investigation = Factory(:investigation, projects:[proj1], policy:Factory(:private_policy,
-                                                                             permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    investigation = FactoryBot.create(:investigation, projects:[proj1], policy:FactoryBot.create(:private_policy,
+                                                                                                 permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute investigation.can_manage?
@@ -581,12 +582,12 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty investigation.creators
 
     patch :manage_update, params: { id: investigation,
-                                   investigation: {
-                                     creator_ids: [other_creator.id],
-                                     project_ids: [proj1.id, proj2.id]
-                                 },
-                                   policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
-                                 } }
+                                    investigation: {
+                                      creator_ids: [other_creator.id],
+                                      project_ids: [proj1.id, proj2.id]
+                                    },
+                                    policy_attributes: { access_type: Policy::VISIBLE, permissions_attributes: { '1' => { contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING } }
+                                    } }
 
     refute_nil flash[:error]
 
@@ -602,15 +603,15 @@ class InvestigationsControllerTest < ActionController::TestCase
 
 
 
-  test 'create an investigation with custom metadata' do
-    cmt = Factory(:simple_investigation_custom_metadata_type)
+  test 'create an investigation with extended metadata' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     assert_difference('Investigation.count') do
-      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
-                                                   data:{
+      inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
+                                                     data:{
                                                        "name":'fred',
                                                        "age":22}}}
 
@@ -619,23 +620,23 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert inv=assigns(:investigation)
 
-    assert cm = inv.custom_metadata
+    assert cm = inv.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
   end
 
-  test 'create an investigation with custom metadata validated' do
-    cmt = Factory(:simple_investigation_custom_metadata_type)
+  test 'create an investigation with extended metadata validated' do
+    cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     # invalid age - needs to be a number
     assert_no_difference('Investigation.count') do
-      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+      inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
       put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -645,8 +646,8 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     # name is required
     assert_no_difference('Investigation.count') do
-      inv_attributes = Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+      inv_attributes = FactoryBot.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id])
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
 
       put :create, params: { investigation: inv_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -656,8 +657,41 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
+  test 'show enabled extended metadata types only' do
+    emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    emt2 = FactoryBot.create(:simple_investigation_extended_metadata_type, enabled: false)
+    login_as(FactoryBot.create(:person))
+    get :new
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option[value=?]',emt.id, text:emt.title, count: 1
+      assert_select 'option[value=?]',emt2.id, text:emt2.title, count: 0
+    end
+    emt.update_column(:enabled, false)
+    get :new
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id', count: 0
+
+  end
+
+  test 'editing an investigation with disabled extended metadata should show the option' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    investigation = FactoryBot.create(:investigation, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'John', age: 12 }), contributor: person)
+    investigation.save!
+    investigation.extended_metadata.extended_metadata_type.update_column(:enabled, false)
+    refute investigation.extended_metadata.enabled?
+
+    get :edit, params: { id: investigation }
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option[value=?]',emt.id, text: "#{emt.title} (DISABLED)", count: 1
+    end
+  end
+
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Investigation.count') do
@@ -672,8 +706,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    disc_link = Factory(:discussion_link)
-    investigation = Factory(:investigation, contributor: User.current_user.person)
+    disc_link = FactoryBot.create(:discussion_link)
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
     investigation.discussion_links = [disc_link]
     get :show, params: { id: investigation }
     assert_response :success
@@ -681,8 +715,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should update node with discussion link' do
-    person = Factory(:person)
-    investigation = Factory(:investigation, contributor: person)
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, contributor: person)
     login_as(person)
     assert_nil investigation.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -696,10 +730,10 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    investigation = Factory(:investigation, contributor: person)
+    asset_link = FactoryBot.create(:discussion_link)
+    investigation = FactoryBot.create(:investigation, contributor: person)
     investigation.discussion_links = [asset_link]
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: investigation.id, investigation: { discussion_links_attributes:[{ id:asset_link.id, _destroy:'1' }] } }
@@ -708,29 +742,29 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty investigation.discussion_links
   end
 
- test 'investigation needs more than one study for ordering' do
-    person = Factory(:admin)
+  test 'investigation needs more than one study for ordering' do
+    person = FactoryBot.create(:admin)
     login_as(person)
-    investigation = Factory(:investigation,
-                            policy: Factory(:public_policy),
-                            contributor: person)
+    investigation = FactoryBot.create(:investigation,
+                                      policy: FactoryBot.create(:public_policy),
+                                      contributor: person)
     get :show, params: { id: investigation.id }
-    
+
     assert_response :success
     assert_select 'a[href=?]',
                   order_studies_investigation_path(investigation), count: 0
 
-    investigation.studies += [Factory(:study,
-                                      policy: Factory(:public_policy),
-                                      contributor: person)]
+    investigation.studies += [FactoryBot.create(:study,
+                                                policy: FactoryBot.create(:public_policy),
+                                                contributor: person)]
     get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'a[href=?]',
                   order_studies_investigation_path(investigation), count: 0
 
-    investigation.studies +=  [Factory(:study,
-                                      policy: Factory(:public_policy),
-                                      contributor: person)]
+    investigation.studies +=  [FactoryBot.create(:study,
+                                                 policy: FactoryBot.create(:public_policy),
+                                                 contributor: person)]
     get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'a[href=?]',
@@ -738,17 +772,17 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'ordering only by editor' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    investigation = Factory(:investigation,
-                            policy: Factory(:all_sysmo_viewable_policy),
-                            contributor: person)
-    investigation.studies += [Factory(:study,
-                                      policy: Factory(:public_policy),
-                                      contributor: person)]
-    investigation.studies += [Factory(:study,
-                                      policy: Factory(:public_policy),
-                                      contributor: person)]
+    investigation = FactoryBot.create(:investigation,
+                                      policy: FactoryBot.create(:all_sysmo_viewable_policy),
+                                      contributor: person)
+    investigation.studies += [FactoryBot.create(:study,
+                                                policy: FactoryBot.create(:public_policy),
+                                                contributor: person)]
+    investigation.studies += [FactoryBot.create(:study,
+                                                policy: FactoryBot.create(:public_policy),
+                                                contributor: person)]
     get :show, params: { id: investigation.id }
     assert_response :success
     assert_select 'a[href=?]',
@@ -765,7 +799,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'new should not include tags element when tags disabled' do
@@ -773,67 +807,647 @@ class InvestigationsControllerTest < ActionController::TestCase
       get :new
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
   test 'edit should include tags element' do
-    inv = Factory(:investigation, policy: Factory(:public_policy))
+    inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
     get :edit, params: { id: inv.id }
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'edit should not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
-      inv = Factory(:investigation, policy: Factory(:public_policy))
+      inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
       get :edit, params: { id: inv.id }
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
   test 'show should include tags box' do
-    inv = Factory(:investigation, policy: Factory(:public_policy))
+    inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: inv.id }
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'show should not include tags box when tags disabled' do
     with_config_value :tagging_enabled, false do
-      inv = Factory(:investigation, policy: Factory(:public_policy))
+      inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
       get :show, params: { id: inv.id }
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
   test 'should add tag on creation' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     project = person.person.projects.first
     login_as(person)
     assert_difference('Investigation.count') do
-      put :create, params: { investigation: Factory.attributes_for(:investigation, project_ids: [project.id]),
+      put :create, params: { investigation: FactoryBot.attributes_for(:investigation, project_ids: [project.id]),
                              tag_list: 'my_tag' }
     end
     assert_equal 'my_tag', assigns(:investigation).tags_as_text_array.first
   end
 
   test 'should add tag on edit' do
-    person = Factory(:person)
-    inv = Factory(:investigation, creator_ids: [person.id])
+    person = FactoryBot.create(:person)
+    inv = FactoryBot.create(:investigation, creator_ids: [person.id])
     login_as(person)
     put :update, params: { id: inv.id, investigation: { title: 'test' }, tag_list: 'my_tag' }
     assert_equal 'my_tag', assigns(:investigation).tags_as_text_array.first
   end
- 
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'Should not export an isa json with unauthorized studies and assays' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      other_user = FactoryBot.create(:user)
+
+      login_as(current_user)
+      project = FactoryBot.create(:project)
+      current_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
+      other_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
+      investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person, is_isa_json_compliant: true)
+
+      source_sample_type = FactoryBot.create(:isa_source_sample_type, template_id: FactoryBot.create(:isa_source_template).id)
+      sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type, template_id: FactoryBot.create(:isa_sample_collection_template).id)
+      accessible_study = FactoryBot.create(:study,
+                                           investigation: investigation,
+                                           sample_types:[source_sample_type, sample_collection_sample_type],
+                                           contributor: current_user.person)
+
+
+      source_sample = FactoryBot.create(:sample,
+                                        title: 'source 1',
+                                        sample_type: source_sample_type,
+                                        project_ids: [project.id],
+                                        data: {
+                                          'Source Name': 'Source Name',
+                                          'Source Characteristic 1': 'Source Characteristic 1',
+                                          'Source Characteristic 2':
+                                            source_sample_type
+                                              .sample_attributes
+                                              .find_by_title('Source Characteristic 2')
+                                              .sample_controlled_vocab
+                                              .sample_controlled_vocab_terms
+                                              .first
+                                              .label
+                                        },
+                                        contributor: current_user.person)
+
+      study_sample =
+        FactoryBot.create(:sample,
+                          title: 'study sample 1',
+                          sample_type: sample_collection_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [source_sample.id],
+                            'sample collection': 'sample collection',
+                            'sample collection parameter value 1': 'sample collection parameter value 1',
+                            'Sample Name': 'sample name',
+                            'sample characteristic 1': 'sample characteristic 1'
+                          },
+                          contributor: current_user.person)
+
+      hidden_study_sample =
+        FactoryBot.create(:sample,
+                          title: 'study sample 2',
+                          sample_type: sample_collection_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [source_sample.id],
+                            'sample collection': 'sample collection',
+                            'sample collection parameter value 1': 'sample collection parameter value 2',
+                            'Sample Name': 'sample name 2',
+                            'sample characteristic 1': 'sample characteristic 2'
+                          },
+                          contributor: other_user.person)
+
+      # Create a 'private' assay in an assay stream
+      stream_1 = FactoryBot.create(:assay_stream, title: 'Assay Stream 1', study: accessible_study, contributor: other_user.person)
+      assert_equal(stream_1.study, accessible_study)
+      assert(stream_1.is_assay_stream?)
+      assay_1_stream_1_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: other_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_1 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+      assay_2_stream_1_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: other_user.person, linked_sample_type: assay_1_stream_1_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_1 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+
+      # Create an assay stream with all assays visible
+      stream_2 = FactoryBot.create(:assay_stream, title: 'Assay Stream 2', study: accessible_study, contributor: current_user.person)
+      assert_equal(stream_2.study, accessible_study)
+      assert(stream_2.is_assay_stream?)
+      assay_1_stream_2_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: current_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_2 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
+      assay_2_stream_2_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: current_user.person, linked_sample_type: assay_1_stream_2_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_2 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
+
+      # create samples in second assay stream with viewing permission
+
+      assay_1_stream_2_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 1 - stream 2 - sample 1',
+                          sample_type: assay_1_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [study_sample.id],
+                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+                            'Assay 1 parameter value 2': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'Assay 1 parameter value 3': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'Extract Name': 'Extract 1 stream 2',
+                            'other material characteristic 1': 'other material characteristic 1',
+                            'other material characteristic 2': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 2')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .first
+                                                                 .label,
+                            'other material characteristic 3': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 3')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .first
+                                                                 .label},
+                          contributor: current_user.person)
+
+      assay_1_stream_2_hidden_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 1 - stream 2 - sample 2',
+                          sample_type: assay_1_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [study_sample.id],
+                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+                            'Assay 1 parameter value 2': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'Assay 1 parameter value 3': assay_1_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 1 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'Extract Name': 'Extract 1 stream 2',
+                            'other material characteristic 1': 'other material characteristic 1',
+                            'other material characteristic 2': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 2')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .second
+                                                                 .label,
+                            'other material characteristic 3': assay_1_stream_2_sample_type
+                                                                 .sample_attributes
+                                                                 .find_by(title: 'other material characteristic 3')
+                                                                 .sample_controlled_vocab
+                                                                 .sample_controlled_vocab_terms
+                                                                 .second
+                                                                 .label},
+                          contributor: other_user.person)
+
+      assay_2_stream_2_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 2 - stream 2 - sample 1',
+                          sample_type: assay_2_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [assay_1_stream_2_sample.id],
+                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
+                            'Assay 2 parameter value 2': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'Assay 2 parameter value 3': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .first
+                                                           .label,
+                            'File Name': 'file 1 stream 2',
+                            'Data file comment 1': 'Data file comment 1',
+                            'Data file comment 2': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 2')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .first
+                                                     .label,
+                            'Data file comment 3': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 3')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .first
+                                                     .label},
+                          contributor: current_user.person)
+
+      assay_2_stream_2_hidden_sample =
+        FactoryBot.create(:sample,
+                          title: 'Assay 2 - stream 2 - sample 2',
+                          sample_type: assay_2_stream_2_sample_type,
+                          project_ids: [project.id],
+                          data: {
+                            Input: [assay_1_stream_2_sample.id],
+                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
+                            'Assay 2 parameter value 2': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 2')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'Assay 2 parameter value 3': assay_2_stream_2_sample_type
+                                                           .sample_attributes
+                                                           .find_by(title: 'Assay 2 parameter value 3')
+                                                           .sample_controlled_vocab
+                                                           .sample_controlled_vocab_terms
+                                                           .second
+                                                           .label,
+                            'File Name': 'file 1 stream 2',
+                            'Data file comment 1': 'Data file comment 1',
+                            'Data file comment 2': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 2')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .second
+                                                     .label,
+                            'Data file comment 3': assay_2_stream_2_sample_type
+                                                     .sample_attributes
+                                                     .find_by(title: 'Data file comment 3')
+                                                     .sample_controlled_vocab
+                                                     .sample_controlled_vocab_terms
+                                                     .second
+                                                     .label},
+                          contributor: other_user.person)
+
+
+      get :export_isa, params: { id: investigation.id }
+
+      assert_response :success
+      json_investigation = JSON.parse(response.body)
+      assert json_investigation['studies'].map { |s| s['title'] }.include? accessible_study.title
+      study_json = json_investigation['studies'].first
+
+      # Total assays
+      assert_equal accessible_study.assays.count, 6
+      # Assay_streams
+      assert_equal accessible_study.assay_streams.count, 2
+      # Child assays
+      assert_equal accessible_study.assay_streams.map(&:child_assays).compact.flatten.count, 4
+      # Only one assay should end up in 1 assay stream in the ISA JSON
+      assert_equal study_json['assays'].count, 1
+
+      sample_ids = study_json['materials']['samples'].map { |sample| sample['@id'] }
+
+      # Check whether permitted samples end up in the materials
+      assert sample_ids.include?("#sample/#{study_sample.id}")
+      refute sample_ids.include?("#sample/#{hidden_study_sample.id}")
+
+      # Check whether permitted study samples end up in the study's processSequence
+      study_output_ids = []
+      study_json['processSequence'].map do |process|
+        process['outputs'].map { |output| study_output_ids.push(output['@id']) }
+      end
+
+      assert study_output_ids.include? "#sample/#{study_sample.id}"
+      refute study_output_ids.include? "#sample/#{hidden_study_sample.id}"
+
+      assay_json = study_json['assays'].first
+
+      # Check otherMaterials
+      other_material_ids = assay_json['materials']['otherMaterials'].map { |om| om['@id'] }
+      assert other_material_ids.include? "#other_material/#{assay_1_stream_2_sample.id}"
+      refute other_material_ids.include? "#other_material/#{assay_1_stream_2_hidden_sample.id}"
+
+      # Check dataFiles
+      data_file_ids = assay_json['dataFiles'].map { |df| df['@id'] }
+      assert data_file_ids.include? "#data_file/#{assay_2_stream_2_sample.id}"
+      refute data_file_ids.include? "#data_file/#{assay_2_stream_2_hidden_sample.id}"
+
+      # Check whether permitted study samples end up in the assay's processSequence
+      assay_output_ids = []
+      assay_json['processSequence'].map do |process|
+        process['outputs'].map { |output| assay_output_ids.push(output['@id']) }
+      end
+
+      assert assay_output_ids.include? "#other_material/#{assay_1_stream_2_sample.id}"
+      assert assay_output_ids.include? "#data_file/#{assay_2_stream_2_sample.id}"
+      refute assay_output_ids.include? "#other_material/#{assay_1_stream_2_hidden_sample.id}"
+      refute assay_output_ids.include? "#data_file/#{assay_2_stream_2_hidden_sample.id}"
+    end
+  end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      inv = FactoryBot.create(:investigation, contributor: current_user.person)
+
+      get :show, params: { id: inv }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      inv = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: current_user.person)
+
+      get :show, params: { id: inv }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('study')}/i, count: 1
+      assert_select 'a', text: 'Export ISA', count: 1
+
+      assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
+    end
+  end
+
+  test 'compliance to isa json checked if ISA-JSON compliance enabled' do
+    current_user = FactoryBot.create(:user)
+    login_as(current_user)
+
+    with_config_values({isa_json_compliance_enabled: false, project_single_page_enabled: false}) do
+      get :new
+      assert_response :success
+
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 0
+    end
+
+    with_config_values({isa_json_compliance_enabled: true, project_single_page_enabled: true}) do
+      get :new
+      assert_response :success
+
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 1
+    end
+  end
+
+  test 'isa json compliance on edit page' do
+    current_user = FactoryBot.create(:user)
+
+    inv = FactoryBot.create(:investigation, contributor: current_user.person)
+    isa_json_inv = FactoryBot.create(:investigation, contributor: current_user.person, is_isa_json_compliant: true)
+
+    login_as(current_user)
+    with_config_values({isa_json_compliance_enabled: false, project_single_page_enabled: false}) do
+      get :edit, params: { id: inv }
+      assert_response :success
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 0
+
+      get :edit, params: { id: isa_json_inv }
+      assert_response :success
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 1
+
+    end
+  end
+
+  test 'update from fair data menu option' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    inv = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier', contributor: person)
+    inv2 = FactoryBot.create(:investigation, external_identifier:'', contributor: person)
+    inv3 = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier2', contributor: FactoryBot.create(:person), policy: FactoryBot.create(:editing_public_policy))
+    assert inv.can_manage?
+    assert inv2.can_manage?
+    refute inv3.can_manage?
+    assert inv3.can_view?
+
+    with_config_value(:fair_data_station_enabled, true) do
+      get :show, params: { id: inv }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIR Data Station', count: 1
+
+      get :show, params: { id: inv2 }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv2), text:'Update from FAIR Data Station', count: 0
+
+      get :show, params: { id: inv3 }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv3), text:'Update from FAIR Data Station', count: 0
+    end
+
+    with_config_value(:fair_data_station_enabled, false) do
+      get :show, params: { id: inv }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIR Data Station', count: 0
+    end
+  end
+
+  test 'update from fairdata station' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    inv = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier', contributor: person)
+    inv2 = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier2', contributor: FactoryBot.create(:person), policy: FactoryBot.create(:editing_public_policy))
+    with_config_value(:fair_data_station_enabled, true) do
+      get :update_from_fairdata_station, params: { id: inv }
+      assert_response :success
+
+      get :update_from_fairdata_station, params: { id: inv2 }
+      assert_redirected_to inv2
+      assert_match /You are not authorized to manage this Investigation/, flash[:error]
+    end
+
+    with_config_value(:fair_data_station_enabled, false) do
+      get :update_from_fairdata_station, params: { id: inv }
+      assert_redirected_to :root
+      assert_match /Fair data station are disabled/, flash[:error]
+    end
+  end
+
+  test 'submit from fair data station' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_difference('Study.count', 1) do
+        assert_difference('ObservationUnit.count', 1) do
+          assert_difference('Sample.count', 1) do
+            assert_difference('Assay.count', 1) do
+              assert_difference('ActivityLog.count',18) do
+                post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+                assert_redirected_to investigation
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station no permission or disabled' do
+    investigation = setup_test_case_investigation
+    investigation.update(policy: FactoryBot.create(:editing_public_policy))
+    login_as(FactoryBot.create(:person))
+    assert investigation.can_edit?
+    refute investigation.can_manage?
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+              assert_redirected_to investigation
+              assert_match /You are not authorized to manage this Investigation/, flash[:error]
+            end
+          end
+        end
+      end
+    end
+
+    login_as(investigation.contributor)
+    assert investigation.can_manage?
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              with_config_value(:fair_data_station_enabled, false) do
+                post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+                assert_redirected_to :root
+                assert_match /Fair data station are disabled/, flash[:error]
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station external id mis match' do
+    investigation = setup_test_case_investigation
+    investigation.update(external_identifier: 'some-other-id')
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+              assert_response :unprocessable_entity
+              assert_match /Investigation external identifiers do not match/, flash[:error]
+              assert_select 'div#error_flash', text: /Investigation external identifiers do not match/
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station invalid metadata' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-invalid-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+              assert_response :unprocessable_entity
+              assert_match /Validation failed: Title can't be blank, Title is required/, flash[:error]
+              assert_select 'div#error_flash', text: /Validation failed: Title can't be blank, Title is required/
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal 'test study 2', Study.by_external_identifier('seek-test-study-2', investigation.projects).title
+    assert_equal 'test seek sample 1', Sample.by_external_identifier('seek-test-sample-1', investigation.projects).title
+
+    # this may have changed in an update before the error, so this checks the transaction is behaving correctly and rolling back
+    assert_equal 'test obs unit 1', ObservationUnit.by_external_identifier('seek-test-obs-unit-1', investigation.projects).title
+  end
+
+  test 'can show and edit with deleted contributor' do
+    investigation = FactoryBot.create(:investigation, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    investigation.update_column(:contributor_id, nil)
+    assert investigation.can_view?
+    assert investigation.can_edit?
+    assert_nil investigation.contributor
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    get :edit, params: { id: investigation.id }
+    assert_response :success
+  end
+
+  private
+
+  def setup_test_case_investigation
+    FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    FactoryBot.create(:experimental_assay_class)
+
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    policy = FactoryBot.create(:public_policy)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
+    assert_difference('Investigation.count', 1) do
+      investigation.save!
+    end
+    assert_equal 'seek-test-investigation', investigation.external_identifier
+    investigation
+  end
 end

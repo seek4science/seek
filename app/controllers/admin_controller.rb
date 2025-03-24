@@ -13,13 +13,12 @@ class AdminController < ApplicationController
     respond_to do |format|
       format.html
     end
-  end  
+  end
 
   def update_admins
-    admin_ids = params[:admins].split(',') || []
     # Don't let admin remove themselves or they won't be able to manage roles
     current_admins = Person.admins.where.not(id: current_person)
-    admins = admin_ids.map { |id| Person.find(id) }
+    admins = Person.find(params[:admins].compact_blank)
     current_admins.each { |ca| ca.is_admin = false }
     admins.each { |admin| admin.is_admin = true }
     (admins | current_admins).each(&:save!)
@@ -90,10 +89,20 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_elixir_aai_enabled = string_to_boolean params[:omniauth_elixir_aai_enabled]
     Seek::Config.omniauth_elixir_aai_client_id = params[:omniauth_elixir_aai_client_id]
     Seek::Config.omniauth_elixir_aai_secret = params[:omniauth_elixir_aai_secret]
+    Seek::Config.omniauth_elixir_aai_legacy_mode = string_to_boolean params[:omniauth_elixir_aai_legacy_mode]
 
     Seek::Config.omniauth_github_enabled = string_to_boolean params[:omniauth_github_enabled]
     Seek::Config.omniauth_github_client_id = params[:omniauth_github_client_id]
     Seek::Config.omniauth_github_secret = params[:omniauth_github_secret]
+
+    Seek::Config.omniauth_oidc_enabled = string_to_boolean params[:omniauth_oidc_enabled]
+    Seek::Config.omniauth_oidc_name = params[:omniauth_oidc_name]
+    Seek::Config.omniauth_oidc_image&.destroy! if params[:clear_omniauth_oidc_image] == '1'
+    Seek::Config.omniauth_oidc_image = params[:omniauth_oidc_image]
+
+    Seek::Config.omniauth_oidc_issuer = params[:omniauth_oidc_issuer]
+    Seek::Config.omniauth_oidc_client_id = params[:omniauth_oidc_client_id]
+    Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
@@ -112,10 +121,14 @@ class AdminController < ApplicationController
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
+    Seek::Config.observation_units_enabled = string_to_boolean params[:observation_units_enabled]
+    Seek::Config.fair_data_station_enabled = string_to_boolean params[:fair_data_station_enabled]
     Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.programmes_open_for_projects_enabled = string_to_boolean params[:programmes_open_for_projects_enabled]
+    Seek::Config.auto_activate_programmes = string_to_boolean params[:auto_activate_programmes]
+    Seek::Config.auto_activate_site_managed_projects = string_to_boolean params[:auto_activate_site_managed_projects]
     Seek::Config.presentations_enabled = string_to_boolean params[:presentations_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
@@ -133,6 +146,11 @@ class AdminController < ApplicationController
     Seek::Config.piwik_analytics_url = params[:piwik_analytics_url]
     Seek::Config.piwik_analytics_tracking_notice = params[:piwik_analytics_tracking_notice]
 
+    Seek::Config.custom_analytics_snippet_enabled = string_to_boolean params[:custom_analytics_snippet_enabled]
+    Seek::Config.custom_analytics_snippet = params[:custom_analytics_snippet]
+    Seek::Config.custom_analytics_tracking_notice = params[:custom_analytics_tracking_notice]
+    Seek::Config.custom_analytics_name = params[:custom_analytics_name]
+
     Seek::Config.doi_minting_enabled = string_to_boolean params[:doi_minting_enabled]
     Seek::Config.datacite_username = params[:datacite_username]
     Seek::Config.datacite_password = params[:datacite_password]
@@ -149,8 +167,8 @@ class AdminController < ApplicationController
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
-    Seek::Config.project_single_page_advanced_enabled = string_to_boolean(params[:project_single_page_advanced_enabled])
-    Seek::Config.sample_type_template_enabled = string_to_boolean(params[:sample_type_template_enabled])
+    Seek::Config.isa_json_compliance_enabled = string_to_boolean(params[:isa_json_compliance_enabled])
+    Seek::Config.project_single_page_folders_enabled= string_to_boolean(params[:project_single_page_folders_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id]&.strip
@@ -163,6 +181,7 @@ class AdminController < ApplicationController
     Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
     Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
     Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
+    Seek::Config.life_monitor_ui_url = params[:life_monitor_ui_url]&.strip&.chomp('/')
 
     Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
@@ -235,7 +254,7 @@ class AdminController < ApplicationController
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
     Seek::Config.header_image_title = params[:header_image_title]
-    header_image_file
+    set_header_image_file
 
     Seek::Config.copyright_addendum_enabled = string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content = params[:copyright_addendum_content]
@@ -330,8 +349,11 @@ class AdminController < ApplicationController
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
-    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
-    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
+    Seek::Config.metadata_license = params[:metadata_license]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
+    Seek::Config.sandbox_instance_url = params[:sandbox_instance_url]
+    Seek::Config.sandbox_instance_name = params[:sandbox_instance_name]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end
@@ -382,13 +404,15 @@ class AdminController < ApplicationController
     if request.post?
       replacement_tags = []
 
-      if params[:tag_list].blank?
+      tag_list = params[:tag_list].compact_blank
+
+      if tag_list.empty?
         flash[:error] = 'Not tags provided, use Delete to delete a tag. Make sure you register the replacement tag by pressing comma'
         respond_to do |format|
           format.html { render status: :not_acceptable }
         end
       else
-        params[:tag_list].split(',').each do |item|
+        tag_list.each do |item|
           item.strip!
           tag = TextValue.find_by_text(item)
           tag = TextValue.create(text: item) if tag.nil? || tag.text != item # case sensitivity check
@@ -515,11 +539,11 @@ class AdminController < ApplicationController
     smtp_hash_new = { address: params[:address],
                       enable_starttls_auto: params[:enable_starttls_auto] == '1',
                       domain: params[:domain],
-                      authentication: params[:authentication],
-                      user_name: (params[:smtp_user_name].blank? ? nil : params[:smtp_user_name]),
-                      password: (params[:smtp_password].blank? ? nil : params[:smtp_password]) }
+                      authentication: params[:authentication].presence,
+                      user_name: params[:smtp_user_name].presence,
+                      password: params[:smtp_password].presence }
     smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
-    ActionMailer::Base.smtp_settings = smtp_hash_new
+    ActionMailer::Base.smtp_settings = smtp_hash_new.compact
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin
@@ -539,7 +563,7 @@ class AdminController < ApplicationController
     end
   end
 
-  def header_image_file
+  def set_header_image_file
     if params[:header_image_file]
       file_io = params[:header_image_file]
       avatar = Avatar.new(original_filename: file_io.original_filename, image_file: file_io, skip_owner_validation: true)
@@ -605,23 +629,6 @@ class AdminController < ApplicationController
 
   private
 
-  def created_at_data_for_model(model)
-    x = {}
-    start = '1 Nov 2008'
-
-    x[Date.parse(start).jd] = 0
-    x[Date.today.jd] = 0
-
-    model.order(:created_at).each do |i|
-      date = i.created_at.to_date
-      day = date.jd
-      x[day] ||= 0
-      x[day] += 1
-    end
-    sorted_keys = x.keys.sort
-    (sorted_keys.first..sorted_keys.last).map { |i| x[i].nil? ? 0 : x[i] }
-  end
-
   def check_valid_email(email_address, field)
     if email_address.blank? || email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/
       true
@@ -681,7 +688,6 @@ class AdminController < ApplicationController
   def update_redirect_to(flag, action)
     if flag
       flash[:notice] = RESTART_MSG
-      expire_header_and_footer
       redirect_to action: :show
     else
       redirect_to action: action.to_s

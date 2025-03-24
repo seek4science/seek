@@ -4,7 +4,7 @@ require 'openbis_test_helper'
 # ContentBlob related tests specific to OpenBIS
 class OpenbisContentBlobTest < ActiveSupport::TestCase
   def setup
-    User.current_user = Factory(:user)
+    User.current_user = FactoryBot.create(:user)
     mock_openbis_calls
   end
 
@@ -13,26 +13,26 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
       headers: { content_length: 500, content_type: 'text/plain' }, status: 200
     )
 
-    refute Factory(:txt_content_blob).openbis?
-    refute Factory(:binary_content_blob).openbis?
-    refute Factory(:url_content_blob, make_local_copy: false).openbis?
+    refute FactoryBot.create(:txt_content_blob).openbis?
+    refute FactoryBot.create(:binary_content_blob).openbis?
+    refute FactoryBot.create(:url_content_blob, make_local_copy: false).openbis?
 
-    refute Factory(:sop).content_blob.openbis?
+    refute FactoryBot.create(:sop).content_blob.openbis?
     # first Stuart implementation
-    refute Factory(:url_content_blob, make_local_copy: false, url: 'openbis:1:dataset:2222').openbis?
+    refute FactoryBot.create(:url_content_blob, make_local_copy: false, url: 'openbis:1:dataset:2222').openbis?
 
     df = openbis_linked_data_file
     assert df.content_blob.openbis?
   end
 
   test 'openbis? handles nil assets' do
-    blob = Factory(:content_blob)
+    blob = FactoryBot.create(:content_blob)
     blob.asset = nil
     refute blob.openbis?
   end
 
   test 'openbis? handles bad url' do
-    blob = Factory(:url_content_blob, url: 'http://url with spaces/another space.doc')
+    blob = FactoryBot.create(:url_content_blob, url: 'http://url with spaces/another space.doc')
     refute blob.openbis?
   end
 

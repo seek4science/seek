@@ -7,6 +7,7 @@
   only_tree ||= false
   view = params[:graph_view] || default_view
   is_full_screen = params.key?(:fullscreen).present?
+  standalone ||= false
 %>
 
 <style>
@@ -27,9 +28,9 @@
   }
 </style>
 
-<div style="float:right"><%= help_link :isa_overview, include_icon: true, link_text:'Help' %></div>
+<div style="float:right" class="<%= standalone ? '' : ' hidden-xs' %>"><%= help_link :isa_overview, include_icon: true, link_text:'Help' %></div>
 <div class="row">
-  <div class="col-sm-12 hidden-xs">
+  <div class="col-sm-12<%= standalone ? '' : ' hidden-xs' %>">
     <div id="isa-graph" class="panel panel-default">
       <div id="node_info"></div>
       <div class="isa-controls">

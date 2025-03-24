@@ -5,15 +5,19 @@
 
 <%
    actions_partial_disable ||= false
-   item ||= nil
+
+   # parent_item will be from a nested route, e.g. for project/5/data_files parent_item would be an instance of the project
+   parent_item ||= nil
+
    display_immediately ||= false
    index_params ||= {}
 
    ordered_resource_types = prepare_resource_hash(resource_hash)
 
-   query = index_params.dig(:filter, :query)
+   search_query = index_params.dig(:filter, :query)
 
    any_list_items = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
+
 %>
 
 <% if any_list_items %>
@@ -21,41 +25,36 @@
       <%= render :partial => 'assets/resource_listing_tab_nav', :locals => { :types => ordered_resource_types } %>
       <div class="tab-content">
         <% active = true %>
-        <% ordered_resource_types.each_with_index do |type, i| -%>
+        <% ordered_resource_types.each_with_index do |list_items_details, i| -%>
+          <%
+            # links to the index view with the appropriate text, and will be nil if not applicable
+            advanced_filtering_link = resource_list_advanced_search_link(list_items_details, search_query, parent_item)
+            resources_shown_count_text = resource_list_items_shown_text(list_items_details, search_query, parent_item)
+            view_all_results_link = resource_list_all_results_link(list_items_details, search_query, parent_item)
+          %>
 
-            <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
-                <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
 
-                  <% if type[:extra_count] > 0 %>
-                    Showing <%= type[:items_count] %> out of a possible <%= pluralize(resource_type_total_visible_count(type),'item') %>
-                  <% end %>
+            <% unless list_items_details[:items].empty? && (list_items_details[:hidden_count] == 0) %>
+                <div id="<%= list_items_details[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
 
-                  <% if !type[:is_external] && type[:type].constantize.available_filters.any? %>
-                    <% if query  %>
+                  <%= resources_shown_count_text if resources_shown_count_text.present? %>
 
-                      <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
-                                  polymorphic_path(type[:type].tableize.to_sym,
-                                                   'filter[query]':query), class:'pull-right'  %>
-                    <% elsif item %>
-                      <%= link_to "Advanced #{type[:visible_resource_type]} list for this #{internationalized_resource_name(item.model_name.to_s, false)} with search and filtering ...",
-                                  [item, type[:type].tableize.to_sym], class:'pull-right'  %>
+                  <%= advanced_filtering_link if advanced_filtering_link.present? %>
 
-                    <% end %>
-                  <% end %>
-
-                  <% unless type[:items].empty? %>
-                      <%= render :partial => "assets/resource_list", :locals => { :collection => type[:items],
+                  <% unless list_items_details[:items].empty? %>
+                      <%= render :partial => "assets/resource_list", :locals => { :collection => list_items_details[:items],
                                                                                   :authorization_for_showing_already_done => true,
                                                                                   :actions_partial_disable => actions_partial_disable} -%>
                   <% end %>
 
-                  <% if type[:hidden_count] > 0 %>
+                  <% if list_items_details[:hidden_count] > 0 %>
                       <div class="list_items_container">
                         <div class="hidden_list_item">
-                          <%= hidden_items_html(type[:hidden_items], pluralize(type[:hidden_count], 'hidden item'))  %>
+                          <%= hidden_items_html(list_items_details[:hidden_items], pluralize(list_items_details[:hidden_count], 'hidden item'))  %>
                         </div>
                       </div>
                   <% end %>
+                    <%= view_all_results_link if view_all_results_link.present? %>
                 </div>
               <% active = false %>
             <% end -%>

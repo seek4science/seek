@@ -9,27 +9,11 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     db:seed:007_sample_attribute_types
-    update_missing_openbis_istest
-    update_missing_publication_versions
-    update_edam_controlled_vocab_keys
-    db:seed:011_topics_controlled_vocab
-    db:seed:012_operations_controlled_vocab
-    db:seed:013_formats_controlled_vocab
-    db:seed:014_data_controlled_vocab
-    db:seed:015_isa_tags
-    db:seed:003_model_formats
-    db:seed:004_model_recommended_environments
-    remove_orphaned_versions
-    refresh_workflow_internals
-    remove_scale_annotations
-    remove_spreadsheet_annotations
-    remove_node_annotations
-    convert_roles
-    update_edam_annotation_attributes
-    remove_orphaned_project_subscriptions
-    remove_node_activity_logs
-    remove_node_asset_creators
-    set_default_sample_type_creators
+    update_rdf
+    update_observation_unit_policies
+    fix_xlsx_marked_as_zip
+    add_policies_to_existing_sample_types
+    fix_previous_sample_type_permissions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -41,8 +25,6 @@ namespace :seek do
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
     puts 'Starting upgrade ...'
-    puts '... trimming old session data ...'
-    Rake::Task['db:sessions:trim'].invoke
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
@@ -66,199 +48,101 @@ namespace :seek do
     end
   end
 
-  task(update_missing_openbis_istest: :environment) do
-    puts '... creating missing is_test for OpenbisEndpoint...'
-    create = 0
+  # if rdf repository enabled then generate jobs, otherwise just clear the cache. Only runs once
+  task(update_rdf: [:environment]) do
+    only_once('seek:update_rdf 1.16.1') do
+      if Seek::Rdf::RdfRepository.instance&.configured?
+        puts '... triggering rdf generation jobs'
+        Rake::Task['seek_rdf:generate'].invoke
+      else
+        path = Seek::Config.rdf_filestore_path
+        unless Dir.empty?(path)
+          puts "... clearing rdf cache at #{path}"
+          FileUtils.rm_rf(path, secure: true)
+        end
+      end
+    end
+  end
+
+  task(update_observation_unit_policies: [:environment]) do
+    puts '..... creating observation unit policies ...'
+    affected_obs_units = []
+    ObservationUnit.where.missing(:policy).includes(:study).in_batches(of: 25) do |batch|
+      batch.each do |obs_unit|
+        policy = obs_unit.study.policy || Policy.default
+        policy = policy.deep_copy
+        policy.save
+        obs_unit.update_column(:policy_id, policy.id)
+        affected_obs_units << obs_unit
+      end
+      putc('.')
+    end
+    AuthLookupUpdateQueue.enqueue(affected_obs_units)
+    RdfGenerationQueue.enqueue(affected_obs_units)
+    puts "..... finished updating policies for #{affected_obs_units.count} observation units"
+  end
+
+  task(fix_xlsx_marked_as_zip: [:environment]) do
+    blobs = ContentBlob.where('original_filename LIKE ?','%.xlsx').where(content_type: 'application/zip')
+    if blobs.any?
+      n = blobs.count
+      blobs.update_all(content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      puts "... fixed #{n} XLSX blobs with zip content type"
+    end
+  end
+
+  task(add_policies_to_existing_sample_types: [:environment]) do
+    puts '... Adding policies to existing sample types'
+    counter = 0
     disable_authorization_checks do
-      OpenbisEndpoint.find_each do |openbis_endpoint|
-        # check if the publication has a version
-        # then create one if missing
-        if openbis_endpoint.is_test.nil?
-          openbis_endpoint.is_test = false # default -> prod, https
-          openbis_endpoint.save
-          unless openbis_endpoint.is_test.nil?
-            create += 1
+      SampleType.includes(:projects, :assays, :studies).where(policy_id: nil).each do |st|
+        if st.is_isa_json_compliant?
+          st.update_column(:policy_id, st.assays.first.policy_id) if st.assays.any?
+          st.update_column(:policy_id, st.studies.first.policy_id) if st.studies.any?
+        else
+          policy = Policy.new
+          policy.name = 'default policy'
+
+          # Visible if linked to public samples
+          if st.samples.any? { |sample| sample.is_published? }
+            policy.access_type = Policy::ACCESSIBLE
+          else
+            policy.access_type = Policy::NO_ACCESS
           end
-        end
-        # publication.save
-      end
-    end
-    puts " ... finished creating missing is_test for #{create.to_s} OpenbisEndpoint(s)"
-  end
-
-  task(update_missing_publication_versions: :environment) do
-    puts '... creating missing publications versions ...'
-    create = 0
-    disable_authorization_checks do
-      Publication.find_each do |publication|
-        # check if the publication has a version
-        # then create one if missing
-        if publication.latest_version.nil?
-          publication.save_as_new_version 'Version for legacy entries'
-          unless publication.latest_version.nil?
-            create += 1
+          # Visible to each project
+          st.projects.map do |project|
+            policy.permissions << Permission.new(contributor_type: Permission::PROJECT, contributor_id: project.id, access_type: Policy::ACCESSIBLE)
           end
-        end
-        # publication.save
-      end
-    end
-    puts " ... finished creating missing publications versions for #{create.to_s} publications"
-  end
-
-  task(remove_orphaned_versions: [:environment]) do
-    puts 'Removing orphaned versions ...'
-    count = 0
-    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Presentation::Version,
-             Sop::Version, Workflow::Version]
-    disable_authorization_checks do
-      types.each do |type|
-        found = type.where.missing(:parent)
-        count += found.length
-        found.each(&:destroy)
-      end
-    end
-    puts "... finished removing #{count} orphaned versions"
-  end
-
-  task(remove_scale_annotations: [:environment]) do
-    a = Annotation.joins(:annotation_attribute).where(annotation_attribute: { name: ['additional_scale_info', 'scale'] })
-    count = a.count
-    a.destroy_all
-    AnnotationAttribute.where(name:['scale','additional_scale_info']).destroy_all
-    puts "Removed #{count} scale related annotations" if count > 0
-  end
-
-  task(remove_spreadsheet_annotations: [:environment]) do
-    annotations = Annotation.where(annotatable_type: 'CellRange')
-    count = annotations.count
-    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' })
-    values.select{|v| v.annotations.count == 1}.each(&:destroy)
-    annotations.destroy_all
-    AnnotationAttribute.where(name:'annotation').destroy_all
-    puts "Removed #{count} spreadsheet related annotations" if count > 0
-  end
-
-  task(remove_node_annotations: [:environment]) do
-    annotations = Annotation.where(annotatable_type: 'Node')
-    count = annotations.count
-    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'Node' })
-    values.select{|v| v.annotations.count == 1}.each(&:destroy)
-    annotations.destroy_all
-    puts "Removed #{count} Node related annotations" if count > 0
-  end
-
-  task(convert_roles: [:environment]) do
-    puts 'Converting roles...'
-    disable_authorization_checks do
-      Person.find_each do |person|
-        RoleType.for_system.each do |rt|
-          mask = rt.id
-          if (person.roles_mask & mask) != 0
-            Role.where(role_type_id: rt.id, person_id: person.id, scope: nil).first_or_create!
+          # Project admins can manage
+          project_admins = st.projects.map(&:project_administrators).flatten
+          project_admins.map do |admin|
+            policy.permissions << Permission.new(contributor_type: Permission::PERSON, contributor_id: admin.id, access_type: Policy::MANAGING)
           end
+
+          policy.save
+          st.update_column(:policy_id, policy.id)
         end
+        putc('.')
+        counter += 1
       end
+    end
+    puts "... Added policies to #{counter} sample types"
+  end
 
-      class AdminDefinedRoleProject < ActiveRecord::Base; end
-
-      AdminDefinedRoleProject.find_each do |role|
-        RoleType.for_projects.each do |rt|
-          mask = rt.id
-          if (role.role_mask & mask) != 0
-            Role.where(role_type_id: rt.id, person_id: role.person_id,
-                       scope_type: 'Project', scope_id: role.project_id).first_or_create!
-          end
+  task(fix_previous_sample_type_permissions: [:environment]) do
+    only_once('fix_previous_sample_type_permissions 1.16.0') do
+      puts '... Updating previous sample type permissions ...'
+      SampleType.includes(:policy).where.not(policy_id: nil).each do |sample_type|
+        policy = sample_type.policy
+        if policy.access_type == Policy::VISIBLE
+          policy.update_column(:access_type, Policy::ACCESSIBLE)
         end
+        policy.permissions.where(access_type: Policy::VISIBLE).where(contributor_type: Permission::PROJECT).update_all(access_type: Policy::ACCESSIBLE)
+        putc('.')
       end
-
-      class AdminDefinedRoleProgramme < ActiveRecord::Base; end
-
-      AdminDefinedRoleProgramme.find_each do |role|
-        RoleType.for_programmes.each do |rt|
-          mask = rt.id
-          if (role.role_mask & mask) != 0
-            Role.where(role_type_id: rt.id, person_id: role.person_id,
-                       scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
-          end
-        end
-      end
+      AuthLookupUpdateQueue.enqueue(SampleType.all)
+      puts '... Finished updating previous sample type permissions'
     end
-  end
-
-  task(update_edam_annotation_attributes: [:environment]) do
-    defs = {
-      "edam_formats": "data_format_annotations",
-      "edam_topics": "topic_annotations",
-      "edam_operations": "operation_annotations",
-      "edam_data": "data_type_annotations"
-    }
-    defs.each do |old_name,new_name|
-      query = AnnotationAttribute.where(name: old_name)
-      if query.any?
-        puts "Updating EDAM based #{old_name} Annotation Attributes"
-        query.update_all(name: new_name)
-      end
-    end
-  end
-
-  task(update_edam_controlled_vocab_keys: [:environment]) do
-    defs = {
-      topics: 'edam_topics',
-      operations: 'edam_operations',
-      data_formats: 'edam_formats',
-      data_types: 'edam_data'
-    }
-
-    defs.each do |property, old_key|
-      new_key = SampleControlledVocab::SystemVocabs.database_key_for_property(property)
-      query = SampleControlledVocab.where(key: old_key)
-      if query.any?
-        puts "Updating key for #{old_key} controlled vocabulary"
-        query.update_all(key: new_key)
-      end
-    end
-  end
-
-  task(remove_orphaned_project_subscriptions: [:environment]) do
-    disable_authorization_checks do
-      ProjectSubscription.where.missing(:project).destroy_all
-    end
-  end
-
-  task(remove_node_activity_logs: [:environment]) do
-    logs = ActivityLog.where(activity_loggable_type: 'Node')
-    puts "Removing #{logs.count} Node related activity logs" if logs.count > 0
-    logs.delete_all
-  end
-
-  task(remove_node_asset_creators: [:environment]) do
-    creators = AssetsCreator.where(asset_type: 'Node')
-    puts "Removing #{creators.count} Node related asset creators" if creators.count > 0
-    creators.delete_all
-  end
-
-  task(refresh_workflow_internals: [:environment]) do |task|
-    ran = only_once(task) do
-      Rake::Task['seek:rebuild_workflow_internals'].invoke
-    end
-
-    puts "Skipping workflow internals rebuild, already done" unless ran
-  end
-
-  task(set_default_sample_type_creators: [:environment]) do
-    ran = only_once('set_default_sample_type_creators') do
-      puts "Setting default Sample Type creators"
-      count = 0
-      SampleType.all.each do |sample_type|
-        if sample_type.assets_creators.empty?
-          sample_type.assets_creators.build(creator: sample_type.contributor).save!
-          count += 1
-        end
-      end
-      puts "#{count} Sample Types updated"
-    end
-
-    puts "Skipping setting default Sample Type creators, as already set" unless ran
   end
 
   private

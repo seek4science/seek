@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "8",
+    "id": "151",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -12,18 +12,51 @@
       "discussion_links": [
 
       ],
-      "title": "changed title",
+      "title": "Fred Bloggs",
       "tags": [
 
       ],
-      "created_at": "2022-06-07T14:12:29.000Z",
-      "updated_at": "2022-06-07T14:12:30.000Z",
+      "created_at": "2024-11-20T10:14:07.000Z",
+      "updated_at": "2024-11-20T10:14:07.000Z",
       "creators": [
 
       ],
       "other_creators": null,
       "attribute_map": {
-        "the_title": "changed title"
+        "full_name": "Fred Bloggs",
+        "address": "ZZ",
+        "postcode": "M13 8PL",
+        "CAPITAL key": "changed",
+        "apple": "Granny Smith",
+        "apples": [
+          "Golden Delicious",
+          "Bramley"
+        ],
+        "patients": [
+          {
+            "id": 149,
+            "type": "Sample",
+            "title": "Fred Bloggs"
+          },
+          {
+            "id": 150,
+            "type": "Sample",
+            "title": "Fred Bloggs"
+          }
+        ],
+        "weight": 3.7,
+        "age": 42,
+        "bool": true,
+        "data file": {
+          "id": 136,
+          "type": "DataFile",
+          "title": "This Data file"
+        },
+        "sop": {
+          "id": 68,
+          "type": "Sop",
+          "title": "This Sop"
+        }
       }
     },
     "relationships": {
@@ -35,28 +68,31 @@
       "submitter": {
         "data": [
           {
-            "id": "61",
+            "id": "1345",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "13",
+          "id": "178",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "68",
+            "id": "1181",
             "type": "projects"
           }
         ]
       },
       "data_files": {
         "data": [
-
+          {
+            "id": "136",
+            "type": "data_files"
+          }
         ]
       },
       "investigations": {
@@ -77,21 +113,21 @@
       "people": {
         "data": [
           {
-            "id": "61",
+            "id": "1345",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/8"
+      "self": "/samples/151"
     },
     "meta": {
-      "created": "2022-06-07T14:12:29.000Z",
-      "modified": "2022-06-07T14:12:30.000Z",
+      "created": "2024-11-20T10:14:07.000Z",
+      "modified": "2024-11-20T10:14:07.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "ca41f520-c899-013a-0f7e-0a81884ed284"
+      "uuid": "1a116530-8956-013d-24a2-0a81884ed284"
     }
   },
   "jsonapi": {

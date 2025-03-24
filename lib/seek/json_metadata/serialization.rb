@@ -9,7 +9,9 @@ module Seek
 
       # Mass assignment of attributes
       def data=(hash)
-        json_metadata_will_change!
+        if data != hash
+          json_metadata_will_change!
+        end
         data.mass_assign(hash)
       end
 
@@ -19,7 +21,6 @@ module Seek
 
       def get_attribute_value(attr)
         attr = attr.accessor_name if attr.is_a?(attribute_class)
-
         data[attr.to_s]
       end
 

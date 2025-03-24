@@ -5,11 +5,11 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
   include HtmlHelper
 
   setup do
-    @galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
+    @galaxy = WorkflowClass.find_by_key('galaxy') || FactoryBot.create(:galaxy_workflow_class)
   end
 
   test 'uploads a new version of a workflow' do
-    workflow = Factory(:workflow)
+    workflow = FactoryBot.create(:workflow)
     workflow_id = workflow.id
     person = workflow.contributor
     login_as(person.user)
@@ -64,7 +64,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
   end
 
   test 'new workflow version upload copes with errors' do
-    workflow = Factory(:workflow)
+    workflow = FactoryBot.create(:workflow)
     projects = workflow.projects
     workflow_id = workflow.id
     person = workflow.contributor
@@ -141,11 +141,11 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
 
     assert_equal 2, workflow.reload.versions.count
     assert_equal 732, workflow.find_version(1).content_blob.file_size
-    assert_equal 12349, workflow.find_version(2).content_blob.file_size
+    assert_equal 12287, workflow.find_version(2).content_blob.file_size
   end
 
   test 'new workflow version upload copes with workflow class change' do
-    workflow = Factory(:workflow)
+    workflow = FactoryBot.create(:workflow)
     projects = workflow.projects
     workflow_id = workflow.id
     person = workflow.contributor

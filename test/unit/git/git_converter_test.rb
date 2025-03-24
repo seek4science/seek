@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GitConverterTest < ActiveSupport::TestCase
   test 'convert constructed RO-Crate' do
-    workflow = Factory(:generated_galaxy_ro_crate_workflow)
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -34,7 +34,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 'convert provided RO-Crate' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow)
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -64,7 +64,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 'convert provided RO-Crate that has a file with spaces in the path' do
-    workflow = Factory(:spaces_ro_crate_workflow)
+    workflow = FactoryBot.create(:spaces_ro_crate_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -88,7 +88,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 'convert workflow that is just a single file' do
-    workflow = Factory(:cwl_workflow)
+    workflow = FactoryBot.create(:cwl_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -111,7 +111,7 @@ class GitConverterTest < ActiveSupport::TestCase
 
   test 'convert workflow that is a remote file' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
-    workflow = Factory(:cwl_url_workflow)
+    workflow = FactoryBot.create(:cwl_url_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -138,7 +138,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 'ensure version metadata is ported correctly' do
-    workflow = Factory(:cwl_workflow, license: 'CC0-1.0',
+    workflow = FactoryBot.create(:cwl_workflow, license: 'CC0-1.0',
                        title: 'First Title',
                        description: '123',
                        maturity_level: :work_in_progress,
@@ -147,7 +147,7 @@ class GitConverterTest < ActiveSupport::TestCase
     v2 = nil
     disable_authorization_checks do
       v1.update(visibility: :private)
-      Factory(:cwl_content_blob, asset: workflow, asset_version: 2)
+      FactoryBot.create(:cwl_content_blob, asset: workflow, asset_version: 2)
       workflow.save_as_new_version
       v2 = workflow.latest_version
       v2.update(doi: '10.81082/dev-workflowhub.workflow.136.1',
@@ -196,7 +196,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 'convert provided RO-Crate that has a file with dots in the path' do
-    workflow = Factory(:dots_ro_crate_workflow)
+    workflow = FactoryBot.create(:dots_ro_crate_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -222,7 +222,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 'safely re-run conversion process without creating additional records' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow)
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -260,7 +260,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 're-run conversion process and overwrite previous records' do
-    workflow = Factory(:existing_galaxy_ro_crate_workflow)
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow)
 
     converter = Git::Converter.new(workflow)
 
@@ -304,7 +304,7 @@ class GitConverterTest < ActiveSupport::TestCase
   end
 
   test 'converted workflow does not retain original files from RO-Crate' do
-    workflow = Factory(:generated_galaxy_ro_crate_workflow)
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow)
 
     converter = Git::Converter.new(workflow)
 

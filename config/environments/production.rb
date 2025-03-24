@@ -50,13 +50,14 @@ Rails.application.configure do
 
   # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
-  config.log_level = :info
+  config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info').downcase
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
   config.cache_store = :file_store, "#{Rails.root}/tmp/cache"
+  config.settings_cache_store = ActiveSupport::Cache::FileStore.new("#{Rails.root}/tmp/cache/settings-cache")
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque

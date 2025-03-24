@@ -6,7 +6,7 @@ class PersonApiTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    @person = Factory(:person)
+    @person = FactoryBot.create(:person)
   end
 
   def ignored_attributes
@@ -35,19 +35,19 @@ class PersonApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'normal user cannot create person' do
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     body = api_max_post_body
     assert_no_difference('Person.count') do
-      post "/people.json", params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
     end
   end
 
   test 'admin can update others' do
-    other_person = Factory(:person)
+    other_person = FactoryBot.create(:person)
     body = api_max_post_body
     body["data"]["id"] = "#{other_person.id}"
     body["data"]["attributes"]["email"] = "updateTest@email.com"
-    patch "/people/#{other_person.id}.json", params: body, as: :json
+    patch "/people/#{other_person.id}.json", params: body, as: :json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
   end
 end

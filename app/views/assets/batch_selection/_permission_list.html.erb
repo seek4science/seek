@@ -1,0 +1,18 @@
+<%
+  item ||= permission_list
+  downloadable = item.try(:is_downloadable?)
+-%>
+<div class="batch-selection-permission-list" style="display: none;">
+  <% sharing_policy_changed = (@batch_sharing_permission_changed && (@items_for_sharing.include? item) && !@policy_params[:access_type].nil?)? "sharing_permission_changed" : "" %>
+  <div class="permission-node <%= sharing_policy_changed %>">
+    <strong>Public:</strong>
+      <%= Policy.get_access_type_wording(item.policy.access_type, downloadable) %>.
+  </div>
+  <% item.policy.permissions.map do |permission| %>
+    <% sharing_permission_changed = @batch_sharing_permission_changed && (@items_for_sharing.include? item) ? PolicyHelper::permission_changed_item_class(permission, @policy_params) : "" %>
+    <div class="permission-node <%= sharing_permission_changed %>">
+      <strong><%=  permission_title(permission, member_prefix: false, icon: false, link: true) -%>:</strong>
+        <%= Policy.get_access_type_wording(permission.access_type, downloadable) %>
+    </div>
+  <% end %>
+</div>

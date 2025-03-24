@@ -5,46 +5,49 @@ class AssayTest < ActiveSupport::TestCase
   fixtures :all
 
   test 'shouldnt edit the assay' do
-    non_admin = Factory :user
+    non_admin = FactoryBot.create :user
     assert !non_admin.person.is_admin?
     assay = assays(:modelling_assay_with_data_and_relationship)
     assert !assay.can_edit?(non_admin)
   end
 
   test 'to_rdf' do
-    assay = Factory :experimental_assay
-    Factory :assay_organism, assay: assay, organism: Factory(:organism)
-    pub = Factory :publication
-    Factory :relationship, subject: assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
-    df = (Factory :assay_asset, assay: assay).asset
+    assay = FactoryBot.create :experimental_assay
+    FactoryBot.create :assay_organism, assay: assay, organism: FactoryBot.create(:organism)
+    pub = FactoryBot.create :publication
+    FactoryBot.create :relationship, subject: assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
+    df = (FactoryBot.create :assay_asset, assay: assay).asset
 
     refute_nil df
     assert_includes assay.assets,df
     assay.reload
     assert_equal 2, assay.assets.size
     rdf = assay.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
-
-      #check includes the data file due to bug OPSK-1919
-      refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), graph.statements.first.subject
+
+    #check includes the data file due to bug OPSK-1919
+    refute_nil graph.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
+
 
     # try modelling, with tech type nil
-    assay = Factory :modelling_assay, organisms: [Factory(:organism)], technology_type_uri: nil
+    assay = FactoryBot.create :modelling_assay, organisms: [FactoryBot.create(:organism)], technology_type_uri: nil
     rdf = assay.to_rdf
 
     # assay with suggested assay/technology types
-    suggested_assay_type = Factory(:suggested_assay_type)
-    suggested_tech_type = Factory(:suggested_technology_type)
-    assay = Factory :experimental_assay, suggested_assay_type: suggested_assay_type, suggested_technology_type: suggested_tech_type
+    suggested_assay_type = FactoryBot.create(:suggested_assay_type)
+    suggested_tech_type = FactoryBot.create(:suggested_technology_type)
+    assay = FactoryBot.create :experimental_assay, suggested_assay_type: suggested_assay_type, suggested_technology_type: suggested_tech_type
     rdf = assay.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      reader.statements.map(&:object).include? suggested_assay_type.ontology_uri
-      reader.statements.map(&:object).include? suggested_tech_type.ontology_uri
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    graph.statements.map(&:object).include? suggested_assay_type.ontology_uri
+    graph.statements.map(&:object).include? suggested_tech_type.ontology_uri
+
   end
 
   test 'is_asset?' do
@@ -63,18 +66,18 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'is_modelling' do
-    assay = Factory(:experimental_assay)
+    assay = FactoryBot.create(:experimental_assay)
     assert_equal 'EXP',assay.assay_class.key
     refute assay.is_modelling?
 
-    assay = Factory(:modelling_assay)
+    assay = FactoryBot.create(:modelling_assay)
     assert_equal 'MODEL',assay.assay_class.key
     assert assay.is_modelling?
   end
 
   test 'title_trimmed' do
-    User.with_current_user Factory(:user) do
-      assay = Factory :assay,
+    User.with_current_user FactoryBot.create(:user) do
+      assay = FactoryBot.create :assay,
                       contributor: User.current_user.person,
                       title: ' test'
       assay.save!
@@ -83,11 +86,11 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'is_experimental' do
-    assay = Factory(:experimental_assay)
+    assay = FactoryBot.create(:experimental_assay)
     assert_equal 'EXP',assay.assay_class.key
     assert assay.is_experimental?
 
-    assay = Factory(:modelling_assay)
+    assay = FactoryBot.create(:modelling_assay)
     assert_equal 'MODEL',assay.assay_class.key
     assert !assay.is_experimental?
   end
@@ -105,7 +108,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
-    User.with_current_user Factory(:user) do
+    User.with_current_user FactoryBot.create(:user) do
       assay = new_valid_assay
 
       assert assay.valid?
@@ -142,24 +145,24 @@ class AssayTest < ActiveSupport::TestCase
       assay.contributor = people(:person_for_model_owner)
 
       # an modelling assay can be valid without a technology type, or organism
-      assay = Factory(:modelling_assay)
+      assay = FactoryBot.create(:modelling_assay)
       assay.technology_type_uri = nil
 
       assert assay.valid?
       # an experimental assay can be invalid without a sample nor a organism
-      assay = Factory(:experimental_assay)
+      assay = FactoryBot.create(:experimental_assay)
       assay.organisms = []
 
       assert assay.valid?
 
-      assay.assay_organisms = [Factory(:assay_organism)]
+      assay.assay_organisms = [FactoryBot.create(:assay_organism)]
       assert assay.valid?
     end
   end
 
   test 'validate assay and tech type' do
 
-    assay = Factory(:experimental_assay)
+    assay = FactoryBot.create(:experimental_assay)
     assert assay.valid?
 
     # not from ontology
@@ -187,7 +190,7 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.valid?
 
     ## now for modelling
-    assay = Factory(:modelling_assay)
+    assay = FactoryBot.create(:modelling_assay)
     assert assay.valid?
 
     # not from ontology
@@ -212,53 +215,72 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.valid?
 
     # validate with uri from suggested assay type
-    assay = Factory(:experimental_assay)
-    assay.suggested_assay_type = Factory(:suggested_assay_type)
+    assay = FactoryBot.create(:experimental_assay)
+    assay.suggested_assay_type = FactoryBot.create(:suggested_assay_type)
     assert assay.valid?
-    assay.suggested_assay_type = Factory(:suggested_modelling_analysis_type)
+    assay.suggested_assay_type = FactoryBot.create(:suggested_modelling_analysis_type)
     refute assay.valid?
 
-    assay = Factory(:modelling_assay)
-    assay.suggested_assay_type = Factory(:suggested_assay_type)
+    assay = FactoryBot.create(:modelling_assay)
+    assay.suggested_assay_type = FactoryBot.create(:suggested_assay_type)
     refute assay.valid?
-    assay.suggested_assay_type = Factory(:suggested_modelling_analysis_type)
+    assay.suggested_assay_type = FactoryBot.create(:suggested_modelling_analysis_type)
     assert assay.valid?
 
   end
 
   test 'publications' do
-    User.with_current_user Factory(:user) do
-    one_assay_with_publication = Factory :assay, publications: [Factory(:publication)]
+    User.with_current_user FactoryBot.create(:user) do
+    one_assay_with_publication = FactoryBot.create :assay, publications: [FactoryBot.create(:publication)]
 
     assert_equal 1, one_assay_with_publication.publications.size
     end
   end
 
   test 'can delete?' do
-    user = User.current_user = Factory(:user)
-    assert Factory(:assay, contributor: user.person).can_delete?
+    user = User.current_user = FactoryBot.create(:user)
+    assert FactoryBot.create(:assay, contributor: user.person).can_delete?
 
-    assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:data_file, contributor: user.person)
+    assay = FactoryBot.create(:assay, contributor: user.person)
+    assay.associate FactoryBot.create(:data_file, contributor: user.person)
     assert !assay.can_delete?
 
-    assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:sop, contributor: user.person)
+    assay = FactoryBot.create(:assay, contributor: user.person)
+    assay.associate FactoryBot.create(:sop, contributor: user.person)
     assert !assay.can_delete?
 
-    assay = Factory(:assay, contributor: user.person)
-    assay.associate Factory(:model, contributor: user.person)
+    assay = FactoryBot.create(:assay, contributor: user.person)
+    assay.associate FactoryBot.create(:model, contributor: user.person)
     assert !assay.can_delete?
 
-    pal = Factory(:pal)
-    another_project_person = Factory(:person, project: pal.projects.first)
+    pal = FactoryBot.create(:pal)
+    another_project_person = FactoryBot.create(:person, project: pal.projects.first)
     # create an assay with projects = to the projects for which the pal is a pal
-    assay = Factory(:assay, contributor: another_project_person)
+    assay = FactoryBot.create(:assay, contributor: another_project_person)
     assert !assay.can_delete?(pal.user)
 
-    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+    one_assay_with_publication = FactoryBot.create :assay, contributor: User.current_user.person, publications: [FactoryBot.create(:publication)]
     assert !one_assay_with_publication.can_delete?(User.current_user.person)
   end
+
+  # Users shouldn't be able to delete assays populated with samples through their linked sample types
+  test 'can only delete assays with empty sample types' do
+    assay_sample_type = FactoryBot.create(:simple_sample_type, title: "Assay Sample Type with samples")
+    empty_sample_type = FactoryBot.create(:simple_sample_type, title: "Empty assay Sample Type")
+    assay_samples = (0..4).map do |i|
+      FactoryBot.create(:sample, title: "DNA Extract nr. #{i}", sample_type: assay_sample_type)
+    end
+
+    assay = FactoryBot.create(:assay, title: "First Assay", sample_type: assay_sample_type)
+    empty_assay = FactoryBot.create(:assay, title: "Empty assay", sample_type:empty_sample_type)
+
+    assert_equal(assay.sample_type.samples.size, 5)
+    assert(empty_assay.sample_type.samples.none?)
+
+    assert_equal(assay.state_allows_delete?, false)
+    assert_equal(empty_assay.state_allows_delete?, true)
+  end
+
 
   test 'assets' do
     assay = assays(:metabolomics_assay)
@@ -288,8 +310,8 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'relate new version of sop' do
-    User.with_current_user Factory(:user) do
-      assay = Factory :assay, contributor: User.current_user.person
+    User.with_current_user FactoryBot.create(:user) do
+      assay = FactoryBot.create :assay, contributor: User.current_user.person
       assay.save!
       sop = sops(:sop_with_all_sysmo_users_policy)
       assert_difference('Assay.find_by_id(assay.id).sops.count', 1) do
@@ -325,7 +347,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'associate organism' do
-    assay = Factory(:experimental_assay)
+    assay = FactoryBot.create(:experimental_assay)
     assay.assay_organisms.clear
     User.current_user = assay.contributor
     organism = organisms(:yeast)
@@ -382,9 +404,9 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'associate organism with strain' do
-    assay = Factory(:assay)
-    organism = Factory(:organism)
-    strain = Factory(:strain, organism: organism)
+    assay = FactoryBot.create(:assay)
+    organism = FactoryBot.create(:organism)
+    strain = FactoryBot.create(:strain, organism: organism)
 
     assert_equal organism, strain.organism
     assert_equal strain, organism.strains.find(strain.id)
@@ -407,9 +429,9 @@ class AssayTest < ActiveSupport::TestCase
       end
     end
 
-    organism = Factory(:organism)
-    strain = Factory(:strain, organism: organism)
-    culture_growth = Factory(:culture_growth_type)
+    organism = FactoryBot.create(:organism)
+    strain = FactoryBot.create(:strain, organism: organism)
+    culture_growth = FactoryBot.create(:culture_growth_type)
 
     assert_difference('AssayOrganism.count') do
       assert_no_difference('Strain.count') do
@@ -446,50 +468,50 @@ class AssayTest < ActiveSupport::TestCase
               study: studies(:metabolomics_study),
               contributor: people(:person_for_model_owner),
               assay_class: assay_classes(:experimental_assay_class),
-              policy: Factory(:private_policy)
+              policy: FactoryBot.create(:private_policy)
              )
   end
 
   test 'contributing_user' do
-    assay = Factory :assay
+    assay = FactoryBot.create :assay
     assert assay.contributor
     assert_equal assay.contributor.user, assay.contributing_user
   end
 
   test 'assay type label from ontology or suggested assay type' do
-    assay = Factory(:experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response')
+    assay = FactoryBot.create(:experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response')
     assert_equal 'Catabolic response', assay.assay_type_label
 
-    assay = Factory(:modelling_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
+    assay = FactoryBot.create(:modelling_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
     assert_equal 'Genome scale', assay.assay_type_label
 
-    suggested_at = Factory(:suggested_assay_type, label: 'new fluxomics')
-    assay = Factory(:experimental_assay, suggested_assay_type: suggested_at)
+    suggested_at = FactoryBot.create(:suggested_assay_type, label: 'new fluxomics')
+    assay = FactoryBot.create(:experimental_assay, suggested_assay_type: suggested_at)
     assert_equal 'new fluxomics', assay.assay_type_label
 
-    suggested_ma = Factory(:suggested_modelling_analysis_type, label: 'new metabolism')
-    assay = Factory(:modelling_assay, suggested_assay_type: suggested_ma)
+    suggested_ma = FactoryBot.create(:suggested_modelling_analysis_type, label: 'new metabolism')
+    assay = FactoryBot.create(:modelling_assay, suggested_assay_type: suggested_ma)
     assert_equal 'new metabolism', assay.assay_type_label
   end
 
   test 'technology type label from ontology or suggested technology type' do
-    assay = Factory(:experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding')
+    assay = FactoryBot.create(:experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding')
     assert_equal 'Binding', assay.technology_type_label
 
-    suggested_tt = Factory(:suggested_technology_type, label: 'new technology type')
-    assay = Factory(:experimental_assay, suggested_technology_type: suggested_tt)
+    suggested_tt = FactoryBot.create(:suggested_technology_type, label: 'new technology type')
+    assay = FactoryBot.create(:experimental_assay, suggested_technology_type: suggested_tt)
     assert_equal 'new technology type', assay.technology_type_label
   end
 
   test 'default assay and tech type' do
-    assay = Factory(:experimental_assay)
+    assay = FactoryBot.create(:experimental_assay)
     assay.assay_type_uri = nil
     assay.technology_type_uri = nil
     assay.save!
     assert_equal Seek::Ontologies::AssayTypeReader.instance.default_parent_class_uri.to_s, assay.assay_type_uri
     assert_equal Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s, assay.technology_type_uri
 
-    assay = Factory(:modelling_assay)
+    assay = FactoryBot.create(:modelling_assay)
     assay.assay_type_uri = nil
     assay.technology_type_uri = nil
     assay.save!
@@ -498,14 +520,14 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'assay type reader' do
-    exp_assay = Factory(:experimental_assay)
-    mod_assay = Factory(:modelling_assay)
+    exp_assay = FactoryBot.create(:experimental_assay)
+    mod_assay = FactoryBot.create(:modelling_assay)
     assert_equal Seek::Ontologies::AssayTypeReader, exp_assay.assay_type_reader.class
     assert_equal Seek::Ontologies::ModellingAnalysisTypeReader, mod_assay.assay_type_reader.class
   end
 
   test 'valid assay type uri' do
-    assay = Factory(:experimental_assay)
+    assay = FactoryBot.create(:experimental_assay)
     assert assay.valid_assay_type_uri?
     assay.assay_type_uri = 'http://fish.com/onto#fish'
     assert !assay.valid_assay_type_uri?
@@ -516,8 +538,8 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'valid technology type uri' do
-    mod_assay = Factory(:modelling_assay)
-    exp_assay = Factory(:experimental_assay)
+    mod_assay = FactoryBot.create(:modelling_assay)
+    exp_assay = FactoryBot.create(:experimental_assay)
     assert mod_assay.valid_technology_type_uri?
     mod_assay.technology_type_uri = Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s
     # for a modelling assay, even if it is set it is invalid
@@ -529,7 +551,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'destroy' do
-    a = Factory(:assay)
+    a = FactoryBot.create(:assay)
     refute_nil a.study
     refute_empty a.projects
     assert_difference('Assay.count', -1) do
@@ -542,9 +564,9 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'converts assay and tech suggested type uri' do
-    assay_type = Factory(:suggested_assay_type, label: 'fishy', ontology_uri: 'fish:2')
-    tech_type = Factory(:suggested_technology_type, label: 'carroty', ontology_uri: 'carrot:3')
-    assay = Factory(:experimental_assay)
+    assay_type = FactoryBot.create(:suggested_assay_type, label: 'fishy', ontology_uri: 'fish:2')
+    tech_type = FactoryBot.create(:suggested_technology_type, label: 'carroty', ontology_uri: 'carrot:3')
+    assay = FactoryBot.create(:experimental_assay)
     assay.assay_type_uri = assay_type.uri
     assay.technology_type_uri = tech_type.uri
     assert_equal assay_type, assay.suggested_assay_type
@@ -557,11 +579,11 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'associated samples' do
-    assay = Factory(:assay)
-    sample1 = Factory(:sample)
-    sample2 = Factory(:sample)
-    sample3 = Factory(:sample)
-    df = Factory(:data_file)
+    assay = FactoryBot.create(:assay)
+    sample1 = FactoryBot.create(:sample)
+    sample2 = FactoryBot.create(:sample)
+    sample3 = FactoryBot.create(:sample)
+    df = FactoryBot.create(:data_file)
     disable_authorization_checks do
       AssayAsset.create! assay: assay, asset: sample1, direction: AssayAsset::Direction::INCOMING
       AssayAsset.create! assay: assay, asset: sample2, direction: AssayAsset::Direction::INCOMING
@@ -582,19 +604,19 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'incoming and outgoing' do
-    assay = Factory(:assay)
-    df_in1 = Factory(:data_file,title:'in1')
-    df_in2 = Factory(:data_file,title:'in2')
-    sample_in1 = Factory(:sample,title:'sample_in1')
+    assay = FactoryBot.create(:assay)
+    df_in1 = FactoryBot.create(:data_file,title:'in1')
+    df_in2 = FactoryBot.create(:data_file,title:'in2')
+    sample_in1 = FactoryBot.create(:sample,title:'sample_in1')
 
-    df_out1 = Factory(:data_file,title:'out1')
-    df_out2 = Factory(:data_file,title: 'out2')
-    sample_out1 = Factory(:sample, title: 'sample_out1')
+    df_out1 = FactoryBot.create(:data_file,title:'out1')
+    df_out2 = FactoryBot.create(:data_file,title: 'out2')
+    sample_out1 = FactoryBot.create(:sample, title: 'sample_out1')
 
-    df_nodir1 = Factory(:data_file)
-    sample_nodir1 = Factory(:sample)
+    df_nodir1 = FactoryBot.create(:data_file)
+    sample_nodir1 = FactoryBot.create(:sample)
 
-    df = Factory(:data_file)
+    df = FactoryBot.create(:data_file)
     disable_authorization_checks do
       AssayAsset.create! assay: assay, asset: df_in1, direction: AssayAsset::Direction::INCOMING
       AssayAsset.create! assay: assay, asset: df_in2, direction: AssayAsset::Direction::INCOMING
@@ -618,11 +640,11 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'validation assets' do
-    assay = Factory(:assay)
-    df_1 = Factory(:data_file,title:'validation')
-    df_2 = Factory(:data_file,title:'not validation')
+    assay = FactoryBot.create(:assay)
+    df_1 = FactoryBot.create(:data_file,title:'validation')
+    df_2 = FactoryBot.create(:data_file,title:'not validation')
 
-    validation_type= RelationshipType.where(key:RelationshipType::VALIDATION).first || Factory(:validation_data_relationship_type)
+    validation_type= RelationshipType.where(key:RelationshipType::VALIDATION).first || FactoryBot.create(:validation_data_relationship_type)
     disable_authorization_checks do
       AssayAsset.create! assay: assay, asset: df_1, relationship_type: validation_type
       AssayAsset.create! assay: assay, asset: df_2
@@ -633,11 +655,11 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'simulation assets' do
-    assay = Factory(:assay)
-    df_1 = Factory(:data_file,title:'simulation')
-    df_2 = Factory(:data_file,title:'not simulation')
+    assay = FactoryBot.create(:assay)
+    df_1 = FactoryBot.create(:data_file,title:'simulation')
+    df_2 = FactoryBot.create(:data_file,title:'not simulation')
 
-    validation_type= RelationshipType.where(key:RelationshipType::SIMULATION).first || Factory(:simulation_data_relationship_type)
+    validation_type= RelationshipType.where(key:RelationshipType::SIMULATION).first || FactoryBot.create(:simulation_data_relationship_type)
     disable_authorization_checks do
       AssayAsset.create! assay: assay, asset: df_1, relationship_type: validation_type
       AssayAsset.create! assay: assay, asset: df_2
@@ -648,11 +670,11 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'construction assets' do
-    assay = Factory(:assay)
-    df_1 = Factory(:data_file,title:'construction')
-    df_2 = Factory(:data_file,title:'not construction')
+    assay = FactoryBot.create(:assay)
+    df_1 = FactoryBot.create(:data_file,title:'construction')
+    df_2 = FactoryBot.create(:data_file,title:'not construction')
 
-    validation_type= RelationshipType.where(key:RelationshipType::CONSTRUCTION).first || Factory(:construction_data_relationship_type)
+    validation_type= RelationshipType.where(key:RelationshipType::CONSTRUCTION).first || FactoryBot.create(:construction_data_relationship_type)
     disable_authorization_checks do
       AssayAsset.create! assay: assay, asset: df_1, relationship_type: validation_type
       AssayAsset.create! assay: assay, asset: df_2
@@ -663,16 +685,16 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'clone with associations' do
-    assay = Factory(:modelling_assay, title: '123', description: 'abc', policy: Factory(:publicly_viewable_policy))
+    assay = FactoryBot.create(:modelling_assay, title: '123', description: 'abc', policy: FactoryBot.create(:publicly_viewable_policy))
     person = assay.contributor
-    data_file = Factory(:data_file, contributor: person)
-    sample = Factory(:sample, contributor: person)
+    data_file = FactoryBot.create(:data_file, contributor: person)
+    sample = FactoryBot.create(:sample, contributor: person)
     data_file_meta = { asset: data_file, direction: AssayAsset::Direction::INCOMING }
     sample_meta = { asset: sample, direction: AssayAsset::Direction::OUTGOING }
-    publication = Factory(:publication, contributor: person)
-    model = Factory(:model, contributor: person)
-    sop = Factory(:sop, contributor: person)
-    document = Factory(:document, contributor: person)
+    publication = FactoryBot.create(:publication, contributor: person)
+    model = FactoryBot.create(:model, contributor: person)
+    sop = FactoryBot.create(:sop, contributor: person)
+    document = FactoryBot.create(:document, contributor: person)
 
     disable_authorization_checks do
       assay.assay_assets.create!(data_file_meta)
@@ -703,9 +725,9 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'has deleted contributor?' do
-    item = Factory(:assay,deleted_contributor:'Person:99')
+    item = FactoryBot.create(:assay,deleted_contributor:'Person:99')
     item.update_column(:contributor_id,nil)
-    item2 = Factory(:assay)
+    item2 = FactoryBot.create(:assay)
     item2.update_column(:contributor_id,nil)
 
     assert_nil item.contributor
@@ -718,9 +740,9 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'has jerm contributor?' do
-    item = Factory(:assay,deleted_contributor:'Person:99')
+    item = FactoryBot.create(:assay,deleted_contributor:'Person:99')
     item.update_column(:contributor_id,nil)
-    item2 = Factory(:assay)
+    item2 = FactoryBot.create(:assay)
     item2.update_column(:contributor_id,nil)
 
     assert_nil item.contributor
@@ -732,5 +754,129 @@ class AssayTest < ActiveSupport::TestCase
     assert item2.has_jerm_contributor?
   end
 
+  test 'isa json compliance' do
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    isa_json_compliant_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation)
+    assert isa_json_compliant_study.is_isa_json_compliant?
+
+    default_assay = FactoryBot.create(:assay, study: isa_json_compliant_study)
+    refute default_assay.is_isa_json_compliant?
+
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_json_compliant_study)
+    assert assay_stream.is_isa_json_compliant?
+
+    isa_json_compliant_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_json_compliant_study, linked_sample_type: isa_json_compliant_study.sample_types.second)
+    assert isa_json_compliant_assay.is_isa_json_compliant?
+  end
+
+  test 'is assay stream' do
+    isa_json_compliant_study = FactoryBot.create(:isa_json_compliant_study)
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_json_compliant_study)
+    assert assay_stream.is_assay_stream?
+
+    default_assay = FactoryBot.create(:assay)
+    refute default_assay.is_assay_stream?
+  end
+
+  test 'previous linked sample type' do
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
+    def_study = FactoryBot.create(:study)
+
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
+    assert assay_stream.is_assay_stream?
+    assert assay_stream.is_isa_json_compliant?
+    assert_equal assay_stream.previous_linked_sample_type, isa_study.sample_types.second
+
+    def_assay = FactoryBot.create(:assay, study:def_study)
+    assert_nil def_assay.previous_linked_sample_type
+
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay,
+                                         assay_stream: assay_stream ,
+                                         study: isa_study,
+                                         linked_sample_type: isa_study.sample_types.second)
+    assert_equal first_isa_assay.previous_linked_sample_type, isa_study.sample_types.second
+
+    data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                              linked_sample_type: first_isa_assay.sample_type)
+    second_isa_assay = FactoryBot.create(:assay,
+                                          study: isa_study,
+                                          assay_stream: assay_stream ,
+                                          sample_type: data_file_sample_type)
+
+    assert_equal second_isa_assay.previous_linked_sample_type, first_isa_assay.sample_type
+    assert_equal first_isa_assay.previous_linked_sample_type, isa_study.sample_types.second
+  end
+
+  test 'has_linked_child_assay?' do
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
+    def_study = FactoryBot.create(:study)
+    def_assay = FactoryBot.create(:assay, study:def_study)
+
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_study, linked_sample_type: isa_study.sample_types.second, assay_stream: assay_stream)
+    data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                              linked_sample_type: first_isa_assay.sample_type)
+    second_isa_assay = FactoryBot.create(:assay,
+                                          study: isa_study,
+                                          assay_stream: assay_stream ,
+                                          sample_type: data_file_sample_type)
+
+    assert assay_stream.has_linked_child_assay?
+    refute def_assay.has_linked_child_assay?
+    assert first_isa_assay.has_linked_child_assay?
+    refute second_isa_assay.has_linked_child_assay?
+  end
+
+  test 'next_linked_child_assay' do
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    isa_study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
+    def_study = FactoryBot.create(:study)
+    def_assay = FactoryBot.create(:assay, study:def_study)
+
+    assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_study, assay_stream: assay_stream, linked_sample_type: isa_study.sample_types.second)
+    data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                              linked_sample_type: first_isa_assay.sample_type)
+    second_isa_assay = FactoryBot.create(:assay,
+                                          study: isa_study,
+                                          assay_stream: assay_stream ,
+                                          sample_type: data_file_sample_type)
+
+    assert_equal assay_stream.first_assay_in_stream, first_isa_assay
+    assert first_isa_assay.first_assay_in_stream?
+    assert_equal assay_stream.next_linked_child_assay, first_isa_assay
+    assert_nil def_assay.next_linked_child_assay
+    assert_equal first_isa_assay.next_linked_child_assay, second_isa_assay
+    assert_nil second_isa_assay.next_linked_child_assay
+  end
+
+  test 'observation units' do
+    sample = FactoryBot.create(:sample)
+    assay = FactoryBot.create(:assay, samples: [sample], contributor: sample.contributor)
+    assert_empty assay.observation_units
+
+    obs_unit = FactoryBot.create(:observation_unit, samples:[sample], study: assay.study)
+    assay.reload
+    assert_equal [obs_unit], assay.observation_units
+  end
+
+  test 'validate study matches with observation variables' do
+    contributor = FactoryBot.create(:person)
+    assay = FactoryBot.create(:assay, contributor: contributor)
+    assert assay.valid?
+
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, study: FactoryBot.create(:study, contributor: contributor))
+    sample = FactoryBot.create(:sample, observation_unit:obs_unit, contributor: contributor)
+    assay = FactoryBot.build(:assay, samples: [sample], contributor: contributor)
+    refute_equal assay.study, obs_unit.study
+    refute assay.valid?
+    assert_equal 'Study must match the associated observation unit', assay.errors.full_messages.first
+
+    assay = FactoryBot.build(:assay, samples: [sample], study: obs_unit.study, contributor: contributor)
+    assert_equal assay.study, obs_unit.study
+    assert assay.valid?
+  end
 
 end

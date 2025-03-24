@@ -5,7 +5,7 @@
     "attributes": {
       "discussion_links": [],
       "title": "Fred Bloggs",
-      "tags": [],
+      "tags": ["tag1","tag2"],
       "created_at": "<%= res.created_at.as_json %>",
       "updated_at": "<%= res.updated_at.as_json %>",
       "other_creators": null,
@@ -14,7 +14,34 @@
         "full_name": "Fred Bloggs",
         "address": "HD",
         "postcode": "M13 9PL",
-        "CAPITAL key": "key must remain capitalised"
+        "CAPITAL key": "key must remain capitalised",
+        "apple": "Bramley",
+        "apples": ["Granny Smith", "Golden Delicious"],
+        "patients": [
+          {
+            "type": "Sample",
+            "title": "Fred Bloggs",
+            "id": <%= res.get_attribute_value(:patients)[0]['id'] %>
+          },
+          {
+            "type": "Sample",
+            "title": "Fred Bloggs",
+            "id": <%= res.get_attribute_value(:patients)[1]['id'] %>
+          }
+        ],
+        "weight": 3.7,
+        "age": 42,
+        "bool": true,
+        "data file": {
+          "type": "DataFile",
+          "title": "This Data file",
+          "id": <%= res.get_attribute_value('data file')['id'] %>
+        },
+        "sop": {
+          "type": "Sop",
+          "title": "This Sop",
+          "id": <%= res.get_attribute_value(:sop)['id'] %>
+        }
       },
       "policy": {
         "access": "no_access",
@@ -50,6 +77,10 @@
       },
       "data_files": {
         "data": [
+          {
+            "id": "<%= res.linked_data_files.first.id %>",
+            "type": "data_files"
+          }
         ]
       },
       "assays": {

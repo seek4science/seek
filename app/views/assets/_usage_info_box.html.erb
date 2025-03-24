@@ -1,6 +1,7 @@
 <%
   logging_start_date ||= nil
   show_downloads = resource.respond_to?(:contains_downloadable_items?) && resource.contains_downloadable_items?
+  show_runs = resource.respond_to?(:can_run?) && resource.can_run?
 %>
 
 <%= panel("Activity") do %>
@@ -10,6 +11,10 @@
     <% if show_downloads -%>
       <span style="width: 2em">&nbsp;</span>
       <strong>Downloads:</strong> <%= resource.download_count -%>
+    <% end -%>
+    <% if show_runs -%>
+      <span style="width: 2em">&nbsp;</span>
+      <strong>Runs:</strong> <%= resource.run_count -%>
     <% end -%>
   </p>
 
@@ -32,7 +37,7 @@
   </div>
 
   <%# for items created before we started collecting logs %>
-  <% if logging_start_date && @resource.created_at <= logging_start_date %>
+  <% if logging_start_date && @parent_resource.created_at <= logging_start_date %>
     <p id="logging_started">
       (Since <%= logging_start_date.strftime('%B %Y') %>)
     </p>

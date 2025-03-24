@@ -19,11 +19,14 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'rdf and json not acceptable' do
+    # This does not raise an exception because it is caught by the `rdf_enabled?` before_action
     get :index, format: :rdf
     assert_response :not_acceptable
 
-    get :index, format: :json
-    assert_response :not_acceptable
+    # This raises an exception due to no `format.json`
+    assert_raises(ActionController::UnknownFormat) do
+      get :index, format: :json
+    end
   end
 
   test 'test title' do
@@ -107,7 +110,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'SOP upload option should be capitalized' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :index
     assert_select 'li#create-menu ul.dropdown-menu', count: 1 do
       assert_select 'li>a', text: I18n.t('sop').to_s, count: 1
@@ -115,7 +118,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'hidden items do not appear in recent items' do
-    model = Factory :model, policy: Factory(:private_policy), title: 'A title'
+    model = FactoryBot.create :model, policy: FactoryBot.create(:private_policy), title: 'A title'
 
     login_as(:quentin)
     get :index
@@ -129,7 +132,7 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_redirected_to signup_path
 
-    Factory(:user)
+    FactoryBot.create(:user)
     get :index
     assert_response :success
   end
@@ -165,10 +168,12 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'feed reader should handle missing feed title' do
     Seek::Config.news_enabled = true
-    Seek::Config.news_feed_urls = uri_to_feed('simple_feed_with_subtitle.xml')
+    Seek::Config.news_feed_urls = 'http://simple-feed-with-subtitle.com/rss'
     Seek::Config.news_number_of_entries = '5'
 
-    get :index
+    VCR.use_cassette('feedjira/get_simple_feed_with_subtitle') do
+      get :index
+    end
 
     assert_response :success
 
@@ -184,10 +189,10 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'project default icon shown in recent contributions' do
-    project = Factory(:project)
+    project = FactoryBot.create(:project)
 
     assert_difference 'ActivityLog.count' do
-      Factory :activity_log, activity_loggable: project, controller_name: 'projects', culprit: Factory(:user)
+      FactoryBot.create :activity_log, activity_loggable: project, controller_name: 'projects', culprit: FactoryBot.create(:user)
     end
 
     get :index
@@ -201,32 +206,39 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show the content of project news and community news with the configurable number of entries' do
-    sbml = uri_to_sbml_feed
-    bbc = uri_to_bbc_feed
 
     Seek::Config.news_enabled = true
-    Seek::Config.news_feed_urls = "#{bbc}, #{sbml}"
+    Seek::Config.news_feed_urls = "#{fairdom_news_feed_url}, #{reddit_feed_url}"
     Seek::Config.news_number_of_entries = '5'
 
     login_as(:aaron)
-    get :index
+    VCR.use_cassette('feedjira/get_reddit_feed') do
+      VCR.use_cassette('feedjira/get_fairdom_feed') do
+        get :index
+      end
+    end
+
     assert_response :success
 
     assert_select 'div#news-feed ul>li', 5
 
     logout
-    get :index
+    VCR.use_cassette('feedjira/get_reddit_feed') do
+      VCR.use_cassette('feedjira/get_fairdom_feed') do
+        get :index
+      end
+    end
     assert_response :success
 
     assert_select 'div#news-feed ul>li', 5
   end
 
   test 'recently added should include data_file' do
-    person = Factory(:person_in_project)
+    person = FactoryBot.create(:person_in_project)
 
-    df = Factory :data_file, title: 'A new data file', contributor: person, policy: Factory(:public_policy)
+    df = FactoryBot.create :data_file, title: 'A new data file', contributor: person, policy: FactoryBot.create(:public_policy)
     assert_difference 'ActivityLog.count' do
-      Factory :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
+      FactoryBot.create :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
     end
 
     get :index
@@ -235,10 +247,10 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added should include presentations' do
-    person = Factory(:person_in_project)
+    person = FactoryBot.create(:person_in_project)
 
-    presentation = Factory :presentation, title: 'A new presentation', contributor: person, policy: Factory(:public_policy)
-    Factory :activity_log, activity_loggable: presentation, controller_name: 'presentations', culprit: person.user
+    presentation = FactoryBot.create :presentation, title: 'A new presentation', contributor: person, policy: FactoryBot.create(:public_policy)
+    FactoryBot.create :activity_log, activity_loggable: presentation, controller_name: 'presentations', culprit: person.user
 
     get :index
     assert_response :success
@@ -246,12 +258,14 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added and download should include snapshot' do
-    person = Factory(:person)
-    snapshot1 = Factory(:investigation, policy: Factory(:publicly_viewable_policy), title: 'inv with snap', contributor: person).create_snapshot
-    snapshot2 = Factory(:assay, policy: Factory(:publicly_viewable_policy), title: 'assay with snap', contributor: person).create_snapshot
+    person = FactoryBot.create(:person)
+    snapshot1 = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                  title: 'inv with snap', contributor: person, creators: [person]).create_snapshot
+    snapshot2 = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
+                                  title: 'assay with snap', contributor: person, creators: [person]).create_snapshot
     assert_difference 'ActivityLog.count', 2 do
-      Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
-      Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
+      FactoryBot.create(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
+      FactoryBot.create(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
     end
 
     get :index
@@ -262,7 +276,7 @@ class HomesControllerTest < ActionController::TestCase
   test 'should show headline announcement' do
     SiteAnnouncement.destroy_all
     login_as :aaron
-    ann = Factory :headline_announcement
+    ann = FactoryBot.create :headline_announcement
 
     get :index
     assert_response :success
@@ -287,7 +301,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show external search when logged in' do
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     with_config_value :solr_enabled, true do
       with_config_value :external_search_enabled, true do
         get :index
@@ -298,7 +312,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should not show external search when disabled' do
-    login_as Factory(:user)
+    login_as FactoryBot.create(:user)
     with_config_value :solr_enabled, true do
       with_config_value :external_search_enabled, false do
         get :index
@@ -318,7 +332,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show tag cloud according to config when logged in' do
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
     get :index
     assert_select 'div#sidebar_tag_cloud', count: 1
     with_config_value :tagging_enabled, false do
@@ -328,9 +342,9 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should display feed announcements when logged in' do
-    login_as(Factory(:person))
-    headline = Factory :headline_announcement, show_in_feed: false, title: 'a headline announcement'
-    feed = Factory :feed_announcement, show_in_feed: true, title: 'a feed announcement'
+    login_as(FactoryBot.create(:person))
+    headline = FactoryBot.create :headline_announcement, show_in_feed: false, title: 'a headline announcement'
+    feed = FactoryBot.create :feed_announcement, show_in_feed: true, title: 'a feed announcement'
     get :index
     assert_select 'div#announcement_gadget' do
       assert_select 'div.panel-body' do
@@ -357,18 +371,19 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'my recent contributions section works correctly' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
 
-    df = Factory :data_file, title: 'A new data file', contributor: person, policy: Factory(:public_policy)
-    sop = Factory :sop, title: 'A new sop', contributor: person, policy: Factory(:public_policy)
-    assay = Factory :assay, title: 'A new assay', contributor: person, policy: Factory(:public_policy)
+    df = FactoryBot.create :data_file, title: 'A new data file', contributor: person, policy: FactoryBot.create(:public_policy)
+    sop = FactoryBot.create :sop, title: 'A new sop', contributor: person, policy: FactoryBot.create(:public_policy)
+    assay = FactoryBot.create :assay, title: 'A new assay', contributor: person,
+                              policy: FactoryBot.create(:public_policy), creators: [person]
     snapshot = assay.create_snapshot
 
-    Factory :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
-    Factory :activity_log, activity_loggable: sop, controller_name: 'sops', culprit: person.user
-    Factory :activity_log, activity_loggable: assay, controller_name: 'assays', culprit: person.user
-    Factory :activity_log, activity_loggable: snapshot, controller_name: 'snapshots', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: df, controller_name: 'data_files', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: sop, controller_name: 'sops', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: assay, controller_name: 'assays', culprit: person.user
+    FactoryBot.create :activity_log, activity_loggable: snapshot, controller_name: 'snapshots', culprit: person.user
 
     get :index
     assert_response :success
@@ -380,7 +395,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
 
     sop.update(title: 'An old sop')
-    Factory :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
+    FactoryBot.create :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
 
     get :index
     assert_response :success
@@ -458,10 +473,10 @@ class HomesControllerTest < ActionController::TestCase
 
   test "alert for pending project creation" do
     project = Project.new(title: "my project")
-    person = Factory(:person)
-    prog_admin = Factory(:programme_administrator)
+    person = FactoryBot.create(:person)
+    prog_admin = FactoryBot.create(:programme_administrator)
     programme = prog_admin.programmes.first
-    institution = Factory(:institution)
+    institution = FactoryBot.create(:institution)
 
     MessageLog.destroy_all
 
@@ -475,7 +490,7 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     get :index
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
@@ -489,6 +504,46 @@ class HomesControllerTest < ActionController::TestCase
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
   end
 
+  test 'alert for programme creation pending' do
+    admin = FactoryBot.create(:admin)
+    person = FactoryBot.create(:person)
+
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+
+    prog = FactoryBot.create(:programme)
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+
+    prog.update_column(:is_activated, false)
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count:1 do
+      assert_select "a[href=?]", awaiting_activation_programmes_path, count: 1
+    end
+
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+
+    prog.update_column(:activation_rejection_reason, 'its rubbish')
+    prog = FactoryBot.create(:programme)
+    login_as(admin)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+    login_as(person)
+    get :index
+    assert_select "div#pending-programme-creation-warning", text: /There are pending/, count: 0
+  end
+
   test 'can disable tag cloud' do
     with_config_value :tagging_enabled, true do
       with_config_value :tag_cloud_enabled, false do
@@ -500,9 +555,9 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'can show workflow class list' do
     WorkflowClass.delete_all
-    Factory(:galaxy_workflow_class)
-    Factory(:cwl_workflow_class)
-    p = Factory(:person)
+    FactoryBot.create(:galaxy_workflow_class)
+    FactoryBot.create(:cwl_workflow_class)
+    p = FactoryBot.create(:person)
     disable_authorization_checks do
       WorkflowClass.create!(title: 'bla', contributor: p)
       WorkflowClass.create!(title: 'bla2', contributor: p)
@@ -671,24 +726,84 @@ class HomesControllerTest < ActionController::TestCase
 
   end
 
-  def uri_to_guardian_feedtest
-    uri_to_feed 'guardian_atom.xml'
+  test 'Show aliases in search options' do
+    original_load_path = I18n.load_path
+    I18n.load_path += Dir[Rails.root.join('test', 'config', 'translation_override.en.yml')]
+    I18n.backend.load_translations
+    with_config_values({ isa_json_compliance_enabled: true, solr_enabled: true }) do
+      get :index
+      assert_response :success
+      assert_select 'select#search_type' do
+        assert_select 'option', text: 'Investigation tests', count: 1
+        assert_select 'option', text: 'Study tests', count: 1
+        assert_select 'option', text: 'Assay tests', count: 1
+        assert_select 'option', text: 'Data file tests', count: 1
+        assert_select 'option', text: 'Document tests', count: 1
+        assert_select 'option', text: 'SOP_test', count: 1 # this is an exception, the alias is not in the translation file
+        assert_select 'option', text: 'Presentation tests', count: 1
+        assert_select 'option', text: 'Event tests', count: 1
+        assert_select 'option', text: 'Collection tests', count: 1
+        assert_select 'option', text: 'Sample tests', count: 1
+        assert_select 'option', text: 'Sample type tests', count: 1
+        assert_select 'option', text: 'Template tests', count: 1
+        assert_select 'option', text: 'Person tests', count: 1
+        assert_select 'option', text: 'Project tests', count: 1
+        assert_select 'option', text: 'Institution tests', count: 1
+        assert_select 'option', text: 'Programme tests', count: 1
+
+        # Making sure the default values are not shown
+        assert_select 'option', text: 'Investigations', count: 0
+        assert_select 'option', text: 'Studies', count: 0
+        assert_select 'option', text: 'Assays', count: 0
+        assert_select 'option', text: 'Data files', count: 0
+        assert_select 'option', text: 'Documents', count: 0
+        assert_select 'option', text: 'SOP', count: 0
+        assert_select 'option', text: 'Presentations', count: 0
+        assert_select 'option', text: 'Events', count: 0
+        assert_select 'option', text: 'Collections', count: 0
+        assert_select 'option', text: 'Samples', count: 0
+        assert_select 'option', text: 'Sample types', count: 0
+        assert_select 'option', text: 'Templates', count: 0
+        assert_select 'option', text: 'People', count: 0
+        assert_select 'option', text: 'Projects', count: 0
+        assert_select 'option', text: 'Institutions', count: 0
+        assert_select 'option', text: 'Programmes', count: 0
+      end
+    end
+    I18n.load_path = original_load_path
+    I18n.backend.load_translations
   end
 
-  def uri_to_sbml_feed
-    uri_to_feed 'sbml_atom.xml'
+  test 'get dataset jsonld from index' do
+    get :index, format: :jsonld
+    assert_response :success
+    assert_equal 'application/ld+json; charset=utf-8', response.headers['Content-Type']
+    res = JSON.parse(response.body)
+    assert_equal 'DataCatalog', res['@type']
+    assert_equal 'http://localhost:3000', res['@id']
   end
 
-  def uri_to_bbc_feed
-    uri_to_feed('bbc_atom.xml')
+  def fairdom_news_feed_url
+    'https://fair-dom.org/news.xml'
   end
 
-  def uri_to_bad_feed
-    uri_to_feed('bad_atom.xml')
+  def reddit_feed_url
+    'https://www.reddit.com/r/ruby.rss'
   end
 
-  def uri_to_feed(filename)
-    path = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', filename)
-    URI.join('file:///', path).to_s
+  test 'Should render the right url for Samples' do
+    login_as(:quentin)
+    get :index
+    assert_select '#browse-menu' do
+      assert_select 'li' do
+        assert_select 'a[href=?]', samples_path, text: 'Samples'
+      end
+    end
+    assert_select '#create-menu' do
+      assert_select 'li' do
+        assert_select 'a[href=?]', select_sample_types_path(act: :create), text: 'Sample'
+      end
+    end
   end
+
 end

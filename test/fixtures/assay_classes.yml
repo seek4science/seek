@@ -1,7 +1,11 @@
 experimental_assay_class:
   title: <%= I18n.t('assays.experimental_assay') %>
   key: EXP
-  
-modelling_assay_class:  
+
+modelling_assay_class:
   title: <%= I18n.t('assays.modelling_analysis') %>
   key: MODEL
+
+assay_stream_class:
+  title: <%= I18n.t('assays.assay_stream') %>
+  key: STREAM

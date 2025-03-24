@@ -1,11 +1,10 @@
 <%
    entity=controller_name.singularize
    object=instance_variable_get("@#{entity}")
-   model_class=entity.camelize.constantize
    #FIXME: this is required for some cases where the page is rendered from an error, but the @entity doesn't exist. Mainly when rendering from a caught Exception AssetsCommon.handle_data
    #the correct fix is to fix AssetsCommon.handle_data to correctly create an instance of @entity
 
-   object ||= model_class.new
+   object ||= controller_model.new
    type_name = text_for_resource(object)
 
    owned_annotations = current_user.annotations_by.collect{|a| a.value}
@@ -19,12 +18,12 @@
       <% if object.id.nil? -%>
           Here you can provide some initial tags to help describe this <%= type_name -%>. You can change these tags
           (including those provided by other people), anytime in the future.
-          Tags should be separated by a comma, and known tags will appear in the drop-down box as you type.
+          Known tags will appear in the drop-down box as you type, and new tags will appear at the top of the list which you can select to create.
       <% else -%>
           You are able to edit all tags, including both the tags you have added and tags added by other people. Any new
           tags you add will be added as your own tags. Tags you remove, even those added by other people, will be
           completely removed from this <%= type_name %>.
-          Tags should be separated by a comma, and known tags will appear in the drop-down box as you type.
+          Known tags will appear in the drop-down box as you type, and new tags will appear at the top of the list which you can select to create.
       <% end %>
     </p>
     <%= render :partial=>"tags/select_tags", :locals=>{:all_tags=>all_tags, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>

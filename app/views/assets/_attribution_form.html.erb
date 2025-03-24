@@ -25,10 +25,12 @@
         Please type titles of <%= resource_type_text.pluralize -%> into the box below - suggestions will be displayed as you type.
         Select resources that you want to attribute to.
       </p>
-
-      <%= objects_input('attribution-typeahead', [], :typeahead => {:query_url => polymorphic_path(resource_class, :action => :typeahead) + '?query=%QUERY'}) -%>
-      <%= hidden_field_tag "attributions", "" -%> <%# this hidden input will submit all permission data with the form -%>
+      <p>
+        <%= objects_input('attribution-typeahead', [], typeahead: {query_url: polymorphic_path(resource_class, action: :typeahead)}, limit:1, style:"width:100%") -%>
+        <%= hidden_field_tag "attributions", "" -%> <%# this hidden input will submit all permission data with the form -%>
+      </p>
     </div>
+
 <% end %>
 
 <script type="text/javascript">
@@ -36,7 +38,7 @@
   var attributions = <%= existing_attributions.map do |a|
   {   type: a.class.name,
       id: a.id,
-      name: a.title,
+      text: a.title,
       contributor: a.contributor.name }
   end.to_json.html_safe -%>;
   updateAttributionSettings(); // ..and update the page to make existing attributions visible

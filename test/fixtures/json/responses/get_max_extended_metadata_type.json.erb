@@ -1,0 +1,95 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "extended_metadata_types",
+    "attributes": {
+      "title": "A Max Extended Metadata Type",
+      "supported_type": "Investigation",
+      "enabled": true,
+      "extended_metadata_attributes": [
+        {
+          "id": "<%= res.extended_metadata_attributes[0].id %>",
+          "title": "age",
+          "label": "Age",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes[0].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[0].sample_attribute_type.title %>",
+            "base_type": "Integer",
+            "regexp": ".*"
+          },
+          "required":false,
+          "pos":null,
+          "sample_controlled_vocab_id":null,
+          "linked_extended_metadata_type_id":null
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes[1].id %>",
+          "title": "name",
+          "label": "Name",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes[1].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[1].sample_attribute_type.title %>",
+            "base_type": "String",
+            "regexp": ".*"
+          },
+          "required":true,
+          "pos":null,
+          "sample_controlled_vocab_id":null,
+          "linked_extended_metadata_type_id":null
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes[2].id %>",
+          "title": "date",
+          "label": "Date",
+          "description": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes[2].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[2].sample_attribute_type.title %>",
+            "base_type": "DateTime",
+            "regexp": ".*"
+          },
+          "required":false,
+          "pos":null,
+          "sample_controlled_vocab_id":null,
+          "linked_extended_metadata_type_id":null
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes[3].id %>",
+          "title": "data file",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes[3].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[3].sample_attribute_type.title %>",
+            "base_type": "SeekDataFile",
+            "regexp": ".*"
+          }
+        },
+        {
+          "id": "<%= res.extended_metadata_attributes[4].id %>",
+          "title": "sop",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.extended_metadata_attributes[4].sample_attribute_type_id %>",
+            "title": "<%= res.extended_metadata_attributes[4].sample_attribute_type.title %>",
+            "base_type": "SeekSop",
+            "regexp": ".*"
+          }
+        }
+      ]
+    },
+    "links": {
+      "self": "/extended_metadata_types/<%= res.id %>"
+    },
+    "meta": {
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

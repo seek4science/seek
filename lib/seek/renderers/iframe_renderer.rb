@@ -4,7 +4,7 @@ module Seek
     class IframeRenderer < BlobRenderer
       def render_content
         "<div class=\"blob-display-container\">\n" +
-          "<iframe src=\"#{blob.content_path(display: display_format)}\"></iframe>" +
+          "<iframe src=\"#{iframe_src}\"></iframe>" +
         "</div>"
       end
 

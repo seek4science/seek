@@ -3,17 +3,25 @@ module Seek
     module SharingCommon
 
       def self.included(base)
-        base.before_action :sharing_auth, only: [:batch_sharing_permission_preview, :batch_change_permssion_for_selected_items, :batch_sharing_permission_changed]
+        base.before_action :sharing_auth, only: [:batch_sharing_permission_preview, :batch_change_permission_for_selected_items, :batch_sharing_permission_changed]
       end
 
-      def batch_change_permssion_for_selected_items
-        @items_for_sharing = resolve_sharing_params(params)
+      def batch_change_permission_for_selected_items
+        @items_for_sharing = resolve_sharing_params(params[:publish])
         if @items_for_sharing.empty?
           flash[:error] = "Please choose at least one item!"
-          redirect_to batch_sharing_permission_preview_person_url(current_user.person)
+          if params[:single_page]
+            render 'single_pages/sample_batch_sharing_permissions_changed', { layout: false }
+          else
+            redirect_to batch_sharing_permission_preview_person_url(current_user.person)
+          end
         else
           respond_to do |format|
-            format.html { render template: 'assets/sharing/sharing_bulk_change_preview' }
+            if params[:single_page]
+              format.html { render 'single_pages/sample_sharing_bulk_change_preview', { layout: false } }
+            else
+              format.html { render 'assets/sharing/sharing_bulk_change_preview' }
+            end
           end
         end
       end
@@ -22,50 +30,69 @@ module Seek
         @batch_sharing_permission_changed = false
         flash[:notice] = nil
         respond_to do |format|
-          format.html { render template: 'assets/sharing/batch_sharing_permission_preview' }
+          format.html { render 'assets/sharing/batch_sharing_permission_preview' }
         end
       end
 
       def batch_sharing_permission_changed
-
-        @items_for_sharing = resolve_sharing_params(params)
-          @batch_sharing_permission_changed = true
-        notice_count = 0
-        error_count = 0
-          flash[:notice] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were successfully updated:<ul> "
-          flash[:error] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were not successfully updated:<ul> "
-          @items_for_sharing.each do |item|
-            item.policy.update_with_bulk_sharing_policy(policy_params) if policy_params.present?
-            begin
-              item.save!
-              notice_count +=1
-              flash[:notice] += "<li>#{item.title}</li>"
-            rescue Exception => e
-              error_count += 1
-              flash[:error] += "<li>#{item.title}<br>"
-              flash[:error] += "The reason:  #{e.message}</li>"
+        @items_for_sharing = resolve_sharing_params(params[:publish])
+        @batch_sharing_permission_changed = true
+        @success = []
+        @gatekeeper_required = []
+        @error = []
+        @items_for_sharing.each do |item|
+          item.policy.update_with_bulk_sharing_policy(policy_params) if policy_params.present?
+          if item.save
+            request_publish_approval_batch_sharing(item)  # Has to go before log_publishing_batch_sharing(item)
+            log_publishing_batch_sharing(item)
+            if item.is_waiting_approval? && is_gatekeeper_approval_required?(item)
+              @gatekeeper_required << item
+            else
+              @success << item
             end
+          else
+            @error << item
           end
-              flash.now[:notice] = notice_count==0 ? nil: (flash[:notice]+"</ul>").html_safe
-              flash.now[:error] = error_count==0 ? nil: (flash[:error]+"</ul>").html_safe
+        end
+        if params[:single_page]
+          render 'single_pages/sample_batch_sharing_permissions_changed', { layout: false }
+        else
           respond_to do |format|
-            format.html { render template: 'assets/sharing/batch_sharing_permission_preview' }
+            format.html { render 'assets/sharing/batch_sharing_permission_preview' }
           end
+        end
+      end
+
+      def log_publishing_batch_sharing(object)
+        User.with_current_user current_user do
+          return if object_invalid_or_unsaved?(object)
+
+          log_state = determine_state_for_log(object)
+          ResourcePublishLog.add_log(log_state, object) if log_state
+        end
+      end
+
+      # request_publish_approval_batch_sharing has to be called *before* log_publishing_batch_sharing to work!
+      def request_publish_approval_batch_sharing(object)
+        User.with_current_user current_user do
+          return if object_invalid_or_unsaved?(object)
+
+          if is_gatekeeper_approval_required?(object) && !object.is_waiting_approval?(current_user)
+            notify_gatekeepers_of_approval_request [object]
+          end
+        end
       end
 
       private
 
       # returns an enumeration of assets for bulk sharing change based upon the parameters passed
       def resolve_sharing_params(params)
-        param_not_isa = params[:share_not_isa] || {}
-        param_isa = params[:share_isa] || {}
-
-        if param_not_isa.blank? && param_isa.blank?
+        if params.blank?
           [@asset].compact
         else
           assets = []
           Seek::Util.authorized_types.each do |klass|
-            ids = (param_not_isa[klass.name]&.keys || []) | (param_isa[klass.name]&.keys || [])
+            ids = params[klass.name]&.keys || []
             assets += klass.where(id: ids).to_a if ids.any?
           end
           assets.compact.uniq

@@ -9,11 +9,11 @@ class StudiesControllerTest < ActionController::TestCase
   include GeneralAuthorizationTestCases
 
   def setup
-    login_as Factory(:admin).user
+    login_as FactoryBot.create(:admin).user
   end
-  
+
   test 'should get index' do
-    Factory :study, policy: Factory(:public_policy)
+    FactoryBot.create :study, policy: FactoryBot.create(:public_policy)
     get :index
     assert_response :success
     assert_not_nil assigns(:studies)
@@ -22,19 +22,19 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'should show aggregated publications linked to assay' do
     person = User.current_user.person
-    assay1 = Factory :assay, policy: Factory(:public_policy), contributor:person
-    assay2 = Factory :assay, policy: Factory(:public_policy), contributor:person
+    assay1 = FactoryBot.create :assay, policy: FactoryBot.create(:public_policy), contributor:person
+    assay2 = FactoryBot.create :assay, policy: FactoryBot.create(:public_policy), contributor:person
 
-    pub1 = Factory :publication, title: 'pub 1', publication_type: Factory(:journal)
-    pub2 = Factory :publication, title: 'pub 2', publication_type: Factory(:journal)
-    pub3 = Factory :publication, title: 'pub 3', publication_type: Factory(:journal)
-    Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
-    Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+    pub1 = FactoryBot.create :publication, title: 'pub 1', publication_type: FactoryBot.create(:journal)
+    pub2 = FactoryBot.create :publication, title: 'pub 2', publication_type: FactoryBot.create(:journal)
+    pub3 = FactoryBot.create :publication, title: 'pub 3', publication_type: FactoryBot.create(:journal)
+    FactoryBot.create :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
+    FactoryBot.create :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
-    Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
-    Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
+    FactoryBot.create :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+    FactoryBot.create :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
 
-    study = Factory(:study, assays: [assay1, assay2], policy: Factory(:public_policy), contributor:person)
+    study = FactoryBot.create(:study, assays: [assay1, assay2], policy: FactoryBot.create(:public_policy), contributor:person)
 
     get :show, params: { id: study.id }
     assert_response :success
@@ -60,7 +60,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should get show' do
-    study = Factory(:study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: study.id }
     assert_response :success
     assert_not_nil assigns(:study)
@@ -101,8 +101,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should not allow linking to an investigation from a project you are not a member of' do
-    inv = Factory(:investigation)
-    user = Factory(:user)
+    inv = FactoryBot.create(:investigation)
+    user = FactoryBot.create(:user)
     login_as(user)
 
     refute inv.projects.map(&:people).flatten.include?(user.person), 'this person should not be a member of the investigations project'
@@ -122,8 +122,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test "shouldn't show edit for unauthorized users" do
-    s = Factory :study, policy: Factory(:private_policy)
-    login_as(Factory(:user))
+    s = FactoryBot.create :study, policy: FactoryBot.create(:private_policy)
+    login_as(FactoryBot.create(:user))
     get :edit, params: { id: s }
     assert_redirected_to study_path(s)
     assert flash[:error]
@@ -139,7 +139,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should create' do
-    investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+    investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
     assert_difference('Study.count') do
       post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
@@ -148,8 +148,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should update sharing permissions' do
-    login_as(Factory(:user))
-    s = Factory :study, contributor: User.current_user.person, policy: Factory(:public_policy)
+    login_as(FactoryBot.create(:user))
+    s = FactoryBot.create :study, contributor: User.current_user.person, policy: FactoryBot.create(:public_policy)
     assert s.can_manage?(User.current_user), 'This user should be able to manage this study'
 
     assert_equal Policy::EVERYONE, s.policy.access_type
@@ -162,8 +162,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should not update sharing permissions to remove your own manage rights' do
-    login_as(Factory(:user))
-    s = Factory :study, contributor: Factory(:person), policy: Factory(:public_policy)
+    login_as(FactoryBot.create(:user))
+    s = FactoryBot.create :study, contributor: FactoryBot.create(:person), policy: FactoryBot.create(:public_policy)
     assert s.can_manage?(User.current_user), 'This user should be able to manage this study'
 
     assert_equal Policy::EVERYONE, s.policy.access_type
@@ -203,8 +203,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test "no edit button shown for people who can't edit the study" do
-    login_as Factory(:user)
-    study = Factory :study, policy: Factory(:private_policy)
+    login_as FactoryBot.create(:user)
+    study = FactoryBot.create :study, policy: FactoryBot.create(:private_policy)
     get :show, params: { id: study }
     assert_select 'a', text: /Edit #{I18n.t('study')}/i, count: 0
   end
@@ -215,9 +215,9 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test "unauthorized user can't update" do
-    s = Factory :study, policy: Factory(:private_policy)
-    login_as(Factory(:user))
-    Factory(:permission, contributor: User.current_user.person, policy: s.policy, access_type: Policy::VISIBLE)
+    s = FactoryBot.create :study, policy: FactoryBot.create(:private_policy)
+    login_as(FactoryBot.create(:user))
+    FactoryBot.create(:permission, contributor: User.current_user.person, policy: s.policy, access_type: Policy::VISIBLE)
 
     put :update, params: { id: s.id, study: { title: 'test' } }
 
@@ -226,7 +226,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'authorized user can delete if no assays' do
-    study = Factory(:study, contributor: Factory(:person))
+    study = FactoryBot.create(:study, contributor: FactoryBot.create(:person))
     login_as study.contributor.user
     assert_difference('Study.count', -1) do
       delete :destroy, params: { id: study.id }
@@ -321,8 +321,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'filter by person using nested routes' do
     assert_routing 'people/2/studies', controller: 'studies', action: 'index', person_id: '2'
-    study = Factory(:study, policy: Factory(:public_policy))
-    study2 = Factory(:study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
+    study2 = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     person = study.contributor
     refute_equal study.contributor, study2.contributor
     assert person.is_a?(Person)
@@ -336,16 +336,16 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first
-    study = Factory(:study, contributor: User.current_user.person,
-                            investigation: Factory(:investigation, contributor: User.current_user.person),
-                            policy: Factory(:policy,
+    study = FactoryBot.create(:study, contributor: User.current_user.person,
+                            investigation: FactoryBot.create(:investigation, contributor: User.current_user.person),
+                            policy: FactoryBot.create(:policy,
                                             access_type: Policy::NO_ACCESS,
-                                            permissions: [Factory(:permission, contributor: proj, access_type: Policy::EDITING)]))
+                                            permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::EDITING)]))
     get :edit, params: { id: study.id }
   end
 
   test 'should show the contributor avatar' do
-    study = Factory(:study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: study }
     assert_response :success
     assert_select 'li.author-list-item' do
@@ -357,8 +357,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'object based on existing study' do
     person = User.current_user.person
-    inv = Factory :investigation, policy: Factory(:public_policy), contributor:person
-    study = Factory :study, title: 'the study', policy: Factory(:public_policy),
+    inv = FactoryBot.create :investigation, policy: FactoryBot.create(:public_policy), contributor:person
+    study = FactoryBot.create :study, title: 'the study', policy: FactoryBot.create(:public_policy),
                             investigation: inv, contributor:person
     get :new_object_based_on_existing_one, params: { id: study.id }
     assert_response :success
@@ -367,7 +367,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'object based on existing one when unauthorized to view' do
-    study = Factory :study, title: 'the private study', policy: Factory(:private_policy)
+    study = FactoryBot.create :study, title: 'the private study', policy: FactoryBot.create(:private_policy)
     refute study.can_view?
     get :new_object_based_on_existing_one, params: { id: study.id }
     assert_response :forbidden
@@ -380,7 +380,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'new object based on existing one when can view but not logged in' do
-    study = Factory(:study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     logout
     assert study.can_view?
     get :new_object_based_on_existing_one, params: { id: study.id }
@@ -389,10 +389,10 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'object based on existing one when unauthorized to edit investigation' do
-    person = Factory(:person)
-    inv = Factory(:investigation, policy: Factory(:private_policy), contributor: person)
+    person = FactoryBot.create(:person)
+    inv = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: person)
 
-    study = Factory :study, title: 'the private study', policy: Factory(:public_policy), investigation: inv, contributor:person
+    study = FactoryBot.create :study, title: 'the private study', policy: FactoryBot.create(:public_policy), investigation: inv, contributor:person
     assert study.can_view?
     refute study.investigation.can_edit?
     get :new_object_based_on_existing_one, params: { id: study.id }
@@ -404,9 +404,9 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'studies filtered by assay through nested routing' do
     assert_routing 'assays/22/studies', controller: 'studies', action: 'index', assay_id: '22'
-    contributor = Factory(:person)
-    assay1 = Factory :assay, contributor: contributor, study: Factory(:study, contributor: contributor)
-    assay2 = Factory :assay, contributor: contributor, study: Factory(:study, contributor: contributor)
+    contributor = FactoryBot.create(:person)
+    assay1 = FactoryBot.create :assay, contributor: contributor, study: FactoryBot.create(:study, contributor: contributor)
+    assay2 = FactoryBot.create :assay, contributor: contributor, study: FactoryBot.create(:study, contributor: contributor)
     login_as contributor
     assert assay1.study.can_view?
     assert assay2.study.can_view?
@@ -419,8 +419,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should add creators' do
-    study = Factory(:study, policy: Factory(:public_policy))
-    creator = Factory(:person)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
+    creator = FactoryBot.create(:person)
     assert study.creators.empty?
 
     put :update, params: { id: study.id, study: { title: study.title, creator_ids: [creator.id] } }
@@ -430,8 +430,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should show creators' do
-    study = Factory(:study, policy: Factory(:public_policy))
-    creator = Factory(:person)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
+    creator = FactoryBot.create(:person)
     study.creators = [creator]
     study.save
     study.reload
@@ -443,7 +443,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should show other creators' do
-    study = Factory(:study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     other_creators = 'frodo baggins'
     study.other_creators = other_creators
     study.save
@@ -455,8 +455,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should not multiply creators after calling show' do
-    study = Factory(:study, policy: Factory(:public_policy))
-    creator = Factory(:person)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
+    creator = FactoryBot.create(:person)
     study.creators = [creator]
     study.save
     study.reload
@@ -472,12 +472,12 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'programme studies through nested routing' do
     assert_routing 'programmes/2/studies', { controller: 'studies', action: 'index', programme_id: '2' }
-    programme = Factory(:programme)
-    person = Factory(:person,project:programme.projects.first)
-    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy),contributor:person)
-    investigation2 = Factory(:investigation, policy: Factory(:public_policy))
-    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy), contributor:investigation.contributor)
-    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy), contributor:investigation2.contributor)
+    programme = FactoryBot.create(:programme)
+    person = FactoryBot.create(:person,project:programme.projects.first)
+    investigation = FactoryBot.create(:investigation, projects: programme.projects, policy: FactoryBot.create(:public_policy),contributor:person)
+    investigation2 = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:public_policy), contributor:investigation.contributor)
+    study2 = FactoryBot.create(:study, investigation: investigation2, policy: FactoryBot.create(:public_policy), contributor:investigation2.contributor)
 
     get :index, params: { programme_id: programme.id }
 
@@ -489,10 +489,10 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'can delete a study with subscriptions' do
-    study = Factory(:study, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    p = Factory(:person)
-    Factory(:subscription, person: study.contributor, subscribable: study)
-    Factory(:subscription, person: p, subscribable: study)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy, access_type: Policy::VISIBLE))
+    p = FactoryBot.create(:person)
+    FactoryBot.create(:subscription, person: study.contributor, subscribable: study)
+    FactoryBot.create(:subscription, person: p, subscribable: study)
 
     login_as(study.contributor)
 
@@ -506,10 +506,10 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'cannot create with link to investigation in another project' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person)
     login_as(person)
-    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects,policy:Factory(:publicly_viewable_policy))
+    investigation = FactoryBot.create(:investigation,contributor:another_person,projects:another_person.projects,policy:FactoryBot.create(:publicly_viewable_policy))
     assert investigation.can_view?
     assert_empty person.projects & investigation.projects
     assert_no_difference('Study.count') do
@@ -519,12 +519,12 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'cannot create with hidden investigation in same project' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person)
     another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
     another_person.save!
     login_as(person)
-    investigation = Factory(:investigation,contributor:another_person,projects:person.projects,policy:Factory(:private_policy))
+    investigation = FactoryBot.create(:investigation,contributor:another_person,projects:person.projects,policy:FactoryBot.create(:private_policy))
     refute investigation.can_view?
     refute_empty person.projects & investigation.projects
 
@@ -535,11 +535,11 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'cannot update with link to investigation in another project' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person)
     login_as(person)
-    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects,policy:Factory(:publicly_viewable_policy))
-    study = Factory(:study,contributor:person,investigation:Factory(:investigation,contributor:person,projects:person.projects))
+    investigation = FactoryBot.create(:investigation,contributor:another_person,projects:another_person.projects,policy:FactoryBot.create(:publicly_viewable_policy))
+    study = FactoryBot.create(:study,contributor:person,investigation:FactoryBot.create(:investigation,contributor:person,projects:person.projects))
 
     assert investigation.can_view?
     assert_empty person.projects & investigation.projects
@@ -555,13 +555,13 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'cannot update with link to hidden investigation in same project' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person)
     another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
     another_person.save!
     login_as(person)
-    investigation = Factory(:investigation,contributor:another_person,projects:person.projects,policy:Factory(:private_policy))
-    study = Factory(:study,contributor:person,investigation:Factory(:investigation,contributor:person,projects:person.projects))
+    investigation = FactoryBot.create(:investigation,contributor:another_person,projects:person.projects,policy:FactoryBot.create(:private_policy))
+    study = FactoryBot.create(:study,contributor:person,investigation:FactoryBot.create(:investigation,contributor:person,projects:person.projects))
 
     refute investigation.can_view?
     refute_empty person.projects & investigation.projects
@@ -575,13 +575,13 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'can create with link to investigation in multiple projects' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    person = FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person)
     login_as(person)
     projects = [person.projects.first, another_person.projects.first]
     assert_includes projects[0].people, person
     refute_includes projects[1].people, person
-    investigation = Factory(:investigation, contributor: another_person, projects:projects, policy: Factory(:publicly_viewable_policy))
+    investigation = FactoryBot.create(:investigation, contributor: another_person, projects:projects, policy: FactoryBot.create(:publicly_viewable_policy))
     assert_difference('Study.count', 1) do
       post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
@@ -592,8 +592,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'can access manage page with manage rights' do
-    person = Factory(:person)
-    study = Factory(:study, contributor:person)
+    person = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, contributor:person)
     login_as(person)
     assert study.can_manage?
     get :manage, params: {id: study}
@@ -612,8 +612,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'cannot access manage page with edit rights' do
-    person = Factory(:person)
-    study = Factory(:study, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    person = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission, contributor:person, access_type:Policy::EDITING)]))
     login_as(person)
     assert study.can_edit?
     refute study.can_manage?
@@ -623,13 +623,13 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'manage_update' do
-    proj1=Factory(:project)
-    person = Factory(:person,project:proj1)
-    other_person = Factory(:person)
+    proj1=FactoryBot.create(:project)
+    person = FactoryBot.create(:person,project:proj1)
+    other_person = FactoryBot.create(:person)
 
-    other_creator = Factory(:person,project:proj1)
+    other_creator = FactoryBot.create(:person,project:proj1)
 
-    study = Factory(:study, contributor:person, policy:Factory(:private_policy))
+    study = FactoryBot.create(:study, contributor:person, policy:FactoryBot.create(:private_policy))
 
     login_as(person)
     assert study.can_manage?
@@ -653,17 +653,17 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'manage_update fails without manage rights' do
-    proj1=Factory(:project)
+    proj1=FactoryBot.create(:project)
 
-    person = Factory(:person, project:proj1)
-
-
-    other_person = Factory(:person)
-
-    other_creator = Factory(:person,project:proj1)
+    person = FactoryBot.create(:person, project:proj1)
 
 
-    study = Factory(:study, policy:Factory(:private_policy, permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+    other_person = FactoryBot.create(:person)
+
+    other_creator = FactoryBot.create(:person,project:proj1)
+
+
+    study = FactoryBot.create(:study, policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor:person, access_type:Policy::EDITING)]))
 
     login_as(person)
     refute study.can_manage?
@@ -688,36 +688,36 @@ class StudiesControllerTest < ActionController::TestCase
 
   end
 
-  test 'create and update a study with custom metadata' do
-    cmt = Factory(:simple_study_custom_metadata_type)
+  test 'create and update a study with extended metadata' do
+    cmt = FactoryBot.create(:simple_study_extended_metadata_type)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     #test create
     assert_difference('Study.count') do
-      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
                                                    data:{
                                                    "name":'fred',
                                                    "age":22}}}
 
-      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
 
     assert study=assigns(:study)
-    assert cm = study.custom_metadata
-    assert_equal cmt, cm.custom_metadata_type
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
-    assert_equal '22',cm.get_attribute_value('age')
+    assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('date')
 
     # test update
     old_id = cm.id
     assert_no_difference('Study.count') do
-      assert_no_difference('CustomMetadata.count') do
+      assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: study.id, study: { title: "new title",
-          custom_metadata_attributes: { custom_metadata_type_id: cmt.id, id: cm.id,
+          extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
                                         data: {
                                           "name": 'max',
                                           "age": 20 } }
@@ -728,24 +728,72 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert new_study = assigns(:study)
     assert_equal 'new title', new_study.title
-    assert_equal 'max', new_study.custom_metadata.get_attribute_value('name')
-    assert_equal '20', new_study.custom_metadata.get_attribute_value('age')
-    assert_equal old_id, new_study.custom_metadata.id
-
+    assert_equal 'max', new_study.extended_metadata.get_attribute_value('name')
+    assert_equal 20, new_study.extended_metadata.get_attribute_value('age')
+    assert_equal old_id, new_study.extended_metadata.id
   end
 
-  test 'create a study with custom metadata validated' do
-    cmt = Factory(:simple_study_custom_metadata_type)
+  test 'create a study with disabled extended metadata should fail' do
+    cmt = FactoryBot.create(:simple_study_extended_metadata_type, enabled: false)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
+
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'test', investigation_id: investigation.id }
+        cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
+                                                        data:{
+                                                          "name":'fred',
+                                                          "age":22}}}
+
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+    assert study=assigns(:study)
+    refute study.valid?
+  end
+
+  test 'update a study with disabled extended metadata should succeed' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.create(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'John', age: 12 }), contributor: person)
+    study.save!
+    study.extended_metadata.extended_metadata_type.update_column(:enabled, false)
+    refute study.extended_metadata.enabled?
+
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "new title",
+                                                      extended_metadata_attributes: { extended_metadata_type_id: emt.id,
+                                                                                      id: study.extended_metadata.id,
+                                                                                      data: {
+                                                                                        "name": 'max',
+                                                                                        "age": 20 } }
+        }
+        }
+      end
+    end
+    assert study = assigns(:study)
+    assert study.valid?
+    assert_equal 'new title', study.title
+    assert_equal 'max', study.extended_metadata.get_attribute_value('name')
+    assert_equal 20, study.extended_metadata.get_attribute_value('age')
+  end
+
+  test 'create a study with extended metadata validated' do
+    cmt = FactoryBot.create(:simple_study_extended_metadata_type)
+
+    login_as(FactoryBot.create(:person))
 
     # invalid age - needs to be a number
     assert_no_difference('Study.count') do
-      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':'fred','age':'not a number'}}}
 
-      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
 
     assert study=assigns(:study)
@@ -753,9 +801,9 @@ class StudiesControllerTest < ActionController::TestCase
 
     # name is required
     assert_no_difference('Study.count') do
-      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id, data:{'name':nil,'age':22}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -764,15 +812,34 @@ class StudiesControllerTest < ActionController::TestCase
     refute study.valid?
   end
 
-  test 'create a study with custom metadata with spaces in attribute names' do
-    cmt = Factory(:study_custom_metadata_type_with_spaces)
+  test 'should not show extended metadata if disabled' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    emt = FactoryBot.create(:simple_study_extended_metadata_type)
+    study = FactoryBot.create(:study, extended_metadata: ExtendedMetadata.new(extended_metadata_type: emt, data: { name: 'Fred', age: 25 }), contributor: person)
 
-    login_as(Factory(:person))
+    #first check it's shown
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 1
+
+    emt.update_column(:enabled, false)
+    get :show, params: {id: study}
+    assert_response :success
+    assert_select 'div#extended-metadata.panel', count: 0
+
+
+  end
+
+  test 'create a study with extended metadata with spaces in attribute names' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_spaces)
+
+    login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
-      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{
                                                    "full name":'Paul Jones',
                                                    "full address":'London, UK'}}}
@@ -783,22 +850,22 @@ class StudiesControllerTest < ActionController::TestCase
     assert study=assigns(:study)
 
     assert study.valid?
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'Paul Jones',cm.get_attribute_value('full name')
     assert_equal 'London, UK',cm.get_attribute_value('full address')
   end
 
-  test 'create a study with custom metadata with clashing attribute names' do
-    cmt = Factory(:study_custom_metadata_type_with_clashes)
+  test 'create a study with extended metadata with clashing attribute names' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_clashes)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
-      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{
                                                    "full name":'full name',
                                                    "Full name":'Full name',
@@ -810,23 +877,23 @@ class StudiesControllerTest < ActionController::TestCase
     assert study=assigns(:study)
 
     assert study.valid?
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal 'full name',cm.get_attribute_value('full name')
     assert_equal 'Full name',cm.get_attribute_value('Full name')
     assert_equal 'full  name',cm.get_attribute_value('full  name')
   end
 
-  test 'create a study with custom metadata with attribute names with symbols' do
-    cmt = Factory(:study_custom_metadata_type_with_symbols)
+  test 'create a study with extended metadata with attribute names with symbols' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_symbols)
 
-    login_as(Factory(:person))
+    login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
-      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                         data:{
                                             "+name":'+name',
                                             "-name":'-name',
@@ -840,50 +907,884 @@ class StudiesControllerTest < ActionController::TestCase
     assert study=assigns(:study)
 
     assert study.valid?
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal '+name',cm.get_attribute_value('+name')
     assert_equal '-name',cm.get_attribute_value('-name')
     assert_equal '&name',cm.get_attribute_value('&name')
     assert_equal 'name(name)',cm.get_attribute_value('name(name)')
   end
 
-  test 'create a study with custom metadata cv type' do
-    cmt = Factory(:study_custom_metadata_type_with_cv_and_cv_list_type)
-    login_as(Factory(:person))
+  test 'create a study with extended metadata cv type' do
+    cmt = FactoryBot.create(:study_extended_metadata_type_with_cv_and_cv_list_type)
+    login_as(FactoryBot.create(:person))
 
     assert_difference('Study.count') do
-      investigation = Factory(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {custom_metadata_attributes:{custom_metadata_type_id: cmt.id,
+      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
                                                    data:{
                                                      "apple name":"Newton's Apple",
                                                      "apple list":['Granny Smith','Bramley'],
-                                                     "apple controlled vocab": 'Granny Smith'}}}
+                                                     "apple controlled vocab": ['Granny Smith']}}}
 
-      put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
 
     assert study=assigns(:study)
 
-    assert cm = study.custom_metadata
+    assert cm = study.extended_metadata
 
-    assert_equal cmt, cm.custom_metadata_type
+    assert_equal cmt, cm.extended_metadata_type
     assert_equal "Newton's Apple",cm.get_attribute_value('apple name')
     assert_equal 'Granny Smith',cm.get_attribute_value('apple controlled vocab')
     assert_equal ['Granny Smith','Bramley'],cm.get_attribute_value('apple list')
 
-    get :show, params:{id:study}
+    get :show, params: { id: study }
     assert_response :success
 
-    assert_select 'p',text:/Granny Smith/, count:2
+    assert_select 'div.extended_metadata',text:/Granny Smith/, count:2
   end
 
+  test 'should create and update study with linked extended metadata type' do
+
+    cmt = FactoryBot.create(:role_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+
+    # test create
+    assert_difference('Study.count') do
+      assert_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
+            "role_email":"alice@email.com",
+            "role_phone":"0012345",
+            "role_name": {
+                "first_name":"alice",
+                "last_name": "liddell"
+              }
+          }
+        }
+        }
+
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    assert study = assigns(:study)
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal "alice@email.com", cm.data['role_email']
+    assert_equal '0012345',cm.data['role_phone']
+    assert_equal 'alice', cm.data['role_name']['first_name']
+    assert_equal 'liddell', cm.data['role_name']['last_name']
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
+                                                      extended_metadata_attributes: {
+                                                        extended_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                          "role_email":"rabbit@email.com",
+                                                          "role_name": {
+                                                            "first_name":"rabbit"
+                                                          }
+                                                        }
+                                                      }
+        }
+        }
+      end
+    end
+
+    assert new_study = assigns(:study)
+    assert_equal 'Alice Through the Looking Glass', new_study.title
+    assert_equal 'rabbit@email.com', new_study.extended_metadata.data['role_email']
+    assert_equal 'rabbit', new_study.extended_metadata.data['role_name']['first_name']
+  end
+
+  test 'should create and update study, whose extended metadata type contains attributes which link to the same extended metadata type' do
+    cmt = FactoryBot.create(:family_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+    linked_cmts = cmt.attributes_with_linked_extended_metadata_type
+    assert_difference('Study.count') do
+      assert_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'Family', investigation_id: investigation.id }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
+            "dad":{"first_name":"john", "last_name":"liddell"},
+            "mom":{"first_name":"lily", "last_name":"liddell"},
+            "child":{"0":{"first_name":"alice", "last_name":"liddell"}}
+            }
+          }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    assert study = assigns(:study)
+    cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    data = cm.data
+    assert_equal %w[dad mom child], linked_cmts.map(&:title)
+    assert_equal "john",data["dad"]["first_name"]
+    assert_equal "liddell",data["dad"]['last_name']
+    assert_equal "lily",data["mom"]["first_name"]
+    assert_equal "alice",data["child"].first["first_name"]
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
+                                                      extended_metadata_attributes: {
+                                                        extended_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                          "dad":{"first_name":"tom", "last_name":"liddell"},
+                                                          "child":{"0":{"first_name":"rabbit", "last_name":"wonderland"},"1":{"first_name":"mad", "last_name":"hatter"}}
+                                                        }
+                                                      }
+        }
+        }
+      end
+    end
+    assert new_study = assigns(:study)
+    data = new_study.extended_metadata.data
+
+    assert_equal "tom",data["dad"]["first_name"]
+    assert_equal "liddell",data["dad"]['last_name']
+    assert_equal "lily",data["mom"]["first_name"]
+    assert_equal "liddell",data["mom"]['last_name']
+    assert_equal "rabbit",data["child"].first["first_name"]
+    assert_equal "wonderland",data["child"].first['last_name']
+    assert_equal "mad",data["child"].last["first_name"]
+    assert_equal "hatter",data["child"].last['last_name']
+
+  end
+
+  test 'should create and update study with multiple linked extended metadata types without entering non-required values' do
+    cmt = FactoryBot.create(:family_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+    assert_difference('Study.count') do
+      assert_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation, projects: User.current_user.person.projects, contributor: User.current_user.person)
+        study_attributes = { title: 'Family', investigation_id: investigation.id }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
+            "dad": { "first_name": "john", "last_name": "liddell" },
+            "mom": { "first_name": "lily", "last_name": "liddell" },
+            # the not reqiured attributes can be removed
+            "child": { "row-template": { "first_name": "alice", "last_name": "liddell" } }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    assert study = assigns(:study)
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal "john",cm.data["dad"]["first_name"]
+    assert_equal "liddell",cm.data["dad"]['last_name']
+    assert_equal "lily",cm.data["mom"]["first_name"]
+    assert_equal "liddell",cm.data["mom"]["last_name"]
+    assert_empty cm.data["child"]
+  end
+
+  test 'should create and update study with multiple linked extended metadata types' do
+    cmt = FactoryBot.create(:role_multiple_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+
+    # test create
+    assert_difference('Study.count') do
+      assert_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id, data: {
+            "role_email":"alice@email.com",
+            "role_phone":"0012345",
+            "role_name": {"first_name":"alice", "last_name": "liddell"},
+            "role_address": {"street":"wonder","city": "land" }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    assert study = assigns(:study)
+    assert cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal "alice@email.com",cm.data['role_email']
+    assert_equal '0012345',cm.data['role_phone']
+    assert_equal 'alice', cm.data['role_name']['first_name']
+    assert_equal 'liddell', cm.data['role_name']['last_name']
+    assert_equal 'wonder', cm.data['role_address']['street']
+    assert_equal 'land', cm.data['role_address']['city']
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
+                                                      extended_metadata_attributes: {
+                                                        extended_metadata_type_id: cmt.id, id:cm.id, data: {
+                                                          "role_email":"rabbit@email.com",
+                                                          "role_name":{
+                                                              "first_name":"rabbit"
+                                                          }
+                                                        }
+                                                      }
+        }
+        }
+      end
+    end
+
+
+    assert new_study = assigns(:study)
+    assert_equal 'Alice Through the Looking Glass', new_study.title
+    cm = new_study.extended_metadata
+    assert_equal 'rabbit@email.com', cm.data['role_email']
+    assert_equal 'rabbit', cm.data['role_name']['first_name']
+  end
+
+  test 'multiple levels of has many relationship' do
+    cmt = FactoryBot.create(:study_extended_metadata_type)
+    # linked_cmt = cmt.attributes_with_linked_extended_metadata_type.last.linked_extended_metadata_type
+    # linked_linked_cmt = linked_cmt.attributes_with_linked_extended_metadata_type.last.linked_extended_metadata_type
+    # linked_linked_linked_cmt = linked_linked_cmt.attributes_with_linked_extended_metadata_type.last.linked_extended_metadata_type
+    login_as(FactoryBot.create(:person))
+
+    assert_difference('Study.count') do
+      assert_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'my study', investigation_id: investigation.id }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
+          data: {
+            "study_title":"happy study",
+            "study_sites":{
+              "0":{
+                  "study_site_name":"site1",
+                  "study_site_location":"fairyland",
+                  "participants":{
+                    "0":{
+                      "participant_name":{
+                        "first_name":"alice",
+                        "last_name":"liddell"
+                      },
+                      "participant_age":"7"
+                    },
+                    "1":{
+                      "participant_name":{
+                        "first_name":"pippi",
+                        "last_name":"langstrumpf"
+                      },
+                      "participant_age":"9"
+                    }
+                  }
+              },
+              "1":{
+                "study_site_name":"site2",
+                "study_site_location":"space",
+                "participants":{
+                  "0":{
+                    "participant_name":{
+                      "first_name":"arthur",
+                      "last_name":"Dent"
+                    },
+                    "participant_age":"40"
+                  }
+                }
+              }
+            }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+
+      end
+    end
+
+    assert study = assigns(:study)
+    assert cm = study.extended_metadata
+
+    assert_equal cmt, cm.extended_metadata_type
+    assert_equal "happy study",cm.data['study_title']
+    assert_equal "site1", cm.data['study_sites'][0]['study_site_name']
+    assert_equal "fairyland", cm.data['study_sites'][0]['study_site_location']
+    assert_equal "alice", cm.data['study_sites'][0]['participants'][0]['participant_name']['first_name']
+    assert_equal "langstrumpf", cm.data['study_sites'][0]['participants'][1]['participant_name']['last_name']
+    assert_equal "Dent", cm.data['study_sites'][1]['participants'][0]['participant_name']['last_name']
+    assert_equal "40", cm.data['study_sites'][1]['participants'][0]['participant_age']
+
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: {
+          id: study.id,
+          study: {
+            title: 'Updated Study',
+            extended_metadata_attributes: {
+              id:cm.id,
+              extended_metadata_type_id: cmt.id,
+              data: {
+                "study_title":"happy study new",
+                "study_sites":{
+                  "0":{
+                    "study_site_name":"site1",
+                    "study_site_location":"better fairyland",
+                    "participants":{
+                      "0":{
+                        "participant_name":{
+                          "first_name":"mad",
+                          "last_name":"hatter"
+                        },
+                        "participant_age":"unknown"
+                      },
+                      "1":{
+                        "participant_name":{
+                          "first_name":"pippi",
+                          "last_name":"langstrumpf"
+                        },
+                        "participant_age":"9"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      end
+    end
+
+    assert new_study = assigns(:study)
+    assert cm = new_study.extended_metadata
+
+
+    assert_equal "site1", cm.data['study_sites'][0]['study_site_name']
+    assert_equal "better fairyland", cm.data['study_sites'][0]['study_site_location']
+    assert_equal "mad", cm.data['study_sites'][0]['participants'][0]['participant_name']['first_name']
+    assert_equal "hatter", cm.data['study_sites'][0]['participants'][0]['participant_name']['last_name']
+    assert_nil cm.data['study_sites'][1]
+
+
+  end
+
+
+  test 'when removing the study with the extended metadata, all its related extended metadtas should be destroyed' do
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+
+    assert_difference('Study.count') do
+      assert_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'my study', investigation_id: investigation.id }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
+          data: {
+            "role_affiliation_name":"HITS",
+            "role_affiliation_identifiers":{
+              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+
+      end
+    end
+
+    assert study = assigns(:study)
+
+
+
+    assert_difference('Study.count', -1) do
+      assert_difference('ExtendedMetadata.count',-1) do
+           delete :destroy, params: { id: study.id }
+      end
+    end
+
+    assert !flash[:error]
+    assert_redirected_to studies_path
+  end
+
+
+
+  test 'should create and update study whose extended metadata type contains linked extended metadata multi type' do
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+
+
+    # test create
+    assert_difference('Study.count') do
+      assert_difference('ExtendedMetadata.count') do
+        investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+        study_attributes = { title: 'my study', investigation_id: investigation.id }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
+          data: {
+            "role_affiliation_name":"HITS",
+            "role_affiliation_identifiers":{
+              "0":{ "identifier":"01f7bcy98", "scheme":"ROR"},
+              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+
+    assert study = assigns(:study)
+    assert_redirected_to study_path(study)
+    study.reload
+
+
+    cm = study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+
+    assert_equal 'my study', study.title
+    assert_equal 'HITS',cm.data['role_affiliation_name']
+    assert_equal '01f7bcy98', cm.data['role_affiliation_identifiers'].first['identifier']
+    assert_equal 'ROR', cm.data['role_affiliation_identifiers'].first['scheme']
+    assert_equal 'grid.424699.4',cm.data['role_affiliation_identifiers'].last['identifier']
+    assert_equal 'GRID', cm.data['role_affiliation_identifiers'].last['scheme']
+
+    # test show
+    get :show, params:{ id:study}
+    assert_response :success
+
+    # test update
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: {
+          id: study.id,
+          study: {
+            title: 'Updated Study',
+            extended_metadata_attributes: {
+              id:cm.id,
+              extended_metadata_type_id: cmt.id,
+              data: {
+                "role_affiliation_name": "University of Manchester",
+                "role_affiliation_identifiers": {
+                  "0": { "identifier": "027m9bs27", "scheme": "ROR"},
+                  "1": { "identifier": "grid.5379.8", "scheme": "GRID" }
+                }
+              }
+            }
+          }
+        }
+      end
+    end
+
+
+    assert new_study = assigns(:study)
+    assert_redirected_to study_path(new_study)
+    new_study.reload
+    cm = new_study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+
+    assert_equal 'Updated Study', new_study.title
+    assert_equal 'University of Manchester',cm.data['role_affiliation_name']
+    assert_equal '027m9bs27', cm.data['role_affiliation_identifiers'].first['identifier']
+    assert_equal 'ROR', cm.data['role_affiliation_identifiers'].first['scheme']
+    assert_equal 'grid.5379.8', cm.data['role_affiliation_identifiers'].last['identifier']
+    assert_equal 'GRID', cm.data['role_affiliation_identifiers'].last['scheme']
+
+    # test update: adding an element in the array of linked extended metadatas
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: {
+          id: study.id,
+          study: {
+            title: 'Updated Study',
+            extended_metadata_attributes: {
+              id:cm.id,
+              extended_metadata_type_id: cmt.id,
+              data: {
+                "role_affiliation_name": "University of Manchester",
+                "role_affiliation_identifiers": {
+                  "0": { "identifier": "027m9bs27", "scheme": "ROR" },
+                  "1": {"identifier": "grid.5379.8", "scheme": "GRID" },
+                  "2": { "identifier": "0000 0001 2166 2407", "scheme": "ISNI" }
+
+                }
+              }
+            }
+          }
+        }
+      end
+    end
+
+    assert new_study = assigns(:study)
+    assert_redirected_to study_path(new_study)
+    new_study.reload
+    cm = new_study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+
+
+
+    assert_equal 'University of Manchester',cm.data['role_affiliation_name']
+    assert_equal '027m9bs27', cm.data['role_affiliation_identifiers'][0]['identifier']
+    assert_equal 'ROR', cm.data['role_affiliation_identifiers'][0]['scheme']
+    assert_equal 'grid.5379.8', cm.data['role_affiliation_identifiers'][1]['identifier']
+    assert_equal 'GRID', cm.data['role_affiliation_identifiers'][1]['scheme']
+    assert_equal '0000 0001 2166 2407', cm.data['role_affiliation_identifiers'][2]['identifier']
+    assert_equal 'ISNI', cm.data['role_affiliation_identifiers'][2]['scheme']
+
+
+    # test update: adding an element and at the same time removing two elements in the array of linked extended metadatas
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+
+        put :update, params: {
+          id: study.id,
+          study: {
+            title: 'Updated Study',
+            extended_metadata_attributes: {
+              id:cm.id,
+              extended_metadata_type_id: cmt.id,
+              data: {
+                "role_affiliation_name": "University of Manchester",
+                "role_affiliation_identifiers": {
+                  "0": { "identifier": "027m9bs27", "scheme": "ROR" },
+                  # new element
+                  "1": { "identifier": "Q230899", "scheme": "Wikidata" }
+                }
+              }
+            }
+          }
+        }
+
+      end
+    end
+
+    assert new_study = assigns(:study)
+    assert_redirected_to study_path(new_study)
+    new_study.reload
+    cm = new_study.extended_metadata
+    assert_equal cmt, cm.extended_metadata_type
+
+    assert_equal 'Updated Study', new_study.title
+    assert_equal 'University of Manchester',cm.data['role_affiliation_name']
+    assert_equal '027m9bs27', cm.data['role_affiliation_identifiers'][0]['identifier']
+    assert_equal 'ROR', cm.data['role_affiliation_identifiers'][0]['scheme']
+    assert_equal 'Q230899', cm.data['role_affiliation_identifiers'][1]['identifier']
+    assert_equal 'Wikidata', cm.data['role_affiliation_identifiers'][1]['scheme']
+
+
+  end
+
+
+
+
+  test 'should not create a study and reload the form for incomplete details' do
+
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+
+
+    # missing investigation
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        study_attributes = { title: 'my study' }
+        cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
+          data: {
+            "role_affiliation_name":"HITS",
+            "role_affiliation_identifiers":{
+              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            }
+          }
+        }
+        }
+        post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    # should show error message
+    assert_select 'div#error_explanation' do
+      assert_select 'ul > li', text: "Investigation is blank or invalid"
+    end
+
+    # should reload the form with title
+    assert_select 'form#new_study' do
+      assert_select 'input#study_title[value=?]', 'my study'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'HITS'
+    end
+
+    # should reload the form with two role_affiliation_identifiers
+      assert_select 'div[id$="role-0"]' do
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '01f7bcy98'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+    end
+
+    assert_select 'div[id$="role-1"]' do
+
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', 'GRID'
+    end
+
+
+    investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+
+    # missing required extended metadata value
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+          study_attributes = { title: 'my study',investigation_id: investigation.id}
+          cm_attributes = { extended_metadata_attributes: {
+            extended_metadata_type_id: cmt.id,
+            data: {
+              "role_affiliation_name":"HITS",
+              "role_affiliation_identifiers":{
+                "0":{"identifier":"", "scheme":"ROR"},
+                "1":{"identifier":"grid.424699.4", "scheme":""}
+              }
+            }
+          }
+          }
+          post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+      end
+    end
+
+    # should show error message
+    assert_select 'div#error_explanation' do
+      assert_select 'ul > li', text: "Extended metadata role affiliation identifiers 1 identifier is required"
+      assert_select 'ul > li', text: "Extended metadata role affiliation identifiers 2 scheme is required"
+    end
+
+    # should reload the form with title
+    assert_select 'form#new_study' do
+      assert_select 'input#study_title[value=?]', 'my study'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'HITS'
+    end
+
+    # should reload the form with two role_affiliation_identifiers
+    assert_select 'div[id$="role-0"]' do
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+    end
+
+    assert_select 'div[id$="role-1"]' do
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_identifier[value=?]', 'grid.424699.4'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_1_scheme[value=?]', ''
+    end
+
+  end
+
+  test 'should not update a study and reload the form for incomplete details' do
+
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+    investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+    study_attributes = { title: 'my study', investigation_id: investigation.id }
+
+
+    cm_attributes = { extended_metadata_attributes: {
+          extended_metadata_type_id: cmt.id,
+          data: {
+            "role_affiliation_name":"HITS",
+            "role_affiliation_identifiers":{
+              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            }
+          }
+        }
+        }
+    post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+
+    assert study = assigns(:study)
+    assert_redirected_to study_path(study)
+    study.reload
+    cm = study.extended_metadata
+
+
+    #  should not update when the investigation is deleted
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+        put :update, params: {
+          id: study.id,
+          study: {
+            title: 'my new study title',
+            investigation_id: nil,
+            extended_metadata_attributes: {
+              id:cm.id,
+              extended_metadata_type_id: cmt.id,
+              data: {
+                "role_affiliation_name": "University of Manchester",
+                "role_affiliation_identifiers": {
+                  "0": { "identifier": "027m9bs27", "scheme": "ROR" },
+                  # remove a previous row
+                  # "1": { "identifier": "grid.5379.8", "scheme": "GRID" },
+
+                  # add a new row
+                  "2": {"identifier": "Q230899", "scheme": "Wikidata" }
+                }
+              }
+            }
+          }
+        }
+      end
+    end
+
+    # the value of study in database should not change
+    assert_equal 'my study', study.title
+    assert_equal 'HITS',cm.data['role_affiliation_name']
+    assert_equal '01f7bcy98', cm.data['role_affiliation_identifiers'][0]['identifier']
+    assert_equal 'ROR', cm.data['role_affiliation_identifiers'][0]['scheme']
+    assert_equal 'grid.424699.4', cm.data['role_affiliation_identifiers'][1]['identifier']
+    assert_equal 'GRID', cm.data['role_affiliation_identifiers'][1]['scheme']
+
+
+    # should show error message
+    assert_select 'div#error_explanation' do
+      assert_select 'ul > li', text: "Investigation is blank or invalid"
+    end
+
+    # the form should load updated title value
+    assert_select 'form.edit_study' do
+      assert_select 'input#study_title[value=?]', 'my new study title'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'University of Manchester'
+    end
+
+    # the form should load updated role_affiliation_identifiers value
+    assert_select 'div[id$="role-0"]' do
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', '027m9bs27'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+    end
+
+    # the form should not show removed value
+    assert_select 'input[value="grid.5379.8"]', count: 0
+    assert_select 'input[value="GRID"]', count: 0
+
+    # the form should show new value
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_identifier'][value=?]",'Q230899'
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_scheme'][value=?]",'Wikidata'
+
+  end
+
+  test 'should not update a study and reload the form for missing required linked extended metadata values' do
+
+    cmt = FactoryBot.create(:role_affiliation_extended_metadata_type)
+    login_as(FactoryBot.create(:person))
+
+    investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+    study_attributes = { title: 'my study', investigation_id: investigation.id }
+
+
+    cm_attributes = { extended_metadata_attributes: {
+      extended_metadata_type_id: cmt.id,
+      data: {
+        "role_affiliation_name":"HITS",
+        "role_affiliation_identifiers":{
+          "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
+          "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+        }
+      }
+    }
+    }
+    post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+
+    assert study = assigns(:study)
+    assert_redirected_to study_path(study)
+    study.reload
+    cm = study.extended_metadata
+
+    #  should not update when the required linked extended metadata is missing
+    assert_no_difference('Study.count') do
+      assert_no_difference('ExtendedMetadata.count') do
+          put :update, params: {
+            id: study.id,
+            study: {
+              title: 'my new study title',
+              extended_metadata_attributes: {
+                id:cm.id,
+                extended_metadata_type_id: cmt.id,
+                data: {
+                  "role_affiliation_name": "University of Manchester",
+                  "role_affiliation_identifiers": {
+                    "0": { "identifier": "", "scheme": "ROR" },
+                    # remove a previous row
+                    # "1": {"identifier": "grid.5379.8", "scheme": "GRID" },
+                    # add a new row
+                    "2": { "identifier": "Q230899", "scheme": "Wikidata" }
+                    }
+                }
+              }
+            }
+          }
+      end
+    end
+
+    assert new_study = assigns(:study)
+
+
+    # the value of study in database should not change
+    assert_equal 'my study', study.title
+    assert_equal 'HITS',cm.data['role_affiliation_name']
+    assert_equal '01f7bcy98', cm.data['role_affiliation_identifiers'][0]['identifier']
+    assert_equal 'ROR', cm.data['role_affiliation_identifiers'][0]['scheme']
+    assert_equal 'grid.424699.4', cm.data['role_affiliation_identifiers'][1]['identifier']
+    assert_equal 'GRID',cm.data['role_affiliation_identifiers'][1]['scheme']
+
+    # should show error message
+    assert_select 'div#error_explanation' do
+      assert_select 'ul > li', text: "Extended metadata role affiliation identifiers 1 identifier is required"
+    end
+
+    # the form should load updated title value
+    assert_select 'form.edit_study' do
+      assert_select 'input#study_title[value=?]', 'my new study title'
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_name[value=?]', 'University of Manchester'
+    end
+
+    # the form should load updated role_affiliation_identifiers value
+    assert_select 'div[id$="role-0"]' do
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_identifier[value=?]', ''
+      assert_select 'input#study_extended_metadata_attributes_data_role_affiliation_identifiers_0_scheme[value=?]', 'ROR'
+    end
+
+    # the form should not show removed value
+    assert_select 'input[value="grid.5379.8"]', count: 0
+    assert_select 'input[value="GRID"]', count: 0
+
+    # the form should show new value
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_identifier'][value=?]",'Q230899'
+    assert_select "input[id^='study_extended_metadata_attributes_data_role_affiliation_identifiers_'][id$='_scheme'][value=?]",'Wikidata'
+
+
+  end
+
+
   test 'experimentalists only shown if set' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    study = Factory(:study,experimentalists:'some experimentalists',contributor:person)
+    study = FactoryBot.create(:study,experimentalists:'some experimentalists',contributor:person)
     refute study.experimentalists.blank?
 
     get :edit, params:{id:study}
@@ -896,7 +1797,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_select 'p',text:/Experimentalists:/,count:1
 
-    study = Factory(:study,contributor:person)
+    study = FactoryBot.create(:study,contributor:person)
     assert study.experimentalists.blank?
 
     get :edit, params:{id:study}
@@ -918,12 +1819,12 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should create with discussion link' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Study.count') do
         post :create, params: { study: { title: 'test',
-                                         investigation_id: Factory(:investigation, contributor: person).id,
+                                         investigation_id: FactoryBot.create(:investigation, contributor: person).id,
                                          discussion_links_attributes: [{url: "http://www.slack.com/"}]},
                                 policy_attributes: valid_sharing }
       end
@@ -934,8 +1835,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should show discussion link' do
-    disc_link = Factory(:discussion_link)
-    study = Factory(:study, contributor: User.current_user.person)
+    disc_link = FactoryBot.create(:discussion_link)
+    study = FactoryBot.create(:study, contributor: User.current_user.person)
     study.discussion_links = [disc_link]
     get :show, params: { id: study }
     assert_response :success
@@ -943,8 +1844,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should update node with discussion link' do
-    person = Factory(:person)
-    study = Factory(:study, contributor: person)
+    person = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, contributor: person)
     login_as(person)
     assert_nil study.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
@@ -957,10 +1858,10 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should destroy related assetlink when the discussion link is removed ' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    asset_link = Factory(:discussion_link)
-    study = Factory(:study, contributor: person)
+    asset_link = FactoryBot.create(:discussion_link)
+    study = FactoryBot.create(:study, contributor: person)
     study.discussion_links = [asset_link]
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: study.id, study: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
@@ -970,27 +1871,27 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'study needs more than one assay for ordering' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    study = Factory(:study,
-                            policy: Factory(:public_policy),
+    study = FactoryBot.create(:study,
+                            policy: FactoryBot.create(:public_policy),
                             contributor: person)
     get :show, params: { id: study.id }
-    
+
     assert_response :success
     assert_select 'a[href=?]',
                   order_assays_study_path(study), count: 0
 
-    study.assays += [Factory(:assay,
-                                      policy: Factory(:public_policy),
+    study.assays += [FactoryBot.create(:assay,
+                                      policy: FactoryBot.create(:public_policy),
                                       contributor: person)]
     get :show, params: { id: study.id }
     assert_response :success
     assert_select 'a[href=?]',
                   order_assays_study_path(study), count: 0
 
-    study.assays +=  [Factory(:assay,
-                                      policy: Factory(:public_policy),
+    study.assays +=  [FactoryBot.create(:assay,
+                                      policy: FactoryBot.create(:public_policy),
                                       contributor: person)]
     get :show, params: { id: study.id }
     assert_response :success
@@ -999,16 +1900,16 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'ordering only by editor' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
-    study = Factory(:study,
-                            policy: Factory(:all_sysmo_viewable_policy),
+    study = FactoryBot.create(:study,
+                            policy: FactoryBot.create(:all_sysmo_viewable_policy),
                             contributor: person)
-    study.assays += [Factory(:assay,
-                                      policy: Factory(:public_policy),
+    study.assays += [FactoryBot.create(:assay,
+                                      policy: FactoryBot.create(:public_policy),
                                       contributor: person)]
-    study.assays += [Factory(:assay,
-                                      policy: Factory(:public_policy),
+    study.assays += [FactoryBot.create(:assay,
+                                      policy: FactoryBot.create(:public_policy),
                                       contributor: person)]
     get :show, params: { id: study.id }
     assert_response :success
@@ -1023,12 +1924,12 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'sample type studies through nested routing' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert_routing 'sample_types/2/studies', controller: 'studies', action: 'index', sample_type_id: '2'
-    study = Factory(:study, contributor: person)
-    study2 = Factory(:study, contributor: person)
-    sample_type = Factory(:patient_sample_type, studies: [study], contributor: person)
+    study = FactoryBot.create(:study, contributor: person)
+    study2 = FactoryBot.create(:study, contributor: person)
+    sample_type = FactoryBot.create(:patient_sample_type, studies: [study], contributor: person)
 
     assert_equal [study], sample_type.studies
     study.reload
@@ -1045,7 +1946,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test 'shows "New Investigation" button if no investigations available' do
     Investigation.delete_all
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     assert Investigation.authorized_for('view', person.user).none?
 
@@ -1055,9 +1956,9 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'does not show "New Investigation" button if investigations available' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
-    Factory(:investigation, contributor: person)
+    FactoryBot.create(:investigation, contributor: person)
     assert Investigation.authorized_for('view', person.user).any?
 
     get :new
@@ -1069,7 +1970,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'new should not include tags element when tags disabled' do
@@ -1077,54 +1978,54 @@ class StudiesControllerTest < ActionController::TestCase
       get :new
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
   test 'edit should include tags element' do
-    study = Factory(:study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     get :edit, params: { id: study.id }
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'edit should not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
-      study = Factory(:study, policy: Factory(:public_policy))
+      study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
       get :edit, params: { id: study.id }
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
   test 'show should include tags box' do
-    study = Factory(:study, policy: Factory(:public_policy))
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
     get :show, params: { id: study.id }
     assert_response :success
 
     assert_select 'div.panel-heading', text: /Tags/, count: 1
-    assert_select 'input#tag_list', count: 1
+    assert_select 'select#tag_list', count: 1
   end
 
   test 'show should not include tags box when tags disabled' do
     with_config_value :tagging_enabled, false do
-      study = Factory(:study, policy: Factory(:public_policy))
+      study = FactoryBot.create(:study, policy: FactoryBot.create(:public_policy))
       get :show, params: { id: study.id }
       assert_response :success
 
       assert_select 'div.panel-heading', text: /Tags/, count: 0
-      assert_select 'input#tag_list', count: 0
+      assert_select 'select#tag_list', count: 0
     end
   end
 
   test 'should add tag on creation' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     projects = person.person.projects
-    investigation = Factory(:investigation, projects: projects, contributor: person)
+    investigation = FactoryBot.create(:investigation, projects: projects, contributor: person)
     login_as(person)
     assert_difference('Study.count') do
       put :create, params: { study: { title: 'Study', investigation_id: investigation.id },
@@ -1134,11 +2035,92 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'should add tag on edit' do
-    person = Factory(:person)
-    study = Factory(:study, creator_ids: [person.id])
+    person = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, creator_ids: [person.id])
     login_as(person)
     put :update, params: { id: study.id, study: { title: 'test' }, tag_list: 'my_tag' }
     assert_equal 'my_tag', assigns(:study).tags_as_text_array.first
   end
 
+  test 'should delete empty study with linked sample type' do
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true)
+    study_source_sample_type = FactoryBot.create :isa_source_sample_type, contributor: person
+    study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
+    study = FactoryBot.create(:study,
+                              investigation: investigation ,
+                              policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
+                              sample_types: [study_source_sample_type, study_sample_sample_type],
+                              contributor: person)
+
+    login_as(person)
+
+    assert study.is_isa_json_compliant?
+
+    assert_difference('SampleType.count', -2) do
+      assert_difference('Study.count', -1) do
+        delete :destroy, params: { id: study.id, return_to: '/single_pages/' }
+      end
+    end
+  end
+
+  test 'do not get index if feature disabled' do
+    with_config_value(:isa_enabled, false) do
+      get :index
+      assert_redirected_to root_path
+      assert flash[:error].include?('disabled')
+    end
+  end
+
+  test 'display single page button if feature enabled' do
+    with_config_value(:project_single_page_enabled, true) do
+      current_user = FactoryBot.create(:user)
+      login_as(current_user)
+      study = FactoryBot.create(:study, contributor: current_user.person)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: 'Single Page', count: 1
+    end
+  end
+
+  test 'display adjusted buttons if isa json compliant' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: investigation)
+
+      get :show, params: { id: study }
+      assert_response :success
+
+      assert_select 'a', text: /Design #{I18n.t('assay')} Stream/i, count: 1
+      assert_select 'a', text: /Add new #{I18n.t('assay')}/i, count: 0
+    end
+  end
+
+  test 'should redirect isa json compliant study to isa study edit page' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: investigation)
+
+      get :edit, params: { id: study }
+      assert_redirected_to edit_isa_study_path(study)
+    end
+  end
+
+  test 'can show and edit with deleted contributor' do
+    study = FactoryBot.create(:study, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    study.update_column(:contributor_id, nil)
+    assert study.can_view?
+    assert study.can_edit?
+    assert_nil study.contributor
+    get :show, params: { id: study.id }
+    assert_response :success
+    get :edit, params: { id: study.id }
+    assert_response :success
+  end
 end

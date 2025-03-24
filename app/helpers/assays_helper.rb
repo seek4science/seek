@@ -57,16 +57,6 @@ module AssaysHelper
     result.html_safe
   end
 
-  # the selection dropdown box for selecting the study for an assay
-  def assay_study_selection(element_name, current_study)
-    grouped_options = grouped_options_for_study_selection(current_study)
-    blank = current_study.blank? ? 'Not specified' : nil
-    disabled = current_study && !current_study.can_edit?
-    options = grouped_options_for_select(grouped_options, current_study.try(:id))
-    select_tag(element_name, options,
-               class: 'form-control', include_blank: blank, disabled: disabled).html_safe
-  end
-
   # a lightway way to select a SOP - specifically for the assay creation during data file creation
   def assay_sop_selection(element_name, current_sop)
     sops = authorised_sops(User.current_user.person.projects)
@@ -91,6 +81,7 @@ module AssaysHelper
   # this includes the editable studies, plus the current associated study if it is not already included (i.e not edtiable)
   def selectable_studies_mapped_to_investigation(current_study)
     studies = Study.authorized_for('edit').to_a
+    studies.select!{ |study| !study.is_isa_json_compliant? } unless displaying_single_page?
     studies << current_study if current_study && !current_study.can_edit?
     investigation_map = {}
     studies.each do |study|

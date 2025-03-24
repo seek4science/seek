@@ -16,7 +16,7 @@ SEEK::Application.routes.draw do
         get 'tools' => 'tools#index'
         get 'tools/:id' => 'tools#show'
         get 'tools/:id/versions' => 'tool_versions#index'
-        get 'tools/:id/versions/:version_id' => 'tool_versions#show'
+        get 'tools/:id/versions/:version_id' => 'tool_versions#show', as: :tool_version
         get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
         get 'tools/:id/versions/:version_id/:type/descriptor(/*relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }, format: false, as: :tool_versions_descriptor
         get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files', format: false
@@ -67,6 +67,11 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :explorable_spreadsheet do
+    member do
+      get :explore
+    end
+  end
   concern :has_versions do
     member do
       post :create_version
@@ -131,6 +136,7 @@ SEEK::Application.routes.draw do
         patch 'blob/*path' => 'git#move_file', as: :git_move_file
         get 'freeze' => 'git#freeze_preview', as: :git_freeze_preview
         post 'freeze' => 'git#freeze', as: :git_freeze
+        patch '' => 'git#update', as: :git_update_version
       end
     end
   end
@@ -197,9 +203,14 @@ SEEK::Application.routes.draw do
   get 'index.html' => 'homes#index'
   get 'index' => 'homes#index'
 
-  resources :custom_metadata_types do
+  resources :extended_metadata_types do
     collection do
       get :form_fields
+      get :administer
+      post :create
+    end
+    member do
+      put :administer_update
     end
   end
 
@@ -295,14 +306,15 @@ SEEK::Application.routes.draw do
       post :gatekeeper_decide
       get :gatekeeper_decision_result
       get :waiting_approval_assets
+      post :cancel_publishing_request
       get :select
       get :items
       get :batch_sharing_permission_preview
-      post :batch_change_permssion_for_selected_items
+      post :batch_change_permission_for_selected_items
       post :batch_sharing_permission_changed
     end
     resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows,
-              :data_files, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
+              :data_files, :observation_units, :presentations, :publications, :documents, :events, :sample_types, :samples, :specimens,
               :strains, :file_templates, :placeholders, :collections, :templates, only: [:index]
   end
 
@@ -311,12 +323,17 @@ SEEK::Application.routes.draw do
       get :request_institutions
       get :guided_join
       get :guided_create
+      get :guided_import
       post :request_join
       post :request_create
+      post :request_import
       get :administer_create_project_request
+      get :administer_import_project_request
       post :respond_create_project_request
+      post :respond_import_project_request
       get :project_join_requests
       get :project_creation_requests
+      get :project_importation_requests
       get  :typeahead
     end
     member do
@@ -333,8 +350,11 @@ SEEK::Application.routes.draw do
       get :administer_join_request
       post :respond_join_request
       get :guided_join
+      get :import_from_fairdata_station
+      post :submit_fairdata_station
+      post :update_annotations_ajax
     end
-    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
+    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :observation_units, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
 
     resources :openbis_endpoints do
@@ -395,13 +415,16 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
+      get :export_isa, action: :export_isa
       get :manage
       get :order_studies
       patch :manage_update
+      get :update_from_fairdata_station
+      post :submit_fairdata_station
     end
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end
 
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
@@ -434,7 +457,7 @@ SEEK::Application.routes.draw do
       get :order_assays
       patch :manage_update
     end
-    resources :people, :programmes, :projects, :sample_types, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :sample_types, :samples, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
@@ -446,7 +469,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :observation_units, :placeholders, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -460,7 +483,7 @@ SEEK::Application.routes.draw do
 
   ### ASSETS ###
 
-  resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
+  resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset, :explorable_spreadsheet] do
     collection do
       get :filter
       get :provide_metadata
@@ -469,8 +492,8 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :explore
-      get :samples_table
+      get :extracted_samples_table
+      get :extracted_samples
       get :select_sample_type
       get :confirm_extraction
       get :extraction_status
@@ -480,11 +503,17 @@ SEEK::Application.routes.draw do
       get :destroy_samples_confirm
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
+      get :has_matching_sample_type
+      post :unzip
+      get :unzip_status
+      get :confirm_unzip
+      delete :cancel_unzip
+      get :unzip_persistence_status
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :data_files, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, :observation_units, only: [:index]
   end
 
-  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
+  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
     resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, :investigations, :studies, :assays, only: [:index]
   end
 
@@ -496,12 +525,16 @@ SEEK::Application.routes.draw do
       post :execute
       get :simulate
       post :simulate
+      get :copasi_simulate
     end
     resources :model_images, only: [:show]
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, :organisms, :human_diseases, only: [:index]
   end
 
-  resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
+  resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :explorable_spreadsheet] do
+    collection do
+      get :dynamic_table_typeahead
+    end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
@@ -510,6 +543,7 @@ SEEK::Application.routes.draw do
       post :create_from_ro_crate
       post :create_from_files
       post :create_from_git
+      post :submit
       get :provide_metadata
       get :annotate_repository
       post :create_metadata
@@ -520,39 +554,37 @@ SEEK::Application.routes.draw do
     member do
       get :diagram
       get :ro_crate
+      get :ro_crate_metadata
       get :new_version
       get :new_git_version
       post :create_version_metadata
       post :create_version_from_git
       get :edit_paths
       patch :update_paths
+      post :run
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, :documents, :data_files, only: [:index]
   end
 
   resources :workflow_classes, except: [:show], concerns: [:has_avatar]
 
-  resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
+  resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset, :explorable_spreadsheet] do
     collection do
       get :filter
       get :provide_metadata
       post :create_content_blob
       post :create_metadata
     end
-    member do
-      get :explore
-    end
     resources :people, :programmes, :projects, :collections, :investigations, :studies, :assays, :data_files, :publications, :placeholders, only: [:index]
   end
 
-  resources :placeholders, concerns: [:asset] do
+  resources :placeholders, concerns: [:asset, :explorable_spreadsheet] do
     collection do
       get :filter
       get :provide_metadata
       post :create_metadata
     end
     member do
-      get :explore
       get :data_file
     end
     resources :people, :programmes, :projects, :collections, :investigations, :studies, :assays, :data_files, :publications, :file_templates, only: [:index]
@@ -574,7 +606,7 @@ SEEK::Application.routes.draw do
       get :reject_activation_confirmation
       get :storage_report
     end
-    resources :people, :projects, :institutions, :investigations, :studies, :assays, :samples,
+    resources :people, :projects, :institutions, :investigations, :studies, :assays, :observation_units, :samples,
               :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
     concerns :has_dashboard, controller: :programme_stats
   end
@@ -663,13 +695,14 @@ SEEK::Application.routes.draw do
       get :query_form
       post :query
     end
-    resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
-              :sample_types, :strains, :organisms, :collections, only: [:index]
+    resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :sops,
+              :publications, :samples, :sample_types, :strains, :organisms, :collections,
+              :observation_units, only: [:index]
   end
 
   ### SAMPLE TYPES ###
   #
-  resources :sample_types do
+  resources :sample_types, concerns: %i[asset has_content_blobs] do
     collection do
       post :create_from_template
       get :select
@@ -678,14 +711,10 @@ SEEK::Application.routes.draw do
     member do
       get :template_details
       get :batch_upload
+      post :update_annotations_ajax
     end
     resources :samples
-    resources :content_blobs do
-      member do
-        get :download
-      end
-    end
-    resources :projects, :programmes, :templates, :studies, :assays, only: [:index]
+    resources :investigations, :people, :collections, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
@@ -697,13 +726,13 @@ SEEK::Application.routes.draw do
   resources :sample_controlled_vocabs do
     collection do
       get :typeahead
-      get :fetch_ols_terms
+      get :fetch_ols_terms_html
     end
   end
 
   ### DOCUMENTS
 
-  resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
+  resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :explorable_spreadsheet] do
     resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 
@@ -735,6 +764,7 @@ SEEK::Application.routes.draw do
       post :template_attributes
     end
     collection do
+      post :filter_isa_tags_by_level
       get :task_status
       get :default_templates
       post :populate_template
@@ -747,7 +777,15 @@ SEEK::Application.routes.draw do
   resources :single_pages do
     member do
       get :dynamic_table_data
-      get :export_isa, action: :export_isa
+      post :update_annotations_ajax
+    end
+    collection do
+      get :batch_sharing_permission_preview
+      post :batch_change_permission_for_selected_items
+      post :batch_sharing_permission_changed
+      post :export_to_excel, action: :export_to_excel
+      get :download_samples_excel, action: :download_samples_excel
+      post :upload_samples, action: :upload_samples
     end
   end
 
@@ -773,12 +811,18 @@ SEEK::Application.routes.draw do
   get '/modelling_analysis_types/', to: 'assay_types#show', as: 'modelling_analysis_types'
   get '/technology_types/', to: 'technology_types#show', as: 'technology_types'
 
+  ### OBSERVATION UNITS ###
+
+  resources :observation_units, concerns:[:asset] do
+
+    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
+  end
+
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search
   get '/search/save' => 'search#save', as: :save_search
   get '/search/delete' => 'search#delete', as: :delete_search
   get 'svg/:id.:format' => 'svg#show', as: :svg
-  get '/tags/latest' => 'tags#latest', as: :latest_tags
   get '/tags/query' => 'tags#query', as: :query_tags
   get '/tags' => 'tags#index', as: :all_tags
   get '/tags/:id' => 'tags#show', as: :show_tag
@@ -802,7 +846,7 @@ SEEK::Application.routes.draw do
   # Omniauth
   post '/auth/:provider' => 'sessions#create', as: :omniauth_authorize # For security, ONLY POST should be enabled on this route.
   match '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback, via: [:get, :post] # Callback routes need both GET and POST enabled.
-  match '/identities/auth/:provider/callback' => 'sessions#create', via: [:get, :post] # Needed for legacy support..
+  match '/identities/auth/:provider/callback' => 'sessions#create', as: :legacy_omniauth_callback, via: [:get, :post] # Needed for legacy support..
   get '/auth/failure' => 'sessions#omniauth_failure', as: :omniauth_failure
 
   get '/activate(/:activation_code)' => 'users#activate', as: :activate

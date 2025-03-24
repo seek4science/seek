@@ -12,14 +12,14 @@ class Workflow < ApplicationRecord
 
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   has_controlled_vocab_annotations :topics, :operations
 
   validates :projects, presence: true, projects: { self: true }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-  has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
   has_and_belongs_to_many :presentations
@@ -29,6 +29,9 @@ class Workflow < ApplicationRecord
   has_many :data_files, ->{ distinct }, through: :workflow_data_files
 
   accepts_nested_attributes_for :workflow_data_files
+
+  has_one :execution_instance, -> { where(link_type: AssetLink::EXECUTION_INSTANCE) },
+          class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset, autosave: true
 
   def initialize(*args)
     @extraction_errors = []
@@ -41,7 +44,7 @@ class Workflow < ApplicationRecord
 
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
 
-    before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
+    before_save :refresh_internals, if: -> { main_workflow_path_changed? && main_workflow_blob && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
     after_commit :submit_to_life_monitor, on: [:create, :update], if: :should_submit_to_life_monitor?
     after_commit :sync_test_status, on: [:create, :update]
@@ -131,6 +134,10 @@ class Workflow < ApplicationRecord
       parent&.source_link&.url
     end
 
+    def execution_instance_url
+      parent&.execution_instance&.url
+    end
+
     def submit_to_life_monitor
       LifeMonitorSubmissionJob.perform_later(self)
     end
@@ -204,9 +211,14 @@ class Workflow < ApplicationRecord
     false
   end
 
+  def self.supports_extended_metadata?
+    false
+  end
+
   MATURITY_LEVELS = {
       0 => :work_in_progress,
-      1 => :released
+      1 => :released,
+      2 => :deprecated
   }
   MATURITY_LEVELS_INV = MATURITY_LEVELS.invert
 
@@ -236,6 +248,18 @@ class Workflow < ApplicationRecord
     v.save!
   end
 
+  def execution_instance_url= url
+    (execution_instance || build_execution_instance).assign_attributes(url: url)
+
+    execution_instance.mark_for_destruction if url.blank?
+
+    url
+  end
+
+  def execution_instance_url
+    execution_instance&.url
+  end
+
   has_filter maturity: Seek::Filtering::Filter.new(
       value_field: 'maturity_level',
       label_mapping: ->(values) {
@@ -254,4 +278,7 @@ class Workflow < ApplicationRecord
       }
   )
 
+  def self.find_by_source_url(source_url)
+    joins(:source_link).where('asset_links.url' => source_url)
+  end
 end

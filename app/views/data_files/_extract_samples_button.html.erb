@@ -1,0 +1,28 @@
+<span id='extract-samples-button-wrapper'>
+  <%= button_link_to('Extract samples', 'extract_samples', extract_samples_data_file_path(@data_file), method: :post, style: 'display:none', id:'extract-samples-button') %>
+</span>
+
+<script type="application/javascript">
+    $j(document).ready(function () {
+        $j('#extract-samples-button-wrapper').spinner('add');
+        $j.ajax({
+            url: '<%= has_matching_sample_type_data_file_path %>',
+            dataType: "json",
+            data: {
+                id: <%= @data_file.id %>
+            },
+            success: function (resp) {
+              if (resp.result) {
+                  $j('#extract-samples-button').show();
+              }
+            },
+            error: function (resp) {
+
+            },
+            complete: function () {
+                $j('#extract-samples-button-wrapper').spinner('remove');
+            }
+        });
+    });
+
+</script>

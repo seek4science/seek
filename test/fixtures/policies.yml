@@ -3,24 +3,24 @@
 private_policy_for_asset_of_my_first_sop:
   name: "auto"
   access_type: <%= Policy::NO_ACCESS %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 private_policy:
   name: "auto"
   access_type: <%= Policy::NO_ACCESS %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 private_policy_using_custom_sharing:
   name: "auto"
   access_type: <%= Policy::NO_ACCESS %>
-  use_whitelist: true
-  use_blacklist: true
+  use_allowlist: true
+  use_denylist: true
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -28,24 +28,24 @@ private_policy_using_custom_sharing:
 editing_for_all_sysmo_users_policy:  
   name: "auto"
   access_type: <%= Policy::EDITING %>
-  use_whitelist: true
-  use_blacklist: true
+  use_allowlist: true
+  use_denylist: true
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 managing_for_all_sysmo_users_policy:
   name: "auto"
   access_type: <%= Policy::MANAGING %>
-  use_whitelist: true
-  use_blacklist: true
+  use_allowlist: true
+  use_denylist: true
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 sysmo_member_edit:
   name: "auto"
   access_type: <%= Policy::EDITING %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -53,8 +53,8 @@ sysmo_member_edit:
 download_for_all_sysmo_users_policy:
   name: "auto"
   access_type: <%= Policy::ACCESSIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -62,32 +62,32 @@ download_for_all_sysmo_users_policy:
 fully_public_policy:  
   name: "auto"
   access_type: <%= Policy::EDITING %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 public_policy_visible_only:
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 public_policy_access:
   name: "auto"
   access_type: <%= Policy::ACCESSIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 policy_with_complex_permissions:  
   name: "auto"
   access_type: <%= Policy::EDITING %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -95,8 +95,8 @@ policy_with_complex_permissions:
 private_policy_with_custom_sharing:  
   name: "auto"
   access_type: <%= Policy::NO_ACCESS %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -104,17 +104,17 @@ private_policy_with_custom_sharing:
 public_download_with_no_custom_sharing:  
   name: "auto"
   access_type: <%= Policy::ACCESSIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-whitelist_blacklist_and_custom_sharing:  
+allowlist_denylist_and_custom_sharing:
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
-  use_whitelist: true
-  use_blacklist: true
+  use_allowlist: true
+  use_denylist: true
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -122,8 +122,8 @@ whitelist_blacklist_and_custom_sharing:
 policy_for_worgroup_sharing_tests:  
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -131,31 +131,31 @@ policy_for_worgroup_sharing_tests:
 policy_for_worgroup_sharing_tests_no_custom_sharing:  
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 sysmo_member_download:  
   name: "auto"
   access_type: <%= Policy::ACCESSIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
 policy_for_test_with_projects_institutions:  
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   
 policy_for_viewable_data_file:  
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
-  use_whitelist: false
-  use_blacklist: false
+  use_allowlist: false
+  use_denylist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>

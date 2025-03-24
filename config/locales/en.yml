@@ -6,18 +6,24 @@ en:
 
   login:
     elixir_aai: 'LS Login'
+    elixir_aai_legacy: 'ELIXIR AAI'
     ldap: 'LDAP'
     github: 'GitHub'
+    oidc: 'OpenID Connect'
 
+  single_page: "Single Page"
+  default_view: "Default View"
   investigation: &investigation "Investigation"
   study: &study "Study"
   assay: &assay "Assay"
+  observation_unit: &observation_unit "Observation Unit"
   assays:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
-  
-  isa_study: "ISA Study"  
+    assay_stream:  "Assay Stream"
+
+  isa_study: "ISA Study"
   study_design: "Study Design"
   isa_assay: "ISA Assay"
 
@@ -40,13 +46,14 @@ en:
       git: 'Import Git Repository'
       ro_crate: 'Upload/Import Workflow RO-Crate'
   publication: &publication "Publication"
-  
+
   presentation: &presentation "Presentation"
   event: &event "Event"
   file_template: &file_template "File Template"
   placeholder: "Placeholder"
   collection: &collection "Collection"
 
+  observation_unit: &observation_unit "Observation Unit"
   sample: &sample "Sample"
   sample_type: &sample_type "Sample type"
   template: &template "Template"
@@ -66,6 +73,12 @@ en:
 
   samples:
     pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
+    allow_free_text_info_text: 'If selected it is possible to provide any text for the attribute value and the Controlled Vocabulary terms are just suggestions; otherwise it values are strictly restricted to only the terms available.'
+    allow_free_text_label_hint: 'free text allowed'
+    allow_free_text_checkbox_label: 'Allow free text?'
+
+  templates:
+    isa_tag_info_text: 'ISA tags define the relation of each attribute to either the sample or the protocol, following the categories specified by the ISA model.'
 
   gadget:
     new_heading: "New or upload"
@@ -80,7 +93,7 @@ en:
     documentation: "Help"
     admin: "Server administration"
     help: "Help documentation"
-    api: "API documentation"    
+    api: "API documentation"
     account: "Account"
     faq: "FAQ"
     jerm_templates: "JERM templates"
@@ -126,7 +139,7 @@ en:
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
-  creator: 'creator' # A person who was involved with the creation of the resource  
+  creator: 'creator' # A person who was involved with the creation of the resource
 
   jerm_harvester_name: 'The JERM Harvester'
   deleted_contributor_name: 'Deleted submitter'
@@ -165,6 +178,7 @@ en:
     collection: *collection
     presentation: *presentation
     event: *event
+    observation_unit: *observation_unit
     sample: *sample
     template: *template
     sample_type: *sample_type
@@ -188,6 +202,7 @@ en:
     collections: 'Collections'
     presentations: 'Presentations'
     events: 'Events'
+    observation_units: 'Observation Units'
     samples: 'Samples'
     templates: 'Templates'
     sample_types: 'Samples types'
@@ -243,6 +258,7 @@ en:
   maturity_level:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
+    deprecated: 'Deprecated'
   test_status:
     all_passing: 'Passing'
     some_passing: 'Some failures'
@@ -262,19 +278,19 @@ en:
     the work you are doing.
     Being in a %{project} allows you to easily share with others whilst collaborating, and also provides useful defaults such as Sharing permissions and License."
 
-  create_join_project_options: "You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one."    
-    
+  create_join_project_options: "You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one."
+
 
   about_programme: "A <strong>%{programme}</strong> holds a collection of one or more %{projects}. If you create a %{programme} you become its administrator and you have the ability to
 create and administer additional %{projects} within it without additional approval from a site administrator. A %{programme} can describe and promote
 an activity that is larger than a %{project}, and can be associated with a funding."
 
-  about_managed_programme: "If you don't think a %{programme} is necessary, and you won't expect to need to create additional %{projects} in the future, 
+  about_managed_programme: "If you don't think a %{programme} is necessary, and you won't expect to need to create additional %{projects} in the future,
 you can choose to have a %{project} linked to a site managed %{programme} instead."
 
   report_a_bug: '<h2>Issue tracker</h2>
   <p>
-  To report a bug or other issue, it is preferable to use the %{issue_tracker_link}. A Github account is required, and your report will be public and open 
+  To report a bug or other issue, it is preferable to use the %{issue_tracker_link}. A Github account is required, and your report will be public and open
   to comments. Before reporting the issue, have a look and search through the current issues to see if the problem has already been raised - if so, add a comment so
    we know it is also affecting you.
   </p>
@@ -283,10 +299,9 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
   <p>'
 
-  controlled_vocabs:
-    add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"
-
   info_text:
+    default_view: "The default view used to visualize your experiments."
+    single_page: "A view specifically designed to visualize and interact with your experiments."
     institution: "An Institution in SEEK is where someone is employed or works or a person's affiliation."
     #person: "A Person (People) in SEEK is a registered user or a Profile of a person that has not registered with SEEK. A Person is someone who participates directly or indirectly in the scientific research described within SEEK."
     programme: "A Programme is an umbrella to group one or more Projects."
@@ -308,6 +323,7 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
     template: "Templates are blueprints that can be reused and applied to Study and Assay for describing Samples. Templates must be associated with one or more Projects."
     organism: "An Organism is identified by an entry in the NCBI ontology. An Organism must be associated with one or more Projects in order to be registered in SEEK."
     file_template: "A File Template describes conforming DataFiles.For example, a File Template that is a Word document may describe conformant PNG images."
+    extended_metadata_type: "Extended Metadata Types are defined, that describe a set of attributes with names and point to a SampleAttributeType to define the attribute type."
 
   cookies:
     notice: "%{instance_name} makes use of some necessary cookies to provide its core functionality."
@@ -325,3 +341,9 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
       all: Allow all cookies
       embedding: Allow necessary cookies and embedded content
       necessary: Allow only necessary cookies
+
+  tooltips:
+    batch_permission_changes_button: "You can change the sharing policy and permissions for your items as a batch. A preview of selected items will be given before you choose new permissions for them."
+    publish_your_items_button: "Publish your owned items as a batch. A preview will be given before publishing"
+
+  extended_metadata_type: "Extended Metadata Type"

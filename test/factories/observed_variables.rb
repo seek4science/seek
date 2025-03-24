@@ -1,11 +1,13 @@
-Factory.define(:observed_variable) do |f|
-    f.variable_id 'the variable'
-end
+FactoryBot.define do
+  factory(:observed_variable) do
+    variable_id { 'the variable' }
+  end
 
-Factory.define(:observed_variable_set) do |f|
-    f.title 'the observed variable set'
-    f.association :contributor, factory: :person
-    f.after_build do |set|
-        set.observed_variables = [Factory.build(:observed_variable)]
+  factory(:observed_variable_set) do
+    title { 'the observed variable set' }
+    association :contributor, factory: :person, strategy: :create
+    after(:build) do |set|
+      set.observed_variables = [FactoryBot.build(:observed_variable)]
     end
+  end
 end

@@ -36,9 +36,56 @@ namespace :seek_dev do
     puts output.read
   end
 
+  task(:profile_command, [:command] => :environment) do |_t, args|
+    unless args[:command].present?
+      puts "command not found"
+      puts
+      puts "Usage: bundle exec rake seek_dev:profile_command['the command']"
+      exit -1
+    end
+    result = RubyProf.profile do
+      eval(args[:command])
+    end
+    printer = RubyProf::GraphHtmlPrinter.new(result)
+    printer.print(STDOUT, {})
+  end
+
+  # to fix an issue where MIT samples didn't link to assay following a job timeout
+  task(:linked_missed_mit_samples_to_assays, [:data_file_id, :assay_ids] => :environment) do |_t, args|
+    data_file_id = args.data_file_id
+    assay_ids = args.assay_ids
+
+    unless assay_ids.blank? || data_file_id.blank?
+      data_file = DataFile.find(data_file_id)
+      samples = data_file.extracted_samples
+      requested_assays = Assay.find(assay_ids.split(' '))
+      matching_assays = requested_assays & data_file.assays
+      puts "About to link assays: #{matching_assays.collect(&:id).join(', ')} with #{samples.count} samples extracted from data file #{data_file.id}"
+      puts "Enter y to continue, or anything else to exit"
+      if STDIN.gets.chomp == 'y'
+        samples.each do |sample|
+          if sample.assays.empty?
+            disable_authorization_checks do
+              data_file.copy_assay_associations([sample], matching_assays)
+            end
+            puts "Updated sample #{sample.id}"
+          else
+            puts "Assays already linked for sample #{sample.id}"
+          end
+        end
+      else
+        puts "exited"
+      end
+    else
+      puts "Both data file id and assay ids needed needed. Assay ids should be a space seprated list"
+      puts "Usage: bundle exec rake seek_dev:linked_missed_mit_samples_to_assays['<df_id>','<assay_id_1> <assay_id_2> ...']"
+      puts "e.g: bundle exec rake seek_dev:linked_missed_mit_samples_to_assays['1','5 6 7']"
+    end
+  end
+
   task(:dump_controlled_vocab, [:id] => :environment) do |_t, args|
     vocab = SampleControlledVocab.find(args.id)
-    json = { title: vocab.title, description: vocab.description, ols_root_term_uri: vocab.ols_root_term_uri,
+    json = { title: vocab.title, description: vocab.description, ols_root_term_uris: vocab.ols_root_term_uris,
              source_ontology: vocab.source_ontology, terms: [] }
     vocab.sample_controlled_vocab_terms.each do |term|
       json[:terms] << { label: term.label, iri: term.iri, parent_iri: term.parent_iri }
@@ -317,14 +364,58 @@ namespace :seek_dev do
     output.close
   end
 
-  task make_ontology_study_cmt: :environment do
-    cmt = CustomMetadataType.new(title: 'Study Ontology CMT', supported_type:'Study')
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
-    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ontology',
-                                                                  required:true,
-                                                                  sample_attribute_type:SampleAttributeType.where(title:'Controlled Vocabulary').first,
-                                                                  sample_controlled_vocab: SampleControlledVocab.find(4))
-    cmt.save!
+  task make_cv_study_test_cmt: :environment do
+    countries = {
+      "AF"=>"Afghanistan",
+      "AX"=>"Aland Islands",
+      "AL"=>"Albania",
+      "DZ"=>"Algeria",
+      "AS"=>"American Samoa",
+      "AD"=>"Andorra",
+      "AO"=>"Angola",
+      "AI"=>"Anguilla",
+      "AQ"=>"Antarctica",
+      "AG"=>"Antigua And Barbuda",
+      "AR"=>"Argentina",
+      "AM"=>"Armenia",
+      "AW"=>"Aruba",
+      "AU"=>"Australia",
+      "AT"=>"Austria"
+    }.values.collect{|t| { label:t } }
+
+    publications = ['Audiovisual', 'Book', 'Book chapter', 'Collection', 'Computational notebook',
+               'Conference paper', 'Conference proceeding', 'Data paper', 'Dataset',
+               'Dissertation', 'Event', 'Image', 'Interactive resource', 'Journal', 'Journal article',
+               'Model', 'Output management plan', 'Peer review', 'Physical object', 'Preprint',
+               'Report', 'Service', 'Software', 'Sound', 'Standard', 'Text', 'Workflow', 'Other'].collect{|t| { label:t } }
+
+    disable_authorization_checks do
+
+      study_country_cv = SampleControlledVocab.where(title: 'NFDI4Health Interventional Study Country').first_or_create!(
+        sample_controlled_vocab_terms_attributes: countries
+      )
+
+      resource_type_general_cv = SampleControlledVocab.where(title: 'resource_type_general').first_or_create!(
+        sample_controlled_vocab_terms_attributes: publications
+      )
+
+
+      #
+      unless ExtendedMetadataType.where(title:'NFDI4Health study metadata', supported_type:'Study').any?
+        cmt = ExtendedMetadataType.new(title: 'NFDI4Health study metadata', supported_type:'Study')
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'name', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_type_general_cv', required:true,
+                                                                      sample_attribute_type: SampleAttributeType.where(title:'Controlled Vocabulary').first, sample_controlled_vocab: resource_type_general_cv, description: "resource type general cv", label: "resource type general cv" , pos:3)
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_type_general_list', required:true,
+                                                                      sample_attribute_type: SampleAttributeType.where(title:'Controlled Vocabulary List').first, sample_controlled_vocab: resource_type_general_cv, description: "resource type general", label: "resource type general" , pos:1)
+        cmt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'resource_study_country_list', required:true,
+                                                                      sample_attribute_type: SampleAttributeType.where(title:'Controlled Vocabulary List').first, sample_controlled_vocab: study_country_cv, description: "study country", label: "study country" , pos:2)
+        cmt.save!
+        puts 'NFDI4Health study metadata'
+      end
+
+
+    end
   end
 
   task report_missing_related_items_routes: :environment do
@@ -341,5 +432,21 @@ namespace :seek_dev do
 
   task rebuild_csl_style_list: :environment do
     File.write(Seek::Citations.style_dictionary_path, Seek::Citations.generate_style_pairs.to_yaml)
+  end
+
+  #bundle exec rake seek_dev:grant_a_person_the_right_to_manage_all_publications_of_a_project[project_id,person_id]
+  task :grant_a_person_the_right_to_manage_all_publications_of_a_project, [:project_id, :person_id] => [:environment] do |t, args|
+
+    project_id = args.project_id
+    person_id = args.person_id
+    puts "project_id:"+project_id.to_s
+    puts "person_id:"+person_id.to_s
+
+    pub_ids = Project.find(project_id).publications.map(&:id)
+    pub_ids.each do |id|
+      permission = Publication.find(id).policy.permissions.where(contributor_type: "Person", contributor_id: person_id).first_or_initialize
+      permission.update(access_type: Policy::MANAGING)
+    end
+
   end
 end

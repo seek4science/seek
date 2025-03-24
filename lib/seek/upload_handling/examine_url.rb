@@ -25,12 +25,21 @@ module Seek
             @type = 'warning'
             @warning_msg = "Unhandled URL scheme: #{uri.scheme}. The given URL will be presented as a clickable link."
           end
+        rescue URI::InvalidURIError
+          @type = 'override'
+          @error_msg = 'The URL appears to be invalid.'
+        rescue OpenSSL::OpenSSLError
+          @type = 'error'
+          @error_msg = 'SSL connection to the URL failed - Please check the certificate is valid.'
         rescue StandardError => e
-          handle_exception_response(e)
+          raise e if Rails.application.config.consider_all_requests_local
+          exception_notification(500, e)
+          @type = 'error'
+          @error_msg = 'An unexpected error occurred whilst accessing the URL.'
         end
 
         respond_to do |format|
-          format.html { render partial: 'content_blobs/examine_url_result', status: @type == 'error' ? 400 : 200 }
+          format.html { render partial: 'content_blobs/examine_url_result', status: ( @type == 'error'|| @type == 'override') ? 400 : 200 }
         end
       end
 
@@ -74,22 +83,12 @@ module Seek
         when 405
           @error_msg = "We can't find out information about this URL - Method not allowed response."
         when 404
-          @error_msg = 'Nothing can be found at that URL. Please check the address and try again'
-        when 400
-          @error_msg = 'The URL appears to be invalid'
+          @type = 'override'
+          @error_msg = 'Nothing can be found at that URL. Please check the address and try again.'
         when 490
-          @error_msg = 'That URL is inaccessible. Please check the address and try again'
+          @error_msg = 'That URL is inaccessible. Please check the address and try again.'
         else
           @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
-        end
-      end
-
-      def handle_exception_response(exception)
-        case exception
-        when URI::InvalidURIError
-          handle_bad_http_response(400)
-        else
-          fail exception
         end
       end
 

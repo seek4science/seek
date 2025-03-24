@@ -13,7 +13,7 @@
         <% if version.revision_comments.blank? %>
           <span class="subtle">No revision comments</span>
         <% else %>
-          <%= white_list(version.revision_comments) -%>
+          <%= sanitized_text(version.revision_comments) -%>
         <% end %>
       </p>
       <% unless version.visibility == :public %>
@@ -36,10 +36,10 @@
       <% if resource.can_manage? %>
         <%= button_link_to('Edit', 'edit', '#', onclick:"$j('#edit_version_form_#{version.version}').fadeToggle(); return false;") -%>
       <%end %>
-      <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && visible_versions.length > 1 %>
-        <% path = polymorphic_path(resource, :version => version.version, :action => :destroy_version) %>
+      <% if Seek::Config.delete_asset_version_enabled && resource.can_edit? && visible_versions.length > 1 %>
+        <% path = polymorphic_path(resource, version: version.version, action: :destroy_version) %>
         <%= button_link_to("Delete", 'destroy', path,
-                           { data: { confirm: "This deletes version #{version.version.to_s} of the #{text_for_resource resource}. Are you sure?" }, :method => :delete}) -%>
+                           { data: { confirm: "This deletes version #{version.version.to_s} of the #{text_for_resource resource}. Are you sure?" }, method: :delete}) -%>
       <% end -%>
     </div>
   </div>

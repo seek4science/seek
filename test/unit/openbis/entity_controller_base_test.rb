@@ -12,12 +12,12 @@ class EntityControllerBaseTest < ActionController::TestCase
 
   def setup
     mock_openbis_calls
-    Factory :experimental_assay_class
+    FactoryBot.create :experimental_assay_class
     @controller = BaseTest.new
-    @user = Factory(:project_administrator)
+    @user = FactoryBot.create(:project_administrator)
     User.current_user = @user.user
     @project = @user.projects.first
-    @endpoint = Factory(:openbis_endpoint, project: @project)
+    @endpoint = FactoryBot.create(:openbis_endpoint, project: @project)
   end
 
   test 'datasets_linked_to gets ids of openbis data sets linked to study and assay' do
@@ -38,9 +38,9 @@ class EntityControllerBaseTest < ActionController::TestCase
     linked = @controller.datasets_linked_to datafiles[0]
     assert_equal [], linked
 
-    normaldf = Factory :data_file, contributor:@user
+    normaldf = FactoryBot.create :data_file, contributor:@user
 
-    assay = Factory :assay, contributor:@user
+    assay = FactoryBot.create :assay, contributor:@user
 
     assay.data_files << normaldf
     assay.data_files << datafiles[0]
@@ -64,12 +64,12 @@ class EntityControllerBaseTest < ActionController::TestCase
 
     assert_equal [], @controller.zamples_linked_to(nil)
 
-    normalas = Factory(:assay, contributor:@user)
+    normalas = FactoryBot.create(:assay, contributor:@user)
     study = normalas.study
 
     assert_equal [], @controller.zamples_linked_to(normalas)
     assert_equal [], @controller.zamples_linked_to(study)
-    assert_equal [], @controller.zamples_linked_to(Factory(:data_file))
+    assert_equal [], @controller.zamples_linked_to(FactoryBot.create(:data_file))
 
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
 

@@ -4,46 +4,87 @@ class IsaAssaysController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
+  before_action :initialize_isa_assay, only: :create
+  after_action :rearrange_assay_positions_create_isa_assay, only: :create
+  after_action :fix_assay_linkage_for_new_assays, only: :create
+
+  # Update sample metadata when updating an assay
+  before_action :old_attributes, only: %i[update]
+  after_action :update_sample_json_metadata, only: :update
 
   def new
-    @isa_assay = IsaAssay.new
+    study = Study.find(params[:study_id])
+    new_position =
+      if params[:is_assay_stream] || params[:source_assay_id].nil? # If first assay is of class assay stream
+        study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
+      elsif params[:source_assay_id] == params[:assay_stream_id] # If first assay in the stream
+        0
+      else
+        Assay.find(params[:source_assay_id]).position + 1
+      end
+
+    source_assay = Assay.find(params[:source_assay_id]) if params[:source_assay_id]
+    input_sample_type_id =
+      if params[:is_assay_stream] || source_assay&.is_assay_stream?
+        study.sample_types.second.id
+      else
+        source_assay&.sample_type&.id
+      end
+
+    @isa_assay =
+      if params[:is_assay_stream]
+        IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
+                                study_id: study.id,
+                                position: new_position },
+                       input_sample_type_id: })
+      else
+        IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
+                                assay_stream_id: params[:assay_stream_id],
+                                study_id: study.id,
+                                position: new_position },
+                       input_sample_type_id: })
+      end
+    respond_to(&:html)
   end
 
   def create
-    @isa_assay = IsaAssay.new(isa_assay_params)
     update_sharing_policies @isa_assay.assay
-    @isa_assay.assay.contributor = current_person
-    @isa_assay.sample_type.contributor = User.current_user.person
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
     if @isa_assay.save
-      redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                   item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!')
+      flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
+      respond_to do |format|
+        format.html do
+          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+                                       item_id: @isa_assay.assay)
+        end
+        format.json { render json: @isa_assay, include: [params[:include]] }
+      end
     else
       respond_to do |format|
-        format.html { render action: 'new' }
+        format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
     end
   end
 
   def edit
-    # let edit the assay if the sample_type is not authorized
-    @isa_assay.sample_type = nil unless requested_item_authorized?(@isa_assay.sample_type)
-
-    respond_to do |format|
-      format.html
-    end
+    respond_to(&:html)
   end
 
   def update
+    update_sharing_policies @isa_assay.assay
     @isa_assay.assay.attributes = isa_assay_params[:assay]
-
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
     # update the sample_type
-    if requested_item_authorized?(@isa_assay.sample_type)
-      @isa_assay.sample_type.update(isa_assay_params[:sample_type])
-      @isa_assay.sample_type.resolve_inconsistencies
+    unless @isa_assay&.assay&.is_assay_stream?
+      if requested_item_authorized?(@isa_assay.sample_type)
+        @isa_assay.sample_type.update(isa_assay_params[:sample_type])
+        @isa_assay.sample_type.resolve_inconsistencies
+      end
     end
 
     if @isa_assay.save
+      flash[:notice] = "The #{t('isa_assay')} was successfully updated.<br/>".html_safe
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay.id)
     else
@@ -55,6 +96,37 @@ class IsaAssaysController < ApplicationController
   end
 
   private
+
+  def fix_assay_linkage_for_new_assays
+    return unless @isa_assay.assay.is_isa_json_compliant?
+    return if @isa_assay.assay.is_assay_stream? # Should not fix anything when creating an assay stream
+    return unless @isa_assay.sample_type.present? # Just to be sure
+
+    previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
+    next_sample_types = previous_sample_type.next_linked_sample_types
+    next_sample_types.delete @isa_assay.sample_type
+    next_sample_type = next_sample_types.first
+
+    # In case an assay is inserted right at the end of an assay stream,
+    # there is no next sample type and also no linkage to fix
+    return if next_sample_type.nil?
+
+    next_sample_type.sample_attributes.detect(&:input_attribute?)&.update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
+  end
+
+  def rearrange_assay_positions_create_isa_assay
+    return if @isa_assay.assay.is_assay_stream?
+    return unless @isa_assay.assay.is_isa_json_compliant?
+
+    rearrange_assay_positions(@isa_assay.assay.assay_stream)
+  end
+
+  def initialize_isa_assay
+    @isa_assay = IsaAssay.new(isa_assay_params)
+    update_sharing_policies @isa_assay.assay
+    @isa_assay.assay.contributor = current_person
+    @isa_assay.sample_type.contributor = User.current_user.person if isa_assay_params[:sample_type]
+  end
 
   def isa_assay_params
     # TODO: get the params from a shared module
@@ -86,11 +158,13 @@ class IsaAssaysController < ApplicationController
      { samples_attributes: %i[asset_id direction] },
      { data_files_attributes: %i[asset_id direction relationship_type_id] },
      { publication_ids: [] },
-     { custom_metadata_attributes: determine_custom_metadata_keys },
-     { discussion_links_attributes: %i[id url label _destroy] }]
+     { extended_metadata_attributes: determine_extended_metadata_keys(:assay) },
+     { discussion_links_attributes: %i[id url label _destroy] }, :assay_stream_id]
   end
 
   def sample_type_params(params)
+    return [] unless params[:sample_type]
+
     attributes = params[:sample_type][:sample_attributes]
     if attributes
       params[:sample_type][:sample_attributes_attributes] = []
@@ -118,7 +192,9 @@ class IsaAssaysController < ApplicationController
                                         sample_attribute_type_id isa_tag_id
                                         sample_controlled_vocab_id
                                         linked_sample_type_id
-                                        description iri
+                                        template_attribute_id
+                                        description pid
+                                        allow_cv_free_text
                                         unit_id _destroy] }, { assay_ids: [] }]
   end
 
@@ -126,11 +202,49 @@ class IsaAssaysController < ApplicationController
     @single_page = true
   end
 
+  def old_attributes
+    @old_attributes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      { id: attr.id, title: attr.title }
+    end
+  end
+  def update_sample_json_metadata
+    attribute_changes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      old_attr = @old_attributes.detect { |oa| oa[:id] == attr.id }
+      next if old_attr.nil?
+
+      {id: attr.id, old_title: old_attr[:title], new_title: attr.title} unless old_attr[:title] == attr.title
+    end.compact
+    return  if attribute_changes.blank?
+
+    UpdateSampleMetadataJob.perform_later(@isa_assay.sample_type, @current_user, attribute_changes)
+  end
+
   def find_requested_item
     @isa_assay = IsaAssay.new
     @isa_assay.populate(params[:id])
-    unless requested_item_authorized?(@isa_assay.assay)
-      flash[:error] = "You are not authorized to edit this #{t('isa_assay')}"
+
+    if @isa_assay.assay.nil?
+      @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.")
+    else
+      @isa_assay.errors.add(:assay, "You are not authorized to edit this #{t('isa_assay')}.") unless requested_item_authorized?(@isa_assay.assay)
+    end
+
+    # Should not deal with sample type if assay has assay_class assay stream
+    unless @isa_assay.assay&.is_assay_stream?
+      if @isa_assay.sample_type.nil?
+        @isa_assay.errors.add(:sample_type, 'Sample type not found.')
+      elsif @isa_assay.sample_type.locked?
+        @isa_assay.errors.add(:sample_type, "The #{t('isa_assay')}'s #{t('sample_type')} is locked by a background process and cannot be edited.")
+      else
+        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this #{t('isa_assay')}'s #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+      end
+    end
+
+    if @isa_assay.errors.any?
+      error_messages = @isa_assay.errors.map do |error|
+        "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
+      end.join('')
+      flash[:error] = "<ul>#{error_messages}</ul>".html_safe
       redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay)
     end

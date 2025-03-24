@@ -2,18 +2,19 @@ class Sop < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
 
+  has_and_belongs_to_many :direct_studies, class_name: 'Study'
+
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  acts_as_doi_parent
 
   validates :projects, presence: true, projects: { self: true }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-  has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
-
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
   has_and_belongs_to_many :workflows
-
-  has_one :study, foreign_key: 'sop_id'
+  has_many :sample_resource_links, -> { where(resource_type: 'Sop') }, foreign_key: :resource_id
+  has_many :linked_samples, through: :sample_resource_links, source: :sample
 
   has_filter assay_type: Seek::Filtering::Filter.new(
       value_field: 'assays.assay_type_uri',
@@ -35,6 +36,9 @@ class Sop < ApplicationRecord
             :primary_key => :sop_id, :foreign_key => :asset_id
   end
 
+  def supports_spreadsheet_explore?
+    true
+  end
   def organism_title
     organism.nil? ? "" : organism.title
   end
@@ -47,11 +51,8 @@ class Sop < ApplicationRecord
     true
   end
 
-  def can_delete?(user = User.current_user)
-    if Seek::Config.project_single_page_advanced_enabled
-      super && study.blank?
-    else
-      super
-    end
+  def related_samples
+    linked_samples
   end
+
 end

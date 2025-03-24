@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="col-md-3">
+    <%= link_to new_extended_metadata_type_path, class: "btn btn-primary", role: "button", aria: { label: "Left Align" } do %>
+      <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+      Create Extended Metadata Type
+    <% end %>
+  </div>
+</div>
+
+<%= render partial: 'help_info' -%>
+
+<%= render partial: 'emt_tabs' -%>
+
+<script>
+    $j(document).ready(function() {
+
+        <% if @extended_metadata_type.present? %>
+             ExtendedMetadataType.addNewMarker('<%= @extended_metadata_type.id %>','<%= @extended_metadata_type.supported_type %>');
+        <% end %>
+    });
+</script>

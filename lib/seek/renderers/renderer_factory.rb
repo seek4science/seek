@@ -3,10 +3,10 @@ module Seek
     class RendererFactory
       include Singleton
 
-      def renderer(blob, url_options: {})
+      def renderer(blob, url_options: {}, params: {})
         renderer_class = cache.fetch(blob.cache_key) { detect_renderer(blob).name }.constantize
 
-        renderer_class.new(blob, url_options: url_options)
+        renderer_class.new(blob, url_options: url_options, params: params)
       end
 
       private
@@ -23,7 +23,7 @@ module Seek
 
       # Ordered list of Renderer classes. More generic renderers appear last.
       def renderer_instances
-        [SlideshareRenderer, YoutubeRenderer, MarkdownRenderer, NotebookRenderer, TextRenderer, PdfRenderer, ImageRenderer, BlankRenderer]
+        [SlideshareRenderer, YoutubeRenderer, MarkdownRenderer, NotebookRenderer, PdfRenderer, ImageRenderer, TextRenderer, BlankRenderer]
       end
     end
   end

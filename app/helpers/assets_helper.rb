@@ -94,18 +94,6 @@ module AssetsHelper
     "publish[#{item.class.name}][#{item.id}]"
   end
 
-  def sharing_item_param(item)
-    if item.try(:is_isa?)
-      "share_isa[#{item.class.name}][#{item.id}]"
-    elsif  (item.respond_to? (:investigations)) && (!item.investigations.any?)
-      "share_not_isa[#{item.class.name}][#{item.id}]"
-    elsif !item.respond_to? (:investigations)
-      "share_not_isa[#{item.class.name}][#{item.id}]"
-    else
-      "share_isa[#{item.class.name}][#{item.id}]"
-    end
-  end
-
   def include_downloadable_item?(items)
     has_downloadable_item = false
     items.each do |item|
@@ -124,10 +112,8 @@ module AssetsHelper
       resource_type = resource_or_text.class.name
       text = if resource_or_text.is_a?(Assay)
                resource_or_text.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
-             elsif !(translated = translate_resource_type(resource_type)).include?('translation missing')
-               translated
              else
-               resource_type.underscore.humanize
+               translate_resource_type(resource_type) || resource_type.underscore.humanize
              end
     end
     text
@@ -228,15 +214,26 @@ module AssetsHelper
     end
   end
 
-  def open_with_copasi_button (asset)
+  def open_with_copasi_js_button
 
-    files =   asset.content_blobs
-    download_path = polymorphic_path([files.first.asset, files.first], action: :download, code: params[:code])
+    tooltip_text = "Simulate model in the browser with javascript library"
+    button_link_to 'Simulate Online', 'copasi', '#', class: 'btn btn-primary btn-block', onclick: 'simulate()', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text)
+
+  end
+
+  def open_with_copasi_ui_button
+
+    blob  =   @display_model.copasi_supported_content_blobs.first
+
+    auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code unless @model.can_download?(nil)
+
+    download_path = polymorphic_path([@model, blob], action: :download, code: auth_code)
+
     copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
 
-    tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
+    tooltip_text_copasi_button = "Simulate your model locally using desk application CopasiUI."
 
-    button= button_link_to('Simulate Model in Copasi', 'copasi', copasi_download_path, class: 'btn btn-default', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+    button= button_link_to('Simulate in CopasiUI', 'copasi', copasi_download_path, class: 'btn btn-primary btn-block', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
 
     button
   end
@@ -348,4 +345,10 @@ module AssetsHelper
     end.join(', ').html_safe
   end
 
+  def batch_selection_collapse_toggle
+    content_tag(:span, class: 'batch-selection-collapse-toggle open') do
+      concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-down', 'aria-hidden' => 'true')
+      concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-right', 'aria-hidden' => 'true')
+    end
+  end
 end

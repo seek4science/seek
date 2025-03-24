@@ -6,27 +6,27 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    @programme_administrator = Factory(:person)
-    @project = Factory(:project)
-    @programme = Factory(:programme)
+    @programme_administrator = FactoryBot.create(:person)
+    @project = FactoryBot.create(:project)
+    @programme = FactoryBot.create(:programme)
   end
 
   #normal user without admin rights
   test 'user can create programme' do
-    a_person = Factory(:person)
+    a_person = FactoryBot.create(:person)
     user_login(a_person)
     body = api_max_post_body
     assert_difference('Programme.count') do
-      post "/programmes.json", params: body, as: :json
+      post collection_url, params: body, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
   end
 
   #programme_admin role access
   test 'programme admin can update' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user_login(person)
-    prog = Factory(:programme)
+    prog = FactoryBot.create(:programme)
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
     body = api_max_post_body
@@ -34,20 +34,20 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     body["data"]['attributes']['title'] = "Updated programme"
     #change_funding_codes_before_CU("min")
 
-    patch "/programmes/#{prog.id}.json", params: body, as: :json
+    patch member_url(prog), params: body, as: :json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
   end
 
   test 'programme admin can delete when no projects' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     user_login(person)
-    prog = Factory(:programme)
+    prog = FactoryBot.create(:programme)
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
 
     #programme has projects ==> cannot delete
     assert_no_difference('Programme.count', -1) do
-      delete "/programmes/#{prog.id}.json"
+      delete member_url(prog), headers: { 'Authorization' => write_access_auth }
       assert_response :forbidden
       validate_json response.body, '#/components/schemas/forbiddenResponse'
     end
@@ -56,11 +56,11 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     prog.projects = []
     prog.save!
     assert_difference('Programme.count', -1) do
-      delete "/programmes/#{prog.id}.json"
+      delete member_url(prog), headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
 
-    get "/programmes/#{prog.id}.json"
+    get member_url(prog), headers: { 'Authorization' => read_access_auth }
     assert_response :not_found
     validate_json response.body, '#/components/schemas/notFoundResponse'
   end

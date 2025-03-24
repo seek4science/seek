@@ -8,9 +8,9 @@
 <ul class="publishing_options">
 
   <% @items_for_publishing.each do |item| %>
-    <% if item.is_a?(Assay) || !item.assays.empty? %>
+    <% if item.is_a?(Assay) || (!item.is_a?(Event) && !item.assays.empty?) %>
       <li class="type_and_title">
-        <%= text_for_resource item -%>: <%= link_to item.title, item, :target => "_blank" -%>
+        <%= text_for_resource item -%>: <%= link_to item.title, item, target: "_blank" -%>
         <% if item.is_published? %>
           <span style="color:green">(already published)</span>
         <% end %>
@@ -30,7 +30,7 @@
   Would you like to review and publish the associated items?
 </p>
 
-<%= form_tag({:action => :publish_related_items}, :method => :post) do %>
+<%= form_tag({action: :publish_related_items}, method: :post) do %>
   <div style="display:none">
     <% @items_for_publishing.each do |item| %>
       <%= check_box_tag publishing_item_param(item), 1, true %>
@@ -40,9 +40,9 @@
 
   <br/>
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-  <%= submit_tag "OK", :class => 'btn btn-primary' -%>
+  <%= submit_tag "OK", class: 'btn btn-primary' -%>
   <% if allow_skip %>
-    <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'", :class => 'btn btn-default' -%>
+    <%= submit_tag "Skip", onclick: "this.form.action='check_gatekeeper_required'", class: 'btn btn-default' -%>
   <% end %>
   <%= cancel_button(:back) -%>
 <% end %>

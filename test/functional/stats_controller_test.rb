@@ -6,7 +6,7 @@ class StatsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test 'clear cache' do
-    person = Factory(:admin)
+    person = FactoryBot.create(:admin)
     login_as(person)
     key = "admin_dashboard_stats_activity"
     refute Rails.cache.exist?(key)
@@ -23,7 +23,7 @@ class StatsControllerTest < ActionController::TestCase
   end
 
   test 'none admins cannot clear cache' do
-    person = Factory(:person)
+    person = FactoryBot.create(:person)
     login_as(person)
     key = "admin_dashboard_stats_activity"
     refute Rails.cache.exist?(key)

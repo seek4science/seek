@@ -1,0 +1,44 @@
+<%
+  checkbox_class ||= "no_name"   # <- Needed!
+  published ||= false
+  cant_manage ||= false
+  not_visible ||= false
+  checked ||= false
+  has_children ||= false
+-%>
+<div class="btn-group">
+  <% if published %>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-success published disabled" data-tooltip="<%= tooltip('This item has already been published.') %>">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      Published
+    </button>
+  <% elsif not_visible %>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-danger not_visible disabled" data-tooltip="<%= tooltip('You do not have permission to view this item.') %>">
+      <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+    </button>
+  <% elsif cant_manage %>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-warning cant_manage disabled" data-tooltip="<%= tooltip('You do not have permission to manage this item.') %>">
+      <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+    </button>
+  <% else %>
+    <button type="button" class="btn btn-sm parent-btn-checkbox btn-default batch-selection-check-btn">
+      <%= check_box_tag checkbox_id, 1, checked, { class: checkbox_class } -%>
+    </button>
+  <% end %>
+
+  <% if has_children %>
+    <button type="button" class="btn btn-sm dropdown-toggle parent-btn-dropdown btn-default"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu text-left" role="menu">
+      <li><a class="batch-selection-select-children" href="#">
+        <%= image('checkbox_select_all', height: 30) %>
+        Select this item and all of its sub-items. </a></li>
+      <li><a class="batch-selection-deselect-children" href="#">
+        <%= image('checkbox_deselect_all', height: 30) %>
+        Deselect this item and all of its sub-items. </a></li>
+    </ul>
+  <% end %>
+</div>

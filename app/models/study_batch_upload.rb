@@ -29,7 +29,7 @@ class StudyBatchUpload < ApplicationRecord
   def self.extract_studies_from_file(studies_file)
     studies = []
     parsed_sheet = Seek::Templates::StudiesReader.new(studies_file)
-    metadata_type = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
+    metadata_type = ExtendedMetadataType.where(title: ExtendedMetadataType::MIAPPE_TITLE, supported_type: 'Study').last
     columns = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     study_start_row_index = 4
     parsed_sheet.each_record(3, columns) do |index, data|
@@ -37,8 +37,8 @@ class StudyBatchUpload < ApplicationRecord
         studies << Study.new(
             title: data[1].value,
             description: data[2].value,
-            custom_metadata: CustomMetadata.new(
-                custom_metadata_type: metadata_type,
+            extended_metadata: ExtendedMetadata.new(
+                extended_metadata_type: metadata_type,
                 data: generate_metadata(data)
             )
         )
@@ -84,7 +84,7 @@ class StudyBatchUpload < ApplicationRecord
 
   def self.unzip_batch(file_path, user_uuid)
     unzipped_files = Zip::File.open(file_path)
-    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload") if File.exists?("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
+    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload") if File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
     Dir.mkdir("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
     tmp_dir = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/"
     study_data = []
@@ -93,11 +93,11 @@ class StudyBatchUpload < ApplicationRecord
       file_name = File.basename(file.name)
       if file.name.include?('data/') && file.ftype != :directory
         study_data << file
-        Dir.mkdir "#{tmp_dir}/data" unless File.exists? "#{tmp_dir}/data"
-        file.extract("#{tmp_dir}/data/#{file_name}") unless File.exists? "#{tmp_dir}/data/#{file_name}"
+        Dir.mkdir "#{tmp_dir}/data" unless File.exist? "#{tmp_dir}/data"
+        file.extract("#{tmp_dir}/data/#{file_name}") unless File.exist? "#{tmp_dir}/data/#{file_name}"
       elsif file.ftype == :file
         studies << file
-        file.extract("#{tmp_dir}#{file_name}") unless File.exists? "#{tmp_dir}#{file_name}"
+        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
       end
     end
     [study_data, studies]
@@ -106,8 +106,8 @@ class StudyBatchUpload < ApplicationRecord
   def self.get_existing_studies(studies)
     existing_studies = []
     studies.each do |study|
-      study_metadata_id = study.custom_metadata.data[:id]
-      find_metadata = CustomMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%")
+      study_metadata_id = study.extended_metadata.data[:id]
+      find_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%")
       next if find_metadata.nil?
 
       find_metadata.each do |metadata|

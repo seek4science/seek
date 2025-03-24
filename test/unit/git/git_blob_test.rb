@@ -2,7 +2,7 @@ require 'test_helper'
 
 class GitBlobTest < ActiveSupport::TestCase
   setup do
-    @resource = Factory(:ro_crate_git_workflow)
+    @resource = FactoryBot.create(:ro_crate_git_workflow)
     @git_version = @resource.git_version
   end
 
@@ -28,7 +28,7 @@ class GitBlobTest < ActiveSupport::TestCase
 
   test 'unfetched remote blob' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/little_file.txt", 'http://somewhere.com/text.txt'
-    git_version = Factory(:git_version)
+    git_version = FactoryBot.create(:git_version)
     disable_authorization_checks do
       git_version.add_remote_file('remote.txt', 'http://somewhere.com/text.txt')
       git_version.save!
@@ -59,11 +59,26 @@ class GitBlobTest < ActiveSupport::TestCase
     remote_blob.file_contents(fetch_remote: true) do |c|
       assert_equal 'lit', c.read(3)
     end
+
+    # fetch_remote
+    refute remote_blob.fetch_remote
+    assert_equal 0, remote_blob.size
+    assert_equal 0, remote_blob.file_contents.size
+    remote_blob.file_contents do |c|
+      assert_nil c.read(1)
+    end
+
+    remote_blob.fetch_remote = true
+    assert remote_blob.fetch_remote
+    assert_equal 11, remote_blob.file_contents.size
+    remote_blob.file_contents do |c|
+      assert_equal 'lit', c.read(3)
+    end
   end
 
   test 'fetched remote blob' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/little_file.txt", 'http://somewhere.com/text.txt'
-    git_version = Factory(:git_version)
+    git_version = FactoryBot.create(:git_version)
     disable_authorization_checks do
       git_version.add_remote_file('remote.txt', 'http://somewhere.com/text.txt')
       git_version.fetch_remote_file('remote.txt')
@@ -98,7 +113,7 @@ class GitBlobTest < ActiveSupport::TestCase
   end
 
   test 'search terms' do
-    git_version = Factory(:git_version)
+    git_version = FactoryBot.create(:git_version)
     disable_authorization_checks do
       git_version.add_file('text.txt', open_fixture_file('large_text_file.txt'))
       git_version.add_file('binary.png', open_fixture_file('file_picture.png'))

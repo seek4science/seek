@@ -1,429 +1,755 @@
 <% environment.context_class.instance_eval { include Seek::Util.routes } %>
-const instanceName = "<%= Seek::Config.instance_name %>";
 
-const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
+const rowStatus = {
+  new: "new",
+  delete: "delete",
+  update: "update",
+  empty: "empty",
+  noAction: ""
+};
 const dtErrClass = "row-error",
-	dtSuccessClass = "row-success",
-	dtDeletedClass = "disabled",
-	dtRowDelete = "row-delete";
-const defaultCols = [
-	{
-		width: "10px",
-		className: "text-center",
-		mRender: function (data, type, full) {
-			return "<td><input class='row-select' type='checkbox' onClick='handleCheck($j(this))'/></td>";
-		}
-	}
-];
+  dtSuccessClass = "row-success",
+  dtDeletedClass = "disabled",
+  dtRowDelete = "row-delete";
+const defaultCols = [{
+  width: "10px",
+  className: "text-center",
+  mRender: function(data, type, full) {
+    return "<td><input class='row-select' type='checkbox' onClick='handleSelect($j(this))'/></td>";
+  }
+}];
 
-const objectInput =
-	"<td><input data-role='seek-objectsinput' data-tags-limit='100' " +
-	"data-existing-objects='%EXISTING%' data-typeahead='true' " +
-	"data-typeahead-query-url=%URL% /></td>";
-const typeaheadUrl = "<%= typeahead_samples_path %>" + "?query=%QUERY&linked_sample_type_id=%LINKED%";
+// Sanitizes input data to prevent XSS attacks
+// https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+function sanitizeHTML(str) {
+    return str.replace(/[&<>"']/g, function(match) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;'
+        }[match];
+    });
+}
 
-const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked"));
+function sanitizeData(data) {
+    if (typeof data === 'string' && data !== "") {
+        return sanitizeHTML(data);
+    } else if(typeof data === 'array'){
+        return data.forEach((e) => {
+            sanitizeData(e);
+        });
+    } else {
+        // Handle other data types or nested objects/arrays if necessary
+        return data;
+    }
+}
 
-(function ($j) {
-	$j.dynamicTable = function (table) {
-		this.table = table instanceof $j ? table : $j(table);
-	};
-	$j.dynamicTable.prototype = {
-		init: function (rows, columns, options = {}) {
-			columns.forEach((c) => {
-				c["mRender"] = function (data, type, full) {
-					if (c.multi_link) {
-						data = data && Array.isArray(data) ? data : [data];
-						data = data[0]?.id ? data : [];
-						const existingObjectsJSON = data.map(({ id, title }) => ({
-							id: id,
-							name: title
-						}));
-						const existingObjects = JSON.stringify(existingObjectsJSON);
-						const url = typeaheadUrl.replace("%LINKED%", c.linked_sample_type);
-						if (options.readonly) {
-							return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
-						} else {
-							return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
-						}
-					} else return data == "#HIDDEN" ? "<em><small>Hidden</small></em>" : data;
-				};
-				c["createdCell"] = function (td, cellData, rowData, row, col) {
-					if (c.multi_link) setTagsInput($j(td));
-					if (cellData == "#HIDDEN") $j(td).addClass("disabled");
-				};
-				if (c.title == "id") c.title = instanceName + " id";
-			});
-			let multi_link_idx = columns.reduce((t, c, i) => (c.multi_link ? [...t, i + 1] : t), []);
-			// If it's Assay level table keep the first, otherwise hide all of them
-			if (options.level == "assay") multi_link_idx = multi_link_idx.slice(1);
-			this.hiddenColumns = multi_link_idx;
-			columns.unshift(...defaultCols);
-			const columnDefs = [
-				{ orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
-				{
-					targets: options.readonly ? multi_link_idx : [1, 2],
-					visible: false,
-					searchable: false
-				}
-			];
-			const editor = this.editor;
-			this.table = this.table.DataTable({
-				columnDefs,
-				columns,
-				scrollX: "100%",
-				errMode: "throw",
-				order: [[options.readonly ? 1 : 3, "asc"]],
-				pageLength: 25,
-				dom:
-					"<'row'<'col-sm-3'l><'col-sm-9 dt-btn-container'<'dt-btn-item'f><'dt-btn-item-last'B>>>" +
-					"<'row'<'col-sm-12'tr>>" +
-					"<'row'<'col-sm-5'i><'col-sm-7'p>>",
-				buttons: [
+const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" value="" autocomplete="off" />' +
+  '<select name="_NAME_[]" id="select-_NAME_" class="form-control _EXTRACLASS_" title="_TITLE_" data-role="seek-objectsinput" ' +
+  'data-tags-limit="_LIMIT?_" multiple style="background-color: coral;" data-typeahead-template="_TYPEHEAD_"' +
+  'data-typeahead-query-url="_URL_" data-allow-new-items=_ALLOW_FREE_TEXT_>_OPTIONS_</select>';
+
+const typeaheadSamplesUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
+const typeaheadCVUrl = "<%= typeahead_sample_controlled_vocabs_path(scv_id: '_CVID_') %>";
+const typeaheadSopsUrl = "<%= dynamic_table_typeahead_sops_path(study_id: '__STUDY_ID__', assay_id: '__ASSAY_ID__') %>";
+const typeaheadDataFilesUrl = "<%= typeahead_data_files_path %>";
+const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
+
+// Checking if settings are enabled
+const registeredSopsEnabled = <%= Seek::Config.sops_enabled %>;
+const registeredDataFilesEnabled = <%= Seek::Config.data_files_enabled %>;
+const registeredOrganismsEnabled = <%= Seek::Config.organisms_enabled %>;
+
+const handleSelect = (e) => {
+  $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
+  if (!e.is(":checked")) {
+    // Hide DT Select all button
+    const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
+    dtSelectAll.html("Select all rows")
+    dtSelectAll.css("display", "none")
+  }
+  const dtName = $j(e).parents("table").data("dtname");
+  window[dtName].setPermissionBTNActivity()
+}
+
+(function($j) {
+  $j.dynamicTable = function(table) {
+    this.table = table instanceof $j ? table : $j(table);
+  };
+  $j.dynamicTable.prototype = {
+    init: function(rows, columns, options = {}) {
+        const studyId = options.studyId;
+        const assayId = options.assayId;
+
+        columns.forEach((c) => {
+        let linkedSamplesUrl;
+        let cvUrl;
+        let registeredSopUrl;
+
+        let isRegisteredSample = false;
+        let isCVList = false;
+        let isRegisteredSop = false;
+        let isRegisteredDataFile = false;
+        let isRegisteredStrain = false;
+        if (c.attribute_type) {
+          isRegisteredSample = c.attribute_type.base_type.includes("SeekSample");
+          isCVList = c.attribute_type.base_type === "CVList";
+          isRegisteredSop = c.attribute_type.base_type === "SeekSop";
+          isRegisteredDataFile = c.attribute_type.base_type === "SeekDataFile";
+          isRegisteredStrain = c.attribute_type.base_type === "SeekStrain";
+        }
+
+        if (isRegisteredSample) {
+          linkedSamplesUrl = typeaheadSamplesUrl.replace("_LINKED_", c.linked_sample_type);
+          const linkedSamples = retrieveLinkedSamples(linkedSamplesUrl);
+          c.linkedSampleIds = linkedSamples.map((ls) => ls.id);
+        }
+
+        if(isCVList && 'cv_id' in c){
+          cvUrl = typeaheadCVUrl.replace("_CVID_", c.cv_id);
+        }
+
+        if (isRegisteredSop) {
+            if (!registeredSopsEnabled) {
+                alert("A 'Registered SOP' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
+            }
+            registeredSopUrl = typeaheadSopsUrl.replace('__STUDY_ID__', options.studyId).replace('__ASSAY_ID__', options.assayId);
+        }
+
+        if (isRegisteredDataFile) {
+            if (!registeredDataFilesEnabled) {
+                alert("A 'Registered Data File' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
+            }
+        }
+
+        if (isRegisteredStrain) {
+            if(!registeredOrganismsEnabled) {
+                alert("A 'Registered Strain' attribute has been detected but the 'organisms' setting has been disabled. Please contact the administrator to enable the setting.")
+            }
+        }
+
+        c["render"] = function(data_, type, full, meta) {
+          let sanitizedData = sanitizeData(data_);
+          let data;
+          if(isRegisteredSample){
+            data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+            data = data[0]?.id ? data : [];
+            return registeredSamplesObjectsInput(c, data, options, linkedSamplesUrl);
+          } else if (isRegisteredSop) {
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data[0]?.id ? data : [];
+              return simpleObjectsInput(c, data, options, registeredSopUrl);
+          } else if(isCVList && sanitizedData !== "#HIDDEN"){
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data.map((e) => {
+                if (e?.id){
+                  return e.id
+                } else {
+                  return e
+                }
+              });
+              return cvListObjectsInput(c, data, options, cvUrl);
+          } else if (isRegisteredDataFile) {
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data[0]?.id ? data : [];
+              return simpleObjectsInput(c, data, options, typeaheadDataFilesUrl);
+          } else if (isRegisteredStrain) {
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data[0]?.id ? data : [];
+              return simpleObjectsInput(c, data, options, typeaheadStrainsUrl);
+          } else if (sanitizedData === "#HIDDEN") {
+            return "<em><small>Hidden</small></em>";
+          } else {
+            return sanitizedData;
+          }
+        };
+        c["createdCell"] = function(td, cellData, rowData, row, col) {
+          if (cellData == "#HIDDEN") $j(td).addClass("disabled");
+        };
+				// Changes the id header to an instance id
+        if (c.title == "id") c.title = window.instanceName + " id";
+      });
+      // Retrieve the column index of the multi-input cells (select2 items)
+      // if column has a multi-input cell, it adds the index to the t array (=accumulator)
+      let multi_link_idx = columns.reduce((t, c, i) => (c.multi_link ? [...t, i + 1] : t), []);
+      // If it's Assay level table keep the first, otherwise hide all of them
+      if (options.level == "assay") multi_link_idx = multi_link_idx.slice(1);
+      this.hiddenColumns = multi_link_idx;
+      columns.unshift(...defaultCols);
+
+      const columnDefs = [{
+          targets: options.readonly ? [0] : [0, 1]
+        },
+        {
+          targets: options.readonly ? [0, ...multi_link_idx] : [1],
+          visible: false,
+          searchable: false
+        }
+      ];
+      const editor = this.editor;
+      this.table = this.table.DataTable({
+        colReorder: true,
+        columnDefs,
+        columns,
+        scrollX: "100%",
+        errMode: "throw",
+        order: [
+          [options.readonly ? 1 : 3, "asc"]
+        ],
+        pageLength: 25,
+        dom: "<'row'<'col-sm-3'l <'toolbar'>><'col-sm-9 dt-btn-container'<'dt-btn-item'f><'dt-btn-item-last'B>>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        buttons: [
 					{
 						extend: "csvHtml5",
-						text: "Export table",
+						text: "Export to CSV",
 						exportOptions: {
 							// exclude checkbox column
-							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"]
+							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
 						}
 					},
+					{
+						extend: "copy",
+						text: "Copy to Clipboard",
+						exportOptions: {
+							// exclude checkbox column
+							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
+						},
+					},
 					"colvis"
-				],
-				ajax: options.ajax
-			});
-			this.table.rows.add(rows.map((r) => [null, ...r])).draw();
-			if (!options.readonly) {
-				const table = this.table;
-				const context = this;
-				this.table.on("click", "tbody td:not(:has(input))", function () {
-					editor($j(this), table, context);
-				});
-			}
-			if (options.assayId) this.assayId = options.assayId;
-			this.options = options;
-			this.initHeader(columns);
-		},
-		initHeader: function (columns) {
-			const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
-			if (this.options.readonly) {
-				const sampleTypes = this.getSampleTypes();
-				$j.each(sampleTypes, (i, s) => {
-					if (!isNaN(s)) {
-						const colIdxs = this.table.columns(`${s}:name`)[0];
-						if (colIdxs.length) colIdxs.push(colIdxs[0] - 1);
-						this.table.column(function (idx, data, node) {
-							if (colIdxs.includes(idx)) $j(node).addClass(`sp-variant-${i % 2}`);
-						});
+        ],
+        ajax: options.ajax
+      });
+      this.table.rows.add(rows.map((r) => [null, ...r])).draw();
+      if (!options.readonly) {
+        const table = this.table;
+        const context = this;
+        this.table.on("click", "tbody td:not(:has(input))", function() {
+					// Makes all cells editable, except column 2 & 3 => Fairdom-seek ID + UUID
+					if (![2, 3].includes(this._DT_CellIndex.column)) {
+						editor($j(this), table, context);
 					}
-				});
-			}
-			this.table
-				.columns()
-				.header()
-				.each((x, i) => {
-					if (i == 0) $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`);
-					else if (requiredCols.includes(i)) {
-						$j(x).append("<span class='required-attribute'>*</span>");
-					}
-					$j(x)
-						.attr("title", columns[i].description)
-						.attr("data-toggle", "tooltip")
-						.attr("data-placement", "top")
-						.attr("data-container", "body");
-				});
-			$j('[data-toggle="tooltip"]').tooltip();
-			highlightTitleCol(this.table);
-		},
-		pasteFromClipboard: function () {
-			navigator.clipboard.readText().then((text) => {
-				const colsCount = this.table.columns().data().length;
-				const splitter = text.includes("\r\n") ? "\r\n" : "\n";
-				const delimeter = "\t";
-				const _defaultCols = defaultCols.map((c) => c.defaultValue || "");
+        });
+      }
+      if (options.assayId) this.assayId = options.assayId;
+      this.options = options;
+      this.initHeader(columns);
+      this.setSelect2();
 
-				const cols = this.table.settings()[0].aoColumns;
-				const sampleLinks = getSampleLinking(cols);
-				const sampleLinkIndexes = sampleLinks.map((x) => x.idx).sort((a, b) => b - a);
-				const sampleLinksTitles = sampleLinks.map((x) => x.title);
+      $j('div.toolbar').html("<span class='dt_select_all' style='display:none' onClick='selectAll(this, true)'>Select all rows</span>").addClass("dt-select-all");
+    },
+    initHeader: function(columns) {
+      const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
+      if (this.options.readonly) {
+        const sampleTypes = this.getSampleTypes();
+        $j.each(sampleTypes, (i, s) => {
+          if (!isNaN(s)) {
+            const colIdxs = this.table.columns(`${s}:name`)[0];
+            if (colIdxs.length) colIdxs.push(colIdxs[0] - 1, colIdxs[0] - 2);
+            this.table.column(function(idx, data, node) {
+              if (colIdxs.includes(idx)) $j(node).addClass(`sp-variant-${i % 2}`);
+            });
+          }
+        });
+      }
+      this.table
+        .columns()
+        .header()
+        .each((x, i) => {
+          if (i == 0 && !this.options.readonly) $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`);
+          else if (requiredCols.includes(i)) {
+            $j(x).append("<span class='required-attribute'>*</span>");
+          }
+          $j(x)
+            .attr("title", columns[i].description)
+            .attr("data-toggle", "tooltip")
+            .attr("data-placement", "top")
+            .attr("data-container", "body");
+        });
+      $j('[data-toggle="tooltip"]').tooltip();
+      highlightTitleCol(this.table);
+    },
+    pasteFromClipboard: function() {
+      try {
+        navigator.clipboard.readText().then((text) => {
+          const colsCount = this.table.columns().data().length;
+          const splitter = text.includes("\r\n") ? "\r\n" : "\n";
+          const delimeter = "\t";
+          const _defaultCols = defaultCols.map((c) => c.defaultValue || "");
 
-				const rows = text
-					.split(splitter)
-					.filter((x) => x)
-					.map((r) => {
-						// Preserve row status and id
-						let splitted = [rowStatus.new, ""].concat(r.split(delimeter));
-						const missingColsCount = colsCount - defaultCols.length - splitted.length;
-						splitted = _defaultCols.concat(splitted);
+          const cols = this.table.settings()[0].aoColumns;
+          const sampleLinks = getSampleLinking(cols);
+          const sampleLinkIndexes = sampleLinks.map((x) => x.idx).sort((a, b) => b - a);
+          const sampleLinksTitles = sampleLinks.map((x) => x.title);
 
-						// Preserve empty placeholder for columns of type of 'Registered Sample (multiple)'
-						sampleLinkIndexes.forEach((x) => splitted.splice(x, 0, []));
+          const rows = text
+            .split(splitter)
+            .filter((x) => x)
+            .map((r) => {
+              // Preserve row status, id and uuid
+              let splitted = [rowStatus.new, "", ""].concat(r.split(delimeter));
+              const missingColsCount = colsCount - defaultCols.length - splitted.length;
+              splitted = _defaultCols.concat(splitted);
 
-						return missingColsCount < 0
-							? splitted.slice(0, colsCount)
-							: splitted.concat(Array(missingColsCount).fill(""));
-					})
-					.filter((x) => x);
+              // Preserve empty placeholder for columns of type of 'Registered Sample List'
+              sampleLinkIndexes.forEach((x) => splitted.splice(x, 0, []));
 
-				this.table.rows.add(rows).draw();
+              return missingColsCount < 0 ?
+                splitted.slice(0, colsCount) :
+                splitted.concat(Array(missingColsCount).fill(""));
+            })
+            .filter((x) => x);
 
-				if (sampleLinksTitles.length)
-					alert(
-						"No value is pasted for the following column(s): \n" +
-							sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
-							"\nYou need to manually input them."
-					);
-			});
-		},
-		newRow: function () {
-			const colsCount = this.table.columns().data().length;
-			const arr = defaultCols.map((c) => c.defaultValue || "").concat(Array(colsCount - defaultCols.length).fill(""));
-			const cols = this.table.settings()[0].aoColumns;
-			const indexes = getStatusIndexes(cols);
-			const sampleLinkIndexes = getSampleLinking(cols).map((x) => x.idx);
-			indexes.forEach((x) => (arr[x] = rowStatus.new));
-			sampleLinkIndexes.forEach((x) => (arr[x] = []));
-			this.table.row.add(arr).draw();
-			updateContainerHeight();
-			highlightTitleCol(this.table);
-		},
-		setAsDeleted: function () {
-			const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
-			const deleteRowInx = [];
-			const table = this.table;
-			table.rows(function (idx, data, node) {
-				let hasId = false;
-				// If selected
-				if (data[0]) {
-					indexes.forEach((x) => {
-						// empty status is a placeholder for missing samples
-						// Check if the sample has an ID (data[x+1]) (it's an existing sample)
-						if (data[x + 1]) {
-							data[x] = rowStatus.delete;
-							$j(node).find("td").addClass(dtRowDelete);
-						} else hasId = true;
-					});
-					// There is only one status column in regular table
-					if (hasId) deleteRowInx.push(idx);
-				}
-			});
-			if (deleteRowInx.length) table.rows(deleteRowInx).remove().draw();
-		},
-		save: async function () {
-			const { enableLoading, disableLoading } = this.options;
-			if (enableLoading) enableLoading();
-			this.resetClasses();
-			//=======================DELETE==================================
-			const deletedSamples = this.getSamples(rowStatus.delete);
-			//* Delete action is applied to all samples in a row
-			let res = await batchDeleteSample(deletedSamples);
-			if (res) handleResponse(this.table, deletedSamples)(res);
-			//=======================UPDATE==================================
-			const updatedSamples = this.getSamples(rowStatus.update);
-			res = await batchUpdateSample(updatedSamples);
-			if (res) handleResponse(this.table, updatedSamples)(res);
-			//=======================CREATE==================================
-			const sampleTypeIds = this.getSampleTypes();
-			for (const s of sampleTypeIds) {
-				const newSamples = this.getSamples(rowStatus.new, s);
-				res = await batchCreateSample(newSamples, projectDefaultPolicy);
-				if (res) {
-					handleResponse(this.table, newSamples)(res);
-				}
-			}
-			if (this.options.callback && typeof this.options.callback === "function") {
-				this.options.callback();
-			}
-			if (disableLoading) disableLoading();
-		},
-		headers: function () {
-			return this.table
-				.columns()
-				.header()
-				.toArray()
-				.map((x) => x.innerText)
-				.slice(defaultCols.length);
-		},
-		getSampleTypes: function () {
-			return this.table
-				.settings()[0]
-				.aoColumns.map((c) => c.name)
-				.filter((value, index, self) => value && self.indexOf(value) === index);
-		},
-		getSamples: function (status, sampleTypeId = null) {
-			const rowsIdx = this.table.rows().indexes().toArray();
-			const sampleTypeIds = sampleTypeId ? [sampleTypeId] : this.getSampleTypes();
-			return sampleTypeIds.map((s) => {
-				const columnNames = this.table
-					.settings()[0]
-					.aoColumns.filter((c) => c.name === s)
-					.map((c) => c.title);
-				return {
-					pid: pid.toString(),
-					sampleTypeId: s,
-					assayId: this.assayId,
-					// Returning those samples that apply the 'status'
-					samples: rowsIdx.reduce((filtered, i) => {
-						const item = this.table.cells(i, `${s}:name`).data().toArray();
-						if (item[0] == status)
-							filtered.push({
-								id: item[1],
-								exId: `${i}-${s}`,
-								data: item.reduce((obj, curr, j) => ({ ...obj, [columnNames[j]]: checkSampleLink(curr) }), {})
-							});
-						return filtered;
-					}, [])
-				};
-			});
-		},
-		log: function () {
-			console.log(this.table.rows().data());
-		},
-		getCvId: function (colIndex) {
-			return this.table.settings()[0].aoColumns[colIndex].cv_id;
-		},
-		editor: function (elem, table, context) {
-			elem
-				.attr("contenteditable", true)
-				.focus()
-				.unbind()
-				.blur(function () {
-					table.cell(elem).data(elem.text());
-					elem.attr("contenteditable", false);
-					table.columns.adjust();
-					handleCellUpdate(table, elem);
-				});
+          this.table.rows.add(rows).draw();
 
-			const colIndex = table.cell(elem).index().column;
-			const cvId = context.getCvId(colIndex);
-			if (cvId) setAutoComplete(elem, cvId);
-		},
-		resetClasses: function () {
-			$j(`#${this.table.tables().nodes().to$().attr("id")} td`).removeClass(dtErrClass);
-		},
-		toggleSampleType: function (sampleTypeId, visible) {
-			const hiddenCols = this.hiddenColumns;
-			const toBeShown = [];
-			if (!visible) return this.table.columns(`${sampleTypeId}:name`).visible(false);
-			this.table.columns(`${sampleTypeId}:name`).every((c) => {
-				!hiddenCols.includes(c) && toBeShown.push(c);
-			});
-			this.table.columns(toBeShown).visible(true);
-		}
-	};
+          if (sampleLinksTitles.length)
+            alert(
+              "No value is pasted for the following column(s): \n" +
+              sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
+              "\nYou need to manually input them."
+            );
+        }).catch((error) =>{
+        alert(`Paste action aborted:\n\n${error}\n\nNote: Some browsers require to click 'paste' to paste the information in the table.`);
+        });
+
+      } catch (error) {
+        if (error instanceof TypeError && navigator.userAgent.toLowerCase().includes('firefox')){
+          if(confirm('Your Firefox browser might not support clipboard access. By clicking OK, you\'ll be redirected to the official documentation.')){
+            window.open("<%= Seek::Help::HelpDictionary.instance.help_link(:clipboard_api_mozilla) %>", "_blank");
+          }
+        }
+        console.log('An error occurred:', error);
+      }
+    },
+    newRow: function() {
+      const colsCount = this.table.columns().data().length;
+      const arr = defaultCols.map((c) => c.defaultValue || "").concat(Array(colsCount - defaultCols.length).fill(""));
+      const cols = this.table.settings()[0].aoColumns;
+      const indexes = getStatusIndexes(cols);
+      const sampleLinkIndexes = getSampleLinking(cols).map((x) => x.idx);
+      indexes.forEach((x) => (arr[x] = rowStatus.new));
+      sampleLinkIndexes.forEach((x) => (arr[x] = []));
+      this.table.row.add(arr).draw();
+      updateContainerHeight();
+      highlightTitleCol(this.table);
+    },
+    setAsDeleted: function() {
+      const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
+      const deleteRowInx = [];
+      const table = this.table;
+      table.rows(function(idx, data, node) {
+        let hasId = false;
+        // If selected
+        if (data[0]) {
+          indexes.forEach((x) => {
+            // empty status is a placeholder for missing samples
+            // Check if the sample has an ID (data[x+1]) (it's an existing sample)
+            if (data[x + 1]) {
+              data[x] = rowStatus.delete;
+              $j(node).find("td").addClass(dtRowDelete);
+            } else hasId = true;
+          });
+          // There is only one status column in regular table
+          if (hasId) deleteRowInx.push(idx);
+        }
+      });
+      if (deleteRowInx.length) table.rows(deleteRowInx).remove().draw();
+    },
+    save: async function() {
+      const {
+        enableLoading,
+        disableLoading
+      } = this.options;
+      if (enableLoading) enableLoading();
+      this.resetClasses();
+      //=======================DELETE==================================
+      const deletedSamples = this.getSamples(rowStatus.delete);
+      //* Delete action is applied to all samples in a row
+      let res = await batchDeleteSample(deletedSamples);
+      if (res) handleResponse(this.table, deletedSamples)(res);
+      //=======================UPDATE==================================
+      const updatedSamples = this.getSamples(rowStatus.update);
+      res = await batchUpdateSample(updatedSamples);
+      if (res) handleResponse(this.table, updatedSamples)(res);
+      //=======================CREATE==================================
+      const sampleTypeIds = this.getSampleTypes();
+      for (const s of sampleTypeIds) {
+        const newSamples = this.getSamples(rowStatus.new, s);
+        res = await batchCreateSample(newSamples, projectDefaultPolicy);
+        if (res) {
+          handleResponse(this.table, newSamples)(res);
+        }
+      }
+      if (this.options.callback && typeof this.options.callback === "function") {
+        this.options.callback();
+      }
+      if (disableLoading) disableLoading();
+    },
+    headers: function() {
+      return this.table
+        .columns()
+        .header()
+        .toArray()
+        .map((x) => x.innerText)
+        .slice(defaultCols.length);
+    },
+    getSampleTypes: function() {
+      return this.table
+        .settings()[0]
+        .aoColumns.map((c) => c.name)
+        .filter((value, index, self) => value && self.indexOf(value) === index);
+    },
+    getSamples: function(status, sampleTypeId = null) {
+      const rowsIdx = this.table.rows().indexes().toArray();
+      const sampleTypeIds = sampleTypeId ? [sampleTypeId] : this.getSampleTypes();
+      return sampleTypeIds.map((s) => {
+        const columnNames = this.table
+          .settings()[0]
+          .aoColumns.filter((c) => c.name === s)
+          .map((c) => c.title);
+        return {
+          pid: pid.toString(),
+          sampleTypeId: s,
+          assayId: this.assayId,
+          // Returning those samples that apply the 'status'
+          samples: rowsIdx.reduce((filtered, i) => {
+            const item = this.table.cells(i, `${s}:name`).data().toArray();
+            if (item[0] == status)
+              filtered.push({
+                id: item[1],
+                exId: `${i}-${s}`,
+                data: item.reduce((obj, curr, j) => ({
+                  ...obj,
+                  [columnNames[j]]: checkSampleLink(curr)
+                }), {})
+              });
+            return filtered;
+          }, [])
+        };
+      });
+    },
+    log: function() {
+      console.log(this.table.rows().data());
+    },
+    getCvId: function(colIndex) {
+      return this.table.settings()[0].aoColumns[colIndex].cv_id;
+    },
+    editor: function(elem, table, context) {
+      elem
+        .attr("contenteditable", true)
+        .focus()
+        .unbind()
+        .blur(function() {
+          table.cell(elem).data(elem.text());
+          elem.attr("contenteditable", false);
+          table.columns.adjust();
+          handleCellUpdate(table, elem);
+        });
+
+      const colIndex = table.cell(elem).index().column;
+      const cvId = context.getCvId(colIndex);
+      if (cvId) setAutoComplete(elem, cvId);
+    },
+    resetClasses: function() {
+      $j(`#${this.table.tables().nodes().to$().attr("id")} td`).removeClass(dtErrClass);
+    },
+    toggleSampleType: function(sampleTypeId, visible) {
+      const hiddenCols = this.hiddenColumns;
+      const toBeShown = [];
+      if (!visible) return this.table.columns(`${sampleTypeId}:name`).visible(false);
+      this.table.columns(`${sampleTypeId}:name`).every((c) => {
+        !hiddenCols.includes(c) && toBeShown.push(c);
+      });
+      this.table.columns(toBeShown).visible(true);
+    },
+    setPermissionBTNActivity: function() {
+      const tbl = $j(this.table.table().container())
+      const permissionBtn = tbl.closest('.tab-pane').find('.btn_set_permission')
+      $j(permissionBtn).prop("disabled", false)
+      const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
+      this.table.rows(function(idx, data, node) {
+        if (data[0])
+          indexes.forEach((x) => {
+            if (data[x] == rowStatus.new) {
+              $j(permissionBtn).prop("disabled", true);
+              return
+            }
+          });
+      });
+    },
+    selectedSampleIds: function() {
+      const sampleIds = []
+      const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
+      this.table.rows(function(idx, data, node) {
+        if (data[0])
+          indexes.forEach((x) => {
+            if (data[x + 1]) sampleIds.push(data[x + 1])
+          })
+      });
+      return sampleIds;
+    },
+    setSelect2: function() {
+      $j(this.table.table().container()).on("select2:select select2:unselect", 'td', function(e) {
+        const td = $j(this);
+        const table = td.parents("table").DataTable();
+
+        const values = td.find("option").map((_index, opt) => {
+          if (opt.value != "") return {
+            id: opt.value,
+            title: opt.innerText
+          };
+        }).toArray();
+
+        const updatedValues = e.params.data.selected ? values : values.filter(({
+          id,
+          title
+        }) => {
+          if (id !== e.params.data.id) return {
+            id,
+            title
+          };
+        });
+
+        table.cell(td).data(updatedValues);
+        handleCellUpdate(table, td);
+        table.columns.adjust();
+      });
+    }
+  };
 })(jQuery);
 
+// Highlights the column if the attribute is a title
 function highlightTitleCol(table) {
-	table.settings()[0].aoColumns.forEach((c, i) => {
-		if (c.is_title) $j(table.column(i).nodes()).addClass("highlight");
-	});
+  table.settings()[0].aoColumns.forEach((c, i) => {
+    if (c.is_title) $j(table.column(i).nodes()).addClass("highlight");
+  });
 }
 
 function checkSampleLink(value) {
-	if (Array.isArray(value)) {
-		return value.map((x) => x.id).join(",");
-	} else return value;
+  if (Array.isArray(value)) {
+    return value.map((x) => x.id).join(",");
+  } else return value;
 }
 
 function sampleStatus(table, rowId, sampleTypeId, value = "notSet") {
-	const sampleStatusIndex = table.settings()[0].aoColumns.findIndex((x) => x?.status && x.name == sampleTypeId);
-	if (value !== "notSet") table.row(rowId).data()[sampleStatusIndex] = value;
-	else return table.row(rowId).data()[sampleStatusIndex];
+  const sampleStatusIndex = table.settings()[0].aoColumns.findIndex((x) => x?.status && x.name == sampleTypeId);
+  if (value !== "notSet") table.row(rowId).data()[sampleStatusIndex] = value;
+  else return table.row(rowId).data()[sampleStatusIndex];
 }
 
 function getStatusIndexes(arr) {
-	return arr.filter((x) => x?.status).map((x) => x.idx);
+  return arr.filter((x) => x?.status).map((x) => x.idx);
 }
 
 function getSampleLinking(arr) {
-	return arr.filter((x) => x.linked_sample_type).map(({ idx, title }) => ({ idx, title }));
-}
-
-function setTagsInput(item) {
-	// There's a new input after the table is rendered
-	const newInput = item.find("input").first();
-	loadObjectInputs({ item: newInput });
-	newInput.on("itemAdded itemRemoved", function (event) {
-		const items = $j(this).tagsinput("items");
-		const values = items.map(({ id, name }) => ({
-			id,
-			title: name
-		}));
-		const table = $j(this).parents("table").DataTable();
-		const elem = $j(this).parent();
-		const td = $j(this).closest("td");
-		table.cell(elem).data(values);
-		handleCellUpdate(table, elem);
-		setTagsInput($j(td));
-		table.columns.adjust();
-	});
+  return arr.filter((x) => x.linked_sample_type).map(({
+    idx,
+    title
+  }) => ({
+    idx,
+    title
+  }));
 }
 
 function handleCellUpdate(table, cell) {
-	const { row, column } = table.cell(cell).index();
-	const colName = table.settings()[0].aoColumns[column].name;
-	// sampleType status col index
-	const sampleStatusIndex = table.settings()[0].aoColumns.findIndex((x) => x?.status && x.name == colName);
-	// If it is a new sample, then it has to be created
-	const status = table.row(row).data()[sampleStatusIndex];
-	if (status == rowStatus.empty) {
-		table.row(row).data()[sampleStatusIndex] = rowStatus.new;
-	} else if (status == "") {
-		table.row(row).data()[sampleStatusIndex] = rowStatus.update;
-	}
+  const {
+    row,
+    column
+  } = table.cell(cell).index();
+  const colName = table.settings()[0].aoColumns[column].name;
+  // sampleType status col index
+  const sampleStatusIndex = table.settings()[0].aoColumns.findIndex((x) => x?.status && x.name == colName);
+  // If it is a new sample, then it has to be created
+  const status = table.row(row).data()[sampleStatusIndex];
+  if (status == rowStatus.empty) {
+      table.row(row).data()[sampleStatusIndex] = rowStatus.new;
+  } else if (status == "" || status == null) {
+    table.row(row).data()[sampleStatusIndex] = rowStatus.update;
+  }
 }
 
 function handleResponse(table, sampleTypes) {
-	return function (res) {
-		if (res.status == "ok") handleSuccess(table, sampleTypes, res);
-		else handleFailure(table, res);
-	};
+  return function(res) {
+    if (res.status == "ok") handleSuccess(table, sampleTypes, res);
+    else handleFailure(table, res);
+  };
 }
 
-function selectAll(e) {
-	const checked = $j(e).prop("checked");
-	const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select");
-	$j.each(checkBoxes, function (i, c) {
-		$j(c).prop("checked", checked);
-		handleCheck($j(c));
-	});
+function selectAll(e, includeHidden = false) {
+  const dtTbl = $j(e).parents(".dataTables_wrapper").find("table")[1]
+  const dtName = $j(dtTbl).data("dtname")
+  const count = window[dtName].table.rows().count()
+  if (includeHidden) {
+    // This will select all rows containing hidden rows
+    performSelect(dtName, true)
+    window[dtName].setPermissionBTNActivity()
+    $j(e).html(`All ${count} items are selected`)
+  } else {
+    const checked = $j(e).prop("checked");
+    const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select");
+    const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
+    dtSelectAll.css("display", checked && count > 0 ? "block" : "none")
+
+    if (!checked) performSelect(dtName, false)
+
+    $j.each(checkBoxes, function(i, c) {
+      $j(c).prop("checked", checked);
+      handleSelect($j(c));
+    });
+  }
+}
+
+function performSelect(dtName, select) {
+  window[dtName].table.rows(function(idx, data, node) {
+    data[0] = select;
+    $j(node).find(".row-select").prop("checked", select)
+  });
+}
+
+function retrieveLinkedSamples(url){
+  let linkedSamples;
+  $j.ajax({
+    async: false,
+    url: url,
+    contentType: "application/json",
+    success: function (data) {
+      linkedSamples = data.results;
+    },
+    error: function (xhr, status) {
+      linkedSamples = []
+      console.log(status);
+      console.log(xhr.responseText);
+    }
+  });
+  return linkedSamples;
+}
+
+function registeredSamplesObjectsInput(column, data, options, url){
+  const existingOptions = data.map((e) => {
+    isHiddenInput = (e.title == '#HIDDEN');
+    if (isHiddenInput) {
+      return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
+    } else {
+      return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`
+    }
+  }).join("");
+  if (options.readonly) {
+    return data.map((e) => `<span title="ID: ${e.id}" class="badge">${sanitizeData(e.title)}</span>`).join(" ");
+  } else {
+    const typeaheadTemplate = 'typeahead/single_pages_samples'
+    const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
+
+    const unLinkedSamples = data.reduce(function(filtered, sample) {
+      if(!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title != '#HIDDEN'){
+        filtered.push(sample);
+      }
+      return filtered;
+    }, []);
+    const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
+
+    const hasMultipleInputs = column.multi_link ? '100' : '1'
+    const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
+    const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as input. Please correct this issue!` : '';
+    setTimeout(ObjectsInput.init);
+
+    return objectInputTemp
+    .replace(/_NAME_/g, objectInputName)
+    .replace('_TYPEHEAD_', typeaheadTemplate)
+    .replace('_URL_', url)
+    .replace('_OPTIONS_', existingOptions)
+    .replace('_EXTRACLASS_', extraClass)
+    .replace('_TITLE_', titleText)
+    .replace('_LIMIT?_', hasMultipleInputs)
+    .replace('_ALLOW_FREE_TEXT_', false);
+  }
+}
+
+function cvListObjectsInput(column, data, options, url){
+  const existingOptions = data.map((e) => `<option selected="selected" value="${sanitizeData(e)}">${sanitizeData(e)}</option>`);
+    if (options.readonly) {
+        return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
+    } else {
+        const typeaheadTemplate = 'typeahead/controlled_vocab_term';
+        const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
+        const extraClass = '';
+        const titleText = '';
+        const allowNewItems = column.cv_allows_free_text;
+        setTimeout(ObjectsInput.init);
+
+    return objectInputTemp
+    .replace(/_NAME_/g, objectInputName)
+    .replace('_TYPEHEAD_', typeaheadTemplate)
+    .replace('_URL_', url)
+    .replace('_OPTIONS_', existingOptions)
+    .replace('_EXTRACLASS_', extraClass)
+    .replace('_TITLE_', titleText)
+    .replace('_LIMIT?_', '')
+    .replace('_ALLOW_FREE_TEXT_', allowNewItems.toString());
+  }
+}
+
+function simpleObjectsInput(column, data, options, url) {
+    const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`);
+    if (options.readonly) {
+        return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
+    } else {
+        const typeaheadTemplate = 'typeahead/single_pages_samples';
+        const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
+        const extraClass = '';
+        const titleText = '';
+        const allowNewItems = false;
+        setTimeout(ObjectsInput.init);
+
+        return objectInputTemp
+            .replace(/_NAME_/g, objectInputName)
+            .replace('_TYPEHEAD_', typeaheadTemplate)
+            .replace('_URL_', url)
+            .replace('_OPTIONS_', existingOptions)
+            .replace('_EXTRACLASS_', extraClass)
+            .replace('_TITLE_', titleText)
+            .replace('_LIMIT?_', '1')
+            .replace('_ALLOW_FREE_TEXT_', allowNewItems.toString());
+    }
 }
 
 const handleFailure = (table, res) => {
-	const errors = new Set();
-	errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
-	res.errors.forEach((error) => {
-		const [rowId, sampleTypeId] = error.ex_id.split("-");
-		const errorColNames = Object.keys(error.error);
-		if (errorColNames.includes("base")) errors.add(error.error["base"]);
-		table.cells(rowId, `${sampleTypeId}:name`).every(function () {
-			const idx = this.index().column;
-			const colTitle = $j(table.column(idx).header()).text().replace("*", "");
-			if (errorColNames.includes(colTitle)) {
-				$j(this.node()).addClass(dtErrClass);
-				$j(this.node()).attr("title", error.error[colTitle]);
-			} else if (error.error == "Can not be deleted.") {
-				$j(this.node()).addClass(dtErrClass);
-			}
-		});
-	});
-	alert([...errors].reverse().join("\n"));
+  const errors = new Set();
+  errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
+  res.errors.forEach((error) => {
+    const [rowId, sampleTypeId] = error.ex_id.split("-");
+    const errorColNames = Object.keys(error.error);
+    if (errorColNames.includes("base")) errors.add(error.error["base"]);
+    table.cells(rowId, `${sampleTypeId}:name`).every(function() {
+      const idx = this.index().column;
+      const colTitle = $j(table.column(idx).header()).text().replace("*", "");
+      if (errorColNames.includes(colTitle)) {
+        $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
+        $j(this.node()).attr("title", error.error[colTitle]);
+      } else if (error.error == "Can not be deleted.") {
+        $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
+      }
+    });
+  });
+  alert([...errors].reverse().join("\n"));
 };
 
 const handleSuccess = (table, sampleTypes, res) => {
-	sampleTypes.forEach((s) => {
-		s.samples.forEach((sa, k) => {
-			const [rowId, sampleTypeId] = sa.exId.split("-");
-			table.cells(rowId, `${sampleTypeId}:name`).every(function (rowIdx, columnIdx) {
-				// Here id column index is 2 (being read from table.columns() that includes the select column)
-				if (res.results && columnIdx == 2) {
-					// update created samples' id in the table
-					const id = res.results.find((r) => r.ex_id == sa.exId).id;
-					this.data(id);
-				}
-				sampleStatus(table, rowId, sampleTypeId, rowStatus.noAction);
-				$j(this.node()).addClass(dtSuccessClass);
-			});
-		});
-	});
+  sampleTypes.forEach((s) => {
+    s.samples.forEach((sa, k) => {
+      const [rowId, sampleTypeId] = sa.exId.split("-");
+      table.cells(rowId, `${sampleTypeId}:name`).every(function(rowIdx, columnIdx) {
+        // Here id column index is 2 (being read from table.columns() that includes the select column)
+        if (res.results && columnIdx == 2) {
+          // update created samples' id in the table
+          const id = res.results.find((r) => r.ex_id == sa.exId).id;
+          this.data(id);
+        }
+        sampleStatus(table, rowId, sampleTypeId, rowStatus.noAction);
+        $j(this.node()).removeClass(dtErrClass).addClass(dtSuccessClass);
+      });
+    });
+  });
 };

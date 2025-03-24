@@ -47,6 +47,10 @@ every RegularMaintenanceJob::RUN_PERIOD, at: offset(1) do
   runner "RegularMaintenanceJob.perform_later"
 end
 
+every AuthLookupMaintenanceJob::RUN_PERIOD, at: offset(1) do
+  runner "AuthLookupMaintenanceJob.perform_later"
+end
+
 every LifeMonitorStatusJob::PERIOD, at: offset(2) do
   runner "LifeMonitorStatusJob.perform_later"
 end
@@ -67,9 +71,23 @@ every 1.day, at: offset(3) do
   runner 'Galaxy::ToolMap.instance.refresh'
 end
 
+every 1.day, at: '12:10 am' do
+  runner "Seek::BioSchema::DataDump.generate_dumps"
+end
+
+# Generate a new sitemap...
+every 1.day, at: '12:45 am' do
+  rake "-s sitemap:refresh"
+end
+
 # not safe to automatically add in a non containerised environment
 if Seek::Docker.using_docker?
   every 10.minutes do
     command "sh /seek/script/kill-long-running-soffice.sh"
   end
+end
+
+# trim sessions
+every 1.day, at: '1:15 am' do
+  rake 'db:sessions:trim'
 end

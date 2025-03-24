@@ -63,7 +63,7 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'project administrator can get new' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     get :new
     assert_response :success
     assert_nil flash[:error]
@@ -71,7 +71,7 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'programme administrator can get new' do
-    pa = Factory(:programme_administrator_not_in_project)
+    pa = FactoryBot.create(:programme_administrator_not_in_project)
     login_as(pa)
 
     # check not already in a project
@@ -90,8 +90,8 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'admin has create human disease menu option' do
-    login_as(Factory(:admin))
-    get :show, params: { id: Factory(:human_disease) }
+    login_as(FactoryBot.create(:admin))
+    get :show, params: { id: FactoryBot.create(:human_disease) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -101,8 +101,8 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'project administrator has create human disease menu option' do
-    login_as(Factory(:project_administrator))
-    get :show, params: { id: Factory(:human_disease) }
+    login_as(FactoryBot.create(:project_administrator))
+    get :show, params: { id: FactoryBot.create(:human_disease) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -112,8 +112,8 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'non admin doesn not have create human disease menu option' do
-    login_as(Factory(:user))
-    get :show, params: { id: Factory(:human_disease) }
+    login_as(FactoryBot.create(:user))
+    get :show, params: { id: FactoryBot.create(:human_disease) }
     assert_response :success
     assert_select 'li#create-menu' do
       assert_select 'ul.dropdown-menu' do
@@ -155,14 +155,14 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   # should convert to the purl version
   test 'update human disease with doid id number' do
     login_as(:quentin)
-    disease = Factory(:human_disease)
+    disease = FactoryBot.create(:human_disease)
     patch :update, params: { id: disease.id, human_disease: { concept_uri:'305' } }
     assert_not_nil assigns(:human_disease)
     assert_equal 'http://purl.bioontology.org/obo/DOID_305', assigns(:human_disease).concept_uri
   end
 
   test 'project administrator can create new human disease' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     assert_difference('HumanDisease.count') do
       post :create, params: { human_disease: { title: 'An human disease' } }
     end
@@ -171,7 +171,7 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'programme administrator can create new human disease' do
-    login_as(Factory(:programme_administrator_not_in_project))
+    login_as(FactoryBot.create(:programme_administrator_not_in_project))
     assert_difference('HumanDisease.count') do
       post :create, params: { human_disease: { title: 'An human disease' } }
     end
@@ -212,7 +212,7 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'project administrator sees create buttons' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     y = human_diseases(:sarcoma)
     get :show, params: { id: y }
     assert_response :success
@@ -245,7 +245,7 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'delete as project administrator' do
-    login_as(Factory(:project_administrator))
+    login_as(FactoryBot.create(:project_administrator))
     d = human_diseases(:sarcoma)
     assert_difference('HumanDisease.count', -1) do
       delete :destroy, params: { id: d }
@@ -271,7 +271,7 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   end
 
   test 'create multiple human diseases with blank concept uri' do
-    login_as(Factory(:admin))
+    login_as(FactoryBot.create(:admin))
     assert_difference('HumanDisease.count') do
       post :create, params: { human_disease: { title: 'An human disease', concept_uri:'' } }
     end

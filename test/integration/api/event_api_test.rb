@@ -16,11 +16,11 @@ class EventApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @project = @current_user.person.projects.first
-    @publication = Factory(:publication, contributor: current_person)
-    @presentation = Factory(:presentation, contributor: current_person)
-    @data_file = Factory(:data_file, contributor: current_person)
-    @creator = Factory(:person)
-    @event = Factory(:event, policy: Factory(:public_policy), contributor: current_person)
+    @publication = FactoryBot.create(:publication, contributor: current_person)
+    @presentation = FactoryBot.create(:presentation, contributor: current_person)
+    @data_file = FactoryBot.create(:data_file, contributor: current_person)
+    @creator = FactoryBot.create(:person)
+    @event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy), contributor: current_person)
   end
 
   test 'returns sensible error objects' do
@@ -28,7 +28,7 @@ class EventApiTest < ActionDispatch::IntegrationTest
     to_post = load_template('post_bad_event.json.erb')
 
     assert_no_difference(-> { model.count }) do
-      post "/#{plural_name}.json", params: to_post
+      post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       #assert_response :unprocessable_entity
     end
 

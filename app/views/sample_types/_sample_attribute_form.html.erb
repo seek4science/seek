@@ -1,14 +1,15 @@
 <% sample_attribute ||= nil %>
 <% index ||= 'replace-me' %>
-<% id = sample_attribute ? sample_attribute.id : '' %>
-<% title = sample_attribute ? sample_attribute.title : '' %>
-<% description = sample_attribute ? sample_attribute.description : '' %>
-<% pid = sample_attribute ? sample_attribute.pid : '' %>
-<% pos = sample_attribute ? sample_attribute.pos : '' %>
-<% required = sample_attribute ? sample_attribute.required : false %>
-<% is_title = sample_attribute ? sample_attribute.is_title : false %>
-<% attribute_type_id = sample_attribute ? sample_attribute.sample_attribute_type_id : nil %>
-<% sample_controlled_vocab_id = sample_attribute ? sample_attribute.sample_controlled_vocab_id : nil %>
+<% id = sample_attribute&.id || '' %>
+<% title = sample_attribute&.title || '' %>
+<% description = sample_attribute&.description || '' %>
+<% pid = sample_attribute&.pid || '' %>
+<% pos = sample_attribute&.pos || '' %>
+<% required = sample_attribute&.required || false %>
+<% is_title = sample_attribute&.is_title || false %>
+<% attribute_type_id = sample_attribute&.sample_attribute_type_id %>
+<% sample_controlled_vocab_id = sample_attribute&.sample_controlled_vocab_id %>
+<% allow_cv_free_text = sample_attribute&.allow_cv_free_text || false %>
 <% linked_sample_type_id = sample_attribute ? sample_attribute.linked_sample_type_id : nil %>
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
@@ -18,11 +19,17 @@
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
-<% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
-<% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
+<% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
-<% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? %>
+<% display_isa_tag ||= false %>
+<% hide_seek_sample_multi = display_isa_tag ? (sample_attribute&.input_attribute? && displaying_single_page?) : false %>
+<% level = sample_type.level if display_isa_tag %>
+<% isa_tags_options = IsaTag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } if display_isa_tag %>
 <% isa_tag_id = sample_attribute&.isa_tag_id %>
+<% template_attribute_id = sample_attribute&.template_attribute_id if display_isa_tag %>
+<% allow_isa_tag_change = constraints.allow_isa_tag_change?(sample_attribute) if display_isa_tag %>
+<% required_title_text = allow_required ? nil : "You are not allowed to make this attribute required.\nSome samples have no value for this attribute." %>
+<% is_title_title_text = allow_required ? nil : "You are not allowed to change this attribute's title field.\nSome samples have no value for this attribute." %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -35,36 +42,47 @@
   <td>
 
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
-                       placeholder: 'Attribute name', disabled: !allow_name_change, data: { attr: "title" } %>
+                       placeholder: 'Attribute name', data: { attr: "title" } %>
   </td>
 
-  <td class="text-center">
+  <td class="text-center" title="<%= required_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, disabled: !allow_required, data: { attr: "required" } %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, class: "#{ allow_required ? '' : 'disabled' }", data: { attr: "required" } %>
     </div>
   </td>
-  <td class="text-center">
+  <td class="text-center" title="<%= is_title_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: seek_sample_multi || !allow_required %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class: "sample-type-is-title #{ allow_required ? '' : 'disabled' }"%>
     </div>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-use-cv'=>t.controlled_vocab? || t.seek_cv_list?,'data-is-ontology'=>t.ontology?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
+                   options_for_select(displayed_sample_attribute_types.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map do |t|
+                     [t.title, t.id,{'data-use-cv': t.controlled_vocab? || t.seek_cv_list?, 'data-is-seek-sample': t.seek_sample? || t.seek_sample_multi? }]
+                   end , attribute_type_id),
                    class: 'form-control sample-type-attribute-type',
                    disabled: !allow_type_change, data: { attr: "type" } %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) || sample_attribute.try(:seek_cv_list?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?, 'data-is-ontology'=>t.custom_input}] },
+                     options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable': scv.can_edit?}] },
                                         sample_controlled_vocab_id),
                      include_blank: true,
                      class: 'form-control controlled-vocab-selection',
                      disabled: !allow_type_change, data: { attr: "cv_id" }%>
+
+      <div>
+        <label>
+          <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", '0'  %>
+          <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text, data: { attr: 'allow_cv_free_text' } %>
+          <%= t('samples.allow_free_text_checkbox_label') %> <%= allow_free_text_help_icon %>
+        </label>
+      </div>
+
       <% if allow_type_change %>
-        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
+        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>
         <%= create_sample_controlled_vocab_modal_button  %>
       <% end %>
       <%= button_link_to('View current', 'show', '#', class:'cv-show-button', disabled: true, target: :_blank) %>
@@ -84,6 +102,7 @@
                      grouped_options_for_select(options,
                                         link_to_self ? 'self' : linked_sample_type_id),
                      include_blank: true,
+                     disabled: !allow_type_change,
                      class: 'form-control linked-sample-type-selection' %>
     </div>
   </td>
@@ -95,19 +114,31 @@
     <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
                        placeholder: 'Identifier URI',  data: { attr: "pid" } %>
   </td>
+
+  <% if display_isa_tag %>
+    <td>
+      <%= select_tag "#{field_name_prefix}[isa_tag_title]",
+                      options_for_select(isa_tags_options, isa_tag_id),
+                      include_blank: true, class: 'form-control',
+                      data: {attr: "isa_tag_title"},
+                      disabled: !allow_isa_tag_change %>
+    </td>
+  <% end %>
+
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
                    options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
                                       unit_id),
                    include_blank: true,
                    class: 'form-control',
-                   disabled: !allow_type_change, data: { attr: "unit" } %>
+                   data: { attr: "unit" } %>
   </td>
 
 
   <td>
     <% if allow_attribute_removal %>
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" } %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">

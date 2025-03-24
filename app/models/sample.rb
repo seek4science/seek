@@ -16,8 +16,6 @@ class Sample < ApplicationRecord
 
   acts_as_asset
 
-  validates :projects, presence: true, projects: { self: true }
-
   belongs_to :sample_type, inverse_of: :samples
   alias_method :metadata_type, :sample_type
 
@@ -32,16 +30,24 @@ class Sample < ApplicationRecord
   has_many :linked_samples, through: :sample_resource_links, source: :resource, source_type: 'Sample'
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
+  has_many :linked_data_files, through: :sample_resource_links, source: :resource, source_type: 'DataFile'
+  has_many :linked_sops, through: :sample_resource_links, source: :resource, source_type: 'Sop'
+
+  belongs_to :observation_unit
+
+  validates :projects, presence: true, projects: { self: true }
   validates :title, :sample_type, presence: true
 
   validates_with SampleAttributeValidator
+  validate :validate_added_linked_sample_permissions
+  validate :check_if_locked_sample_type, on: %i[create update]
 
   before_validation :set_title_to_title_attribute_value
+  before_validation :update_sample_resource_links
 
-  before_save :update_sample_resource_links
   after_save :queue_sample_type_update_job
+  after_save :queue_linking_samples_update_job
   after_destroy :queue_sample_type_update_job
-
 
   has_filter :sample_type
 
@@ -60,8 +66,16 @@ class Sample < ApplicationRecord
     User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
-  def related_data_file
-    originating_data_file
+  def self.supports_extended_metadata?
+    false
+  end
+
+  def related_data_files
+    [originating_data_file].compact + linked_data_files
+  end
+
+  def related_sops
+    linked_sops
   end
 
   def related_samples
@@ -75,9 +89,18 @@ class Sample < ApplicationRecord
   def referenced_resources
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute_value(sa)
-      type = sa.sample_attribute_type.base_type_handler.type
-      Array.wrap(value).map {|v| type.constantize.find_by_id(v['id']) if v && type} 
+      type = sa.base_type_handler.type
+      return [] unless type
+      Array.wrap(value).map { |v| type.find_by_id(v['id']) if v }
     end.flatten.compact
+  end
+
+  def referenced_data_files
+    referenced_resources.select { |r| r.is_a?(DataFile) }
+  end
+
+  def referenced_sops
+    referenced_resources.select { |r| r.is_a?(Sop) }
   end
 
   def referenced_strains
@@ -88,20 +111,8 @@ class Sample < ApplicationRecord
     referenced_resources.select { |r| r.is_a?(Sample) }
   end
 
-  def state_allows_edit?(*args)
-    (id.nil? || originating_data_file.nil?) && super
-  end
-
   def extracted?
     !!originating_data_file
-  end
-
-  def projects
-    extracted? ? originating_data_file.projects : super
-  end
-
-  def project_ids
-    extracted? ? originating_data_file.project_ids : super
   end
 
   def creators
@@ -120,11 +131,6 @@ class Sample < ApplicationRecord
     end
   end
 
-  # although it includes the RdfGeneration for some rdf support, it can't be considered to fully support it yet.
-  def rdf_supported?
-    false
-  end
-
   def related_organisms
     Organism.where(id: related_organism_ids)
   end
@@ -133,9 +139,31 @@ class Sample < ApplicationRecord
     organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
-  #overides default to include sample_type key at the start
+  # overides default to include sample_type key at the start
   def list_item_title_cache_key_prefix
     "#{sample_type.list_item_title_cache_key_prefix}/#{cache_key}"
+  end
+
+  def refresh_linking_samples
+    sample_type_hash = {}
+    linking_samples.each do |s|
+      sample_type_hash = update_sample_type_hash(sample_type_hash, s.sample_type)
+      positions = sample_type_hash[s.sample_type.id]
+      metadata = s.data
+      positions.each do |p|
+        item_linked_samples = Array(metadata.values[p - 1])
+        item_linked_samples.each do |sample|
+          sample['title'] = title if sample['id'] == id
+        end
+        metadata.values[p - 1] = item_linked_samples
+
+        # only update if changed, to prevent triggered jobs that could potentially create an infinate loop
+        if s.json_metadata != metadata.to_json
+          s.json_metadata = metadata.to_json
+          s.save
+        end
+      end
+    end
   end
 
   private
@@ -143,19 +171,20 @@ class Sample < ApplicationRecord
   # organisms linked through an NCBI attribute type
   def ncbi_linked_organisms
     return [] unless sample_type
+
     Rails.cache.fetch("sample-organisms-#{cache_key}-#{Organism.order('updated_at DESC').first.try(:cache_key)}") do
       sample_type.sample_attributes.collect do |attribute|
         next unless attribute.sample_attribute_type.title == 'NCBI ID'
+
         value = get_attribute_value(attribute)
-        if value
-          Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value }
-        end
+        Organism.all.select { |o| o.ncbi_id && o.ncbi_id.to_s == value } if value
       end.flatten.compact.uniq
     end
   end
 
   def samples_this_links_to
     return [] unless sample_type
+
     seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.seek_sample? }
     seek_sample_attributes.map do |attr|
       value = get_attribute_value(attr)
@@ -174,6 +203,7 @@ class Sample < ApplicationRecord
   # the designated title attribute
   def title_attribute
     return nil unless sample_type && sample_type.sample_attributes.title_attributes.any?
+
     sample_type.sample_attributes.title_attributes.first
   end
 
@@ -181,13 +211,43 @@ class Sample < ApplicationRecord
     SampleTypeUpdateJob.new(sample_type, false).queue_job
   end
 
+  def queue_linking_samples_update_job
+    LinkingSamplesUpdateJob.new(self).queue_job
+  end
+
   def update_sample_resource_links
+    return unless sample_type.present?
     self.strains = referenced_strains
     self.linked_samples = referenced_samples
+    self.linked_data_files = referenced_data_files
+    self.linked_sops = referenced_sops
   end
 
   def attribute_class
     SampleAttribute
   end
 
+  def update_sample_type_hash(sample_type_hash, sample_type)
+    if sample_type_hash[sample_type.id].nil?
+      # Select all attributes of type seek_sample_multi or seek_sample
+      sample_type_hash[sample_type.id] = sample_type.sample_attributes.select do |sa|
+        sa.seek_sample_multi? || sa.seek_sample?
+      end.map(&:pos)
+    end
+    sample_type_hash
+  end
+
+  # checks and validates whether new linked samples have view permission, but ignores existing ones
+  def validate_added_linked_sample_permissions
+    return if $authorization_checks_disabled
+    return if linked_samples.empty?
+    previous_linked_samples = []
+    previous_linked_samples = Sample.find(id).referenced_samples unless new_record?
+    additions = linked_samples - previous_linked_samples
+    errors.add(:linked_samples, 'includes a new private sample') if additions.detect { |sample| !sample.can_view? }
+  end
+
+  def check_if_locked_sample_type
+    errors.add(:sample_type, 'is locked') if sample_type&.locked?
+  end
 end

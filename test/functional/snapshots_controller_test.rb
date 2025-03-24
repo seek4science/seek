@@ -16,8 +16,9 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test 'can get snapshot preview page' do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     get :new, params: { investigation_id: investigation }
@@ -29,8 +30,9 @@ class SnapshotsControllerTest < ActionController::TestCase
 
 
   test "can't get snapshot preview if no manage permissions" do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy))
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      creators: [FactoryBot.create(:user).person])
     login_as(user)
 
     get :new, params: { investigation_id: investigation }
@@ -41,8 +43,9 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test "can't get snapshot preview if not publicly accessible" do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:private_policy), contributor: user.person)
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     get :new, params: { investigation_id: investigation }
@@ -53,8 +56,9 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test 'can create investigation snapshot' do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_difference('Snapshot.count') do
@@ -66,8 +70,9 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test 'can create study snapshot' do
-    user = Factory(:user)
-    study = Factory(:study, policy: Factory(:publicly_viewable_policy), contributor: user.person)
+    user = FactoryBot.create(:user)
+    study = FactoryBot.create(:study, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_difference('Snapshot.count') do
@@ -79,8 +84,9 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test 'can create assay snapshot' do
-    user = Factory(:user)
-    assay = Factory(:assay, policy: Factory(:publicly_viewable_policy), contributor: user.person)
+    user = FactoryBot.create(:user)
+    assay = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_difference('Snapshot.count') do
@@ -91,9 +97,26 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_redirected_to assay_snapshot_path(assay, assigns(:snapshot).snapshot_number)
   end
 
+  test 'can create snapshot under sub-uri' do
+    with_relative_root('/seek/seek123') do
+      user = FactoryBot.create(:user)
+      assay = FactoryBot.create(:assay, policy: FactoryBot.create(:publicly_viewable_policy),
+                                contributor: user.person, creators: [user.person])
+      login_as(user)
+
+      assert_difference('Snapshot.count') do
+        post :create, params: { assay_id: assay }
+      end
+
+      assert assay.can_manage?(user)
+      assert_redirected_to assay_snapshot_path(assay, assigns(:snapshot).snapshot_number)
+    end
+  end
+
   test "can't create snapshot if no manage permissions" do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy))
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      creators: [FactoryBot.create(:user).person])
     login_as(user)
 
     assert_no_difference('Snapshot.count') do
@@ -106,8 +129,9 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test "can't create snapshot if not publicly accessible" do
-    user = Factory(:user)
-    investigation = Factory(:investigation, policy: Factory(:private_policy), contributor: user.person)
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy),
+                                      contributor: user.person, creators: [user.person])
     login_as(user)
 
     assert_no_difference('Snapshot.count') do
@@ -117,6 +141,34 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert investigation.can_manage?(user)
     assert_redirected_to investigation_path(investigation)
     assert flash[:error].include?('accessible')
+  end
+
+  test "can't create snapshot if there are no creators" do
+    user = FactoryBot.create(:user)
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                                      contributor: user.person, creators: [])
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [])
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:publicly_viewable_policy),
+                              contributor: user.person, creators: [])
+
+    login_as(user)
+    [investigation, study, assay].each do |snap|
+      assert snap.can_manage?(user)
+      assert snap.creators.empty?
+      type = snap.class.name.underscore
+      # Updating the request.path is needed so that @resource is correctly set, and the snapshots is created for the correct item in the loop
+      request.path = Seek::Util.routes.polymorphic_path([snap, :snapshots])
+      # Get preview
+      get :new, params: { "#{type}_id": snap.id }
+      assert_response :success
+      # Can't create snapshot
+      assert_no_difference('Snapshot.count') do
+        post :create, params: { "#{type}_id": snap.id }
+      end
+      assert_redirected_to Seek::Util.routes.polymorphic_path(snap)
+      assert flash[:error].include?('creator is required')
+    end
   end
 
   test 'can get snapshot show page' do
@@ -158,8 +210,6 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :redirect
     assert flash[:error].include?('exist')
   end
-
-
 
   test 'can get confirmation when minting DOI for snapshot' do
     datacite_mock
@@ -234,7 +284,7 @@ class SnapshotsControllerTest < ActionController::TestCase
   test "can't mint DOI for snapshot if no manage permissions" do
     datacite_mock
     create_investigation_snapshot
-    other_user = Factory(:user)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     post :mint_doi, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
@@ -248,7 +298,7 @@ class SnapshotsControllerTest < ActionController::TestCase
   test "can't get DOI confirmation page when no manage permissions" do
     datacite_mock
     create_investigation_snapshot
-    other_user = Factory(:user)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     get :mint_doi_confirm, params: { investigation_id: @investigation, id: @snapshot.snapshot_number }
@@ -287,7 +337,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
-    Factory(:oauth_session, user_id: @user.id)
+    FactoryBot.create(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
@@ -313,7 +363,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
-    Factory(:oauth_session, user_id: @user.id)
+    FactoryBot.create(:oauth_session, user_id: @user.id)
     assert_nil @snapshot.doi
 
     login_as(@user)
@@ -334,7 +384,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_study_snapshot
-    Factory(:oauth_session, user_id: @user.id)
+    FactoryBot.create(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
@@ -355,7 +405,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_assay_snapshot
-    Factory(:oauth_session, user_id: @user.id)
+    FactoryBot.create(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
@@ -392,7 +442,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
-    Factory(:oauth_session, user_id: @user.id)
+    FactoryBot.create(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
@@ -420,7 +470,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     create_investigation_snapshot
     @snapshot.doi = '123'
     @snapshot.save
-    other_user = Factory(:user)
+    other_user = FactoryBot.create(:user)
     login_as(other_user)
 
     post :export_submit, params: { investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc', metadata: { access_type: 'open', license: 'CC-BY-4.0' } }
@@ -434,7 +484,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
-    Factory(:oauth_session, user_id: @user.id)
+    FactoryBot.create(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
@@ -542,23 +592,26 @@ class SnapshotsControllerTest < ActionController::TestCase
   private
 
   def create_investigation_snapshot
-    @user = Factory(:user)
-    @investigation = Factory(:investigation, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
+    @user = FactoryBot.create(:user)
+    @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy),
+                                       contributor: @user.person, creators: [@user.person])
     @snapshot = @investigation.create_snapshot
   end
 
   def create_study_snapshot
-    @user = Factory(:user)
-    @investigation = Factory(:investigation, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
-    @study = Factory(:study, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
+    @user = FactoryBot.create(:user)
+    @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
+    @study = FactoryBot.create(:study, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy),
+                               contributor: @user.person, creators: [@user.person])
     @snapshot = @study.create_snapshot
   end
 
   def create_assay_snapshot
-    @user = Factory(:user)
-    @investigation = Factory(:investigation, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
-    @study = Factory(:study, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
-    @assay = Factory(:assay, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
+    @user = FactoryBot.create(:user)
+    @investigation = FactoryBot.create(:investigation, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
+    @study = FactoryBot.create(:study, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy), contributor: @user.person)
+    @assay = FactoryBot.create(:assay, description: 'not blank', policy: FactoryBot.create(:publicly_viewable_policy),
+                               contributor: @user.person, creators: [@user.person])
     @snapshot = @assay.create_snapshot
   end
 end

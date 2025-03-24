@@ -70,8 +70,8 @@ module ImagesHelper
     url
   end
 
-  def delete_icon(model_item, user, confirm_msg='Are you sure?')
-    item_name = text_for_resource model_item
+  def delete_icon(model_item, user, confirm_msg='Are you sure?', alternative_item_name=nil)
+    item_name = alternative_item_name.nil? ? (text_for_resource model_item) : alternative_item_name
     if model_item.can_delete?(user)
       fullURL = url_for(model_item)
 

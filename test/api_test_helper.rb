@@ -13,7 +13,7 @@ module ApiTestHelper
 
   def private_resource
     res = resource
-    res.update_column(:policy_id, Factory(:private_policy).id) if res.respond_to?(:policy)
+    res.update_column(:policy_id, FactoryBot.create(:private_policy).id) if res.respond_to?(:policy)
     res
   end
 
@@ -30,7 +30,7 @@ module ApiTestHelper
   end
 
   def api_get_test(template, res)
-    get member_url(res), as: :json
+    get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
 
     validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
@@ -52,7 +52,7 @@ module ApiTestHelper
 
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
     assert_difference(-> { model.count }, 1) do
-      post collection_url, params: template, as: :json
+      post collection_url, params: template, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
 
@@ -76,14 +76,14 @@ module ApiTestHelper
   end
 
   def api_patch_test(resource, template)
-    get member_url(resource)
+    get member_url(resource), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
     expected = JSON.parse(response.body)
 
     validate_json template.to_json, "#/components/schemas/#{singular_name.camelize(:lower)}Patch"
 
     assert_no_difference(-> { model.count }) do
-      patch member_url(resource), params: template, as: :json
+      patch member_url(resource), params: template, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
     end
 
@@ -166,15 +166,22 @@ module ApiTestHelper
   end
 
   def admin_login
-    admin = Factory.create(:admin)
-    @current_user = admin.user
-    # log in
-    post '/session', params: { login: @current_user.login, password: generate_user_password }
+    user_login(FactoryBot.create(:admin))
   end
 
-  def user_login(person = Factory(:person))
+  def user_login(person = FactoryBot.create(:person))
     @current_user = person.user
-    post '/session', params: { login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH) }
+    @api_application ||= FactoryBot.create(:oauth_application, scopes: 'read,write')
+    @read_access_token = FactoryBot.create(:oauth_access_token, scopes: 'read', application: @api_application, resource_owner_id: @current_user.id)
+    @write_access_token = FactoryBot.create(:oauth_access_token, scopes: 'write', application: @api_application, resource_owner_id: @current_user.id)
+  end
+
+  def read_access_auth
+    "Bearer #{@read_access_token.token}"
+  end
+
+  def write_access_auth
+    "Bearer #{@write_access_token.token}"
   end
 
   def id

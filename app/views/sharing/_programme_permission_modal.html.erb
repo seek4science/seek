@@ -5,7 +5,7 @@
     <%= modal_body do %>
         <div class="form-group">
           <label>The following <%= t('programme').pluralize -%>...</label>
-          <%= objects_input('permission-programmes-ids', [], typeahead: { values: Programme.all.map { |p| { id: p.id, name: p.title } } }, name: nil) -%>
+          <%= objects_input('permission-programmes-ids', [], typeahead: { values: Programme.all.map { |p| { id: p.id, text: p.title } } }, name: nil) -%>
           <p class="help-block">Start typing a <%= t('programme') -%>'s title and select from the list that appears. You can select multiple <%= t('programme').pluralize -%>.</p>
         </div>
         <div class="form-group">
@@ -26,24 +26,25 @@
   // Display programme modal
   $j('#add-programme-permission-button').click(function () {
     $j('#add-programme-permission-modal').modal('show');
-    $j('#permission-programmes-ids').tagsinput('focus');
+    $j('select#permission-programmes-ids').focus();
 
     return false;
   });
 
   // Add a programme permission to the table
   $j('#permission-programmes-confirm').click(function () {
-    var programmes = $j('#permission-programmes-ids').tagsinput('items');
+    let programmes = $j('select#permission-programmes-ids').select2('data');
 
     programmes.forEach(function (programme, index) {
       Sharing.addPermission(
           { contributor_type: 'Programme',
             contributor_id: parseInt(programme.id),
-            title: programme.name,
+            title: programme.text,
             access_type: parseInt($j('#permission-programmes-access-type').val()) });
     });
 
     // Reset form
-    $j('#permission-programmes-ids').tagsinput('removeAll');
+      $j('select#permission-programmes-ids').val([]).change();
+      $j('#permission-programmes-access-type').val('<%= Policy::ACCESSIBLE %>').change();
   });
 </script>

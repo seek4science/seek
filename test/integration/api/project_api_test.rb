@@ -7,33 +7,35 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
   def setup
     admin_login
 
-    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    FactoryBot.create(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
 
-    @person = Factory(:person)
-    @project = Factory(:project)
-    @institution = Factory(:institution)
-    @programme = Factory(:programme)
-    @organism = Factory(:organism)
+    @person = FactoryBot.create(:person)
+    @project = FactoryBot.create(:project)
+    @institution = FactoryBot.create(:institution)
+    @programme = FactoryBot.create(:programme)
+    @organism = FactoryBot.create(:organism)
+    @emt = FactoryBot.create(:family_extended_metadata_type)
+
   end
 
   test 'normal user cannot create project' do
-    user_login(Factory(:person))
+    user_login(FactoryBot.create(:person))
     body = api_max_post_body
     assert_no_difference('Project.count') do
-      post "/projects.json", params: body, as: :json
+      post collection_url, params: body, as: :json, headers: { 'Authorization' => write_access_auth }
     end
   end
 
   test 'adds members to project by PATCHing entire project' do
-    project = Factory(:project)
-    new_institution = Factory(:institution)
-    new_person = Factory(:person)
-    new_person2 = Factory(:person)
-    new_person3 = Factory(:person)
+    project = FactoryBot.create(:project)
+    new_institution = FactoryBot.create(:institution)
+    new_person = FactoryBot.create(:person)
+    new_person2 = FactoryBot.create(:person)
+    new_person3 = FactoryBot.create(:person)
 
     assert_empty project.people
 
-    get project_path(project, format: :json)
+    get project_path(project, format: :json), headers: { 'Authorization' => read_access_auth }
 
     project_json = JSON.parse(@response.body)
 
@@ -43,7 +45,7 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
       { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }
     ]
 
-    patch project_path(project, format: :json), params: project_json, as: :json
+    patch project_path(project, format: :json), as: :json, params: project_json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
 
     people = project.reload.people.to_a
@@ -54,11 +56,11 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'adds members to project' do
-    project = Factory(:project)
-    new_institution = Factory(:institution)
-    new_person = Factory(:person)
-    new_person2 = Factory(:person)
-    new_person3 = Factory(:person)
+    project = FactoryBot.create(:project)
+    new_institution = FactoryBot.create(:institution)
+    new_person = FactoryBot.create(:person)
+    new_person2 = FactoryBot.create(:person)
+    new_person3 = FactoryBot.create(:person)
 
     assert_empty project.people
 
@@ -74,7 +76,7 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
       }
     }
 
-    patch project_path(project, format: :json), params: to_patch, as: :json
+    patch project_path(project, format: :json), params: to_patch, as: :json, headers: { 'Authorization' => write_access_auth }
     assert_response :success
 
     people = project.reload.people.to_a
@@ -86,9 +88,9 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
 
   # TO DO: revisit after doing relationships linkage
   # test 'should not create project with programme if not programme admin' do
-  #   person = Factory(:person)
+  #   person = FactoryBot.create(:person)
   #   user_login(person)
-  #   prog = Factory(:programme)
+  #   prog = FactoryBot.create(:programme)
   #   refute_nil prog
   #   @to_post['data']['attributes']['programme_id'] = prog.id
   #   assert_difference('Project.count') do
