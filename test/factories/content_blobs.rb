@@ -211,6 +211,42 @@ FactoryBot.define do
     data { File.new("#{Rails.root}/test/fixtures/files/study_batch.zip", 'rb').read }
   end
   
+  factory(:zip_folder_content_blob, parent: :content_blob) do
+    original_filename { 'unzip_zip_testing.zip' }
+    content_type { 'application/zip' }
+    data { File.new("#{Rails.root}/test/fixtures/files/unzip/unzip_zip_testing.zip", 'rb').read }
+  end
+  
+  factory(:sevenz_folder_content_blob, parent: :content_blob) do
+    original_filename { 'unzip_7z_testing.7z' }
+    content_type { 'application/x-7z-compressed' }
+    data { File.new("#{Rails.root}/test/fixtures/files/unzip/unzip_7z_testing.7z", 'rb').read }
+  end
+ 
+  factory(:tar_bz2_folder_content_blob, parent: :content_blob) do
+    original_filename { 'unzip_bz2_testing.tar.bz2' }
+    content_type { 'application/x-bzip-compressed-tar' }
+    data { File.new("#{Rails.root}/test/fixtures/files/unzip/unzip_bz2_testing.tar.bz2", 'rb').read }
+  end
+  
+  factory(:tar_gz_folder_content_blob, parent: :content_blob) do
+    original_filename { 'unzip_gz_testing.tar.gz' }
+    content_type { 'application/x-compressed-tar' }
+    data { File.new("#{Rails.root}/test/fixtures/files/unzip/unzip_gz_testing.tar.gz", 'rb').read }
+  end  
+  
+  factory(:tar_folder_content_blob, parent: :content_blob) do
+    original_filename { 'unzip_tar_testing.tar' }
+    content_type { 'application/x-tar' }
+    data { File.new("#{Rails.root}/test/fixtures/files/unzip/unzip_tar_testing.tar", 'rb').read }
+  end  
+  
+  factory(:tar_xz_folder_content_blob, parent: :content_blob) do
+    original_filename { 'unzip_xz_testing.tar.xz' }
+    content_type { 'application/x-xz-compressed-tar' }
+    data { File.new("#{Rails.root}/test/fixtures/files/unzip/unzip_xz_testing.tar.xz", 'rb').read }
+  end
+
   factory(:sample_type_template_content_blob, parent: :content_blob) do
     original_filename { 'sample-type-example.xlsx' }
     content_type { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
