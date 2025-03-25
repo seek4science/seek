@@ -72,6 +72,18 @@ class SampleControlledVocab < ApplicationRecord
     self.ols_root_term_uris = uris.join(', ')
   end
 
+  def update_from_json_dump(json)
+    # find and attach the ids for those that exist
+    json[:sample_controlled_vocab_terms_attributes].each do |term_json|
+      iri = term_json[:iri]
+      term = sample_controlled_vocab_terms.where(iri: iri).first
+      if term
+        term_json[:id] = term.id
+      end
+    end
+    update(json)
+  end
+
   private
 
   def update_sample_type_templates(_term)
