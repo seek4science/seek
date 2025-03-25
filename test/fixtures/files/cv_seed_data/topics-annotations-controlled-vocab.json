@@ -1,0 +1,28 @@
+{
+  "title": "Topics test",
+  "description": "Topics description",
+  "ols_root_term_uris": "http://edamontology.org/topic_0003",
+  "source_ontology": "edam",
+  "sample_controlled_vocab_terms_attributes": [
+    {
+      "label": "Topic",
+      "iri": "http://edamontology.org/topic_0003",
+      "parent_iri": ""
+    },
+    {
+      "label": "Environmental sciences",
+      "iri": "http://edamontology.org/topic_3855",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Carbon cycle",
+      "iri": "http://edamontology.org/topic_4020",
+      "parent_iri": "http://edamontology.org/topic_3855"
+    },
+    {
+      "label": "Ecology",
+      "iri": "http://edamontology.org/topic_0610",
+      "parent_iri": "http://edamontology.org/topic_3855"
+    }
+  ]
+}
