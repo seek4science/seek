@@ -86,6 +86,7 @@ class ExtendedMetadataTypesController < ApplicationController
       begin
         extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(StringIO.new(json))
         extended_metadata_type.title = title
+        extended_metadata_type.activity_logs.build(culprit: current_user, action: 'create')
         if extended_metadata_type.save
           successes << "#{extended_metadata_type.title}(#{extended_metadata_type.supported_type})"
         else

@@ -474,6 +474,9 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
 
     sample_type = assigns(:sample_type)
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+    assert_equal @person.user, ActivityLog.last.culprit
     assert_redirected_to edit_sample_type_path(sample_type)
     assert_empty sample_type.errors
     refute sample_type.uploaded_template?
