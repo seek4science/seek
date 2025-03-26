@@ -329,8 +329,10 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
 
     assert_no_difference('ExtendedMetadataType.count') do
-      with_config_value(:fair_data_station_enabled, true) do
-        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      assert_no_difference('ActivityLog.count') do
+        with_config_value(:fair_data_station_enabled, true) do
+          post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+        end
       end
     end
     assert_response :success
@@ -414,11 +416,17 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     json2 = file_fixture('extended_metadata_type/valid_emt_with_linked_emt.json').read.gsub('PERSON_EMT_ID', person_emt.id.to_s)
     person = FactoryBot.create(:admin)
     login_as(person)
-    assert_difference('ExtendedMetadataType.count', 2) do
-      post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['person new title','family new title'] }
+    assert_difference('ActivityLog.count', 2) do
+      assert_difference('ExtendedMetadataType.count', 2) do
+        post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['person new title','family new title'] }
+      end
     end
     assert_redirected_to administer_extended_metadata_types_path
     emts = ExtendedMetadataType.last(2)
+    activity_logs = ActivityLog.last(2)
+    assert_equal emts.sort, activity_logs.collect(&:activity_loggable).sort
+    assert_equal ['create'], activity_logs.collect(&:action).uniq
+    assert_equal [person.user], activity_logs.collect(&:culprit).uniq
     assert_equal ['person new title', 'family new title'], emts.map(&:title)
     assert_equal '2 Extended Metadata Types successfully created for: person new title(ExtendedMetadata), family new title(Investigation).', flash[:notice]
     assert_nil flash[:error]
@@ -429,12 +437,15 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     json2 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
     person = FactoryBot.create(:admin)
     login_as(person)
-    assert_difference('ExtendedMetadataType.count', 1) do
-      post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['json1 title', 'json2 title'] }
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('ExtendedMetadataType.count', 1) do
+        post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['json1 title', 'json2 title'] }
+      end
     end
     assert_redirected_to administer_extended_metadata_types_path
     assert_equal '1 Extended Metadata Type successfully created for: json2 title(ExtendedMetadata).', flash[:notice]
     assert_equal "1 Extended Metadata Type failed to be created: json1 title(Journal) - Supported type 'Journal' is not a valid support type!.", flash[:error]
+    assert_equal ExtendedMetadataType.last, ActivityLog.last.activity_loggable
   end
 
   test 'submit jsons - invalid JSON' do
@@ -443,12 +454,15 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     json3 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
     person = FactoryBot.create(:admin)
     login_as(person)
-    assert_difference('ExtendedMetadataType.count', 1) do
-      post :submit_jsons, params: { emt_jsons: [json1, json2, json3], emt_titles: ['json1 title', 'json2 title', 'json3 title'] }
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('ExtendedMetadataType.count', 1) do
+        post :submit_jsons, params: { emt_jsons: [json1, json2, json3], emt_titles: ['json1 title', 'json2 title', 'json3 title'] }
+      end
     end
     assert_redirected_to administer_extended_metadata_types_path
     assert_equal '1 Extended Metadata Type successfully created for: json3 title(ExtendedMetadata).', flash[:notice]
     assert_equal "2 Extended Metadata Types failed to be created: Failed to parse JSON, The attribute type 'String1' does not exist..", flash[:error]
+    assert_equal ExtendedMetadataType.last, ActivityLog.last.activity_loggable
   end
 
 end

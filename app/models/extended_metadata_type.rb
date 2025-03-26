@@ -1,4 +1,6 @@
 class ExtendedMetadataType < ApplicationRecord
+  include Seek::Stats::ActivityCounts
+
   has_many :extended_metadata_attributes, inverse_of: :extended_metadata_type, dependent: :destroy
   has_many :extended_metadatas, inverse_of: :extended_metadata_type
   validates :title, presence: true
