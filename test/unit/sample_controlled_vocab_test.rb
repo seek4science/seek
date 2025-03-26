@@ -342,13 +342,14 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/topic_0610"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
     assert_equal ["", "http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_3855"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
 
+    # update without deletion
     json = open_fixture_file('cv_seed_data/topics-annotations-controlled-vocab-update.json').read
     data = JSON.parse(json).with_indifferent_access
-    cv.update_from_json_dump(data)
-    assert cv.valid?
     disable_authorization_checks do
       assert_no_difference('SampleControlledVocab.count') do
         assert_difference('SampleControlledVocabTerm.count', 2) do
+          cv.update_from_json_dump(data, false)
+          assert cv.valid?
           cv.save!
         end
       end
@@ -362,6 +363,21 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697", "http://edamontology.org/topic_4038"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
     assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
 
+    # update with deletion
+    data = JSON.parse(json).with_indifferent_access
+    disable_authorization_checks do
+      assert_no_difference('SampleControlledVocab.count') do
+        assert_difference('SampleControlledVocabTerm.count', -1) do
+          cv.update_from_json_dump(data, true)
+          assert cv.valid?
+          cv.save!
+        end
+      end
+    end
+    assert_equal 5, cv.sample_controlled_vocab_terms.count
+    assert_equal ["Topic", "Environmental sciences", "Carbon cycle updated", "Microbial ecology", "Metabarcoding"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
+    assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/topic_3697", "http://edamontology.org/topic_4038"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
+    assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
   end
 
 end
