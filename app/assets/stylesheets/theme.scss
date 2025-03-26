@@ -1,16 +1,20 @@
 
 
-$navbar-default-bg: rgba(164,205,85,0.7) !default;
+$navbar-default-bg: rgba(164,205,85,0.9) !default;
 $navbar-default-border: darken($navbar-default-bg, 15%);
 $navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
 $navbar-default-link-color: #19340d;
 $navbar-default-link-active-color: lighten($navbar-default-link-color, 10%);
 $navbar-default-link-hover-color: lighten($navbar-default-link-color, 20%);
 
-$body-bg: rgba(240, 248, 227, 0.8);
-$panel-bg: lighten($body-bg, 6%);
-$panel-default-heading-bg: darken($body-bg, 15%);
-$panel-footer-bg: $navbar-default-bg;
+$body-bg: rgba(248, 252, 241, 0.8);
+//$panel-bg: white;
+$panel-default-heading-bg: darken($body-bg, 10%);
+$panel-footer-bg: $panel-default-heading-bg;
+
+$footer-bg: $navbar-default-bg;
+
+$link-color: #151591;
 
 //$btn-primary-bg: rgb(164, 210, 131);
 //$btn-primary-color: #19340d;
