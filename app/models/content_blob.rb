@@ -85,7 +85,7 @@ class ContentBlob < ApplicationRecord
 
   def file_extension
     split_filename = original_filename&.split('.')
-    if split_filename.length > 2
+    if split_filename && split_filename.length > 2
       extension = split_filename[-2, 2]&.join('.')&.downcase
       return extension unless mime_types_for_extension(extension).empty?
     end
