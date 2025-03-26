@@ -72,13 +72,23 @@ class SampleControlledVocab < ApplicationRecord
     self.ols_root_term_uris = uris.join(', ')
   end
 
-  def update_from_json_dump(json)
+  def update_from_json_dump(json, delete_removed)
     # find and attach the ids for those that exist
+    presented_iris = []
     json[:sample_controlled_vocab_terms_attributes].each do |term_json|
       iri = term_json[:iri]
+      presented_iris << iri
       term = sample_controlled_vocab_terms.where(iri: iri).first
       if term
         term_json[:id] = term.id
+      end
+    end
+    if delete_removed
+      existing_iris = sample_controlled_vocab_terms.select(:iri).collect(&:iri)
+      removed_iris = existing_iris - presented_iris
+      removed_iris.each do |iri|
+        id = sample_controlled_vocab_terms.where(iri: iri).first.id
+        json[:sample_controlled_vocab_terms_attributes] << {id:id, _destroy:true }
       end
     end
     update(json)
