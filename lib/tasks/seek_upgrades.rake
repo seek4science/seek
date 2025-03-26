@@ -8,6 +8,10 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
+    db:seed:011_topics_controlled_vocab
+    db:seed:012_operations_controlled_vocab
+    db:seed:013_data_formats_controlled_vocab
+    db:seed:014_data_types_controlled_vocab
     db:seed:007_sample_attribute_types
     update_rdf
     update_observation_unit_policies
