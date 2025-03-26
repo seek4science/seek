@@ -52,7 +52,7 @@ module Seek
       end
 
       def self.read_data(json_file, property)
-        json = File.read(File.join(Rails.root, 'config/default_data', json_file))
+        json = File.read(File.join(Rails.root, 'config/default_data/controlled-vocabs', json_file))
         data = JSON.parse(json).with_indifferent_access
         data[:key] = SampleControlledVocab::SystemVocabs.database_key_for_property(property)
         data
