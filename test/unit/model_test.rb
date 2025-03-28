@@ -102,6 +102,9 @@ class ModelTest < ActiveSupport::TestCase
     model = FactoryBot.create(:copasi_model)
     assert model.is_copasi_supported?
 
+    model = FactoryBot.create(:morpheus_model)
+    assert model.is_morpheus_supported?
+
     model = FactoryBot.create(:teusink_model)
     assert model.is_copasi_supported?
 

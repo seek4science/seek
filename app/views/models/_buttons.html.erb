@@ -2,6 +2,10 @@
   <%= button_link_to("Simulate #{t('model')} on Copasi", 'copasi', copasi_simulate_model_path(version: @display_model.version, code: params[:code]),method: :get) %>
 <% end %>
 
+<% if show_morpheus_button? %>
+  <%= open_with_morpheus_button %>
+<% end %>
+
 <% if show_jws_simulate? %>
     <%= button_link_to("Simulate #{t('model')} on JWS", 'execute',
                        simulate_model_path(item, version: @display_model.version, code: params[:code]), method: :post, title: "Simulate #{t('model')} on JWS") %>

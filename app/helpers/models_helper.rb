@@ -42,4 +42,9 @@ module ModelsHelper
   def show_copasi_button?
     Seek::Config.copasi_enabled && @display_model.is_copasi_supported? && @display_model.is_downloadable? && @display_model.can_download?(current_user)
   end
+
+  def show_morpheus_button?
+    Seek::Config.morpheus_enabled && @display_model.is_morpheus_supported? && @display_model.is_downloadable? && @display_model.can_download?(nil)
+  end
+
 end

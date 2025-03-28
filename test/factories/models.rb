@@ -161,6 +161,12 @@ FactoryBot.define do
       model.content_blobs = [FactoryBot.create(:copasi_content_blob, asset: model, asset_version: model.version)]
     end
   end
+
+  factory(:morpheus_model, parent: :model) do
+    after(:create) do |model|
+      model.content_blobs = [FactoryBot.create(:morpheus_model_content_blob, asset: model, asset_version: model.version)]
+    end
+  end
   
   # Model::Version
   factory(:model_version, class: Model::Version) do
