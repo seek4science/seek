@@ -84,7 +84,12 @@ class ContentBlob < ApplicationRecord
   end
 
   def file_extension
-    original_filename&.split('.')&.last&.downcase
+    split_filename = original_filename&.split('.')
+    if split_filename && split_filename.length > 2
+      extension = split_filename[-2, 2]&.join('.')&.downcase
+      return extension unless mime_types_for_extension(extension).empty?
+    end
+    split_filename&.last&.downcase
   end
 
   def make_temp_copy

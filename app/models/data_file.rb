@@ -3,6 +3,7 @@ require_dependency 'seek/util'
 class DataFile < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
+  include Seek::DataFiles::Unzip
 
   acts_as_asset
 
@@ -141,29 +142,6 @@ class DataFile < ApplicationRecord
   
   def related_data_files
     zip_origin.nil? ? unzipped_files : [zip_origin] + unzipped_files
-  end
-
-  def unzip(tmp_dir)
-    unzip_folder = Zip::File.open(content_blob.filepath)
-    FileUtils.rm_r(tmp_dir) if File.exist?(tmp_dir)
-    Dir.mkdir(tmp_dir)
-    unzipped =[]
-    unzip_folder.entries.each do |file|
-      if file.ftype == :file
-        file_name = File.basename(file.name)
-        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
-        data_file_params = {
-          title: file_name,
-            license: license,
-            projects: projects,
-            description: '',
-            contributor_id: contributor.id,
-            zip_origin_id: self.id
-        }
-        unzipped << DataFile.new(data_file_params)
-      end
-    end
-    unzipped
   end
 
   # Extracts samples using the given sample_type

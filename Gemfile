@@ -157,3 +157,8 @@ group :test, :development do
   gem 'teaspoon-mocha'
   gem 'webmock'
 end
+
+gem "minitar"
+gem "bzip2-ffi"
+gem "seven-zip", require: 'seven_zip_ruby'
+gem "ruby-xz", require: 'xz'

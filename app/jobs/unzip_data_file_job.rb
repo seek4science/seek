@@ -16,5 +16,10 @@ class UnzipDataFileJob < TaskJob
       super
       @unzipper.clear if @unzipper
     end
+
+    def timelimit
+      2.hours
+    end
+
   end
   
