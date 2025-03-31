@@ -146,11 +146,11 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'copasi enabled' do
-    assert Seek::Config.jws_enabled
+    assert Seek::Config.copasi_enabled
   end
 
   test 'morpheus enabled' do
-    assert Seek::Config.jws_enabled
+    assert Seek::Config.morpheus_enabled
   end
 
   test 'exception_notification_enabled' do
