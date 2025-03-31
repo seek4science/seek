@@ -130,6 +130,8 @@
   <%= admin_checkbox_setting(:copasi_enabled, 1, Seek::Config.copasi_enabled,
                              "Copasi enabled", "Whether support for running a publicly available model in Copasi is enabled.") %>
 
+  <%= admin_checkbox_setting(:morpheus_enabled, 1, Seek::Config.morpheus_enabled,
+                             "Morpheus enabled", "Whether support for running a publicly available model in Morpheus is enabled.") %>
 
   <%= admin_checkbox_setting(:require_cookie_consent, 1, Seek::Config.require_cookie_consent,
                              "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below.
