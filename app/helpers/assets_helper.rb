@@ -243,9 +243,9 @@ module AssetsHelper
     blob  =   @display_model.morpheus_supported_content_blobs.first
     download_path = polymorphic_path([@model, blob], action: :download)
     morpheus_download_path =  "morpheus://"+request.host_with_port+download_path
-    tooltip_text_copasi_button = "Simulate your model locally using desk application MorpheusUI."
+    tooltip_text_morpheus_button = "Simulate your model locally using desk application MorpheusUI."
 
-    button= button_link_to('Simulate in MorpheusUI', 'morpheus', morpheus_download_path, class: 'btn', 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+    button= button_link_to('Simulate in MorpheusUI', 'morpheus', morpheus_download_path, class: 'btn', 'data-tooltip' => tooltip(tooltip_text_morpheus_button))
 
     button
   end
