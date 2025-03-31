@@ -192,7 +192,7 @@ module Seek
       end
 
       def populate_extended_metadata(seek_entity, datastation_entity)
-        if (emt = detect_extended_metadata_type(seek_entity, datastation_entity))
+        if (emt = datastation_entity.find_closest_matching_extended_metadata_type)
           seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
           update_extended_metadata(seek_entity, datastation_entity)
         end
@@ -204,56 +204,13 @@ module Seek
 
       def update_sample_metadata(seek_sample, datastation_sample)
         datastation_sample.populate_seek_sample(seek_sample)
-      end	
-
-      def detect_extended_metadata_type(seek_entity, datastation_entity)
-        property_ids = datastation_entity.additional_metadata_annotations.collect { |annotation| annotation[0] }
-
-        # collect and sort those with the most properties that match, eliminating any where no properties match
-        candidates = ::ExtendedMetadataType.where(supported_type: seek_entity.class.name).includes(:extended_metadata_attributes).collect do |emt|
-          extended_metadata_property_ids = collect_extended_metadata_type_attibute_pids(emt)
-          intersection = (property_ids & extended_metadata_property_ids)
-          difference = (property_ids | extended_metadata_property_ids) - intersection
-          emt = nil if intersection.length.zero?
-          [intersection.length, difference.length, emt]
-        end.sort_by do |x|
-          # order by the number of properties matched coming top, but downgraded by the number of differences
-          [-x[0], x[1]]
-        end
-
-        candidates.first&.last
-      end
-
-      def collect_extended_metadata_type_attibute_pids(extended_metadata_type)
-        pids = extended_metadata_type.extended_metadata_attributes.collect do |attr|
-          if attr.linked_extended_metadata_type
-            collect_extended_metadata_type_attibute_pids(attr.linked_extended_metadata_type)
-          else
-            attr.pid
-          end
-        end
-        pids.flatten
       end
 
       def populate_sample(seek_sample, datastation_sample)
-        if (sample_type = detect_sample_type(datastation_sample))
+        if (sample_type = datastation_sample.find_closest_matching_sample_type)
           seek_sample.sample_type = sample_type
           update_sample_metadata(seek_sample, datastation_sample)
         end
-      end
-
-      def detect_sample_type(datastation_sample)
-        property_ids = datastation_sample.additional_metadata_annotations.collect { |annotation| annotation[0] }
-
-        # collect and sort those with the most properties that match, eliminating any where no properties match
-        candidates = SampleType.all.collect do |sample_type|
-          ids = sample_type.sample_attributes.collect(&:pid)
-          score = (property_ids - ids).length
-          sample_type = nil if (property_ids & ids).empty?
-          [score, sample_type]
-        end.sort_by { |x| x[0] }
-
-        candidates.first&.last
       end
 
       def build_data_file(contributor, datastation_dataset, projects, policy)

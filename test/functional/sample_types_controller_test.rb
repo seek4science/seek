@@ -27,9 +27,26 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil assigns(:sample_types)
   end
 
-  test 'should get new' do
-    get :new
+  test 'should get new fair data station enabled shows tab' do
+    with_config_value(:fair_data_station_enabled, true) do
+      get :new
+    end
     assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 3
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl'
+    end
+  end
+
+  test 'should get new fair data station disabled no tab' do
+    with_config_value(:fair_data_station_enabled, false) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 2
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl', count: 0
+    end
   end
 
   test 'should create sample_type' do
@@ -439,8 +456,127 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
 
     assert_template :new
-    assert_not_empty assigns(:sample_type).errors
+    refute_empty assigns(:sample_type).errors
   end
+
+  test 'create from fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    sample_type = assigns(:sample_type)
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+    assert_equal @person.user, ActivityLog.last.culprit
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    refute sample_type.uploaded_template?
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+
+    assert_equal 6, sample_type.sample_attributes.count
+
+    expected = ["http://schema.org/name", "http://schema.org/description", "http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:pid).sort
+
+    expected = ["Title", "Description", "biosafety level", "scientific name", "ncbi taxonomy id", "collection date"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:title).sort
+  end
+
+  test 'create from fair data station ttl but exact match exists' do
+    original_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, contributor: @person)
+    assert original_sample_type.can_view?
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    existing_sample_type = assigns(:existing_sample_type)
+    assert_redirected_to sample_type_path(existing_sample_type)
+    assert_equal 'An exact matching Sample type already exists, and now shown.', flash[:error]
+  end
+
+  test 'create from fair data station ttl ignore private exact match' do
+    private_matching_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
+    refute private_matching_sample_type.can_view?
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    refute sample_type.uploaded_template?
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+  end
+
+  test 'create from empty fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle') }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    assert_template :new
+    assert_equal 'No Sample type metadata could be found.', flash.now[:error]
+    refute_empty assigns(:sample_type).errors
+  end
+
+  test 'cannot create from fair data station ttl if disabled' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, false) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal 'Fair data station are disabled', flash[:error]
+  end
+
 
   test 'should show link to sample type for linked attribute' do
     linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)

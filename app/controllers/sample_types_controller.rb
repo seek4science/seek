@@ -5,6 +5,7 @@ class SampleTypesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :samples_enabled?
+  before_action :fair_data_station_enabled?, only:[:create_from_fair_ds_ttl]
   before_action :check_no_created_samples, only: [:destroy]
   before_action :check_if_locked, only: %i[edit manage manage_update update]
   before_action :find_and_authorize_requested_item, except: %i[create batch_upload index new template_details]
@@ -47,10 +48,27 @@ class SampleTypesController < ApplicationController
     @tab = 'from-template'
 
     respond_to do |format|
-      if @sample_type.errors.empty? && @sample_type.save
+      if @sample_type.valid? && @sample_type.save
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
       else
         @sample_type.content_blob.destroy if @sample_type.content_blob.persisted?
+        format.html { render action: 'new' }
+      end
+    end
+  end
+
+  def create_from_fair_ds_ttl
+    build_or_detect_sample_type_from_fair_ds_ttl
+
+    @tab = 'from-fair-ds-ttl'
+
+    respond_to do |format|
+      if @existing_sample_type
+        flash[:error] = "An exact matching #{t('sample_type')} already exists, and now shown."
+        format.html { redirect_to sample_type_path(@existing_sample_type) }
+      elsif @sample_type && @sample_type.valid? && @sample_type.save
+        format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
+      else
         format.html { render action: 'new' }
       end
     end
@@ -183,6 +201,53 @@ class SampleTypesController < ApplicationController
     handle_upload_data
     @sample_type.content_blob.save! # Need's to be saved so the spreadsheet can be read from disk
     @sample_type.build_attributes_from_template
+  end
+
+  def build_or_detect_sample_type_from_fair_ds_ttl
+    @sample_type = SampleType.new(sample_type_params)
+    blob_params = params[:content_blobs]
+
+    fds_sample = nil
+    Tempfile.create('fds-ttl') do |file|
+      file << blob_params.first[:data].read.force_encoding('UTF-8')
+      inv = Seek::FairDataStation::Reader.new.parse_graph(file.path).first
+      if inv
+        fds_sample = inv&.studies.first&.observation_units.first&.samples.first
+      end
+    end
+    if fds_sample && fds_sample.all_additional_potential_annotation_predicates.any?
+      @existing_sample_type = fds_sample.find_exact_matching_sample_type
+      unless @existing_sample_type
+        string_attribute_type = SampleAttributeType.where(title: 'String').first
+        @sample_type.sample_attributes.build({
+                                               title: 'Title',
+                                               description: '',
+                                               pid: RDF::Vocab::SCHEMA.name,
+                                               sample_attribute_type: string_attribute_type,
+                                               required: true,
+                                               is_title: true
+                                             })
+        @sample_type.sample_attributes.build({
+                                               title: 'Description',
+                                               description: '',
+                                               pid: RDF::Vocab::SCHEMA.description,
+                                               sample_attribute_type: string_attribute_type
+                                             })
+        fds_sample.all_additional_potential_annotation_details.each do |details|
+          @sample_type.sample_attributes.build({
+                                                 title: details.label,
+                                                 description: details.description,
+                                                 pid: details.property_id,
+                                                 sample_attribute_type: string_attribute_type,
+                                                 required: details.required
+                                               })
+        end
+      end
+
+    else
+      flash.now[:error] = "No #{t('sample_type')} metadata could be found."
+    end
+
   end
 
   def check_isa_json_compliance

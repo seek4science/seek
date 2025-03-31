@@ -107,6 +107,33 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_equal 'Admin rights required', flash[:error]
   end
 
+  test 'should get new fair data station enabled shows tab' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    with_config_value(:fair_data_station_enabled, true) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#extended-metadata-type-tabs' do
+      assert_select 'li', count: 2
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl'
+    end
+  end
+
+  test 'should get new fair data station disabled shows no tab' do
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    with_config_value(:fair_data_station_enabled, false) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#extended-metadata-type-tabs' do
+      assert_select 'li', count: 1
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl', count: 0
+    end
+  end
+
+
   test 'should create successfully' do
     person = FactoryBot.create(:admin)
     login_as(person)
@@ -274,6 +301,168 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
       delete :destroy, params: { id: emt.id }
     end
 
+  end
+
+  # FAIR Data Station TTL
+
+  test 'none-admin cannot create from ttl' do
+    person = FactoryBot.create(:person)
+    refute person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      with_config_value(:fair_data_station_enabled, true) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
+    end
+    assert_redirected_to :root
+    assert_equal 'Admin rights required', flash[:error]
+  end
+
+  test 'create from ttl' do
+    person = FactoryBot.create(:admin)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      assert_no_difference('ActivityLog.count') do
+        with_config_value(:fair_data_station_enabled, true) do
+          post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+        end
+      end
+    end
+    assert_response :success
+    assert_equal 4, assigns(:jsons).count
+    assert_empty assigns(:existing_extended_metadata_types)
+    assert_select 'div.panel.extended-metadata-type-preview', count: 4
+    assert_select 'table.extended-metadata-type-attributes', count: 4
+    assert_select 'table.extended-metadata-type-attributes tbody tr', count: 10
+    assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
+    assert_select 'input.btn[type="submit"][value="Create"]'
+  end
+
+  test 'create from ttl with existing study and assay' do
+    person = FactoryBot.create(:admin)
+    study_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    assay_emt = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      with_config_value(:fair_data_station_enabled, true) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
+    end
+    assert_response :success
+    assert_equal 2, assigns(:jsons).count
+    assert_equal [study_emt, assay_emt], assigns(:existing_extended_metadata_types)
+    assert_select 'div.panel.extended-metadata-type-preview', count: 2
+    assert_select 'table.extended-metadata-type-attributes', count: 2
+    assert_select 'table.extended-metadata-type-attributes tbody tr', count: 4
+    assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
+    assert_select 'input.btn[type="submit"][value="Create"]'
+
+    assert_select 'ul.existing-extended-metadata-types' do
+      assert_select 'li', count: 2
+      assert_select 'li', text: "Study : #{study_emt.title}"
+      assert_select 'li', text: "Assay : #{assay_emt.title}"
+    end
+  end
+
+  test 'create from ttl no results' do
+    person = FactoryBot.create(:admin)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      with_config_value(:fair_data_station_enabled, true) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
+    end
+    assert_response :success
+    assert_select 'p.alert.alert-info', text:/There were no new Extended Metadata Types identified as needing to be created./
+    assert_select 'a.btn[href=?]', administer_extended_metadata_types_path, text:'Cancel'
+    assert_select 'input.btn[type="submit"][value="Create"]', count: 0
+  end
+
+  test 'cannot create from ttl if fair data station disabled' do
+    person = FactoryBot.create(:admin)
+    assert person.is_admin?
+    login_as(person)
+
+    file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle')
+
+    assert_no_difference('ExtendedMetadataType.count') do
+      with_config_value(:fair_data_station_enabled, false) do
+        post :create_from_fair_ds_ttl, params: { emt_fair_ds_ttl_file: file }
+      end
+    end
+    assert_redirected_to :root
+    assert_equal 'Fair data station are disabled', flash[:error]
+  end
+
+
+  test 'submit jsons' do
+    person_emt = FactoryBot.create(:role_name_extended_metadata_type)
+    json1 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
+    json2 = file_fixture('extended_metadata_type/valid_emt_with_linked_emt.json').read.gsub('PERSON_EMT_ID', person_emt.id.to_s)
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    assert_difference('ActivityLog.count', 2) do
+      assert_difference('ExtendedMetadataType.count', 2) do
+        post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['person new title','family new title'] }
+      end
+    end
+    assert_redirected_to administer_extended_metadata_types_path
+    emts = ExtendedMetadataType.last(2)
+    activity_logs = ActivityLog.last(2)
+    assert_equal emts.sort, activity_logs.collect(&:activity_loggable).sort
+    assert_equal ['create'], activity_logs.collect(&:action).uniq
+    assert_equal [person.user], activity_logs.collect(&:culprit).uniq
+    assert_equal ['person new title', 'family new title'], emts.map(&:title)
+    assert_equal '2 Extended Metadata Types successfully created for: person new title(ExtendedMetadata), family new title(Investigation).', flash[:notice]
+    assert_nil flash[:error]
+  end
+
+  test 'submit jsons - invalid resulting EMT' do
+    json1 = file_fixture('extended_metadata_type/invalid_supported_type_emt.json').read
+    json2 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('ExtendedMetadataType.count', 1) do
+        post :submit_jsons, params: { emt_jsons: [json1, json2], emt_titles: ['json1 title', 'json2 title'] }
+      end
+    end
+    assert_redirected_to administer_extended_metadata_types_path
+    assert_equal '1 Extended Metadata Type successfully created for: json2 title(ExtendedMetadata).', flash[:notice]
+    assert_equal "1 Extended Metadata Type failed to be created: json1 title(Journal) - Supported type 'Journal' is not a valid support type!.", flash[:error]
+    assert_equal ExtendedMetadataType.last, ActivityLog.last.activity_loggable
+  end
+
+  test 'submit jsons - invalid JSON' do
+    json1 = file_fixture('extended_metadata_type/invalid_json.json').read
+    json2 = file_fixture('extended_metadata_type/invalid_emt_with_wrong_type.json').read
+    json3 = file_fixture('extended_metadata_type/valid_simple_emt.json').read
+    person = FactoryBot.create(:admin)
+    login_as(person)
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('ExtendedMetadataType.count', 1) do
+        post :submit_jsons, params: { emt_jsons: [json1, json2, json3], emt_titles: ['json1 title', 'json2 title', 'json3 title'] }
+      end
+    end
+    assert_redirected_to administer_extended_metadata_types_path
+    assert_equal '1 Extended Metadata Type successfully created for: json3 title(ExtendedMetadata).', flash[:notice]
+    assert_equal "2 Extended Metadata Types failed to be created: Failed to parse JSON, The attribute type 'String1' does not exist..", flash[:error]
+    assert_equal ExtendedMetadataType.last, ActivityLog.last.activity_loggable
   end
 
 end
