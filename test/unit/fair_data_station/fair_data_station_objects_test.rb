@@ -108,6 +108,10 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
 
     exact_match = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
     assert_equal exact_match, study.find_exact_matching_extended_metadata_type
+
+    #doesn't match if disabled
+    exact_match.update_column(:enabled, false)
+    assert_nil study.find_exact_matching_extended_metadata_type
   end
 
   test 'find_exact_matching_sample_type' do
@@ -139,9 +143,11 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assay = inv.studies.first.assays.first
-    ::Assay.new
-    detected_type = assay.find_closest_matching_extended_metadata_type
-    assert_equal seek_test_case_assay, detected_type
+    assert_equal seek_test_case_assay, assay.find_closest_matching_extended_metadata_type
+
+    # but not if disabled
+    seek_test_case_assay.update_column(:enabled, false)
+    refute_equal seek_test_case_assay, assay.find_closest_matching_extended_metadata_type
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
