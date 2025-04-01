@@ -157,7 +157,7 @@ module Seek
         annotation[0]
       end)
         # collect and sort those with the most properties that match, eliminating any where no properties match
-        candidates = ::ExtendedMetadataType.where(supported_type: type_name).includes(:extended_metadata_attributes).collect do |emt|
+        candidates = ::ExtendedMetadataType.where(supported_type: type_name).enabled.includes(:extended_metadata_attributes).collect do |emt|
           extended_metadata_property_ids = emt.deep_extended_metadata_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & extended_metadata_property_ids)
           difference = (property_ids | extended_metadata_property_ids) - intersection

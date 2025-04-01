@@ -5251,22 +5251,25 @@ class ProjectsControllerTest < ActionController::TestCase
 
     person = FactoryBot.create(:person)
     FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    assay_emt = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
     project = person.projects.first
     another_person = FactoryBot.create(:person)
     login_as(person)
 
     ttl_file = fixture_file_upload('fair_data_station/demo.ttl')
 
-    assert_difference('ActivityLog.count',40) do
-      post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
-                                               policy_attributes: {
-                                                 access_type: Policy::VISIBLE,
-                                                 permissions_attributes: {
-                                                   '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+    assert_difference('ActivityLog.count', 40) do
+      assert_difference('ExtendedMetadata.count', 9) do
+        post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
+                                                 policy_attributes: {
+                                                   access_type: Policy::VISIBLE,
+                                                   permissions_attributes: {
+                                                     '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                     }
                                                    }
                                                  }
-                                               }
-      }
+        }
+      end
     end
 
     assert investigation = assigns(:investigation)
@@ -5278,6 +5281,9 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 9, study.assays.count
     assert_equal 2, study.observation_units.count
     assert_equal 4, study.observation_units.first.samples.count
+
+    assay = study.assays.first
+    assert_equal assay_emt, assay.extended_metadata.extended_metadata_type
 
     obs_unit = study.observation_units.first
     sample = obs_unit.samples.first
@@ -5305,6 +5311,43 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 1, sample.policy.permissions.count
     assert_equal another_person, sample.policy.permissions.first.contributor
     assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
+
+  end
+
+  test 'import from fairdata station ttl ignores disabled emt' do
+
+    person = FactoryBot.create(:person)
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata, enabled: false)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    ttl_file = fixture_file_upload('fair_data_station/demo.ttl')
+
+    assert_difference('ActivityLog.count', 40) do
+      assert_no_difference('ExtendedMetadata.count') do
+        post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
+                                                 policy_attributes: {
+                                                   access_type: Policy::VISIBLE,
+                                                   permissions_attributes: {
+                                                     '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                     }
+                                                   }
+                                                 }
+        }
+      end
+    end
+
+    assert investigation = assigns(:investigation)
+    assert_redirected_to investigation
+
+    assert_equal person, investigation.contributor
+    assert_equal 1, investigation.studies.count
+    study = investigation.studies.first
+    assert_equal 9, study.assays.count
+    assay = study.assays.first
+    assert_nil assay.extended_metadata
 
   end
 
