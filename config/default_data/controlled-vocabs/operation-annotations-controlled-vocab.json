@@ -1,5 +1,5 @@
 {
-  "title": "Operations ( EDAM NEW )",
+  "title": "Operations",
   "description": "Operations, used for annotating. Describes a function that can take place over some inputs to produce an output. Initially seeded from the EDAM ontology",
   "ols_root_term_uris": "http://edamontology.org/operation_0004",
   "source_ontology": "edam",

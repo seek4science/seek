@@ -28,8 +28,8 @@ module Seek
         show_changes_summary(data, vocab)
 
         disable_authorization_checks do
-          # vocab.update_from_json_dump(data)
-          # vocab.save!
+          vocab.update_from_json_dump(data, true)
+          vocab.save!
         end
       end
 

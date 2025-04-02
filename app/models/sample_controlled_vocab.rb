@@ -72,6 +72,7 @@ class SampleControlledVocab < ApplicationRecord
     self.ols_root_term_uris = uris.join(', ')
   end
 
+  # updates the vocab and terms from a json file created with rake seek_dev:dump_controlled_vocab
   def update_from_json_dump(json, delete_removed)
     # find and attach the ids for those that exist
     presented_iris = []
