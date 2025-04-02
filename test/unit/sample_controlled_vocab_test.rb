@@ -378,6 +378,24 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     assert_equal ["Topic", "Environmental sciences", "Carbon cycle updated", "Microbial ecology", "Metabarcoding"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
     assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/topic_3697", "http://edamontology.org/topic_4038"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
     assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
+
+    # update with 2 terms moving IRI
+    json = open_fixture_file('cv_seed_data/topics-annotations-controlled-vocab-iri-changed.json').read
+    data = JSON.parse(json).with_indifferent_access
+    data = JSON.parse(json).with_indifferent_access
+    disable_authorization_checks do
+      assert_no_difference('SampleControlledVocab.count') do
+        assert_no_difference('SampleControlledVocabTerm.count') do
+          cv.update_from_json_dump(data, true)
+          assert cv.valid?
+          cv.save!
+        end
+      end
+    end
+    assert_equal 5, cv.sample_controlled_vocab_terms.count
+    assert_equal ["Topic", "Environmental sciences", "Carbon cycle updated", "Microbial ecology", "Metabarcoding"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
+    assert_equal ["http://edamontology.org/new_topic_3697", "http://edamontology.org/new_topic_4038", "http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
+    assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
   end
 
 end
