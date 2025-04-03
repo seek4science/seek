@@ -394,7 +394,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
     assert_equal 5, cv.sample_controlled_vocab_terms.count
     assert_equal ["Topic", "Environmental sciences", "Carbon cycle updated", "Microbial ecology", "Metabarcoding"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
-    assert_equal ["http://edamontology.org/new_topic_3697", "http://edamontology.org/new_topic_4038", "http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
+    assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/new_topic_3697", "http://edamontology.org/new_topic_4038"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
     assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
   end
 

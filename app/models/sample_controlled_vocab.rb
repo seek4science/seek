@@ -84,13 +84,20 @@ class SampleControlledVocab < ApplicationRecord
         term_json[:id] = term.id
       end
     end
-    if delete_removed
-      existing_iris = sample_controlled_vocab_terms.select(:iri).collect(&:iri)
-      removed_iris = existing_iris - presented_iris
-      removed_iris.each do |iri|
-        id = sample_controlled_vocab_terms.where(iri: iri).first.id
-        json[:sample_controlled_vocab_terms_attributes] << {id:id, _destroy:true }
+
+    existing_iris = sample_controlled_vocab_terms.select(:iri).collect(&:iri)
+    removed_iris = existing_iris - presented_iris
+    removed_iris.each do |iri|
+      term = sample_controlled_vocab_terms.where(iri: iri).first
+
+      # see if the label exists, and if so set id to update existing or otherwise mark for deletion. (deleting original and adding new will give duplicate label validation error)
+      json_term = json[:sample_controlled_vocab_terms_attributes].detect{|json_term| json_term[:label] == term.label}
+      if json_term
+        json_term[:id] = term.id
+      elsif delete_removed
+        json[:sample_controlled_vocab_terms_attributes] << {id: term.id, _destroy:true }
       end
+
     end
     update(json)
   end
