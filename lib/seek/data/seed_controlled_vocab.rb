@@ -33,21 +33,34 @@ module Seek
         end
       end
 
-      def self.show_changes_summary(data, vocab)
-        current_iris = vocab.sample_controlled_vocab_terms.collect(&:iri)
-        terms = data[:sample_controlled_vocab_terms_attributes]
-        update_iris = terms.collect { |atr| atr[:iri] }
-        gone = current_iris - update_iris
-        new = update_iris - current_iris
-        puts "#{new.count} new #{'term'.pluralize(new.count)}#{':' if new.any?}"
-        new.each do |iri|
-          term = terms.detect { |t| iri == t[:iri] }
-          puts "\t#{term[:label]}\t#{iri}"
+      def self.show_changes_summary(data, vocab, show_detailed_changes = false)
+        new, removed, updated = determine_changes(data, vocab)
+
+        puts "#{new.count} new #{'term'.pluralize(new.count)}#{':' if show_detailed_changes}" if new.any?
+        if show_detailed_changes
+          new.each do |term_attr|
+            puts format("\t%-50s%-40s", term_attr[:label], term_attr[:iri])
+          end
         end
-        puts "#{gone.count} #{'term'.pluralize(gone.count)} removed#{':' if gone.any?}"
-        gone.each do |iri|
-          term = vocab.sample_controlled_vocab_terms.where(iri: iri).first
-          puts "\t#{term.label}\t#{iri}"
+
+        if updated.any?
+          puts "#{updated.count} #{'term'.pluralize(updated.count)} updated#{':' if show_detailed_changes}"
+        end
+        if show_detailed_changes
+          updated.each do |term_attr, original|
+            puts format("\t%-50s%-40s%-40s", term_attr[:label], term_attr[:iri], term_attr[:parent_iri])
+            puts format("WAS:\t%-50s%-40s%-40s", original.label, original.iri, original.parent_iri)
+            puts
+          end
+        end
+
+        if removed.any?
+          puts "#{removed.count} #{'term'.pluralize(removed.count)} removed#{':' if show_detailed_changes}"
+        end
+        return unless show_detailed_changes
+
+        removed.each do |term|
+          puts format("\t%-50s%-40s", term.label, term.iri)
         end
       end
 
@@ -56,6 +69,30 @@ module Seek
         data = JSON.parse(json).with_indifferent_access
         data[:key] = SampleControlledVocab::SystemVocabs.database_key_for_property(property)
         data
+      end
+
+      def self.determine_changes(data, vocab)
+        updated = []
+        new = []
+        removed = []
+        json_terms_attributes = data[:sample_controlled_vocab_terms_attributes]
+        json_terms_attributes.each do |term_attrs|
+          query = vocab.sample_controlled_vocab_terms.where(iri: term_attrs[:iri]).or(vocab.sample_controlled_vocab_terms.where(label: term_attrs[:label]))
+          match = query.first
+          if match
+            if match.label != term_attrs[:label] || match.iri != term_attrs[:iri] || match.parent_iri != term_attrs[:parent_iri]
+              updated << [term_attrs, match]
+            end
+          else
+            new << term_attrs
+          end
+        end
+        vocab.sample_controlled_vocab_terms.each do |term|
+          unless json_terms_attributes.detect { |attr| attr[:iri] == term.iri || attr[:label] == term.label }
+            removed << term
+          end
+        end
+        [new, removed, updated]
       end
     end
   end
