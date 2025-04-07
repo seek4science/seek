@@ -382,7 +382,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     # update with 2 terms moving IRI
     json = open_fixture_file('cv_seed_data/topics-annotations-controlled-vocab-iri-changed.json').read
     data = JSON.parse(json).with_indifferent_access
-    data = JSON.parse(json).with_indifferent_access
+
     disable_authorization_checks do
       assert_no_difference('SampleControlledVocab.count') do
         assert_no_difference('SampleControlledVocabTerm.count') do
