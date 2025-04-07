@@ -28,8 +28,19 @@ module Seek
         show_changes_summary(data, vocab)
 
         disable_authorization_checks do
-          vocab.update_from_json_dump(data, true)
-          vocab.save!
+          SampleControlledVocab.transaction do
+            vocab.update_from_json_dump(data, true)
+            if vocab.valid?
+              vocab.save
+            else
+              puts "validation failed: #{vocab.errors.full_messages.join(', ')}"
+              bad_terms = vocab.sample_controlled_vocab_terms.reject(&:valid?)
+              if bad_terms.any?
+                puts "invalid terms #{bad_terms.map(&:label).join(', ')}"
+              end
+              raise ActiveRecord::Rollback
+            end
+          end
         end
       end
 
