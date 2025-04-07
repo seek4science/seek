@@ -35,7 +35,7 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'new with sample type id' do
     login_as(FactoryBot.create(:person))
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
     get :new, params: { sample_type_id: type.id }
     assert_response :success
     assert assigns(:sample)
@@ -45,11 +45,21 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'div label+p', text:/the weight of the patient/i, count:1
   end
 
+  test 'cannot access new with hidden sample type' do
+    login_as(FactoryBot.create(:person))
+    hidden_type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:private_policy), contributor: FactoryBot.create(:person))
+    refute hidden_type.can_view?
+    get :new, params: { sample_type_id: hidden_type.id }
+
+    assert_redirected_to root_path
+    assert_equal 'You are not authorized to use this Sample type', flash[:error]
+  end
+
   test 'create from form' do
     person = FactoryBot.create(:person)
     creator = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
     assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
       assert_difference('Sample.count') do
         post :create, params: { sample: { sample_type_id: type.id,
@@ -73,11 +83,28 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'frank, mary',sample.other_creators
   end
 
+  test 'cannot create with hidden sample type' do
+    person = FactoryBot.create(:person)
+    creator = FactoryBot.create(:person)
+    login_as(person)
+    hidden_type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:private_policy), contributor: FactoryBot.create(:person))
+    refute hidden_type.can_view?
+    assert_no_enqueued_jobs do
+      assert_no_difference('Sample.count') do
+        post :create, params: { sample: { sample_type_id: hidden_type.id,
+                                          data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                                          project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+      end
+    end
+    assert_redirected_to root_path
+    assert_equal 'You are not authorized to use this Sample type', flash[:error]
+  end
+
   test 'create' do
     person = FactoryBot.create(:person)
     creator = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
     obs_unit = FactoryBot.create(:observation_unit, contributor: person)
     assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
       assert_difference('Sample.count') do
@@ -103,7 +130,7 @@ class SamplesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     creator = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
     assert_no_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
                                         data: { 'full name': 'Fred Smith', age: 'Fish' },
@@ -123,9 +150,9 @@ class SamplesControllerTest < ActionController::TestCase
   test 'create and update with boolean from form' do
     person = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:simple_sample_type)
-    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', 
-                                                                   sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
+    type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:sample_attribute, title: 'bool',
+                      sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
@@ -148,7 +175,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'create with symbols' do
     person = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:sample_type_with_symbols)
+    type = FactoryBot.create(:sample_type_with_symbols, policy: FactoryBot.create(:public_policy))
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
                                         data: {
@@ -167,9 +194,9 @@ class SamplesControllerTest < ActionController::TestCase
   test 'create and update with boolean' do
     person = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:simple_sample_type)
-    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', 
-                                                                   sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
+    type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:sample_attribute, title: 'bool',
+                      sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, data: { the_title: 'ttt', bool: '1' },
@@ -190,7 +217,7 @@ class SamplesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     login_as(person)
 
-    type = FactoryBot.create(:apples_list_controlled_vocab_sample_type)
+    type = FactoryBot.create(:apples_list_controlled_vocab_sample_type, policy: FactoryBot.create(:public_policy))
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id,
                                         data: { apples: ['Granny Smith', 'Bramley'] },
@@ -215,8 +242,8 @@ class SamplesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     login_as(person)
     type = FactoryBot.create(:simple_sample_type)
-    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', 
-                                                                   sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
+    FactoryBot.create(:sample_attribute, title: 'bool',
+                      sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     sample = FactoryBot.create(:sample, sample_type: type, contributor: person)
     sample.set_attribute_value(:the_title, 'ttt')
@@ -346,7 +373,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'associate with project on create from form' do
     person = FactoryBot.create(:person_in_multiple_projects)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
     assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
@@ -366,7 +393,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'associate with project on create' do
     person = FactoryBot.create(:person_in_multiple_projects)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
     assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
@@ -464,7 +491,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'create with sharing from form' do
     person = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
@@ -484,7 +511,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'create with sharing' do
     person = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
@@ -622,8 +649,8 @@ class SamplesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     login_as(person)
     type = FactoryBot.create(:simple_sample_type)
-    type.sample_attributes << FactoryBot.create(:sample_attribute, title: 'bool', 
-                                                                   sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
+    FactoryBot.create(:sample_attribute, title: 'bool',
+                      sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     sample = FactoryBot.create(:sample, sample_type: type, contributor: person)
     sample.set_attribute_value(:the_title, 'ttt')
@@ -1001,7 +1028,7 @@ class SamplesControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person)
     login_as(person)
 
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
 
     sample =  {sample_type_id: type.id,
                data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
@@ -1222,8 +1249,8 @@ class SamplesControllerTest < ActionController::TestCase
   test 'create single linked sample' do
     person = FactoryBot.create(:person)
     login_as(person)
-    patient = FactoryBot.create(:patient_sample, contributor: person)
-    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id])
+    patient = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    linked_sample_type = FactoryBot.create(:linked_sample_type, project_ids: [person.projects.first.id], policy: FactoryBot.create(:public_policy))
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     linked_sample_type.save!
 
@@ -1249,7 +1276,7 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person)
     patient = FactoryBot.create(:patient_sample, contributor: person)
     patient2 = FactoryBot.create(:patient_sample, sample_type:patient.sample_type, contributor: person )
-    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id], policy: FactoryBot.create(:public_policy))
     multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     multi_linked_sample_type.save!
 
@@ -1276,7 +1303,7 @@ class SamplesControllerTest < ActionController::TestCase
     patient = FactoryBot.create(:patient_sample, contributor: FactoryBot.create(:person), 
                                                  policy: FactoryBot.create(:private_policy))
 
-    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id])
+    multi_linked_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [person.projects.first.id], policy: FactoryBot.create(:public_policy))
     multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     multi_linked_sample_type.save!
 
@@ -1555,7 +1582,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'should show label to say controlled vocab allows free text' do
     login_as(FactoryBot.create(:person))
 
-    type = FactoryBot.create(:simple_sample_type)
+    type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy))
     FactoryBot.create(:apples_controlled_vocab_attribute, is_title: true, title: 'allowed', allow_cv_free_text: true, 
                                                           sample_type: type)
     FactoryBot.create(:apples_controlled_vocab_attribute, title: 'not allowed', allow_cv_free_text: false, 

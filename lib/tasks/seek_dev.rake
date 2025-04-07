@@ -50,6 +50,38 @@ namespace :seek_dev do
     printer.print(STDOUT, {})
   end
 
+  # to fix an issue where MIT samples didn't link to assay following a job timeout
+  task(:linked_missed_mit_samples_to_assays, [:data_file_id, :assay_ids] => :environment) do |_t, args|
+    data_file_id = args.data_file_id
+    assay_ids = args.assay_ids
+
+    unless assay_ids.blank? || data_file_id.blank?
+      data_file = DataFile.find(data_file_id)
+      samples = data_file.extracted_samples
+      requested_assays = Assay.find(assay_ids.split(' '))
+      matching_assays = requested_assays & data_file.assays
+      puts "About to link assays: #{matching_assays.collect(&:id).join(', ')} with #{samples.count} samples extracted from data file #{data_file.id}"
+      puts "Enter y to continue, or anything else to exit"
+      if STDIN.gets.chomp == 'y'
+        samples.each do |sample|
+          if sample.assays.empty?
+            disable_authorization_checks do
+              data_file.copy_assay_associations([sample], matching_assays)
+            end
+            puts "Updated sample #{sample.id}"
+          else
+            puts "Assays already linked for sample #{sample.id}"
+          end
+        end
+      else
+        puts "exited"
+      end
+    else
+      puts "Both data file id and assay ids needed needed. Assay ids should be a space seprated list"
+      puts "Usage: bundle exec rake seek_dev:linked_missed_mit_samples_to_assays['<df_id>','<assay_id_1> <assay_id_2> ...']"
+      puts "e.g: bundle exec rake seek_dev:linked_missed_mit_samples_to_assays['1','5 6 7']"
+    end
+  end
 
   task(:dump_controlled_vocab, [:id] => :environment) do |_t, args|
     vocab = SampleControlledVocab.find(args.id)
@@ -413,7 +445,7 @@ namespace :seek_dev do
     pub_ids = Project.find(project_id).publications.map(&:id)
     pub_ids.each do |id|
       permission = Publication.find(id).policy.permissions.where(contributor_type: "Person", contributor_id: person_id).first_or_initialize
-      permission.update_attributes(access_type: Policy::MANAGING)
+      permission.update(access_type: Policy::MANAGING)
     end
 
   end

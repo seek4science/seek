@@ -20,7 +20,7 @@ class StudyApiTest < ActionDispatch::IntegrationTest
     assert_no_difference('Study.count') do
       delete member_url(study), headers: { 'Authorization' => write_access_auth }
       assert_response :forbidden
-      validate_json response.body, '#/components/schemas/forbiddenResponse'
+      assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
     end
   end
 

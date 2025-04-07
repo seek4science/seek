@@ -9,8 +9,8 @@
 <div>
   <div class="pull-right">
     <% if @blob.fetched? %>
-      <%= button_link_to('Download', 'download', polymorphic_path([@parent_resource, :git_download], version: @git_version.version, path: @blob.path)) %>
-      <%= button_link_to('Raw', 'markup', polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path)) %>
+      <%= button_link_to('Download', 'download', polymorphic_path([@parent_resource, :git_download], version: @git_version.version, path: @blob.path, code: params[:code])) %>
+      <%= button_link_to('Raw', 'markup', polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path, code: params[:code])) %>
     <% end %>
     <% if @blob.remote? %>
       <%= button_link_to('External Link', 'external_link', @blob.url, target: :_blank) %>

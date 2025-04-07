@@ -9,11 +9,12 @@ class SamplesController < ApplicationController
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
   before_action :check_if_locked_sample_type, only: %i[edit new create update]
+  before_action :authorize_sample_type, only: %i[new create]
   before_action :templates_enabled?, only: [:query, :query_form]
 
   before_action :auth_to_create, only: %i[new create batch_create]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include Seek::Publishing::PublishingCommon
 
   api_actions :index, :show, :create, :update, :destroy, :batch_create
@@ -247,7 +248,7 @@ class SamplesController < ApplicationController
       end
     end
 
-    if params[:input_template_id].present? # linked
+    if params[:input_template_id].present? && params[:input_attribute_id].present? # linked
       input_template_attribute =
         TemplateAttribute.find(params[:input_attribute_id])
       @result = filter_linked_samples(@result, :linked_samples,
@@ -256,7 +257,7 @@ class SamplesController < ApplicationController
           template_id: params[:input_template_id] }, input_template_attribute)
     end
 
-    if params[:output_template_id].present? # linking
+    if params[:output_template_id].present? && params[:output_attribute_id].present? # linking
       output_template_attribute =
         TemplateAttribute.find(params[:output_attribute_id])
       @result = filter_linked_samples(@result, :linking_samples,
@@ -371,4 +372,17 @@ class SamplesController < ApplicationController
     flash[:error] = 'This sample type is locked. You cannot edit the sample.'
     redirect_to sample_types_path(sample_type)
   end
+
+  def authorize_sample_type
+    id = params[:sample_type_id] || params.dig(:sample, :sample_type_id)
+    return unless id
+
+    sample_type = SampleType.find(id)
+    unless sample_type.can_view?
+      flash[:error] = "You are not authorized to use this #{t('sample_type')}"
+      redirect_to root_path
+    end
+
+  end
+
 end

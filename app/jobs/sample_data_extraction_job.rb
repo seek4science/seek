@@ -12,6 +12,10 @@ class SampleDataExtractionJob < TaskJob
     arguments[0].sample_extraction_task
   end
 
+  def timelimit
+    30.minutes
+  end
+
   def handle_error(exception)
     super
     @extractor.clear if @extractor

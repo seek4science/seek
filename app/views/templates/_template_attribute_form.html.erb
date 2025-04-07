@@ -15,7 +15,7 @@
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
 <% level = template&.level %>
-<% isa_tag_options = IsaTag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } %>
+<% isa_tag_options = ISATag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } %>
 <% isa_tag_id = template_attribute&.isa_tag_id %>
 <% isa_tag_title = template_attribute&.isa_tag&.title %>
 <% allow_cv_free_text = template_attribute&.allow_cv_free_text || false %>

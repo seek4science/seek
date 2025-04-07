@@ -10,7 +10,6 @@ class ApplicationController < ActionController::Base
 
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
-  include Recaptcha::Verify
   include CommonSweepers
   include ResourceHelper
 
@@ -362,7 +361,7 @@ class ApplicationController < ActionController::Base
                              culprit: current_user,
                              controller_name: controller_name,
                              user_agent: user_agent,
-                             data: { search_query: object, result_count: @results.count })
+                             data: { search_query: object.inspect, result_count: @results.count })
         end
       when 'content_blobs'
         # action download applies for normal download
@@ -386,7 +385,7 @@ class ApplicationController < ActionController::Base
         end
       when *Seek::Util.authorized_types.map { |t|
  t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'create_metadata' || action == 'create_from_template'
+        action = 'create' if action == 'create_metadata' || action == 'create_from_template'|| action == 'create_from_fair_ds_ttl'
         action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
         action = 'download' if action == 'ro_crate'
@@ -527,7 +526,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_api_request?
-    request.format.json? || ( request.content_type && Mime::Type.lookup(request.content_type)&.json? )
+    request.format.json? || (request.media_type && Mime::Type.lookup(request.media_type)&.json?)
   end
 
   # filter that responds with :not_acceptable if request rdf for non rdf capable resource

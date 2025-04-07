@@ -25,7 +25,7 @@ http {
         sendfile on;
         tcp_nopush on;
         tcp_nodelay on;
-        keepalive_timeout 65;
+        keepalive_timeout 300;
         types_hash_max_size 2048;
         # server_tokens off;
 
@@ -65,6 +65,9 @@ http {
         server {
                 listen 3000;
                 client_max_body_size 50G;
+                proxy_read_timeout 300;
+                proxy_send_timeout 300;
+                send_timeout 300;
 
                 location ~ ^${SEEK_SUB_URI}(/.*|$) {
                         alias /seek/public;

@@ -13,8 +13,8 @@ end
 module SEEK
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.2
-
+    config.load_defaults 7.2
+    config.active_record.default_column_serializer = YAML
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
@@ -31,7 +31,16 @@ module SEEK
     # Run "rake -D time" for a list of tasks for finding time zone names. Uncomment to use default local time.
     config.time_zone = 'UTC'
 
-    config.eager_load_paths << Rails.root.join('lib')
+    config.autoload_lib(ignore: %w[extensions])
+
+    # The following fixes `uninitialized constant ROCrate::ReadException` etc. when classes are reloaded in development mode.
+    overrides = "#{Rails.root}/lib/overrides"
+    Rails.autoloaders.main.ignore(overrides)
+    config.to_prepare do
+      Dir.glob("#{overrides}/**/*.rb").sort.each do |file|
+        load(file)
+      end
+    end
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password,"rack.request.form_vars"]
@@ -73,6 +82,5 @@ module SEEK
 
     config.active_record.belongs_to_required_by_default = false
     config.action_mailer.delivery_job = 'EnhancedMailDeliveryJob' # sets the configured SMTP settngs before each run
-    config.action_mailer.preview_path = "#{Rails.root}/test/mailers/previews" # For some reason it is looking in spec/ by default
   end
 end

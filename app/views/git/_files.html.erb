@@ -37,7 +37,9 @@
             if (node.type === 'blob') {
                 var path = '<%= polymorphic_path([resource, :git_blob], version: git_version.version, path: '__replaceme__') %>'.replace('__replaceme__', Git.encodePath(node.data.path))
                 element.spinner('add');
+                var code = new URLSearchParams(document.location.search).get('code');
                 $j.ajax(path, {
+                    data: code ? { code: code } : {},
                     success: function (html) {
                         $j('#git-preview-modal .modal-body').html(html);
                         $j('#git-preview-modal').modal('show');

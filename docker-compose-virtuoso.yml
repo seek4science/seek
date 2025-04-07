@@ -77,7 +77,7 @@ services:
       - /opt/solr/server/solr/configsets/seek_config 
 
   virtuoso:
-    image: tenforce/virtuoso
+    image: openlink/virtuoso-opensource-7
     container_name: seek-virtuoso
     restart: always
     ports:
@@ -86,7 +86,7 @@ services:
     environment:
       DBA_PASSWORD: wibble
     volumes:
-      - seek-virtuoso-data:/data
+      - seek-virtuoso-data:/database
 
 
 volumes:

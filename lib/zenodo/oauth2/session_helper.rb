@@ -23,11 +23,11 @@ module Zenodo
                   refresh_token: hash['refresh_token']
               )
             rescue
-              redirect_to @zenodo_oauth_client.authorize_url(request.original_url)
+              redirect_to @zenodo_oauth_client.authorize_url(request.original_url), allow_other_host: true
             end
           end
         else
-          redirect_to @zenodo_oauth_client.authorize_url(request.original_url)
+          redirect_to @zenodo_oauth_client.authorize_url(request.original_url), allow_other_host: true
         end
       end
 

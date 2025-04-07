@@ -1,6 +1,5 @@
 class Study < ApplicationRecord
 
-  enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
 
   searchable(:auto_index => false) do

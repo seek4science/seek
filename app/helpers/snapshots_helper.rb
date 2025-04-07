@@ -15,6 +15,12 @@ module SnapshotsHelper
   end
 
   def snapshot_link(resource, snapshot)
-    link_to "Snapshot #{snapshot.snapshot_number}", polymorphic_path([resource, snapshot])
+    link_to snapshot_display_name(snapshot), polymorphic_path([resource, snapshot]), 'data-tooltip' => tooltip(snapshot.description)
+  end
+
+  def snapshot_display_name(snapshot)
+    return snapshot.title if snapshot.title.present?
+    return "Snapshot #{snapshot.snapshot_number}" if snapshot.persisted?
+    "Snapshot #{snapshot.potential_snapshot_number}"
   end
 end

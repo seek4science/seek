@@ -27,9 +27,26 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil assigns(:sample_types)
   end
 
-  test 'should get new' do
-    get :new
+  test 'should get new fair data station enabled shows tab' do
+    with_config_value(:fair_data_station_enabled, true) do
+      get :new
+    end
     assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 3
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl'
+    end
+  end
+
+  test 'should get new fair data station disabled no tab' do
+    with_config_value(:fair_data_station_enabled, false) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 2
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl', count: 0
+    end
   end
 
   test 'should create sample_type' do
@@ -255,6 +272,31 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'update', ActivityLog.last.action
   end
 
+  test 'template download link visibility' do
+    person = FactoryBot.create(:person)
+    sample_type = SampleType.new title: 'testing download',
+                                 uploaded_template: true,
+                                 project_ids: person.projects.collect(&:id),
+                                 contributor: person,
+                                 content_blob: FactoryBot.create(:sample_type_template_content_blob),
+                                 policy: FactoryBot.create(:downloadable_public_policy)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    assert sample_type.can_view?
+    assert sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download'
+
+    sample_type.policy = FactoryBot.create(:publicly_viewable_policy)
+    disable_authorization_checks { sample_type.save! }
+    assert sample_type.can_view?
+    refute sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download', count:0
+  end
+
   test 'update changing from a CV attribute' do
     sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids,
                                                                           contributor: @person)
@@ -414,8 +456,127 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
 
     assert_template :new
-    assert_not_empty assigns(:sample_type).errors
+    refute_empty assigns(:sample_type).errors
   end
+
+  test 'create from fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    sample_type = assigns(:sample_type)
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+    assert_equal @person.user, ActivityLog.last.culprit
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    refute sample_type.uploaded_template?
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+
+    assert_equal 6, sample_type.sample_attributes.count
+
+    expected = ["http://schema.org/name", "http://schema.org/description", "http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:pid).sort
+
+    expected = ["Title", "Description", "biosafety level", "scientific name", "ncbi taxonomy id", "collection date"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:title).sort
+  end
+
+  test 'create from fair data station ttl but exact match exists' do
+    original_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, contributor: @person)
+    assert original_sample_type.can_view?
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    existing_sample_type = assigns(:existing_sample_type)
+    assert_redirected_to sample_type_path(existing_sample_type)
+    assert_equal 'An exact matching Sample type already exists, and now shown.', flash[:error]
+  end
+
+  test 'create from fair data station ttl ignore private exact match' do
+    private_matching_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
+    refute private_matching_sample_type.can_view?
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    refute sample_type.uploaded_template?
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+  end
+
+  test 'create from empty fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle') }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    assert_template :new
+    assert_equal 'No Sample type metadata could be found.', flash.now[:error]
+    refute_empty assigns(:sample_type).errors
+  end
+
+  test 'cannot create from fair data station ttl if disabled' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, false) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal 'Fair data station are disabled', flash[:error]
+  end
+
 
   test 'should show link to sample type for linked attribute' do
     linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)
@@ -479,10 +640,31 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'filter for select authorization' do
+    visible_type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy), contributor: FactoryBot.create(:person))
+    hidden_type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:private_policy), contributor: FactoryBot.create(:person))
+    assert visible_type.can_view?
+    refute hidden_type.can_view?
+
+    projects = (visible_type.projects | hidden_type.projects).collect(&:id)
+
+    get :filter_for_select, params: { projects: projects }
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_includes assigns(:sample_types), visible_type
+    refute_includes assigns(:sample_types), hidden_type
+
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(visible_type), text:visible_type.title
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(hidden_type), text:hidden_type.title, count: 0
+    end
+
+  end
+
   test 'filter for select' do
-    st1 = FactoryBot.create(:patient_sample_type)
-    st2 = FactoryBot.create(:patient_sample_type)
-    st3 = FactoryBot.create(:simple_sample_type)
+    st1 = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
+    st2 = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
+    st3 = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy))
     st3.tags = 'fred,mary'
     st1.tags = 'monkey'
     st3.save!
@@ -523,9 +705,9 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'filter for select exclusive tags' do
-    st1 = FactoryBot.create(:simple_sample_type, projects: [@project])
-    st2 = FactoryBot.create(:simple_sample_type, projects: [@project])
-    st3 = FactoryBot.create(:simple_sample_type, projects: [@project])
+    st1 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
+    st2 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
+    st3 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
     st1.tags = 'fred,mary'
     st2.tags = 'fred,bob,jane'
     st3.tags = 'frank,john,jane,peter'
@@ -671,7 +853,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'filter sample types with template when advanced single page is enabled' do
     project = FactoryBot.create(:project)
-    FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project])
+    FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project], policy: FactoryBot.create(:public_policy))
     params = { projects: [project.id]}
     get :filter_for_select, params: params
     assert_equal assigns(:sample_types).length, 1

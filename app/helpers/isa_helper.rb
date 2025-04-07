@@ -1,6 +1,6 @@
 require 'tempfile'
 
-module IsaHelper
+module ISAHelper
   OLD_FILL_COLOURS = {
       'Sop' => '#7AC5CD', # cadetblue3
       'Model' => '#CDCD00', # yellow3
@@ -19,6 +19,7 @@ module IsaHelper
       'Investigation' => '#D6FF00',
       'Study' => '#96ED29',
       'Assay' =>'#52D155',
+      'ObservationUnit' => '#40A040',
       'Publication' => '#CBB8FF',
       'DataFile' => '#FFC382',
       'Document' => '#D5C8A8',

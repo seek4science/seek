@@ -20,7 +20,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal ['This is a ms word doc format', 'doc', 'word.doc'], df.content_blob_search_terms.sort
 
     df = FactoryBot.create :xlsx_spreadsheet_datafile
-    assert_includes df.content_blob_search_terms, 'mild stress on ageing in a multispecies approach Experiment Transcripto'
+    assert_includes df.content_blob_search_terms, 'MAGE-TAB template submission sheet for SysMO-DB adapted for JenAge RNA-Seq'
   end
 
   test 'event association' do
@@ -193,11 +193,12 @@ class DataFileTest < ActiveSupport::TestCase
     df.reload
     rdf = df.to_rdf
     assert_not_nil rdf
-    # just checks it is valid rdf/xml and contains some statements for now
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 0
-      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    # just checks it is valid and contains some statements for now
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 0
+    assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), graph.statements.first.subject
   end
 
   test 'cache_remote_content' do
@@ -513,6 +514,14 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal [sample1], df_extracted.related_samples
     assert_equal [sample2].sort_by(&:id), df_attributes.related_samples
     assert_equal [sample1, sample2].sort_by(&:id), df_ext_attr.related_samples.sort_by(&:id)
+  end
+
+  test 'search field formatting methods' do
+    df = FactoryBot.create(:data_file, description: 'Hello\nWorld\n\n> quote')
+    FactoryBot.create(:tag, annotatable: df, source: df.contributor, value: 'aaa')
+    FactoryBot.create(:tag, annotatable: df, source: df.contributor, value: 'bbb')
+    assert_equal "<p>Hello\\nWorld\\n\\n&gt; quote</p>", df.send(:strip_markdown, df.description)
+    assert_equal ['aaa', 'bbb'], df.send(:searchable_tags)
   end
 
 end

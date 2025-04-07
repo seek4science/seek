@@ -81,7 +81,7 @@ SEEK::Application.routes.draw do
   end
 
   concern :has_snapshots do
-    resources :snapshots, only: [:show, :new, :create, :destroy], concerns: [:has_doi] do
+    resources :snapshots, concerns: [:has_doi] do
       member do
         get :download
         get :export, action: :export_preview
@@ -208,6 +208,8 @@ SEEK::Application.routes.draw do
       get :form_fields
       get :administer
       post :create
+      post :create_from_fair_ds_ttl
+      post :submit_jsons
     end
     member do
       put :administer_update
@@ -408,6 +410,7 @@ SEEK::Application.routes.draw do
       get :request_all
       get :request_all_sharing_form
       get  :typeahead
+      get  :ror_search
     end
     resources :people, :programmes, :projects, :specimens, only: [:index]
   end
@@ -532,6 +535,9 @@ SEEK::Application.routes.draw do
   end
 
   resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :explorable_spreadsheet] do
+    collection do
+      get :dynamic_table_typeahead
+    end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
@@ -603,7 +609,7 @@ SEEK::Application.routes.draw do
       get :reject_activation_confirmation
       get :storage_report
     end
-    resources :people, :projects, :institutions, :investigations, :studies, :assays, :samples,
+    resources :people, :projects, :institutions, :investigations, :studies, :assays, :observation_units, :samples,
               :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
     concerns :has_dashboard, controller: :programme_stats
   end
@@ -702,6 +708,7 @@ SEEK::Application.routes.draw do
   resources :sample_types, concerns: %i[asset has_content_blobs] do
     collection do
       post :create_from_template
+      post :create_from_fair_ds_ttl
       get :select
       get :filter_for_select
     end

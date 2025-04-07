@@ -228,6 +228,7 @@ FactoryBot.define do
 
   factory(:fairdatastation_virtual_demo_sample_type, parent: :sample_type) do
     title { 'fair data station virtual demo'}
+    association :policy, factory: :public_policy
     after(:build) do |type, eval|
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)
@@ -244,6 +245,7 @@ FactoryBot.define do
 
   factory(:fairdatastation_test_case_sample_type, parent: :sample_type) do
     title { 'fair data station test case'}
+    association :policy, factory: :public_policy
     after(:build) do |type, eval|
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)

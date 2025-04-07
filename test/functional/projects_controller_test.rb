@@ -7,11 +7,13 @@ class ProjectsControllerTest < ActionController::TestCase
   include RdfTestCases
   include ActionView::Helpers::NumberHelper
   include SharingFormTestHelper
+  include MockHelper
 
   fixtures :all
 
   def setup
     login_as(FactoryBot.create(:admin))
+    ror_mock
   end
 
   def test_title
@@ -403,7 +405,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     model.save
     publication.associate(model)
-    publication.save!
+    disable_authorization_checks { publication.save! }
     project = person.projects.first
 
     assert_includes publication.projects, project
@@ -1838,6 +1840,17 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'guided_import' do
+    prog = FactoryBot.create(:programme)
+    person = FactoryBot.create(:person_not_in_project)
+    login_as(person)
+    with_config_value(:managed_programme_id, prog.id) do
+      get :guided_import
+    end
+    assert_response :success
+    assert_select 'input#managed_programme', count:1
+  end
+
   test 'guided create with administered programmes' do
     person = FactoryBot.create(:programme_administrator)
     managed_prog = FactoryBot.create(:programme, title:'THE MANAGED ONE')
@@ -2128,7 +2141,7 @@ class ProjectsControllerTest < ActionController::TestCase
         params = {
           programme_id: programme.id,
           project: { title: '', description: 'description', web_page: 'invalid' },
-          institution: { title: 'new inst', country: 'xyz' }
+          institution: { title: 'new inst', country: 'GB' }
         }
         assert_no_enqueued_emails do
           assert_no_difference('Project.count') do
@@ -2143,7 +2156,6 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_response :unprocessable_entity
         assert flash[:error].include?("Title can't be blank")
         assert flash[:error].include?("Web page is not a valid URL")
-        assert flash[:error].include?("Country isn't a valid country or code")
         assert_equal 'new inst', assigns(:institution).title
         assert_equal 'description', assigns(:project).description
         assert_equal '', assigns(:project).title
@@ -2214,6 +2226,70 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+
+  test 'request create project with an existing institution ror id or title' do
+
+    FactoryBot.create(:admin)
+    person = FactoryBot.create(:person_not_in_project)
+    login_as(person)
+    programme = FactoryBot.create(:programme)
+    institution_existing = FactoryBot.create(:max_institution)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+        project: { title: 'The Project', description:'description', web_page:'web_page'},
+        institution: { title: institution_existing.title},
+        programme_id: '',
+        programme: {title: 'the prog'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('ProjectCreationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+
+      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
+
+    end
+
+
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+        project: { title: 'The Project', description:'description', web_page:'web_page'},
+        institution: { title: "new title", ror_id: institution_existing.ror_id},
+        programme_id: '',
+        programme: {title: 'the prog'}
+      }
+      assert_enqueued_emails(1) do
+        assert_difference('ProjectCreationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+      end
+
+      assert_response :success
+      assert flash[:notice]
+
+      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
+
+    end
+
+
+  end
+
   test 'request create project with new programme and institution' do
     FactoryBot.create(:admin)
     person = FactoryBot.create(:person_not_in_project)
@@ -2222,10 +2298,10 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
-          project: { title: 'The Project', description:'description', web_page:'web_page'},
-          institution: {id: ['the inst'], title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
-          programme_id: '',
-          programme: {title: 'the prog'}
+        project: { title: 'The Project', description:'description', web_page:'https://example.com'},
+        institution: {id: ['the inst'], title: 'the inst', web_page: 'https://example.com', city: 'London', country: 'GB'},
+        programme_id: '',
+        programme: {title: 'the prog'}
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
@@ -2246,7 +2322,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_equal 'GB',details.institution.country
       assert_equal 'London',details.institution.city
-      assert_equal 'the page',details.institution.web_page
+      assert_equal 'https://example.com',details.institution.web_page
       assert_equal 'the inst',details.institution.title
       assert_nil details.institution.id
 
@@ -2256,6 +2332,37 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_equal 'the prog',details.programme.title
       assert_nil details.programme.id
+    end
+  end
+
+  test 'Project creation request with institution errors should not trigger emails or logs' do
+    FactoryBot.create(:admin)
+    person = FactoryBot.create(:person_not_in_project)
+    programme = FactoryBot.create(:programme)
+    assert Person.admins.count > 1
+    login_as(person)
+    with_config_value(:managed_programme_id, programme.id) do
+      params = {
+        project: { title: 'The Project', description:'description', web_page:'https://example.com'},
+        institution: {title: 'the inst', web_page: 'invaid', city: 'London', country: 'XY'},
+        programme_id: '',
+        programme: {title: 'the prog'}
+      }
+      assert_no_enqueued_emails do
+        assert_no_difference('ProjectCreationMessageLog.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('Project.count') do
+              assert_no_difference('Programme.count') do
+                post :request_create, params: params
+              end
+            end
+          end
+        end
+      end
+
+      assert_response :unprocessable_entity
+      assert flash[:error]
+      assert_match /Institution is not valid: Web page is not a valid URL, Country isn't a valid country or code/, flash[:error]
     end
   end
 
@@ -2322,7 +2429,7 @@ class ProjectsControllerTest < ActionController::TestCase
       with_config_value(:managed_programme_id, managed_programme.id) do
         params = {
           project: { title: '', description: 'description', web_page: 'https://example.com' },
-          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'XY' },
+          institution: { id: ['the inst'], title: 'the inst', web_page: 'https://example.com/inst', city: 'London', country: 'GB' },
           programme_id: '',
           programme: { title: 'A Cool Programme' }
         }
@@ -2343,7 +2450,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
         assert flash[:error].include?("The Project is invalid, Title can't be blank")
         assert flash[:error].include?("The Programme is invalid, Title has already been taken")
-        assert flash[:error].include?("The Institution is invalid, Country isn't a valid country or code")
         assert_equal 'the inst', assigns(:institution).title
         assert_equal 'https://example.com/inst', assigns(:institution).web_page
         assert_equal 'description', assigns(:project).description
@@ -2360,8 +2466,8 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     with_config_value(:programmes_enabled, false) do
       params = {
-        project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: ['the inst'], title:'the inst',web_page:'the page',city:'London',country:'GB'}
+        project: { title: 'The Project',description:'description',web_page:'http://www.example.com'},
+        institution: {title:'the inst',web_page:'http://www.example.com',city:'London',country:'GB'}
       }
       assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
@@ -2380,7 +2486,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_equal 'GB',details.institution.country
       assert_equal 'London',details.institution.city
-      assert_equal 'the page',details.institution.web_page
+      assert_equal 'http://www.example.com',details.institution.web_page
       assert_equal 'the inst',details.institution.title
       assert_nil details.institution.id
 
@@ -2895,11 +3001,41 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
-    institution = Institution.new(title:'my institution')
+    institution = Institution.new(title:'my institution', ror_id: "027m9bs27", country: "GB")
     log = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
+    assert_select 'div.panel-body' do
+      assert_select 'div', text: /They have requested a new Institution, and provided the following details./
+    end
   end
+
+  test 'administer create request project with an existing institution ror id or title' do
+
+    person = FactoryBot.create(:admin)
+    institution_existing = FactoryBot.create(:max_institution)
+
+    login_as(person)
+    project = Project.new(title:'new project')
+    institution = Institution.new(title:'my new institution', ror_id: institution_existing.ror_id, country: "GB")
+    log = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution)
+    get :administer_create_project_request, params:{message_log_id:log.id}
+
+    assert_response :success
+    assert_select 'div', text: /They wish to be associated with University of Manchester/
+
+    institution2 = Institution.new(title: institution_existing.title)
+    log2 = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution2)
+    get :administer_create_project_request, params:{message_log_id:log2.id}
+
+    assert_response :success
+    assert_select 'div', text: /They wish to be associated with University of Manchester/
+
+
+  end
+
+
+
 
   test 'administer create project request, message log deleted' do
     person = FactoryBot.create(:admin)

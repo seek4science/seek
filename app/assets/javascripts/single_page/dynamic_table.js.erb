@@ -53,6 +53,14 @@ const objectInputTemp = '<input type="hidden" name="_NAME_[]" id="inpt-_NAME_" v
 
 const typeaheadSamplesUrl = "<%= typeahead_samples_path(linked_sample_type_id: '_LINKED_') %>";
 const typeaheadCVUrl = "<%= typeahead_sample_controlled_vocabs_path(scv_id: '_CVID_') %>";
+const typeaheadSopsUrl = "<%= dynamic_table_typeahead_sops_path(study_id: '__STUDY_ID__', assay_id: '__ASSAY_ID__') %>";
+const typeaheadDataFilesUrl = "<%= typeahead_data_files_path %>";
+const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
+
+// Checking if settings are enabled
+const registeredSopsEnabled = <%= Seek::Config.sops_enabled %>;
+const registeredDataFilesEnabled = <%= Seek::Config.data_files_enabled %>;
+const registeredOrganismsEnabled = <%= Seek::Config.organisms_enabled %>;
 
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
@@ -72,27 +80,68 @@ const handleSelect = (e) => {
   };
   $j.dynamicTable.prototype = {
     init: function(rows, columns, options = {}) {
-      columns.forEach((c) => {
+        const studyId = options.studyId;
+        const assayId = options.assayId;
+
+        columns.forEach((c) => {
         let linkedSamplesUrl;
         let cvUrl;
-        if (c.linked_sample_type) {
+        let registeredSopUrl;
+
+        let isRegisteredSample = false;
+        let isCVList = false;
+        let isRegisteredSop = false;
+        let isRegisteredDataFile = false;
+        let isRegisteredStrain = false;
+        if (c.attribute_type) {
+          isRegisteredSample = c.attribute_type.base_type.includes("SeekSample");
+          isCVList = c.attribute_type.base_type === "CVList";
+          isRegisteredSop = c.attribute_type.base_type === "SeekSop";
+          isRegisteredDataFile = c.attribute_type.base_type === "SeekDataFile";
+          isRegisteredStrain = c.attribute_type.base_type === "SeekStrain";
+        }
+
+        if (isRegisteredSample) {
           linkedSamplesUrl = typeaheadSamplesUrl.replace("_LINKED_", c.linked_sample_type);
           const linkedSamples = retrieveLinkedSamples(linkedSamplesUrl);
           c.linkedSampleIds = linkedSamples.map((ls) => ls.id);
         }
 
-        if(c.is_cv_list && 'cv_id' in c){
+        if(isCVList && 'cv_id' in c){
           cvUrl = typeaheadCVUrl.replace("_CVID_", c.cv_id);
+        }
+
+        if (isRegisteredSop) {
+            if (!registeredSopsEnabled) {
+                alert("A 'Registered SOP' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
+            }
+            registeredSopUrl = typeaheadSopsUrl.replace('__STUDY_ID__', options.studyId).replace('__ASSAY_ID__', options.assayId);
+        }
+
+        if (isRegisteredDataFile) {
+            if (!registeredDataFilesEnabled) {
+                alert("A 'Registered Data File' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
+            }
+        }
+
+        if (isRegisteredStrain) {
+            if(!registeredOrganismsEnabled) {
+                alert("A 'Registered Strain' attribute has been detected but the 'organisms' setting has been disabled. Please contact the administrator to enable the setting.")
+            }
         }
 
         c["render"] = function(data_, type, full, meta) {
           let sanitizedData = sanitizeData(data_);
           let data;
-          if(c.linked_sample_type){
+          if(isRegisteredSample){
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
             return registeredSamplesObjectsInput(c, data, options, linkedSamplesUrl);
-          } else if(c.is_cv_list && sanitizedData !== "#HIDDEN"){
+          } else if (isRegisteredSop) {
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data[0]?.id ? data : [];
+              return simpleObjectsInput(c, data, options, registeredSopUrl);
+          } else if(isCVList && sanitizedData !== "#HIDDEN"){
               data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
               data = data.map((e) => {
                 if (e?.id){
@@ -102,6 +151,14 @@ const handleSelect = (e) => {
                 }
               });
               return cvListObjectsInput(c, data, options, cvUrl);
+          } else if (isRegisteredDataFile) {
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data[0]?.id ? data : [];
+              return simpleObjectsInput(c, data, options, typeaheadDataFilesUrl);
+          } else if (isRegisteredStrain) {
+              data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
+              data = data[0]?.id ? data : [];
+              return simpleObjectsInput(c, data, options, typeaheadStrainsUrl);
           } else if (sanitizedData === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
           } else {
@@ -630,8 +687,32 @@ function cvListObjectsInput(column, data, options, url){
     .replace('_EXTRACLASS_', extraClass)
     .replace('_TITLE_', titleText)
     .replace('_LIMIT?_', '')
-    .replace('_ALLOW_FREE_TEXT_', allowNewItems);
+    .replace('_ALLOW_FREE_TEXT_', allowNewItems.toString());
   }
+}
+
+function simpleObjectsInput(column, data, options, url) {
+    const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`);
+    if (options.readonly) {
+        return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
+    } else {
+        const typeaheadTemplate = 'typeahead/single_pages_samples';
+        const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
+        const extraClass = '';
+        const titleText = '';
+        const allowNewItems = false;
+        setTimeout(ObjectsInput.init);
+
+        return objectInputTemp
+            .replace(/_NAME_/g, objectInputName)
+            .replace('_TYPEHEAD_', typeaheadTemplate)
+            .replace('_URL_', url)
+            .replace('_OPTIONS_', existingOptions)
+            .replace('_EXTRACLASS_', extraClass)
+            .replace('_TITLE_', titleText)
+            .replace('_LIMIT?_', '1')
+            .replace('_ALLOW_FREE_TEXT_', allowNewItems.toString());
+    }
 }
 
 const handleFailure = (table, res) => {

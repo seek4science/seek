@@ -136,7 +136,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'smtp_settings authentication' do
-    assert_equal :plain, Seek::Config.smtp_settings('authentication')
+    assert_equal '', Seek::Config.smtp_settings('authentication')
   end
   test 'noreply_sender' do
     assert_equal 'no-reply@sysmo-db.org', Seek::Config.noreply_sender
@@ -484,6 +484,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 128,key.length
     FileUtils.rm(path)
     refute_equal key, Seek::Config.secret_key_base
+  end
+
+  test 'application secret_key_base monkey patch' do
+    expected = '3daa438adac605595e91478ba4d9291ddcae049c9f0a922731b9f94fa7f65804db54fb19554490e45436ab8b7beb738f97c2c98ca9d00f5ac3d12749611c80f3'
+    assert_equal expected, Rails.application.secret_key_base
   end
 
   test 'project-specific setting' do

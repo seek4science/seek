@@ -58,7 +58,7 @@ module HomesHelper
     filtered_entries = []
     unless feeds.blank?
       feeds.each do |feed|
-        entries = try_block { feed.entries }
+        entries = feed&.entries
         # concat the source of the entry in the entry title, used later on to display
         unless entries.blank?
           entries.each { |entry| entry.title << "***#{feed.title}" if entry.title }
