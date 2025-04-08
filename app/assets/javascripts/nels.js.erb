@@ -383,7 +383,7 @@ const NelsBrowser = {
     validateMetadataFileExtension: function (extension, parentId = null) {
         const files = $j(`#${parentId} input[type="file"][name="content_blobs[][data]"]`);
         const filepath = files[0].value;
-        if (filepath.split(".").slice(-1) == extension) {
+        if (filepath.split(".").pop() == extension) {
             return true;
         } else {
             alert(`Please select a file of format ${extension}`);

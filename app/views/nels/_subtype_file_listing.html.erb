@@ -27,10 +27,9 @@
         <td>
           <%= file_type_icon_for_filename(file_item["name"]) %>
           <%= file_item["name"] %>
-          </span>
           <span style="float: right;">
-              <%= icon_link_to('', 'download','#',{ class:'nels-download-link','data-index':index }) %>
-            </span>
+            <%= icon_link_to('', 'download', '#', { class: 'nels-download-link', 'data-index': index }) %>
+          </span>
         </td>
         <td><%= number_to_human_size(file_item["size"]) %></td>
       </tr>
