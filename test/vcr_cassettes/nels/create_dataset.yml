@@ -1,0 +1,51 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/v2/sbi/projects/1125299/datasets/
+    body:
+      encoding: UTF-8
+      string: '{"datasettypeid":225,"name":"test dataset","description":"testing
+        creating a dataset"}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '87'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 01 Nov 2022 14:11:32 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '0'
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 01 Nov 2022 14:11:32 GMT
+recorded_with: VCR 2.9.3

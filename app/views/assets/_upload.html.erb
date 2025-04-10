@@ -5,6 +5,7 @@
   path_for_examine_url ||= examine_url_content_blobs_path
   existing_objects ||= []
   file_field_opts ||= {}
+  hide_remote ||= false
 
   url_from_params = nil
   original_filename_from_params = nil
@@ -22,9 +23,11 @@
     <li role="presentation" class="upload-field-tab active">
       <a data-role="seek-upload-field-tab" data-tab-target="local-file" role="tab" data-toggle="tab">Local file</a>
     </li>
-    <li role="presentation" class="upload-field-tab">
-      <a data-role="seek-upload-field-tab" data-tab-target="remote-url" role="tab" data-toggle="tab">Remote URL</a>
-    </li>
+    <% unless hide_remote %>
+      <li role="presentation" class="upload-field-tab">
+        <a data-role="seek-upload-field-tab" data-tab-target="remote-url" role="tab" data-toggle="tab">Remote URL</a>
+      </li>
+    <% end %>
   </ul>
 
   <div class="tab-content">
