@@ -11,10 +11,9 @@ module Nels
 
       attr_reader :base, :access_token
 
-      def initialize(access_token, base = nil)
-        base ||= Seek::Config.nels_api_url
+      def initialize(access_token)
         @access_token = access_token
-        @base = RestClient::Resource.new(base, timeout: 240)
+        @base = RestClient::Resource.new(Seek::Config.nels_api_url, timeout: 240)
       end
 
       def sanitise_storage_path(file_path)
