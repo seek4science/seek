@@ -1,5 +1,7 @@
 module NelsHelper
 
+  NORMAL_USER_MEMBERSHIP = 4
+
   def nels_file_details_json(items_hash, project_name, dataset_name, subtype_name)
     # download_file,project_id: @project_id, dataset_id: @dataset_id, subtype_name: , path: file_item["path"], filename: file_item['name']
     items_hash.collect do |item|
@@ -36,7 +38,7 @@ module NelsHelper
   end
 
   def is_nels_dataset_locked?(dataset, project)
-    dataset['islocked'] || project['membership_type']==4
+    dataset['islocked'] || project['membership_type'] == NORMAL_USER_MEMBERSHIP
   end
 
   def subtype_path_breadcrumbs(subtype_path, full_path, project_id, dataset_id, subtype_name)
