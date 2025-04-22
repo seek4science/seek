@@ -1,8 +1,8 @@
 <%= modal(id: 'upload-metadata-file', size: 'm', class: 'text-left') do %>
-  <%= form_tag({:action => :add_metadata}, :multipart => true) do %>
+  <%= form_tag({action: :add_metadata}, multipart: true) do %>
     <%= modal_header('Add metadata') %>
     <%= modal_body do %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload metadata", hide_remote: true} -%>
+      <%= render partial: "assets/upload_box", locals: {action_text: "upload metadata", hide_remote: true} -%>
     <% end %>
     <%= modal_footer do %>
       <%= create_button id:"data_file_submit_btn", button_text:'Add',

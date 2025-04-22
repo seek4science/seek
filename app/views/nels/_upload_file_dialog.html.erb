@@ -1,8 +1,8 @@
 <%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
-  <%= form_tag({:action => :upload_file}, id: 'upload-file-form', multipart: true) do %>
+  <%= form_tag({action: :upload_file}, id: 'upload-file-form', multipart: true) do %>
     <%= modal_header('Upload file') %>
     <%= modal_body do %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:action_text=>"upload", hide_remote: true} -%>
+      <%= render partial: "assets/upload_box", locals: {action_text: "upload", hide_remote: true} -%>
       <%= hidden_field_tag(:subtype_path, '/'+subtype_path) %>
 
       <%= hidden_field_tag :project_id, project_id %>

@@ -1,5 +1,5 @@
 <%= modal(id: 'create-folder-dialog', size: 'm', class: 'text-left') do %>
-  <%= form_tag({:action => :create_folder}, id: 'create-folder-form', :multipart => true) do %>
+  <%= form_tag({action: :create_folder}, id: 'create-folder-form', multipart: true) do %>
     <%= modal_header('Create a folder') %>
     <%= modal_body do %>
       <label>Folder name</label>

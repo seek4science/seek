@@ -21,15 +21,15 @@
   <%# Based on projects/_form.html.erb %>
   <div class="form-group">
     <label>Name <span class="required">*</span></label>
-    <%= text_field_tag :title, nil, :class=>"form-control"-%>
+    <%= text_field_tag :title, nil, class: "form-control"-%>
   </div>
 
   <div class="form-group">
     <label>Description <span class="required">*</span></label>
-    <%= text_field_tag :description, nil, :class=>"form-control"-%>
+    <%= text_field_tag :description, nil, class: "form-control"-%>
   </div>
 
-  <%= submit_tag "Create dataset", data: {disable_with: 'Creating...'}, :class => 'btn btn-primary' -%>
+  <%= submit_tag "Create dataset", data: {disable_with: 'Creating...'}, class: 'btn btn-primary' -%>
   or
   <%= cancel_button(nels_path) %>
 

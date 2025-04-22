@@ -21,7 +21,7 @@
 
 <h4>Datasets</h4>
 <p>
-  <%= button_link_to('Create a new NeLS dataset', 'add', new_dataset_nels_path(:project_id => @project['id'], :project_name => @project['name'])) %>
+  <%= button_link_to('Create a new NeLS dataset', 'add', new_dataset_nels_path(project_id: @project['id'], project_name: @project['name'])) %>
 </p>
 <ul>
 <% @datasets.each do |dataset| %>
