@@ -121,14 +121,13 @@ module Nels
         rescue RestClient::Exceptions::ReadTimeout
           base.options[:timeout] = original_timeout
           new_path = File.join(current_path, new_folder)
-          Timeout.timeout(240) do
-            loop do
-              files = sbi_storage_list(project_id, dataset_id, current_path)
-              files = files.collect { |f| f['path'] }
-              break if files.include?(new_path)
-
-              sleep(1)
-            end
+          timeout = Time.now + 3.minutes
+          loop do
+            files = sbi_storage_list(project_id, dataset_id, current_path)
+            files = files.collect { |f| f['path'] }
+            break if files.include?(new_path)
+            raise Timeout::Error if Time.now > timeout
+            sleep(1)
           end
         end
       end
@@ -177,11 +176,12 @@ module Nels
 
         Rails.logger.info("upload_done response code: #{response.code}")
         job_state = 0
+        timeout = Time.now + 3.minutes
         while job_state != 101
           job_state, progress = upload_transfer_check_progress(project_id, dataset_id, subtype_name, job_id)
           Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
           raise TransferError, 'There was an error with the transfer job after upload.' if job_state == 102
-
+          raise Timeout::Error if Time.now > timeout
           sleep(0.2)
         end
       end
