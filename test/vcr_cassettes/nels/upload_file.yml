@@ -70,7 +70,7 @@ http_interactions:
       - test-fe.cbu.uib.no
   response:
     status:
-      code: 200
+      code: 204
       message: OK
     headers:
       Date:
@@ -89,9 +89,6 @@ http_interactions:
       - localhost
       Connection:
       - close
-    body:
-      encoding: UTF-8
-      string: ''
     http_version: 
   recorded_at: Thu, 13 Oct 2022 15:50:23 GMT
 - request:

@@ -5,7 +5,6 @@ require 'tempfile'
 module Nels
   module Rest
     class Client
-      class UploadError < StandardError; end
       class TransferError < StandardError; end
       class FetchFileError < StandardError; end
 
@@ -127,7 +126,7 @@ module Nels
             files = files.collect { |f| f['path'] }
             break if files.include?(new_path)
             raise Timeout::Error if Time.now > timeout
-            sleep(1)
+            sleep(2)
           end
         end
       end
@@ -159,11 +158,8 @@ module Nels
 
         Rails.logger.info("Job ID: #{job_id} ; Upload URL: #{upload_url}")
 
-        response = RestClient.post(upload_url, { file: File.new(file_path, 'rb') }, { accept: '*/*' })
+        RestClient.post(upload_url, { file: File.new(file_path, 'rb') }, { accept: '*/*' })
 
-        unless response.code == 200
-          raise UploadError, "There was an error uploading the file #{file_path}, response was #{response.code}"
-        end
 
         # Once upload is done, trigger NeLS transfer
         response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
@@ -182,7 +178,7 @@ module Nels
           Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
           raise TransferError, 'There was an error with the transfer job after upload.' if job_state == 102
           raise Timeout::Error if Time.now > timeout
-          sleep(0.2)
+          sleep(2)
         end
       end
 

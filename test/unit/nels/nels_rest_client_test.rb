@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'rest-client'
 
 class NelsRestClientTest < ActiveSupport::TestCase
   setup do
@@ -121,6 +122,26 @@ class NelsRestClientTest < ActiveSupport::TestCase
       file_path = File.join(Rails.root, 'test', 'fixtures', 'files', 'little_file.txt')
       assert File.exist?(file_path)
       @rest_client.upload_file(1_125_299, 1_124_840, 'analysis', '', 'little_file.txt', file_path)
+    end
+  end
+
+  test 'upload file with MethodNotAllowed error' do
+    VCR.use_cassette('nels/upload_file_405_error') do
+      file_path = File.join(Rails.root, 'test', 'fixtures', 'files', 'little_file.txt')
+      assert File.exist?(file_path)
+      assert_raises RestClient::MethodNotAllowed do
+        @rest_client.upload_file(1_125_299, 1_124_840, 'analysis', '', 'little_file.txt', file_path)
+      end
+    end
+  end
+
+  test 'upload file with Unauthorized error' do
+    VCR.use_cassette('nels/upload_file_401_error') do
+      file_path = File.join(Rails.root, 'test', 'fixtures', 'files', 'little_file.txt')
+      assert File.exist?(file_path)
+      assert_raises RestClient::Unauthorized do
+        @rest_client.upload_file(1_125_299, 1_124_840, 'analysis', '', 'little_file.txt', file_path)
+      end
     end
   end
 
