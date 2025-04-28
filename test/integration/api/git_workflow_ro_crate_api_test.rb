@@ -64,6 +64,12 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         assert_equal 'main.nf', new_version.main_workflow_path
         assert_equal 'main.nf', workflow.ro_crate.main_workflow.id
         assert_equal 'concat_two_files.ga', old_version.main_workflow_path
+
+        assert new_version.file_exists?('main.nf')
+        refute new_version.file_exists?('concat_two_files.ga')
+
+        refute old_version.file_exists?('main.nf')
+        assert old_version.file_exists?('concat_two_files.ga')
       end
     end
   end
