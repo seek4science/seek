@@ -4,11 +4,14 @@ require 'tempfile'
 
 module Nels
   module Rest
+
     class Client
       class TransferError < StandardError; end
       class FetchFileError < StandardError; end
 
       attr_reader :base, :access_token
+
+      TIMEOUT = 4.minutes
 
       def initialize(access_token)
         @access_token = access_token
@@ -120,7 +123,7 @@ module Nels
         rescue RestClient::Exceptions::ReadTimeout
           base.options[:timeout] = original_timeout
           new_path = File.join(current_path, new_folder)
-          timeout = Time.now + 3.minutes
+          timeout = Time.now + TIMEOUT
           loop do
             files = sbi_storage_list(project_id, dataset_id, current_path)
             files = files.collect { |f| f['path'] }
@@ -172,7 +175,7 @@ module Nels
 
         Rails.logger.info("upload_done response code: #{response.code}")
         job_state = 0
-        timeout = Time.now + 3.minutes
+        timeout = Time.now + TIMEOUT
         while job_state != 101
           job_state, progress = upload_transfer_check_progress(project_id, dataset_id, subtype_name, job_id)
           Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
@@ -217,13 +220,15 @@ module Nels
         Rails.logger.info("initiate_download, job id: #{job_id}")
 
         job_state = 0
+        timeout = Time.now + TIMEOUT
         while job_state != 101
           job_state, progress = check_download_transfer_progress(project_id, dataset_id, subtype_name, job_id)
 
           Rails.logger.info("Waiting for transfer, Job state: #{job_state}; Completion: #{progress}")
           raise TransferError, 'There was an problem with the transfer before download' if job_state == 102
+          raise Timeout::Error if Time.now > timeout
 
-          sleep(0.25)
+          sleep(1)
         end
 
         # Once the file has been transfered, request download-uri

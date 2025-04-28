@@ -287,6 +287,44 @@ class NelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'upload file not authorized error' do
+    project_id = '1125299'
+    dataset_id = '1124840'
+    subtype = 'analysis'
+
+    file_path = File.join(Rails.root, 'test', 'fixtures', 'files', 'little_file.txt')
+    assert File.exist?(file_path)
+
+    file_data = fixture_file_upload('little_file.txt', 'text/plain')
+
+    VCR.use_cassette('nels/upload_file_401_error') do
+      post :upload_file,
+           params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
+                     subtype_path: '', content_blobs: [{ data: file_data }] }, format: :json
+      assert_response :unauthorized
+      assert_equal 'Unauthorized', JSON.parse(response.body)['error']
+    end
+  end
+
+  test 'upload file method not allowed error' do
+    project_id = '1125299'
+    dataset_id = '1124840'
+    subtype = 'analysis'
+
+    file_path = File.join(Rails.root, 'test', 'fixtures', 'files', 'little_file.txt')
+    assert File.exist?(file_path)
+
+    file_data = fixture_file_upload('little_file.txt', 'text/plain')
+
+    VCR.use_cassette('nels/upload_file_405_error') do
+      post :upload_file,
+           params: { dataset_id: dataset_id, project_id: project_id, subtype_name: subtype,
+                     subtype_path: '', content_blobs: [{ data: file_data }] }, format: :json
+      assert_response :internal_server_error
+      assert_equal 'Error interacting with the NeLS API (status: 405)', JSON.parse(response.body)['message']
+    end
+  end
+
   test 'upload file with space in name fails fails' do
     project_id = '1125299'
     dataset_id = '1124840'

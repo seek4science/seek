@@ -7,8 +7,11 @@ class NelsController < ApplicationController
   before_action :oauth_client
   before_action :nels_oauth_session, except: :callback
 
+  rescue_from RestClient::ExceptionWithResponse, with: :nels_communication_error_response
   rescue_from RestClient::Unauthorized, with: :unauthorized_response
   rescue_from RestClient::InternalServerError, with: :nels_error_response
+  rescue_from Timeout::Error, with: :nels_timeout_error_response
+  rescue_from Nels::Rest::Client::TransferError, with: :nels_transfer_error_response
 
   def callback
     hash = @oauth_client.get_token(params[:code])
@@ -55,11 +58,7 @@ class NelsController < ApplicationController
   end
 
   def create_dataset
-    begin
-      rest_client.create_dataset(params['project'], params['datasettype'], params['title'], params['description'])
-    rescue RuntimeError => e
-      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
-    end
+    rest_client.create_dataset(params['project'], params['datasettype'], params['title'], params['description'])
     render :index
   end
 
@@ -67,19 +66,12 @@ class NelsController < ApplicationController
     file_name, file_path = rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,
                                                     params[:subtype_name])
     send_file file_path, filename: file_name, disposition: 'attachment'
-  rescue RuntimeError => e
-    flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
-    redirect_to nels_path
   end
 
   def add_metadata
-    begin
-      rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
-                                  params['content_blobs'][0]['data'].path)
-    rescue RuntimeError => e
-      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{e.class.name})"
-    end
 
+    rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name],
+                                  params['content_blobs'][0]['data'].path)
     redirect_to nels_path
   end
 
@@ -96,11 +88,6 @@ class NelsController < ApplicationController
       respond_to do |format|
         format.all { render json: { success: true } }
       end
-    end
-  rescue RuntimeError => e
-    Rails.logger.error("Error creating folder  #{e.message} - #{e.backtrace.join($INPUT_RECORD_SEPARATOR)}")
-    respond_to do |format|
-      format.json { render json: { error: e.message, exception: e.class.name }, status: :internal_server_error }
     end
   end
 
@@ -119,11 +106,6 @@ class NelsController < ApplicationController
         format.all { render json: { success: true } }
       end
     end
-  rescue RuntimeError => e
-    Rails.logger.error("Error uploading file  #{e.message} - #{e.backtrace.join($INPUT_RECORD_SEPARATOR)}")
-    respond_to do |format|
-      format.json { render json: { error: e.message, exception: e.class.name }, status: :internal_server_error }
-    end
   end
 
   def download_file
@@ -134,10 +116,6 @@ class NelsController < ApplicationController
     file_key = path.gsub('/tmp/nels-download-','')
     respond_to do |format|
       format.json { render json: { filename: filename, file_key: file_key } }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { error: e.message, exception: e.class.name }, status: :internal_server_error }
     end
   end
 
@@ -292,7 +270,44 @@ class NelsController < ApplicationController
 
   def nels_error_response
     render json: { error: 'NeLS API Error',
-                   message: 'An error occurred whilst accessing the NeLS API.' }, status: :internal_server_error
+                   message: 'An error occurred whilst accessing the NeLS API.',
+                   exception: 'RestClient::InternalServerError'}, status: :internal_server_error
+  end
+
+  def nels_communication_error_response(exception)
+    if request.format == :json
+      render json: { error: "NeLS API Error",
+                     message: "Error interacting with the NeLS API (status: #{exception.response.code})",
+                     exception: exception.response.class.name,
+                     }, status: :internal_server_error
+    else
+      flash[:error] = "Something went wrong interacting with NeLS, please try again later (#{exception.response.status})"
+      redirect_to nels_path
+    end
+  end
+
+  def nels_timeout_error_response
+    if request.format == :json
+      render json: { error: 'Timeout error',
+                     message: 'There was a timeout error interacting with NeLS',
+                     exception: 'Timeout::Error'
+      }, status: :internal_server_error
+    else
+      flash[:error] = "There was a timeout error interacting with NeLS"
+      redirect_to nels_path
+    end
+  end
+
+  def nels_transfer_error_response(exception)
+    if request.format == :json
+      render json: { error: "Transfer error: #{exception.message}",
+                     message: "There was a error transferring files: #{exception.message}",
+                     exception: exception.class.name,
+      }, status: :internal_server_error
+    else
+      flash[:error] = "There was a error transferring files: #{exception.message}"
+      redirect_to nels_path
+    end
   end
 
   def check_code_present

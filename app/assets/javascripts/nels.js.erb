@@ -233,6 +233,7 @@ const NelsBrowser = {
         element.spinner('add');
         $j.ajax({
             url: '<%= download_file_nels_path() %>',
+            dataType: 'json',
             data: {
                 project_id: json['project_id'],
                 dataset_id: json['dataset_id'],
@@ -255,7 +256,8 @@ const NelsBrowser = {
             },
             error: function (request, status, error) {
                 const exception = request.responseJSON['exception'];
-                alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
+                const message = request.responseJSON['message'];
+                alert(message + ' (' + exception + ')');
             },
             complete: function (data) {
                 element.spinner('remove');
@@ -299,6 +301,7 @@ const NelsBrowser = {
         $j.ajax({
             url: '<%= create_folder_nels_path() %>',
             data: data,
+            dataType: 'json',
             cache: false,
             contentType: false,
             processData: false,
@@ -314,14 +317,9 @@ const NelsBrowser = {
             },
             error: function (request, status, error) {
                 $j('#create-folder-spinner').modal('hide');
-                // not acceptable
-                if (request.status == 406) {
-                    const msg = request.responseJSON['error'];
-                    alert(msg);
-                } else {
-                    const exception = request.responseJSON['exception'];
-                    alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
-                }
+                const exception = request.responseJSON['exception'];
+                const message = request.responseJSON['message'];
+                alert(message + ' (' + exception + ')');
             },
             complete: function (data) {
                 $j('#create-folder-spinner').modal('hide');
@@ -337,6 +335,7 @@ const NelsBrowser = {
             $j.ajax({
                 url: '<%= upload_file_nels_path() %>',
                 data: data,
+                dataType: 'json',
                 cache: false,
                 contentType: false,
                 processData: false,
@@ -352,14 +351,9 @@ const NelsBrowser = {
                 },
                 error: function (request, status, error) {
                     $j('#upload-spinner').modal('hide');
-                    // not acceptable
-                    if (request.status == 406) {
-                        const msg = request.responseJSON['error'];
-                        alert(msg);
-                    } else {
-                        const exception = request.responseJSON['exception'];
-                        alert('Something went wrong interacting with NeLS, please try again later. (' + exception + ')');
-                    }
+                    const exception = request.responseJSON['exception'];
+                    const message = request.responseJSON['message'];
+                    alert(message + ' (' + exception + ')');
                 },
                 complete: function (data) {
                     $j('#upload-spinner').modal('hide');
