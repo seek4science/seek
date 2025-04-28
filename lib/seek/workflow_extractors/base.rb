@@ -78,8 +78,12 @@ module Seek
             if affiliation.is_a?(String)
               author[:affiliation] = affiliation
             else
-              affiliation = affiliation.dereference if affiliation.respond_to?(:dereference)
-              author[:affiliation] = affiliation['name'] if affiliation && affiliation['name'].present?
+              affiliation = [affiliation] unless affiliation.is_a?(Array)
+              affiliation = affiliation.map do |aff|
+                aff = aff.dereference if aff.respond_to?(:dereference)
+                aff['name'] if aff && aff['name'].present?
+              end.compact.join(', ')
+              author[:affiliation] = affiliation
             end
           end
           orcid = obj['identifier'] || obj['@id']
