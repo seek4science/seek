@@ -347,7 +347,7 @@ const NelsBrowser = {
                 },
                 error: function (response, status, error) {
                     $j('#upload-spinner').modal('hide');
-                    NelsBrowser.alertAjaxError(response)
+                    NelsBrowser.alertAjaxError(response);
                 },
                 complete: function (data) {
                     $j('#upload-spinner').modal('hide');
