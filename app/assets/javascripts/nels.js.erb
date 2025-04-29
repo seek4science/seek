@@ -172,7 +172,7 @@ const NelsTreeEvents = {
 
 
         //folder_path = sessionStorage.getItem('nels_folder_state');
-        folder_path = `Storebioinfo/${project_name}/${data.node.data.dataset_name}/${data.node.data.text}/`;
+        folder_path = `Storebioinfo/${encodeURIComponent(project_name)}/${encodeURIComponent(data.node.data.dataset_name)}/${encodeURIComponent(data.node.data.text)}/`;
 
         NelsTree.showSubtype(data.node.data.project_id, data.node.data.dataset_id, data.node.data.text, folder_path, data.node.data.assay_id);
     },
