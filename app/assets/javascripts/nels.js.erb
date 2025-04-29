@@ -254,10 +254,8 @@ const NelsBrowser = {
                 a.click();
                 document.body.removeChild(a);
             },
-            error: function (request, status, error) {
-                const exception = request.responseJSON['exception'];
-                const message = request.responseJSON['message'];
-                alert(message + ' (' + exception + ')');
+            error: function (response, status, error) {
+                NelsBrowser.alertAjaxError(response)
             },
             complete: function (data) {
                 element.spinner('remove');
@@ -315,11 +313,9 @@ const NelsBrowser = {
                 $j('#create-folder-spinner').modal('hide');
                 NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
             },
-            error: function (request, status, error) {
+            error: function (response, status, error) {
                 $j('#create-folder-spinner').modal('hide');
-                const exception = request.responseJSON['exception'];
-                const message = request.responseJSON['message'];
-                alert(message + ' (' + exception + ')');
+                NelsBrowser.alertAjaxError(response);
             },
             complete: function (data) {
                 $j('#create-folder-spinner').modal('hide');
@@ -349,11 +345,9 @@ const NelsBrowser = {
                     $j('#upload-spinner').modal('hide');
                     NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
                 },
-                error: function (request, status, error) {
+                error: function (response, status, error) {
                     $j('#upload-spinner').modal('hide');
-                    const exception = request.responseJSON['exception'];
-                    const message = request.responseJSON['message'];
-                    alert(message + ' (' + exception + ')');
+                    NelsBrowser.alertAjaxError(response)
                 },
                 complete: function (data) {
                     $j('#upload-spinner').modal('hide');
@@ -383,5 +377,10 @@ const NelsBrowser = {
             alert(`Please select a file of format ${extension}`);
             return false;
         }
+    },
+    alertAjaxError: function(response) {
+        const exception = response.responseJSON['exception'];
+        const message = response.responseJSON['message'];
+        alert(message + ' (' + exception + ')');
     }
 }
