@@ -16,6 +16,11 @@
           <%= t('workflows.register.git') %>
         </a>
       <% end %>
+      <%= content_tag(:li, role: 'presentation') do %>
+        <a href="#new-ro-crate-version" aria-controls="new-ro-crate-version" role="tab" data-toggle="tab">
+          <%= t('workflows.register.ro_crate') %>
+        </a>
+      <% end %>
     </ul>
   </div>
 
@@ -61,6 +66,23 @@
               <%= f.text_field :remote, placeholder: 'https://github.com/example/repository.git', class: 'form-control' %>
             </div>
           <% end %>
+
+          <div>
+            <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@workflow) %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%= content_tag(:div, role: 'tabpanel', id: 'new-ro-crate-version', class: 'tab-pane') do %>
+        <%= form_tag(polymorphic_path([:create_version_from_ro_crate, @workflow], anchor: 'new-ro-crate-version'), multipart: true) do -%>
+          <%= error_messages_for :crate_extractor -%>
+          <%= error_messages_for :workflow -%>
+
+          <div class="form-group">
+            <label class="required">Workflow RO-Crate</label>
+            <p class="help-block">The zipped <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workflow RO-Crate</a>.</p>
+            <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate', file_field_opts: { accept: '.zip' } } -%>
+          </div>
 
           <div>
             <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@workflow) %>

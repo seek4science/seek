@@ -144,6 +144,19 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def create_version_from_ro_crate
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(workflow: @workflow))
+    @workflow = @crate_extractor.build
+
+    respond_to do |format|
+      if @crate_extractor.valid?
+        format.html { render :provide_metadata }
+      else
+        format.html { render action: :new, status: :unprocessable_entity }
+      end
+    end
+  end
+
   #
   # # Displays the form Wizard for providing the metadata for the workflow
   # def provide_metadata
@@ -310,7 +323,7 @@ class WorkflowsController < ApplicationController
   end
 
   def submit
-    @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, update_existing: true)
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, detect_workflow: true)
 
     if @crate_extractor.valid?
       @workflow = @crate_extractor.build
