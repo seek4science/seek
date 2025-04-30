@@ -296,6 +296,21 @@ const NelsBrowser = {
         $j('#create-folder-dialog').modal('hide');
         $j('#create-folder-spinner').modal('show');
         const data = new FormData($j('#create-folder-form')[0]);
+
+        const folder_name = data.get('new_folder');
+        if (folder_name.length < 1) {
+            alert('Please provide a name for the folder');
+            $j('#create-folder-dialog').modal('show');
+            $j('#create-folder-spinner').modal('hide');
+            return false;
+        }
+        if ((/\s/).test(folder_name)) {
+            alert('Folder names containing spaces are not allowed');
+            $j('#create-folder-dialog').modal('show');
+            $j('#create-folder-spinner').modal('hide');
+            return false;
+        }
+
         $j.ajax({
             url: '<%= create_folder_nels_path() %>',
             data: data,
