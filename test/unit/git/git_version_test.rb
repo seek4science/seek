@@ -65,6 +65,55 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_not_empty v.blobs
   end
 
+  test 'add multiple files' do
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
+
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
+    v.add_files([
+                  ['blah.txt', StringIO.new('blah')],
+                  ['hello/whatever.txt', StringIO.new('whatever')]
+                ])
+    assert v.commit.present?
+    assert v.file_exists?('blah.txt')
+    assert v.file_exists?('hello/whatever.txt')
+    assert_equal 'blah', v.file_contents('blah.txt')
+    assert_equal 'whatever', v.file_contents('hello/whatever.txt')
+    assert_not_empty v.blobs
+  end
+
+  test 'replace files' do
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
+    v.add_files([
+                  ['blah.txt', StringIO.new('123')],
+                  ['whatever.txt', StringIO.new('whatever')]
+                ])
+
+    assert v.reload.commit.present?
+    assert_equal 'Added/updated 2 files', v.commit_object.message
+    assert v.file_exists?('blah.txt')
+    assert v.file_exists?('whatever.txt')
+    assert_equal 2, v.blobs.count
+    assert_equal '123', v.file_contents('blah.txt')
+    assert_equal 'whatever', v.file_contents('whatever.txt')
+
+    v.replace_files([
+                      ['blah.txt', StringIO.new('456')],
+                      ['something_else.txt', StringIO.new('something_else')]
+                    ], message: 'Replaced some files!')
+
+    assert v.reload.commit.present?
+    assert_equal 'Replaced some files!', v.commit_object.message
+    assert v.file_exists?('blah.txt')
+    refute v.file_exists?('whatever.txt')
+    assert v.file_exists?('something_else.txt')
+    assert_equal 2, v.blobs.count
+    assert_equal '456', v.file_contents('blah.txt')
+    assert_equal 'something_else', v.file_contents('something_else.txt')
+  end
+
   test 'change git author' do
     workflow = FactoryBot.create(:workflow)
     repo = FactoryBot.create(:blank_repository, resource: workflow)
