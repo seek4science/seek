@@ -1,4 +1,5 @@
 module FilteringHelper
+  include SessionsHelper
   def filter_link(key, filter, hidden: false, replace: false)
     link_to(page_and_sort_params.merge({ page: nil, filter: filter.active ? without_filter(key, filter.value) : with_filter(key, filter.value, replace: replace) }),
             title: filter.label,
@@ -34,5 +35,13 @@ module FilteringHelper
     else
       @filters.merge(key => existing)
     end
+  end
+
+  # returns true of nobody is logged in and the @filters equal or exceeds the configured max_filters
+  def max_filters_met?
+    return false unless @filters && @filters.is_a?(Hash)
+    return false if logged_in_and_registered?
+
+    @filters.values.flatten.size >= Seek::Config.max_filters
   end
 end
