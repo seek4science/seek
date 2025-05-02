@@ -37,7 +37,7 @@ module FilteringHelper
     end
   end
 
-  # returns true of nobody is logged in and the @filters equal or exceeds the configured max_filters
+  # Returns true if no user is logged in and the number of filters is equal to or exceeds the maximum allowed.
   def max_filters_met?
     return false unless @filters && @filters.is_a?(Hash)
     return false if logged_in_and_registered?
