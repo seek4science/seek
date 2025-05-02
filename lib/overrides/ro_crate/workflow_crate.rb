@@ -59,7 +59,7 @@ module ROCrate
 
     def source_url
       url = id if id.start_with?('http')
-      url || self['isBasedOn'] || self['url'] || self.main_workflow['url']
+      url || self['isBasedOn'] || self['url'] || (self.main_workflow && self.main_workflow['url'])
     end
   end
 end
