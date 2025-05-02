@@ -265,6 +265,7 @@ class User < ApplicationRecord
   end
 
   def self.with_current_user(user)
+    user = user.user if user.is_a?(Person)
     previous = current_user
     self.current_user = user
     begin
