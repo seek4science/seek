@@ -1,0 +1,39 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/1125299/datasets/1124840/analysis/data/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"initiate_upload","payload":{"location_in_sub_type":"","file_name":"little_file.txt"}}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.3.7p123
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '97'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 405
+      message: Method Not Allowed
+    headers:
+      Date:
+      - Thu, 24 Apr 2025 12:26:09 GMT
+      Server:
+      - Apache/2.4.37 (AlmaLinux) OpenSSL/1.1.1k
+      Content-Length:
+      - '0'
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 24 Apr 2025 12:26:09 GMT
+recorded_with: VCR 6.3.1

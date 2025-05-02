@@ -1,0 +1,54 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/user/sbi-storage/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"list","payload":{"path":"Storebioinfo/seek_pilot3/Demo Dataset/Analysis","project_id":1125299,"dataset_id":1125261}}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.8p225
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '127'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 08 Jun 2023 14:53:57 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '1895'
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: '{"elements":[{"size":9142,"path":"Storebioinfo/seek_pilot3/Demo Dataset/Analysis/main_logo.svg","name":"main_logo.svg","creationtime":1683207670626,"isFolder":false,"project_id":91123122,"dataset_id":91123528,"refid":"8cd8932b-805e-4f1b-8f60-2e8103d9700c","lastUpdate":1683207670626,"islocked":false,"membership_type":2,"description":""},{"size":11,"path":"Storebioinfo/seek_pilot3/Demo
+        Dataset/Analysis/little_file.txt","name":"little_file.txt","creationtime":1683729238658,"isFolder":false,"project_id":91123122,"dataset_id":91123528,"refid":"8cd8932b-805e-4f1b-8f60-2e8103d9700c","lastUpdate":1683729238658,"islocked":false,"membership_type":2,"description":""},{"name":"test","size":0,"path":"Storebioinfo/seek_pilot3/Demo
+        Dataset/Analysis/test","project_id":91123122,"dataset_id":91123528,"refid":"8cd8932b-805e-4f1b-8f60-2e8103d9700c","description":"","islocked":false,"membership_type":2,"isFolder":true},{"name":"test2","size":0,"path":"Storebioinfo/seek_pilot3/Demo
+        Dataset/Analysis/test2","project_id":91123122,"dataset_id":91123528,"refid":"8cd8932b-805e-4f1b-8f60-2e8103d9700c","description":"","islocked":false,"membership_type":2,"isFolder":true},{"name":"test3","size":0,"path":"Storebioinfo/seek_pilot3/Demo
+        Dataset/Analysis/test3","project_id":91123122,"dataset_id":91123528,"refid":"8cd8932b-805e-4f1b-8f60-2e8103d9700c","description":"","islocked":false,"membership_type":2,"isFolder":true},{"name":"test4","size":0,"path":"Storebioinfo/seek_pilot3/Demo
+        Dataset/Analysis/test4","project_id":91123122,"dataset_id":91123528,"refid":"8cd8932b-805e-4f1b-8f60-2e8103d9700c","description":"","islocked":false,"membership_type":2,"isFolder":true},{"name":"test5","size":0,"path":"Storebioinfo/seek_pilot3/Demo
+        Dataset/Analysis/test5","project_id":91123122,"dataset_id":91123528,"refid":"8cd8932b-805e-4f1b-8f60-2e8103d9700c","description":"","islocked":false,"membership_type":2,"isFolder":true}]}'
+    http_version: 
+  recorded_at: Thu, 08 Jun 2023 14:53:58 GMT
+recorded_with: VCR 2.9.3

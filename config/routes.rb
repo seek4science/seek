@@ -464,15 +464,27 @@ SEEK::Application.routes.draw do
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :nels, only: [:index] do
-      collection do
-        get :projects
-        get :datasets
-        get :dataset
-        post :register
-      end
-    end
+    resources :nels, only: [:index]
     resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :observation_units, :placeholders, only: [:index]
+  end
+
+  resources :nels do
+    collection do
+      get :projects
+      get :project
+      get :datasets
+      get :dataset
+      get :subtype
+      get :download_file
+      get :fetch_file
+      get :new_dataset
+      get :get_metadata
+      post :register
+      post :create_dataset
+      post :add_metadata
+      post :upload_file
+      post :create_folder
+    end  
   end
 
   # to be removed as STI does not work in too many places
