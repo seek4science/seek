@@ -681,12 +681,12 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_select '.alert-warning', count: 0
   end
 
-  test 'dont show filters if max met' do
+  test 'dont show filters if max met and remove excess' do
     document = FactoryBot.create(:document)
     contributor = document.contributor
     project = document.projects.first
     with_config_value(:max_filters, 2) do
-      get :index, params: { filter: { contributor: contributor.id, project: project.id } }
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1], creator: [1,2] } }
       assert_equal 2, assigns(:filters).values.flatten.length
       assert_select '.index-filters', count: 0
       assert_select '.alert-warning', text:/maximum of 2 filters has been reached/, count: 1
@@ -699,8 +699,8 @@ class DocumentsControllerTest < ActionController::TestCase
     project = document.projects.first
     login_as(FactoryBot.create(:user))
     with_config_value(:max_filters, 2) do
-      get :index, params: { filter: { contributor: contributor.id, project: project.id } }
-      assert_equal 2, assigns(:filters).values.flatten.length
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1] } }
+      assert_equal 3, assigns(:filters).values.flatten.length
       assert_select '.index-filters', count: 1
       assert_select '.alert-warning', count: 0
     end
