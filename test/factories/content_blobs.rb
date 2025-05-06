@@ -105,6 +105,12 @@ FactoryBot.define do
     original_filename { 'teusink.dat' }
     data { File.new("#{Rails.root}/test/fixtures/files/Teusink2010921171725.dat", 'rb').read }
   end
+
+  factory(:morpheus_model_content_blob, parent: :content_blob) do
+    original_filename { 'm9148_hcc_model.xml' }
+    data { File.new("#{Rails.root}/test/fixtures/files/M9148_hcc_model.xml", 'rb').read }
+  end
+
   
   factory(:xgmml_content_blob, parent: :content_blob) do
     original_filename { 'cytoscape.xgmml' }
