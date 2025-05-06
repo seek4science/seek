@@ -149,7 +149,7 @@ module Seek
 
       # Filters
       @filters = page_and_sort_params[:filter].to_h
-      @filters = remove_excess_filters(@filters) unless User.logged_in_and_registered?
+      @filters = remove_excess_filters(@filters) unless json_api_request? || User.logged_in_and_registered?
       @active_filters = {}
       @available_filters = {}
     end

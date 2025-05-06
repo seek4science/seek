@@ -706,6 +706,16 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'dont remove excess filters if an api call' do
+    document = FactoryBot.create(:document)
+    contributor = document.contributor
+    project = document.projects.first
+    with_config_value(:max_filters, 2) do
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1], creator: [1,2] } }, format: :json
+      assert_equal 5, assigns(:filters).values.flatten.length
+    end
+  end
+
   test 'do not show filters on index if disabled' do
     FactoryBot.create(:public_document)
 
