@@ -419,7 +419,7 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'can copy assay associations with assay_ids' do
+  test 'can copy assay associations for selected assay_ids assay_ids' do
     person = FactoryBot.create(:person)
     another_person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
@@ -430,7 +430,7 @@ class DataFileTest < ActiveSupport::TestCase
 
       # non editable assay
       aa2 = FactoryBot.create(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
-                              asset: df, assay:FactoryBot.create(:assay, contributor:another_person, policy:FactoryBot.create(:downloadable_public_policy)))
+                              asset: df, assay: FactoryBot.create(:assay, contributor:another_person, policy:FactoryBot.create(:downloadable_public_policy)))
 
       assert aa1.assay.can_edit?
       refute aa2.assay.can_edit?
@@ -454,6 +454,37 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
+  test 'can copy assay associations for selected assays' do
+    person = FactoryBot.create(:person)
+    another_person = FactoryBot.create(:person)
+    User.with_current_user(person.user) do
+      df = FactoryBot.create(:data_file,contributor:person)
+      aa1 = FactoryBot.create(:assay_asset, direction: AssayAsset::Direction::INCOMING,
+                    asset: df,  assay:FactoryBot.create(:assay, contributor:person))
+      aa2 = FactoryBot.create(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
+                    asset: df, assay: FactoryBot.create(:assay, contributor:another_person, policy:FactoryBot.create(:downloadable_public_policy)))
+
+      assert aa1.assay.can_edit?
+      refute aa2.assay.can_edit?
+
+      s1 = FactoryBot.create(:sample, originating_data_file: df,contributor:person)
+      s2 = FactoryBot.create(:sample, originating_data_file: df,contributor:person)
+
+      assert_equal 2, df.extracted_samples.count
+
+      assert_difference('AssayAsset.count', 2) do
+        assert_enqueued_jobs(1, only: RdfGenerationJob) do
+          df.copy_assay_associations(df.extracted_samples, [aa1.assay])
+        end
+      end
+
+      assert_equal [aa1.assay], s1.assays
+      assert_equal [aa1.assay], s2.assays
+
+      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+    end
+  end
+
   test 'extract_samples without confirm shouldnt trigger gatekeeper check' do
     gate_keeper = FactoryBot.create(:asset_gatekeeper)
 
@@ -464,58 +495,8 @@ class DataFileTest < ActiveSupport::TestCase
     disable_authorization_checks { sample_type.save! }
 
     data_file = FactoryBot.create :data_file, content_blob: FactoryBot.create(:sample_type_populated_template_content_blob),
-                        policy: FactoryBot.create(:public_policy), contributor: gate_keeper
+                                  policy: FactoryBot.create(:public_policy), contributor: gate_keeper
     refute_empty data_file.extract_samples(sample_type, false, false)
-  end
-
-  test 'can copy assay associations for selected assays' do
-    person = FactoryBot.create(:person)
-    User.with_current_user(person.user) do
-      df = FactoryBot.create(:data_file,contributor:person)
-      aa1 = FactoryBot.create(:assay_asset, direction: AssayAsset::Direction::INCOMING,
-                    asset: df,  assay:FactoryBot.create(:assay, contributor:person))
-      aa2 = FactoryBot.create(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
-                    asset: df,  assay:FactoryBot.create(:assay, contributor:person))
-
-      s1 = FactoryBot.create(:sample, originating_data_file: df,contributor:person)
-      s2 = FactoryBot.create(:sample, originating_data_file: df,contributor:person)
-
-      assert_equal 2, df.extracted_samples.count
-
-      assert_difference('AssayAsset.count', 2) do
-        df.copy_assay_associations(df.extracted_samples, [aa1.assay])
-      end
-
-      assert_equal [aa1.assay], s1.assays
-      assert_equal [aa1.assay], s2.assays
-
-      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
-    end
-  end
-
-  test 'can copy assay associations for selected assay IDs' do
-    person = FactoryBot.create(:person)
-    User.with_current_user(person.user) do
-      df = FactoryBot.create(:data_file,contributor:person)
-      aa1 = FactoryBot.create(:assay_asset, direction: AssayAsset::Direction::INCOMING,
-                    asset: df, assay:FactoryBot.create(:assay, contributor:person))
-      aa2 = FactoryBot.create(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
-                    asset: df, assay:FactoryBot.create(:assay, contributor:person))
-
-      s1 = FactoryBot.create(:sample, originating_data_file: df, contributor:person)
-      s2 = FactoryBot.create(:sample, originating_data_file: df, contributor:person)
-
-      assert_equal 2, df.extracted_samples.count
-
-      assert_difference('AssayAsset.count', 2) do
-        df.copy_assay_associations(df.extracted_samples, [aa1.assay_id])
-      end
-
-      assert_equal [aa1.assay], s1.assays
-      assert_equal [aa1.assay], s2.assays
-
-      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
-    end
   end
 
   test 'ontology cv annotation properties'do

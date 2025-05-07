@@ -217,11 +217,11 @@ class DataFile < ApplicationRecord
   end
 
   # Copy the AssayAsset associations to each of the given resources (usually Samples).
-  # If an array of `assays_ids` is specified (must be IDs), only copy associations to these assays.
-  def copy_assay_associations(resources, assay_ids = nil)
+  # If an array of `assays` is specified (must be assay instances or IDs), only copy associations to these assays.
+  def copy_assay_associations(resources, assays = nil)
     aa = assay_assets
-    if assay_ids
-      assays = Assay.where(id:assay_ids).authorized_for(:edit)
+    if assays
+      assays = Assay.where(id:assays).authorized_for(:edit)
       aa = assay_assets.where(assay: assays)
     end
     inserts = resources.map do |resource|
