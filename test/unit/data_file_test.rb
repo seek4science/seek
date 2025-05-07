@@ -406,7 +406,9 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal 2, df.extracted_samples.count
 
       assert_difference('AssayAsset.count', 4) do # samples * assay_assets
-        df.copy_assay_associations(df.extracted_samples)
+        assert_enqueued_jobs(1, only: RdfGenerationJob) do
+          df.copy_assay_associations(df.extracted_samples)
+        end
       end
 
       assert_equal df.assays.sort, s1.assays.sort

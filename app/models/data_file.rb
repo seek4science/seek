@@ -217,15 +217,20 @@ class DataFile < ApplicationRecord
   end
 
   # Copy the AssayAsset associations to each of the given resources (usually Samples).
-  # If an array of `assays` is specified (can be Assay objects or IDs), only copy associations to these assays.
-  def copy_assay_associations(resources, assays = nil)
-    resources.map do |resource|
-      aa = assay_assets
-      aa = assay_assets.where(assay: assays) if assays
+  # If an array of `assays_ids` is specified (must be IDs), only copy associations to these assays.
+  def copy_assay_associations(resources, assay_ids = nil)
+    aa = assay_assets
+    if assay_ids
+      assays = Assay.where(id:assay_ids).authorized_for(:view)
+      aa = assay_assets.where(assay: assays)
+    end
+    inserts = resources.map do |resource|
       aa.map do |aa|
-        AssayAsset.create(assay: aa.assay, direction: aa.direction, asset: resource)
+        {assay_id: aa.assay.id, direction: aa.direction, asset_id: resource.id, asset_type: resource.class.name}
       end
     end.flatten
+    AssayAsset.insert_all(inserts)
+    queue_rdf_generation(true, true)
   end
 
   def populate_metadata_from_template
