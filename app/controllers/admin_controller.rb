@@ -106,6 +106,7 @@ class AdminController < ApplicationController
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
+    Seek::Config.max_filters = params[:max_filters]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root = params[:jws_online_root]
 
