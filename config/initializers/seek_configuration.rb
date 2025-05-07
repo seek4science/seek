@@ -172,6 +172,7 @@ def load_seek_config_defaults!
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
   Seek::Config.default :cv_dropdown_limit, 100
+  Seek::Config.default :max_filters, 5
 
   # Admin setting to allow user impersonation, useful for debugging
   Seek::Config.default :admin_impersonation_enabled, false
