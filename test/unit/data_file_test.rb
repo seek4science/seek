@@ -419,7 +419,7 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'can copy assay associations for selected assay_ids assay_ids' do
+  test 'can copy assay associations for selected assay_ids' do
     person = FactoryBot.create(:person)
     another_person = FactoryBot.create(:person)
     User.with_current_user(person.user) do
