@@ -225,12 +225,18 @@ class DataFile < ApplicationRecord
       assays = Assay.where(id: assay_ids).authorized_for(:edit)
       aa = assay_assets.where(assay: assays)
     end
-    inserts = resources.map do |resource|
-      aa.map do |aa|
-        {assay_id: aa.assay.id, direction: aa.direction, asset_id: resource.id, asset_type: resource.class.name}
+
+    AssayAsset.transaction do
+      resources.in_groups_of(500).each do |group|
+        inserts = group.compact.map do |resource|
+          aa.map do |aa|
+            {assay_id: aa.assay.id, direction: aa.direction, asset_id: resource.id, asset_type: resource.class.name}
+          end
+        end.flatten
+        AssayAsset.insert_all(inserts)
       end
-    end.flatten
-    AssayAsset.insert_all(inserts)
+    end
+
     queue_rdf_generation(true, true)
   end
 
