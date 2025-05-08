@@ -442,6 +442,7 @@ class DataFileTest < ActiveSupport::TestCase
 
       assert_difference('AssayAsset.count', 2) do
         assert_enqueued_jobs(1, only: RdfGenerationJob) do
+          # Including Assay.last.id+1 to test the behavior when a non-existent assay ID is provided.
           df.copy_assay_associations(df.extracted_samples, [aa1.assay.id, aa2.assay.id, Assay.last.id+1])
         end
       end

@@ -221,7 +221,8 @@ class DataFile < ApplicationRecord
   def copy_assay_associations(resources, assays = nil)
     aa = assay_assets
     if assays
-      assays = Assay.where(id:assays).authorized_for(:edit)
+      assay_ids = assays.map { |a| a.is_a?(Assay) ? a.id : a }
+      assays = Assay.where(id: assay_ids).authorized_for(:edit)
       aa = assay_assets.where(assay: assays)
     end
     inserts = resources.map do |resource|
