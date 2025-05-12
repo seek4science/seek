@@ -8,6 +8,10 @@
       <div class="col-md-9 col-sm-8 box_about_actor">
 
         <p class="ror_id">
+          <strong>Department: </strong><%= text_or_not_specified @institution.department -%>
+        </p>
+
+        <p class="ror_id">
           <strong>ROR ID: </strong><%= ror_link(@institution.ror_id) -%>
         </p>
 

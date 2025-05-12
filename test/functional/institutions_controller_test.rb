@@ -55,6 +55,17 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal 'test', assigns(:institution).title
   end
 
+  def test_should_create_institution_with_title_department
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'German Cancer Research Center', department: 'Division of Applied Bioinformatics' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'German Cancer Research Center', assigns(:institution).title
+    assert_equal 'Division of Applied Bioinformatics', assigns(:institution).department
+  end
+
 
   def test_can_not_create_institution_with_invalid_ror_id
     VCR.use_cassette("ror/fetch_invalid_id") do
