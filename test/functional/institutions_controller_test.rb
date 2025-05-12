@@ -93,6 +93,30 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
   end
 
+  def test_can_create_institution_with_the_title_or_ror_id_that_already_exists_but_different_department
+    VCR.use_cassette("ror/existing_institution") do
+      FactoryBot.create(:institution, title: 'Harvard University', ror_id: '03vek6s52')
+
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { title: 'Harvard University', department: "Applied Mathematics"} }
+      end
+
+      assert_redirected_to institution_path(assigns(:institution))
+      assert_equal 'Harvard University', assigns(:institution).title
+      assert_equal 'Applied Mathematics', assigns(:institution).department
+
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { ror_id: '03vek6s52', department: "Computer Science"} }
+      end
+
+      assert_redirected_to institution_path(assigns(:institution))
+      assert_equal 'Harvard University', assigns(:institution).title
+      assert_equal 'Computer Science', assigns(:institution).department
+      assert_equal '03vek6s52', assigns(:institution).ror_id
+
+    end
+  end
+
   def test_should_show_institution
     get :show, params: { id: institutions(:one).id }
     assert_response :success
@@ -305,7 +329,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', institution.discussion_links.first.url
   end
 
-  test 'should destroy related assetlink when the discussion link is removed ' do
+  test 'should destroy related assetlink when the discussion link is removed' do
     person = FactoryBot.create(:admin)
     login_as(person)
     asset_link = FactoryBot.create(:discussion_link)
