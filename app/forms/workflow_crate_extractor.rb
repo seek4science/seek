@@ -47,12 +47,8 @@ class WorkflowCrateExtractor
       files = []
       @crate.entries.each do |path, entry|
         next if entry.directory?
-        files << [path, entry.source].tap { |x| pp x}
+        files << [path, entry.source]
       end
-      puts
-      puts
-      puts
-      puts
       git_version.replace_files(files)
 
       extractor = Seek::WorkflowExtractors::ROCrate.new(git_version)
