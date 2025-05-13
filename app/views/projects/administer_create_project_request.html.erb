@@ -71,6 +71,9 @@
                   <%= label_tag 'ROR ID','ROR ID' %>
                   <%= text_field_tag 'institution[ror_id]',@institution.ror_id, class:'form-control' %>
 
+                  <%= label_tag 'Department' %>
+                  <%= text_field_tag 'institution[department]',@institution.department, class:'form-control' %>
+
                   <%= label_tag 'Website' %>
                   <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
 
@@ -84,7 +87,7 @@
               </div>
             <% else %>
               <div>
-                They wish to be associated with <%= link_to(@institution.title, @institution) %>
+                They wish to be associated with  <%= link_to([@institution.department.presence, @institution.title].compact.join(', '), @institution) %>.
               </div>
               <%= hidden_field_tag 'institution[id]',@institution.id %>
             <% end %>
