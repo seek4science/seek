@@ -357,8 +357,6 @@ class WorkflowsController < ApplicationController
         return
       else
         @crate_extractor.workflow = @workflow
-        @workflow.latest_git_version.lock if @workflow.latest_git_version.mutable?
-        @crate_extractor.git_version = @workflow.latest_git_version.next_version(mutable: true)
       end
     end
     @workflow = @crate_extractor.build
