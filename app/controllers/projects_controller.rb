@@ -214,12 +214,14 @@ class ProjectsController < ApplicationController
         format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
       end
     else
-      @investigation = Seek::FairDataStation::Writer.new.construct_isa(fair_data_station_inv, current_person, [@project], policy)
-      @investigation.save!
-
-      respond_to do |format|
-        format.html { redirect_to(@investigation) }
-      end
+      content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
+                                     original_filename: params[:datastation_data].original_filename)
+      @fair_data_station_upload = FairDataStationUpload.new(project: @project, contributor: current_person,
+                                                            investigation_external_identifier: fair_data_station_inv.external_id,
+                                                            policy: policy, purpose: :import,
+                                                            content_blob: content_blob
+                                                            )
+      @fair_data_station_upload.save!
     end
 
   end
