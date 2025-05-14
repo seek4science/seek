@@ -24,6 +24,13 @@ class Institution < ApplicationRecord
     text :city, :address
   end if Seek::Config.solr_enabled
 
+
+  def full_title
+    return title unless department.present?
+
+    "#{department}, #{title}"
+  end
+
   def can_edit?(user = User.current_user)
     return false unless user
     return true if new_record? && self.class.can_create?

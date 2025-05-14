@@ -53,6 +53,21 @@ class InstitutionsControllerTest < ActionController::TestCase
 
     assert_redirected_to institution_path(assigns(:institution))
     assert_equal 'test', assigns(:institution).title
+    assert_equal 'test', assigns(:institution).full_title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'test', count: 1
+
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'University of Manchester', department: 'Manchester Institute of Biotechnology'} }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'University of Manchester', assigns(:institution).title
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', assigns(:institution).full_title
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Manchester Institute of Biotechnology, University of Manchester', count: 1
   end
 
   def test_should_create_institution_with_title_department
