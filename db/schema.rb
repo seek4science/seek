@@ -683,6 +683,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_14_101813) do
     t.bigint "project_id"
     t.bigint "investigation_id"
     t.bigint "content_blob_id"
+    t.bigint "policy_id"
     t.string "investigation_external_identifier", limit: 2048
     t.integer "purpose", limit: 2
     t.datetime "created_at", null: false
