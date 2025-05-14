@@ -6,7 +6,7 @@ class CreateFairDataStationUploads < ActiveRecord::Migration[7.2]
       t.bigint :investigation_id
       t.bigint :content_blob_id
       t.string :investigation_external_identifier, limit: 2048
-
+      t.integer :purpose, limit: 2
       t.timestamps
     end
   end
