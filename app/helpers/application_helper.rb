@@ -332,7 +332,7 @@ module ApplicationHelper
   end
 
   def get_object_title(item)
-    h(item.title)
+   item.is_a?(Institution) ? h(item.full_title) : h(item.title)
   end
 
   def can_manage_announcements?
