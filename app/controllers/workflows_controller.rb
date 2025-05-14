@@ -55,7 +55,7 @@ class WorkflowsController < ApplicationController
 
   def create_version
     if params[:ro_crate]
-      handle_ro_crate_post(true)
+      handle_ro_crate_api_post(true)
     else
       if handle_upload_data(true)
         comments = params[:revision_comments]
@@ -152,7 +152,8 @@ class WorkflowsController < ApplicationController
       if @crate_extractor.valid?
         format.html { render :provide_metadata }
       else
-        format.html { render action: :new, status: :unprocessable_entity }
+        @git_version = @workflow.git_version
+        format.html { render action: :new_git_version, status: :unprocessable_entity }
       end
     end
   end
@@ -228,7 +229,7 @@ class WorkflowsController < ApplicationController
       valid = @content_blob && @workflow.save_as_new_version(params[:revision_comments]) && @content_blob.save
       @content_blob.update_column(:asset_id, nil) unless valid # Have to do this otherwise the content blob keeps the workflow's ID
     elsif @workflow.git_version_attributes.present?
-      valid = @workflow.save_as_new_git_version
+      valid = @workflow.save_as_new_git_version.valid?
     else
       valid = false
     end
@@ -306,7 +307,7 @@ class WorkflowsController < ApplicationController
 
   def create
     if params[:ro_crate]
-      handle_ro_crate_post
+      handle_ro_crate_api_post
     else
       super
     end
@@ -346,8 +347,8 @@ class WorkflowsController < ApplicationController
 
   private
 
-  def handle_ro_crate_post(new_version = false)
-    return legacy_handle_ro_crate_post(new_version) unless Seek::Config.git_support_enabled
+  def handle_ro_crate_api_post(new_version = false)
+    return legacy_handle_ro_crate_api_post(new_version) unless Seek::Config.git_support_enabled
 
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params)
     if new_version
