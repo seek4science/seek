@@ -4,7 +4,8 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
 
   test 'validate' do
     person = FactoryBot.create(:person)
-    item = FairDataStationUpload.new(contributor: person, project: person.projects.first, content_blob: FactoryBot.create(:content_blob), purpose: :imported)
+    item = FairDataStationUpload.new(contributor: person, project: person.projects.first,
+                                     content_blob: FactoryBot.create(:content_blob), purpose: :import)
 
     assert item.valid?
 
@@ -22,7 +23,7 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
 
     item.purpose = nil
     refute item.valid?
-    item.purpose = :updated
+    item.purpose = :update
     assert item.valid?
 
     item.content_blob = nil
