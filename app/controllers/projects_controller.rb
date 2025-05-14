@@ -222,6 +222,7 @@ class ProjectsController < ApplicationController
                                                             content_blob: content_blob
                                                             )
       @fair_data_station_upload.save!
+      FairDataStationImportJob.new(@fair_data_station_upload).queue_job
     end
 
   end

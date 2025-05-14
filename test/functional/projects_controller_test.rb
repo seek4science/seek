@@ -5259,16 +5259,19 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_difference('FairDataStationUpload.count') do
       assert_difference('Policy.count') do
         assert_difference('ContentBlob.count') do
+          assert_enqueued_jobs(1, only: FairDataStationImportJob) do
 
-          post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
-                                                   policy_attributes: {
-                                                     access_type: Policy::VISIBLE,
-                                                     permissions_attributes: {
-                                                       '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+            post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
+                                                     policy_attributes: {
+                                                       access_type: Policy::VISIBLE,
+                                                       permissions_attributes: {
+                                                         '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                         }
                                                        }
                                                      }
-                                                   }
-          }
+            }
+          end
+
         end
       end
     end
@@ -5288,7 +5291,8 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'demo.ttl', content_blob.original_filename
     assert_equal 'text/turtle', content_blob.content_type
     assert_equal ttl_file.size, content_blob.file_size
-    #assert fds_upload.fair_data_station_import_task&.pending?
+    assert fds_upload.fair_data_station_import_task&.pending?
+    refute fds_upload.fair_data_station_update_task&.pending?
   end
 
   test 'import from fairdata station ttl ignores disabled emt' do
