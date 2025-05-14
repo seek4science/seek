@@ -33,6 +33,7 @@
     <% end %>
 
     <%= error_messages_for :workflow -%>
+    <%= error_messages_for(@workflow.latest_version) unless @workflow.new_record? -%>
 
     <div class="form-group">
       <%= render partial: 'workflow_class_form', locals: { name: 'workflow[workflow_class_id]', selected: @workflow.workflow_class_id } %>

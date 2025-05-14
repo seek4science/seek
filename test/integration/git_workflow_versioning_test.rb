@@ -278,6 +278,52 @@ class GitWorkflowVersioningTest < ActionDispatch::IntegrationTest
     assert_equal annotation_count + 1, Git::Annotation.count
   end
 
+  test 'handles errors when creating version metadata' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    person = workflow.contributor
+    original_version = workflow.latest_git_version
+
+    repo_count = Git::Repository.count
+    workflow_count = Workflow.count
+    version_count = Git::Version.count
+    annotation_count = Git::Annotation.count
+
+    login_as(person.user)
+
+    assert_no_difference('Workflow.count') do
+      assert_no_difference('Git::Version.count') do
+        assert_no_difference('Git::Annotation.count') do
+          post create_version_from_ro_crate_workflow_path(workflow), params: {
+            ro_crate: { data: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip') }
+          }
+
+          assert_response :success
+          new_version = assigns(:workflow).git_version
+
+          post create_version_metadata_workflow_path, params: {
+            id: workflow.id,
+            workflow: {
+              workflow_class_id: workflow.workflow_class_id,
+              title: 'blabla',
+              project_ids: [person.projects.first.id],
+              git_version_attributes: {
+                root_path: '/',
+                git_repository_id: new_version.git_repository_id,
+                commit: new_version.commit,
+                main_workflow_path: 'this path does not exist'
+              }
+            }
+          }
+
+          assert_response :unprocessable_entity
+
+          assert_select 'div#error_explanation'
+          assert_select 'input[name="workflow[title]"]', count: 1
+        end
+      end
+    end
+  end
+
   private
 
   def login_as(user)
