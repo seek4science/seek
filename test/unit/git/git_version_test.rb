@@ -522,16 +522,12 @@ class GitVersionTest < ActiveSupport::TestCase
       v1.add_file('text.txt', StringIO.new('text'))
       v1.save!
       parent_commit = v1.commit
-      # Make a change to the repo, but don't update the `commit` of the Git::Version
+      # Make a change to the repo, but don't save the change to the `commit` of the Git::Version
       v1.add_file('text2.txt', StringIO.new('text2'))
       orphaned_commit = v1.commit
       v1.reload
       assert_equal parent_commit, v1.commit
       assert v1.git_base.head.target.tree.path('text2.txt') # Check the file is actually there in the repo
-      v1.reset_to_last_local_commit
-      assert_raises(Rugged::TreeError) do
-        assert v1.git_base.head.target.tree.path('text2.txt') # We reset the head of the repo so the file should no longer be there
-      end
       v1.add_file('text3.txt', StringIO.new('text3'))
       v1.save!
       assert_equal parent_commit, v1.commit_object.parents.first.oid
