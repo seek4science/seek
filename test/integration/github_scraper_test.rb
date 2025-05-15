@@ -62,7 +62,7 @@ class GithubScraperTest < ActionDispatch::IntegrationTest
                                  git_version_attributes: { name: 'v0.01',
                                                            git_repository_id: repos.first.id,
                                                            ref: 'refs/tags/v0.01',
-                                                           commit: 'a321b6e',
+                                                           commit: 'a321b6e4dd2cfb5219cf03bb9e2743db344f537a',
                                                            main_workflow_path: 'sort-and-change-case.ga',
                                                            mutable: false })
 
