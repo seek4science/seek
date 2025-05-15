@@ -161,6 +161,13 @@ module Git
 
     private
 
+    def reset_to_last_local_commit
+      return if git_repository.remote?
+      last_local_commit = git_repository.git_versions.last&.commit
+      return unless last_local_commit
+      git_repository.git_base.references.update(DEFAULT_LOCAL_REF, last_local_commit)
+    end
+
     def perform_commit(message, &block)
       raise Git::ImmutableVersionException unless mutable?
 
@@ -168,6 +175,7 @@ module Git
 
       is_initial = git_base.head_unborn?
 
+      reset_to_last_local_commit
       index.read_tree(git_base.head.target.tree) unless is_initial
 
       yield index
