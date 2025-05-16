@@ -1,0 +1,10 @@
+<%
+  uploads = FairDataStationUpload.for_project_and_contributor(project, contributor).import_purpose
+  return if uploads.empty?
+%>
+
+<h1>Existing Imports</h1>
+
+<% uploads.each do |upload| %>
+  <%= render partial: 'fair_data_station_import_status', locals: { upload: upload } %>
+<% end %>

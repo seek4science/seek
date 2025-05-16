@@ -12,6 +12,7 @@ class FairDataStationUpload < ApplicationRecord
   has_task :fair_data_station_import
   has_task :fair_data_station_update
 
+  scope :for_project_and_contributor, ->(project, contributor) { where project: project, contributor: contributor }
 
   private
 

@@ -20,6 +20,8 @@
 
 <% end %>
 
+<%= render partial: 'fair_data_station_import_statuses', locals: {project: @project, contributor: current_person} %>
+
 <%= form_tag submit_fairdata_station_project_path(@project), multipart: true do %>
 
   <%= panel(t('fair_data_station.upload_file_label')) do %>

@@ -1,0 +1,47 @@
+
+
+
+<%
+  task = upload.fair_data_station_import_task
+  job_status ||= task.status
+  in_progress = task.in_progress?
+  failed = task.failed?
+  success = task.success?
+  element_id = "fair-data-station-import-#{upload.id}"
+%>
+
+<%
+  alert_style = 'alert-info'
+  alert_style = 'alert-warning' if failed
+  alert_style = 'alert-success' if success
+%>
+
+<div id='<%= element_id %>'>
+  <% if in_progress || failed || success %>
+      <div class="alert <%= alert_style %>" role="alert">
+        <strong>FAIR Data Station import status:</strong>
+        <% if in_progress %>
+            <%= job_status.to_s.humanize %>
+            <%= image 'spinner' %>
+            <script>
+              setTimeout(function () {
+                $j.ajax('<%= fair_data_station_import_status_project_path(upload.project, upload_id: upload.id) %>', {
+                      data: { 'previous_status': '<%= job_status -%>' },
+                      success: function (html) {
+                        $j('#<%= element_id %>').replaceWith(html);
+                      }
+                    }
+                );
+              }, 5000);
+            </script>
+        <% elsif failed %>
+          Failed. An administrator will have been notified of the problem, but you could try again.
+        <% elsif success  %>
+            Completed
+
+            <%= link_to("View imported #{t('investigation')}", investigation_path(upload.investigation),
+                        class: 'btn btn-primary') if upload.investigation %>
+        <% end %>
+      </div>
+  <% end %>
+</div>

@@ -223,8 +223,17 @@ class ProjectsController < ApplicationController
                                                             )
       @fair_data_station_upload.save!
       FairDataStationImportJob.new(@fair_data_station_upload).queue_job
+      redirect_to import_from_fairdata_station_project_path(@project)
     end
 
+  end
+
+  def fair_data_station_import_status
+    upload = FairDataStationUpload.find(params[:upload_id])
+    job_status = upload.fair_data_station_import_task.status
+    respond_to do |format|
+      format.html { render partial: 'fair_data_station_import_status', locals: { upload: upload, job_status: job_status } }
+    end
   end
 
   def request_create

@@ -353,6 +353,7 @@ SEEK::Application.routes.draw do
       post :respond_join_request
       get :guided_join
       get :import_from_fairdata_station
+      get :fair_data_station_import_status
       post :submit_fairdata_station
       post :update_annotations_ajax
     end

@@ -5270,6 +5270,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                                        }
                                                      }
             }
+            assert_redirected_to import_from_fairdata_station_project_path(project)
           end
 
         end
