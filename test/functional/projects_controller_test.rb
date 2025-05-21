@@ -5197,6 +5197,59 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(other_project)
   end
 
+  test 'show import from fair data station task status' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    login_as(person)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-import-status', count: 0
+
+
+    upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project)
+    upload2 = FactoryBot.create(:fair_data_station_upload)
+    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload2.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Queued/
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+
+    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Active/
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+
+    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-warning', text:/Failed. An administrator will have been notified of the problem, but you could try again./
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+
+    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_DONE)
+    upload.update_attribute(:investigation_id, FactoryBot.create(:investigation, contributor: person).id)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-success', text:/Completed/ do
+        assert_select 'a.btn-primary[href=?]', investigation_path(upload.investigation), text:/View imported Investigation/
+      end
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+  end
+
   test 'dont show import from fair data station if disabled' do
     person = FactoryBot.create(:person)
     refute person.is_admin?
@@ -5361,6 +5414,41 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', investigation_path(investigation), text:investigation.title
       assert_select 'a[href=?]', update_from_fairdata_station_investigation_path(investigation)
     end
+
+  end
+
+  test 'fair_data_station_import_status' do
+    upload = FactoryBot.create(:fair_data_station_upload)
+    upload_other_project = FactoryBot.create(:fair_data_station_upload)
+    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload_other_project.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+
+    login_as(upload.contributor)
+
+    get :fair_data_station_import_status, params: {id: upload.project, upload_id: upload.id}
+    assert_response :success
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Queued/
+    end
+
+    # not a member of the project
+    get :fair_data_station_import_status, params: {id: upload_other_project.project, upload_id: upload_other_project.id}
+    assert_redirected_to upload_other_project.project
+    assert_empty @response.body
+
+    # different person
+    other_person = FactoryBot.create(:person)
+    other_person.add_to_project_and_institution(upload.project, other_person.institutions.first)
+    other_person.save!
+    upload.update_column(:contributor_id, other_person.id)
+    get :fair_data_station_import_status, params: {id: upload.project, upload_id: upload.id}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # invalid id
+    get :fair_data_station_import_status, params: {id: upload.project, upload_id: FairDataStationUpload.last.id + 1}
+    assert_response :forbidden
+    assert_empty @response.body
 
   end
 

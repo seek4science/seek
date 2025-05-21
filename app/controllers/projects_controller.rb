@@ -34,7 +34,7 @@ class ProjectsController < ApplicationController
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
-  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station], unless: :admin_logged_in?
+  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station, :fair_data_station_import_status], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
@@ -229,10 +229,16 @@ class ProjectsController < ApplicationController
   end
 
   def fair_data_station_import_status
-    upload = FairDataStationUpload.find(params[:upload_id])
-    job_status = upload.fair_data_station_import_task.status
-    respond_to do |format|
-      format.html { render partial: 'fair_data_station_import_status', locals: { upload: upload, job_status: job_status } }
+    upload = FairDataStationUpload.where(id: params[:upload_id], contributor: current_person).first
+    if upload
+      job_status = upload.fair_data_station_import_task.status
+      respond_to do |format|
+        format.html { render partial: 'fair_data_station_import_status', locals: { upload: upload, job_status: job_status } }
+      end
+    else
+      respond_to do |format|
+        format.html { render plain:'', status: :forbidden }
+      end
     end
   end
 

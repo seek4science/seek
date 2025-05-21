@@ -16,7 +16,7 @@
   alert_style = 'alert-success' if success
 %>
 
-<div id='<%= element_id %>'>
+<div id='<%= element_id %>' class='fair-data-station-import-status'>
   <% if in_progress || failed || success %>
       <div class="alert <%= alert_style %>" role="alert">
         <strong>FAIR Data Station import status:</strong>
