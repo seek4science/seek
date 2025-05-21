@@ -8,6 +8,7 @@
   failed = task.failed?
   success = task.success?
   element_id = "fair-data-station-import-#{upload.id}"
+  external_id = upload.investigation_external_identifier
 %>
 
 <%
@@ -19,7 +20,8 @@
 <div id='<%= element_id %>' class='fair-data-station-import-status'>
   <% if in_progress || failed || success %>
       <div class="alert <%= alert_style %>" role="alert">
-        <strong>FAIR Data Station import status:</strong>
+        <strong>FAIR Data Station import status ( ID: <%= external_id %> ) :</strong>
+
         <% if in_progress %>
             <%= job_status.to_s.humanize %>
             <%= image 'spinner' %>

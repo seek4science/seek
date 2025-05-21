@@ -14,6 +14,12 @@ class FairDataStationUpload < ApplicationRecord
 
   scope :for_project_and_contributor, ->(project, contributor) { where project: project, contributor: contributor }
 
+  def self.matching_imports_in_progress(project, external_id)
+    FairDataStationUpload.import_purpose.where(investigation_external_identifier: external_id, project: project).select do |upload|
+      upload.fair_data_station_import_task.in_progress? || upload.fair_data_station_import_task.waiting?
+    end
+  end
+
   private
 
   def validate_project_membership
@@ -21,6 +27,7 @@ class FairDataStationUpload < ApplicationRecord
       errors.add("must be a member of the #{t('project')}")
     end
   end
+
 
 
 

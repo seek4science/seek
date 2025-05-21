@@ -5207,8 +5207,8 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'div.fair-data-station-import-status', count: 0
 
 
-    upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project)
-    upload2 = FactoryBot.create(:fair_data_station_upload)
+    upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier:'the-ext-id')
+    upload2 = FactoryBot.create(:fair_data_station_upload, investigation_external_identifier:'the-other-ext-id')
     upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
     upload2.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
     get :import_from_fairdata_station, params: {id: project}
@@ -5216,6 +5216,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'div.fair-data-station-import-status', count: 1
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-info', text:/Queued/
+      assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
 
@@ -5225,6 +5226,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'div.fair-data-station-import-status', count: 1
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-info', text:/Active/
+      assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
 
@@ -5234,6 +5236,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'div.fair-data-station-import-status', count: 1
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-warning', text:/Failed. An administrator will have been notified of the problem, but you could try again./
+      assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
 
@@ -5245,6 +5248,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-success', text:/Completed/ do
         assert_select 'a.btn-primary[href=?]', investigation_path(upload.investigation), text:/View imported Investigation/
+        assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
       end
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
@@ -5388,7 +5392,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'import from fairdata station ttl existing external id' do
     person = FactoryBot.create(:person)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
     project = person.projects.first
     another_person = FactoryBot.create(:person)
     login_as(person)
@@ -5415,6 +5418,31 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', update_from_fairdata_station_investigation_path(investigation)
     end
 
+  end
+
+  test 'import from fair data station task in progress' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    upload = FactoryBot.create(:fair_data_station_upload, investigation_external_identifier: 'seek-test-investigation', project: project)
+    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
+    assert_no_difference('Investigation.count') do
+      post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                              policy_attributes:{
+                                                access_type: Policy::VISIBLE,
+                                                permissions_attributes: {
+                                                  '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                  }
+                                                }
+                                              }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_match /An Investigation with that external identifier is currently already being imported for this Project/, flash[:error]
   end
 
   test 'fair_data_station_import_status' do
