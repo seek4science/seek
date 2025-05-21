@@ -61,7 +61,7 @@ const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
 const registeredSopsEnabled = <%= Seek::Config.sops_enabled %>;
 const registeredDataFilesEnabled = <%= Seek::Config.data_files_enabled %>;
 const registeredOrganismsEnabled = <%= Seek::Config.organisms_enabled %>;
-
+const idFieldName = window.instanceName + " id";
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
   if (!e.is(":checked")) {
@@ -169,7 +169,7 @@ const handleSelect = (e) => {
           if (cellData == "#HIDDEN") $j(td).addClass("disabled");
         };
 				// Changes the id header to an instance id
-        if (c.title == "id") c.title = window.instanceName + " id";
+        if (c.title == "id") c.title = idFieldName;
       });
       // Retrieve the column index of the multi-input cells (select2 items)
       // if column has a multi-input cell, it adds the index to the t array (=accumulator)
@@ -191,6 +191,10 @@ const handleSelect = (e) => {
       const editor = this.editor;
       this.table = this.table.DataTable({
         colReorder: true,
+        keys: {
+          blurable: false,
+          columns: ':not(:first-child):not(:nth-child(2)):not(:nth-child(3))'
+        },
         columnDefs,
         columns,
         scrollX: "100%",
@@ -221,6 +225,32 @@ const handleSelect = (e) => {
 					},
 					"colvis"
         ],
+        on: {
+          key: (e, datatable, key, cell) => {
+            if (key === 13 && !options.readonly) { // 13 = Enter key
+              const {_row, column, _columnVisible} = cell.index();
+              const currentCell = $j(cell.node());
+              const columnTitle = datatable.column(column).title()
+              const isReadOnlyField = [idFieldName, 'uuid'].includes(columnTitle);
+
+              // Prevent multiple inputs & skip if is a read-only field
+              if (currentCell.find('input').length === 0 && !isReadOnlyField) {
+                  currentCell.attr('contenteditable', 'true');
+                  currentCell.focus();
+              }
+            }
+          },
+          keyup: (e) => {
+            if (e.key === "Escape") {
+              const currentCell = $j(e.target);
+
+              if (currentCell.find('input').length === 0) {
+                currentCell.removeAttr('contenteditable');
+                currentCell.blur();
+              }
+            }
+          },
+        },
         ajax: options.ajax
       });
       this.table.rows.add(rows.map((r) => [null, ...r])).draw();
