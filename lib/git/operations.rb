@@ -61,6 +61,10 @@ module Git
     end
 
     def empty?
+      raise 'who calls me?'
+    end
+
+    def no_content?
       persisted? && blobs.empty? && trees.empty?
     end
 
