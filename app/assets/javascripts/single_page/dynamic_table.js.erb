@@ -215,14 +215,6 @@ const handleSelect = (e) => {
 							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
 						}
 					},
-					{
-						extend: "copy",
-						text: "Copy to Clipboard",
-						exportOptions: {
-							// exclude checkbox column
-							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
-						},
-					},
 					"colvis"
         ],
         on: {
