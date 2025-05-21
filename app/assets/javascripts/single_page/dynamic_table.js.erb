@@ -303,9 +303,9 @@ const handleSelect = (e) => {
           const _defaultCols = defaultCols.map((c) => c.defaultValue || "");
 
           const cols = this.table.settings()[0].aoColumns;
-          const sampleLinks = getSampleLinking(cols);
-          const sampleLinkIndexes = sampleLinks.map((x) => x.idx).sort((a, b) => b - a);
-          const sampleLinksTitles = sampleLinks.map((x) => x.title);
+          const nonTextColumns = getNonTextAttributes(cols);
+          const nonTextColumnIndexes = nonTextColumns.map((x) => x.idx).sort((a, b) => b - a);
+          const nonTextColumnTitles = nonTextColumns.map((x) => x.title);
 
           const rows = text
             .split(splitter)
@@ -317,7 +317,7 @@ const handleSelect = (e) => {
               splitted = _defaultCols.concat(splitted);
 
               // Preserve empty placeholder for columns of type of 'Registered Sample List'
-              sampleLinkIndexes.forEach((x) => splitted.splice(x, 0, []));
+              nonTextColumnIndexes.forEach((x) => splitted.splice(x, 0, []));
 
               return missingColsCount < 0 ?
                 splitted.slice(0, colsCount) :
@@ -327,10 +327,10 @@ const handleSelect = (e) => {
 
           this.table.rows.add(rows).draw();
 
-          if (sampleLinksTitles.length)
+          if (nonTextColumnTitles.length)
             alert(
               "No value is pasted for the following column(s): \n" +
-              sampleLinksTitles.map((x) => `"${x}"`).join(", ") +
+              nonTextColumnTitles.map((x) => `"${x}"`).join(", ") +
               "\nYou need to manually input them."
             );
         }).catch((error) => {
@@ -568,14 +568,30 @@ function getStatusIndexes(arr) {
 
 function getSampleLinking(st_attributes) {
   return st_attributes
-    .filter((attr) => attr.linked_sample_type)
-    .map(({
-            idx,
-            title
-          }) => ({
-      idx,
-      title
-    }));
+    .filter(
+      (attr) => attr.linked_sample_type)
+    .map(function (attr) {
+      return {
+        idx: attr.idx,
+        title: attr.title
+      };
+    });
+}
+
+function getNonTextAttributes(st_attributes) {
+  const stringType = "<%= Seek::Samples::BaseType::STRING %>";
+  return st_attributes
+    .filter(
+      (attr) => {
+        const baseType = attr?.attribute_type?.base_type ?? stringType;
+        return baseType !== stringType;
+      })
+    .map(function (attr) {
+      return {
+        idx: attr.idx,
+        title: attr.title
+      };
+    });
 }
 
 function handleCellUpdate(table, cell) {
