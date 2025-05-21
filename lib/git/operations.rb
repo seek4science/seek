@@ -60,10 +60,6 @@ module Git
       tree.total_size
     end
 
-    def empty?
-      raise 'who calls me?'
-    end
-
     def no_content?
       persisted? && blobs.empty? && trees.empty?
     end
