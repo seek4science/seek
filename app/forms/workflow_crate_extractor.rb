@@ -24,7 +24,9 @@ class WorkflowCrateExtractor
       # If we have an existing workflow, initialise a new version
       if new_version?
         self.workflow.latest_git_version.lock if self.workflow.latest_git_version.mutable?
-        self.git_version = self.workflow.latest_git_version.next_version(mutable: true)
+        self.git_version = self.workflow.git_versions.build(mutable: true)
+        # This is a hacky way of ensuring all the default attributes are set (via the before_validation callbacks)
+        self.git_version.valid?
       else
         self.workflow = default_workflow
         self.git_version = workflow.git_version.tap do |gv|

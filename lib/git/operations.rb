@@ -161,9 +161,11 @@ module Git
 
     private
 
+    # Reset the master branch to the most recent "real" commit - that is a commit that is linked to a Git::Version,
+    #  either on the one that is currently being operated on, or if that is nil, a previous version on the same repository.
     def reset_to_last_local_commit
       return if git_repository.remote?
-      last_local_commit = git_repository.git_versions.last&.commit
+      last_local_commit = commit.presence || git_repository.git_versions.last&.commit
       return unless last_local_commit
       git_repository.git_base.references.update(DEFAULT_LOCAL_REF, last_local_commit)
     end
