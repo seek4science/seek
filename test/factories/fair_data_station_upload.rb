@@ -17,5 +17,8 @@ FactoryBot.define do
 
   end
 
+  factory(:invalid_fair_data_station_upload, parent: :fair_data_station_upload) do
+    content_blob { FactoryBot.build(:copasi_content_blob)}
+  end
 
 end

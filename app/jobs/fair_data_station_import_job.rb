@@ -8,13 +8,17 @@ class FairDataStationImportJob < TaskJob
     project = fair_data_station_upload.project
     policy = fair_data_station_upload.policy
     fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(blob.file_path).first
-    investigation = Seek::FairDataStation::Writer.new.construct_isa(fair_data_station_inv, person, [project], policy)
-    User.with_current_user(person) do
-      investigation.save!
+    if fair_data_station_inv
+      investigation = Seek::FairDataStation::Writer.new.construct_isa(fair_data_station_inv, person, [project], policy)
+      User.with_current_user(person) do
+        investigation.save!
+      end
+      fair_data_station_upload.investigation = investigation
+      fair_data_station_upload.investigation_external_identifier = investigation.external_identifier
+      fair_data_station_upload.save!
+    else
+      raise "Unable to find an #{I18n.t('investigation')} in the FAIR Data Station file"
     end
-    fair_data_station_upload.investigation = investigation
-    fair_data_station_upload.investigation_external_identifier = investigation.external_identifier
-    fair_data_station_upload.save!
   end
 
   def task

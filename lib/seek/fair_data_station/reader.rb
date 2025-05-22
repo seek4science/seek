@@ -6,7 +6,7 @@ module Seek
   module FairDataStation
     class Reader
       def parse_graph(path)
-        graph = RDF::Graph.load(path, format: :ttl)
+        graph = RDF::Graph.load(path, format: :ttl, quiet: true)
         sparql = SPARQL::Client.new(graph)
         jerm = RDF::Vocabulary.new('http://jermontology.org/ontology/JERMOntology#')
 

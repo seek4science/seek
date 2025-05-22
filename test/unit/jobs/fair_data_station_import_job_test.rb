@@ -37,6 +37,17 @@ class FairDataStationImportJobTest < ActiveSupport::TestCase
 
   end
 
+  test 'error recorded' do
+    upload_record = FactoryBot.create :invalid_fair_data_station_upload
+    assert_no_difference('Investigation.count') do
+      FairDataStationImportJob.perform_now(upload_record)
+    end
+    upload_record.reload
+    assert upload_record.fair_data_station_import_task.failed?
+    assert_equal 'RuntimeError: Unable to find an Investigation in the FAIR Data Station file', upload_record.fair_data_station_import_task.error_message
+    assert_match /block in _perform_job/, upload_record.fair_data_station_import_task.exception
+  end
+
   test 'queue' do
     upload_record = FactoryBot.create :fair_data_station_upload
     assert_enqueued_jobs(1, only: FairDataStationImportJob) do
