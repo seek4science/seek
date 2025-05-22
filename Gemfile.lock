@@ -942,6 +942,8 @@ GEM
     sunspot_rails (2.7.1)
       rails (>= 5)
       sunspot (= 2.7.1)
+    support_table_cache (1.1.3)
+      activerecord
     swd (2.0.3)
       activesupport (>= 3)
       attr_required (>= 0.0.5)
@@ -1166,6 +1168,7 @@ DEPENDENCIES
   stackprof
   sunspot_matchers
   sunspot_rails
+  support_table_cache
   teaspoon
   teaspoon-mocha
   terrapin

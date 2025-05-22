@@ -1,4 +1,5 @@
 class WorkflowClass < ApplicationRecord
+  include SupportTableCache
   include HasCustomAvatar
 
   has_many :workflows, inverse_of: :workflow_class
@@ -11,6 +12,9 @@ class WorkflowClass < ApplicationRecord
   validates :title, uniqueness: true
   validates :key, uniqueness: true
   validate :extractor_valid?
+
+  cache_by :id
+  cache_by :key
 
   def extractor_class
     extractor ? self.class.const_get("Seek::WorkflowExtractors::#{extractor}") : Seek::WorkflowExtractors::Base
