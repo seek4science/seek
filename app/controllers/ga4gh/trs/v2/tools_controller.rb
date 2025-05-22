@@ -24,8 +24,8 @@ module Ga4gh
           @limit = tools_index_params[:limit]&.to_i || 1000
 
           # Filtering
-          workflows = Workflow.authorized_for('view').includes(:projects, :creators, :workflow_class, :git_versions, :standard_versions)
-          workflows = relationify_collection(workflows)
+          workflows = relationify_collection(Workflow.authorized_for('view'))
+          workflows = workflows.includes(:projects, :creators, :workflow_class, :git_versions, :standard_versions)
           workflows = workflows.where(id: tools_index_params[:id]) if tools_index_params[:id].present?
           workflows = workflows.where('LOWER(workflows.title) LIKE ?', "%#{tools_index_params[:name].downcase}%") if tools_index_params[:name].present?
           workflows = workflows.where('LOWER(workflows.description) LIKE ?', "%#{tools_index_params[:description].downcase}%") if tools_index_params[:description].present?
