@@ -2,7 +2,7 @@
 
 
 <%
-  task = upload.fair_data_station_import_task
+  task = upload.import_task
   job_status ||= task.status
   in_progress = task.in_progress?
   failed = task.failed?

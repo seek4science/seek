@@ -5209,8 +5209,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier:'the-ext-id')
     upload2 = FactoryBot.create(:fair_data_station_upload, investigation_external_identifier:'the-other-ext-id')
-    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
-    upload2.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload2.import_task.update_attribute(:status, Task::STATUS_QUEUED)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
     assert_select 'div.fair-data-station-import-status', count: 1
@@ -5220,7 +5220,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
 
-    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    upload.import_task.update_attribute(:status, Task::STATUS_ACTIVE)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
     assert_select 'div.fair-data-station-import-status', count: 1
@@ -5230,7 +5230,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
 
-    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_FAILED)
+    upload.import_task.update_attribute(:status, Task::STATUS_FAILED)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
     assert_select 'div.fair-data-station-import-status', count: 1
@@ -5240,7 +5240,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
 
-    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_DONE)
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
     upload.update_attribute(:investigation_id, FactoryBot.create(:investigation, contributor: person).id)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
@@ -5349,8 +5349,8 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'demo.ttl', content_blob.original_filename
     assert_equal 'text/turtle', content_blob.content_type
     assert_equal ttl_file.size, content_blob.file_size
-    assert fds_upload.fair_data_station_import_task&.pending?
-    refute fds_upload.fair_data_station_update_task&.pending?
+    assert fds_upload.import_task&.pending?
+    refute fds_upload.update_task&.pending?
   end
 
   test 'import from fairdata station ttl ignores disabled emt' do
@@ -5427,7 +5427,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
 
     upload = FactoryBot.create(:fair_data_station_upload, investigation_external_identifier: 'seek-test-investigation', project: project)
-    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload.import_task.update_attribute(:status, Task::STATUS_QUEUED)
 
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
     assert_no_difference('Investigation.count') do
@@ -5448,8 +5448,8 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'fair_data_station_import_status' do
     upload = FactoryBot.create(:fair_data_station_upload)
     upload_other_project = FactoryBot.create(:fair_data_station_upload)
-    upload.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
-    upload_other_project.fair_data_station_import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload_other_project.import_task.update_attribute(:status, Task::STATUS_QUEUED)
 
     login_as(upload.contributor)
 

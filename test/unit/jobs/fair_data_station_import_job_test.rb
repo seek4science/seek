@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class FairDataStationImportJobTest < ActiveSupport::TestCase
-
   def setup
     FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
     FactoryBot.create(:fairdata_test_case_study_extended_metadata)
@@ -29,12 +28,11 @@ class FairDataStationImportJobTest < ActiveSupport::TestCase
       end
     end
     upload_record.reload
-    assert upload_record.fair_data_station_import_task.success?
+    assert upload_record.import_task.success?
     inv = upload_record.investigation
     refute_nil inv
     assert_equal 2, inv.studies.count
     assert_equal inv.external_identifier, upload_record.investigation_external_identifier
-
   end
 
   test 'error recorded' do
@@ -43,9 +41,10 @@ class FairDataStationImportJobTest < ActiveSupport::TestCase
       FairDataStationImportJob.perform_now(upload_record)
     end
     upload_record.reload
-    assert upload_record.fair_data_station_import_task.failed?
-    assert_equal 'RuntimeError: Unable to find an Investigation in the FAIR Data Station file', upload_record.fair_data_station_import_task.error_message
-    assert_match /block in _perform_job/, upload_record.fair_data_station_import_task.exception
+    assert upload_record.import_task.failed?
+    assert_equal 'RuntimeError: Unable to find an Investigation in the FAIR Data Station file',
+                 upload_record.import_task.error_message
+    assert_match(/block in _perform_job/, upload_record.import_task.exception)
   end
 
   test 'queue' do
@@ -54,7 +53,6 @@ class FairDataStationImportJobTest < ActiveSupport::TestCase
       FairDataStationImportJob.new(upload_record).queue_job
     end
     upload_record.reload
-    assert upload_record.fair_data_station_import_task.pending?
+    assert upload_record.import_task.pending?
   end
-
 end

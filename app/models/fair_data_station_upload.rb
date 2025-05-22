@@ -4,31 +4,28 @@ class FairDataStationUpload < ApplicationRecord
   belongs_to :project
   belongs_to :policy
   belongs_to :contributor, class_name: 'Person'
-  enum :purpose,  [:import, :update], suffix: true
+  enum :purpose, %i[import update], suffix: true
 
   validates :contributor, :content_blob, :project, :purpose, presence: true
   validate :validate_project_membership
 
-  has_task :fair_data_station_import
-  has_task :fair_data_station_update
+  has_task :import
+  has_task :update
 
   scope :for_project_and_contributor, ->(project, contributor) { where project: project, contributor: contributor }
 
   def self.matching_imports_in_progress(project, external_id)
-    FairDataStationUpload.import_purpose.where(investigation_external_identifier: external_id, project: project).select do |upload|
-      upload.fair_data_station_import_task.in_progress? || upload.fair_data_station_import_task.waiting?
+    FairDataStationUpload.import_purpose.where(investigation_external_identifier: external_id,
+                                               project: project).select do |upload|
+      upload.import_task.in_progress? || upload.import_task.waiting?
     end
   end
 
   private
 
   def validate_project_membership
-    unless contributor&.member_of?(project)
-      errors.add("must be a member of the #{t('project')}")
-    end
+    return if contributor&.member_of?(project)
+
+    errors.add("must be a member of the #{t('project')}")
   end
-
-
-
-
 end
