@@ -60,7 +60,7 @@ module Git
       tree.total_size
     end
 
-    def empty?
+    def no_content?
       persisted? && blobs.empty? && trees.empty?
     end
 
