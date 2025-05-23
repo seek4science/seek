@@ -5209,8 +5209,10 @@ class ProjectsControllerTest < ActionController::TestCase
 
     upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier:'the-ext-id')
     upload2 = FactoryBot.create(:fair_data_station_upload, investigation_external_identifier:'the-other-ext-id')
+    upload3 = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, show_status: false, investigation_external_identifier:'the-ext-id-closed')
     upload.import_task.update_attribute(:status, Task::STATUS_QUEUED)
     upload2.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload3.import_task.update_attribute(:status, Task::STATUS_QUEUED)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
     assert_select 'div.fair-data-station-import-status', count: 1
@@ -5219,6 +5221,7 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
 
     upload.import_task.update_attribute(:status, Task::STATUS_ACTIVE)
     get :import_from_fairdata_station, params: {id: project}
@@ -5229,6 +5232,7 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
 
     upload.import_task.update_attribute(:status, Task::STATUS_FAILED)
     get :import_from_fairdata_station, params: {id: project}
@@ -5239,6 +5243,7 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
 
     upload.import_task.update_attribute(:status, Task::STATUS_DONE)
     upload.update_attribute(:investigation_id, FactoryBot.create(:investigation, contributor: person).id)
@@ -5252,6 +5257,7 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
     assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
   end
 
   test 'dont show import from fair data station if disabled' do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -688,6 +688,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
     t.integer "purpose", limit: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "show_status", default: true
   end
 
   create_table "favourite_group_memberships", id: :integer, force: :cascade do |t|

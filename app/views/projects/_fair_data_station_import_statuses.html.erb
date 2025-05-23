@@ -1,5 +1,6 @@
 <%
-  uploads = FairDataStationUpload.for_project_and_contributor(project, contributor).import_purpose
+  #FIXME: 2197 - move query to model or helper method
+  uploads = FairDataStationUpload.for_project_and_contributor(project, contributor).show_status.import_purpose
   return if uploads.empty?
 %>
 
