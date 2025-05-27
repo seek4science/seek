@@ -2,6 +2,7 @@
 
 
 <%
+  return unless upload.show_status?
   task = upload.import_task
   job_status ||= task.status
   in_progress = task.in_progress?
@@ -31,6 +32,7 @@
                       data: { 'previous_status': '<%= job_status -%>' },
                       success: function (html) {
                         $j('#<%= element_id %>').replaceWith(html);
+                        FairDataStation.registerStatusCloseButtons('#<%= element_id %>');
                       }
                     }
                 );
@@ -38,11 +40,14 @@
             </script>
         <% elsif failed %>
           Failed. An administrator will have been notified of the problem, but you could try again.
+          <%= link_to "Close", '#', class: 'btn btn-primary close-status-button', "data-project_id":upload.project.id, "data-upload_id":upload.id %>
         <% elsif success  %>
             Completed
 
             <%= link_to("View imported #{t('investigation')}", investigation_path(upload.investigation),
                         class: 'btn btn-primary') if upload.investigation %>
+
+             <%= link_to "Close", '#', class: 'btn btn-primary close-status-button', "data-project_id":upload.project.id, "data-upload_id":upload.id %>
         <% end %>
       </div>
   <% end %>

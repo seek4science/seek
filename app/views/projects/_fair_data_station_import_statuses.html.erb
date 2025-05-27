@@ -4,8 +4,17 @@
   return if uploads.empty?
 %>
 
-<h1>Existing Imports</h1>
+<div id='fair-data-station-imports'>
+  <h1>Existing Imports</h1>
 
-<% uploads.each do |upload| %>
-  <%= render partial: 'fair_data_station_import_status', locals: { upload: upload } %>
-<% end %>
+  <% uploads.each do |upload| %>
+    <%= render partial: 'fair_data_station_import_status', locals: { upload: upload } %>
+  <% end %>
+
+</div>
+
+<script>
+  $j(document).ready( function () {
+     FairDataStation.registerStatusCloseButtons('div#fair-data-station-imports');
+  });
+</script>
