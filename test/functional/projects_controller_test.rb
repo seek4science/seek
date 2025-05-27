@@ -5486,6 +5486,60 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'hide_fair_data_station_import_status' do
+    upload = FactoryBot.create(:fair_data_station_upload, purpose: :import)
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    project = person.projects.first
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :success
+    upload.reload
+    refute upload.show_status?
+  end
+
+  test 'hide_fair_data_station_import_status not the owner' do
+    upload = FactoryBot.create(:fair_data_station_upload, purpose: :import)
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
+    project = upload.project
+    another_person = FactoryBot.create(:person)
+    another_person.add_to_project_and_institution(project, another_person.institutions.first)
+    another_person.save!
+    assert upload.show_status?
+    login_as(another_person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_import_status wrong purpose' do
+    upload = FactoryBot.create(:fair_data_station_upload, purpose: :update)
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    project = person.projects.first
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_import_status not finished' do
+    upload = FactoryBot.create(:fair_data_station_upload, purpose: :import)
+    upload.import_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    person = upload.contributor
+    project = person.projects.first
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
   private
 
   def check_project(project)
