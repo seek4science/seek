@@ -127,4 +127,13 @@ module ProjectsHelper
     return nil if project.has_member?(current_user)
     ProjectMembershipMessageLog.recent_requests(current_user.try(:person), project).first
   end
+
+  def fair_data_station_close_status_button(fair_data_station_upload)
+    content_tag(:button, class: 'close close-status-button', 'aria-label': 'Close',
+                'data-project_id': fair_data_station_upload.project.id, 'data-upload_id': fair_data_station_upload.id) do
+      content_tag(:span, 'aria-hidden': true) do
+        '&times;'.html_safe
+      end
+    end
+  end
 end
