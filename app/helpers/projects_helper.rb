@@ -136,4 +136,10 @@ module ProjectsHelper
       end
     end
   end
+
+  def fair_data_station_imports_to_show(project, contributor)
+    FairDataStationUpload.for_project_and_contributor(project, contributor).show_status.import_purpose.select do |upload|
+      upload.import_task.in_progress? || upload.import_task.completed?
+    end
+  end
 end
