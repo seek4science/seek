@@ -229,20 +229,14 @@ class ProjectsController < ApplicationController
     @project = Project.new(proj_params)
 
     institution_params = params[:institution]
-    department = institution_params[:department].presence
+    department = institution_params[:department]
     ror_id     = institution_params[:ror_id]
     title      = institution_params[:title]
     id         = institution_params[:id]
 
-    @institution = Institution.find_by_id(id) ||
-                   if department
-                     Institution.find_by(ror_id: ror_id, department: department) if ror_id.present? ||
-                                                                                    Institution.find_by(title: title, 
-                                                                                                        department: department)
-                   else
-                     Institution.find_by(ror_id: ror_id) if ror_id.present? ||
-                                                            Institution.find_by(title: title)
-                   end
+    @institution = Institution.find_by(id:id, department: department) ||
+      (Institution.find_by(ror_id: ror_id, department: department) if ror_id.present? ) ||
+                      Institution.find_by(title: title, department: department)
 
     if @institution.nil?
       inst_params = params.require(:institution).permit([:title, :department, :web_page, :city, :country, :ror_id])
@@ -470,7 +464,7 @@ class ProjectsController < ApplicationController
     end
   end
 
-  
+
   # GET /projects/1
   def show
     respond_to do |format|
@@ -671,7 +665,7 @@ class ProjectsController < ApplicationController
       format.html { redirect_to project_path(@project) }
     end
   end
-  
+
   def admin_members
     respond_with(@project)
   end
@@ -743,7 +737,7 @@ class ProjectsController < ApplicationController
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title, :department,:web_page, :city, 
+        @institution = Institution.new(params.require(:institution).permit([:title, :department,:web_page, :city,
 :country, :ror_id]))
       end
 
@@ -805,7 +799,7 @@ class ProjectsController < ApplicationController
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title,:department, :web_page, :city, 
+        @institution = Institution.new(params.require(:institution).permit([:title,:department, :web_page, :city,
 :country, :ror_id]))
       end
 

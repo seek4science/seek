@@ -53,7 +53,7 @@
             <li><strong>Country:</strong> <%= country_text_or_not_specified @institution.country -%></li>
           </ul>
         <% else %>
-          You have indicated that you are associated with <%= link_to(@institution.title, @institution) %>
+          You have indicated that you are associated with <%= link_to(@institution.full_title, @institution) %>
         <% end %>
         </p>
 
