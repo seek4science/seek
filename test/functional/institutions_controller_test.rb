@@ -70,15 +70,64 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_select 'h1', text: 'Manchester Institute of Biotechnology, University of Manchester', count: 1
   end
 
-  def test_should_create_institution_with_title_department
+  def test_should_create_institution_with_or_without_title_department_
 
+    # If creating a new institution with a title first,
+    # it should still be possible to create another institution with the same title but a different department.
     assert_difference('Institution.count') do
-      post :create, params: { institution: { title: 'German Cancer Research Center', department: 'Division of Applied Bioinformatics' } }
+      post :create, params: { institution: { title: 'Institution 1', department: 'Division 1' } }
     end
 
     assert_redirected_to institution_path(assigns(:institution))
-    assert_equal 'German Cancer Research Center', assigns(:institution).title
-    assert_equal 'Division of Applied Bioinformatics', assigns(:institution).department
+    assert_equal 'Institution 1', assigns(:institution).title
+    assert_equal 'Division 1', assigns(:institution).department
+    assert_equal 'Division 1, Institution 1', assigns(:institution).full_title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Division 1, Institution 1', count: 1
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1' }}
+    end
+
+    assert_equal 'Institution 1', assigns(:institution).title
+    assert_equal 'Institution 1', assigns(:institution).full_title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Institution 1', count: 1
+
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1',department: 'Division 2' }}
+    end
+
+    assert_equal 'Institution 1', assigns(:institution).title
+    assert_equal 'Division 2, Institution 1', assigns(:institution).full_title
+
+    # If creating a new institution with a title and a department first,
+    # it should still be possible to create another institution with the title but without a different department.
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 2' }}
+    end
+
+    assert_equal 'Institution 2', assigns(:institution).title
+    assert_equal 'Institution 2', assigns(:institution).full_title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Institution 2', count: 1
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 2', department: 'Division 2' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Institution 2', assigns(:institution).title
+    assert_equal 'Division 2', assigns(:institution).department
+    assert_equal 'Division 2, Institution 2', assigns(:institution).full_title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Division 2, Institution 2', count: 1
+
   end
 
 
