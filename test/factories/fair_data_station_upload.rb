@@ -28,4 +28,8 @@ FactoryBot.define do
     content_blob { FactoryBot.build(:fair_data_station_test_case_modified_content_blob)}
   end
 
+  factory(:invalid_update_fair_data_station_upload, parent: :update_fair_data_station_upload) do
+    content_blob { FactoryBot.build(:fair_data_station_test_case_invalid_content_blob)}
+  end
+
 end

@@ -32,6 +32,40 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'record errors' do
+    investigation = setup_test_case_investigation
+    person = investigation.contributor
+    project = investigation.projects.first
+
+    upload = FactoryBot.create(:invalid_update_fair_data_station_upload, contributor: person, project: project, investigation: investigation)
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              assert_no_difference('ActivityLog.count') do
+                FairDataStationUpdateJob.perform_now(upload)
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_equal 'test study 2', Study.by_external_identifier('seek-test-study-2', investigation.projects).title
+    assert_equal 'test seek sample 1', Sample.by_external_identifier('seek-test-sample-1', investigation.projects).title
+
+    # this may have changed in an update before the error, so this checks the transaction is behaving correctly and rolling back
+    assert_equal 'test obs unit 1', ObservationUnit.by_external_identifier('seek-test-obs-unit-1', investigation.projects).title
+
+    upload.reload
+    assert upload.update_task.failed?
+    assert_equal "ActiveRecord::RecordInvalid: Validation failed: Title can't be blank, Title is required",
+                 upload.update_task.error_message
+    assert_match(/block in _perform_job/, upload.update_task.exception)
+
+  end
+
   def setup_test_case_investigation
     FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
     FactoryBot.create(:fairdata_test_case_study_extended_metadata)
