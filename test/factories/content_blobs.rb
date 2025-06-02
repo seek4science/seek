@@ -531,4 +531,10 @@ FactoryBot.define do
     original_filename { 'seek-fair-data-station-test-case.ttl' }
     data { File.new("#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl", 'rb').read }
   end
+
+  factory(:fair_data_station_test_case_modified_content_blob, parent: :content_blob) do
+    content_type { 'text/turtle' }
+    original_filename { 'seek-fair-data-station-modified-test-case.ttl' }
+    data { File.new("#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-modified-test-case.ttl", 'rb').read }
+  end
 end
