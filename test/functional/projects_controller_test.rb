@@ -5311,7 +5311,6 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'import from fairdata station ttl' do
-
     person = FactoryBot.create(:person)
     project = person.projects.first
     another_person = FactoryBot.create(:person)

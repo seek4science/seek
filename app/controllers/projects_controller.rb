@@ -208,10 +208,10 @@ class ProjectsController < ApplicationController
     policy = Policy.new
     policy.set_attributes_with_sharing(policy_params)
     fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
+    @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
     in_progress = FairDataStationUpload.matching_imports_in_progress(@project, fair_data_station_inv.external_id)
 
-    if existing_investigation
+    if @existing_investigation
       flash.now[:error] = "An #{t('investigation')} with that external identifier already exists for this #{t('project')}"
       respond_to do |format|
         format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }

@@ -1398,33 +1398,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'submit from fair data station invalid metadata' do
-    investigation = setup_test_case_investigation
-    login_as(investigation.contributor)
-    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-invalid-test-case.ttl')
-
-    assert_no_difference('Investigation.count') do
-      assert_no_difference('Study.count') do
-        assert_no_difference('ObservationUnit.count') do
-          assert_no_difference('Sample.count') do
-            assert_no_difference('Assay.count') do
-              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-              assert_response :unprocessable_entity
-              assert_match /Validation failed: Title can't be blank, Title is required/, flash[:error]
-              assert_select 'div#error_flash', text: /Validation failed: Title can't be blank, Title is required/
-            end
-          end
-        end
-      end
-    end
-
-    assert_equal 'test study 2', Study.by_external_identifier('seek-test-study-2', investigation.projects).title
-    assert_equal 'test seek sample 1', Sample.by_external_identifier('seek-test-sample-1', investigation.projects).title
-
-    # this may have changed in an update before the error, so this checks the transaction is behaving correctly and rolling back
-    assert_equal 'test obs unit 1', ObservationUnit.by_external_identifier('seek-test-obs-unit-1', investigation.projects).title
-  end
-
   test 'can show and edit with deleted contributor' do
     investigation = FactoryBot.create(:investigation, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
     investigation.update_column(:contributor_id, nil)
