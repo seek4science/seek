@@ -92,4 +92,53 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
     matches = FairDataStationUpload.matching_imports_in_progress(project, 'test-id')
     assert_equal [upload, upload2, upload3, upload4].sort, matches.sort
   end
+
+  test 'matching updates in progress' do
+    person = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
+    project = person.projects.first
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, person.institutions.first)
+    person2.add_to_project_and_institution(project, person2.institutions.first)
+    upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project,
+                               investigation_external_identifier: 'test-id', purpose: :update)
+    upload.update_task.update_attribute(:status, Task::STATUS_WAITING)
+    upload2 = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project,
+                                investigation_external_identifier: 'test-id', purpose: :update)
+    upload2.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload3 = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project,
+                                investigation_external_identifier: 'test-id', purpose: :update)
+    upload3.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    # same project, different person
+    upload4 = FactoryBot.create(:fair_data_station_upload, contributor: person2, project: project,
+                                investigation_external_identifier: 'test-id', purpose: :update)
+    upload4.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    # different identifier
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier: 'another-id', purpose: :update).update_task.update_attribute(
+      :status, Task::STATUS_QUEUED
+    )
+    # different purpose
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier: 'test-id', purpose: :import).update_task.update_attribute(
+      :status, Task::STATUS_QUEUED
+    )
+    # different project
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project2, investigation_external_identifier: 'test-id', purpose: :update).update_task.update_attribute(
+      :status, Task::STATUS_QUEUED
+    )
+    # complete
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier: 'test-id', purpose: :update).update_task.update_attribute(
+      :status, Task::STATUS_DONE
+    )
+    # cancelled
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier: 'test-id', purpose: :update).update_task.update_attribute(
+      :status, Task::STATUS_CANCELLED
+    )
+    # failed
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier: 'test-id', purpose: :update).update_task.update_attribute(
+      :status, Task::STATUS_FAILED
+    )
+
+    matches = FairDataStationUpload.matching_updates_in_progress(project, 'test-id')
+    assert_equal [upload, upload2, upload3, upload4].sort, matches.sort
+  end
 end

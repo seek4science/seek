@@ -1309,20 +1309,29 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(investigation.contributor)
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
-    assert_no_difference('Investigation.count') do
-      assert_difference('Study.count', 1) do
-        assert_difference('ObservationUnit.count', 1) do
-          assert_difference('Sample.count', 1) do
-            assert_difference('Assay.count', 1) do
-              assert_difference('ActivityLog.count',18) do
-                post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-                assert_redirected_to investigation
-              end
-            end
+    assert_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_difference('ContentBlob.count') do
+          assert_enqueued_jobs(1, only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_redirected_to update_from_fairdata_station_investigation_path(investigation)
           end
         end
       end
     end
+
+    fds_upload = FairDataStationUpload.last
+    assert fds_upload.update_purpose?
+    assert_equal investigation.contributor, fds_upload.contributor
+    assert_equal investigation.projects.first, fds_upload.project
+    assert_equal investigation,  fds_upload.investigation
+    assert_equal 'seek-test-investigation', fds_upload.investigation_external_identifier
+    content_blob = fds_upload.content_blob
+    assert_equal 'seek-fair-data-station-modified-test-case.ttl', content_blob.original_filename
+    assert_equal 'text/turtle', content_blob.content_type
+    assert_equal ttl_file.size, content_blob.file_size
+    assert fds_upload.update_task&.pending?
+    refute fds_upload.import_task&.pending?
   end
 
   test 'submit from fair data station no permission or disabled' do

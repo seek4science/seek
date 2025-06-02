@@ -37,25 +37,32 @@ class InvestigationsController < ApplicationController
 
   def submit_fairdata_station
     path = params[:datastation_data].path
-    data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
-    begin
-      Investigation.transaction do
-        @investigation = Seek::FairDataStation::Writer.new.update_isa(@investigation, data_station_inv, current_person, @investigation.projects, @investigation.policy)
-        @investigation.save!
+    in_progress = FairDataStationUpload.matching_updates_in_progress(@project, fair_data_station_inv.external_id)
+    mismatching_external_id = fair_data_station_inv.external_id != @investigation.external_identifier
+
+    if mismatching_external_id
+      flash.now[:error] = "#{t('investigation')} external identifiers do not match"
+      respond_to do |format|
+        format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
       end
-    rescue ActiveRecord::RecordInvalid, Seek::FairDataStation::ExternalIdMismatchException => e
-      flash.now[:error] = e.message
-    end
-
-    if flash[:error].present?
+    elsif in_progress
+      flash.now[:error] = "An #{t('investigation')} with that external identifier is currently already being updated for this #{t('project')}"
       respond_to do |format|
         format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
       end
     else
-      respond_to do |format|
-        format.html { redirect_to(@investigation) }
-      end
+      content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
+                                     original_filename: params[:datastation_data].original_filename)
+      fair_data_station_upload = FairDataStationUpload.new(project: @investigation.projects.first, contributor: current_person,
+                                                           investigation: @investigation,
+                                                           investigation_external_identifier: fair_data_station_inv.external_id,
+                                                           purpose: :update, content_blob: content_blob
+      )
+      fair_data_station_upload.save!
+      FairDataStationUpdateJob.new(fair_data_station_upload).queue_job
+      redirect_to update_from_fairdata_station_investigation_path(@investigation)
     end
   end
 

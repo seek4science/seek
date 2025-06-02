@@ -208,15 +208,15 @@ class ProjectsController < ApplicationController
     policy = Policy.new
     policy.set_attributes_with_sharing(policy_params)
     fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
-    @in_progress = FairDataStationUpload.matching_imports_in_progress(@project, fair_data_station_inv.external_id)
+    existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
+    in_progress = FairDataStationUpload.matching_imports_in_progress(@project, fair_data_station_inv.external_id)
 
-    if @existing_investigation
+    if existing_investigation
       flash.now[:error] = "An #{t('investigation')} with that external identifier already exists for this #{t('project')}"
       respond_to do |format|
         format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
       end
-    elsif @in_progress.any?
+    elsif in_progress.any?
       flash.now[:error] = "An #{t('investigation')} with that external identifier is currently already being imported for this #{t('project')}"
       respond_to do |format|
         format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
@@ -224,13 +224,13 @@ class ProjectsController < ApplicationController
     else
       content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
                                      original_filename: params[:datastation_data].original_filename)
-      @fair_data_station_upload = FairDataStationUpload.new(project: @project, contributor: current_person,
+      fair_data_station_upload = FairDataStationUpload.new(project: @project, contributor: current_person,
                                                             investigation_external_identifier: fair_data_station_inv.external_id,
                                                             policy: policy, purpose: :import,
                                                             content_blob: content_blob
                                                             )
-      @fair_data_station_upload.save!
-      FairDataStationImportJob.new(@fair_data_station_upload).queue_job
+      fair_data_station_upload.save!
+      FairDataStationImportJob.new(fair_data_station_upload).queue_job
       redirect_to import_from_fairdata_station_project_path(@project)
     end
 

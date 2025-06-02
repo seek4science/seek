@@ -22,6 +22,13 @@ class FairDataStationUpload < ApplicationRecord
     end
   end
 
+  def self.matching_updates_in_progress(project, external_id)
+    FairDataStationUpload.update_purpose.where(investigation_external_identifier: external_id,
+                                               project: project).select do |upload|
+      upload.update_task.in_progress? || upload.update_task.waiting?
+    end
+  end
+
   private
 
   def validate_project_membership
