@@ -39,7 +39,7 @@ class InvestigationsController < ApplicationController
     path = params[:datastation_data].path
     fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
-    in_progress = FairDataStationUpload.matching_updates_in_progress(@project, fair_data_station_inv.external_id)
+    in_progress = FairDataStationUpload.matching_updates_in_progress(@investigation, fair_data_station_inv.external_id)
     mismatching_external_id = fair_data_station_inv.external_id != @investigation.external_identifier
 
     if mismatching_external_id
@@ -47,7 +47,7 @@ class InvestigationsController < ApplicationController
       respond_to do |format|
         format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
       end
-    elsif in_progress
+    elsif in_progress.any?
       flash.now[:error] = "An #{t('investigation')} with that external identifier is currently already being updated for this #{t('project')}"
       respond_to do |format|
         format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
