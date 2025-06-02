@@ -5358,43 +5358,6 @@ class ProjectsControllerTest < ActionController::TestCase
     refute fds_upload.update_task&.pending?
   end
 
-  test 'import from fairdata station ttl ignores disabled emt' do
-    skip('revisit when the rest of issue 2197 is working')
-    person = FactoryBot.create(:person)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
-    FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata, enabled: false)
-    project = person.projects.first
-    another_person = FactoryBot.create(:person)
-    login_as(person)
-
-    ttl_file = fixture_file_upload('fair_data_station/demo.ttl')
-
-    assert_difference('ActivityLog.count', 40) do
-      assert_no_difference('ExtendedMetadata.count') do
-        post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
-                                                 policy_attributes: {
-                                                   access_type: Policy::VISIBLE,
-                                                   permissions_attributes: {
-                                                     '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
-                                                     }
-                                                   }
-                                                 }
-        }
-      end
-    end
-
-    assert investigation = assigns(:investigation)
-    assert_redirected_to investigation
-
-    assert_equal person, investigation.contributor
-    assert_equal 1, investigation.studies.count
-    study = investigation.studies.first
-    assert_equal 9, study.assays.count
-    assay = study.assays.first
-    assert_nil assay.extended_metadata
-
-  end
-
   test 'import from fairdata station ttl existing external id' do
     person = FactoryBot.create(:person)
     project = person.projects.first

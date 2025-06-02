@@ -158,6 +158,26 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal '408170', sample.get_attribute_value('Organism')
   end
 
+  test 'ignore disabled EMT' do
+    contributor = FactoryBot.create(:person)
+    FactoryBot.create(:fairdatastation_test_case_sample_type, policy: Policy.public_policy)
+    FactoryBot.create(:fairdata_test_case_study_extended_metadata, enabled: false)
+    project = contributor.projects.first
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    investigation = nil
+    assert_difference('Study.count', 2) do
+      assert_no_difference('ExtendedMetadata.count') do
+        User.with_current_user(contributor.user) do
+          investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
+          investigation.save!
+        end
+      end
+    end
+    investigation.reload
+    assert_equal [nil, nil], investigation.studies.collect(&:extended_metadata)
+  end
+
   test 'observation_unit and assay datasets created in construct_isa' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
