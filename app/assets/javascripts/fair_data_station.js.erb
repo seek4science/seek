@@ -3,18 +3,27 @@
 const FairDataStation = {
     registerStatusCloseButtons: function(ancestor) {
         $j(ancestor + ' .close-status-button').on('click', function() {
-            let btn = $j(this);
+            const btn = $j(this);
             btn.attr('disabled', true);
-            let upload_id = btn.data('upload_id');
-            let project_id = btn.data('project_id');
-            let url = '<%= hide_fair_data_station_import_status_project_path('~project_id~') %>';
-            url = url.replace('~project_id~', project_id);
+            const upload_id = btn.data('upload_id');
+            const project_id = btn.data('project_id');
+            const investigation_id = btn.data('investigation_id');
+            const purpose = btn.data('purpose');
+            let url = '';
+            if (purpose == 'import') {
+                url = '<%= hide_fair_data_station_import_status_project_path('~project_id~') %>';
+                url = url.replace('~project_id~', project_id);
+            }
+            else {
+                url = '<%= hide_fair_data_station_update_status_investigation_path('~investigation_id~') %>';
+                url = url.replace('~investigation_id~', investigation_id);
+            }
 
             $j.ajax(url, {
                   data: { 'upload_id': upload_id },
                   method: 'POST',
                   success: function (response) {
-                      $j(btn).parents('div.fair-data-station-import-status').fadeOut();
+                      $j(btn).parents('div.fair-data-station-status').fadeOut();
                   },
                   error: function(response, textStatus, errorThrown) {
                     alert('There was an error when trying to close: ' + errorThrown);

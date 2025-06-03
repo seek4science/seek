@@ -1542,6 +1542,60 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal 'You are not authorized to manage this Investigation.', flash[:error]
   end
 
+  test 'hide_fair_data_station_update_status' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    investigation = upload.investigation
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :success
+    upload.reload
+    refute upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status not the owner' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    investigation = upload.investigation
+    another_person = FactoryBot.create(:person)
+    investigation.policy.permissions.create(access_type: Policy::MANAGING, contributor: another_person)
+    assert upload.show_status?
+    login_as(another_person)
+    assert investigation.can_manage?
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status wrong purpose' do
+    upload = FactoryBot.create(:update_fair_data_station_upload, purpose: :import)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    investigation = upload.investigation
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status not finished' do
+    upload = FactoryBot.create(:update_fair_data_station_upload, purpose: :import)
+    upload.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    person = upload.contributor
+    investigation = upload.investigation
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
   test 'can show and edit with deleted contributor' do
     investigation = FactoryBot.create(:investigation, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
     investigation.update_column(:contributor_id, nil)

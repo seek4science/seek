@@ -15,7 +15,7 @@
   alert_style = 'alert-success' if success
 %>
 
-<div id='<%= element_id %>' class='fair-data-station-import-status'>
+<div id='<%= element_id %>' class='fair-data-station-status'>
   <% if in_progress || failed || success %>
     <div class="alert <%= alert_style %>" role="alert">
       <strong>FAIR Data Station import status ( ID: <%= external_id %> ) :</strong>
@@ -37,14 +37,14 @@
         </script>
       <% elsif failed %>
         Failed. An administrator will have been notified of the problem, but you could try again.
-        <%= fair_data_station_close_status_button(upload) %>
+        <%= fair_data_station_close_status_button(upload, :import) %>
       <% elsif success %>
         Completed
 
         <%= link_to("View imported #{t('investigation')}", investigation_path(upload.investigation),
                     class: 'btn btn-primary') if upload.investigation %>
 
-        <%= fair_data_station_close_status_button(upload) %>
+        <%= fair_data_station_close_status_button(upload, :import) %>
       <% end %>
     </div>
   <% end %>
