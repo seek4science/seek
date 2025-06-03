@@ -18,4 +18,11 @@ module InvestigationsHelper
   def authorised_investigations(projects = nil)
     authorised_assets(Investigation, projects, 'view')
   end
+
+  def fair_data_station_investigation_updates_to_show(investigation, contributor)
+    FairDataStationUpload.for_investigation_and_contributor(investigation, contributor).show_status.update_purpose.select do |upload|
+      upload.update_task.in_progress? || upload.update_task.completed?
+    end
+  end
+
 end

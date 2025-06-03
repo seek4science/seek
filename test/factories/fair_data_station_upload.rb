@@ -26,6 +26,11 @@ FactoryBot.define do
     purpose { :update }
     policy { nil }
     content_blob { FactoryBot.build(:fair_data_station_test_case_modified_content_blob)}
+    after(:build) do |resource|
+      if resource.investigation.blank?
+        resource.investigation = FactoryBot.create(:investigation, contributor: resource.contributor, projects: [resource.project])
+      end
+    end
   end
 
   factory(:invalid_update_fair_data_station_upload, parent: :update_fair_data_station_upload) do

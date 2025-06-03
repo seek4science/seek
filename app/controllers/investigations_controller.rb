@@ -7,7 +7,7 @@ class InvestigationsController < ApplicationController
   before_action :investigations_enabled?
   before_action :fair_data_station_enabled?, only: %i[update_from_fairdata_station submit_fairdata_station]
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: [:edit, :manage, :update, :manage_update, :destroy, :show, :update_from_fairdata_station, :submit_fairdata_station, :new_object_based_on_existing_one]
+  before_action :find_and_authorize_requested_item, only: [:edit, :manage, :update, :manage_update, :destroy, :show, :update_from_fairdata_station, :submit_fairdata_station, :fair_data_station_update_status, :new_object_based_on_existing_one]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   #defined in the application controller
@@ -63,6 +63,20 @@ class InvestigationsController < ApplicationController
       fair_data_station_upload.save!
       FairDataStationUpdateJob.new(fair_data_station_upload).queue_job
       redirect_to update_from_fairdata_station_investigation_path(@investigation)
+    end
+  end
+
+  def fair_data_station_update_status
+    upload = FairDataStationUpload.for_investigation_and_contributor(@investigation, current_person).update_purpose.where(id: params[:upload_id]).first
+    if upload
+      job_status = upload.update_task.status
+      respond_to do |format|
+        format.html { render partial: 'fair_data_station_update_status', locals: { upload: upload, job_status: job_status } }
+      end
+    else
+      respond_to do |format|
+        format.html { render plain:'', status: :forbidden }
+      end
     end
   end
 

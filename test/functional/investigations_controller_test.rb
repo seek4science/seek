@@ -1398,6 +1398,51 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'fair_data_station_update_status' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload_other_investigation = FactoryBot.create(:update_fair_data_station_upload, contributor: upload.contributor, project: upload.project)
+    refute_equal upload.investigation, upload_other_investigation.investigation
+    assert_equal upload.contributor, upload_other_investigation.contributor
+    assert_equal upload.project, upload_other_investigation.project
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload_other_investigation.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+
+    login_as(upload.contributor)
+
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload.id}
+    assert_response :success
+    assert_select "div#fair-data-station-update-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Queued/
+    end
+
+    # wrong investigation
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload_other_investigation.id}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # different person
+    other_person = FactoryBot.create(:person)
+    other_person.add_to_project_and_institution(upload.project, other_person.institutions.first)
+    other_person.save!
+    upload.update_column(:contributor_id, other_person.id)
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload.id}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # invalid id
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: FairDataStationUpload.last.id + 1}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # no permission
+    investigation = FactoryBot.create(:investigation, projects:[upload.project], policy: FactoryBot.create(:editing_public_policy))
+    assert investigation.can_edit?
+    refute investigation.can_manage?
+    get :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_redirected_to investigation_path(investigation)
+    assert_equal 'You are not authorized to manage this Investigation.', flash[:error]
+  end
+
   test 'can show and edit with deleted contributor' do
     investigation = FactoryBot.create(:investigation, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
     investigation.update_column(:contributor_id, nil)

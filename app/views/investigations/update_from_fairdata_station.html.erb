@@ -1,5 +1,7 @@
 <%= render partial: "general/page_title",locals: {title: "Update from FAIR Data Station for #{ t('investigation') } #{link_to(@investigation.title, @investigation)}".html_safe} %>
 
+<%= render partial: 'fair_data_station_update_statuses' %>
+
 <%= form_tag submit_fairdata_station_investigation_path(@investigation), multipart: true do %>
 
   <%= panel(t('fair_data_station.upload_file_label')) do %>

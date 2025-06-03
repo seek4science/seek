@@ -428,6 +428,8 @@ SEEK::Application.routes.draw do
       patch :manage_update
       get :update_from_fairdata_station
       post :submit_fairdata_station
+      get :fair_data_station_update_status
+      post :hide_fair_data_station_import_status
     end
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end

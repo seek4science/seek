@@ -13,6 +13,7 @@ class FairDataStationUpload < ApplicationRecord
   has_task :update
 
   scope :for_project_and_contributor, ->(project, contributor) { where project: project, contributor: contributor }
+  scope :for_investigation_and_contributor, ->(investigation, contributor) { where investigation: investigation, contributor: contributor }
   scope :show_status, -> { where show_status: true}
 
   def self.matching_imports_in_progress(project, external_id)
