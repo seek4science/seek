@@ -25,4 +25,10 @@ module InvestigationsHelper
     end
   end
 
+  def fair_data_station_investigation_updates_in_progress?(investigation, contributor)
+    fair_data_station_investigation_updates_to_show(investigation, contributor).any? do |upload|
+      upload.update_task.in_progress?
+    end
+  end
+
 end

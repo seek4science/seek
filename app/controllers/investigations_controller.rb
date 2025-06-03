@@ -48,7 +48,7 @@ class InvestigationsController < ApplicationController
         format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
       end
     elsif in_progress.any?
-      flash.now[:error] = "An #{t('investigation')} with that external identifier is currently already being updated for this #{t('project')}"
+      flash.now[:error] = "An existing update of this #{t('investigation')} is currently already in progress."
       respond_to do |format|
         format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
       end

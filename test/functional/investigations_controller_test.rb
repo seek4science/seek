@@ -1304,6 +1304,81 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'disable fair data station submit if currently in progress' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    login_as(upload.contributor)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input.disabled#datastation_data[type="file"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled[type="submit"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input.disabled#datastation_data[type="file"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled[type="submit"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_attribute(:show_status, false)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel', count: 0
+  end
+
   test 'submit from fair data station' do
     investigation = setup_test_case_investigation
     login_as(investigation.contributor)
@@ -1391,6 +1466,30 @@ class InvestigationsControllerTest < ActionController::TestCase
               assert_response :unprocessable_entity
               assert_match /Investigation external identifiers do not match/, flash[:error]
               assert_select 'div#error_flash', text: /Investigation external identifiers do not match/
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station already in progress' do
+    investigation = setup_test_case_investigation
+    upload = FactoryBot.create(:update_fair_data_station_upload, investigation: investigation,
+                               contributor: investigation.contributor, project: investigation.projects.first)
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
+              assert_response :unprocessable_entity
+              assert_match /An existing update of this Investigation is currently already in progress/, flash[:error]
+              assert_select 'div#error_flash', text: /An existing update of this Investigation is currently already in progress/
             end
           end
         end

@@ -3,7 +3,7 @@
   return if uploads.empty?
 %>
 
-<%= panel('Updates in progress or completed') do %>
+<%= panel('Updates in progress or completed', id:'fair-data-station-update-status-panel') do %>
   <div id='fair-data-station-updates'>
     <% uploads.each do |upload| %>
       <%= render partial: 'fair_data_station_update_status', locals: { upload: upload } %>

@@ -38,6 +38,9 @@
       <% elsif failed %>
         Failed. An administrator will have been notified of the problem, but you could try again.
         <%= fair_data_station_close_status_button(upload) %>
+        <script>
+          FairDataStation.reenableNewUpdateButtons();
+        </script>
       <% elsif success %>
         Completed
 
@@ -45,6 +48,9 @@
                     class: 'btn btn-primary') if upload.investigation %>
 
         <%= fair_data_station_close_status_button(upload) %>
+        <script>
+            FairDataStation.reenableNewUpdateButtons();
+        </script>
       <% end %>
     </div>
   <% end %>
