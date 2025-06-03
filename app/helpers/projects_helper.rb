@@ -128,26 +128,4 @@ module ProjectsHelper
     ProjectMembershipMessageLog.recent_requests(current_user.try(:person), project).first
   end
 
-  def fair_data_station_close_status_button(fair_data_station_upload, purpose)
-    extra_options = {}
-    if purpose.to_s == 'import'
-      extra_options = {'data-project_id': fair_data_station_upload.project.id, 'data-purpose':'import'}
-    elsif purpose.to_s == 'update'
-      extra_options = {'data-investigation_id': fair_data_station_upload.investigation.id, 'data-purpose':'update'}
-    else
-      raise 'Unknown Purpose for FDS upload'
-    end
-    content_tag(:button, {class: 'close close-status-button', 'aria-label': 'Close',
-                'data-upload_id': fair_data_station_upload.id}.merge(extra_options)) do
-      content_tag(:span, 'aria-hidden': true) do
-        '&times;'.html_safe
-      end
-    end
-  end
-
-  def fair_data_station_imports_to_show(project, contributor)
-    FairDataStationUpload.for_project_and_contributor(project, contributor).show_status.import_purpose.select do |upload|
-      upload.import_task.in_progress? || upload.import_task.completed?
-    end
-  end
 end
