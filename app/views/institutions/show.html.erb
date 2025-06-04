@@ -31,14 +31,16 @@
           <strong>Address: </strong><%= text_or_not_specified @institution.address, :address => true %>
         </p>
 
+        <% if other_departments(@institution).present? %>
           <p class="related-departments">
-            <strong>Other Departments: </strong>
-              <% Institution.where(title: @institution.title).where.not(department: @institution.department).each do |inst| %>
-                <div>
-                   <%= link_to(inst.full_title, inst) %>
-                </div>
-              <% end %>
+            <strong>Related Departments: </strong>
+            <% other_departments(@institution).each do |related_dep| %>
+              <div>
+                <%= link_to(related_dep.full_title, related_dep) %>
+              </div>
+            <% end %>
           </p>
+        <% end  %>
 
       </div>
 
