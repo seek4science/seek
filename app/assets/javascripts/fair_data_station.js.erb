@@ -42,5 +42,18 @@ const FairDataStation = {
         $j('input.disabled#datastation_data').popover('destroy');
         $j('input.disabled#datastation_data').removeAttr('onclick');
         $j('input.disabled#datastation_data').removeClass('disabled');
+    },
+    updateStatusPolling: function(endpointUrl, elementId, jobStatus) {
+        elementSelector = '#'+elementId;
+        setTimeout(function () {
+            $j.ajax(endpointUrl, {
+                    data: {'previous_status': jobStatus},
+                    success: function (html) {
+                        $j(elementSelector).replaceWith(html);
+                        FairDataStation.registerStatusCloseButtons(elementSelector);
+                    }
+                }
+            );
+        }, 5000);
     }
 };

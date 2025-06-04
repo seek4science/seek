@@ -24,16 +24,10 @@
         <%= job_status.to_s.humanize %>
         <%= image 'spinner' %>
         <script>
-            setTimeout(function () {
-                $j.ajax('<%= fair_data_station_update_status_investigation_path(upload.investigation, upload_id: upload.id) %>', {
-                        data: {'previous_status': '<%= job_status -%>'},
-                        success: function (html) {
-                            $j('#<%= element_id %>').replaceWith(html);
-                            FairDataStation.registerStatusCloseButtons('#<%= element_id %>');
-                        }
-                    }
-                );
-            }, 5000);
+          const endpoint = '<%= fair_data_station_update_status_investigation_path(upload.investigation, upload_id: upload.id) %>';
+          const elementId = '<%= element_id %>';
+          const jobStatus = '<%= job_status -%>';
+            FairDataStation.updateStatusPolling(endpoint,elementId, jobStatus);
         </script>
       <% elsif failed %>
         Failed. An administrator will have been notified of the problem, but you could try again.
