@@ -83,7 +83,7 @@
               </div>
             <% else %>
               <div>
-                They wish to be associated with <%= link_to(@institution.full_title, @institution) %>
+                They wish to be associated with <%= link_to(@institution.title, @institution) %>
               </div>
               <%= hidden_field_tag 'institution[id]',@institution.id %>
             <% end %>

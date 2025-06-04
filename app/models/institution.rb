@@ -25,10 +25,12 @@ class Institution < ApplicationRecord
   end if Seek::Config.solr_enabled
 
 
-  def full_title
-    return title unless department.present?
-
-    "#{department}, #{title}"
+  def title
+    if department.present?
+      "#{department}, #{super}"
+    else
+      super
+    end
   end
 
   def can_edit?(user = User.current_user)

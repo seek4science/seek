@@ -53,7 +53,6 @@ class InstitutionsControllerTest < ActionController::TestCase
 
     assert_redirected_to institution_path(assigns(:institution))
     assert_equal 'test', assigns(:institution).title
-    assert_equal 'test', assigns(:institution).full_title
 
     get :show, params: { id: assigns(:institution) }
     assert_select 'h1', text: 'test', count: 1
@@ -64,8 +63,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to institution_path(assigns(:institution))
-    assert_equal 'University of Manchester', assigns(:institution).title
-    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', assigns(:institution).full_title
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', assigns(:institution).title
     get :show, params: { id: assigns(:institution) }
     assert_select 'h1', text: 'Manchester Institute of Biotechnology, University of Manchester', count: 1
   end
@@ -79,9 +77,8 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to institution_path(assigns(:institution))
-    assert_equal 'Institution 1', assigns(:institution).title
     assert_equal 'Division 1', assigns(:institution).department
-    assert_equal 'Division 1, Institution 1', assigns(:institution).full_title
+    assert_equal 'Division 1, Institution 1', assigns(:institution).title
 
     get :show, params: { id: assigns(:institution) }
     assert_select 'h1', text: 'Division 1, Institution 1', count: 1
@@ -91,7 +88,6 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Institution 1', assigns(:institution).title
-    assert_equal 'Institution 1', assigns(:institution).full_title
 
     get :show, params: { id: assigns(:institution) }
     assert_select 'h1', text: 'Institution 1', count: 1
@@ -101,8 +97,7 @@ class InstitutionsControllerTest < ActionController::TestCase
       post :create, params: { institution: { title: 'Institution 1',department: 'Division 2' }}
     end
 
-    assert_equal 'Institution 1', assigns(:institution).title
-    assert_equal 'Division 2, Institution 1', assigns(:institution).full_title
+    assert_equal 'Division 2, Institution 1', assigns(:institution).title
 
     # If creating a new institution with a title and a department first,
     # it should still be possible to create another institution with the title but without a different department.
@@ -111,7 +106,6 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Institution 2', assigns(:institution).title
-    assert_equal 'Institution 2', assigns(:institution).full_title
 
     get :show, params: { id: assigns(:institution) }
     assert_select 'h1', text: 'Institution 2', count: 1
@@ -121,9 +115,8 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to institution_path(assigns(:institution))
-    assert_equal 'Institution 2', assigns(:institution).title
     assert_equal 'Division 2', assigns(:institution).department
-    assert_equal 'Division 2, Institution 2', assigns(:institution).full_title
+    assert_equal 'Division 2, Institution 2', assigns(:institution).title
 
     get :show, params: { id: assigns(:institution) }
     assert_select 'h1', text: 'Division 2, Institution 2', count: 1
@@ -166,7 +159,7 @@ class InstitutionsControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to institution_path(assigns(:institution))
-      assert_equal 'Harvard University', assigns(:institution).title
+      assert_equal 'Applied Mathematics, Harvard University', assigns(:institution).title
       assert_equal 'Applied Mathematics', assigns(:institution).department
 
       assert_difference('Institution.count') do
@@ -174,7 +167,7 @@ class InstitutionsControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to institution_path(assigns(:institution))
-      assert_equal 'Harvard University', assigns(:institution).title
+      assert_equal 'Computer Science, Harvard University', assigns(:institution).title
       assert_equal 'Computer Science', assigns(:institution).department
       assert_equal '03vek6s52', assigns(:institution).ror_id
 

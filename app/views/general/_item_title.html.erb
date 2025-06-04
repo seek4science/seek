@@ -6,7 +6,6 @@ avatar = favouritable_icon(version ? display_item : item, 120)
 title_prefix||=""
 title_postfix||=""
 title ||= item.title || ""
-title = item.full_title if item.respond_to?(:full_title)
 title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
 buttons_partial ||= nil
 col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
