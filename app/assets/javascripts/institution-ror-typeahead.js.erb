@@ -90,7 +90,7 @@ function rorQuerySource(query, processSync, processAsync) {
 function localSuggestionTemplate(data) {
     return `
         <div>
-            <strong>${data.text}</strong>
+            <strong>${data.department ? `${data.department}, ` : ''}${data.text}</strong>
             <small>${data.hint || ''}</small>
         </div>`;
 }
@@ -172,6 +172,7 @@ $j(document).ready(function () {
         // First Dataset: Local Institutions
         {
             name: 'institutions',
+            limit: 10,
             display: 'text', // Display the 'text' field in the dropdown
             source: function (query, syncResults, asyncResults) {
                 const bloodhound = initializeLocalInstitutions(query);
@@ -235,6 +236,7 @@ $j(document).ready(function () {
             $j('#institution_title').val(data.text);
             $j('#institution_id').val(data.id);
             $j('#institution_ror_id').val(data.ror_id);
+            $j('#institution_department').val(data.department);
             $j('#institution_city').val(data.city);
             $j('#institution_country').val(data.country);
             $j('#institution_web_page').val(data.web_page);
