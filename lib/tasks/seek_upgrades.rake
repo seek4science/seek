@@ -109,7 +109,6 @@ namespace :seek do
         puts "Error: #{e.message}. Ensure that the required 'Morpheus' records exist in the database."
         abort("Aborting task due to missing 'Morpheus' records.")
       end
-      model.save
       model.update_columns(model_format_id: model.model_format_id, recommended_environment_id: model.recommended_environment_id)
     end
   end
