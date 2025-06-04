@@ -8,9 +8,9 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:007_sample_attribute_types
     db:seed:003_model_formats
     db:seed:004_model_recommended_environments
+    db:seed:007_sample_attribute_types
     update_rdf
     update_observation_unit_policies
     fix_xlsx_marked_as_zip
@@ -96,17 +96,21 @@ namespace :seek do
 
   task(update_morpheus_model: [:environment]) do
     puts "... updating morpheus model"
-    Model.all.each do |model|
+    Model.find_each do |model|
       next unless model.is_morpheus_supported?
-      unless model.model_format
-        model.model_format = ModelFormat.find_by(title: 'Morpheus')
-      end
-      unless model.recommended_environment
-        model.recommended_environment = RecommendedModelEnvironment.find_by(title: 'Morpheus')
+      begin
+        unless model.model_format
+          model.model_format = ModelFormat.find_by!(title: 'Morpheus')
+        end
+        unless model.recommended_environment
+          model.recommended_environment = RecommendedModelEnvironment.find_by!(title: 'Morpheus')
+        end
+      rescue ActiveRecord::RecordNotFound => e
+        puts "Error: #{e.message}. Ensure that the required 'Morpheus' records exist in the database."
+        abort("Aborting task due to missing 'Morpheus' records.")
       end
       model.save
-      model.update_column(:model_format_id, model.model_format_id)
-      model.update_column(:recommended_environment_id, model.recommended_environment_id)
+      model.update_columns(model_format_id: model.model_format_id, recommended_environment_id: model.recommended_environment_id)
     end
   end
 
