@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class InvestigationsHelperTest < ActionView::TestCase
+class FairDataStationHelperTest < ActionView::TestCase
 
   test 'show_update_from_fair_data_station_button?' do
     person = FactoryBot.create(:person)
@@ -28,6 +28,5 @@ class InvestigationsHelperTest < ActionView::TestCase
     end
 
   end
-
 
 end

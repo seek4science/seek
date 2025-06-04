@@ -5204,7 +5204,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
-    assert_select 'div.fair-data-station-import-status', count: 0
+    assert_select 'div.fair-data-station-status', count: 0
 
 
     upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier:'the-ext-id')
@@ -5215,7 +5215,7 @@ class ProjectsControllerTest < ActionController::TestCase
     upload3.import_task.update_attribute(:status, Task::STATUS_QUEUED)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
-    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select 'div.fair-data-station-status', count: 1
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-info', text:/Queued/
       assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
@@ -5226,7 +5226,7 @@ class ProjectsControllerTest < ActionController::TestCase
     upload.import_task.update_attribute(:status, Task::STATUS_ACTIVE)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
-    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select 'div.fair-data-station-status', count: 1
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-info', text:/Active/
       assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
@@ -5237,7 +5237,7 @@ class ProjectsControllerTest < ActionController::TestCase
     upload.import_task.update_attribute(:status, Task::STATUS_FAILED)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
-    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select 'div.fair-data-station-status', count: 1
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-warning', text:/Failed. An administrator will have been notified of the problem, but you could try again./
       assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
@@ -5249,7 +5249,7 @@ class ProjectsControllerTest < ActionController::TestCase
     upload.update_attribute(:investigation_id, FactoryBot.create(:investigation, contributor: person).id)
     get :import_from_fairdata_station, params: {id: project}
     assert_response :success
-    assert_select 'div.fair-data-station-import-status', count: 1
+    assert_select 'div.fair-data-station-status', count: 1
     assert_select "div#fair-data-station-import-#{upload.id}" do
       assert_select 'div.alert-success', text:/Completed/ do
         assert_select 'a.btn-primary[href=?]', investigation_path(upload.investigation), text:/View imported Investigation/
