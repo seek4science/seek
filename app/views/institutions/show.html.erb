@@ -30,6 +30,16 @@
         <p class="address">
           <strong>Address: </strong><%= text_or_not_specified @institution.address, :address => true %>
         </p>
+
+          <p class="related-departments">
+            <strong>Other Departments: </strong>
+              <% Institution.where(title: @institution.title).where.not(department: @institution.department).each do |inst| %>
+                <div>
+                   <%= link_to(inst.full_title, inst) %>
+                </div>
+              <% end %>
+          </p>
+
       </div>
 
       <div class="col-md-3 col-sm-4">
