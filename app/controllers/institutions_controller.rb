@@ -92,6 +92,7 @@ class InstitutionsController < ApplicationController
     items = results.map do |institution|
       { id: institution.id,
         text: institution.title,
+        department: institution.department,
         ror_id: institution.ror_id,
         web_page: institution.web_page,
         city: institution.city,
@@ -148,7 +149,7 @@ class InstitutionsController < ApplicationController
   private
 
   def institution_params
-    params.require(:institution).permit(:title, :web_page, :address, :city, :country, :ror_id,
+    params.require(:institution).permit(:title, :web_page, :address, :city, :country, :ror_id, :department,
                                         discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

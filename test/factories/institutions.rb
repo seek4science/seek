@@ -12,6 +12,7 @@ FactoryBot.define do
   
   factory(:max_institution, class: Institution) do
     title { "University of Manchester" }
+    department { "Manchester Institute of Biotechnology" }
     country { "GB" }
     city { "Manchester" }
     ror_id { "027m9bs27" }

@@ -35,6 +35,11 @@
 </div>
 
 <div class="form-group">
+  <label class="control-label">Department</label>
+  <%= text_field_tag('institution[department]', @institution.department, class:'form-control') %>
+</div>
+
+<div class="form-group">
   <label class="control-label">Website</label>
   <%= text_field_tag('institution[web_page]', @institution.web_page, class:'form-control') %>
 </div>

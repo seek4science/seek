@@ -1,6 +1,6 @@
 class InstitutionSerializer < AvatarObjSerializer
   include CountryCodes
-  attributes :title, :ror_id, :country
+  attributes :title, :department, :ror_id, :country
 
   attribute :country_code do
     object.country

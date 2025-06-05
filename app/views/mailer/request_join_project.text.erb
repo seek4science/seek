@@ -6,12 +6,14 @@ The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url
 <% if @institution.id.nil? %>
   <%
     title = @institution.title.blank? ? 'No title provided' : @institution.title
+    department = @institution.department.blank? ? 'No department provided' : @institution.department
     web_page = @institution.web_page.blank? ? 'No web page provided' : @institution.web_page
     country = @institution.country.blank? ? 'No country provided' : CountryCodes.country(@institution.country)
 
   %>
 They provided the following details about their <%= t('institution') %>:
   <%= t('institution') %> title: '<%= title %>'
+  <%= t('institution') %> department: '<%= department %>'
   <%= t('institution') %> web page: '<%= web_page %>'
   <%= t('institution') %> country: '<%= country %>'
 <% else %>

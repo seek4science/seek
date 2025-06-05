@@ -52,6 +52,15 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal('an institution', i.title)
   end
 
+  test 'title combines title and department correctly' do
+
+    assert_equal 'Science, University', FactoryBot.create(:institution, title: 'University', department: 'Science').title
+    assert_equal 'University', FactoryBot.create(:institution, title: 'University', department: '').title
+    assert_equal 'University', FactoryBot.create(:institution, title: 'University', department: nil).title
+    assert_equal 'A Minimal Institution', FactoryBot.create(:min_institution).title
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', FactoryBot.create(:max_institution).title
+  end
+
   def test_update_first_letter
     i = FactoryBot.create(:institution, title: 'an institution', country: 'NL')
     assert_equal 'A', i.first_letter

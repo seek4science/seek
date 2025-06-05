@@ -14,6 +14,7 @@ module Seek
 
     module InstanceMethods
       def trim_title
+        title = self[:title]
         self.title = title.strip if has_attribute?(:title) && title
       end
     end
