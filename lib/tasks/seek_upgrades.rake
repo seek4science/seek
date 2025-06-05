@@ -107,14 +107,20 @@ namespace :seek do
           model.recommended_environment = RecommendedModelEnvironment.find_by!(title: 'Morpheus')
         end
       rescue ActiveRecord::RecordNotFound => e
-        puts "Error: #{e.message}. Ensure that the required 'Morpheus' records exist in the database."
-        abort("Aborting task due to missing 'Morpheus' records.")
+        error_message = "Error: #{e.message}. Ensure that the required 'Morpheus' records exist in the database."
+        puts error_message
+        errors << error_message
+        next
       end
       model.update_columns(model_format_id: model.model_format_id, recommended_environment_id: model.recommended_environment_id)
       affected_models << model
     end
     ReindexingQueue.enqueue(affected_models)
     puts "... reindexing job triggered for #{affected_models.count} models"
+    unless errors.empty?
+      puts "The following errors were encountered during the update:"
+      errors.each { |error| puts error }
+    end
   end
 
   task(add_policies_to_existing_sample_types: [:environment]) do
