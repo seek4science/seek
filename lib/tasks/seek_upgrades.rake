@@ -97,6 +97,7 @@ namespace :seek do
   task(update_morpheus_model: [:environment]) do
     puts "... updating morpheus model"
     affected_models = []
+    errors = []
     Model.find_each do |model|
       next unless model.is_morpheus_supported?
       begin
