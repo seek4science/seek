@@ -96,6 +96,7 @@ namespace :seek do
 
   task(update_morpheus_model: [:environment]) do
     puts "... updating morpheus model"
+    affected_models = []
     Model.find_each do |model|
       next unless model.is_morpheus_supported?
       begin
@@ -110,7 +111,10 @@ namespace :seek do
         abort("Aborting task due to missing 'Morpheus' records.")
       end
       model.update_columns(model_format_id: model.model_format_id, recommended_environment_id: model.recommended_environment_id)
+      affected_models << model
     end
+    ReindexingQueue.enqueue(affected_models)
+    puts "... reindexing job triggered for #{affected_models.count} models"
   end
 
   task(add_policies_to_existing_sample_types: [:environment]) do
