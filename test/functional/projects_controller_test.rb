@@ -2237,7 +2237,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
         project: { title: 'The Project', description:'description', web_page:'web_page'},
-        institution: { title: institution_existing.title, department:'Manchester Institute of Biotechnology' },
+        institution: { title: institution_existing[:title], department:'Manchester Institute of Biotechnology' },
         programme_id: '',
         programme: {title: 'the prog'}
       }
@@ -3028,7 +3028,8 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'a', text: 'Manchester Institute of Biotechnology, University of Manchester'
       assert_select 'div', /They wish to be associated with/
     end
-    institution2 = Institution.new(title: institution_existing.title,department:'Manchester Institute of Biotechnology')
+
+    institution2 = Institution.new(title: institution_existing[:title], department:'Manchester Institute of Biotechnology')
     log2 = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution2)
     get :administer_create_project_request, params:{message_log_id:log2.id}
 

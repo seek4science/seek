@@ -1109,7 +1109,7 @@ class ProjectsController < ApplicationController
     @people = details.people
     if @institution&.new_record?
       existing_institution = Institution.find_by(ror_id: @institution.ror_id, department: @institution.department.presence) ||
-        Institution.find_by(title: @institution.title, department: @institution.department.presence)
+        Institution.find_by(title: @institution[:title], department: @institution.department.presence)
       @institution = existing_institution if existing_institution
     end
 
