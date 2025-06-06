@@ -59,7 +59,8 @@ class FairDataStationHelperTest < ActionView::TestCase
     FactoryBot.create(:fair_data_station_upload, project: other_project, contributor: contributor).import_task.update_attribute(:status, Task::STATUS_QUEUED)
 
     # wrong purpose
-    FactoryBot.create(:fair_data_station_upload, project: project, contributor: contributor, purpose: :update).import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    investigation = FactoryBot.create(:investigation, contributor: contributor, projects:[project])
+    FactoryBot.create(:fair_data_station_upload, project: project, contributor: contributor, investigation:investigation, purpose: :update).import_task.update_attribute(:status, Task::STATUS_QUEUED)
 
     # wrong task status
     FactoryBot.create(:fair_data_station_upload, project: project, contributor: contributor).import_task.update_attribute(:status, Task::STATUS_WAITING)
@@ -95,7 +96,7 @@ class FairDataStationHelperTest < ActionView::TestCase
     FactoryBot.create(:update_fair_data_station_upload, contributor: contributor, investigation: other_inv).update_task.update_attribute(:status, Task::STATUS_QUEUED)
 
     # wrong purpose
-    FactoryBot.create(:update_fair_data_station_upload, contributor: contributor, investigation: investigation, purpose: :import).update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    FactoryBot.create(:update_fair_data_station_upload, contributor: contributor, project:investigation.projects.first, investigation: investigation, purpose: :import).update_task.update_attribute(:status, Task::STATUS_QUEUED)
 
     # wrong task status
     FactoryBot.create(:update_fair_data_station_upload, contributor: contributor, investigation: investigation).update_task.update_attribute(:status, Task::STATUS_WAITING)

@@ -13,8 +13,10 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
     item.contributor = person
     assert item.valid?
 
+    # import purpose needs project
+
     item.project = nil
-    assert item.valid?
+    refute item.valid?
     item.project = FactoryBot.create(:project)
     refute item.valid?
     item.project = person.projects.first
@@ -22,8 +24,19 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
 
     item.purpose = nil
     refute item.valid?
-    item.purpose = :update
+    item.purpose = :import
     assert item.valid?
+
+    item.content_blob = nil
+    refute item.valid?
+
+    # update purpose needs investigation that can_manage?
+
+    item = FairDataStationUpload.new(contributor: person,
+                              content_blob: FactoryBot.create(:content_blob), purpose: :update)
+
+    assert_nil item.investigation
+    refute item.valid?
 
     item.investigation = FactoryBot.create(:investigation, policy: FactoryBot.build(:private_policy))
     refute item.investigation.can_manage?(item.contributor)
@@ -34,9 +47,6 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
     item.investigation = FactoryBot.create(:investigation, contributor: item.contributor)
     assert item.investigation.can_manage?(item.contributor)
     assert item.valid?
-
-    item.content_blob = nil
-    refute item.valid?
 
   end
 
@@ -80,7 +90,8 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
       :status, Task::STATUS_QUEUED
     )
     # different purpose
-    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier: 'test-id', purpose: :update).import_task.update_attribute(
+    investigation = FactoryBot.create(:investigation, contributor: person, projects:[project])
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation:investigation, investigation_external_identifier: 'test-id', purpose: :update).import_task.update_attribute(
       :status, Task::STATUS_QUEUED
     )
     # different project

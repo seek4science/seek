@@ -9,6 +9,7 @@ class FairDataStationUpload < ApplicationRecord
   validates :contributor, :content_blob, :purpose, presence: true
   validate :validate_project_membership
   validate :validate_can_manage_investigation
+  validate :validate_for_purpose
 
   has_task :import
   has_task :update
@@ -42,5 +43,18 @@ class FairDataStationUpload < ApplicationRecord
   def validate_can_manage_investigation
     return if investigation.nil? || investigation.can_manage?(contributor)
     errors.add(:contributor, "must be able to manage the #{I18n.t('investigation')}")
+  end
+
+  def validate_for_purpose
+    if import_purpose?
+      if project.blank?
+        errors.add(:project, "must not be blank")
+      end
+    end
+    if update_purpose?
+      if investigation.blank?
+        errors.add(:investigation, "must not be blank")
+      end
+    end
   end
 end

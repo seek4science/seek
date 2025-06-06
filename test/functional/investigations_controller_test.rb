@@ -1569,10 +1569,13 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'hide_fair_data_station_update_status wrong purpose' do
-    upload = FactoryBot.create(:update_fair_data_station_upload, purpose: :import)
+    upload = FactoryBot.create(:fair_data_station_upload)
     upload.update_task.update_attribute(:status, Task::STATUS_DONE)
     person = upload.contributor
-    investigation = upload.investigation
+    investigation = FactoryBot.create(:investigation, contributor:person, projects:[upload.project])
+    upload.investigation = investigation
+    upload.save!
+    assert upload.import_purpose?
     assert upload.show_status?
     login_as(person)
     post :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
