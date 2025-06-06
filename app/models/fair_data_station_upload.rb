@@ -15,8 +15,11 @@ class FairDataStationUpload < ApplicationRecord
   has_task :update
 
   scope :for_project_and_contributor, ->(project, contributor) { where project: project, contributor: contributor }
-  scope :for_investigation_and_contributor, ->(investigation, contributor) { where investigation: investigation, contributor: contributor }
-  scope :show_status, -> { where show_status: true}
+  scope :for_investigation_and_contributor, ->(investigation, contributor){
+    where investigation: investigation, contributor: contributor
+  }
+
+  scope :show_status, -> { where show_status: true }
 
   def self.matching_imports_in_progress(project, external_id)
     FairDataStationUpload.import_purpose.where(investigation_external_identifier: external_id,
@@ -42,19 +45,15 @@ class FairDataStationUpload < ApplicationRecord
 
   def validate_can_manage_investigation
     return if investigation.nil? || investigation.can_manage?(contributor)
+
     errors.add(:contributor, "must be able to manage the #{I18n.t('investigation')}")
   end
 
   def validate_for_purpose
-    if import_purpose?
-      if project.blank?
-        errors.add(:project, "must not be blank for an import")
-      end
-    end
-    if update_purpose?
-      if investigation.blank?
-        errors.add(:investigation, "must not be blank for an update")
-      end
-    end
+    errors.add(:project, 'must not be blank for an import') if import_purpose? && project.blank?
+    return unless update_purpose?
+    return unless investigation.blank?
+
+    errors.add(:investigation, 'must not be blank for an update')
   end
 end

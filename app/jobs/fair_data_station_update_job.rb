@@ -13,7 +13,8 @@ class FairDataStationUpdateJob < TaskJob
 
     User.with_current_user(person) do
       Investigation.transaction do
-        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, fair_data_station_inv, person, investigation.projects, investigation.policy)
+        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, fair_data_station_inv, person,
+                                                                     investigation.projects, investigation.policy)
         investigation.save!
       end
     end

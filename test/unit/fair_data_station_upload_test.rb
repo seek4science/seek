@@ -33,7 +33,7 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
     # update purpose needs investigation that can_manage?
 
     item = FairDataStationUpload.new(contributor: person,
-                              content_blob: FactoryBot.create(:content_blob), purpose: :update)
+                                     content_blob: FactoryBot.create(:content_blob), purpose: :update)
 
     assert_nil item.investigation
     refute item.valid?
@@ -47,7 +47,6 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
     item.investigation = FactoryBot.create(:investigation, contributor: item.contributor)
     assert item.investigation.can_manage?(item.contributor)
     assert item.valid?
-
   end
 
   test 'for_project_and_contributor scope' do
@@ -90,8 +89,8 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
       :status, Task::STATUS_QUEUED
     )
     # different purpose
-    investigation = FactoryBot.create(:investigation, contributor: person, projects:[project])
-    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation:investigation, investigation_external_identifier: 'test-id', purpose: :update).import_task.update_attribute(
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: [project])
+    FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation: investigation, investigation_external_identifier: 'test-id', purpose: :update).import_task.update_attribute(
       :status, Task::STATUS_QUEUED
     )
     # different project
@@ -118,17 +117,18 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
   test 'matching updates in progress' do
     investigation = FactoryBot.create(:investigation, external_identifier: 'test-id')
     person = investigation.contributor
-    investigation2 = FactoryBot.create(:investigation, external_identifier: 'test-id', contributor: person, projects:[FactoryBot.create(:project)])
+    investigation2 = FactoryBot.create(:investigation, external_identifier: 'test-id', contributor: person,
+                                                       projects: [FactoryBot.create(:project)])
     project = investigation.projects.first
 
     upload = FactoryBot.create(:update_fair_data_station_upload, contributor: person,
-                               investigation_external_identifier: 'test-id', investigation: investigation)
+                                                                 investigation_external_identifier: 'test-id', investigation: investigation)
     upload.update_task.update_attribute(:status, Task::STATUS_WAITING)
     upload2 = FactoryBot.create(:update_fair_data_station_upload, contributor: person,
-                                investigation_external_identifier: 'test-id', investigation: investigation)
+                                                                  investigation_external_identifier: 'test-id', investigation: investigation)
     upload2.update_task.update_attribute(:status, Task::STATUS_QUEUED)
     upload3 = FactoryBot.create(:update_fair_data_station_upload, contributor: person,
-                                investigation_external_identifier: 'test-id', investigation: investigation)
+                                                                  investigation_external_identifier: 'test-id', investigation: investigation)
     upload3.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
 
     # different identifier

@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class FairDataStationUpdateJobTest < ActiveSupport::TestCase
-
   test 'queue' do
     upload_record = FactoryBot.create :update_fair_data_station_upload
     assert_enqueued_jobs(1, only: FairDataStationUpdateJob) do
@@ -21,7 +20,7 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
         assert_difference('ObservationUnit.count', 1) do
           assert_difference('Sample.count', 1) do
             assert_difference('Assay.count', 1) do
-              assert_difference('ActivityLog.count',18) do
+              assert_difference('ActivityLog.count', 18) do
                 FairDataStationUpdateJob.perform_now(upload)
               end
             end
@@ -35,7 +34,8 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
     investigation = setup_test_case_investigation
     person = investigation.contributor
 
-    upload = FactoryBot.create(:invalid_update_fair_data_station_upload, contributor: person, investigation: investigation)
+    upload = FactoryBot.create(:invalid_update_fair_data_station_upload, contributor: person,
+                                                                         investigation: investigation)
     assert_no_difference('Investigation.count') do
       assert_no_difference('Study.count') do
         assert_no_difference('ObservationUnit.count') do
@@ -54,14 +54,14 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
     assert_equal 'test seek sample 1', Sample.by_external_identifier('seek-test-sample-1', investigation.projects).title
 
     # this may have changed in an update before the error, so this checks the transaction is behaving correctly and rolling back
-    assert_equal 'test obs unit 1', ObservationUnit.by_external_identifier('seek-test-obs-unit-1', investigation.projects).title
+    assert_equal 'test obs unit 1',
+                 ObservationUnit.by_external_identifier('seek-test-obs-unit-1', investigation.projects).title
 
     upload.reload
     assert upload.update_task.failed?
     assert_equal "ActiveRecord::RecordInvalid: Validation failed: Title can't be blank, Title is required",
                  upload.update_task.error_message
     assert_match(/block in _perform_job/, upload.update_task.exception)
-
   end
 
   def setup_test_case_investigation
@@ -84,5 +84,4 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
     assert_equal 'seek-test-investigation', investigation.external_identifier
     investigation
   end
-
 end
