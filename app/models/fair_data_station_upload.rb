@@ -48,12 +48,12 @@ class FairDataStationUpload < ApplicationRecord
   def validate_for_purpose
     if import_purpose?
       if project.blank?
-        errors.add(:project, "must not be blank")
+        errors.add(:project, "must not be blank for an import")
       end
     end
     if update_purpose?
       if investigation.blank?
-        errors.add(:investigation, "must not be blank")
+        errors.add(:investigation, "must not be blank for an update")
       end
     end
   end
