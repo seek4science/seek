@@ -1398,7 +1398,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     fds_upload = FairDataStationUpload.last
     assert fds_upload.update_purpose?
     assert_equal investigation.contributor, fds_upload.contributor
-    assert_equal investigation.projects.first, fds_upload.project
     assert_equal investigation,  fds_upload.investigation
     assert_equal 'seek-test-investigation', fds_upload.investigation_external_identifier
     content_blob = fds_upload.content_blob
@@ -1476,7 +1475,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'submit from fair data station already in progress' do
     investigation = setup_test_case_investigation
     upload = FactoryBot.create(:update_fair_data_station_upload, investigation: investigation,
-                               contributor: investigation.contributor, project: investigation.projects.first)
+                               investigation_external_identifier: investigation.external_identifier,
+                               contributor: investigation.contributor)
     upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
     login_as(investigation.contributor)
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
@@ -1499,10 +1499,9 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test 'fair_data_station_update_status' do
     upload = FactoryBot.create(:update_fair_data_station_upload)
-    upload_other_investigation = FactoryBot.create(:update_fair_data_station_upload, contributor: upload.contributor, project: upload.project)
+    upload_other_investigation = FactoryBot.create(:update_fair_data_station_upload, contributor: upload.contributor)
     refute_equal upload.investigation, upload_other_investigation.investigation
     assert_equal upload.contributor, upload_other_investigation.contributor
-    assert_equal upload.project, upload_other_investigation.project
     upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
     upload_other_investigation.update_task.update_attribute(:status, Task::STATUS_QUEUED)
 
@@ -1521,12 +1520,11 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     # different person
     other_person = FactoryBot.create(:person)
-    other_person.add_to_project_and_institution(upload.project, other_person.institutions.first)
-    other_person.save!
     upload.update_column(:contributor_id, other_person.id)
     get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload.id}
     assert_response :forbidden
     assert_empty @response.body
+    upload.update_column(:contributor_id, upload.contributor.id)
 
     # invalid id
     get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: FairDataStationUpload.last.id + 1}
@@ -1534,7 +1532,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty @response.body
 
     # no permission
-    investigation = FactoryBot.create(:investigation, projects:[upload.project], policy: FactoryBot.create(:editing_public_policy))
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:editing_public_policy))
     assert investigation.can_edit?
     refute investigation.can_manage?
     get :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
@@ -1577,14 +1575,14 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation = upload.investigation
     assert upload.show_status?
     login_as(person)
-    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    post :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
     assert_response :forbidden
     upload.reload
     assert upload.show_status?
   end
 
   test 'hide_fair_data_station_update_status not finished' do
-    upload = FactoryBot.create(:update_fair_data_station_upload, purpose: :import)
+    upload = FactoryBot.create(:update_fair_data_station_upload)
     upload.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
     person = upload.contributor
     investigation = upload.investigation

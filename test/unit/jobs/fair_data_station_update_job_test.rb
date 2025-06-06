@@ -14,9 +14,8 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
   test 'perform' do
     investigation = setup_test_case_investigation
     person = investigation.contributor
-    project = investigation.projects.first
 
-    upload = FactoryBot.create(:update_fair_data_station_upload, contributor: person, project: project, investigation: investigation)
+    upload = FactoryBot.create(:update_fair_data_station_upload, contributor: person, investigation: investigation)
     assert_no_difference('Investigation.count') do
       assert_difference('Study.count', 1) do
         assert_difference('ObservationUnit.count', 1) do
@@ -35,9 +34,8 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
   test 'record errors' do
     investigation = setup_test_case_investigation
     person = investigation.contributor
-    project = investigation.projects.first
 
-    upload = FactoryBot.create(:invalid_update_fair_data_station_upload, contributor: person, project: project, investigation: investigation)
+    upload = FactoryBot.create(:invalid_update_fair_data_station_upload, contributor: person, investigation: investigation)
     assert_no_difference('Investigation.count') do
       assert_no_difference('Study.count') do
         assert_no_difference('ObservationUnit.count') do

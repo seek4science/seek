@@ -6,8 +6,9 @@ class FairDataStationUpload < ApplicationRecord
   belongs_to :contributor, class_name: 'Person'
   enum :purpose, %i[import update], suffix: true
 
-  validates :contributor, :content_blob, :project, :purpose, presence: true
+  validates :contributor, :content_blob, :purpose, presence: true
   validate :validate_project_membership
+  validate :validate_can_manage_investigation
 
   has_task :import
   has_task :update
@@ -33,8 +34,13 @@ class FairDataStationUpload < ApplicationRecord
   private
 
   def validate_project_membership
-    return if contributor&.member_of?(project)
+    return if project.nil? || contributor&.member_of?(project)
 
-    errors.add("must be a member of the #{t('project')}")
+    errors.add(:contributor, "must be a member of the #{I18n.t('project')}")
+  end
+
+  def validate_can_manage_investigation
+    return if investigation.nil? || investigation.can_manage?(contributor)
+    errors.add(:contributor, "must be able to manage the #{I18n.t('investigation')}")
   end
 end

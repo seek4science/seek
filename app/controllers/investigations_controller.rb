@@ -57,7 +57,7 @@ class InvestigationsController < ApplicationController
     else
       content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
                                      original_filename: params[:datastation_data].original_filename)
-      fair_data_station_upload = FairDataStationUpload.new(project: @investigation.projects.first, contributor: current_person,
+      fair_data_station_upload = FairDataStationUpload.new(contributor: current_person,
                                                            investigation: @investigation,
                                                            investigation_external_identifier: fair_data_station_inv.external_id,
                                                            purpose: :update, content_blob: content_blob

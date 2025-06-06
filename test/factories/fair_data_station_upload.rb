@@ -22,13 +22,16 @@ FactoryBot.define do
     content_blob { FactoryBot.build(:copasi_content_blob)}
   end
 
-  factory(:update_fair_data_station_upload, parent: :fair_data_station_upload) do
+  factory(:update_fair_data_station_upload, class: FairDataStationUpload) do
     purpose { :update }
-    policy { nil }
     content_blob { FactoryBot.build(:fair_data_station_test_case_modified_content_blob)}
+    investigation_external_identifier { 'seek-test-investigation' }
     after(:build) do |resource|
+      if resource.contributor.blank?
+        resource.contributor = FactoryBot.create(:person)
+      end
       if resource.investigation.blank?
-        resource.investigation = FactoryBot.create(:investigation, contributor: resource.contributor, projects: [resource.project])
+        resource.investigation = FactoryBot.create(:investigation, contributor: resource.contributor, projects: [resource.contributor.projects.first])
       end
     end
   end
