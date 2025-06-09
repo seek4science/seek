@@ -24,7 +24,8 @@ class ProjectsController < ApplicationController
                                                asset_report populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request
-                                               import_from_fairdata_station submit_fairdata_station]
+                                               import_from_fairdata_station submit_fairdata_station
+                                               fair_data_station_import_status hide_fair_data_station_import_status]
 
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
@@ -34,7 +35,8 @@ class ProjectsController < ApplicationController
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
-  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station], unless: :admin_logged_in?
+  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station,
+                                                :fair_data_station_import_status, :hide_fair_data_station_import_status], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
@@ -207,21 +209,59 @@ class ProjectsController < ApplicationController
     policy.set_attributes_with_sharing(policy_params)
     fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
+    in_progress = FairDataStationUpload.matching_imports_in_progress(@project, fair_data_station_inv.external_id)
 
     if @existing_investigation
       flash.now[:error] = "An #{t('investigation')} with that external identifier already exists for this #{t('project')}"
       respond_to do |format|
         format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
       end
-    else
-      @investigation = Seek::FairDataStation::Writer.new.construct_isa(fair_data_station_inv, current_person, [@project], policy)
-      @investigation.save!
-
+    elsif in_progress.any?
+      flash.now[:error] = "An #{t('investigation')} with that external identifier is currently already being imported for this #{t('project')}"
       respond_to do |format|
-        format.html { redirect_to(@investigation) }
+        format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
       end
+    else
+      content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
+                                     original_filename: params[:datastation_data].original_filename)
+      fair_data_station_upload = FairDataStationUpload.new(project: @project, contributor: current_person,
+                                                            investigation_external_identifier: fair_data_station_inv.external_id,
+                                                            policy: policy, purpose: :import,
+                                                            content_blob: content_blob
+                                                            )
+      fair_data_station_upload.save!
+      FairDataStationImportJob.new(fair_data_station_upload).queue_job
+      redirect_to import_from_fairdata_station_project_path(@project)
     end
 
+  end
+
+  def fair_data_station_import_status
+    upload = FairDataStationUpload.for_project_and_contributor(@project, current_person).import_purpose.where(id: params[:upload_id]).first
+    if upload
+      job_status = upload.import_task.status
+      respond_to do |format|
+        format.html { render partial: 'fair_data_station_import_status', locals: { upload: upload, job_status: job_status } }
+      end
+    else
+      respond_to do |format|
+        format.html { render plain:'', status: :forbidden }
+      end
+    end
+  end
+
+  def hide_fair_data_station_import_status
+    upload = FairDataStationUpload.for_project_and_contributor(@project, current_person).import_purpose.where(id: params[:upload_id]).first
+    if upload && (upload.import_task.completed? || upload.import_task.cancelled?)
+      upload.update_attribute(:show_status, false)
+      respond_to do |format|
+        format.html { render plain:'' }
+      end
+    else
+      respond_to do |format|
+        format.html { render plain:'', status: :forbidden }
+      end
+    end
   end
 
   def request_create

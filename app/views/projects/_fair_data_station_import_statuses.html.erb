@@ -1,0 +1,17 @@
+<%
+  uploads = fair_data_station_imports_to_show(project, contributor)
+  return if uploads.empty?
+%>
+<%= panel('Imports in progress or completed') do %>
+  <div id='fair-data-station-imports'>
+    <% uploads.each do |upload| %>
+      <%= render partial: 'fair_data_station_import_status', locals: { upload: upload } %>
+    <% end %>
+  </div>
+<% end %>
+
+<script>
+  $j(document).ready( function () {
+     FairDataStation.registerStatusCloseButtons('div#fair-data-station-imports');
+  });
+</script>

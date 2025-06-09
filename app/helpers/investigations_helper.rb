@@ -11,11 +11,8 @@ module InvestigationsHelper
     end
   end
 
-  def show_update_from_fair_data_station_button?(investigation)
-    Seek::Config.fair_data_station_enabled && investigation.external_identifier.present? && investigation.can_manage?
-  end
-
   def authorised_investigations(projects = nil)
     authorised_assets(Investigation, projects, 'view')
   end
+
 end

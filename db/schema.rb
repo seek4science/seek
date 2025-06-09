@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -676,6 +676,19 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.integer "failures", default: 0
     t.index ["seek_entity_type", "seek_entity_id"], name: "index_external_assets_on_seek_entity_type_and_seek_entity_id"
     t.index ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id"
+  end
+
+  create_table "fair_data_station_uploads", force: :cascade do |t|
+    t.bigint "contributor_id"
+    t.bigint "project_id"
+    t.bigint "investigation_id"
+    t.bigint "content_blob_id"
+    t.bigint "policy_id"
+    t.string "investigation_external_identifier", limit: 2048
+    t.integer "purpose", limit: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "show_status", default: true
   end
 
   create_table "favourite_group_memberships", id: :integer, force: :cascade do |t|
@@ -2153,6 +2166,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "exception"
+    t.text "error_message"
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 

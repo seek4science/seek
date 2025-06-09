@@ -127,4 +127,5 @@ module ProjectsHelper
     return nil if project.has_member?(current_user)
     ProjectMembershipMessageLog.recent_requests(current_user.try(:person), project).first
   end
+
 end
