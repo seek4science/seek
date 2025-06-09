@@ -176,7 +176,7 @@ module Seek
               unless expr.respond_to?(:relation) && expr.relation == items.arel_table
                 columns << expr
               end
-            else
+            elsif !ordering.is_a?(Arel::Nodes::SqlLiteral)
               columns << ordering
             end
           end
