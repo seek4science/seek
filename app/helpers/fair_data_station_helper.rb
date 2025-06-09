@@ -17,17 +17,21 @@ module FairDataStationHelper
   end
 
   def fair_data_station_imports_to_show(project, contributor)
-    FairDataStationUpload.for_project_and_contributor(project,
-                                                      contributor).show_status.import_purpose.select do |upload|
-      upload.import_task.in_progress? || upload.import_task.completed?
-    end
+    FairDataStationUpload.import_purpose
+                         .joins(:import_task)
+                         .for_project_and_contributor(project, contributor)
+                         .show_status
+                         .where(tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_DONE,
+                                                  Task::STATUS_FAILED] })
   end
 
   def fair_data_station_investigation_updates_to_show(investigation, contributor)
-    FairDataStationUpload.for_investigation_and_contributor(investigation,
-                                                            contributor).show_status.update_purpose.select do |upload|
-      upload.update_task.in_progress? || upload.update_task.completed?
-    end
+    FairDataStationUpload.update_purpose
+                         .joins(:update_task)
+                         .for_investigation_and_contributor(investigation, contributor)
+                         .show_status
+                         .where(tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_DONE,
+                                                  Task::STATUS_FAILED] })
   end
 
   def fair_data_station_investigation_updates_in_progress?(investigation, contributor)

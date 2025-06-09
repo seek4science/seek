@@ -15,24 +15,26 @@ class FairDataStationUpload < ApplicationRecord
   has_task :update
 
   scope :for_project_and_contributor, ->(project, contributor) { where project: project, contributor: contributor }
-  scope :for_investigation_and_contributor, ->(investigation, contributor){
+  scope :for_investigation_and_contributor, lambda { |investigation, contributor|
     where investigation: investigation, contributor: contributor
   }
 
   scope :show_status, -> { where show_status: true }
 
   def self.matching_imports_in_progress(project, external_id)
-    FairDataStationUpload.import_purpose.where(investigation_external_identifier: external_id,
-                                               project: project).select do |upload|
-      upload.import_task.in_progress? || upload.import_task.waiting?
-    end
+    FairDataStationUpload.import_purpose
+                         .joins(:import_task)
+                         .where(investigation_external_identifier: external_id,
+                                project: project,
+                                tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_WAITING] })
   end
 
   def self.matching_updates_in_progress(investigation, external_id)
-    FairDataStationUpload.update_purpose.where(investigation_external_identifier: external_id,
-                                               investigation: investigation).select do |upload|
-      upload.update_task.in_progress? || upload.update_task.waiting?
-    end
+    FairDataStationUpload.update_purpose
+                         .joins(:update_task)
+                         .where(investigation_external_identifier: external_id,
+                                investigation: investigation,
+                                tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_WAITING] })
   end
 
   private
