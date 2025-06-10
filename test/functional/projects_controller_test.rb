@@ -2204,7 +2204,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, nil) do
       params = {
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: [institution.id]}
+        institution: {id: institution.id}
       }
       assert_enqueued_emails(0) do
         assert_difference('ProjectCreationMessageLog.count',1) do
@@ -2237,7 +2237,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
         project: { title: 'The Project', description:'description', web_page:'web_page'},
-        institution: { title: institution_existing.title},
+        institution: { title: institution_existing[:title], department:'Manchester Institute of Biotechnology' },
         programme_id: '',
         programme: {title: 'the prog'}
       }
@@ -2256,11 +2256,15 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       assert flash[:notice]
 
-      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
-
+      assert_select 'p' do
+        assert_select 'a', text: 'Manchester Institute of Biotechnology, University of Manchester'
+        assert_select 'p', /You have indicated that you are associated with/
+      end
     end
 
 
+    # institution_existing has the department.
+    # if creating a new institution with the same title or ror id, but without department, it is considered a new institution
     with_config_value(:managed_programme_id, programme.id) do
       params = {
         project: { title: 'The Project', description:'description', web_page:'web_page'},
@@ -2281,9 +2285,7 @@ class ProjectsControllerTest < ActionController::TestCase
       end
 
       assert_response :success
-      assert flash[:notice]
-
-      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
+      assert_select 'p', text: /You have described a new Institution with the following details:/
 
     end
 
@@ -3017,21 +3019,25 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(person)
     project = Project.new(title:'new project')
-    institution = Institution.new(title:'my new institution', ror_id: institution_existing.ror_id, country: "GB")
+    institution = Institution.new(title:'my new institution', department:'Manchester Institute of Biotechnology', ror_id: institution_existing.ror_id)
     log = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
 
     assert_response :success
-    assert_select 'div', text: /They wish to be associated with University of Manchester/
+    assert_select 'div' do
+      assert_select 'a', text: 'Manchester Institute of Biotechnology, University of Manchester'
+      assert_select 'div', /They wish to be associated with/
+    end
 
-    institution2 = Institution.new(title: institution_existing.title)
+    institution2 = Institution.new(title: institution_existing[:title], department:'Manchester Institute of Biotechnology')
     log2 = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution2)
     get :administer_create_project_request, params:{message_log_id:log2.id}
 
     assert_response :success
-    assert_select 'div', text: /They wish to be associated with University of Manchester/
-
-
+    assert_select 'div' do
+      assert_select 'a', text: 'Manchester Institute of Biotechnology, University of Manchester'
+      assert_select 'div', /They wish to be associated with/
+    end
   end
 
 

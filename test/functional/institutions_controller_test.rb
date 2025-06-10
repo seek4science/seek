@@ -53,6 +53,74 @@ class InstitutionsControllerTest < ActionController::TestCase
 
     assert_redirected_to institution_path(assigns(:institution))
     assert_equal 'test', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'test', count: 1
+
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'University of Manchester', department: 'Manchester Institute of Biotechnology'} }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', assigns(:institution).title
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Manchester Institute of Biotechnology, University of Manchester', count: 1
+  end
+
+  def test_should_create_institution_with_or_without_title_department_
+
+    # If creating a new institution with a title first,
+    # it should still be possible to create another institution with the same title but a different department.
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1', department: 'Division 1' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Division 1', assigns(:institution).department
+    assert_equal 'Division 1, Institution 1', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Division 1, Institution 1', count: 1
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1' }}
+    end
+
+    assert_equal 'Institution 1', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Institution 1', count: 1
+
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1',department: 'Division 2' }}
+    end
+
+    assert_equal 'Division 2, Institution 1', assigns(:institution).title
+
+    # If creating a new institution with a title and a department first,
+    # it should still be possible to create another institution with the title but without a different department.
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 2' }}
+    end
+
+    assert_equal 'Institution 2', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Institution 2', count: 1
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 2', department: 'Division 2' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Division 2', assigns(:institution).department
+    assert_equal 'Division 2, Institution 2', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Division 2, Institution 2', count: 1
+
   end
 
 
@@ -79,6 +147,30 @@ class InstitutionsControllerTest < ActionController::TestCase
         post :create, params: { institution: { ror_id: '03vek6s52' } }
       end
       assert_equal assigns(:institution).errors[:ror_id].first, 'has already been taken'
+    end
+  end
+
+  def test_can_create_institution_with_the_title_or_ror_id_that_already_exists_but_different_department
+    VCR.use_cassette("ror/existing_institution") do
+      FactoryBot.create(:institution, title: 'Harvard University', ror_id: '03vek6s52')
+
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { title: 'Harvard University', department: "Applied Mathematics"} }
+      end
+
+      assert_redirected_to institution_path(assigns(:institution))
+      assert_equal 'Applied Mathematics, Harvard University', assigns(:institution).title
+      assert_equal 'Applied Mathematics', assigns(:institution).department
+
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { ror_id: '03vek6s52', department: "Computer Science"} }
+      end
+
+      assert_redirected_to institution_path(assigns(:institution))
+      assert_equal 'Computer Science, Harvard University', assigns(:institution).title
+      assert_equal 'Computer Science', assigns(:institution).department
+      assert_equal '03vek6s52', assigns(:institution).ror_id
+
     end
   end
 
@@ -294,7 +386,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', institution.discussion_links.first.url
   end
 
-  test 'should destroy related assetlink when the discussion link is removed ' do
+  test 'should destroy related assetlink when the discussion link is removed' do
     person = FactoryBot.create(:admin)
     login_as(person)
     asset_link = FactoryBot.create(:discussion_link)

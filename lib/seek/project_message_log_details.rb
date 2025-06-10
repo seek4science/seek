@@ -26,7 +26,7 @@ module Seek
 
     REQUIRED_ATTRIBUTES = {
       Project => %w[id title description web_page programme_id],
-      Institution => %w[id title city country web_page ror_id],
+      Institution => %w[id title city country web_page ror_id department],
       Person => %w[id first_name last_name email],
       Programme => %w[id title description]
     }.freeze
