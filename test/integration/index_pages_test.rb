@@ -6,9 +6,9 @@ class IndexPagesTest < ActionDispatch::IntegrationTest
     types = Person::RELATED_RESOURCE_TYPES
     types.collect do |type|
       factory_name = if type == 'Strain'
-                       type.tableize.singularize
+                       type.underscore
                      else
-                       "max_#{type.tableize.singularize}"
+                       "max_#{type.underscore}"
                      end
       item = FactoryBot.create(factory_name.to_sym, deleted_contributor: 'Person:1',
                                                     policy: FactoryBot.create(:public_policy))
