@@ -29,6 +29,20 @@ class CollectionsControllerTest < ActionController::TestCase
     assert assigns(:collections).any?
   end
 
+  test 'should get index when the contributor is deleted' do
+    FactoryBot.create_list(:public_collection, 3)
+
+    login_as(FactoryBot.create(:admin))
+    contributor = Collection.all.last.contributor
+    contributor.destroy
+    assert_not Person.exists?(contributor.id)
+    assert "Person:#{contributor.id}", Collection.all.last.deleted_contributor
+
+    get :index
+    assert_response :success
+    assert assigns(:collections).any?
+  end
+
   test 'should not duplicate maintainer' do
     person = FactoryBot.create(:person)
     login_as(person.user)
