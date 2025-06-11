@@ -76,7 +76,8 @@ class FairDataStationHelperTest < ActionView::TestCase
       :status, Task::STATUS_CANCELLED
     )
 
-    assert_equal [upload1, upload2, upload3, upload4].sort, fair_data_station_imports_to_show(project, contributor).sort
+    # in reverse order, most recent first
+    assert_equal [upload4, upload3, upload2, upload1], fair_data_station_imports_to_show(project, contributor)
   end
 
   test 'fair_data_station_investigation_updates_to_show' do
@@ -126,8 +127,9 @@ class FairDataStationHelperTest < ActionView::TestCase
       :status, Task::STATUS_CANCELLED
     )
 
-    assert_equal [upload1, upload2, upload3, upload4].sort,
-                 fair_data_station_investigation_updates_to_show(investigation, contributor).sort
+    # in reverse order, most recent first
+    assert_equal [upload4, upload3, upload2, upload1],
+                 fair_data_station_investigation_updates_to_show(investigation, contributor)
   end
 
   test 'fair_data_station_investigation_updates_in_progress?' do

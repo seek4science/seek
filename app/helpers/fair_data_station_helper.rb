@@ -23,6 +23,7 @@ module FairDataStationHelper
                          .show_status
                          .where(tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_DONE,
                                                   Task::STATUS_FAILED] })
+                         .order(id: :desc)
   end
 
   def fair_data_station_investigation_updates_to_show(investigation, contributor)
@@ -32,6 +33,7 @@ module FairDataStationHelper
                          .show_status
                          .where(tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_DONE,
                                                   Task::STATUS_FAILED] })
+                         .order(id: :desc)
   end
 
   def fair_data_station_investigation_updates_in_progress?(investigation, contributor)
