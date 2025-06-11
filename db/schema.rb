@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -686,9 +686,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
     t.bigint "policy_id"
     t.string "investigation_external_identifier", limit: 2048
     t.integer "purpose", limit: 2
+    t.boolean "show_status", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "show_status", default: true
     t.index ["contributor_id"], name: "index_fair_data_station_uploads_on_contributor_id"
     t.index ["investigation_id"], name: "index_fair_data_station_uploads_on_investigation_id"
     t.index ["project_id"], name: "index_fair_data_station_uploads_on_project_id"
