@@ -43,18 +43,19 @@ class CollectionsControllerTest < ActionController::TestCase
     assert assigns(:collections).any?
   end
 
-  test 'should not duplicate maintainer' do
+  test 'should show other creators and not duplicate maintainer' do
     person = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
     login_as(person.user)
-    collection = FactoryBot.create(:public_collection, title: 'my collection',contributor:person, creators:[person, FactoryBot.create(:person)])
+    collection = FactoryBot.create(:public_collection, title: 'my collection',contributor:person, creators:[person, person2], other_creators:'other credit')
 
     get :index
     assert_response :success
     assert_equal 1, assigns(:collections).count
 
     assert_select 'div.list_item_title a[href=?]', collection_path(collection), text: 'my collection'
-    assert_select 'p.list_item_attribute', text: /Submitter/, count: 1
-    assert_select 'p.list_item_attribute', text: /Submitter: #{person.name}/, count: 1
+    assert_select 'p.list_item_attribute', text: /Maintainers/, count: 1
+    assert_select 'p.list_item_attribute', text: /Maintainers: #{person.name}, #{person2.name}, other credit/, count: 1
     assert_select 'p.list_item_attribute', text: /Number of items/, count: 1
 
   end
