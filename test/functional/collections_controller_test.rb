@@ -36,7 +36,7 @@ class CollectionsControllerTest < ActionController::TestCase
     contributor = Collection.all.last.contributor
     contributor.destroy
     assert_not Person.exists?(contributor.id)
-    assert "Person:#{contributor.id}", Collection.all.last.deleted_contributor
+    assert_equal "Person:#{contributor.id}", Collection.all.last.deleted_contributor
 
     get :index
     assert_response :success
