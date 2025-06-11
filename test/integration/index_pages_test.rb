@@ -2,7 +2,7 @@ require 'test_helper'
 
 class IndexPagesTest < ActionDispatch::IntegrationTest
 
-  test 'test list items with deleted contribtor' do
+  test 'test list items with deleted contributor' do
     types = Person::RELATED_RESOURCE_TYPES
     types.collect do |type|
       factory_name = if type == 'Strain'
