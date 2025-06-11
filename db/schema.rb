@@ -24,7 +24,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -263,8 +263,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
     t.bigint "resource_id"
     t.string "bio_tools_id"
     t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["resource_type", "resource_id"], name: "index_bio_tools_links_on_resource"
   end
 
@@ -837,7 +837,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "resource_attributes", size: :medium
+    t.text "resource_attributes", limit: 16777215
     t.bigint "git_repository_id"
     t.integer "visibility"
     t.string "doi"
@@ -1248,8 +1248,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
     t.string "identifier"
     t.bigint "organism_id"
     t.bigint "extended_metadata_type_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.bigint "contributor_id"
     t.string "uuid"
     t.string "deleted_contributor"
@@ -1748,8 +1748,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
     t.bigint "role_type_id"
     t.string "scope_type"
     t.bigint "scope_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
     t.index ["person_id"], name: "index_roles_on_person_id"
     t.index ["role_type_id"], name: "index_roles_on_role_type_id"
@@ -1841,8 +1841,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
     t.boolean "can_edit", default: false
     t.boolean "can_download", default: false
     t.boolean "can_delete", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
     t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
   end
@@ -1898,7 +1898,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
 
   create_table "sessions", id: :integer, force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -2239,7 +2239,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_131503) do
   create_table "text_values", id: :integer, force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", size: :medium, null: false
+    t.text "text", limit: 16777215, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
