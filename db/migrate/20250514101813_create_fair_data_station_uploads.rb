@@ -9,6 +9,10 @@ class CreateFairDataStationUploads < ActiveRecord::Migration[7.2]
       t.string :investigation_external_identifier, limit: 2048
       t.integer :purpose, limit: 2
       t.timestamps
+      t.index :contributor_id
+      t.index :project_id
+      t.index :investigation_id
+      t.index :purpose
     end
   end
 end
