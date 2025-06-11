@@ -54,7 +54,7 @@ class CollectionsControllerTest < ActionController::TestCase
 
     assert_select 'div.list_item_title a[href=?]', collection_path(collection), text: 'my collection'
     assert_select 'p.list_item_attribute', text: /Submitter/, count: 1
-    assert_select 'p.list_item_attribute', text: /Person1 Last/, count: 1
+    assert_select 'p.list_item_attribute', text: /Submitter: #{person.name}/, count: 1
     assert_select 'p.list_item_attribute', text: /Number of items/, count: 1
 
   end
