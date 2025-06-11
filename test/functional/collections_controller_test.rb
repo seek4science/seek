@@ -52,10 +52,11 @@ class CollectionsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal 1, assigns(:collections).count
 
-    assert_select 'div.list_item' do
-      assert_select '.list_item_title', text:'my collection'
-      assert_select '.rli-person-list a[href=?]',person_path(person),count:1
-    end
+    assert_select 'div.list_item_title a[href=?]', collection_path(collection), text: 'my collection'
+    assert_select 'p.list_item_attribute', text: /Submitter/, count: 1
+    assert_select 'p.list_item_attribute', text: /Person1 Last/, count: 1
+    assert_select 'p.list_item_attribute', text: /Number of items/, count: 1
+
   end
 
   test "shouldn't show hidden items in index" do
