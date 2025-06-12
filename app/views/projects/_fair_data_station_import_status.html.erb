@@ -36,9 +36,10 @@
         Completed
 
         <%= link_to("View imported #{t('investigation')}", investigation_path(upload.investigation),
-                    class: 'btn btn-primary') if upload.investigation %>
+                    class: 'btn btn-primary ml-3') if upload.investigation %>
 
         <%= fair_data_station_close_status_button(upload, :import) %>
+
       <% end %>
     </div>
   <% end %>
