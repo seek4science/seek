@@ -86,6 +86,10 @@ class HomesController < ApplicationController
     end
   end
 
+  def api_docs
+    render file: "#{Rails.root}/public/api/index.html", layout: false
+  end
+
   private
 
   def fair_signposting
