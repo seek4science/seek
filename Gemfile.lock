@@ -673,7 +673,6 @@ GEM
     rails-observers (0.1.5)
       activemodel (>= 4.0)
     rails-perftest (0.0.7)
-    rails-static-router (1.0.0)
     rails_autolink (1.1.8)
       actionview (> 3.1)
       activesupport (> 3.1)
@@ -1133,7 +1132,6 @@ DEPENDENCIES
   rails-html-sanitizer
   rails-observers
   rails-perftest
-  rails-static-router
   rails_autolink
   rails_best_practices
   rdf-virtuoso
