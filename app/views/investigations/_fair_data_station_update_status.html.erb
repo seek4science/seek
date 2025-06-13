@@ -1,7 +1,7 @@
 <%
   return unless upload.show_status?
   task = upload.update_task
-  job_status ||= task.status
+  job_status = task.status
   in_progress = task.in_progress?
   failed = task.failed?
   success = task.success?

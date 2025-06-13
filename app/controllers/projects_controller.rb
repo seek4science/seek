@@ -239,9 +239,8 @@ class ProjectsController < ApplicationController
   def fair_data_station_import_status
     upload = FairDataStationUpload.for_project_and_contributor(@project, current_person).import_purpose.where(id: params[:upload_id]).first
     if upload
-      job_status = upload.import_task.status
       respond_to do |format|
-        format.html { render partial: 'fair_data_station_import_status', locals: { upload: upload, job_status: job_status } }
+        format.html { render partial: 'fair_data_station_import_status', locals: { upload: upload } }
       end
     else
       respond_to do |format|

@@ -71,9 +71,8 @@ class InvestigationsController < ApplicationController
   def fair_data_station_update_status
     upload = FairDataStationUpload.for_investigation_and_contributor(@investigation, current_person).update_purpose.where(id: params[:upload_id]).first
     if upload
-      job_status = upload.update_task.status
       respond_to do |format|
-        format.html { render partial: 'fair_data_station_update_status', locals: { upload: upload, job_status: job_status } }
+        format.html { render partial: 'fair_data_station_update_status', locals: { upload: upload } }
       end
     else
       respond_to do |format|
