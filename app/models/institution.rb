@@ -1,9 +1,8 @@
 class Institution < ApplicationRecord
 
   acts_as_yellow_pages
-  title_trimmer
 
-  auto_strip_attributes :web_page
+  auto_strip_attributes :web_page, :title
 
   before_validation :fetch_ror_details, if: -> { ror_id.present? && ror_id_changed? }
 

@@ -80,8 +80,7 @@ class InvestigationTest < ActiveSupport::TestCase
     assert result.blank?, "check-isa.py result was not blank, returned: #{result}"
   end
 
-# the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
-  test 'title trimmed' do
+  test 'title stripped' do
     inv = FactoryBot.create(:investigation, title: ' Test')
     assert_equal 'Test', inv.title
   end

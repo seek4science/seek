@@ -5,7 +5,7 @@ class Project < ApplicationRecord
   include Seek::Taggable
 
   acts_as_yellow_pages
-  title_trimmer
+
   has_extended_metadata
 
   has_and_belongs_to_many :investigations
@@ -56,7 +56,7 @@ class Project < ApplicationRecord
 
   scope :without_programme, -> { where('programme_id IS NULL') }
 
-  auto_strip_attributes :web_page, :wiki_page
+  auto_strip_attributes :web_page, :wiki_page, :title
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :wiki_page, url: {allow_nil: true, allow_blank: true}
