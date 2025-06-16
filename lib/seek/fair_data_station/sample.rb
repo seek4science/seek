@@ -11,8 +11,8 @@ module Seek
         super.except(:title, :description)
       end
 
-      def find_closest_matching_sample_type(property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
-        candidates = SampleType.includes(:sample_attributes).authorized_for(:view).collect do |sample_type|
+      def find_closest_matching_sample_type(person, property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
+        candidates = SampleType.includes(:sample_attributes).authorized_for(:view, person).collect do |sample_type|
           sample_type_property_ids = sample_type.sample_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & sample_type_property_ids)
           difference = (property_ids | sample_type_property_ids) - intersection
@@ -26,10 +26,10 @@ module Seek
         candidates.first&.last
       end
 
-      def find_exact_matching_sample_type
+      def find_exact_matching_sample_type(person)
         property_ids = all_additional_potential_annotation_predicates
         property_ids |= [@schema.title.to_s, @schema.description.to_s]
-        sample_type = find_closest_matching_sample_type(property_ids)
+        sample_type = find_closest_matching_sample_type(person, property_ids)
         return unless sample_type && sample_type.sample_attributes.count == property_ids.count
 
         sample_type
