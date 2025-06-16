@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class FairDataStationWriterTest < ActiveSupport::TestCase
+
   test 'construct seek isa' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
@@ -9,7 +10,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
+    # private but visible to the contributor
+    FactoryBot.create(:fairdatastation_virtual_demo_sample_type, contributor: contributor, policy: FactoryBot.create(:private_policy))
     investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
 
     studies = investigation.studies.to_a

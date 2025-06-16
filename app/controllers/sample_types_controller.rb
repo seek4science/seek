@@ -216,7 +216,7 @@ class SampleTypesController < ApplicationController
       end
     end
     if fds_sample && fds_sample.all_additional_potential_annotation_predicates.any?
-      @existing_sample_type = fds_sample.find_exact_matching_sample_type
+      @existing_sample_type = fds_sample.find_exact_matching_sample_type(current_person)
       unless @existing_sample_type
         string_attribute_type = SampleAttributeType.where(title: 'String').first
         @sample_type.sample_attributes.build({
