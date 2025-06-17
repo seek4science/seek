@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_10_150132) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -1808,7 +1808,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_10_150132) do
     t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
-    t.integer "template_id"
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
