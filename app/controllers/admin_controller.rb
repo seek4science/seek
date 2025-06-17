@@ -367,19 +367,9 @@ class AdminController < ApplicationController
   end
 
   def restart_delayed_job
-    error = nil
-    unless Rails.env.test?
-      begin
-        Seek::Workers.restart
-        wait_for_delayed_job_to_start
-      rescue SystemExit => e
-        Rails.logger.info("Exit code #{e.status}")
-      rescue => e
-        Seek::Errors::ExceptionForwarder.send_notification(e, data:{message:'Problem restarting delayed job'})
-      end
-    end
-
-    redirect_with_status(error, 'background tasks')
+    command = "bundle exec rake seek:workers:restart"
+    error = execute_command(command)
+    redirect_with_status(error, 'background job workers')
   end
 
   def clear_cache
@@ -699,13 +689,16 @@ class AdminController < ApplicationController
   def execute_command(command)
     return nil if Rails.env.test?
     begin
+      Rails.logger.info("executing admin shell command '#{command}")
       cl = Terrapin::CommandLine.new(command)
       cl.run
+      Rails.logger.info('admin shell command successfully executed!')
       return nil
     rescue Terrapin::CommandNotFoundError => e
-      return 'The command to restart the background tasks could not be found!'
+      return 'The command could not be found!'
     rescue => e
       error = e.message
+      Rails.logger.error("Error executing admin shell command: #{error}")
       return error
     end
   end

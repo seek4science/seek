@@ -3,11 +3,13 @@ require 'delayed/command'
 # module for handling interaction with delayed job workers
 module Seek
   module Workers
-    def self.start(action = 'start')
+    def self.start
+      invoke('start')
+    end
+
+    def self.invoke(action)
       @identifier = 0
-
       commands = create_commands(action)
-
       daemonize_commands(commands)
     end
 
@@ -32,7 +34,7 @@ module Seek
     end
 
     def self.stop
-      daemonize_commands(['stop'])
+      invoke 'stop'
     end
 
     def self.status
@@ -40,7 +42,7 @@ module Seek
     end
 
     def self.restart
-      start('restart')
+      invoke 'restart'
     end
 
     def self.start_data_file_auth_lookup_worker(number = 1)
