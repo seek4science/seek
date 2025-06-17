@@ -4,11 +4,7 @@ require 'delayed/command'
 module Seek
   module Workers
     def self.start
-      invoke('start')
-    end
-
-    def self.invoke(action)
-      commands = create_commands(action)
+      commands = create_commands('start')
       daemonize_commands(commands)
     end
 
@@ -38,7 +34,8 @@ module Seek
     end
 
     def self.stop
-      invoke 'stop'
+      # will stop the first 15, not expecting more than that
+      daemonize_commands(['stop -n 15'])
     end
 
     def self.status
@@ -46,7 +43,8 @@ module Seek
     end
 
     def self.restart
-      invoke 'restart'
+      stop
+      start
     end
 
     def self.command(queue_name, index, number_of_workers, action)
