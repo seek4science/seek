@@ -2158,7 +2158,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert flash[:error].include?("Web page is not a valid URL")
         assert_equal 'new inst', assigns(:institution).title
         assert_equal 'description', assigns(:project).description
-        assert_nil assigns(:project).title #nullyfied by auto_strip_attributes
+        assert_nil assigns(:project).title # set to nil by auto_strip_attributes
         assert_equal 'invalid', assigns(:project).web_page
         assert_equal programme.id, params[:programme_id]
       end
@@ -2455,7 +2455,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_equal 'the inst', assigns(:institution).title
         assert_equal 'https://example.com/inst', assigns(:institution).web_page
         assert_equal 'description', assigns(:project).description
-        assert_nil assigns(:project).title #nullyfied by auto_strip_attributes
+        assert_nil assigns(:project).title #set to nil by auto_strip_attributes
         assert_equal 'https://example.com', assigns(:project).web_page
         assert_equal 'A Cool Programme', assigns(:programme).title
       end
