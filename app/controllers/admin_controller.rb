@@ -705,9 +705,9 @@ class AdminController < ApplicationController
 
   def redirect_with_status(error, process)
     if error.blank?
-      flash[:notice] = "The #{process} was restarted"
+      flash[:notice] = "Successfully restarted the #{process}"
     else
-      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
+      flash[:error] = "There was a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
     end
     redirect_to action: :show
   end
