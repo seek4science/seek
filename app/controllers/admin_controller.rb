@@ -689,7 +689,7 @@ class AdminController < ApplicationController
   def execute_command(command)
     return nil if Rails.env.test?
     begin
-      Rails.logger.info("executing admin shell command '#{command}")
+      Rails.logger.info("executing admin shell command '#{command}'")
       cl = Terrapin::CommandLine.new(command)
       cl.run
       Rails.logger.info('admin shell command successfully executed!')
