@@ -82,15 +82,7 @@ class SampleTypesController < ApplicationController
   # POST /sample_types
   # POST /sample_types.json
   def create
-    @sample_type = SampleType.new(sample_type_params)
-    @sample_type.contributor = User.current_user.person
-
-    # Update sharing policies
-    update_sharing_policies(@sample_type)
-    # Update relationships
-    update_relationships(@sample_type, params)
-    # Update tags
-    update_annotations(params[:tag_list], @sample_type)
+    build_sample_type
 
     # removes controlled vocabularies or linked seek samples where the type may differ
     @sample_type.resolve_inconsistencies
@@ -162,6 +154,18 @@ class SampleTypesController < ApplicationController
 
   private
 
+  def build_sample_type
+    @sample_type = SampleType.new(sample_type_params)
+    @sample_type.contributor = User.current_user.person
+
+    # Update sharing policies
+    update_sharing_policies(@sample_type)
+    # Update relationships
+    update_relationships(@sample_type, params)
+    # Update tags
+    update_annotations(params[:tag_list], @sample_type)
+  end
+
   def sample_type_params
     attributes = params[:sample_type][:sample_attributes]
     if attributes
@@ -195,7 +199,7 @@ class SampleTypesController < ApplicationController
 
 
   def build_sample_type_from_template
-    @sample_type = SampleType.new(sample_type_params)
+    build_sample_type
     @sample_type.uploaded_template = true
 
     handle_upload_data
@@ -204,7 +208,7 @@ class SampleTypesController < ApplicationController
   end
 
   def build_or_detect_sample_type_from_fair_ds_ttl
-    @sample_type = SampleType.new(sample_type_params)
+    build_sample_type
     blob_params = params[:content_blobs]
 
     fds_sample = nil
@@ -242,6 +246,8 @@ class SampleTypesController < ApplicationController
                                                  required: details.required
                                                })
         end
+        update_sharing_policies(@sample_type)
+        update_relationships(@sample_type, params)
       end
 
     else
