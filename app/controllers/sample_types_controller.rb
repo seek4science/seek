@@ -246,8 +246,6 @@ class SampleTypesController < ApplicationController
                                                  required: details.required
                                                })
         end
-        update_sharing_policies(@sample_type)
-        update_relationships(@sample_type, params)
       end
 
     else
