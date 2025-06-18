@@ -15,8 +15,8 @@ module Seek
     def self.create_commands(action)
       commands = []
 
-      active_queues.each_index  do |index, queue_name|
-        commands << command(queue_name, index+1, 1, action)
+      active_queues.each_with_index do |queue_name, index|
+        commands << command(queue_name, index + 1, 1, action)
       end
       commands
     end
