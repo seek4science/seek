@@ -11,7 +11,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
     # private but visible to the contributor
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type, contributor: contributor, policy: FactoryBot.create(:private_policy))
+    sample_type = FactoryBot.create(:fairdatastation_virtual_demo_sample_type, contributor: contributor, policy: FactoryBot.create(:private_policy))
     investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
 
     studies = investigation.studies.to_a
@@ -58,6 +58,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'DRR243856_1.fastq.gz', data_files.first.external_identifier
     assert_equal 'HIV-1_positive', obs_units.first.external_identifier
     assert_equal 'DRS176892', samples.first.external_identifier
+    assert_equal sample_type, samples.first.sample_type
 
     assert_difference('Investigation.count', 1) do
       assert_difference('Study.count', 1) do
