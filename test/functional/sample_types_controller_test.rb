@@ -75,7 +75,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
                                                        }
                                                      },
-                                                     tags: ['fish','golf'] },
+                                                     tags: ['fish', 'golf'] },
                                       policy_attributes: policy_attributes}
             end
           end
