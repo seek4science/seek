@@ -1322,16 +1322,16 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'should return max query result' do
-    with_config_value(:isa_json_compliance_enabled, true) do
-      person = FactoryBot.create(:person)
-      project = FactoryBot.create(:project)
+	test 'should return max query result' do
+		with_config_value(:isa_json_compliance_enabled, true) do
+			person = FactoryBot.create(:person)
+			project = FactoryBot.create(:project)
 
-      login_as(person)
+			login_as(person)
 
-      template1 = FactoryBot.create(:isa_source_template)
-      template2 = FactoryBot.create(:isa_sample_collection_template)
-      template3 = FactoryBot.create(:isa_assay_material_template)
+			template1 = FactoryBot.create(:isa_source_template)
+			template2 = FactoryBot.create(:isa_sample_collection_template)
+			template3 = FactoryBot.create(:isa_assay_material_template)
 
 			# Add extra non-text attributes
 			[template1, template2, template3].each do |template|
@@ -1355,12 +1355,12 @@ class SamplesControllerTest < ActionController::TestCase
 				template.save
 			end
 
-      type1 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], 
-                                                     title: 'Source sample type', template_id: template1.id)
-      type1.create_sample_attributes_from_isa_template(template1)
+			type1 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id],
+																title: 'Source sample type', template_id: template1.id)
+			type1.create_sample_attributes_from_isa_template(template1)
 
-      type2 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], 
-                                                     title: 'Sample collection sample type', template_id: template2.id)
+			type2 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id],
+																title: 'Sample collection sample type', template_id: template2.id)
 			type2.create_sample_attributes_from_isa_template(template2, type1)
 
 			type3 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id],
@@ -1370,7 +1370,7 @@ class SamplesControllerTest < ActionController::TestCase
 			# Create strains
 			strain1 = FactoryBot.create(:min_strain, projects: [project], title: 'Saccharomyces cerevisiae YGL118W', organism: FactoryBot.create(:organism, title: 'Saccharomyces cerevisiae'))
 			strain2 = FactoryBot.create(:min_strain, projects: [project], title: 'SARS-CoV-2', organism: FactoryBot.create(:organism, title: 'Coronavirus'))
-			strain3 = FactoryBot.create(:min_strain, projects: [project], title: 'Arabidopsis thaliana', organism: FactoryBot.create(:organism, title:'Arabidopsis'))
+			strain3 = FactoryBot.create(:min_strain, projects: [project], title: 'Arabidopsis thaliana', organism: FactoryBot.create(:organism, title: 'Arabidopsis'))
 
 			# Create data_files
 			df1 = FactoryBot.create(:min_data_file, contributor: person, project_ids: [project.id], title: "Excel spreadsheet")
@@ -1423,35 +1423,35 @@ class SamplesControllerTest < ActionController::TestCase
 												}
 
 			post :query, xhr: true, params: {
-        project_ids: [project.id],
-        template_id: template2.id,
-        template_attribute_id: template2.template_attributes.second.id,
-        template_attribute_value: 'collection',
-        input_template_id: template1.id,
-        input_attribute_id: template1.template_attributes.third.id,
-        input_attribute_value: "x's",
-        output_template_id: template3.id,
-        output_attribute_id: template3.template_attributes.second.id,
-        output_attribute_value: '1'
-      }
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2.template_attributes.second.id,
+				template_attribute_value: 'collection',
+				input_template_id: template1.id,
+				input_attribute_id: template1.template_attributes.third.id,
+				input_attribute_value: "x's",
+				output_template_id: template3.id,
+				output_attribute_id: template3.template_attributes.second.id,
+				output_attribute_value: '1'
+			}
 
-      assert_response :success
-      assert result = assigns(:result)
-      assert_equal 1, result.length
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
 
-      # Do the same query but with random casing to check if case-insensitive
-      post :query, xhr: true, params: {
-        project_ids: [project.id],
-        template_id: template2.id,
-        template_attribute_id: template2.template_attributes.second.id,
-        template_attribute_value: 'ColLecTion',
-        input_template_id: template1.id,
-        input_attribute_id: template1.template_attributes.third.id,
-        input_attribute_value: "x's",
-        output_template_id: template3.id,
-        output_attribute_id: template3.template_attributes.second.id,
-        output_attribute_value: '1'
-      }
+			# Do the same query but with random casing to check if case-insensitive
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2.template_attributes.second.id,
+				template_attribute_value: 'ColLecTion',
+				input_template_id: template1.id,
+				input_attribute_id: template1.template_attributes.third.id,
+				input_attribute_value: "x's",
+				output_template_id: template3.id,
+				output_attribute_id: template3.template_attributes.second.id,
+				output_attribute_value: '1'
+			}
 
 			assert_response :success
 			assert result = assigns(:result)
@@ -1463,26 +1463,26 @@ class SamplesControllerTest < ActionController::TestCase
 				template_id: template2.id,
 				template_attribute_id: template2
 																 .template_attributes
-																 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
+																 .detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
 																 .id,
 				template_attribute_value: 'false',
 				input_template_id: template1.id,
 				input_attribute_id: template1
 															.template_attributes
-															.detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
+															.detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
 															.id,
 				input_attribute_value: 'true',
 				output_template_id: template3.id,
 				output_attribute_id: template3
 															 .template_attributes
-															 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
+															 .detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
 															 .id,
 				output_attribute_value: 'true',
 			}
 
-      assert_response :success
-      assert result = assigns(:result)
-      assert_equal 1, result.length
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
 
 			# Query on SOPs
 			post :query, xhr: true, params: {
@@ -1490,13 +1490,13 @@ class SamplesControllerTest < ActionController::TestCase
 				template_id: template2.id,
 				template_attribute_id: template2
 																 .template_attributes
-																 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
+																 .detect { |tat| tat.sample_attribute_type.seek_sop? }
 																 .id,
 				template_attribute_value: 'sampling',
 				output_template_id: template3.id,
 				output_attribute_id: template3
 															 .template_attributes
-															 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
+															 .detect { |tat| tat.sample_attribute_type.seek_sop? }
 															 .id,
 				output_attribute_value: 'assay'
 			}
@@ -1511,19 +1511,19 @@ class SamplesControllerTest < ActionController::TestCase
 				template_id: template2.id,
 				template_attribute_id: template2
 																 .template_attributes
-																 .detect{ |tat| tat.sample_attribute_type.seek_strain? }
+																 .detect { |tat| tat.sample_attribute_type.seek_strain? }
 																 .id,
 				template_attribute_value: 'SARs',
 				input_template_id: template1.id,
 				input_attribute_id: template1
 															.template_attributes
-															.detect{ |tat| tat.sample_attribute_type.seek_strain? }
+															.detect { |tat| tat.sample_attribute_type.seek_strain? }
 															.id,
 				input_attribute_value: 'cerevis',
 				output_template_id: template3.id,
 				output_attribute_id: template3
 															 .template_attributes
-															 .detect{ |tat| tat.sample_attribute_type.seek_strain? }
+															 .detect { |tat| tat.sample_attribute_type.seek_strain? }
 															 .id,
 				output_attribute_value: 'thaliana'
 			}
@@ -1538,19 +1538,19 @@ class SamplesControllerTest < ActionController::TestCase
 				template_id: template2.id,
 				template_attribute_id: template2
 																 .template_attributes
-																 .detect{ |tat| tat.sample_attribute_type.seek_data_file? }
+																 .detect { |tat| tat.sample_attribute_type.seek_data_file? }
 																 .id,
 				template_attribute_value: 'powerp',
 				input_template_id: template1.id,
 				input_attribute_id: template1
 															.template_attributes
-															.detect{ |tat| tat.sample_attribute_type.seek_data_file? }
+															.detect { |tat| tat.sample_attribute_type.seek_data_file? }
 															.id,
 				input_attribute_value: 'spread',
 				output_template_id: template3.id,
 				output_attribute_id: template3
 															 .template_attributes
-															 .detect{ |tat| tat.sample_attribute_type.seek_data_file? }
+															 .detect { |tat| tat.sample_attribute_type.seek_data_file? }
 															 .id,
 				output_attribute_value: 'zip'
 			}
@@ -1565,19 +1565,19 @@ class SamplesControllerTest < ActionController::TestCase
 				template_id: template2.id,
 				template_attribute_id: template2
 																 .template_attributes
-																 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
+																 .detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
 																 .id,
 				template_attribute_value: '65',
 				input_template_id: template1.id,
 				input_attribute_id: template1
 															.template_attributes
-															.detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
+															.detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
 															.id,
 				input_attribute_value: '0.7',
 				output_template_id: template3.id,
 				output_attribute_id: template3
 															 .template_attributes
-															 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
+															 .detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
 															 .id,
 				output_attribute_value: '0'
 			}
@@ -1592,19 +1592,19 @@ class SamplesControllerTest < ActionController::TestCase
 				template_id: template2.id,
 				template_attribute_id: template2
 																 .template_attributes
-																 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
+																 .detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
 																 .id,
 				template_attribute_value: '15:00',
 				input_template_id: template1.id,
 				input_attribute_id: template1
 															.template_attributes
-															.detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
+															.detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
 															.id,
 				input_attribute_value: '01-01',
 				output_template_id: template3.id,
 				output_attribute_id: template3
 															 .template_attributes
-															 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
+															 .detect { |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
 															 .id,
 				output_attribute_value: '2024'
 			}
@@ -1613,80 +1613,80 @@ class SamplesControllerTest < ActionController::TestCase
 			assert result = assigns(:result)
 			assert_equal 1, result.length
 			# Query for sample's grandparents
-      post :query, xhr: true, params: {
-        project_ids: [project.id],
-        template_id: template3.id,
-        template_attribute_id: template3.template_attributes.second.id,
-        template_attribute_value: 'Protocol',
-        input_template_id: template1.id,
-        input_attribute_id: template1.template_attributes.third.id,
-        input_attribute_value: "x's"
-      }
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template3.id,
+				template_attribute_id: template3.template_attributes.second.id,
+				template_attribute_value: 'Protocol',
+				input_template_id: template1.id,
+				input_attribute_id: template1.template_attributes.third.id,
+				input_attribute_value: "x's"
+			}
 
-      assert_response :success
-      assert result = assigns(:result)
-      assert_equal 1, result.length
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
 
-      # Query for sample's grandchildren
-      post :query, xhr: true, params: {
-        project_ids: [project.id],
-        template_id: template1.id,
-        template_attribute_id: template1.template_attributes.third.id,
-        template_attribute_value: "x's",
-        output_template_id: template3.id,
-        output_attribute_id: template3.template_attributes.second.id,
-        output_attribute_value: 'Protocol'
-      }
+			# Query for sample's grandchildren
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template1.id,
+				template_attribute_id: template1.template_attributes.third.id,
+				template_attribute_value: "x's",
+				output_template_id: template3.id,
+				output_attribute_id: template3.template_attributes.second.id,
+				output_attribute_value: 'Protocol'
+			}
 
-      assert_response :success
-      assert result = assigns(:result)
-      assert_equal 1, result.length
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
 
-      # Simple query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
-      post :query, xhr: true, params: {
-        project_ids: [project.id],
-        template_id: template2.id,
-        template_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
-        template_attribute_value: 'source'
-      }
+			# Simple query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
+				template_attribute_value: 'source'
+			}
 
-      assert_response :success
-      result = assigns(:result)
-      assert_equal result.length, 1
+			assert_response :success
+			result = assigns(:result)
+			assert_equal result.length, 1
 
-      # parent query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
-      post :query, xhr: true, params: {
-        project_ids: [project.id],
-        template_id: template3.id,
-        template_attribute_id: template3.template_attributes.second.id,
-        template_attribute_value: 'Protocol',
-        input_template_id: template2.id,
-        input_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
-        input_attribute_value: "source"
-      }
+			# parent query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template3.id,
+				template_attribute_id: template3.template_attributes.second.id,
+				template_attribute_value: 'Protocol',
+				input_template_id: template2.id,
+				input_attribute_id: template2.template_attributes.detect(&:input_attribute?)&.id,
+				input_attribute_value: "source"
+			}
 
-      assert_response :success
-      result = assigns(:result)
-      assert_equal result.length, 1
+			assert_response :success
+			result = assigns(:result)
+			assert_equal result.length, 1
 
-      # Grandchild query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
-      post :query, xhr: true, params: {
-        project_ids: [project.id],
-        template_id: template1.id,
-        template_attribute_id: template1.template_attributes.third.id,
-        template_attribute_value: "x's",
-        output_template_id: template3.id,
-        output_attribute_id: template3.template_attributes.detect(&:input_attribute?)&.id,
-        output_attribute_value: 'sample'
-      }
+			# Grandchild query on 'Input' attribute (SEEK_SAMPLE_MULTI type)
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template1.id,
+				template_attribute_id: template1.template_attributes.third.id,
+				template_attribute_value: "x's",
+				output_template_id: template3.id,
+				output_attribute_id: template3.template_attributes.detect(&:input_attribute?)&.id,
+				output_attribute_value: 'sample'
+			}
 
-      assert_response :success
-      result = assigns(:result)
-      assert_equal result.length, 1
-    end
-  end
+			assert_response :success
+			result = assigns(:result)
+			assert_equal result.length, 1
+		end
+	end
 
-  test 'form hides private linked multi samples' do
+	test 'form hides private linked multi samples' do
     person = FactoryBot.create(:person)
     login_as(person)
 
