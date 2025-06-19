@@ -1466,6 +1466,117 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should filter samples according to the dates created and updated' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      project = FactoryBot.create(:project)
+
+      login_as(person)
+
+      template1 = FactoryBot.create(:isa_source_template)
+
+      sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id],
+                                title: 'Source sample type', template_id: template1.id)
+      sample_type.create_sample_attributes_from_isa_template(template1)
+
+      # Create Samples at three different dates
+      travel_to(Time.zone.local(2024, 9, 1, 12, 0, 0))
+      source1 = FactoryBot.create :sample, title: 'Source 1', sample_type: sample_type, project_ids: [project.id], contributor: person,
+                                  data: { 'Source Name': 'Source 1', 'Source Characteristic 1': 'Source Characteristic A', 'Source Characteristic 2': "Cox's Orange Pippin" }
+
+      travel_to(Time.zone.local(2024, 9, 8, 12, 0, 0))
+      source2 = FactoryBot.create :sample, title: 'Source 2', sample_type: sample_type, project_ids: [project.id], contributor: person,
+                        data: { 'Source Name': 'Source 2', 'Source Characteristic 1': 'Source Characteristic B', 'Source Characteristic 2': "Cox's Orange Pippin" }
+
+      travel_to(Time.zone.local(2024, 9, 15, 12, 0, 0))
+      source3 = FactoryBot.create :sample, title: 'Source 3', sample_type: sample_type, project_ids: [project.id], contributor: person,
+                        data: { 'Source Name': 'Source 3', 'Source Characteristic 1': 'Source Characteristic C', 'Source Characteristic 2': "Cox's Orange Pippin" }
+
+      travel_back
+
+      # Query for samples created on 2024-09-01 or later
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.first.id,
+        template_attribute_value: 'source',
+        filter_begin_date_created: '2024-09-01'
+      }
+
+      assert_response :success
+
+      result = assigns(:result)
+      assert_equal 3, result.length
+
+      # Query for samples created on 2024-09-02 or later
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.first.id,
+        template_attribute_value: 'source',
+        filter_begin_date_created: '2024-09-02'
+      }
+
+      assert_response :success
+
+      result = assigns(:result)
+      assert_equal 2, result.length
+
+      # Query for samples created between 2024-09-05 and 2024-09-10
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.first.id,
+        template_attribute_value: 'source',
+        filter_begin_date_created: '2024-09-05',
+        filter_end_date_created: '2024-09-10'
+      }
+
+      assert_response :success
+
+      result = assigns(:result)
+      assert_equal 1, result.length
+      assert_equal 'Source 2', result.first['title']
+
+      # Update the first sample
+      travel_to(Time.zone.local(2024, 9, 20, 12, 0, 0))
+      source1.update!(external_identifier: 's1')
+      source2.update!(external_identifier: 's2')
+      travel_to(Time.zone.local(2024, 9, 25, 12, 0, 0))
+      source3.update!(external_identifier: 's3')
+
+
+      travel_back
+      # Query for samples updated between 2024-09-20 or 2024-09-21
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.first.id,
+        template_attribute_value: 'source',
+        filter_begin_date_updated: '2024-09-20',
+        filter_end_date_updated: '2024-09-21'
+      }
+
+      assert_response :success
+
+      result = assigns(:result)
+      assert_equal 2, result.length
+
+      # Query for samples updated before 2024-09-26
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.first.id,
+        template_attribute_value: 'source',
+        filter_end_date_updated: '2024-09-26'
+      }
+
+      result = assigns(:result)
+      assert_equal 3, result.length
+
+    end
+  end
+
   test 'form hides private linked multi samples' do
     person = FactoryBot.create(:person)
     login_as(person)
