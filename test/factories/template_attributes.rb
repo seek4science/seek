@@ -32,4 +32,10 @@ FactoryBot.define do
 		sample_attribute_type { FactoryBot.create(:strain_sample_attribute_type) }
 	end
 
+	factory(:data_file_attribute, parent: :template_attribute) do
+		sequence(:title) { |n| "Datafile attribute #{n}" }
+		association :template, factory: :template
+		sample_attribute_type { FactoryBot.create(:data_file_sample_attribute_type) }
+	end
+
 end

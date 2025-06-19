@@ -1347,7 +1347,8 @@ class SamplesControllerTest < ActionController::TestCase
 				boolean_attribute = FactoryBot.create(:boolean_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
 				sop_attribute = FactoryBot.create(:sop_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
 				strain_attribute = FactoryBot.create(:strain_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - strain")
-				template.template_attributes << [boolean_attribute, sop_attribute, strain_attribute]
+				datafile_attribute = FactoryBot.create(:data_file_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - data file")
+				template.template_attributes << [boolean_attribute, sop_attribute, strain_attribute, datafile_attribute]
 				template.save
 			end
 
@@ -1368,6 +1369,11 @@ class SamplesControllerTest < ActionController::TestCase
 			strain2 = FactoryBot.create(:min_strain, projects: [project], title: 'SARS-CoV-2', organism: FactoryBot.create(:organism, title: 'Coronavirus'))
 			strain3 = FactoryBot.create(:min_strain, projects: [project], title: 'Arabidopsis thaliana', organism: FactoryBot.create(:organism, title:'Arabidopsis'))
 
+			# Create data_files
+			df1 = FactoryBot.create(:min_data_file, contributor: person, project_ids: [project.id], title: "Excel spreadsheet")
+			df2 = FactoryBot.create(:min_data_file, contributor: person, project_ids: [project.id], title: "Powerpoint presentation")
+			df3 = FactoryBot.create(:min_data_file, contributor: person, project_ids: [project.id], title: "Zip file")
+
 			sample1 = FactoryBot.create :sample, title: 'sample1',
 																	sample_type: type1,
 																	project_ids: [project.id],
@@ -1376,7 +1382,8 @@ class SamplesControllerTest < ActionController::TestCase
 																					'Source Characteristic 1': 'Source Characteristic 1',
 																					'Source Characteristic 2': "Cox's Orange Pippin",
 																					'source_characteristic - boolean': true,
-																					'source_characteristic - strain': strain1
+																					'source_characteristic - strain': strain1,
+																					'source_characteristic - data file': df1
 																	}
 
 			sampling_sop = FactoryBot.create(:public_sop, title: 'Sampling SOP')
@@ -1388,7 +1395,8 @@ class SamplesControllerTest < ActionController::TestCase
 																					'sample characteristic 1': 'sample characteristic 1',
 																					'sample_characteristic - boolean': false,
 																					'sample_characteristic - sop': sampling_sop,
-																					'sample_characteristic - strain': strain2
+																					'sample_characteristic - strain': strain2,
+																					'sample_characteristic - data file': df2
 																	}
 
 			# sample3
@@ -1401,7 +1409,8 @@ class SamplesControllerTest < ActionController::TestCase
 																'other material characteristic 1': 'other material characteristic 1',
 																'other_material_characteristic - boolean': true,
 																'other_material_characteristic - sop': material_assay_sop,
-																'other_material_characteristic - strain': strain3
+																'other_material_characteristic - strain': strain3,
+																'other_material_characteristic - data file': df3
 												}
 
 			post :query, xhr: true, params: {
@@ -1508,6 +1517,33 @@ class SamplesControllerTest < ActionController::TestCase
 															 .detect{ |tat| tat.sample_attribute_type.seek_strain? }
 															 .id,
 				output_attribute_value: 'thaliana'
+			}
+
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
+
+			# Query on data files
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2
+																 .template_attributes
+																 .detect{ |tat| tat.sample_attribute_type.seek_data_file? }
+																 .id,
+				template_attribute_value: 'powerp',
+				input_template_id: template1.id,
+				input_attribute_id: template1
+															.template_attributes
+															.detect{ |tat| tat.sample_attribute_type.seek_data_file? }
+															.id,
+				input_attribute_value: 'spread',
+				output_template_id: template3.id,
+				output_attribute_id: template3
+															 .template_attributes
+															 .detect{ |tat| tat.sample_attribute_type.seek_data_file? }
+															 .id,
+				output_attribute_value: 'zip'
 			}
 
 			assert_response :success
