@@ -12,5 +12,14 @@ FactoryBot.define do
       type.sample_controlled_vocab = FactoryBot.build(:apples_sample_controlled_vocab)
       type.sample_attribute_type = FactoryBot.create(:controlled_vocab_attribute_type)
     end
-  end
+	end
+
+	factory(:boolean_attribute, parent: :template_attribute) do
+		sequence(:title) { |n| "boolean attribute #{n}" }
+		association :template, factory: :template
+		# after(:build) do |attribute|
+		# 	attribute.sample_attribute_type = FactoryBot.create(:boolean_sample_attribute_type)
+		# end
+		sample_attribute_type { FactoryBot.create(:boolean_sample_attribute_type) }
+	end
 end

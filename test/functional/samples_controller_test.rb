@@ -1333,31 +1333,60 @@ class SamplesControllerTest < ActionController::TestCase
       template2 = FactoryBot.create(:isa_sample_collection_template)
       template3 = FactoryBot.create(:isa_assay_material_template)
 
+			[template1, template2, template3].each do |template|
+				isa_tag = if template.level == 'study source'
+										FactoryBot.build(:source_characteristic_isa_tag)
+									elsif template.level == 'study sample'
+										FactoryBot.build(:sample_characteristic_isa_tag)
+									elsif template.level == 'assay - material'
+										FactoryBot.build(:other_material_characteristic_isa_tag)
+									else
+										FactoryBot.build(:data_file_comment_isa_tag)
+									end
+				boolean_attribute = FactoryBot.create(:boolean_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
+				template.template_attributes << boolean_attribute
+				template.save
+			end
+
       type1 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], 
                                                      title: 'Source sample type', template_id: template1.id)
       type1.create_sample_attributes_from_isa_template(template1)
 
       type2 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], 
                                                      title: 'Sample collection sample type', template_id: template2.id)
-      type2.create_sample_attributes_from_isa_template(template2, type1)
+			type2.create_sample_attributes_from_isa_template(template2, type1)
 
-      type3 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id], 
-                                                     title: 'Assay material sample type', template_id: template3.id)
-      type3.create_sample_attributes_from_isa_template(template3, type2)
+			type3 = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id],
+																title: 'Assay material sample type', template_id: template3.id)
+			type3.create_sample_attributes_from_isa_template(template3, type2)
 
-      sample1 = FactoryBot.create :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
-                                           data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
+			sample1 = FactoryBot.create :sample, title: 'sample1',
+																	sample_type: type1,
+																	project_ids: [project.id],
+																	contributor: person,
+																	data: { 'Source Name': 'Source Name',
+																					'Source Characteristic 1': 'Source Characteristic 1',
+																					'Source Characteristic 2': "Cox's Orange Pippin",
+																					'source_characteristic - boolean': true }
 
-      sample2 = FactoryBot.create :sample, title: 'sample2', sample_type: type2, project_ids: [project.id], contributor: person,
-                                           data: { Input: [sample1.id], 'sample collection': 'sample collection', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': 'sample name', 'sample characteristic 1': 'sample characteristic 1' }
+			sample2 = FactoryBot.create :sample, title: 'sample2', sample_type: type2, project_ids: [project.id], contributor: person,
+																	data: { Input: [sample1.id],
+																					'sample collection': 'sample collection',
+																					'sample collection parameter value 1': 'sample collection parameter value 1',
+																					'Sample Name': 'sample name',
+																					'sample characteristic 1': 'sample characteristic 1',
+																					'sample_characteristic - boolean': false }
 
-      # sample3
-      FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
-                                 data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1' }
+			# sample3
+			FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
+												data: { Input: [sample2.id],
+																'Protocol Assay 1': 'Protocol Assay 1',
+																'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+																'Extract Name': 'Extract Name',
+																'other material characteristic 1': 'other material characteristic 1',
+																'other_material_characteristic - boolean': true }
 
-
-
-      post :query, xhr: true, params: {
+			post :query, xhr: true, params: {
         project_ids: [project.id],
         template_id: template2.id,
         template_attribute_id: template2.template_attributes.second.id,
@@ -1387,6 +1416,33 @@ class SamplesControllerTest < ActionController::TestCase
         output_attribute_id: template3.template_attributes.second.id,
         output_attribute_value: '1'
       }
+
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
+
+			# Query on booleans
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2
+																 .template_attributes
+																 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
+																 .id,
+				template_attribute_value: 'false',
+				input_template_id: template1.id,
+				input_attribute_id: template1
+															.template_attributes
+															.detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
+															.id,
+				input_attribute_value: 'true',
+				output_template_id: template3.id,
+				output_attribute_id: template3
+															 .template_attributes
+															 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::BOOLEAN }
+															 .id,
+				output_attribute_value: 'true',
+			}
 
       assert_response :success
       assert result = assigns(:result)
