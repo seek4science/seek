@@ -243,7 +243,7 @@ class SamplesController < ApplicationController
           attr_value = s.get_attribute_value(sample_attribute_title)
           attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
         else
-          s.get_attribute_value(sample_attribute_title)&.downcase&.include?(attribute_filter_value)
+          s.get_attribute_value(sample_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
         end
       end
     end
@@ -350,7 +350,7 @@ class SamplesController < ApplicationController
         elsif template_attribute.sample_attribute_type.seek_cv_list?
           selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v.downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
         else
-          selected = x.get_attribute_value(template_attribute_title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
+          selected = x.get_attribute_value(template_attribute_title)&.to_s&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
         end
         selected || filter_linked_samples([x], link, options, template_attribute).present?
       end
