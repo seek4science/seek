@@ -1333,6 +1333,7 @@ class SamplesControllerTest < ActionController::TestCase
       template2 = FactoryBot.create(:isa_sample_collection_template)
       template3 = FactoryBot.create(:isa_assay_material_template)
 
+			# Add extra non-text attributes
 			[template1, template2, template3].each do |template|
 				isa_tag = if template.level == 'study source'
 										FactoryBot.build(:source_characteristic_isa_tag)
@@ -1345,7 +1346,8 @@ class SamplesControllerTest < ActionController::TestCase
 									end
 				boolean_attribute = FactoryBot.create(:boolean_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
 				sop_attribute = FactoryBot.create(:sop_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
-				template.template_attributes << [boolean_attribute, sop_attribute]
+				strain_attribute = FactoryBot.create(:strain_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - strain")
+				template.template_attributes << [boolean_attribute, sop_attribute, strain_attribute]
 				template.save
 			end
 
@@ -1361,6 +1363,11 @@ class SamplesControllerTest < ActionController::TestCase
 																title: 'Assay material sample type', template_id: template3.id)
 			type3.create_sample_attributes_from_isa_template(template3, type2)
 
+			# Create strains
+			strain1 = FactoryBot.create(:min_strain, projects: [project], title: 'Saccharomyces cerevisiae YGL118W', organism: FactoryBot.create(:organism, title: 'Saccharomyces cerevisiae'))
+			strain2 = FactoryBot.create(:min_strain, projects: [project], title: 'SARS-CoV-2', organism: FactoryBot.create(:organism, title: 'Coronavirus'))
+			strain3 = FactoryBot.create(:min_strain, projects: [project], title: 'Arabidopsis thaliana', organism: FactoryBot.create(:organism, title:'Arabidopsis'))
+
 			sample1 = FactoryBot.create :sample, title: 'sample1',
 																	sample_type: type1,
 																	project_ids: [project.id],
@@ -1368,7 +1375,8 @@ class SamplesControllerTest < ActionController::TestCase
 																	data: { 'Source Name': 'Source Name',
 																					'Source Characteristic 1': 'Source Characteristic 1',
 																					'Source Characteristic 2': "Cox's Orange Pippin",
-																					'source_characteristic - boolean': true
+																					'source_characteristic - boolean': true,
+																					'source_characteristic - strain': strain1
 																	}
 
 			sampling_sop = FactoryBot.create(:public_sop, title: 'Sampling SOP')
@@ -1379,7 +1387,8 @@ class SamplesControllerTest < ActionController::TestCase
 																					'Sample Name': 'sample name',
 																					'sample characteristic 1': 'sample characteristic 1',
 																					'sample_characteristic - boolean': false,
-																					'sample_characteristic - sop': sampling_sop
+																					'sample_characteristic - sop': sampling_sop,
+																					'sample_characteristic - strain': strain2
 																	}
 
 			# sample3
@@ -1391,7 +1400,8 @@ class SamplesControllerTest < ActionController::TestCase
 																'Extract Name': 'Extract Name',
 																'other material characteristic 1': 'other material characteristic 1',
 																'other_material_characteristic - boolean': true,
-																'other_material_characteristic - sop': material_assay_sop
+																'other_material_characteristic - sop': material_assay_sop,
+																'other_material_characteristic - strain': strain3
 												}
 
 			post :query, xhr: true, params: {
@@ -1429,27 +1439,6 @@ class SamplesControllerTest < ActionController::TestCase
 			assert result = assigns(:result)
 			assert_equal 1, result.length
 
-			# Query on SOPs
-			post :query, xhr: true, params: {
-				project_ids: [project.id],
-				template_id: template2.id,
-				template_attribute_id: template2
-																 .template_attributes
-																 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
-																 .id,
-				template_attribute_value: 'sampling',
-				output_template_id: template3.id,
-				output_attribute_id: template3
-															 .template_attributes
-															 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
-															 .id,
-				output_attribute_value: 'assay'
-			}
-
-			assert_response :success
-			assert result = assigns(:result)
-			assert_equal 1, result.length
-
 			# Query on booleans
 			post :query, xhr: true, params: {
 				project_ids: [project.id],
@@ -1477,7 +1466,55 @@ class SamplesControllerTest < ActionController::TestCase
       assert result = assigns(:result)
       assert_equal 1, result.length
 
-      # Query for sample's grandparents
+			# Query on SOPs
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2
+																 .template_attributes
+																 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
+																 .id,
+				template_attribute_value: 'sampling',
+				output_template_id: template3.id,
+				output_attribute_id: template3
+															 .template_attributes
+															 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
+															 .id,
+				output_attribute_value: 'assay'
+			}
+
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
+
+			# Query on Strains
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2
+																 .template_attributes
+																 .detect{ |tat| tat.sample_attribute_type.seek_strain? }
+																 .id,
+				template_attribute_value: 'SARs',
+				input_template_id: template1.id,
+				input_attribute_id: template1
+															.template_attributes
+															.detect{ |tat| tat.sample_attribute_type.seek_strain? }
+															.id,
+				input_attribute_value: 'cerevis',
+				output_template_id: template3.id,
+				output_attribute_id: template3
+															 .template_attributes
+															 .detect{ |tat| tat.sample_attribute_type.seek_strain? }
+															 .id,
+				output_attribute_value: 'thaliana'
+			}
+
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
+
+			# Query for sample's grandparents
       post :query, xhr: true, params: {
         project_ids: [project.id],
         template_id: template3.id,

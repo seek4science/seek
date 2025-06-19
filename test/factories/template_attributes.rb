@@ -26,4 +26,10 @@ FactoryBot.define do
 		sample_attribute_type { FactoryBot.create(:sop_sample_attribute_type) }
 	end
 
+	factory(:strain_attribute, parent: :template_attribute) do
+		sequence(:title) { |n| "Strain attribute #{n}" }
+		association :template, factory: :template
+		sample_attribute_type { FactoryBot.create(:strain_sample_attribute_type) }
+	end
+
 end

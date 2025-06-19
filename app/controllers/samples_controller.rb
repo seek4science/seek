@@ -244,6 +244,8 @@ class SamplesController < ApplicationController
           attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
 				elsif sample_attribute&.sample_attribute_type&.seek_sop?
 					s.get_attribute_value(sample_attribute_title)&.dig(:title)&.downcase&.include?(attribute_filter_value)
+				elsif sample_attribute&.sample_attribute_type&.seek_strain?
+					s.get_attribute_value(sample_attribute_title)&.dig(:title)&.downcase&.include?(attribute_filter_value)
 				else
           s.get_attribute_value(sample_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
         end
@@ -352,6 +354,8 @@ class SamplesController < ApplicationController
         elsif template_attribute.sample_attribute_type.seek_cv_list?
           selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v.downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
 				elsif template_attribute.sample_attribute_type.seek_sop?
+					selected = x.get_attribute_value(template_attribute_title)&.dig(:title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
+				elsif template_attribute.sample_attribute_type.seek_strain?
 					selected = x.get_attribute_value(template_attribute_title)&.dig(:title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
 				else
           selected = x.get_attribute_value(template_attribute_title)&.to_s&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
