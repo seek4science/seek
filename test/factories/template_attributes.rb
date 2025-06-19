@@ -17,9 +17,13 @@ FactoryBot.define do
 	factory(:boolean_attribute, parent: :template_attribute) do
 		sequence(:title) { |n| "boolean attribute #{n}" }
 		association :template, factory: :template
-		# after(:build) do |attribute|
-		# 	attribute.sample_attribute_type = FactoryBot.create(:boolean_sample_attribute_type)
-		# end
 		sample_attribute_type { FactoryBot.create(:boolean_sample_attribute_type) }
 	end
+
+	factory(:sop_attribute, parent: :template_attribute) do
+		sequence(:title) { |n| "SOP attribute #{n}" }
+		association :template, factory: :template
+		sample_attribute_type { FactoryBot.create(:sop_sample_attribute_type) }
+	end
+
 end

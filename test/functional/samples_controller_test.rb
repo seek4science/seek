@@ -1344,7 +1344,8 @@ class SamplesControllerTest < ActionController::TestCase
 										FactoryBot.build(:data_file_comment_isa_tag)
 									end
 				boolean_attribute = FactoryBot.create(:boolean_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
-				template.template_attributes << boolean_attribute
+				sop_attribute = FactoryBot.create(:sop_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
+				template.template_attributes << [boolean_attribute, sop_attribute]
 				template.save
 			end
 
@@ -1367,24 +1368,31 @@ class SamplesControllerTest < ActionController::TestCase
 																	data: { 'Source Name': 'Source Name',
 																					'Source Characteristic 1': 'Source Characteristic 1',
 																					'Source Characteristic 2': "Cox's Orange Pippin",
-																					'source_characteristic - boolean': true }
+																					'source_characteristic - boolean': true
+																	}
 
+			sampling_sop = FactoryBot.create(:public_sop, title: 'Sampling SOP')
 			sample2 = FactoryBot.create :sample, title: 'sample2', sample_type: type2, project_ids: [project.id], contributor: person,
 																	data: { Input: [sample1.id],
 																					'sample collection': 'sample collection',
 																					'sample collection parameter value 1': 'sample collection parameter value 1',
 																					'Sample Name': 'sample name',
 																					'sample characteristic 1': 'sample characteristic 1',
-																					'sample_characteristic - boolean': false }
+																					'sample_characteristic - boolean': false,
+																					'sample_characteristic - sop': sampling_sop
+																	}
 
 			# sample3
+			material_assay_sop = FactoryBot.create(:public_sop, title: 'Material Assay SOP')
 			FactoryBot.create :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
 												data: { Input: [sample2.id],
 																'Protocol Assay 1': 'Protocol Assay 1',
 																'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
 																'Extract Name': 'Extract Name',
 																'other material characteristic 1': 'other material characteristic 1',
-																'other_material_characteristic - boolean': true }
+																'other_material_characteristic - boolean': true,
+																'other_material_characteristic - sop': material_assay_sop
+												}
 
 			post :query, xhr: true, params: {
         project_ids: [project.id],
@@ -1416,6 +1424,27 @@ class SamplesControllerTest < ActionController::TestCase
         output_attribute_id: template3.template_attributes.second.id,
         output_attribute_value: '1'
       }
+
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
+
+			# Query on SOPs
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2
+																 .template_attributes
+																 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
+																 .id,
+				template_attribute_value: 'sampling',
+				output_template_id: template3.id,
+				output_attribute_id: template3
+															 .template_attributes
+															 .detect{ |tat| tat.sample_attribute_type.seek_sop? }
+															 .id,
+				output_attribute_value: 'assay'
+			}
 
 			assert_response :success
 			assert result = assigns(:result)
