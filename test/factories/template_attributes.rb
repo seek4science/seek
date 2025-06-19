@@ -38,4 +38,15 @@ FactoryBot.define do
 		sample_attribute_type { FactoryBot.create(:data_file_sample_attribute_type) }
 	end
 
+	factory(:float_attribute, parent: :template_attribute) do
+		sequence(:title) { |n| "Float attribute #{n}" }
+		association :template, factory: :template
+		sample_attribute_type { FactoryBot.create(:float_sample_attribute_type) }
+	end
+
+	factory(:datetime_attribute, parent: :template_attribute) do
+		sequence(:title) { |n| "Datetime attribute #{n}" }
+		association :template, factory: :template
+		sample_attribute_type { FactoryBot.create(:datetime_sample_attribute_type) }
+	end
 end

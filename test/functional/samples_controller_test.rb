@@ -1348,7 +1348,10 @@ class SamplesControllerTest < ActionController::TestCase
 				sop_attribute = FactoryBot.create(:sop_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
 				strain_attribute = FactoryBot.create(:strain_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - strain")
 				datafile_attribute = FactoryBot.create(:data_file_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - data file")
-				template.template_attributes << [boolean_attribute, sop_attribute, strain_attribute, datafile_attribute]
+				float_attribute = FactoryBot.create(:float_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - float")
+				datetime_attribute = FactoryBot.create(:datetime_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - datetime")
+				template.template_attributes << [boolean_attribute, sop_attribute, strain_attribute, datafile_attribute,
+																				 float_attribute, datetime_attribute]
 				template.save
 			end
 
@@ -1383,7 +1386,9 @@ class SamplesControllerTest < ActionController::TestCase
 																					'Source Characteristic 2': "Cox's Orange Pippin",
 																					'source_characteristic - boolean': true,
 																					'source_characteristic - strain': strain1,
-																					'source_characteristic - data file': df1
+																					'source_characteristic - data file': df1,
+																					'source_characteristic - float': 0.721,
+																					'source_characteristic - datetime': '01-01-2020',
 																	}
 
 			sampling_sop = FactoryBot.create(:public_sop, title: 'Sampling SOP')
@@ -1396,7 +1401,9 @@ class SamplesControllerTest < ActionController::TestCase
 																					'sample_characteristic - boolean': false,
 																					'sample_characteristic - sop': sampling_sop,
 																					'sample_characteristic - strain': strain2,
-																					'sample_characteristic - data file': df2
+																					'sample_characteristic - data file': df2,
+																					'sample_characteristic - float': 0.965,
+																					'sample_characteristic - datetime': '02-02-2022 15:00'
 																	}
 
 			# sample3
@@ -1410,7 +1417,9 @@ class SamplesControllerTest < ActionController::TestCase
 																'other_material_characteristic - boolean': true,
 																'other_material_characteristic - sop': material_assay_sop,
 																'other_material_characteristic - strain': strain3,
-																'other_material_characteristic - data file': df3
+																'other_material_characteristic - data file': df3,
+																'other_material_characteristic - float': 0.843,
+																'other_material_characteristic - datetime': '04-2024'
 												}
 
 			post :query, xhr: true, params: {
@@ -1550,6 +1559,59 @@ class SamplesControllerTest < ActionController::TestCase
 			assert result = assigns(:result)
 			assert_equal 1, result.length
 
+			# Query on float number
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2
+																 .template_attributes
+																 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
+																 .id,
+				template_attribute_value: '65',
+				input_template_id: template1.id,
+				input_attribute_id: template1
+															.template_attributes
+															.detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
+															.id,
+				input_attribute_value: '0.7',
+				output_template_id: template3.id,
+				output_attribute_id: template3
+															 .template_attributes
+															 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::FLOAT }
+															 .id,
+				output_attribute_value: '0'
+			}
+
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
+
+			# Query on date and time
+			post :query, xhr: true, params: {
+				project_ids: [project.id],
+				template_id: template2.id,
+				template_attribute_id: template2
+																 .template_attributes
+																 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
+																 .id,
+				template_attribute_value: '15:00',
+				input_template_id: template1.id,
+				input_attribute_id: template1
+															.template_attributes
+															.detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
+															.id,
+				input_attribute_value: '01-01',
+				output_template_id: template3.id,
+				output_attribute_id: template3
+															 .template_attributes
+															 .detect{ |tat| tat.sample_attribute_type.base_type == Seek::Samples::BaseType::DATE_TIME }
+															 .id,
+				output_attribute_value: '2024'
+			}
+
+			assert_response :success
+			assert result = assigns(:result)
+			assert_equal 1, result.length
 			# Query for sample's grandparents
       post :query, xhr: true, params: {
         project_ids: [project.id],
