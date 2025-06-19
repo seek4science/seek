@@ -14,37 +14,37 @@ FactoryBot.define do
     end
 	end
 
-	factory(:boolean_attribute, parent: :template_attribute) do
+	factory(:boolean_template_attribute, parent: :template_attribute) do
 		sequence(:title) { |n| "boolean attribute #{n}" }
 		association :template, factory: :template
 		sample_attribute_type { FactoryBot.create(:boolean_sample_attribute_type) }
 	end
 
-	factory(:sop_attribute, parent: :template_attribute) do
+	factory(:sop_template_attribute, parent: :template_attribute) do
 		sequence(:title) { |n| "SOP attribute #{n}" }
 		association :template, factory: :template
 		sample_attribute_type { FactoryBot.create(:sop_sample_attribute_type) }
 	end
 
-	factory(:strain_attribute, parent: :template_attribute) do
+	factory(:strain_template_attribute, parent: :template_attribute) do
 		sequence(:title) { |n| "Strain attribute #{n}" }
 		association :template, factory: :template
 		sample_attribute_type { FactoryBot.create(:strain_sample_attribute_type) }
 	end
 
-	factory(:data_file_attribute, parent: :template_attribute) do
+	factory(:data_file_template_attribute, parent: :template_attribute) do
 		sequence(:title) { |n| "Datafile attribute #{n}" }
 		association :template, factory: :template
 		sample_attribute_type { FactoryBot.create(:data_file_sample_attribute_type) }
 	end
 
-	factory(:float_attribute, parent: :template_attribute) do
+	factory(:float_template_attribute, parent: :template_attribute) do
 		sequence(:title) { |n| "Float attribute #{n}" }
 		association :template, factory: :template
 		sample_attribute_type { FactoryBot.create(:float_sample_attribute_type) }
 	end
 
-	factory(:datetime_attribute, parent: :template_attribute) do
+	factory(:datetime_template_attribute, parent: :template_attribute) do
 		sequence(:title) { |n| "Datetime attribute #{n}" }
 		association :template, factory: :template
 		sample_attribute_type { FactoryBot.create(:datetime_sample_attribute_type) }

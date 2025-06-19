@@ -1344,12 +1344,12 @@ class SamplesControllerTest < ActionController::TestCase
 									else
 										FactoryBot.build(:data_file_comment_isa_tag)
 									end
-				boolean_attribute = FactoryBot.create(:boolean_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
-				sop_attribute = FactoryBot.create(:sop_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
-				strain_attribute = FactoryBot.create(:strain_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - strain")
-				datafile_attribute = FactoryBot.create(:data_file_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - data file")
-				float_attribute = FactoryBot.create(:float_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - float")
-				datetime_attribute = FactoryBot.create(:datetime_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - datetime")
+				boolean_attribute = FactoryBot.create(:boolean_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
+				sop_attribute = FactoryBot.create(:sop_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
+				strain_attribute = FactoryBot.create(:strain_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - strain")
+				datafile_attribute = FactoryBot.create(:data_file_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - data file")
+				float_attribute = FactoryBot.create(:float_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - float")
+				datetime_attribute = FactoryBot.create(:datetime_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - datetime")
 				template.template_attributes << [boolean_attribute, sop_attribute, strain_attribute, datafile_attribute,
 																				 float_attribute, datetime_attribute]
 				template.save
