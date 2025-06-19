@@ -237,15 +237,9 @@ class SamplesController < ApplicationController
         if sample_attribute&.sample_attribute_type&.seek_sample_multi?
           attr_value = s.get_attribute_value(sample_attribute_title)
           attr_value&.any? { |v| v&.dig(:title)&.downcase&.include?(attribute_filter_value) }
-        elsif sample_attribute&.sample_attribute_type&.seek_sample?
-          s.get_attribute_value(sample_attribute_title)&.dig(:title)&.downcase&.include?(attribute_filter_value)
         elsif sample_attribute&.sample_attribute_type&.seek_cv_list?
           attr_value = s.get_attribute_value(sample_attribute_title)
           attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
-				elsif sample_attribute&.sample_attribute_type&.seek_sop?
-					s.get_attribute_value(sample_attribute_title)&.dig(:title)&.downcase&.include?(attribute_filter_value)
-				elsif sample_attribute&.sample_attribute_type&.seek_strain?
-					s.get_attribute_value(sample_attribute_title)&.dig(:title)&.downcase&.include?(attribute_filter_value)
 				else
           s.get_attribute_value(sample_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
         end
@@ -349,14 +343,8 @@ class SamplesController < ApplicationController
         selected = x.sample_type.template_id == options[:template_id].to_i
         if template_attribute.sample_attribute_type.seek_sample_multi?
           selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v&.dig(:title).downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
-        elsif  template_attribute.sample_attribute_type.seek_sample?
-          selected = x.get_attribute_value(template_attribute_title)&.dig(:title)&.downcase&.include?(options[:attribute_value]) if template_attribute.present? && selected
         elsif template_attribute.sample_attribute_type.seek_cv_list?
           selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v.downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
-				elsif template_attribute.sample_attribute_type.seek_sop?
-					selected = x.get_attribute_value(template_attribute_title)&.dig(:title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
-				elsif template_attribute.sample_attribute_type.seek_strain?
-					selected = x.get_attribute_value(template_attribute_title)&.dig(:title)&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
 				else
           selected = x.get_attribute_value(template_attribute_title)&.to_s&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
         end
