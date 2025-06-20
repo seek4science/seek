@@ -11,12 +11,12 @@ Physics
 Climate Science
 Humanities
 Library Science
-Cross-cutting
+Cross-discipline
 Environmental Science
 Engineering
 Mathematics
 Neuroscience
-).split('\n').map(&:strip).compact_blank.freeze
+).split("\n").map(&:strip).compact_blank.freeze
 
 data = {
   title: 'Scientific disciplines',

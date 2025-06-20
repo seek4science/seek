@@ -37,7 +37,6 @@
   <%= f.text_field :wiki_page, :class=>"form-control" -%>
 </div>
 
-
 <div class="form-group">
   <div class="row">
     <div class="col-md-2">
@@ -61,6 +60,8 @@
 <% unless project %>
     <%= render :partial=> "projects/select_add_current_user_to_project" %>
 <% end %>
+
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: @project, property: :disciplines} -%>
 
 <%= f.fancy_multiselect :organisms, { possibilities: Organism.order(:title).all, hidden: false } %>
 

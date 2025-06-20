@@ -993,7 +993,7 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
                         :end_date,
-                        { funding_codes: [] }, { human_disease_ids: [] }, topic_annotations: [],
+                        { funding_codes: [] }, { human_disease_ids: [] }, { topic_annotations: [] }, { discipline_annotations: [] },
                         discussion_links_attributes:[:id, :url, :label, :_destroy], extended_metadata_attributes: determine_extended_metadata_keys ]
 
     if User.admin_logged_in?
