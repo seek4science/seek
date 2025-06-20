@@ -287,9 +287,10 @@ class Workflow < ApplicationRecord
     joins(:source_link).where('asset_links.url' => source_url)
   end
 
-  def discipline_annotation_labels
-    mine = controlled_vocab_annotation_labels(:disciplines)
-    return projects.first.discipline_annotation_labels if mine.empty? && projects.first
+  alias_method :orig_discipline_annotation_values, :discipline_annotation_values
+  def discipline_annotation_values
+    mine = orig_discipline_annotation_values
+    return projects.first.discipline_annotation_values if mine.empty? && projects.first
     mine
   end
 end
