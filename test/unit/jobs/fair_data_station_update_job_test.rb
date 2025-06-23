@@ -64,6 +64,36 @@ class FairDataStationUpdateJobTest < ActiveSupport::TestCase
     assert_match(/block in _perform_job/, upload.update_task.exception)
   end
 
+  test 'no sample type recorded' do
+    investigation = setup_test_case_investigation
+    person = investigation.contributor
+    # make the sample type hidden
+    disable_authorization_checks do
+      sample_type = SampleType.last
+      sample_type.policy.update_column(:access_type, Policy::NO_ACCESS)
+      refute sample_type.can_view?(person)
+    end
+    upload = FactoryBot.create(:update_fair_data_station_upload, contributor: person,
+                               investigation: investigation)
+    assert_no_difference('Investigation.count') do
+      assert_no_difference('Study.count') do
+        assert_no_difference('ObservationUnit.count') do
+          assert_no_difference('Sample.count') do
+            assert_no_difference('Assay.count') do
+              assert_no_difference('ActivityLog.count') do
+                FairDataStationUpdateJob.perform_now(upload)
+              end
+            end
+          end
+        end
+      end
+    end
+    assert upload.update_task.failed?
+    assert_equal 'Seek::FairDataStation::MissingSampleTypeException: Unable to find a matching Sample Type with suitable access rights',
+                 upload.update_task.error_message
+    assert_match(/block in _perform_job/, upload.update_task.exception)
+  end
+
   def setup_test_case_investigation
     FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
     FactoryBot.create(:fairdata_test_case_study_extended_metadata)
