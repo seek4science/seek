@@ -262,6 +262,22 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal '2020-01-10', obvs_unit.extended_metadata.get_attribute_value('Date of birth')
   end
 
+  test 'no sample type during construct isa raises exception' do
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    disable_authorization_checks{ SampleType.destroy_all }
+    FactoryBot.create(:experimental_assay_class)
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+
+    assert_raises(Seek::FairDataStation::MissingSampleTypeException) do
+      Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
+    end
+
+  end
+
   test 'update isa' do
     investigation = setup_test_case_investigation
     policy = investigation.policy

@@ -47,6 +47,19 @@ class FairDataStationImportJobTest < ActiveSupport::TestCase
     assert_match(/block in _perform_job/, upload_record.import_task.exception)
   end
 
+  test 'no sample type recorded' do
+    upload_record = FactoryBot.create :fair_data_station_upload
+    disable_authorization_checks{ SampleType.destroy_all }
+    assert_no_difference('Investigation.count') do
+      FairDataStationImportJob.perform_now(upload_record)
+    end
+    upload_record.reload
+    assert upload_record.import_task.failed?
+    assert_equal 'Seek::FairDataStation::MissingSampleTypeException: Unable to find a matching Sample Type with suitable access rights',
+                 upload_record.import_task.error_message
+    assert_match(/block in _perform_job/, upload_record.import_task.exception)
+  end
+
   test 'queue' do
     upload_record = FactoryBot.create :fair_data_station_upload
     assert_enqueued_jobs(1, only: FairDataStationImportJob) do
