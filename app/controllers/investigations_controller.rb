@@ -38,23 +38,31 @@ class InvestigationsController < ApplicationController
   end
 
   def submit_fairdata_station
-    path = params[:datastation_data].path
-    fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    error = nil
+    in_progress = []
+    mismatching_external_id = nil
+    if params[:datastation_data].present?
+      path = params[:datastation_data].path
+      fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
-    in_progress = FairDataStationUpload.matching_updates_in_progress(@investigation, fair_data_station_inv.external_id)
-    mismatching_external_id = fair_data_station_inv.external_id != @investigation.external_identifier
-
-    if mismatching_external_id
-      flash.now[:error] = "#{t('investigation')} external identifiers do not match"
-      respond_to do |format|
-        format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
-      end
-    elsif in_progress.any?
-      flash.now[:error] = "An existing update of this #{t('investigation')} is currently already in progress."
-      respond_to do |format|
-        format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
+      if fair_data_station_inv.present?
+        in_progress = FairDataStationUpload.matching_updates_in_progress(@investigation, fair_data_station_inv.external_id)
+        mismatching_external_id = fair_data_station_inv.external_id != @investigation.external_identifier
+      else
+        error = 'Unable to process the file'
       end
     else
+      error = 'No file was submitted'
+    end
+
+
+    if mismatching_external_id
+      error = "#{t('investigation')} external identifiers do not match"
+    elsif in_progress.any?
+      error = "An existing update of this #{t('investigation')} is currently already in progress."
+    end
+
+    if error.nil?
       content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
                                      original_filename: params[:datastation_data].original_filename)
       fair_data_station_upload = FairDataStationUpload.new(contributor: current_person,
@@ -62,10 +70,21 @@ class InvestigationsController < ApplicationController
                                                            investigation_external_identifier: fair_data_station_inv.external_id,
                                                            purpose: :update, content_blob: content_blob
       )
-      fair_data_station_upload.save!
-      FairDataStationUpdateJob.new(fair_data_station_upload).queue_job
-      redirect_to update_from_fairdata_station_investigation_path(@investigation)
+      if fair_data_station_upload.save
+        FairDataStationUpdateJob.new(fair_data_station_upload).queue_job
+        redirect_to update_from_fairdata_station_investigation_path(@investigation)
+      else
+        error = 'Unable to save the record'
+      end
     end
+
+    if error.present?
+      flash[:error] = error
+      respond_to do |format|
+        format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
+      end
+    end
+
   end
 
   def fair_data_station_update_status

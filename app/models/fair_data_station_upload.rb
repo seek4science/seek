@@ -1,8 +1,8 @@
 class FairDataStationUpload < ApplicationRecord
   belongs_to :investigation
-  belongs_to :content_blob
+  belongs_to :content_blob, validate: true
   belongs_to :project
-  belongs_to :policy
+  belongs_to :policy, validate: true
   belongs_to :contributor, class_name: 'Person'
   enum :purpose, %i[import update], suffix: true
 

@@ -5310,7 +5310,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'import from fairdata station ttl' do
+  test 'submit fairdata station ttl' do
     person = FactoryBot.create(:person)
     project = person.projects.first
     another_person = FactoryBot.create(:person)
@@ -5358,7 +5358,7 @@ class ProjectsControllerTest < ActionController::TestCase
     refute fds_upload.update_task&.pending?
   end
 
-  test 'import from fairdata station ttl existing external id' do
+  test 'submit fairdata station existing external id' do
     person = FactoryBot.create(:person)
     project = person.projects.first
     another_person = FactoryBot.create(:person)
@@ -5366,18 +5366,21 @@ class ProjectsControllerTest < ActionController::TestCase
 
     investigation = FactoryBot.create(:investigation, external_identifier: 'seek-test-investigation', projects:[project], contributor: person)
 
-
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
-    assert_no_difference('Investigation.count') do
-      post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
-                                              policy_attributes:{
-                                                access_type: Policy::VISIBLE,
-                                                permissions_attributes: {
-                                                  '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                                  policy_attributes:{
+                                                    access_type: Policy::VISIBLE,
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
                                                   }
-                                                }
-                                              }
-      }
+          }
+        end
+      end
     end
     assert_response :unprocessable_entity
     assert_match /An Investigation with that external identifier already exists for this Project/, flash[:error]
@@ -5388,7 +5391,83 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test 'import from fair data station task in progress' do
+  test 'submit fairdata station no file' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project,
+                                                  policy_attributes:{
+                                                    access_type: Policy::VISIBLE,
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
+                                                  }
+          }
+        end
+      end
+    end
+    assert_response :unprocessable_entity
+    assert_match /No file was submitted/, flash[:error]
+  end
+
+  test 'submit fairdata station invalid file' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    ttl_file = fixture_file_upload('fair_data_station/empty.ttl')
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                                  policy_attributes:{
+                                                    access_type: Policy::VISIBLE,
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
+                                                  }
+          }
+        end
+      end
+    end
+    assert_response :unprocessable_entity
+    assert_match /Unable to process the file/, flash[:error]
+  end
+
+  test 'submit fairdata station unable to save' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                                  policy_attributes:{
+                                                    access_type: 100, # invalid, causing a validation error
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
+                                                  }
+          }
+        end
+      end
+    end
+    assert_response :unprocessable_entity
+    assert_match /Unable to save the record/, flash[:error]
+  end
+
+  test 'submit fairdata station task in progress' do
     person = FactoryBot.create(:person)
     project = person.projects.first
     another_person = FactoryBot.create(:person)
