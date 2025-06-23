@@ -212,7 +212,7 @@ class ProjectsController < ApplicationController
       policy.set_attributes_with_sharing(policy_params)
       fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
       if fair_data_station_inv.present?
-        @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
+        @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id, [@project])
         in_progress = FairDataStationUpload.matching_imports_in_progress(@project, fair_data_station_inv.external_id)
       else
         error = 'Unable to process the file'
@@ -249,7 +249,6 @@ class ProjectsController < ApplicationController
         format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
       end
     end
-
 
   end
 

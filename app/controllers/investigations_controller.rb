@@ -40,7 +40,7 @@ class InvestigationsController < ApplicationController
   def submit_fairdata_station
     error = nil
     in_progress = []
-    mismatching_external_id = nil
+    mismatching_external_id = false
     if params[:datastation_data].present?
       path = params[:datastation_data].path
       fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
@@ -54,7 +54,6 @@ class InvestigationsController < ApplicationController
     else
       error = 'No file was submitted'
     end
-
 
     if mismatching_external_id
       error = "#{t('investigation')} external identifiers do not match"
