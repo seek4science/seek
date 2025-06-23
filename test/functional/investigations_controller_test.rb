@@ -1438,8 +1438,8 @@ class InvestigationsControllerTest < ActionController::TestCase
           assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
             post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
             assert_response :unprocessable_entity
-            assert_match /Unable to process the file/, flash[:error]
-            assert_select 'div#error_flash', text: /Unable to process the file/
+            assert_match /Unable to find an Investigation within the file/, flash[:error]
+            assert_select 'div#error_flash', text: /Unable to find an Investigation within the file/
           end
         end
       end

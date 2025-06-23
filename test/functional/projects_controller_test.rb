@@ -5439,7 +5439,7 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
     assert_response :unprocessable_entity
-    assert_match /Unable to process the file/, flash[:error]
+    assert_match /Unable to find an Investigation within the file/, flash[:error]
   end
 
   test 'submit fairdata station unable to save' do

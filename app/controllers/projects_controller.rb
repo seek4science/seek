@@ -215,7 +215,7 @@ class ProjectsController < ApplicationController
         @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id, [@project])
         in_progress = FairDataStationUpload.matching_imports_in_progress(@project, fair_data_station_inv.external_id)
       else
-        error = 'Unable to process the file'
+        error = "Unable to find an #{t('investigation')} within the file"
       end
     else
       error = 'No file was submitted'

@@ -49,7 +49,7 @@ class InvestigationsController < ApplicationController
         in_progress = FairDataStationUpload.matching_updates_in_progress(@investigation, fair_data_station_inv.external_id)
         mismatching_external_id = fair_data_station_inv.external_id != @investigation.external_identifier
       else
-        error = 'Unable to process the file'
+        error = "Unable to find an #{t('investigation')} within the file"
       end
     else
       error = 'No file was submitted'
