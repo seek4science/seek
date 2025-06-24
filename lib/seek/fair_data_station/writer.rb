@@ -194,7 +194,7 @@ module Seek
       def populate_extended_metadata(seek_entity, datastation_entity)
         if (emt = datastation_entity.find_closest_matching_extended_metadata_type)
           if emt != seek_entity.extended_metadata&.extended_metadata_type
-            seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
+            seek_entity.build_extended_metadata(extended_metadata_type: emt)
           end
           update_extended_metadata(seek_entity, datastation_entity)
         end

@@ -497,6 +497,14 @@ FactoryBot.define do
     end
   end
 
+  factory(:fairdata_test_case_partial_study_extended_metadata, class: ExtendedMetadataType) do
+    title {'Fair Data Station Partial Study Test Case'}
+    supported_type { 'Study' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:study_title_extended_metadata_attribute, title: 'Experimental site name', pid:'http://fairbydesign.nl/ontology/experimental_site_name')
+    end
+  end
+
   factory(:fairdata_test_case_study_extended_metadata, class: ExtendedMetadataType) do
     title {'Fair Data Station Study Test Case'}
     supported_type { 'Study' }

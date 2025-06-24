@@ -612,8 +612,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_nil investigation.extended_metadata
 
     inv_emt = FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
-    study_emt = FactoryBot.create(:fairdata_test_case_nested_study_extended_metadata)
-    obs_unit_emt = FactoryBot.create(:fairdata_test_case_nested_obsv_unit_extended_metadata)
+    study_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    obs_unit_emt = FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
     assay_emt = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-modified-test-case.ttl"
@@ -654,6 +654,61 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal obs_unit_emt, obs_unit.extended_metadata.extended_metadata_type
     assert_equal assay_emt, assay.extended_metadata.extended_metadata_type
 
+    expected = HashWithIndifferentAccess.new({
+                                               'Experimental site name': 'manchester test site - changed',
+                                               'End date of Study': '2024-08-08',
+                                               'Start date of Study': '2024-08-01'
+
+                                             })
+
+    assert_equal expected, study.extended_metadata.data
+
+  end
+
+  test 'EMT replaced during update if better match found' do
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    study_emt_partial = FactoryBot.create(:fairdata_test_case_partial_study_extended_metadata)
+    FactoryBot.create(:experimental_assay_class)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+    projects = contributor.projects
+    policy = Policy.default
+
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, projects, policy)
+    assert investigation.valid?
+    User.with_current_user(contributor.user) do
+      assert_difference('ExtendedMetadata.count', 2) do
+        investigation.save!
+      end
+    end
+    investigation.reload
+    assert_equal study_emt_partial, investigation.studies.first.extended_metadata.extended_metadata_type
+    expected = HashWithIndifferentAccess.new({
+                                               'Experimental site name': 'manchester test site'
+                                             })
+
+    assert_equal expected, investigation.studies.first.extended_metadata.data
+
+    study_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    User.with_current_user(contributor.user) do
+      assert_no_difference('ExtendedMetadata.count') do
+        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                     projects, policy)
+        investigation.save!
+      end
+    end
+
+    investigation.reload
+    assert_equal study_emt, investigation.studies.first.extended_metadata.extended_metadata_type
+    expected = HashWithIndifferentAccess.new({
+                                               'Experimental site name': 'manchester test site',
+                                               'End date of Study': '2024-08-08',
+                                               'Start date of Study': '2024-08-01'
+
+                                             })
+
+    assert_equal expected, investigation.studies.first.extended_metadata.data
   end
 
   test 'update isa with nested metadata' do
