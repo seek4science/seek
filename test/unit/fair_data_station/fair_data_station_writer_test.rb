@@ -691,8 +691,11 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal expected, investigation.studies.first.extended_metadata.data
 
     study_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-modified-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
     User.with_current_user(contributor.user) do
-      assert_no_difference('ExtendedMetadata.count') do
+      assert_difference('ExtendedMetadata.count', 1) do # 1 new study, other 2 had EMT replaced and old version removed
         investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
                                                                      projects, policy)
         investigation.save!
@@ -702,7 +705,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     investigation.reload
     assert_equal study_emt, investigation.studies.first.extended_metadata.extended_metadata_type
     expected = HashWithIndifferentAccess.new({
-                                               'Experimental site name': 'manchester test site',
+                                               'Experimental site name': 'manchester test site - changed',
                                                'End date of Study': '2024-08-08',
                                                'Start date of Study': '2024-08-01'
 
