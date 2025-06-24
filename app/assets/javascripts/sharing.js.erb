@@ -27,13 +27,6 @@ var Sharing = {
       }
     }
 
-    // This ensures that if a project permission is added, and that project is associated with the resource, it gains
-    //  the "isMandatory" flag.
-    if (permission.contributor_type === 'Project' &&
-        Sharing.getSelectedProjectIds().includes(permission.contributor_id)) {
-        permission.isMandatory = true;
-    }
-
     Sharing.permissionsTable.permissions.push(permission);
   },
 
@@ -43,20 +36,7 @@ var Sharing = {
         contributor_type: 'Project',
         contributor_id: project.id,
         title: project.title,
-        access_type: Sharing.associatedProjectAccessType,
-        isMandatory: true }, true);
-  },
-
-  removeMandatoryProjectPermissions: function () {
-    if (!Sharing.permissionsTable)
-      return;
-    var indices = [];
-    for (var i = Sharing.permissionsTable.permissions.length - 1; i >= 0; i--) {
-      if (Sharing.permissionsTable.permissions[i].contributor_type === 'Project' &&
-          Sharing.permissionsTable.permissions[i].isMandatory) {
-        Sharing.permissionsTable.permissions.splice(i, 1);
-      }
-    }
+        access_type: Sharing.associatedProjectAccessType }, true);
   },
 
   removePermissionForProject: function (project) {
@@ -68,8 +48,6 @@ var Sharing = {
     }
     if (confirm('Do you want to remove any permissions for ' + project.title + '?')) {
       Sharing.permissionsTable.permissions.splice(i, 1);
-    } else {
-      Sharing.permissionsTable.permissions[i].isMandatory = false;
     }
   },
 
@@ -230,9 +208,10 @@ Vue.component('permission-row', {
       return '<%= asset_path icon_filename_for_key('world') %>';
     },
     mandatory: function () {
-        if (this.permission.isMandatory) {
+        if (this.permission.isPublic) {
             return true;
-        } else if (this.permission.contributor_type === 'Project') {
+        }
+        if (this.permission.contributor_type === 'Project') {
             return Sharing.getSelectedProjectIds().includes(this.permission.contributor_id);
         }
         return false;

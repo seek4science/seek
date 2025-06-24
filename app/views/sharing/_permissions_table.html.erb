@@ -21,8 +21,7 @@
       publicPermission: {
         access_type: policy.access_type, <%# Uses snake case because that's how rails returns the JSON %>
         title: 'Public',
-        isPublic: true,
-        isMandatory: true },
+        isPublic: true },
       permissions: policy.permissions
     }
   });
