@@ -199,7 +199,11 @@ module Seek
       end
 
       def update_extended_metadata(seek_entity, datastation_entity)
-        datastation_entity.populate_extended_metadata(seek_entity)
+        if seek_entity.extended_metadata.nil?
+          populate_extended_metadata(seek_entity, datastation_entity)
+        else
+          datastation_entity.populate_extended_metadata(seek_entity)
+        end
       end
 
       def update_sample_metadata(seek_sample, datastation_sample)
