@@ -18,14 +18,16 @@ class ProjectsController < ApplicationController
                                         :administer_create_project_request, :respond_create_project_request,
                                         :administer_import_project_request, :respond_import_project_request,
                                         :import_from_fairdata_station, :submit_fairdata_station,
-                                        :project_join_requests, :project_creation_requests, :project_importation_requests, :typeahead]
+                                        :project_join_requests, :project_creation_requests, :project_importation_requests,
+                                        :typeahead, :default_data]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy admin_members
                                                asset_report populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request
                                                import_from_fairdata_station submit_fairdata_station
-                                               fair_data_station_import_status hide_fair_data_station_import_status]
+                                               fair_data_station_import_status hide_fair_data_station_import_status
+                                               default_data]
 
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
@@ -36,7 +38,8 @@ class ProjectsController < ApplicationController
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
   before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station,
-                                                :fair_data_station_import_status, :hide_fair_data_station_import_status], unless: :admin_logged_in?
+                                                :fair_data_station_import_status, :hide_fair_data_station_import_status,
+                                                :default_data], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
@@ -974,6 +977,12 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.json { render json: {results: items}.to_json }
+    end
+  end
+
+  def default_data
+    respond_to do |format|
+      format.json
     end
   end
 

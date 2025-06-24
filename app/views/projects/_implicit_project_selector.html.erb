@@ -1,12 +1,10 @@
 <%# Selects a project implicitly when a study/investigation is selected from an assay/study.%>
 <%# Populates the sharing form, prompts to apply the default policy%>
 
-<%= content_tag :script, project_policies_json(parents.map(&:projects).flatten.uniq), type: 'application/json', id: 'project-default-policies-json' %>
 <%= content_tag :script, project_lookup_json(parents), type: 'application/json', id: 'project-lookup-json' %>
 <script>
   var projectsLookup = JSON.parse($j('#project-lookup-json').text());
   Sharing.implicitProjects = [];
-  Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
 
   function setImplicitProjects(lookupId, skipPrompt) {
     Sharing.removeMandatoryProjectPermissions();
@@ -16,7 +14,9 @@
         Sharing.implicitProjects = projects;
 
         if (projects.length === 1) {
-          Sharing.defaultPolicyPrompt(projects[0], skipPrompt);
+            Sharing.fetchDefaultData(projects[0]).then((data) => {
+              Sharing.defaultPolicyPrompt(projects[0], data.policy, skipPrompt);
+            });
         }
 
         for (var i = 0; i < projects.length; i++) {
