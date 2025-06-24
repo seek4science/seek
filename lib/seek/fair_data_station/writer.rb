@@ -118,7 +118,7 @@ module Seek
       def update_entity(seek_entity, datastation_entity, contributor)
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
-        update_extended_metadata(seek_entity, datastation_entity)
+        populate_extended_metadata(seek_entity, datastation_entity)
         record_update_activity_if_changed(seek_entity, contributor)
         seek_entity
       end
@@ -193,17 +193,15 @@ module Seek
 
       def populate_extended_metadata(seek_entity, datastation_entity)
         if (emt = datastation_entity.find_closest_matching_extended_metadata_type)
-          seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
+          if emt != seek_entity.extended_metadata&.extended_metadata_type
+            seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
+          end
           update_extended_metadata(seek_entity, datastation_entity)
         end
       end
 
       def update_extended_metadata(seek_entity, datastation_entity)
-        if seek_entity.extended_metadata.nil?
-          populate_extended_metadata(seek_entity, datastation_entity)
-        else
-          datastation_entity.populate_extended_metadata(seek_entity)
-        end
+        datastation_entity.populate_extended_metadata(seek_entity)
       end
 
       def update_sample_metadata(seek_sample, datastation_sample)
