@@ -19,11 +19,13 @@
 
 <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals:{f:f,resource:@assay} %>
 
-<div class="form-group">
-  <label class="required"><%= t('study') -%></label>
+<% if show_form_manage_specific_attributes? %>
+  <div class="form-group">
+    <label class="required"><%= t('study') -%></label>
 
-  <%= resource_study_selection('assay[study_id]', @assay.study) %>
-</div>
+    <%= resource_study_selection('assay[study_id]', @assay.study) %>
+  </div>
+<% end %>
 
 <div class="form-group">
   <%= f.label "Assay position" -%><br/>
