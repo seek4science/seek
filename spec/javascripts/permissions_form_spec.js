@@ -10,8 +10,7 @@ describe('Permissions form and projects selector', function() {
                 publicPermission: {
                     access_type: Sharing.accessTypes.accessible,
                     title: 'Public',
-                    isPublic: true,
-                    isMandatory: true },
+                    isPublic: true },
                 permissions: []
             }
         });
