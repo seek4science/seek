@@ -1098,10 +1098,10 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
     if @project.nil? || !@project.has_member?(current_user)
       flash[:error] = "You are not a member of this #{t('project')}, so cannot access this page."
-      redirect_to project_path(@project)
-      false
-    else
-      true
+      respond_to do |format|
+        format.html { redirect_to project_path(@project) }
+        format.json { head :forbidden }
+      end
     end
   end
 
