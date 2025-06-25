@@ -107,6 +107,16 @@
                           licenseSelect.val(data.license).change().trigger('select2:select');
                       }
                   }
+
+                  // Select default disciplines
+                  if (select.selected.length === 1 && data.disciplines) {
+                      var disciplineSelect = $j('#<%= controller_name.singularize -%>_discipline_annotations');
+                      if (disciplineSelect.length && !disciplineSelect.val()) {
+                          disciplineSelect.val(data.disciplines).change().trigger('select2:select');
+                      }
+                  }
+
+                  // Remove project option from list
                   this.possibilities.splice(i, 1);
               });
 
