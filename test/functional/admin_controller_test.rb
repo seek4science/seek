@@ -198,6 +198,16 @@ class AdminControllerTest < ActionController::TestCase
     assert User.current_user.person.is_admin?
   end
 
+  test 'get registered users' do
+    user = FactoryBot.create(:user, email: 'test@test.com')
+    person_with_user = user.person
+    person_without_user = FactoryBot.create(:person, user: nil)
+    get :get_stats, xhr: true, params: { page: 'registered_users' }
+    assert_response :success
+    assert_match person_with_user.name, response.body
+    refute_match person_without_user.name, response.body
+  end
+
   test 'get project content stats' do
     get :get_stats, xhr: true, params: { page: 'content_stats' }
     assert_response :success

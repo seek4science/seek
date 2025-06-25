@@ -513,6 +513,10 @@ class AdminController < ApplicationController
       partial = 'user_stats_list'
       collection = Person.pals
       title = 'List of PALs'
+    when 'registered_users'
+      partial = 'user_stats_list'
+      collection  = Person.registered
+      title = 'All Profiles'
     when 'none'
       partial = 'none'
     end
