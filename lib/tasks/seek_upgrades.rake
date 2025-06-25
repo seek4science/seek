@@ -14,12 +14,7 @@ namespace :seek do
     db:seed:014_data_types_controlled_vocab
     db:seed:003_model_formats
     db:seed:004_model_recommended_environments
-    db:seed:007_sample_attribute_types
     update_rdf
-    update_observation_unit_policies
-    fix_xlsx_marked_as_zip
-    add_policies_to_existing_sample_types
-    fix_previous_sample_type_permissions
     update_morpheus_model
   ]
 
@@ -57,7 +52,7 @@ namespace :seek do
 
   # if rdf repository enabled then generate jobs, otherwise just clear the cache. Only runs once
   task(update_rdf: [:environment]) do
-    only_once('seek:update_rdf 1.16.1') do
+    only_once('seek:update_rdf 1.17.0') do
       if Seek::Rdf::RdfRepository.instance&.configured?
         puts '... triggering rdf generation jobs'
         Rake::Task['seek_rdf:generate'].invoke
@@ -68,33 +63,6 @@ namespace :seek do
           FileUtils.rm_rf(path, secure: true)
         end
       end
-    end
-  end
-
-  task(update_observation_unit_policies: [:environment]) do
-    puts '..... creating observation unit policies ...'
-    affected_obs_units = []
-    ObservationUnit.where.missing(:policy).includes(:study).in_batches(of: 25) do |batch|
-      batch.each do |obs_unit|
-        policy = obs_unit.study.policy || Policy.default
-        policy = policy.deep_copy
-        policy.save
-        obs_unit.update_column(:policy_id, policy.id)
-        affected_obs_units << obs_unit
-      end
-      putc('.')
-    end
-    AuthLookupUpdateQueue.enqueue(affected_obs_units)
-    RdfGenerationQueue.enqueue(affected_obs_units)
-    puts "..... finished updating policies for #{affected_obs_units.count} observation units"
-  end
-
-  task(fix_xlsx_marked_as_zip: [:environment]) do
-    blobs = ContentBlob.where('original_filename LIKE ?','%.xlsx').where(content_type: 'application/zip')
-    if blobs.any?
-      n = blobs.count
-      blobs.update_all(content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      puts "... fixed #{n} XLSX blobs with zip content type"
     end
   end
 
@@ -125,60 +93,6 @@ namespace :seek do
     unless errors.empty?
       puts "The following errors were encountered during the update:"
       errors.each { |error| puts error }
-    end
-  end
-
-  task(add_policies_to_existing_sample_types: [:environment]) do
-    puts '... Adding policies to existing sample types'
-    counter = 0
-    disable_authorization_checks do
-      SampleType.includes(:projects, :assays, :studies).where(policy_id: nil).each do |st|
-        if st.is_isa_json_compliant?
-          st.update_column(:policy_id, st.assays.first.policy_id) if st.assays.any?
-          st.update_column(:policy_id, st.studies.first.policy_id) if st.studies.any?
-        else
-          policy = Policy.new
-          policy.name = 'default policy'
-
-          # Visible if linked to public samples
-          if st.samples.any? { |sample| sample.is_published? }
-            policy.access_type = Policy::ACCESSIBLE
-          else
-            policy.access_type = Policy::NO_ACCESS
-          end
-          # Visible to each project
-          st.projects.map do |project|
-            policy.permissions << Permission.new(contributor_type: Permission::PROJECT, contributor_id: project.id, access_type: Policy::ACCESSIBLE)
-          end
-          # Project admins can manage
-          project_admins = st.projects.map(&:project_administrators).flatten
-          project_admins.map do |admin|
-            policy.permissions << Permission.new(contributor_type: Permission::PERSON, contributor_id: admin.id, access_type: Policy::MANAGING)
-          end
-
-          policy.save
-          st.update_column(:policy_id, policy.id)
-        end
-        putc('.')
-        counter += 1
-      end
-    end
-    puts "... Added policies to #{counter} sample types"
-  end
-
-  task(fix_previous_sample_type_permissions: [:environment]) do
-    only_once('fix_previous_sample_type_permissions 1.16.0') do
-      puts '... Updating previous sample type permissions ...'
-      SampleType.includes(:policy).where.not(policy_id: nil).each do |sample_type|
-        policy = sample_type.policy
-        if policy.access_type == Policy::VISIBLE
-          policy.update_column(:access_type, Policy::ACCESSIBLE)
-        end
-        policy.permissions.where(access_type: Policy::VISIBLE).where(contributor_type: Permission::PROJECT).update_all(access_type: Policy::ACCESSIBLE)
-        putc('.')
-      end
-      AuthLookupUpdateQueue.enqueue(SampleType.all)
-      puts '... Finished updating previous sample type permissions'
     end
   end
 
