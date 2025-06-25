@@ -49,17 +49,18 @@ class LinkingSamplesUpdateJobTest < ActiveSupport::TestCase
 
     another_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [project.id])
     another_sample_type.sample_attributes.last.linked_sample_type = sample_type
+    another_sample_type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'age',
+                                                              sample_attribute_type: FactoryBot.create(:age_sample_attribute_type), required: false)
     another_sample_type.save!
+    disable_authorization_checks do
+      Sample.create!(sample_type: another_sample_type, project_ids: [project.id],
+                     data: { title: 'linked_sample1', patient: [main_sample.id], age: 42 })
 
-    linked_sample1 = Sample.new(sample_type: another_sample_type, project_ids: [project.id])
-    linked_sample1.set_attribute_value(:title, 'linked_sample1')
-    linked_sample1.set_attribute_value(:patient, [main_sample.id])
-    disable_authorization_checks { linked_sample1.save! }
-
-    linked_sample2 = Sample.new(sample_type: another_sample_type, project_ids: [project.id])
-    linked_sample2.set_attribute_value(:title, 'linked_sample2')
-    linked_sample2.set_attribute_value(:patient, [main_sample.id])
-    disable_authorization_checks { linked_sample2.save! }
+      s2 = Sample.create!(sample_type: another_sample_type, project_ids: [project.id],
+                     data: { title: 'linked_sample2', patient: [main_sample.id], age: 43 })
+      # Muddle the order of the properties in the JSON metadata
+      s2.update_column(:json_metadata, JSON.parse(s2.json_metadata).slice('patient', 'age', 'title').to_json)
+    end
   end
 
 end
