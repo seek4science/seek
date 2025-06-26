@@ -199,6 +199,7 @@ FactoryBot.define do
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Discipline', iri: 'http://disciplineontology.org/discipline_1', parent_iri:'')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Biology', iri: 'http://disciplineontology.org/discipline_2', parent_iri: 'http://disciplineontology.org/discipline_1')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Chemistry', iri: 'http://disciplineontology.org/discipline_3', parent_iri: 'http://disciplineontology.org/discipline_1')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Physics', iri: 'http://disciplineontology.org/discipline_4', parent_iri: 'http://disciplineontology.org/discipline_1')
     end
   end
   

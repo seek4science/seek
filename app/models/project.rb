@@ -93,6 +93,9 @@ class Project < ApplicationRecord
 
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
+  before_save :check_disciplines
+  after_save :propagate_disciplines
+
   def assets
     data_files | sops | models | publications | presentations | documents | workflows | collections
   end
@@ -282,4 +285,20 @@ class Project < ApplicationRecord
     end
   end
 
+  def check_disciplines
+    @_disciplines = discipline_annotation_labels.sort
+  end
+
+  def propagate_disciplines
+    new_disciplines = discipline_annotation_labels.sort
+    unless @_disciplines == new_disciplines
+      disable_authorization_checks do
+        workflows.find_each do |workflow|
+          next if workflow.discipline_annotations.any?
+          workflow.discipline_annotations = new_disciplines
+          workflow.save(touch: false)
+        end
+      end
+    end
+  end
 end
