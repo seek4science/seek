@@ -134,7 +134,8 @@ module Seek
           'sioc' => RDF::Vocab::SIOC.to_uri.to_s,
           'mixs' => 'https://w3id.org/mixs/',
           'uniprot' => 'http://purl.uniprot.org/core/',
-          'fairbd' => 'http://fairbydesign.nl/ontology/'
+          'fairbd' => 'http://fairbydesign.nl/ontology/',
+          'xsd' => 'http://www.w3.org/2001/XMLSchema#'
         }
       end
 
