@@ -286,11 +286,4 @@ class Workflow < ApplicationRecord
   def self.find_by_source_url(source_url)
     joins(:source_link).where('asset_links.url' => source_url)
   end
-
-  alias_method :orig_discipline_annotation_values, :discipline_annotation_values
-  def discipline_annotation_values
-    mine = orig_discipline_annotation_values
-    return projects.first.discipline_annotation_values if mine.empty? && projects.first
-    mine
-  end
 end
