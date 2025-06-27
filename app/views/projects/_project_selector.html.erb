@@ -70,13 +70,8 @@
 <% end %>
 <%= content_tag :script, possible_projects_json.html_safe, type: 'application/json', id: 'project-selector-possibilities-json' %>
 <%= content_tag :script, selected_projects_json.html_safe, type: 'application/json', id: 'project-selector-selected-json' %>
-<%= content_tag :script, project_policies_json(possible_projects | selected_projects), type: 'application/json', id: 'project-default-policies-json' %>
-<%= content_tag :script, enable_auto_project_license? ? project_licenses_json : '{}', type: 'application/json', id: 'project-default-licenses-json' %>
 
 <script id="project-selector-script">
-  Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
-  Sharing.defaultLicenses = JSON.parse($j('#project-default-licenses-json').text());
-
   Sharing.projectsSelector = new Vue({
     el: '#project-selector',
     data: {
@@ -100,18 +95,31 @@
         for (var i = 0; i < this.possibilities.length; i++) {
           var project = this.possibilities[i];
           if (project.id == projectId) {
-            this.selected.push(project);
-            Sharing.defaultPolicyPrompt(project, skipPrompt);
+              const select = this;
+              select.selected.push(project);
+              Sharing.fetchDefaultData(project).then((data) => {
+                  Sharing.defaultPolicyPrompt(project, data.policy, skipPrompt);
+                  // Select the default license
+                  if (select.selected.length === 1 && data.license) {
+                      var licenseSelect = $j('#license-select');
+                      if (licenseSelect.length && licenseSelect.data('canOverwrite') &&
+                          $j('option[value="'+data.license+'"]', licenseSelect).length) {
+                          licenseSelect.val(data.license).change().trigger('select2:select');
+                      }
+                  }
 
-            // Select the default license
-            if (this.selected.length === 1 && Sharing.defaultLicenses[project.id]) {
-                var licenseSelect = $j('#license-select');
-                if (licenseSelect.length && licenseSelect.data('canOverwrite') &&
-                    $j('option[value="'+Sharing.defaultLicenses[project.id]+'"]', licenseSelect).length) {
-                    licenseSelect.val(Sharing.defaultLicenses[project.id]).change();
-                }
-            }
-            this.possibilities.splice(i, 1);
+                  // Select default disciplines
+                  if (select.selected.length === 1 && data.disciplines) {
+                      var disciplineSelect = $j('#<%= controller_name.singularize -%>_discipline_annotations');
+                      if (disciplineSelect.length && !disciplineSelect.val()) {
+                          disciplineSelect.val(data.disciplines).change().trigger('select2:select');
+                      }
+                  }
+
+                  // Remove project option from list
+                  this.possibilities.splice(i, 1);
+              });
+
             return false;
           }
         }

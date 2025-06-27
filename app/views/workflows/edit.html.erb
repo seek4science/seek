@@ -34,6 +34,8 @@
 
     <%= render partial: 'assets/controlled_vocab_annotations_form_properties', locals: { resource: @workflow } %>
 
+    <%= render partial: 'assets/controlled_vocab_annotations_form_property', locals: { resource: @workflow, property: :disciplines} -%>
+
     <div class="form-group">
       <label>Maturity</label>
       <%= f.select :maturity_level, Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, { include_blank: 'Not specified' }, class: 'form-control' -%>
