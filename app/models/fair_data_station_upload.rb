@@ -1,8 +1,11 @@
 class FairDataStationUpload < ApplicationRecord
+  include Seek::ActsAsAsset::ContentBlobs::ClassMethods
+  include Seek::ActsAsAsset::ContentBlobs::InstanceMethods
+
   belongs_to :investigation
   belongs_to :content_blob, validate: true
   belongs_to :project
-  belongs_to :policy, validate: true
+  belongs_to :policy, validate: true, dependent: :destroy
   belongs_to :contributor, class_name: 'Person'
   enum :purpose, %i[import update], suffix: true
 

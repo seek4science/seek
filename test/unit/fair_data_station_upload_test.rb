@@ -159,4 +159,33 @@ class FairDataStationUploadTest < ActiveSupport::TestCase
     matches = FairDataStationUpload.matching_updates_in_progress(investigation, 'test-id')
     assert_equal [upload, upload2, upload3].sort, matches.sort
   end
+
+  test 'clean up after investigation destroyed' do
+    investigation = FactoryBot.create(:investigation)
+    contributor = investigation.contributor
+    project = investigation.projects.first
+    upload1 = FactoryBot.create(:fair_data_station_upload, investigation: investigation, project: project, contributor: contributor)
+    upload2 = FactoryBot.create(:update_fair_data_station_upload, investigation: investigation, project: project, contributor: contributor)
+    blob1 = upload1.content_blob
+    blob2 = upload2.content_blob
+    refute blob1.deleted?
+    refute blob2.deleted?
+    assert_equal [upload1, upload2], investigation.fair_data_station_uploads
+    User.with_current_user(contributor.user) do
+      assert_difference('Investigation.count', -1) do
+        assert_difference('Policy.count', -2) do
+          assert_difference('FairDataStationUpload.count', -2) do
+            assert_no_difference('ContentBlob.count') do
+              investigation.destroy!
+            end
+          end
+        end
+      end
+    end
+    # blobs are not deleted immediately, but marked for deletion to be cleaned up by a job
+    blob1.reload
+    blob2.reload
+    assert blob1.deleted?
+    assert blob2.deleted?
+  end
 end

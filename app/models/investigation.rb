@@ -21,6 +21,8 @@ class Investigation < ApplicationRecord
   has_many :observation_units, through: :studies
   has_many :observations_unit_data_files, -> { distinct }, through: :observation_units, source: :data_files
   has_many :observations_unit_samples, -> { distinct }, through: :observation_units, source: :samples
+
+  has_many :fair_data_station_uploads, dependent: :destroy
   def state_allows_delete?(*args)
     studies.empty? && super
   end
