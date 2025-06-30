@@ -500,7 +500,12 @@ module Seek
       def get_value(setting, conversion = nil)
         val = Settings.defaults[setting.to_s]
         if Thread.current[:use_settings_cache]
-          result = settings_cache[setting]
+          begin
+            result = settings_cache[setting]
+          rescue Errno::ENOENT => e
+            Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
+            result = Settings.global.fetch(setting)
+          end
         else
           result = Settings.global.fetch(setting)
         end
