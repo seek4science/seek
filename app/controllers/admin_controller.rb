@@ -516,7 +516,7 @@ class AdminController < ApplicationController
     when 'profiles_with_users'
       partial = 'user_stats_list'
       collection  = Person.registered
-      title = 'All Profiles'
+      title = 'Profiles with users'
     when 'none'
       partial = 'none'
     end
