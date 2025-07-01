@@ -116,7 +116,8 @@ class SampleControlledVocab < ApplicationRecord
       topics: 'topic_annotations',
       operations: 'operation_annotations',
       data_formats: 'data_format_annotations',
-      data_types: 'data_type_annotations'
+      data_types: 'data_type_annotations',
+      disciplines: 'discipline_annotations',
     }
 
     def self.vocab_for_property(property)

@@ -19,11 +19,13 @@
   </div>
 <% end %>
 
-<%= folding_panel("#{t('investigation')} details") do %>
-    <label class="required"><%= t('investigation') %></label>
-    <div id="investigation_collection">
-      <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
-    </div>    
+<% if show_form_manage_specific_attributes? %>
+  <%= folding_panel("#{t('investigation')} details") do %>
+      <label class="required"><%= t('investigation') %></label>
+      <div id="investigation_collection">
+        <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
+      </div>
+  <% end %>
 <% end %>
 
 <div class="form-group">

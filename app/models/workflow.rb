@@ -14,7 +14,7 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent
 
-  has_controlled_vocab_annotations :topics, :operations
+  has_controlled_vocab_annotations :topics, :operations, :disciplines
 
   validates :projects, presence: true, projects: { self: true }
 
