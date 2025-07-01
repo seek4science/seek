@@ -30,6 +30,7 @@ module Seek
     )
 
     def self.render(markdown)
+      markdown = markdown.encode('UTF-8', 'binary', invalid: :replace, undef: :replace)
       return '' if markdown.blank?
       MarkdownPipeline.call(markdown)[:output]
     end
