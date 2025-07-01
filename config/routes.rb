@@ -899,6 +899,6 @@ SEEK::Application.routes.draw do
   get 'cookies/consent' => 'cookies#consent'
   post 'cookies/consent' => 'cookies#set_consent'
 
-  # for the api docs under production, avoids special rewrite rules
-  get 'api', to: static("api/index.html") if Rails.env.production?
+  # for the api docs avoids special rewrite rules
+  get 'api' => 'homes#api_docs'
 end

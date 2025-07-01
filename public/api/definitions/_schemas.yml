@@ -1791,6 +1791,8 @@ institutionPost:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            department:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             ror_id:
               $ref: "#/components/schemas/nullableNonEmptyString"
             country:
@@ -1831,6 +1833,8 @@ institutionPatch:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            department:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             ror_id:
               $ref: "#/components/schemas/nullableNonEmptyString"
             country:
@@ -3752,6 +3756,8 @@ institutionResponse:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            department:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             ror_id:
               $ref: "#/components/schemas/nullableNonEmptyString"
             country:

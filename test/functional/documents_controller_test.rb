@@ -1518,6 +1518,20 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can filter search result set with many results and sort by relevance' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    documents = FactoryBot.create_list(:document, 85, contributor: person)
+    first_doc = documents.delete_at(31) # Pick a random doc from the middle of the collection and move it to the front
+    documents.unshift(first_doc)
+    assert_equal first_doc, documents.first
+    Document.stub(:solr_cache, -> (q) { documents.map(&:id) }) do
+      get :index, params: { filter: { query: 'test', contributor: person.id } }
+    end
+
+    assert_equal first_doc, assigns(:documents).first
+  end
+
   private
 
   def valid_document

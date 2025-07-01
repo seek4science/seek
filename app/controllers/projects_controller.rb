@@ -131,7 +131,7 @@ class ProjectsController < ApplicationController
     validation_error_msg=nil;
 
     if params[:accept_request]=='1'
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:id, :title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
 
       if @institution.id
@@ -186,7 +186,7 @@ class ProjectsController < ApplicationController
     raise 'no projects defined' if @projects.empty?
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:id, :title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
@@ -283,13 +283,18 @@ class ProjectsController < ApplicationController
     proj_params = params.require(:project).permit([:title, :web_page, :description])
     @project = Project.new(proj_params)
 
+    institution_params = params[:institution]
+    department = institution_params[:department]
+    ror_id     = institution_params[:ror_id]
+    title      = institution_params[:title]
+    id         = institution_params[:id]
 
-    @institution = Institution.find_by_id(params[:institution][:id]) ||
-      (params[:institution][:ror_id].present? && Institution.find_by(ror_id: params[:institution][:ror_id])) ||
-      Institution.find_by(title: params[:institution][:title])
+    @institution = Institution.find_by(id:id, department: department) ||
+      (Institution.find_by(ror_id: ror_id, department: department) if ror_id.present? ) ||
+                      Institution.find_by(title: title, department: department)
 
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
@@ -406,7 +411,7 @@ class ProjectsController < ApplicationController
     # Create institution
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:id, :title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
@@ -514,7 +519,7 @@ class ProjectsController < ApplicationController
     end
   end
 
-  
+
   # GET /projects/1
   def show
     respond_to do |format|
@@ -715,7 +720,7 @@ class ProjectsController < ApplicationController
       format.html { redirect_to project_path(@project) }
     end
   end
-  
+
   def admin_members
     respond_with(@project)
   end
@@ -787,7 +792,8 @@ class ProjectsController < ApplicationController
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id]))
+        @institution = Institution.new(params.require(:institution).permit([:title, :department,:web_page, :city,
+:country, :ror_id]))
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
@@ -848,7 +854,8 @@ class ProjectsController < ApplicationController
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id]))
+        @institution = Institution.new(params.require(:institution).permit([:title,:department, :web_page, :city,
+:country, :ror_id]))
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
@@ -1156,15 +1163,11 @@ class ProjectsController < ApplicationController
     @institution = details.institution
     @people = details.people
     if @institution&.new_record?
-      existing_institution =
-        if @institution.ror_id.present?
-          Institution.find_by(ror_id: @institution.ror_id)
-        elsif @institution.title.present?
-          Institution.find_by(title: @institution.title)
-        end
-
-      @institution = existing_institution if existing_institution.present?
+      existing_institution = Institution.find_by(ror_id: @institution.ror_id, department: @institution.department.presence) ||
+        Institution.find_by(title: @institution[:title], department: @institution.department.presence)
+      @institution = existing_institution if existing_institution
     end
+
   end
 
   # check programme permissions for responding to a MessageLog

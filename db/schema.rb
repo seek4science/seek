@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -774,6 +774,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "external_identifier", limit: 2048
+    t.string "deleted_contributor"
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -943,6 +944,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.string "ror_id"
+    t.string "department"
   end
 
   create_table "investigation_auth_lookup", force: :cascade do |t|
@@ -1387,6 +1389,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
     t.bigint "project_id"
     t.integer "data_file_id"
     t.string "external_identifier", limit: 2048
+    t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
@@ -1822,7 +1825,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_22_132921) do
     t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
-    t.integer "template_id"
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|

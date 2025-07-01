@@ -18,4 +18,10 @@ class RoutingTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'api docs' do
+    get '/api'
+
+    assert_response :success
+    assert_select 'redoc'
+  end
 end

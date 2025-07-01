@@ -208,7 +208,7 @@ module Seek
       end
 
       def populate_sample(seek_sample, datastation_sample)
-        if (sample_type = datastation_sample.find_closest_matching_sample_type)
+        if (sample_type = datastation_sample.find_closest_matching_sample_type(seek_sample.contributor))
           seek_sample.sample_type = sample_type
           update_sample_metadata(seek_sample, datastation_sample)
         else

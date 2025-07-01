@@ -1,14 +1,13 @@
 class Institution < ApplicationRecord
 
   acts_as_yellow_pages
-  title_trimmer
 
-  auto_strip_attributes :web_page
+  auto_strip_attributes :web_page, :title
 
   before_validation :fetch_ror_details, if: -> { ror_id.present? && ror_id_changed? }
 
-  validates :title, uniqueness: true
-  validates :ror_id, uniqueness: true, allow_blank: true
+  validates :title, uniqueness: { scope: :department }
+  validates :ror_id, uniqueness: { scope: :department }, allow_blank: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
 
@@ -23,6 +22,15 @@ class Institution < ApplicationRecord
   searchable(auto_index: false) do
     text :city, :address
   end if Seek::Config.solr_enabled
+
+
+  def title
+    if department.present?
+      "#{department}, #{super}"
+    else
+      super
+    end
+  end
 
   def can_edit?(user = User.current_user)
     return false unless user

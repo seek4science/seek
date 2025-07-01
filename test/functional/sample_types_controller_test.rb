@@ -3,6 +3,7 @@ require 'test_helper'
 class SampleTypesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include SharingFormTestHelper
 
   setup do
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
@@ -52,7 +53,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should create sample_type' do
     FactoryBot.create :annotation, attribute_name: 'sample_type_tag', source: @person.user,
                                    annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
-
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
     assert_enqueued_with(job: SampleTemplateGeneratorJob) do
       assert_enqueued_with(job: SampleTypeUpdateJob) do
         assert_difference('ActivityLog.count') do
@@ -74,34 +75,41 @@ class SampleTypesControllerTest < ActionController::TestCase
 
                                                        }
                                                      },
-                                                     tags: ['fish','golf'] } }
+                                                     tags: ['fish', 'golf'] },
+                                      policy_attributes: policy_attributes}
             end
           end
         end
       end
     end
 
-    refute_nil type = assigns(:sample_type)
-    assert_redirected_to sample_type_path(type)
+    refute_nil sample_type = assigns(:sample_type)
+    assert_redirected_to sample_type_path(sample_type)
 
-    assert_equal @person, type.contributor
-    assert_equal 'Hello!', type.title
-    assert_equal 'The description!!', type.description
-    assert_equal @project_ids.sort, type.project_ids.sort
-    assert_equal 2, type.sample_attributes.size
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+    assert_equal 'The description!!', sample_type.description
+    assert_equal @project_ids.sort, sample_type.project_ids.sort
+    assert_equal 2, sample_type.sample_attributes.size
 
-    assert_equal 'a string', type.sample_attributes.title_attributes.first.title
-    assert_nil type.sample_attributes.first.description
-    assert_nil type.sample_attributes.first.pid
-    assert_equal 'a number', type.sample_attributes.second.title
-    assert_equal 'this is a number', type.sample_attributes.second.description
-    assert_equal 'scheme:id', type.sample_attributes.second.pid
+    assert_equal 'a string', sample_type.sample_attributes.title_attributes.first.title
+    assert_nil sample_type.sample_attributes.first.description
+    assert_nil sample_type.sample_attributes.first.pid
+    assert_equal 'a number', sample_type.sample_attributes.second.title
+    assert_equal 'this is a number', sample_type.sample_attributes.second.description
+    assert_equal 'scheme:id', sample_type.sample_attributes.second.pid
 
-    assert_equal [@project], type.projects
-    refute type.uploaded_template?
-    assert_equal %w[fish golf], type.tags.sort
+    assert_equal [@project], sample_type.projects
+    refute sample_type.uploaded_template?
+    assert_equal %w[fish golf], sample_type.tags.sort
 
-    assert_equal type, ActivityLog.last.activity_loggable
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'create', ActivityLog.last.action
     assert_equal @person.user, ActivityLog.last.culprit
     assert_equal 'Hello!', ActivityLog.last.data
@@ -247,13 +255,16 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert sample_type.template_generation_task.reload.completed?
 
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
+
     assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
       assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample_type, true]) do
         assert_difference('ActivityLog.count', 1) do
           assert_difference('SampleAttribute.count', -1) do
             put :update, params: { id: sample_type, sample_type: { title: 'Hello!',
                                                                    sample_attributes_attributes: sample_attributes_fields,
-                                                                   tags: ['fish',golf.value.text] } }
+                                                                   tags: ['fish',golf.value.text] },
+                                   policy_attributes: policy_attributes }
 
             assert sample_type.template_generation_task.reload.pending?
           end
@@ -262,11 +273,18 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
     assert_redirected_to sample_type_path(assigns(:sample_type))
 
-    assert_equal sample_attributes_fields.keys.size - 1, assigns(:sample_type).sample_attributes.size
-    assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
-    refute assigns(:sample_type).sample_attributes[0].is_title?
-    assert assigns(:sample_type).sample_attributes[1].is_title?
-    assert_equal %w[fish golf], assigns(:sample_type).tags.sort
+    sample_type.reload
+    assert_equal sample_attributes_fields.keys.size - 1, sample_type.sample_attributes.size
+    assert_includes sample_type.sample_attributes.map(&:title), 'hello'
+    refute sample_type.sample_attributes[0].is_title?
+    assert sample_type.sample_attributes[1].is_title?
+    assert_equal %w[fish golf], sample_type.tags.sort
+
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
 
     assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'update', ActivityLog.last.action
@@ -413,20 +431,34 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'create from template' do
     blob = { data: template_for_upload }
 
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
+
     assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
         assert_difference('ContentBlob.count', 1) do
           post :create_from_template,
-               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+               params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
+                         content_blobs: [blob],
+                         policy_attributes: policy_attributes }
+
         end
       end
     end
 
-    assert_redirected_to edit_sample_type_path(assigns(:sample_type))
-    assert_empty assigns(:sample_type).errors
-    assert assigns(:sample_type).uploaded_template?
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    assert sample_type.uploaded_template?
 
-    assert_equal assigns(:sample_type), ActivityLog.last.activity_loggable
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal %w[fish golf], sample_type.tags.sort
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'create', ActivityLog.last.action
   end
 
@@ -462,12 +494,15 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'create from fair data station ttl' do
     blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
     FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
     assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
         assert_no_difference('ContentBlob.count') do
           with_config_value(:fair_data_station_enabled, true) do
             post :create_from_fair_ds_ttl,
-                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
+                           content_blobs: [blob],
+                           policy_attributes: policy_attributes}
           end
         end
       end
@@ -482,6 +517,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute sample_type.uploaded_template?
     assert_equal @person, sample_type.contributor
     assert_equal 'Hello!', sample_type.title
+
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal %w[fish golf], sample_type.tags.sort
 
     assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'create', ActivityLog.last.action

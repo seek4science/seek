@@ -30,6 +30,9 @@
                 <%= label_tag 'Title' %><span class="required">*</span>
                 <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
 
+                <%= label_tag 'Department' %>
+                <%= text_field_tag 'institution[department]',@institution.department, class:'form-control' %>
+
                 <%= label_tag 'Website' %>
                 <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
 
