@@ -1,6 +1,7 @@
 module Seek
   module FairDataStation
     class ExternalIdMismatchException < RuntimeError; end
+    class MissingSampleTypeException < RuntimeError; end
 
     class Writer
       def construct_isa(datastation_inv, contributor, projects, policy)
@@ -210,6 +211,8 @@ module Seek
         if (sample_type = datastation_sample.find_closest_matching_sample_type(seek_sample.contributor))
           seek_sample.sample_type = sample_type
           update_sample_metadata(seek_sample, datastation_sample)
+        else
+          raise MissingSampleTypeException, 'Unable to find a matching Sample Type with suitable access rights'
         end
       end
 

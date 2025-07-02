@@ -69,4 +69,5 @@
 //= require plotly-2.27.0.min
 //= require extended_metadata_type
 //= require institution-ror-typeahead
+//= require fair_data_station
 //= require DataTables-2.3.1/datatables.min

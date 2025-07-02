@@ -678,6 +678,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.index ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id"
   end
 
+  create_table "fair_data_station_uploads", force: :cascade do |t|
+    t.bigint "contributor_id"
+    t.bigint "project_id"
+    t.bigint "investigation_id"
+    t.bigint "content_blob_id"
+    t.bigint "policy_id"
+    t.string "investigation_external_identifier", limit: 2048
+    t.integer "purpose", limit: 2
+    t.boolean "show_status", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contributor_id"], name: "index_fair_data_station_uploads_on_contributor_id"
+    t.index ["investigation_id"], name: "index_fair_data_station_uploads_on_investigation_id"
+    t.index ["project_id"], name: "index_fair_data_station_uploads_on_project_id"
+    t.index ["purpose"], name: "index_fair_data_station_uploads_on_purpose"
+  end
+
   create_table "favourite_group_memberships", id: :integer, force: :cascade do |t|
     t.integer "person_id"
     t.integer "favourite_group_id"
@@ -2155,6 +2172,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "exception"
+    t.text "error_message"
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 

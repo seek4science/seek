@@ -1304,21 +1304,142 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'disable fair data station submit if currently in progress' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    login_as(upload.contributor)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input.disabled#datastation_data[type="file"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled[type="submit"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input.disabled#datastation_data[type="file"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled[type="submit"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_attribute(:show_status, false)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel', count: 0
+  end
+
   test 'submit from fair data station' do
     investigation = setup_test_case_investigation
     login_as(investigation.contributor)
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
-    assert_no_difference('Investigation.count') do
-      assert_difference('Study.count', 1) do
-        assert_difference('ObservationUnit.count', 1) do
-          assert_difference('Sample.count', 1) do
-            assert_difference('Assay.count', 1) do
-              assert_difference('ActivityLog.count',18) do
-                post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-                assert_redirected_to investigation
-              end
-            end
+    assert_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_difference('ContentBlob.count') do
+          assert_enqueued_jobs(1, only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_redirected_to update_from_fairdata_station_investigation_path(investigation)
+          end
+        end
+      end
+    end
+
+    fds_upload = FairDataStationUpload.last
+    assert fds_upload.update_purpose?
+    assert_equal investigation.contributor, fds_upload.contributor
+    assert_equal investigation,  fds_upload.investigation
+    assert_equal 'seek-test-investigation', fds_upload.investigation_external_identifier
+    content_blob = fds_upload.content_blob
+    assert_equal 'seek-fair-data-station-modified-test-case.ttl', content_blob.original_filename
+    assert_equal 'text/turtle', content_blob.content_type
+    assert_equal ttl_file.size, content_blob.file_size
+    assert fds_upload.update_task&.pending?
+    refute fds_upload.import_task&.pending?
+  end
+
+  test 'submit fairdata station no file' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation }
+            assert_response :unprocessable_entity
+            assert_match /No file was submitted/, flash[:error]
+            assert_select 'div#error_flash', text: /No file was submitted/
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit fairdata station invalid file' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/empty.ttl')
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_response :unprocessable_entity
+            assert_match /Unable to find an Investigation within the file/, flash[:error]
+            assert_select 'div#error_flash', text: /Unable to find an Investigation within the file/
           end
         end
       end
@@ -1333,33 +1454,30 @@ class InvestigationsControllerTest < ActionController::TestCase
     refute investigation.can_manage?
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
-    assert_no_difference('Investigation.count') do
-      assert_no_difference('Study.count') do
-        assert_no_difference('ObservationUnit.count') do
-          assert_no_difference('Sample.count') do
-            assert_no_difference('Assay.count') do
-              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-              assert_redirected_to investigation
-              assert_match /You are not authorized to manage this Investigation/, flash[:error]
-            end
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_redirected_to investigation
+            assert_match /You are not authorized to manage this Investigation/, flash[:error]
           end
         end
       end
     end
 
+
     login_as(investigation.contributor)
     assert investigation.can_manage?
 
-    assert_no_difference('Investigation.count') do
-      assert_no_difference('Study.count') do
-        assert_no_difference('ObservationUnit.count') do
-          assert_no_difference('Sample.count') do
-            assert_no_difference('Assay.count') do
-              with_config_value(:fair_data_station_enabled, false) do
-                post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-                assert_redirected_to :root
-                assert_match /Fair data station are disabled/, flash[:error]
-              end
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            with_config_value(:fair_data_station_enabled, false) do
+              post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+              assert_redirected_to :root
+              assert_match /Fair data station are disabled/, flash[:error]
             end
           end
         end
@@ -1373,47 +1491,142 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(investigation.contributor)
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
-    assert_no_difference('Investigation.count') do
-      assert_no_difference('Study.count') do
-        assert_no_difference('ObservationUnit.count') do
-          assert_no_difference('Sample.count') do
-            assert_no_difference('Assay.count') do
-              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-              assert_response :unprocessable_entity
-              assert_match /Investigation external identifiers do not match/, flash[:error]
-              assert_select 'div#error_flash', text: /Investigation external identifiers do not match/
-            end
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_response :unprocessable_entity
+            assert_match /Investigation external identifiers do not match/, flash[:error]
+            assert_select 'div#error_flash', text: /Investigation external identifiers do not match/
           end
         end
       end
     end
   end
 
-  test 'submit from fair data station invalid metadata' do
+  test 'submit from fair data station already in progress' do
     investigation = setup_test_case_investigation
+    upload = FactoryBot.create(:update_fair_data_station_upload, investigation: investigation,
+                               investigation_external_identifier: investigation.external_identifier,
+                               contributor: investigation.contributor)
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
     login_as(investigation.contributor)
-    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-invalid-test-case.ttl')
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
 
-    assert_no_difference('Investigation.count') do
-      assert_no_difference('Study.count') do
-        assert_no_difference('ObservationUnit.count') do
-          assert_no_difference('Sample.count') do
-            assert_no_difference('Assay.count') do
-              post :submit_fairdata_station, params: {id: investigation, datastation_data: ttl_file }
-              assert_response :unprocessable_entity
-              assert_match /Validation failed: Title can't be blank, Title is required/, flash[:error]
-              assert_select 'div#error_flash', text: /Validation failed: Title can't be blank, Title is required/
-            end
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_response :unprocessable_entity
+            assert_match /An existing update of this Investigation is currently already in progress/, flash[:error]
+            assert_select 'div#error_flash', text: /An existing update of this Investigation is currently already in progress/
           end
         end
       end
     end
 
-    assert_equal 'test study 2', Study.by_external_identifier('seek-test-study-2', investigation.projects).title
-    assert_equal 'test seek sample 1', Sample.by_external_identifier('seek-test-sample-1', investigation.projects).title
+  end
 
-    # this may have changed in an update before the error, so this checks the transaction is behaving correctly and rolling back
-    assert_equal 'test obs unit 1', ObservationUnit.by_external_identifier('seek-test-obs-unit-1', investigation.projects).title
+  test 'fair_data_station_update_status' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload_other_investigation = FactoryBot.create(:update_fair_data_station_upload, contributor: upload.contributor)
+    refute_equal upload.investigation, upload_other_investigation.investigation
+    assert_equal upload.contributor, upload_other_investigation.contributor
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload_other_investigation.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+
+    login_as(upload.contributor)
+
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload.id}
+    assert_response :success
+    assert_select "div#fair-data-station-update-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Queued/
+    end
+
+    # wrong investigation
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload_other_investigation.id}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # different person
+    other_person = FactoryBot.create(:person)
+    upload.update_column(:contributor_id, other_person.id)
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload.id}
+    assert_response :forbidden
+    assert_empty @response.body
+    upload.update_column(:contributor_id, upload.contributor.id)
+
+    # invalid id
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: FairDataStationUpload.last.id + 1}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # no permission
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:editing_public_policy))
+    assert investigation.can_edit?
+    refute investigation.can_manage?
+    get :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_redirected_to investigation_path(investigation)
+    assert_equal 'You are not authorized to manage this Investigation.', flash[:error]
+  end
+
+  test 'hide_fair_data_station_update_status' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    investigation = upload.investigation
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :success
+    upload.reload
+    refute upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status not the owner' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    investigation = upload.investigation
+    another_person = FactoryBot.create(:person)
+    investigation.policy.permissions.create(access_type: Policy::MANAGING, contributor: another_person)
+    assert upload.show_status?
+    login_as(another_person)
+    assert investigation.can_manage?
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status wrong purpose' do
+    upload = FactoryBot.create(:fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    investigation = FactoryBot.create(:investigation, contributor:person, projects:[upload.project])
+    upload.investigation = investigation
+    upload.save!
+    assert upload.import_purpose?
+    assert upload.show_status?
+    login_as(person)
+    post :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status not finished' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    person = upload.contributor
+    investigation = upload.investigation
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
   end
 
   test 'can show and edit with deleted contributor' do

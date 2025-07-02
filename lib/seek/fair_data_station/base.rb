@@ -229,7 +229,15 @@ module Seek
           [:object, :property, :value]
         )
         query.execute.collect do |solution|
-          solution.property.to_s
+          # display some clues as to why test occasionally fails
+          if solution.respond_to?(:property)
+            solution.property.to_s
+          else
+            pp solution.inspect
+            pp "solution[:property]: #{solution[:property].inspect}"
+            solution.property.to_s
+          end
+
         end.uniq
       end
 
