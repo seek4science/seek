@@ -211,7 +211,7 @@ class Sample < ApplicationRecord
   end
 
   def queue_linking_samples_update_job
-    LinkingSamplesUpdateJob.new(self).queue_job
+    LinkingSamplesUpdateJob.new(self).queue_job if title_previously_changed?
   end
 
   def update_sample_resource_links
