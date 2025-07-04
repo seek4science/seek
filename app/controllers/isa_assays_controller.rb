@@ -101,6 +101,7 @@ class ISAAssaysController < ApplicationController
     return unless @isa_assay.assay.is_isa_json_compliant?
     return if @isa_assay.assay.is_assay_stream? # Should not fix anything when creating an assay stream
     return unless @isa_assay.sample_type.present? # Just to be sure
+		return if @isa_assay.assay.assay_stream.child_assays == [@isa_assay.assay] # No need to fix sample type linkage if it's the only assay in the assay stream
 
     previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
     next_sample_types = previous_sample_type.next_linked_sample_types
