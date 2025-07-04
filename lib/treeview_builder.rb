@@ -58,8 +58,16 @@ class TreeviewBuilder
       obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
     end
 
+		is_opened_node = %w[assay source_table study_samples_table assay_samples_table].none? obj[:_type]
     node = { id: obj[:id], text: obj[:text], a_attr: obj[:a_attr], count: obj[:count],
-             data: { id: obj[:_id], type: obj[:_type], project_id: obj[:project_id], folder_id: obj[:folder_id] }, state: { opened: true, separate: { label: obj[:label] } }, children: obj[:children], icon: get_icon(obj[:resource]) }
+             data: { id: obj[:_id],
+										 type: obj[:_type] == 'assay_stream' ? 'assay' : obj[:_type],
+										 project_id: obj[:project_id],
+										 folder_id: obj[:folder_id] },
+						 state: { opened: is_opened_node,
+											separate: { label: obj[:label] } },
+						 children: obj[:children],
+						 icon: get_icon(obj[:resource]) }
     deep_compact(node)
   end
 
@@ -135,7 +143,7 @@ class TreeviewBuilder
   end
 
   def build_assay_stream_item(assay_stream, child_assays)
-    create_node({ text: assay_stream.title, _type: 'assay', label: 'Assay Stream', _id: assay_stream.id, a_attr: BOLD,
+    create_node({ text: assay_stream.title, _type: 'assay_stream', label: 'Assay Stream', _id: assay_stream.id, a_attr: BOLD,
                   children: isa_assay_elements(assay_stream) + child_assays, resource: assay_stream })
   end
 
