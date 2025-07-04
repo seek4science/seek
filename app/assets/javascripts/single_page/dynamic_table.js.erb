@@ -186,6 +186,10 @@ const handleSelect = (e) => {
           targets: options.readonly ? [0, ...multi_link_idx] : [1],
           visible: false,
           searchable: false
+        },
+        {
+          targets: options.readonly ? [] : [0],
+          orderable: false
         }
       ];
       const editor = this.editor;
