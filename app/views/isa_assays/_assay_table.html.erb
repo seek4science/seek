@@ -18,7 +18,7 @@
     <script>
         let assayOverviewInitialLoad = true;
         $j(document).ready(function () {
-            const dt = <%= sanitize(dt_aggregated(assay.study, assay).to_json) %>
+            const dt = <%= sanitize(dt_aggregated(assay&.study, assay).to_json) %>
             window.assayDynamicTable = new $j.dynamicTable('#assay-table')
             const ajax = {
                 url: dynamicTableDataPath,
@@ -27,8 +27,8 @@
                         assayOverviewInitialLoad = false;
                         return;
                     }
-                    d.study_id = '<%=assay.study.id%>';
-                    d.assay_id = '<%=assay.id%>';
+                    d.study_id = '<%=assay&.study&.id%>';
+                    d.assay_id = '<%=assay&.id%>';
                     d.rows_pad = "true";
                 }
             }
