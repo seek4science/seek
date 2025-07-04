@@ -414,4 +414,12 @@ class ApplicationHelperTest < ActionView::TestCase
   test 'markdown renderer handles blank input' do
     assert_equal '', Seek::Markdown.render('')
   end
+
+  test 'markdown renderer replaces non-UTF-8 characters' do
+    assert_equal "<p>x � y</p>", Seek::Markdown.render("x \xD7 y")
+  end
+
+  test 'markdown renderer allows non-ASCII characters' do
+    assert_equal "<p>x🍌y</p>", Seek::Markdown.render("x🍌y")
+  end
 end
