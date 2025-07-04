@@ -106,7 +106,16 @@ class ISAAssaysController < ApplicationController
     previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
     next_sample_types = previous_sample_type.next_linked_sample_types
     next_sample_types.delete @isa_assay.sample_type
-    next_sample_type = next_sample_types.first
+
+		# Ignore sample types that don't belong in the current assay stream
+		# They should not affect sample type linkage
+		next_sample_types.map do |sample_type|
+			unless sample_type.assays&.first&.assay_stream_id == @isa_assay.assay.assay_stream_id
+				next_sample_types.delete sample_type
+			end
+		end
+
+		next_sample_type = next_sample_types.first
 
     # In case an assay is inserted right at the end of an assay stream,
     # there is no next sample type and also no linkage to fix
