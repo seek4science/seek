@@ -66,7 +66,7 @@ const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
   if (!e.is(":checked")) {
     // Hide DT Select all button
-    const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
+    const dtSelectAll = $j(e).parents("#study-samples-table_wrapper, #source-material-table_wrapper, #assay-samples-table_wrapper").find(".dt_select_all");
     dtSelectAll.html("Select all rows")
     dtSelectAll.css("display", "none")
   }
@@ -622,9 +622,11 @@ function handleResponse(table, sampleTypes) {
 }
 
 function selectAll(e, includeHidden = false) {
-  const dtTbl = $j(e).parents(".dataTables_wrapper").find("table")[1]
+  const tblWrapper = $j(e).parents("#study-samples-table_wrapper, #source-material-table_wrapper, #assay-samples-table_wrapper")
+  const dtTbl = tblWrapper.find("table")[1]
   const dtName = $j(dtTbl).data("dtname")
   const count = window[dtName].table.rows().count()
+
   if (includeHidden) {
     // This will select all rows containing hidden rows
     performSelect(dtName, true)
@@ -632,8 +634,8 @@ function selectAll(e, includeHidden = false) {
     $j(e).html(`All ${count} items are selected`)
   } else {
     const checked = $j(e).prop("checked");
-    const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select");
-    const dtSelectAll = $j(e).parents(".dataTables_wrapper").find(".dt_select_all");
+    const checkBoxes = $j(e).closest(".dt-scroll").find(".row-select");
+    const dtSelectAll = tblWrapper.find(".dt_select_all");
     dtSelectAll.css("display", checked && count > 0 ? "block" : "none")
 
     if (!checked) performSelect(dtName, false)
