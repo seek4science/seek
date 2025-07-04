@@ -145,23 +145,22 @@ class Sample < ApplicationRecord
   end
 
   def refresh_linking_samples
-    sample_type_hash = {}
-    linking_samples.each do |s|
-      sample_type_hash = update_sample_type_hash(sample_type_hash, s.sample_type)
-      positions = sample_type_hash[s.sample_type.id]
-      metadata = s.data
-      positions.each do |p|
-        item_linked_samples = Array(metadata.values[p - 1])
-        item_linked_samples.each do |sample|
-          sample['title'] = title if sample['id'] == id
-        end
-        metadata.values[p - 1] = item_linked_samples
+    linking_samples.group_by(&:sample_type).each do |sample_type, _linking_samples|
+      potential_linking_attributes = sample_type.sample_attributes.select do |sa|
+        sa.seek_sample_multi? || sa.seek_sample?
+      end
 
-        # only update if changed, to prevent triggered jobs that could potentially create an infinate loop
-        if s.json_metadata != metadata.to_json
-          s.json_metadata = metadata.to_json
-          s.save
+      _linking_samples.each do |linking_sample|
+        changed = false
+        potential_linking_attributes.each do |attr|
+          Array(linking_sample.get_attribute_value(attr)).each do |linked_sample_data|
+            next unless linked_sample_data['id'] == id
+            next if linked_sample_data['title'] == title
+            linked_sample_data['title'] = title
+            changed = true
+          end
         end
+        linking_sample.update_column(:json_metadata, linking_sample.data.to_json) if changed
       end
     end
   end
@@ -212,7 +211,7 @@ class Sample < ApplicationRecord
   end
 
   def queue_linking_samples_update_job
-    LinkingSamplesUpdateJob.new(self).queue_job
+    LinkingSamplesUpdateJob.new(self).queue_job if saved_change_to_title?
   end
 
   def update_sample_resource_links
@@ -225,16 +224,6 @@ class Sample < ApplicationRecord
 
   def attribute_class
     SampleAttribute
-  end
-
-  def update_sample_type_hash(sample_type_hash, sample_type)
-    if sample_type_hash[sample_type.id].nil?
-      # Select all attributes of type seek_sample_multi or seek_sample
-      sample_type_hash[sample_type.id] = sample_type.sample_attributes.select do |sa|
-        sa.seek_sample_multi? || sa.seek_sample?
-      end.map(&:pos)
-    end
-    sample_type_hash
   end
 
   # checks and validates whether new linked samples have view permission, but ignores existing ones
