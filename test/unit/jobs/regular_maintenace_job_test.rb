@@ -171,4 +171,34 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert File.exist?(redundant_but_in_grace.local_path)
     assert File.exist?(not_redundant.local_path)
   end
+
+  test 'clean up failed fair data station imports' do
+    fds1 = FactoryBot.create(:fair_data_station_upload)
+    fds1.import_task.update_attribute(:status, Task::STATUS_DONE)
+
+    fds2 = FactoryBot.create(:fair_data_station_upload)
+    fds2.import_task.update_attribute(:status, Task::STATUS_FAILED)
+
+    fds3 = FactoryBot.create(:update_fair_data_station_upload)
+    fds3.update_task.update_attribute(:status, Task::STATUS_FAILED)
+
+    assert_no_difference('FairDataStationUpload.count') do
+      RegularMaintenanceJob.perform_now
+    end
+
+    travel(3.weeks) do
+      assert_no_difference('FairDataStationUpload.count') do
+        RegularMaintenanceJob.perform_now
+      end
+    end
+
+    travel(5.weeks) do
+      assert_difference('FairDataStationUpload.count', -1) do
+        RegularMaintenanceJob.perform_now
+      end
+    end
+
+    assert_equal [fds1, fds3].sort, FairDataStationUpload.last(2).sort
+
+  end
 end
