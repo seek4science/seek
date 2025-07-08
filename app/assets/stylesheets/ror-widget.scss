@@ -1,4 +1,4 @@
-@import 'bootstrap/variables';
+@import 'variables';
 
 .institution-input-disable {
     background-color: $input-bg-disabled !important;
@@ -15,6 +15,13 @@ cursor: not-allowed;
     overflow-y: auto;
     border-radius: $border-radius-large;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tt-suggestion {
+  border-bottom: 1px $gray-lighter solid;
+}
+.tt-suggestion:hover {
+  background-color: $hover-highlight;
 }
 
 .league-name {
