@@ -18,7 +18,7 @@ cursor: not-allowed;
 }
 
 .tt-suggestion {
-  border-bottom: 1px lightgrey solid;
+  border-bottom: 1px $gray-lighter solid;
 }
 .tt-suggestion:hover {
   background-color: $hover-highlight;
