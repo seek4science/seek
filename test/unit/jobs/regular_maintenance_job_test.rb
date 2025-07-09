@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RegularMaintenaceJobTest < ActiveSupport::TestCase
+class RegularMaintenanceJobTest < ActiveSupport::TestCase
   def setup
     ContentBlob.destroy_all
   end
