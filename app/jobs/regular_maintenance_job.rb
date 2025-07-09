@@ -77,7 +77,7 @@ class RegularMaintenanceJob < ApplicationJob
   # cleans up failed fair data station imports, that are older than 4 weeks old
   def clean_failed_fair_data_station_imports
     FairDataStationUpload.for_import_task_status(Task::STATUS_FAILED)
-                          .where('fair_data_station_uploads.created_at < ?', FAILED_FAIR_DATA_STATION_IMPORTS_PERIOD.ago)
+                         .where('fair_data_station_uploads.created_at < ?', FAILED_FAIR_DATA_STATION_IMPORTS_PERIOD.ago)
                          .destroy_all
 
   end
