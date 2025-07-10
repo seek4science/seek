@@ -1,8 +1,11 @@
 class FairDataStationUpload < ApplicationRecord
+  include Seek::ActsAsAsset::ContentBlobs::ClassMethods
+  include Seek::ActsAsAsset::ContentBlobs::InstanceMethods
+
   belongs_to :investigation
   belongs_to :content_blob, validate: true
   belongs_to :project
-  belongs_to :policy, validate: true
+  belongs_to :policy, validate: true, dependent: :destroy
   belongs_to :contributor, class_name: 'Person'
   enum :purpose, %i[import update], suffix: true
 
@@ -20,21 +23,19 @@ class FairDataStationUpload < ApplicationRecord
   }
 
   scope :show_status, -> { where show_status: true }
+  scope :for_import_task_status, ->(statuses) { import_purpose.joins(:import_task).where(tasks: {status: statuses})}
+  scope :for_update_task_status, ->(statuses) { update_purpose.joins(:update_task).where(tasks: {status: statuses})}
 
   def self.matching_imports_in_progress(project, external_id)
-    FairDataStationUpload.import_purpose
-                         .joins(:import_task)
+    FairDataStationUpload.for_import_task_status([Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_WAITING])
                          .where(investigation_external_identifier: external_id,
-                                project: project,
-                                tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_WAITING] })
+                                project: project)
   end
 
   def self.matching_updates_in_progress(investigation, external_id)
-    FairDataStationUpload.update_purpose
-                         .joins(:update_task)
+    FairDataStationUpload.for_update_task_status([Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_WAITING])
                          .where(investigation_external_identifier: external_id,
-                                investigation: investigation,
-                                tasks: { status: [Task::STATUS_QUEUED, Task::STATUS_ACTIVE, Task::STATUS_WAITING] })
+                                investigation: investigation)
   end
 
   private
