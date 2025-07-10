@@ -1,6 +1,8 @@
 module Ror
   class Client
-    ENDPOINT = 'https://api.ror.org'.freeze
+    #ENDPOINT = 'https://api.ror.org'.freeze
+    ENDPOINT = 'https://api.ror.org/v1'.freeze
+
 
     def initialize(endpoint = ENDPOINT)
       @endpoint = RestClient::Resource.new(endpoint)
@@ -9,7 +11,7 @@ module Ror
     # Search for an institution by name
     def query_name(query)
       encoded_query = URI.encode_www_form_component(query)
-      request("organizations?query=#{encoded_query}")
+      request("organizations?query=#{encoded_query}*")
     end
 
     # define a method to extract the ror id from the link "https://ror.org/04rcqnp59"
