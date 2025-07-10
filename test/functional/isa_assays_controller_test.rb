@@ -662,6 +662,101 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
   end
 
+  test 'should not update sample type linkage if it is the first assay in the assay stream' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation:, contributor: person)
+
+    # Create the assay streams
+    first_assay_stream = FactoryBot.create(:assay_stream, contributor: person, study:)
+    second_assay_stream = FactoryBot.create(:assay_stream, contributor: person, study:)
+    assert first_assay_stream.is_assay_stream?
+    assert second_assay_stream.is_assay_stream?
+    assert_equal first_assay_stream.previous_linked_sample_type, study.sample_types.second
+    assert_equal second_assay_stream.previous_linked_sample_type, study.sample_types.second
+    assert_nil first_assay_stream.next_linked_child_assay
+    assert_nil second_assay_stream.next_linked_child_assay
+
+    # Create an assay at the begin of the first stream
+    first_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
+                                                linked_sample_type: study.sample_types.second,
+                                                projects: [project],
+                                                contributor: person)
+    first_assay = FactoryBot.create(:assay, title: 'First Assay in the second assay stream', contributor: person, study:, sample_type: first_assay_sample_type, assay_stream: second_assay_stream)
+
+    # Create an assay at the end of the first stream
+    second_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
+                                                 linked_sample_type: first_assay_sample_type,
+                                                 projects: [project],
+                                                 contributor: person)
+    second_assay = FactoryBot.create(:assay, title: 'Second Assay in the second assay stream', contributor: person, study:, sample_type: second_assay_sample_type, assay_stream: second_assay_stream)
+
+    refute first_assay.is_assay_stream?
+    refute second_assay.is_assay_stream?
+    assert_equal first_assay.previous_linked_sample_type, second_assay_stream.previous_linked_sample_type, study.sample_types.second
+    assert_nil second_assay.next_linked_child_assay
+
+    # Post first assay in first assay stream, which is the third assay in total
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+
+    third_assay_attributes = { title: 'First assay of the first assay stream',
+                               study_id: study.id,
+                               assay_class_id: AssayClass.experimental.id,
+                               creator_ids: [person.id],
+                               policy_attributes:,
+                               assay_stream_id: first_assay_stream.id }
+
+    third_assay_sample_type_attributes = { title: "Third Assay Sample type",
+                                           project_ids: [project.id],
+                                           sample_attributes_attributes: {
+                                             '0': {
+                                               pos: '1', title: 'a string', required: '1', is_title: '1',
+                                               sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0',
+                                               isa_tag_id: FactoryBot.create(:other_material_isa_tag).id
+                                             },
+                                             '1': {
+                                               pos: '2', title: 'protocol', required: '1', is_title: '0',
+                                               sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                               isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, _destroy: '0'
+                                             },
+                                             '2': {
+                                               pos: '3', title: 'Input sample', required: '1',
+                                               sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
+                                               linked_sample_type_id: study.sample_types.second.id, _destroy: '0'
+                                             },
+                                             '3': {
+                                               pos: '4', title: 'Some material characteristic', required: '1',
+                                               sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+                                               _destroy: '0',
+                                               isa_tag_id: FactoryBot.create(:other_material_characteristic_isa_tag).id
+                                             }
+                                           }
+    }
+
+    third_isa_assay_attributes = { assay: third_assay_attributes,
+                                   input_sample_type_id: study.sample_types.second.id,
+                                   sample_type: third_assay_sample_type_attributes }
+
+    # Test if resources are created
+    assert_difference "Assay.count", 1 do
+      assert_difference "SampleType.count", 1 do
+        post :create, params: { isa_assay: third_isa_assay_attributes }
+      end
+    end
+
+    isa_assay = assigns(:isa_assay)
+
+    # The created assay sample type should be linked to the seconde study sample type
+    assert_equal isa_assay.assay.previous_linked_sample_type, study.sample_types.second
+
+    # The first assay sample type in the first assay stream should still be linked to the seconde study sample type
+    first_assay_sample_type.reload
+    assert_equal first_assay_sample_type.previous_linked_sample_type, study.sample_types.second
+  end
+
   private
 
   def material_assay_sample_type_attributes(project, linked_sample_type_id='self')
