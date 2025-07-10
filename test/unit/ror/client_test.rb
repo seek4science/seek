@@ -48,4 +48,12 @@ class RorClientTest < ActiveSupport::TestCase
     end
   end
 
+  def test_fussy_search_with_vcr
+    VCR.use_cassette('ror/fussy_search_harvard_by_name') do
+      response = @client.query_name('Harv')
+      assert_equal 54, response['number_of_results']
+    end
+  end
+
+
 end
