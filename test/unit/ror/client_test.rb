@@ -16,20 +16,33 @@ class RorClientTest < ActiveSupport::TestCase
   def test_query_name_with_vcr
     VCR.use_cassette('ror/query_harvard_by_name') do
       response = @client.query_name('Harvard')
-      assert response.key?('items'), 'Response should contain items key'
-      assert response['items'].is_a?(Array), 'Items should be an array'
-      assert response['items'].any?, 'Items array should not be empty'
+      assert response.key?(:items), 'Response should contain :items key'
+      assert response[:items].is_a?(Array), ':items should be an array'
+      assert response[:items].any?, ':items array should not be empty'
+
+      first_item = response[:items].first
+
+      assert first_item.key?(:name), 'Each item should have a :name key'
+      assert first_item.key?(:id), 'Each item should have an :id key'
+      assert first_item.key?(:type), 'Each item should have a :type key'
+      assert first_item.key?(:country), 'Each item should have a :country key'
+      assert first_item.key?(:webpage), 'Each item should have a :webpage key'
     end
   end
 
   def test_fetch_by_id_with_vcr
     VCR.use_cassette('ror/fetch_by_id') do
       response = @client.fetch_by_id('03vek6s52')
-      assert_equal 'https://ror.org/03vek6s52', response['id']
-      assert_equal 'Harvard University', response['name']
-      assert_equal 'Cambridge', response.dig('addresses', 0, 'city')
-      assert_equal 'US', response.dig('country', 'country_code')
-      assert_equal 'https://www.harvard.edu', response.dig('links', 0)
+      puts response.inspect
+
+      assert_equal '03vek6s52', response[:id]
+      assert_equal 'Harvard University', response[:name]
+      assert_equal 'education', response[:type]
+      assert_equal 'Universidad de Harvard', response[:altNames]
+      assert_equal 'United States', response[:country]
+      assert_equal 'US', response[:countrycode]
+      assert_equal 'Cambridge', response[:city]
+      assert_equal 'https://www.harvard.edu', response[:webpage]
     end
   end
 
@@ -51,9 +64,7 @@ class RorClientTest < ActiveSupport::TestCase
   def test_fussy_search_with_vcr
     VCR.use_cassette('ror/fussy_search_harvard_by_name') do
       response = @client.query_name('Harv')
-      assert_equal 54, response['number_of_results']
+      assert_equal 20, response[:items].size
     end
   end
-
-
 end
