@@ -56,8 +56,7 @@ class RorClientTest < ActiveSupport::TestCase
   test "returns an empty result when querying a nonexistent institution" do
     VCR.use_cassette("ror/ror_nonexistent_institution") do
       response = @client.query_name('nonexistentuniversity123')
-      assert_equal 0, response["number_of_results"]
-      assert_empty response["items"]
+      assert_empty response[:items]
     end
   end
 

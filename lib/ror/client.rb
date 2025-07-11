@@ -24,7 +24,13 @@ module Ror
 
     # Fetch institution details by ROR ID
     def fetch_by_id(ror_id)
-      extract_details(request("organizations/#{ror_id}"))
+      response = request("organizations/#{ror_id}")
+
+      if response.key?(:error)
+        return { error: response[:error]}
+      else
+        return extract_details(response)
+      end
     end
 
     private

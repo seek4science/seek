@@ -282,9 +282,7 @@ class InstitutionTest < ActiveSupport::TestCase
   test 'fetch_ror_details adds error if ROR ID is invalid' do
     institution = Institution.new( title: 'test', ror_id: 'invalid_id')
     institution.valid?
-    # if ror_id is present, it should fetch the details from ROR API using ror_id,
-    # it will return title as nil since the ror_id is invalid
-    assert_equal "Title can't be blank", institution.errors.full_messages.join(', ')
+    assert_equal "Ror 'invalid_id' is not a valid ROR ID", institution.errors.full_messages.join(', ')
   end
 
 end
