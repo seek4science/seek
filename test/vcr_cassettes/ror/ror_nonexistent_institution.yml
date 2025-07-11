@@ -1,0 +1,47 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.ror.org/v2/organizations?query=nonexistentuniversity123*
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - rest-client/2.1.0 (darwin24 arm64) ruby/3.3.8p144
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - api.ror.org
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 11 Jul 2025 19:20:45 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '114'
+      Connection:
+      - keep-alive
+      Status:
+      - 200 OK
+      Vary:
+      - Cookie, Origin
+      X-Frame-Options:
+      - SAMEORIGIN
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      X-Powered-By:
+      - Phusion Passenger 6.0.7
+      Server:
+      - nginx/1.18.0 + Phusion Passenger 6.0.7
+    body:
+      encoding: UTF-8
+      string: '{"number_of_results":0,"time_taken":3,"items":[],"meta":{"types":[],"countries":[],"continents":[],"statuses":[]}}'
+  recorded_at: Fri, 11 Jul 2025 19:20:45 GMT
+recorded_with: VCR 6.3.1
