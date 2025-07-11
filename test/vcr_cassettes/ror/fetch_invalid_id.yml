@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.ror.org/organizations/invalid_id
+    uri: https://api.ror.org/v1/organizations/invalid_id
     body:
       encoding: US-ASCII
       string: ''
@@ -10,7 +10,7 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - rest-client/2.1.0 (darwin24 arm64) ruby/3.3.6p108
+      - rest-client/2.1.0 (darwin24 arm64) ruby/3.3.8p144
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Host:
@@ -21,7 +21,7 @@ http_interactions:
       message: Not Found
     headers:
       Date:
-      - Wed, 12 Mar 2025 12:05:32 GMT
+      - Thu, 10 Jul 2025 18:03:29 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -43,6 +43,5 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"errors":["''invalid_id'' is not a valid ROR ID"]}'
-    http_version:
-  recorded_at: Wed, 12 Mar 2025 12:05:39 GMT
-recorded_with: VCR 2.9.3
+  recorded_at: Thu, 10 Jul 2025 18:03:29 GMT
+recorded_with: VCR 6.3.1

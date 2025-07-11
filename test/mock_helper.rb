@@ -105,14 +105,14 @@ module MockHelper
 
   def ror_mock
     file_path = "#{Rails.root}/test/fixtures/files/mocking/ror_response.json"
-    stub_request(:get, "https://api.ror.org/organizations/027m9bs27")
+    stub_request(:get, "https://api.ror.org/v1/organizations/027m9bs27")
       .to_return(
         status: 200,
         body: File.read(file_path),
         headers: { 'Content-Type' => 'application/json' }
       )
 
-    stub_request(:get, "https://api.ror.org/organizations/invalid_id")
+    stub_request(:get, "https://api.ror.org/v1/organizations/invalid_id")
       .to_return(
         status: 400,
         body: {
