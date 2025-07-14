@@ -20,7 +20,7 @@ class NelsIntegrationTest < ActionDispatch::IntegrationTest
         assert_difference('ContentBlob.count', 1) do
           VCR.use_cassette('nels/get_dataset') do
             VCR.use_cassette('nels/get_persistent_url') do
-              post register_assay_nels_path(assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype)
+              post register_nels_path(assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype)
 
               assert_redirected_to provide_metadata_data_files_path(project_ids: projects.map(&:id))
               follow_redirect!

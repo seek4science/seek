@@ -100,6 +100,7 @@ Kernel.class_eval do
     Rails.application.config.relative_url_root = root
     Rails.application.default_url_options = Seek::Config.site_url_options
     yield
+  ensure
     Rails.application.config.relative_url_root = oldval
     Rails.application.default_url_options = Seek::Config.site_url_options
   end

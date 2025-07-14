@@ -1,13 +1,14 @@
 require 'test_helper'
 
-class IsaExporterTest < ActionController::TestCase
+class ISAExporterTest < ActionController::TestCase
+  
   def setup
     @seek_sop_type = SampleAttributeType.find_by(base_type: Seek::Samples::BaseType::SEEK_SOP) || FactoryBot.create(:sop_sample_attribute_type)
   end
 
   test 'find sample origin' do
     current_user = FactoryBot.create(:user)
-    controller = IsaExporter::Exporter.new(FactoryBot.create(:investigation), current_user)
+    controller = ISAExporter::Exporter.new(FactoryBot.create(:investigation), current_user)
     project = FactoryBot.create(:project)
 
     type_1 = FactoryBot.create(:simple_sample_type, project_ids: [project.id])
@@ -132,7 +133,7 @@ class IsaExporterTest < ActionController::TestCase
                          data: { 'File Name': "Measurement #{i}", Input: "Extract #{i}", 'Protocol Assay 2': protocol_name, 'Assay 2 parameter value 1': "Measurement #{i} Parameter 1", 'Data file comment 1': "Measurement #{i} comment 1" })
     end
 
-    isa = JSON.parse(IsaExporter::Exporter.new(investigation, person.user).export)
+    isa = JSON.parse(ISAExporter::Exporter.new(investigation, person.user).export)
     assert_not_nil isa
 
     # Check the number of studies

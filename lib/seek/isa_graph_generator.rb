@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Seek
-  class IsaGraphNode
+  class ISAGraphNode
     attr_accessor :object, :child_count, :can_view
 
     def initialize(object)
@@ -50,8 +50,9 @@ module Seek
     end
   end
 
-  class IsaGraphGenerator
+  class ISAGraphGenerator
     MIN_AGGREGATED_CHILDREN = 5
+	
     def initialize(object)
       @object = object
     end
@@ -114,7 +115,7 @@ module Seek
     end
 
     def traverse(method, object, max_depth = nil, depth = 0)
-      node = Seek::IsaGraphNode.new(object)
+      node = Seek::ISAGraphNode.new(object)
       node.can_view = object.can_view? if @auth
 
       children = send(method, object)
@@ -129,7 +130,7 @@ module Seek
           next unless associations.any?
           if associations.count > MIN_AGGREGATED_CHILDREN
             agg = Seek::ObjectAggregation.new(object, type, associations)
-            agg_node = Seek::IsaGraphNode.new(agg)
+            agg_node = Seek::ISAGraphNode.new(agg)
             agg_node.can_view = true
             nodes << agg_node
             edges << [object, agg]

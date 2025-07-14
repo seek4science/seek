@@ -4,5 +4,17 @@ SEEK::Application.configure do
   ActiveSupport::Inflector.inflections do |inflect|
     inflect.irregular "specimen","specimens"
     inflect.irregular "data","data"
+    inflect.acronym "HTML"
+    inflect.acronym "JSON"
+    inflect.acronym "CSV"
+    inflect.acronym "HTTP"
+    inflect.acronym "FTP"
+    inflect.acronym "JERM"
+    inflect.acronym "ROCrate"
+    inflect.acronym "ROLike"
+    inflect.acronym "CWL"
+    inflect.acronym "KNIME"
+    inflect.acronym "CFF"
+    inflect.acronym "ISA"
   end
 end

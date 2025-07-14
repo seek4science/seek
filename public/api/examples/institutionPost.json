@@ -2,11 +2,12 @@
   "data": {
     "type": "institutions",
     "attributes": {
-      "title": "Post Institution 1555 Max",
+      "title": "University of Manchester",
+      "ror_id": "027m9bs27",
       "country": "United Kingdom",
       "city": "Manchester",
       "address": "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom",
-      "web_page": "http://www.mib.ac.uk/"
+      "web_page": "http://www.manchester.ac.uk/"
     }
   }
 }

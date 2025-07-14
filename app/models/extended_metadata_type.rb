@@ -1,4 +1,6 @@
 class ExtendedMetadataType < ApplicationRecord
+  include Seek::Stats::ActivityCounts
+
   has_many :extended_metadata_attributes, inverse_of: :extended_metadata_type, dependent: :destroy
   has_many :extended_metadatas, inverse_of: :extended_metadata_type
   validates :title, presence: true
@@ -60,6 +62,18 @@ class ExtendedMetadataType < ApplicationRecord
     rescue NameError
       errors.add(:supported_type, "'#{self.supported_type}' is not a valid support type!")
     end
+  end
+
+  # collects all the attributes, including those associated through an attribute with a linked_extended_metadata_type
+  def deep_extended_metadata_attributes(extended_metadata_type = self)
+    attributes = extended_metadata_type.extended_metadata_attributes.collect do |attr|
+      if attr.linked_extended_metadata_type
+        deep_extended_metadata_attributes(attr.linked_extended_metadata_type)
+      else
+        attr
+      end
+    end
+    attributes.flatten
   end
 
   def usage

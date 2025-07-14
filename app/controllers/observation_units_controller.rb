@@ -11,7 +11,7 @@ class ObservationUnitsController < ApplicationController
   before_action :find_assets, only: [:index]
 
   include Seek::Publishing::PublishingCommon
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 

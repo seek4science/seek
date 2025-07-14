@@ -885,6 +885,7 @@ class AssaysControllerTest < ActionController::TestCase
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::EDITING)]))
     get :edit, params: { id: assay.id }
+    assert_response :success
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
@@ -1326,7 +1327,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id: assay }
 
     assert_response :success
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 1
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 1
   end
 
   test 'should not show NeLS button if NeLS integration disabled' do
@@ -1343,7 +1344,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 0
   end
 
   test 'should not show NeLS button for non-NeLS' do
@@ -1357,7 +1358,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id: assay }
 
     assert_response :success
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 0
   end
 
   test 'should not show NeLS button for NeLS-enabled project to non-NeLS project member' do
@@ -1379,7 +1380,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 0 # But not browse NeLS
   end
 
   test 'can delete an assay with subscriptions' do

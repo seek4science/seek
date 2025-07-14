@@ -435,7 +435,7 @@ class MessageLogTest < ActiveSupport::TestCase
 
     actual = JSON.parse(log.details)
     expected = {
-      institution: {id: institution.id, title: institution.title, city: institution.city, web_page: institution.web_page, country: institution.country},
+      institution: {id: institution.id, title: institution.title, ror_id: institution.ror_id, city: institution.city, department: institution.department, web_page: institution.web_page, country: institution.country},
       project: {id:nil, title:'new project', description: 'blah', web_page: 'https://webpage.com', programme_id:programme.id},
       programme: {id:programme.id, title:programme.title, description: programme.description}
     }.with_indifferent_access

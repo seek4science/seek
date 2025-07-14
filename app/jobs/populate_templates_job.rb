@@ -5,6 +5,6 @@ class PopulateTemplatesJob < ApplicationJob
   def perform(user)
     return unless Seek::Config.isa_json_compliance_enabled
 
-    Seek::IsaTemplates::TemplateExtractor.extract_templates(user)
+    Seek::ISATemplates::TemplateExtractor.extract_templates(user)
   end
 end

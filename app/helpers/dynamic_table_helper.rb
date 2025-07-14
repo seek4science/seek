@@ -159,7 +159,7 @@ module DynamicTableHelper
     sample_types.flat_map do |s|
       s.sample_attributes.map do |a|
         attribute = { title: a.title, name: s.id.to_s, required: a.required, description: a.description,
-                      is_title: a.is_title }
+                      is_title: a.is_title, attribute_type: a.sample_attribute_type }
         is_seek_sample_multi = a.sample_attribute_type.seek_sample_multi?
         is_seek_sample = a.sample_attribute_type.seek_sample?
         is_cv_list = a.sample_attribute_type.seek_cv_list?

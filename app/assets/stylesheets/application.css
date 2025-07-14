@@ -20,13 +20,6 @@
 *= require human_diseases
 *= require samples
 *= require controlled_vocabs
-*= require DataTables-1.11.3/dataTables.bootstrap
-*= require DataTables-1.11.3/select.bootstrap
-*= require DataTables-1.11.3/buttons.bootstrap
-*= require DataTables-1.11.3/autoFill.bootstrap
-*= require DataTables-1.11.3/colReorder.bootstrap
-*= require DataTables-1.11.3/fixedColumns.bootstrap
-*= require DataTables-1.11.3/fixedHeader.bootstrap
 *= require jstree
 *= require openbis
 *= require eonasdan-bootstrap-datetimepicker
@@ -47,4 +40,6 @@
 *= require select2.min
 *= require select2.bootstrap.min
 *= require linked_extended_metadata
+*= require ror-widget
+*= require DataTables-2.3.1/datatables.min
 */

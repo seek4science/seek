@@ -4,24 +4,24 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   setup do
     @zip_file = "#{Rails.root}/test/fixtures/files/study_batch.zip"
-    user_uuid = 'user_uuid'
-    @data_files, @studies = StudyBatchUpload.unzip_batch @zip_file, user_uuid
-     #FactoryBot.create(:study_template_content_blob)
+    @user_uuid = 'user_uuid'
+    @data_files, @studies = StudyBatchUpload.unzip_batch @zip_file, @user_uuid
+  end
+
+  teardown do
+    FileUtils.rm_r("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/")
   end
 
   test 'check extracted files' do
 
       # Extracts study file and associated data files from zip
       # file_name = params[:data][:content_blob][:tempfile].path
-    user_uuid = 'user_uuid'
-    data_files, studies = StudyBatchUpload.unzip_batch @zip_file, user_uuid
+    data_files, studies = StudyBatchUpload.unzip_batch @zip_file, @user_uuid
 
-    assert_same 3, data_files.count
-    assert_same 1, studies.count
-    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{data_files.first.name}")
-    assert_same true, File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{studies.first.name}")
-
-    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
+    assert_equal 3, data_files.count
+    assert_equal 1, studies.count
+    assert File.exist?("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/#{data_files.first.name}")
+    assert File.exist?("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/#{studies.first.name}")
   end
 
   test 'read study file' do
@@ -32,22 +32,21 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
     studies_file.save!
-    StudyBatchUpload.extract_studies_from_file(studies_file)
 
-    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
+    studies = StudyBatchUpload.extract_studies_from_file(studies_file)
+    assert_equal 3, studies.count
   end
 
   test 'extract study correctly' do
-    user_uuid = 'user_uuid'
     extended_metadata_type = FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     assert_equal 'MIAPPE metadata v1.1', extended_metadata_type.title, 'must match the seed data title'
     studies_file = ContentBlob.new
-    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
+    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/#{@studies.first.name}")
     studies_file.original_filename = @studies.first.name.to_s
     studies_file.save!
 
     studies = StudyBatchUpload.extract_studies_from_file(studies_file)
-    assert_same 3, studies.count
+    assert_equal 3, studies.count
 
     assert_equal 'Clonal test of mapping pedigree 0504B in nursery', studies[0].title
     assert_equal 'POPYOMICS-POP2-F', studies[0].extended_metadata.data[:id]
@@ -57,9 +56,6 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
     assert_equal 'Clonal test of mapping pedigree 0504B in nursery', studies[2].title
     assert_equal 'POPYOMICS-POP2-UK', studies[2].extended_metadata.data[:id]
-
-    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
-    #@extractor.extract
   end
 
 

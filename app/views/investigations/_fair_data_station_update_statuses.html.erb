@@ -1,0 +1,18 @@
+<%
+  uploads = fair_data_station_investigation_updates_to_show(@investigation, current_person)
+  return if uploads.empty?
+%>
+
+<%= panel('Updates in progress or completed', id:'fair-data-station-update-status-panel') do %>
+  <div id='fair-data-station-updates'>
+    <% uploads.each do |upload| %>
+      <%= render partial: 'fair_data_station_update_status', locals: { upload: upload } %>
+    <% end %>
+  </div>
+<% end %>
+
+<script>
+    $j(document).ready( function () {
+        FairDataStation.registerStatusCloseButtons('div#fair-data-station-updates');
+    });
+</script>

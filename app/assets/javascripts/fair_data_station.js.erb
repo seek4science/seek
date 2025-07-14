@@ -1,0 +1,59 @@
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
+
+const FairDataStation = {
+    registerStatusCloseButtons: function(ancestor) {
+        $j(ancestor + ' .close-status-button').on('click', function() {
+            const btn = $j(this);
+            btn.attr('disabled', true);
+            const uploadId = btn.data('upload-id');
+            const projectId = btn.data('project-id');
+            const investigationId = btn.data('investigation-id');
+            const purpose = btn.data('purpose');
+            let url = '';
+            if (purpose == 'import') {
+                url = '<%= hide_fair_data_station_import_status_project_path('~project_id~') %>';
+                url = url.replace('~project_id~', projectId);
+            }
+            else {
+                url = '<%= hide_fair_data_station_update_status_investigation_path('~investigation_id~') %>';
+                url = url.replace('~investigation_id~', investigationId);
+            }
+
+            $j.ajax(url, {
+                  data: { 'upload_id': uploadId },
+                  method: 'POST',
+                  success: function (response) {
+                      $j(btn).parents('div.fair-data-station-status').fadeOut();
+                  },
+                  error: function(response, textStatus, errorThrown) {
+                    alert('There was an error when trying to close: ' + errorThrown);
+                    btn.attr('disabled', false);
+                  }
+              }
+            );
+        });
+    },
+    reenableNewUpdateButtons: function() {
+        $j('input.disabled[type=submit]').removeAttr('data-tooltip');
+        $j('input.disabled[type=submit]').popover('destroy');
+        $j('input.disabled[type=submit]').removeAttr('onclick');
+        $j('input.disabled[type=submit]').removeClass('disabled');
+        $j('input.disabled#datastation_data').removeAttr('data-tooltip');
+        $j('input.disabled#datastation_data').popover('destroy');
+        $j('input.disabled#datastation_data').removeAttr('onclick');
+        $j('input.disabled#datastation_data').removeClass('disabled');
+    },
+    updateStatusPolling: function(endpointUrl, elementId, jobStatus) {
+        elementSelector = '#'+elementId;
+        setTimeout(function () {
+            $j.ajax(endpointUrl, {
+                    data: {'previous_status': jobStatus},
+                    success: function (html) {
+                        $j(elementSelector).replaceWith(html);
+                        FairDataStation.registerStatusCloseButtons(elementSelector);
+                    }
+                }
+            );
+        }, 5000);
+    }
+};

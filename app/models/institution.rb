@@ -1,11 +1,13 @@
 class Institution < ApplicationRecord
 
   acts_as_yellow_pages
-  title_trimmer
 
-  auto_strip_attributes :web_page
+  auto_strip_attributes :web_page, :title
 
-  validates :title, uniqueness: true
+  before_validation :fetch_ror_details, if: -> { ror_id.present? && ror_id_changed? }
+
+  validates :title, uniqueness: { scope: :department }
+  validates :ror_id, uniqueness: { scope: :department }, allow_blank: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
 
@@ -20,6 +22,15 @@ class Institution < ApplicationRecord
   searchable(auto_index: false) do
     text :city, :address
   end if Seek::Config.solr_enabled
+
+
+  def title
+    if department.present?
+      "#{department}, #{super}"
+    else
+      super
+    end
+  end
 
   def can_edit?(user = User.current_user)
     return false unless user
@@ -53,4 +64,26 @@ class Institution < ApplicationRecord
       CountryCodes.country(country)
     end
   end
+
+  private
+
+  def fetch_ror_details
+
+    ror_client = Ror::Client.new
+    response = ror_client.fetch_by_id(ror_id)
+
+    if response[:error]
+      errors.add(:ror_id, response[:error])
+      return
+    end
+
+    self.title = response['name']
+    self.city = response.dig('addresses', 0, 'city')
+    self.country = response.dig('country', 'country_code')
+    self.web_page = response.dig('links', 0)
+
+  end
+
+
+
 end

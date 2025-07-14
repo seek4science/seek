@@ -25,6 +25,7 @@ module Ga4gh
 
           # Filtering
           workflows = relationify_collection(Workflow.authorized_for('view'))
+          workflows = workflows.includes(:projects, :creators, :workflow_class, :git_versions, :standard_versions)
           workflows = workflows.where(id: tools_index_params[:id]) if tools_index_params[:id].present?
           workflows = workflows.where('LOWER(workflows.title) LIKE ?', "%#{tools_index_params[:name].downcase}%") if tools_index_params[:name].present?
           workflows = workflows.where('LOWER(workflows.description) LIKE ?', "%#{tools_index_params[:description].downcase}%") if tools_index_params[:description].present?
@@ -32,16 +33,15 @@ module Ga4gh
           if tools_index_params[:descriptorType].present?
             class_key = ToolVersion::DESCRIPTOR_TYPE_MAPPING.invert[tools_index_params[:descriptorType].upcase]
             if class_key
-              workflows = workflows.includes(:workflow_class).where(workflow_classes: { key: class_key })
+              workflows = workflows.where(workflow_classes: { key: class_key })
             else
               workflows = workflows.none
             end
           end
-          workflows = workflows.includes(:projects).where(projects: { title: tools_index_params[:organization] }) if tools_index_params[:organization].present?
+          workflows = workflows.where(projects: { title: tools_index_params[:organization] }) if tools_index_params[:organization].present?
           workflows = workflows.none if tools_index_params[:checker].present? && tools_index_params[:checker].to_s.downcase != 'false'
           if tools_index_params[:author].present?
             people = Person.all.select { |p| p.name == tools_index_params[:author] }.map(&:id)
-            workflows = workflows.includes(:creators)
             workflows = workflows.where(people: { id: people }).or(workflows.where('workflows.other_creators LIKE ?', "%#{tools_index_params[:author]}%"))
           end
           # Not implemented:

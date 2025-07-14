@@ -5,77 +5,54 @@
   }
 </style>
 
+<%= hidden_field_tag 'institution[id]', @institution.id %>
+
+<div class="form-group" id="combined_typeahead">
+  <div class="help-block">
+    This is the <%= t('institution').downcase %> <strong>you</strong> are associated with, and will be used when defining your membership with the <%= t('project') %>.
+  </div>
+  <div class="help-block">
+    Type the name of the <%= t('institution').downcase %>, or part of the name or the city it may be associated with. From the list of the results
+    found, select the <%= t('institution').downcase %> you are looking for.
+    <br>
+  </div>
+  <div class="help-block">
+    Suggested <%= t('institution').pluralize.downcase %> are sourced from the local instance first, followed by the <%= link_to(image('ror_id', title: 'ROR',width: '30'), 'https://ror.org/', target: '_blank') %> service remotely.
+    Whenever possible, select the <%= t('institution').downcase %> from the local list.
+    If the desired <%= t('institution').downcase %> is not listed, continue typing its full name and select one from ROR.
+  </div>
+
+  <label class="control-label">Type the name of the <%= t('institution').downcase %> </label><span class="required">*</span>
+  <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
+  <%= text_field_tag 'institution[title]', nil, placeholder: "Search...", class: "typeahead form-control" %>
+</div>
 
 <div class="form-group">
-  <div class="help-block">
-    This is the <%= t('institution') %> <strong>you</strong> are associated with, and will be used when defining your membership with the <%= t('project') %>.
-  </div>
-  <div class="help-block">
-    Type the name of the <%= t('institution') %>, or part of the name or the city it may be associated with. From the list of the results
-    found, select the <%= t('institution') %> you are looking for. If you cannot find it in the list, continue to type the full name and select
-    the top <em>new item</em>; you will then be able to provide the additional details about the new <%= t('institution') %>.
-  </div>
-
-  <label class="control-label">Type the name of the <%= t('institution') %> </label><span class="required">*</span>
-
-  <%# I am setting the institution id to a junk value of 0 (if blank) to get around a bug in select2 wherein an <option>
-      with a blank `value`, that is selected when the page is loaded, does not get rendered as a "tag". %>
-  <%= objects_input('institution[id]', @institution.title.present? ? [@institution.tap { |i| i.id ||= 0 }] : [],
-                    typeahead: { query_url: typeahead_institutions_path,
-                                 handlebars_template:'typeahead/institution' },
-                    limit: 1, allow_new: true, class: 'form-control') -%>
+  <label class="control-label">ROR ID</label>    <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
+  <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
+   To find out more and get your ORCID ID please visit https://ror.org/') -%>
+  <%= text_field_tag 'institution[ror_id]', @institution.ror_id, class: "form-control" %>
 </div>
 
-<%= hidden_field_tag 'institution[title]', @institution.title %>
+<div class="form-group">
+  <label class="control-label">Department</label>
+  <%= text_field_tag('institution[department]', @institution.department, class:'form-control') %>
+</div>
 
-<div class="form-group" id='additional-institution-details'>
+<div class="form-group">
   <label class="control-label">Website</label>
-  <%= text_field_tag('institution[web_page]', @institution.web_page, class:'form-control institution-user-input') %>
+  <%= text_field_tag('institution[web_page]', @institution.web_page, class:'form-control') %>
+</div>
 
+<div class="form-group">
   <label class="control-label">City</label>
-  <%= text_field_tag('institution[city]', @institution.city, class:'form-control institution-user-input') %>
+  <%= text_field_tag('institution[city]', @institution.city, class:'form-control') %>
+</div>
 
+<div class="form-group">
   <label class="control-label">Country</label>
   <%= country_select('institution','country',
-                     { include_blank: 'Select a country' },
-                     { class: 'form-control institution-user-input', disabled:true }) %>
+                     { include_blank: 'Select a country' },value: @institution.nil? ? nil:CountryCodes.country(@institution.country), class: 'form-control') %>
 </div>
 
-<script type='application/javascript'>
-
-    function toggleUserInput(disabled) {
-        $j(".institution-user-input").prop('disabled',disabled);
-    }
-    $j(document).ready(function () {
-        toggleUserInput(<%= (@institution.id.blank? || @institution.id == 0) ? 'false' : 'true' -%>);
-
-        $j('select#institution_country').on('change',function() {
-            checkSubmitButtonEnabled();
-        });
-
-        $j('select#institution_id').on('select2:select', function(event) {
-            var data = event.params.data;
-            if (data.id==data.text) { //new record
-                toggleUserInput(false);
-            }
-            else {
-                toggleUserInput(true);
-            }
-            $j('#institution_title').val(data.text);
-            $j('#institution_web_page').val(data.web_page);
-            $j('#institution_city').val(data.city);
-            $j('#institution_country').val(data.country);
-            checkSubmitButtonEnabled();
-        });
-
-        $j('select#institution_id').on('select2:unselect', function(event) {
-            toggleUserInput(true);
-            $j('#institution_title').val('');
-            $j('#institution_web_page').val('');
-            $j('#institution_country').val('');
-            checkSubmitButtonEnabled();
-        });
-
-    });
-</script>
 

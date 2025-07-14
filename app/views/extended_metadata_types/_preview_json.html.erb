@@ -1,0 +1,39 @@
+<%= panel(json['title'], class:'extended-metadata-type-preview') do %>
+  <p>
+    <strong>Title: </strong>
+    <% if editable_title %>
+      <%= text_field_tag 'emt_titles[]', json['title'], :class=>'form-control' %>
+    <% else %>
+      <%= json['title'] %>
+    <% end %>
+  </p>
+  <p>
+    <strong>Supported type: </strong><%= json['supported_type'] %>
+  </p>
+  <p>
+    <strong>Attributes:</strong>
+  </p>
+  <table class="table table-hover extended-metadata-type-attributes">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Type</th>
+      <th>PID</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+      <% json['attributes'].each do |attribute| %>
+      <tr>
+        <td><%= attribute['title'] %></td>
+        <td><%= attribute['type'] %></td>
+        <td><%= attribute['pid'] %></td>
+        <td><%= attribute['required'] %></td>
+        <td><%= attribute['description'] %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+<% end %>

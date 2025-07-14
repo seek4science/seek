@@ -3,20 +3,27 @@
   title ||= 'Content'
   id ||= 'upload-panel'
   asset_name ||= text_for_resource(asset_field_prefix)
+  action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
   extra_content ||= nil
+  hide_remote ||= false
 %>
 <%= panel(title, id: id) do %>
   <div>
     <p>
-      You can register a <%= asset_name -%> by either directly uploading a file<%= ' or zipped folder' if asset_name == 'Data file' %>,
-      or registering a URL to a remote file or web page.
+      <% unless hide_remote %>
+        You can register a <%= asset_name -%> by either directly uploading a file<%= ' or zipped folder' if asset_name == 'Data file' %>,
+      	or registering a URL to a remote file or web page.
+      <% else %>
+        You can <%= action_text -%> by selecting a file.
+      <% end %>
+
     </p>
   </div>
 
   <% if !resource.nil? && Seek::Util.is_multi_file_asset_type?(resource.class) %>
-    <%= render partial: 'assets/upload', locals: { existing_objects: resource.content_blobs, batch: true } -%>
+    <%= render partial: 'assets/upload', locals: { existing_objects: resource.content_blobs, batch: true, hide_remote: hide_remote } -%>
   <% else %>
-    <%= render partial: 'assets/upload' -%>
+    <%= render partial: 'assets/upload', locals: { hide_remote: hide_remote } -%>
   <% end %>
 
   <%= extra_content if extra_content %>

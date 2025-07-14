@@ -3,11 +3,8 @@ require 'delayed/command'
 # module for handling interaction with delayed job workers
 module Seek
   module Workers
-    def self.start(action = 'start')
-      @identifier = 0
-
-      commands = create_commands(action)
-
+    def self.start
+      commands = create_commands('start')
       daemonize_commands(commands)
     end
 
@@ -17,6 +14,14 @@ module Seek
 
     def self.create_commands(action)
       commands = []
+
+      active_queues.each_with_index do |queue_name, index|
+        commands << command(queue_name, index + 1, 1, action)
+      end
+      commands
+    end
+
+    def self.active_queues
       queues = [QueueNames::DEFAULT]
       queues << QueueNames::MAILERS
       queues << QueueNames::AUTH_LOOKUP if Seek::Config.auth_lookup_enabled
@@ -25,14 +30,12 @@ module Seek
       queues << QueueNames::INDEXING if Seek::Config.solr_enabled
       queues << QueueNames::TEMPLATES if Seek::Config.isa_json_compliance_enabled
       queues << QueueNames::DATAFILES if Seek::Config.data_files_enabled
-      queues.each do |queue_name|
-        commands << command(queue_name, 1, action)
-      end
-      commands
+      queues
     end
 
     def self.stop
-      daemonize_commands(['stop'])
+      # will stop the first 15, not expecting more than that
+      daemonize_commands(['stop -n 15'])
     end
 
     def self.status
@@ -40,17 +43,12 @@ module Seek
     end
 
     def self.restart
-      start('restart')
+      stop
+      start
     end
 
-    def self.start_data_file_auth_lookup_worker(number = 1)
-      @identifier = 0
-      commands = [command(QueueNames::AUTH_LOOKUP, number, 'start')]
-      daemonize_commands(commands)
-    end
-
-    def self.command(queue_name, number_of_workers, action)
-      "--queue=#{queue_name} -i #{@identifier += 1} -n #{number_of_workers} #{action}"
+    def self.command(queue_name, index, number_of_workers, action)
+      "--queue=#{queue_name} -i #{index} -n #{number_of_workers} #{action}"
     end
   end
 end

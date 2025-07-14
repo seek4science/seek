@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_10_15_093333) do
-
+ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -25,7 +24,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -679,6 +678,23 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.index ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id"
   end
 
+  create_table "fair_data_station_uploads", force: :cascade do |t|
+    t.bigint "contributor_id"
+    t.bigint "project_id"
+    t.bigint "investigation_id"
+    t.bigint "content_blob_id"
+    t.bigint "policy_id"
+    t.string "investigation_external_identifier", limit: 2048
+    t.integer "purpose", limit: 2
+    t.boolean "show_status", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contributor_id"], name: "index_fair_data_station_uploads_on_contributor_id"
+    t.index ["investigation_id"], name: "index_fair_data_station_uploads_on_investigation_id"
+    t.index ["project_id"], name: "index_fair_data_station_uploads_on_project_id"
+    t.index ["purpose"], name: "index_fair_data_station_uploads_on_purpose"
+  end
+
   create_table "favourite_group_memberships", id: :integer, force: :cascade do |t|
     t.integer "person_id"
     t.integer "favourite_group_id"
@@ -758,6 +774,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "external_identifier", limit: 2048
+    t.string "deleted_contributor"
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -821,7 +838,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "resource_attributes", size: :medium
+    t.text "resource_attributes", limit: 16777215
     t.bigint "git_repository_id"
     t.integer "visibility"
     t.string "doi"
@@ -926,6 +943,8 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.integer "avatar_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
+    t.string "ror_id"
+    t.string "department"
   end
 
   create_table "investigation_auth_lookup", force: :cascade do |t|
@@ -1370,6 +1389,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.bigint "project_id"
     t.integer "data_file_id"
     t.string "external_identifier", limit: 2048
+    t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
@@ -1805,7 +1825,6 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
-    t.integer "template_id"
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
@@ -1881,7 +1900,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
 
   create_table "sessions", id: :integer, force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -1930,6 +1949,8 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "updated_at", null: false
     t.integer "zenodo_deposition_id"
     t.string "zenodo_record_url"
+    t.string "title"
+    t.text "description"
   end
 
   create_table "sop_auth_lookup", force: :cascade do |t|
@@ -2016,11 +2037,6 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.boolean "can_delete", default: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_strain_user_id_asset_id_can_view"
     t.index ["user_id", "can_view"], name: "index_strain_auth_lookup_on_user_id_and_can_view"
-  end
-
-  create_table "strain_descendants", id: false, force: :cascade do |t|
-    t.integer "ancestor_id"
-    t.integer "descendant_id"
   end
 
   create_table "strains", id: :integer, force: :cascade do |t|
@@ -2156,6 +2172,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "exception"
+    t.text "error_message"
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
@@ -2224,7 +2241,7 @@ ActiveRecord::Schema.define(version: 2024_10_15_093333) do
   create_table "text_values", id: :integer, force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", size: :medium, null: false
+    t.text "text", limit: 16777215, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

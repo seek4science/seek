@@ -1,0 +1,39 @@
+{
+  "id": "https://ror.org/027m9bs27",
+  "name": "University of Manchester",
+  "email_address": null,
+  "ip_addresses": [],
+  "established": 1824,
+  "types": ["Education"],
+  "relationships": [],
+  "addresses": [
+    {
+      "lat": 53.4668,
+      "lng": -2.2339,
+      "state": null,
+      "state_code": null,
+      "city": "Manchester",
+      "geonames_city": {
+        "id": 2643123,
+        "city": "Manchester",
+        "geonames_admin1": { "name": "England", "code": "GB.ENG" },
+        "license": {
+          "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+          "license": "http://creativecommons.org/licenses/by/3.0/"
+        }
+      },
+      "primary": false,
+      "line": null,
+      "country_geonames_id": null
+    }
+  ],
+  "links": ["http://www.manchester.ac.uk/"],
+  "acronyms": ["UoM"],
+  "status": "active",
+  "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Manchester",
+  "country": { "country_name": "United Kingdom", "country_code": "GB" },
+  "external_ids": {
+    "ISNI": { "all": ["0000 0004 0490 3210"] },
+    "GRID": { "preferred": "grid.484148.f", "all": "grid.484148.f" }
+  }
+}

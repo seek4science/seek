@@ -1791,6 +1791,10 @@ institutionPost:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            department:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            ror_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             country:
               $ref: "#/components/schemas/nullableCountryString"
             city:
@@ -1829,6 +1833,10 @@ institutionPatch:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            department:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            ror_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             country:
               $ref: "#/components/schemas/nullableCountryString"
             city:
@@ -3748,6 +3756,10 @@ institutionResponse:
               $ref: "#/components/schemas/nullableUriString"
             title:
               $ref: "#/components/schemas/nonEmptyString"
+            department:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            ror_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             country:
               $ref: "#/components/schemas/nullableCountryString"
             country_code:
@@ -3762,6 +3774,7 @@ institutionResponse:
               $ref: "#/components/schemas/assetLinkList"
           required:
             - title
+            - ror_id
             - country
             - city
             - address
@@ -5186,3 +5199,82 @@ workflowtool:
       $ref: "#/components/schemas/nullableNonEmptyString"
   required:
     - id
+gitTreeResponse:
+  type: object
+  description: A Git tree (directory) within a repository (or the root of the repository).
+  properties:
+    id:
+      type: string
+      description: The internal Git object ID for this tree.
+    path:
+      type: string
+      description: The full path of the tree within the repository.
+    tree:
+      type: array
+      description:
+      minItems: 0
+      items:
+        $ref: "#/components/schemas/gitTreeEntry"
+gitTreeEntry:
+  type: object
+  description: A Git object within a tree, pointing to either a blob (file) or tree (directory) using a path.
+  properties:
+    id:
+      type: string
+      description: The internal Git object ID for the file/directory pointed to by this entry.
+    name:
+      type: string
+      description: The filename of this file/directory within the current tree.
+    path:
+      type: string
+      description: The full path of the file/directory within the repository.
+    type:
+      type: string
+      description: The type of object pointed to by this entry, either a blob (file) or tree (directory).
+      enum:
+        - blob
+        - tree
+    mode:
+      type: string
+      description: UNIX mode of this entry, e.g. 100755 for an executable file etc.
+gitBlobResponse:
+  type: object
+  description: A Git blob (file) within a repository.
+  properties:
+    id:
+      type: string
+      description: The internal Git object ID for the file.
+    path:
+      type: string
+      description: The full path of the file within the repository.
+    size:
+      type: integer
+      description: The size of the file in bytes.
+    binary:
+      type: boolean
+      description: Whether this file is binary or not.
+    content:
+      type: string
+      description: The base64-encoded content of the file.
+    annotations:
+      type: array
+      minItems: 0
+      items:
+        $ref: "#/components/schemas/gitAnnotation"
+gitAnnotation:
+  type: object
+  description: An annotation on a file/directory indicating some kind of special use, e.g. to signify that this is the main workflow in a workflow repository.
+  properties:
+    key:
+      type: string
+      description: The key that indicates the type of this annotation, e.g. "main_workflow".
+    value:
+      type:
+        - 'null'
+        - string
+      description: The optional value of this annotation, e.g. in the case of a remote file, it would be the URL where the file is located.
+gitErrorResponse:
+  type: object
+  properties:
+    error:
+      type: string

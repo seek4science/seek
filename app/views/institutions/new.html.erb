@@ -3,7 +3,7 @@
 <%= index_and_new_help_icon controller_name %>
 
 <div class="asset_form">
-	<%= form_for(@institution) do |f| %>
-	  <%= render :partial => "form", :locals => { :f => f, :institution => nil } -%>
-	<% end %>
+  <%= form_for(@institution) do |f| %>
+    <%= render partial: 'form', locals: { f:f, institution:nil } %>
+  <% end %>
 </div>

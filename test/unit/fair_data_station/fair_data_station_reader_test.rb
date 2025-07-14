@@ -82,10 +82,18 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     study = inv.studies.first
 
     assert_equal 8, study.additional_metadata_annotations.count
-    assert_includes study.annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
+    assert_includes study.additional_metadata_annotations, ['http://fairbydesign.nl/ontology/center_name', 'NIID']
     study.additional_metadata_annotations.each do |annotation|
       assert annotation[0].start_with?('http://fairbydesign.nl/ontology/'), "#{annotation[0]} is not expected"
     end
+
+    # packageName not included
+    assay = study.assays.first
+    assert_equal 12, assay.additional_metadata_annotations.count
+    refute_includes assay.additional_metadata_annotations,
+                    ['http://fairbydesign.nl/ontology/packageName', 'Amplicon demultiplexed']
+    assert_equal 'Amplicon demultiplexed', assay.package_name
+    assert_nil study.package_name
 
     # non fairbydesign annotations
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
@@ -164,5 +172,27 @@ class FairDataStationReaderTest < ActiveSupport::TestCase
     assert_equal 0, study.datasets.count
     assert_equal 0, obs_unit.datasets.count
     assert_equal 0, sample.datasets.count
+  end
+
+  test 'candidates_for_extended_metadata and validate generated json' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
+    assert_equal 4, candidates.count
+    assert_equal %w[Investigation Study ObservationUnit Assay], candidates.collect(&:type_name)
+    candidates.each do |candidate|
+      assert_nothing_raised do
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
+      end
+    end
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
+    candidates = Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(path)
+    assert_equal 2, candidates.count
+    assert_equal %w[Study Assay], candidates.collect(&:type_name)
+    candidates.each do |candidate|
+      assert_nothing_raised do
+        Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.valid_emt_json?(candidate.to_extended_metadata_type_json)
+      end
+    end
   end
 end

@@ -33,6 +33,15 @@ module Seek
             end
           end
         end
+        if controller_model == Publication
+          format.any(*Publication::EXPORT_TYPES.keys) do
+            send_data(
+              instance_variable_get("@#{controller_name}").collect { |publication| publication.export(request.format.to_sym) }.join("\n\n"),
+              type: request.format.to_sym,
+              filename: "publications.#{request.format.to_sym}"
+            )
+          end
+        end
       end
     end
 

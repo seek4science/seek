@@ -7,7 +7,9 @@ class InvestigationsController < ApplicationController
   before_action :investigations_enabled?
   before_action :fair_data_station_enabled?, only: %i[update_from_fairdata_station submit_fairdata_station]
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: [:edit, :manage, :update, :manage_update, :destroy, :show, :update_from_fairdata_station, :submit_fairdata_station, :new_object_based_on_existing_one]
+  before_action :find_and_authorize_requested_item, only: [:edit, :manage, :update, :manage_update, :destroy, :show,
+                                                           :update_from_fairdata_station, :submit_fairdata_station, :fair_data_station_update_status,
+                                                           :hide_fair_data_station_update_status, :new_object_based_on_existing_one]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   #defined in the application controller
@@ -19,7 +21,7 @@ class InvestigationsController < ApplicationController
 
   include Seek::AnnotationCommon
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -36,36 +38,88 @@ class InvestigationsController < ApplicationController
   end
 
   def submit_fairdata_station
-    path = params[:datastation_data].path
-    data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    error = nil
+    in_progress = []
+    mismatching_external_id = false
+    if params[:datastation_data].present?
+      path = params[:datastation_data].path
+      fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
 
-    begin
-      Investigation.transaction do
-        @investigation = Seek::FairDataStation::Writer.new.update_isa(@investigation, data_station_inv, current_person, @investigation.projects, @investigation.policy)
-        @investigation.save!
+      if fair_data_station_inv.present?
+        in_progress = FairDataStationUpload.matching_updates_in_progress(@investigation, fair_data_station_inv.external_id)
+        mismatching_external_id = fair_data_station_inv.external_id != @investigation.external_identifier
+      else
+        error = "Unable to find an #{t('investigation')} within the file"
       end
-    rescue ActiveRecord::RecordInvalid, Seek::FairDataStation::ExternalIdMismatchException => e
-      flash.now[:error] = e.message
+    else
+      error = 'No file was submitted'
     end
 
-    if flash[:error].present?
+    if mismatching_external_id
+      error = "#{t('investigation')} external identifiers do not match"
+    elsif in_progress.any?
+      error = "An existing update of this #{t('investigation')} is currently already in progress."
+    end
+
+    if error.nil?
+      content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
+                                     original_filename: params[:datastation_data].original_filename)
+      fair_data_station_upload = FairDataStationUpload.new(contributor: current_person,
+                                                           investigation: @investigation,
+                                                           investigation_external_identifier: fair_data_station_inv.external_id,
+                                                           purpose: :update, content_blob: content_blob
+      )
+      if fair_data_station_upload.save
+        FairDataStationUpdateJob.new(fair_data_station_upload).queue_job
+        redirect_to update_from_fairdata_station_investigation_path(@investigation)
+      else
+        error = 'Unable to save the record'
+      end
+    end
+
+    if error.present?
+      flash[:error] = error
       respond_to do |format|
         format.html { render action: :update_from_fairdata_station, status: :unprocessable_entity }
       end
+    end
+
+  end
+
+  def fair_data_station_update_status
+    upload = FairDataStationUpload.for_investigation_and_contributor(@investigation, current_person).update_purpose.where(id: params[:upload_id]).first
+    if upload
+      respond_to do |format|
+        format.html { render partial: 'fair_data_station_update_status', locals: { upload: upload } }
+      end
     else
       respond_to do |format|
-        format.html { redirect_to(@investigation) }
+        format.html { render plain:'', status: :forbidden }
+      end
+    end
+  end
+
+  def hide_fair_data_station_update_status
+    upload = FairDataStationUpload.for_investigation_and_contributor(@investigation, current_person).update_purpose.where(id: params[:upload_id]).first
+    if upload && (upload.update_task.completed? || upload.update_task.cancelled?)
+      upload.update_attribute(:show_status, false)
+      respond_to do |format|
+        format.html { render plain:'' }
+      end
+    else
+      respond_to do |format|
+        format.html { render plain:'', status: :forbidden }
       end
     end
   end
 
   def export_isatab_json
-    the_hash = IsaTabConverter.convert_investigation(Investigation.find(params[:id]))
+    the_hash = ISATabConverter.convert_investigation(Investigation.find(params[:id]))
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
   def export_isa
-    isa = IsaExporter::Exporter.new(Investigation.find(params[:id]), current_user).export
+    isa = ISAExporter::Exporter.new(Investigation.find(params[:id]), current_user).export
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
     respond_to do |format|

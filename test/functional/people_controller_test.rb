@@ -469,7 +469,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :redirect
     refute_nil flash[:error]
 
-    refute_equal 'blablba', assigns(:person).first_name
+    admin.reload
+    refute_equal 'blablba', admin.first_name
   end
 
   test 'admin can edit other admin' do

@@ -126,4 +126,13 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
 
     assert_equal 'Apache-2.0', metadata[:license]
   end
+
+  test 'extracts author with affiliation as array' do
+    # Also note that the following is just a regular RO-Crate, not a Workflow RO-Crate
+    wf = open_fixture_file('ro_crates/affiliation_array.crate.zip')
+    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    metadata = extractor.metadata
+
+    assert_equal 'The Secret Club, University of Manchester', metadata[:assets_creators_attributes]['0'][:affiliation]
+  end
 end

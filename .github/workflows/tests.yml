@@ -29,7 +29,7 @@ jobs:
           - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       virtuoso:
-        image: tenforce/virtuoso
+        image: openlink/virtuoso-opensource-7
         env:
           DBA_PASSWORD: tester
           SPARQL_UPDATE: true
@@ -101,8 +101,15 @@ jobs:
         run: |
           git fetch origin ${{ github.event.before }}
           git checkout ${{ github.event.before }} -- db/schema.rb
+          mv db/migrate db/migrate.bkp
+          git checkout ${{ github.event.before }} -- db/migrate
       - name: Load test database schema
         run: bundle exec rake db:schema:load
+      - name: Restore migrations
+        if: github.event_name == 'push' && matrix.suite == 'rake db:migrate' && github.event.before != '0000000000000000000000000000000000000000'
+        run: |
+          rm -rf db/migrate
+          mv db/migrate.bkp db/migrate
       - name: Seed database
         if: matrix.suite == 'rake seek:upgrade'
         run: bundle exec rake db:seed

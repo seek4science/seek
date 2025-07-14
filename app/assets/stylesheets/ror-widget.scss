@@ -1,0 +1,33 @@
+@import 'variables';
+
+.institution-input-disable {
+    background-color: $input-bg-disabled !important;
+cursor: not-allowed;
+}
+
+.tt-menu {
+    width: 422px;
+    margin: 12px 0;
+    padding: 8px 0;
+    background-color: $input-bg;
+    border: 1px solid $gray-base;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: $border-radius-large;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tt-suggestion {
+  border-bottom: 1px $gray-lighter solid;
+}
+.tt-suggestion:hover {
+  background-color: $hover-highlight;
+}
+
+.league-name {
+    margin: 0 20px 5px 0;
+    padding: 3px 6px;
+    background-color: $btn-default-border;
+    transition: background-color 0.5s ease-in-out;
+}
+

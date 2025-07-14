@@ -1,14 +1,23 @@
 <%= render partial: "general/page_title",locals: {title: "Update from FAIR Data Station for #{ t('investigation') } #{link_to(@investigation.title, @investigation)}".html_safe} %>
 
+<%
+  updates_in_progress = fair_data_station_investigation_updates_in_progress?(@investigation, current_person)
+  in_progress_msg = 'An update is currently in progress.'
+  extra_options = {}
+  if updates_in_progress
+    extra_options = {class: 'disabled', onclick:"alert('#{in_progress_msg}');return false;", 'data-tooltip': in_progress_msg}
+  end
+%>
+
+<%= render partial: 'fair_data_station_update_statuses' %>
+
 <%= form_tag submit_fairdata_station_investigation_path(@investigation), multipart: true do %>
 
-  <%= panel('FAIR Data Station turtle (ttl) metadata file') do %>
-
-    <%= file_field_tag "datastation_data", accept: '.ttl' -%>
-
+  <%= panel(t('fair_data_station.upload_file_label')) do %>
+    <%= file_field_tag "datastation_data", {accept: '.ttl'}.merge(extra_options) -%>
   <% end %>
 
   <div>
-    <%= submit_tag("Submit", class: 'btn btn-primary') %>
+    <%= submit_tag("Submit", {class: 'btn btn-primary'}.merge(extra_options)) %>
   </div>
 <% end %>

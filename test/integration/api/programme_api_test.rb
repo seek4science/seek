@@ -49,7 +49,7 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     assert_no_difference('Programme.count', -1) do
       delete member_url(prog), headers: { 'Authorization' => write_access_auth }
       assert_response :forbidden
-      validate_json response.body, '#/components/schemas/forbiddenResponse'
+      assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
     end
 
     #no projects ==> can delete
@@ -62,6 +62,6 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
 
     get member_url(prog), headers: { 'Authorization' => read_access_auth }
     assert_response :not_found
-    validate_json response.body, '#/components/schemas/notFoundResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
   end
 end

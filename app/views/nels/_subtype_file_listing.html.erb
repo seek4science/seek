@@ -1,0 +1,39 @@
+<p>
+  <label>Path</label>
+  <%= subtype_path_breadcrumbs(@subtype_path, @path, @project_id, @dataset_id, @subtype_name) %>
+</p>
+
+<table class="table table-hover table-bordered">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Size</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @file_list.each_with_index do |file_item, index| %>
+    <%  if file_item['isFolder'] %>
+      <tr>
+        <td>
+          <span class='nels-folder clickable' data-path='<%= file_item["path"] %>' data-project-id='<%= @project_id %>' data-dataset-id='<%= @dataset_id %>' data-subtype='<%= @subtype_name %>' data-assay-id='<%= params[:assay_id] %>'>
+            <%= nels_folder_icon %>
+            <%= file_item["name"] %>
+          </span>
+        </td>
+        <td><%= number_to_human_size(file_item["size"]) %></td>
+      </tr>
+    <% else %>
+      <tr>
+        <td>
+          <%= file_type_icon_for_filename(file_item["name"]) %>
+          <%= file_item["name"] %>
+          <span style="float: right;">
+            <%= icon_link_to('', 'download', '#', { class: 'nels-download-link', 'data-index': index }) %>
+          </span>
+        </td>
+        <td><%= number_to_human_size(file_item["size"]) %></td>
+      </tr>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>

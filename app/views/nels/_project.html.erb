@@ -1,0 +1,45 @@
+<h2>
+  <span class="<%= nels_project_glyph %>"/>
+  &nbsp;
+  NeLS Project: <%= @project['name'] -%>
+</h2>
+
+<%= item_description @project['description'] -%>
+
+<% if @project['contact_person'].present? %>
+  <p>
+    <label>Contact person:</label> <%= @project['contact_person'] %>
+  </p>
+<% end %>
+
+<% if (time = Time.parse(@project['created_at']) rescue nil).present? %>
+  <p>
+    <label>Created:</label> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span>
+  </p>
+<% end %>
+<br/>
+
+<h4>Datasets</h4>
+<p>
+  <%= button_link_to('Create a new NeLS dataset', 'add', new_dataset_nels_path(project_id: @project['id'], project_name: @project['name'])) %>
+</p>
+<ul>
+<% @datasets.each do |dataset| %>
+
+  <li>
+    <%= link_to(dataset['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"dataset#{dataset['id']}"}) %>
+    <%= nels_locked_dataset_icon if is_nels_dataset_locked?(dataset, @project) %>
+    <ul>
+      <li><label>Description:</label><%= dataset['description'] %></li>
+      <li><label>Type:</label><%= dataset['type'] %></li>
+    </ul>
+  </li>
+
+<% end %>
+</ul>
+
+<script>
+    $j(document).ready(function () {
+        NelsBrowser.bindNelsTreeNodeLinks();
+    });
+</script>

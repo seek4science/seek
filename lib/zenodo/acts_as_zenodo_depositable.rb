@@ -42,9 +42,6 @@ module Zenodo
         metadata = zenodo_metadata
         metadata.merge!(extra_metadata.to_h.deep_symbolize_keys)
 
-        #FIXME: this is a quick hack
-        metadata[:description] = 'not set' if metadata[:description].blank?
-
         client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
         deposition = client.create_deposition({ metadata: metadata.build })
         deposition_file = deposition.create_file(zenodo_depositable_file)

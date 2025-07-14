@@ -1,4 +1,4 @@
-class IsaAssaysController < ApplicationController
+class ISAAssaysController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Publishing::PublishingCommon
 
@@ -33,12 +33,12 @@ class IsaAssaysController < ApplicationController
 
     @isa_assay =
       if params[:is_assay_stream]
-        IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
+        ISAAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
                                 study_id: study.id,
                                 position: new_position },
                        input_sample_type_id: })
       else
-        IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
+        ISAAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
                                 assay_stream_id: params[:assay_stream_id],
                                 study_id: study.id,
                                 position: new_position },
@@ -101,10 +101,20 @@ class IsaAssaysController < ApplicationController
     return unless @isa_assay.assay.is_isa_json_compliant?
     return if @isa_assay.assay.is_assay_stream? # Should not fix anything when creating an assay stream
     return unless @isa_assay.sample_type.present? # Just to be sure
+    return if @isa_assay.assay.assay_stream.child_assays == [@isa_assay.assay] # No need to fix sample type linkage if it's the only assay in the assay stream
 
     previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
     next_sample_types = previous_sample_type.next_linked_sample_types
     next_sample_types.delete @isa_assay.sample_type
+
+    # Ignore sample types that don't belong in the current assay stream
+    # They should not affect sample type linkage
+    next_sample_types.map do |sample_type|
+      unless sample_type.assays&.first&.assay_stream_id == @isa_assay.assay.assay_stream_id
+        next_sample_types.delete sample_type
+      end
+    end
+
     next_sample_type = next_sample_types.first
 
     # In case an assay is inserted right at the end of an assay stream,
@@ -122,7 +132,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def initialize_isa_assay
-    @isa_assay = IsaAssay.new(isa_assay_params)
+    @isa_assay = ISAAssay.new(isa_assay_params)
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.contributor = current_person
     @isa_assay.sample_type.contributor = User.current_user.person if isa_assay_params[:sample_type]
@@ -207,20 +217,21 @@ class IsaAssaysController < ApplicationController
       { id: attr.id, title: attr.title }
     end
   end
+
   def update_sample_json_metadata
     attribute_changes = @isa_assay.sample_type.sample_attributes.map do |attr|
       old_attr = @old_attributes.detect { |oa| oa[:id] == attr.id }
       next if old_attr.nil?
 
-      {id: attr.id, old_title: old_attr[:title], new_title: attr.title} unless old_attr[:title] == attr.title
+      { id: attr.id, old_title: old_attr[:title], new_title: attr.title } unless old_attr[:title] == attr.title
     end.compact
-    return  if attribute_changes.blank?
+    return if attribute_changes.blank?
 
     UpdateSampleMetadataJob.perform_later(@isa_assay.sample_type, @current_user, attribute_changes)
   end
 
   def find_requested_item
-    @isa_assay = IsaAssay.new
+    @isa_assay = ISAAssay.new
     @isa_assay.populate(params[:id])
 
     if @isa_assay.assay.nil?

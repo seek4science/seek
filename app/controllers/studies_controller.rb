@@ -18,7 +18,7 @@ class StudiesController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
