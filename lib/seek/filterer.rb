@@ -114,6 +114,10 @@ module Seek
           label_field: 'sample_types.title',
           joins: [:sample_type]
         ),
+        isa_json_compliance: Seek::Filtering::BooleanFilter.new(
+          field: 'investigations.is_isa_json_compliant',
+          joins: [:investigation],
+        ),
     }.freeze
 
     def initialize(klass)
@@ -135,7 +139,13 @@ module Seek
 
       active_filters.each do |key, values|
         filter = get_filter(key)
-        filtered_collection = filter.apply(filtered_collection, values)
+
+        if filter.is_a? Seek::Filtering::BooleanFilter
+          bool = values&.first&.downcase == 'true'
+          filtered_collection = filter.apply(filtered_collection, bool)
+        else
+          filtered_collection = filter.apply(filtered_collection, values)
+        end
       end
 
       filtered_collection
