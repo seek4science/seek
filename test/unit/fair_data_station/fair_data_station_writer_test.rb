@@ -163,6 +163,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
 
   test 'ignore disabled EMT' do
     contributor = FactoryBot.create(:person)
+    FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:fairdatastation_test_case_sample_type, policy: Policy.public_policy)
     FactoryBot.create(:fairdata_test_case_study_extended_metadata, enabled: false)
     project = contributor.projects.first
