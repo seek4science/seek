@@ -118,6 +118,9 @@ module Seek
           field: 'investigations.is_isa_json_compliant',
           joins: [:investigation],
         ),
+        is_isa_json_compliant: Seek::Filtering::BooleanFilter.new(
+          field: 'is_isa_json_compliant',
+        )
     }.freeze
 
     def initialize(klass)
