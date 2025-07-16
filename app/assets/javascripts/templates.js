@@ -203,11 +203,7 @@ function updateIsaTagSelect(template_level, attribute_row) {
 
 const applyTemplate = () => {
   const id = $j("#source_select").find(":selected").val();
-  const data = templates.find((t) => t.template_id == id);
-  const codeMirror = $j(Templates.context.description_elem || "#template-description").nextAll(
-    ".CodeMirror"
-  )[0].CodeMirror;
-  if (data.description) codeMirror.getDoc().setValue(data.description);
+  const data = templates.find((t) => t.template_id === id);
   const suffix = Templates.context.suffix || "";
   const attribute_table = "#attribute-table" + suffix;
   const attribute_row = "#new-attribute-row" + suffix;
