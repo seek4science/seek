@@ -91,7 +91,7 @@ class InstitutionsController < ApplicationController
                            query: "%#{query}%").limit(params[:limit] || 10)
     items = results.map do |institution|
       { id: institution.id,
-        text: institution.title,
+        text: institution.base_title,
         department: institution.department,
         ror_id: institution.ror_id,
         web_page: institution.web_page,

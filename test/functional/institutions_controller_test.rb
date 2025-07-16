@@ -62,11 +62,20 @@ class InstitutionsControllerTest < ActionController::TestCase
       post :create, params: { institution: { title: 'University of Manchester', department: 'Manchester Institute of Biotechnology'} }
     end
 
+    institution = assigns(:institution)
+
     assert_redirected_to institution_path(assigns(:institution))
-    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', assigns(:institution).title
-    get :show, params: { id: assigns(:institution) }
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', institution.title
+
+    get :show, params: { id: institution }
     assert_select 'h1', text: 'Manchester Institute of Biotechnology, University of Manchester', count: 1
+
+    get :edit, params: { id: institution }
+    assert_response :success
+    assert_select 'input#institution_title[value=?]', 'University of Manchester'
+
   end
+
 
   def test_should_create_institution_with_or_without_title_department_
 
@@ -122,6 +131,15 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_select 'h1', text: 'Division 2, Institution 2', count: 1
 
   end
+
+  def test_should_not_create_institution_without_title
+    assert_no_difference('Institution.count') do
+      post :create, params: { institution: { department: 'Some Department' } }
+    end
+    assert_includes assigns(:institution).errors[:title], "can't be blank"
+
+  end
+
 
 
   def test_can_not_create_institution_with_invalid_ror_id

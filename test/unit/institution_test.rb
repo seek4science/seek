@@ -285,4 +285,22 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal "Ror 'invalid_id' is not a valid ROR ID", institution.errors.full_messages.join(', ')
   end
 
+
+  test 'validate raw title presence' do
+    institution = FactoryBot.build(:institution, title: nil)
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution.title = ''
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution = FactoryBot.build(:institution, title: nil, department: 'Department of Science')
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution.title = 'Valid Title'
+    assert institution.valid?
+  end
+
 end
