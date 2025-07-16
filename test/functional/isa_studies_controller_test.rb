@@ -174,6 +174,29 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert study.sample_types.first.locked?
   end
 
+  test 'should auto-populate the sample type title and description' do
+    projects = User.current_user.person.projects
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person, is_isa_json_compliant: true)
+    source_sample_type_no_title = source_attributes(projects)
+    source_sample_type_no_title.delete(:title)
+    sample_collection_sample_type_no_title = sample_collection_attributes(projects)
+    sample_collection_sample_type_no_title.delete(:title)
+
+    assert_difference('Study.count', 1) do
+      assert_difference('SampleType.count', 2) do
+        post :create, params: { isa_study: { study: { title: 'test', investigation_id: inv.id, sop_id: FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id },
+                                             source_sample_type: source_sample_type_no_title ,
+                                             sample_collection_sample_type: sample_collection_sample_type_no_title } }
+      end
+    end
+
+    assert_response :redirect
+    isa_study = assigns(:isa_study)
+
+    assert_equal isa_study.source.title, "#{isa_study.study.title} - Source Sample Type"
+    assert_equal isa_study.sample_collection.title, "#{isa_study.study.title} - Sample Collection Sample Type"
+  end
+
   private
 
   def sample_collection_attributes(projects=[])
