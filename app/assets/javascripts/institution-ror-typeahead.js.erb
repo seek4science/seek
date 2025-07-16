@@ -90,7 +90,7 @@ function rorQuerySource(query, processSync, processAsync) {
 function localSuggestionTemplate(data) {
     return `
         <div>
-            <strong>${data.text}</strong>
+            <strong>${data.department ? `${data.department}, ` : ''}${data.text}</strong>
             <small>${data.hint || ''}</small>
         </div>`;
 }
