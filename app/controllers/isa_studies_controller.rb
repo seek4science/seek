@@ -19,6 +19,10 @@ class ISAStudiesController < ApplicationController
     @isa_study.sample_collection.policy = @isa_study.study.policy
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
+    @isa_study.source.title = "#{@isa_study.study.title} - Source Sample Type" if @isa_study.source.title.blank?
+    @isa_study.source.description = "Source Sample Type linked to Study '#{@isa_study.study.title}'." if @isa_study.source.description.blank?
+    @isa_study.sample_collection.title = "#{@isa_study.study.title} - Sample Collection Sample Type" if @isa_study.sample_collection.title.blank?
+    @isa_study.sample_collection.description = "Sample Collection Sample Type linked to Study '#{@isa_study.study.title}'." if @isa_study.sample_collection.description.blank?
     @isa_study.study.sample_types = [ @isa_study.source, @isa_study.sample_collection ]
 
     if @isa_study.save
