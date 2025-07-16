@@ -48,7 +48,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
                                                       assay_class_id: AssayClass.experimental.id,
                                                       position: 0, policy_attributes: },
                                              input_sample_type_id: sample_collection_sample_type.id,
-                                             sample_type: material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id)
+                                             sample_type: create_material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id)
         } }
       end
     end
@@ -193,7 +193,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
     isa_assay_attributes = { assay: assay_attributes.merge(emt_attributes),
                              input_sample_type_id: sample_collection_sample_type.id,
-                             sample_type: material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id)
+                             sample_type: create_material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id)
     }
 
     assert_difference 'Assay.count', 1 do
@@ -302,7 +302,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
     intermediate_isa_assay_attributes1 = { assay: intermediate_assay_attributes1,
                                            input_sample_type_id: study.sample_types.second.id,
-                                           sample_type: material_assay_sample_type_attributes(projects.first, study.sample_types.second.id) }
+                                           sample_type: create_material_assay_sample_type_attributes(projects.first, study.sample_types.second.id) }
 
     assert_difference "Assay.count", 1 do
       assert_difference "SampleType.count", 1 do
@@ -603,7 +603,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assay_attributes = assay.as_json.reject { |_, v| v.blank? }
 
     login_as person.user
-    post :create, params: { isa_assay: { assay: assay_attributes, sample_type: material_assay_sample_type_attributes(project, study.sample_types.second.id), source_assay_id: assay_stream.id, input_sample_type_id: study.sample_types.second.id }, policy_attributes: assay_policy_attributes }
+    post :create, params: { isa_assay: { assay: assay_attributes, sample_type: create_material_assay_sample_type_attributes(project, study.sample_types.second.id), source_assay_id: assay_stream.id, input_sample_type_id: study.sample_types.second.id }, policy_attributes: assay_policy_attributes }
     @isa_assay = assigns(:isa_assay)
     assert_redirected_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay', item_id: @isa_assay.assay)
 
@@ -757,11 +757,81 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_equal first_assay_sample_type.previous_linked_sample_type, study.sample_types.second
   end
 
+  test 'should auto-populate the sample type title and description' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    projects = person.projects
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation:, contributor: person)
+    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study:)
+    material_assay_template = FactoryBot.create(:isa_assay_material_template)
+    data_file_assay_template = FactoryBot.create(:isa_assay_data_file_template)
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+
+    # Create an assay with material outputs
+    material_assay_sample_type_attributes = create_material_assay_sample_type_attributes(projects.first, study.sample_types.second.id, material_assay_template.id)
+    material_assay_sample_type_attributes.delete(:title)
+
+    material_assay_attributes = { title: 'Material Assay',
+                                  study_id: study.id,
+                                  assay_class_id: AssayClass.experimental.id,
+                                  creator_ids: [person.id],
+                                  policy_attributes:,
+                                  assay_stream_id: assay_stream.id }
+
+    material_isa_assay_attributes = { assay: material_assay_attributes,
+                             input_sample_type_id: study.sample_types.second.id,
+                             sample_type: material_assay_sample_type_attributes }
+
+    assert_difference('Assay.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        post :create, params: { isa_assay: material_isa_assay_attributes }
+      end
+    end
+
+    assert_response :redirect
+    material_isa_assay = assigns(:isa_assay)
+
+    assert_equal material_isa_assay.sample_type.title, "#{material_isa_assay.assay.title} - 'Assay - Material' Sample Type"
+    assert_equal material_isa_assay.sample_type.description, "'Assay - Material' Sample Type linked to Assay '#{material_isa_assay.assay.title}'."
+
+    # Create an assay with data file outputs
+    data_file_assay_sample_type_attributes = create_data_file_assay_sample_type_attributes(projects.first, material_isa_assay.sample_type.id, data_file_assay_template.id)
+    data_file_assay_sample_type_attributes.delete(:title)
+
+    data_file_assay_attributes = { title: 'Material Assay',
+                                  study_id: study.id,
+                                  assay_class_id: AssayClass.experimental.id,
+                                  creator_ids: [person.id],
+                                  policy_attributes:,
+                                  assay_stream_id: assay_stream.id }
+
+    data_file_isa_assay_attributes = { assay: data_file_assay_attributes,
+                             input_sample_type_id: study.sample_types.second.id,
+                             sample_type: data_file_assay_sample_type_attributes }
+
+    assert_difference('Assay.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        post :create, params: { isa_assay: data_file_isa_assay_attributes }
+      end
+    end
+
+    assert_response :redirect
+    data_file_isa_assay = assigns(:isa_assay)
+
+    assert_equal data_file_isa_assay.sample_type.title, "#{data_file_isa_assay.assay.title} - 'Assay - Data file' Sample Type"
+    assert_equal data_file_isa_assay.sample_type.description, "'Assay - Data file' Sample Type linked to Assay '#{data_file_isa_assay.assay.title}'."
+
+  end
+
   private
 
-  def material_assay_sample_type_attributes(project, linked_sample_type_id='self')
-    { title: "Intermediate Assay Sample type 1",
+  def create_material_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=nil, counter=1)
+    { title: "Intermediate Assay Sample type #{counter}",
       project_ids: [project.id],
+      template_id: parent_template_id,
       sample_attributes_attributes: {
         '0': {
           pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -787,4 +857,35 @@ class ISAAssaysControllerTest < ActionController::TestCase
       }
     }
   end
+
+  def create_data_file_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=nil, counter=1)
+    { title: "Data File Assay Sample type #{counter}",
+      project_ids: [project.id],
+      template_id: parent_template_id,
+      sample_attributes_attributes: {
+        '0': {
+          pos: '1', title: 'Data File name', required: '1', is_title: '1',
+          sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id, _destroy: '0',
+          isa_tag_id: FactoryBot.create(:data_file_isa_tag).id
+        },
+        '1': {
+          pos: '2', title: 'Protocol', required: '1', is_title: '0',
+          sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+          isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, _destroy: '0'
+        },
+        '2': {
+          pos: '3', title: 'Input sample', required: '1',
+          sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
+          linked_sample_type_id: linked_sample_type_id, _destroy: '0'
+        },
+        '3': {
+          pos: '4', title: 'Some Data File comment', required: '1',
+          sample_attribute_type_id: FactoryBot.create(:string_sample_attribute_type).id,
+          _destroy: '0',
+          isa_tag_id: FactoryBot.create(:data_file_comment_isa_tag).id
+        }
+      }
+    }
+  end
+
 end
