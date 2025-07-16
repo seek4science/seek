@@ -118,7 +118,7 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  def upload_samples
+  def preview_upload_samples
     uploaded_file = params[:file]
     project_id = params[:project_id]
     @project = Project.find(project_id)

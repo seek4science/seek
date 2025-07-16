@@ -305,7 +305,7 @@ async function batchUpdateSample(sampleTypes) {
 async function handleUploadSubmit(formData){
   $j.ajax({
     type: 'POST',
-    url: "<%= upload_samples_single_pages_path %>",
+    url: "<%= preview_upload_samples_single_pages_path %>",
     data: formData,
     dataType: 'html',
     processData: false,
