@@ -236,6 +236,30 @@ class SinglePagesController < ApplicationController
     end
   end
 
+  def upload_samples_by_spreadsheet
+    errors = []
+    results = []
+    param_converter = Seek::Api::ParameterConverter.new("samples")
+    new_samples_params = param_converter.convert(params[:newSamples])
+    updated_samples_params = param_converter.convert(params[:updatedSamples])
+    # SamplesBatchCreateJob.perform_later()
+    # SamplesBatchUpdateJob.perform_later()
+    status = errors.empty? ? :ok : :unprocessable_entity
+    flash[:notice] = 'A background job has been launched. Samples are being added as we speak!'
+  rescue StandardError => e
+    flash[:error] = e.message
+  ensure
+    respond_to do |format|
+      format.html do
+        redirect_to single_page_path(@project), status: status
+      end
+      format.json do
+        render json: { status: status, errors: errors, results: results }, status: status
+      end
+    end
+  end
+
+
   private
 
   def get_spreadsheet_data(samples_sheet)
