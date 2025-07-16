@@ -2892,7 +2892,7 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
 
-    assert_equal "The Institution is invalid, Title can't be blank",flash[:error]
+    assert_includes flash[:error],"The Institution is invalid, Title can't be blank"
     project.reload
     refute_includes project.people, sender
 

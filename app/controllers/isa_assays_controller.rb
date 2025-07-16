@@ -49,7 +49,16 @@ class ISAAssaysController < ApplicationController
 
   def create
     update_sharing_policies @isa_assay.assay
-    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
+    unless @isa_assay.assay.is_assay_stream?
+      level = if @isa_assay.sample_type.level
+                @isa_assay.sample_type.level&.split(' - ').map(&:capitalize).join(' - ')
+              else
+                'Custom'
+              end
+      @isa_assay.sample_type.policy = @isa_assay.assay.policy
+      @isa_assay.sample_type.title = "#{@isa_assay.assay.title} - '#{level}' Sample Type" if @isa_assay.sample_type.title.blank?
+      @isa_assay.sample_type.description = "'#{level}' Sample Type linked to Assay '#{@isa_assay.assay.title}'." if @isa_assay.sample_type.description.blank?
+    end
     if @isa_assay.save
       flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
       respond_to do |format|

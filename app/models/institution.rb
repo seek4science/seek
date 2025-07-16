@@ -6,10 +6,11 @@ class Institution < ApplicationRecord
 
   before_validation :fetch_ror_details, if: -> { ror_id.present? && ror_id_changed? }
 
-  validates :title, uniqueness: { scope: :department }
+  validates :title, presence: true, uniqueness: { scope: :department }
   validates :ror_id, uniqueness: { scope: :department }, allow_blank: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
+  validate :validate_base_title_presence
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
@@ -25,11 +26,11 @@ class Institution < ApplicationRecord
 
 
   def title
-    if department.present?
-      "#{department}, #{super}"
-    else
-      super
-    end
+    department.present? ? "#{department}, #{super}" : super
+  end
+
+  def base_title
+    read_attribute(:title) || ''
   end
 
   def can_edit?(user = User.current_user)
@@ -66,6 +67,12 @@ class Institution < ApplicationRecord
   end
 
   private
+
+  def validate_base_title_presence
+    if base_title.blank?
+      errors.add(:title, "can't be blank")
+    end
+  end
 
   def fetch_ror_details
 
