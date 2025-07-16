@@ -1,7 +1,7 @@
 class SamplesController < ApplicationController
   respond_to :html
   include Seek::PreviewHandling
-  include Seek::AssetsCommon
+  include Seek::Samples::SamplesCommon
   include Seek::IndexPager
   include Seek::JSONMetadata
 
@@ -304,13 +304,7 @@ class SamplesController < ApplicationController
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
-  def update_sample_with_params(parameters = params, sample = @sample)
-    sample.assign_attributes(sample_params(sample.sample_type, parameters))
-    update_sharing_policies(sample, parameters)
-    update_annotations(parameters[:tag_list], sample)
-    update_relationships(sample, parameters)
-    sample
-  end
+
 
   def find_index_assets
     if params[:sample_type_id]
