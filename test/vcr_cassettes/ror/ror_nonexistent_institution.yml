@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.ror.org/v1/organizations?query=nonexistentuniversity123*
+    uri: https://api.ror.org/v2/organizations?query=nonexistentuniversity123*
     body:
       encoding: US-ASCII
       string: ''
@@ -21,11 +21,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 10 Jul 2025 18:03:33 GMT
+      - Fri, 11 Jul 2025 19:20:45 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '98'
+      - '114'
       Connection:
       - keep-alive
       Status:
@@ -42,6 +42,6 @@ http_interactions:
       - nginx/1.18.0 + Phusion Passenger 6.0.7
     body:
       encoding: UTF-8
-      string: '{"number_of_results":0,"time_taken":7,"items":[],"meta":{"types":[],"countries":[],"statuses":[]}}'
-  recorded_at: Thu, 10 Jul 2025 18:03:33 GMT
+      string: '{"number_of_results":0,"time_taken":3,"items":[],"meta":{"types":[],"countries":[],"continents":[],"statuses":[]}}'
+  recorded_at: Fri, 11 Jul 2025 19:20:45 GMT
 recorded_with: VCR 6.3.1

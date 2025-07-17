@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.ror.org/v1/organizations/invalid_id
+    uri: https://api.ror.org/v2/organizations/invalid_id
     body:
       encoding: US-ASCII
       string: ''
@@ -21,7 +21,7 @@ http_interactions:
       message: Not Found
     headers:
       Date:
-      - Thu, 10 Jul 2025 18:03:29 GMT
+      - Fri, 11 Jul 2025 14:51:12 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -43,5 +43,5 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"errors":["''invalid_id'' is not a valid ROR ID"]}'
-  recorded_at: Thu, 10 Jul 2025 18:03:29 GMT
+  recorded_at: Fri, 11 Jul 2025 14:51:12 GMT
 recorded_with: VCR 6.3.1

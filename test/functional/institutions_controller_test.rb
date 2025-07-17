@@ -445,11 +445,14 @@ class InstitutionsControllerTest < ActionController::TestCase
       get :ror_search, params: { ror_id: '03vek6s52' }
       assert_response :success
       res = JSON.parse(response.body)
-      assert_equal 'https://ror.org/03vek6s52', res['id']
-      assert_equal 'Harvard University', res['name']
-      assert_equal 'Cambridge', res.dig('addresses', 0, 'city')
-      assert_equal 'US', res.dig('country', 'country_code')
-      assert_equal 'https://www.harvard.edu', res.dig('links', 0)
+      assert_equal '03vek6s52', res["id"]
+      assert_equal 'Harvard University', res["name"]
+      assert_equal 'education', res["type"]
+      assert_equal 'Universidad de Harvard', res["altNames"]
+      assert_equal 'United States', res["country"]
+      assert_equal 'US', res["countrycode"]
+      assert_equal 'Cambridge', res["city"]
+      assert_equal 'https://www.harvard.edu', res["webpage"]
     end
   end
 
@@ -459,7 +462,6 @@ class InstitutionsControllerTest < ActionController::TestCase
       get :ror_search, params: { query: 'nonexistentuniversity123' }
       assert_response :success
       res = JSON.parse(response.body)
-      assert_equal 0, res["number_of_results"]
       assert_empty res["items"]
     end
   end
