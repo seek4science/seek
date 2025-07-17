@@ -13,6 +13,8 @@ def load_seek_config_defaults!
   Seek::Config.default :solr_enabled, false
   Seek::Config.default :filtering_enabled, true
   Seek::Config.default :jws_enabled, true
+  Seek::Config.default :copasi_enabled, true
+  Seek::Config.default :morpheus_enabled, true
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
   Seek::Config.default :external_help_url,"https://docs.seek4science.org/help/user-guide/"
@@ -170,6 +172,7 @@ def load_seek_config_defaults!
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
   Seek::Config.default :cv_dropdown_limit, 100
+  Seek::Config.default :max_filters, 5
 
   # Admin setting to allow user impersonation, useful for debugging
   Seek::Config.default :admin_impersonation_enabled, false

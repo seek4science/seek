@@ -5,8 +5,10 @@
     <%
       # filter out creators that are also the contributor
       maintainers = [resource.contributor] | resource.assets_creators.reject{|creator| creator.person == resource.contributor}
+      maintainers.compact!
+
     %>
-    <%= list_item_person_list maintainers, resource.other_creators, 'Maintainers' %>
+    <%= list_item_person_list maintainers, resource.other_creators, Collection.human_attribute_name('creators') %>
     <%= list_item_attribute('Number of items', resource.items.count) %>
     <%= list_item_doi(resource) %>
     <%= list_item_tag_list(resource) %>

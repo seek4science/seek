@@ -312,6 +312,16 @@ module Seek
       }
     end
 
+    # url to the NeLS StoreBioinfo, derived from the api url. Returns nil if not set or invalid.
+    def nels_sbi_url
+      return nil if Seek::Config.nels_api_url.blank?
+      uri = URI.parse(nels_api_url)
+      base = "#{uri.scheme}://#{uri.host}"
+      URI.join(base, 'nels-web/#/sbi-storage').to_s
+    rescue URI::InvalidURIError
+      nil
+    end
+
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'wb') do |f|
         f << SecureRandom.random_bytes(32)
@@ -490,7 +500,12 @@ module Seek
       def get_value(setting, conversion = nil)
         val = Settings.defaults[setting.to_s]
         if Thread.current[:use_settings_cache]
-          result = settings_cache[setting]
+          begin
+            result = settings_cache[setting]
+          rescue Errno::ENOENT => e
+            Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
+            result = Settings.global.fetch(setting)
+          end
         else
           result = Settings.global.fetch(setting)
         end

@@ -145,6 +145,14 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.jws_enabled
   end
 
+  test 'copasi enabled' do
+    assert Seek::Config.copasi_enabled
+  end
+
+  test 'morpheus enabled' do
+    assert Seek::Config.morpheus_enabled
+  end
+
   test 'exception_notification_enabled' do
     assert !Seek::Config.exception_notification_enabled
   end
@@ -643,6 +651,23 @@ class ConfigTest < ActiveSupport::TestCase
 
     with_config_value(:isa_json_compliance_enabled, true) do
       assert Seek::Config.templates_enabled
+    end
+  end
+
+  test 'nels sbi url' do
+    assert_equal 'https://test-fe.cbu.uib.no/nels-api', Seek::Config.nels_api_url
+    assert_equal 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage', Seek::Config.nels_sbi_url
+    with_config_value(:nels_api_url, 'https://fish.com/sub/the-nels-api') do
+      assert_equal 'https://fish.com/nels-web/#/sbi-storage', Seek::Config.nels_sbi_url
+    end
+    with_config_value(:nels_api_url, '') do
+      assert_nil Seek::Config.nels_sbi_url
+    end
+    with_config_value(:nels_api_url, nil) do
+      assert_nil Seek::Config.nels_sbi_url
+    end
+    with_config_value(:nels_api_url, 'not a url') do
+      assert_nil Seek::Config.nels_sbi_url
     end
   end
 end

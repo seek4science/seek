@@ -111,7 +111,7 @@ class User < ApplicationRecord
   # a person can be logged in but not fully registered during
   # the registration process whilst selecting or creating a profile
   def self.logged_in_and_registered?
-    logged_in? && current_user.person && current_user.person.id
+    logged_in? && current_user.registration_complete?
   end
 
   def self.logged_in_and_member?
@@ -265,6 +265,7 @@ class User < ApplicationRecord
   end
 
   def self.with_current_user(user)
+    user = user.user if user.is_a?(Person)
     previous = current_user
     self.current_user = user
     begin

@@ -1,0 +1,29 @@
+<%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
+  <%= form_tag({action: :upload_file}, id: 'upload-file-form', multipart: true) do %>
+    <%= modal_header('Upload file') %>
+    <%= modal_body do %>
+      <%= render partial: "assets/upload_box", locals: {action_text: "upload", hide_remote: true} -%>
+      <%= hidden_field_tag(:subtype_path, '/'+subtype_path) %>
+
+      <%= hidden_field_tag :project_id, project_id %>
+      <%= hidden_field_tag :dataset_id, dataset_id %>
+      <%= hidden_field_tag :assay_id, params[:assay_id] if params[:assay_id] %>
+      <%= hidden_field_tag :subtype_name, subtype_name %>
+      <%= hidden_field_tag :file_path, path %>
+
+    <% end %>
+    <%= modal_footer do %>
+      <%= create_button id:"upload-file-submit-button", button_text:'Add',
+                        type: 'button',
+                        class:'btn btn-primary' %>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= modal(id: 'upload-spinner', size: 'm', class: 'text-center') do %>
+  <%= modal_body do %>
+    <h1>Uploading ...</h1>
+    <div class='large_spinner'></div>
+  <% end %>
+<% end %>

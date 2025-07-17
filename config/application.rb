@@ -77,6 +77,10 @@ module SEEK
 
     config.active_job.queue_adapter = :delayed_job
 
+    # Revert Rails 7 change that auto loads nested locale files
+    initializer :avoid_nested_locale_directories, before: :add_locales do
+      config.paths['config/locales'].glob = '*.yml'
+    end
     # Ignore translation overrides when testing
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
 

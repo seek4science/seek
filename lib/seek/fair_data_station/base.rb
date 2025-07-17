@@ -157,7 +157,7 @@ module Seek
         annotation[0]
       end)
         # collect and sort those with the most properties that match, eliminating any where no properties match
-        candidates = ::ExtendedMetadataType.where(supported_type: type_name).includes(:extended_metadata_attributes).collect do |emt|
+        candidates = ::ExtendedMetadataType.where(supported_type: type_name).enabled.includes(:extended_metadata_attributes).collect do |emt|
           extended_metadata_property_ids = emt.deep_extended_metadata_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & extended_metadata_property_ids)
           difference = (property_ids | extended_metadata_property_ids) - intersection
@@ -223,14 +223,11 @@ module Seek
       end
 
       def query_all_annotations
-        sparql = SPARQL::Client.new(graph)
-        query = sparql.select.where(
-          [:object, RDF.type, RDF::URI(rdf_type_uri)],
-          [:object, :property, :value]
-        )
-        query.execute.collect do |solution|
-          solution.property.to_s
-        end.uniq
+        query_str = "SELECT DISTINCT ?annotation WHERE { ?subject a <#{rdf_type_uri}> . ?subject ?annotation ?object . }"
+        query = SPARQL.parse(query_str)
+        graph.query(query).collect do |solution|
+          solution.annotation.to_s
+        end
       end
 
       def find_annotation_value(property)

@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://test-fe.cbu.uib.no/nels-api/sbi/projects
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects
     body:
       encoding: US-ASCII
       string: ''

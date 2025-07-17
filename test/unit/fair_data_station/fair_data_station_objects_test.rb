@@ -108,24 +108,29 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
 
     exact_match = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
     assert_equal exact_match, study.find_exact_matching_extended_metadata_type
+
+    #doesn't match if disabled
+    exact_match.update_column(:enabled, false)
+    assert_nil study.find_exact_matching_extended_metadata_type
   end
 
   test 'find_exact_matching_sample_type' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     sample = inv.studies.first.observation_units.first.samples.first
+    person = FactoryBot.create(:person)
 
-    assert_nil sample.find_exact_matching_sample_type
+    assert_nil sample.find_exact_matching_sample_type(person)
     partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, title: 'partial matching')
     assert partial_sample_type.can_view?
     partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
     partial_sample_type.reload
     assert_equal 5, partial_sample_type.sample_attributes.count
-    assert_nil sample.find_exact_matching_sample_type
+    assert_nil sample.find_exact_matching_sample_type(person)
 
     exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type)
-    assert exact_match.can_view?
-    assert_equal exact_match, sample.find_exact_matching_sample_type
+    assert exact_match.can_view?(person)
+    assert_equal exact_match, sample.find_exact_matching_sample_type(person)
   end
 
   test 'find closest matching extended metadata type' do
@@ -139,9 +144,11 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     assay = inv.studies.first.assays.first
-    ::Assay.new
-    detected_type = assay.find_closest_matching_extended_metadata_type
-    assert_equal seek_test_case_assay, detected_type
+    assert_equal seek_test_case_assay, assay.find_closest_matching_extended_metadata_type
+
+    # but not if disabled
+    seek_test_case_assay.update_column(:enabled, false)
+    refute_equal seek_test_case_assay, assay.find_closest_matching_extended_metadata_type
 
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
@@ -167,14 +174,16 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
 
     private_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
     refute private_sample_type.can_view?
-    #    assert_nil sample.find_closest_matching_sample_type
+    assert_nil sample.find_closest_matching_sample_type(nil)
+    assert private_sample_type.can_view?(private_sample_type.contributor)
+    assert_equal private_sample_type, sample.find_closest_matching_sample_type(private_sample_type.contributor)
 
     partial_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
     assert partial_sample_type.can_view?
     partial_sample_type.sample_attributes.delete(partial_sample_type.sample_attributes.last)
     partial_sample_type.reload
     assert_equal 5, partial_sample_type.sample_attributes.count
-    #  assert_equal partial_sample_type, sample.find_closest_matching_sample_type
+    assert_equal partial_sample_type, sample.find_closest_matching_sample_type(nil)
 
     less_close_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
     assert less_close_sample_type.can_view?
@@ -183,16 +192,19 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     less_close_sample_type.reload
     assert_equal 4, less_close_sample_type.sample_attributes.count
 
-    assert_equal partial_sample_type, sample.find_closest_matching_sample_type
+    assert_equal partial_sample_type, sample.find_closest_matching_sample_type(nil)
   end
 
   test 'find_exact_matching_sample_type dont pick if private' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     sample = inv.studies.first.observation_units.first.samples.first
+    person = FactoryBot.create(:person)
 
-    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
+    exact_match = FactoryBot.create(:fairdatastation_test_case_sample_type, contributor: person, policy: FactoryBot.create(:private_policy))
     refute exact_match.can_view?
-    assert_nil sample.find_exact_matching_sample_type
+    assert_nil sample.find_exact_matching_sample_type(nil)
+    assert exact_match.can_view?(person)
+    assert_equal exact_match, sample.find_exact_matching_sample_type(person)
   end
 end

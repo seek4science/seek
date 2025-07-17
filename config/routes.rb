@@ -353,6 +353,8 @@ SEEK::Application.routes.draw do
       post :respond_join_request
       get :guided_join
       get :import_from_fairdata_station
+      get :fair_data_station_import_status
+      post :hide_fair_data_station_import_status
       post :submit_fairdata_station
       post :update_annotations_ajax
     end
@@ -426,6 +428,8 @@ SEEK::Application.routes.draw do
       patch :manage_update
       get :update_from_fairdata_station
       post :submit_fairdata_station
+      get :fair_data_station_update_status
+      post :hide_fair_data_station_update_status
     end
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end
@@ -464,15 +468,27 @@ SEEK::Application.routes.draw do
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :nels, only: [:index] do
-      collection do
-        get :projects
-        get :datasets
-        get :dataset
-        post :register
-      end
-    end
+    resources :nels, only: [:index]
     resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :observation_units, :placeholders, only: [:index]
+  end
+
+  resources :nels do
+    collection do
+      get :projects
+      get :project
+      get :datasets
+      get :dataset
+      get :subtype
+      get :download_file
+      get :fetch_file
+      get :new_dataset
+      get :get_metadata
+      post :register
+      post :create_dataset
+      post :add_metadata
+      post :upload_file
+      post :create_folder
+    end  
   end
 
   # to be removed as STI does not work in too many places
@@ -883,6 +899,6 @@ SEEK::Application.routes.draw do
   get 'cookies/consent' => 'cookies#consent'
   post 'cookies/consent' => 'cookies#set_consent'
 
-  # for the api docs under production, avoids special rewrite rules
-  get 'api', to: static("api/index.html") if Rails.env.production?
+  # for the api docs avoids special rewrite rules
+  get 'api' => 'homes#api_docs'
 end

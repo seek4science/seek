@@ -106,6 +106,7 @@ class AdminController < ApplicationController
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
+    Seek::Config.max_filters = params[:max_filters]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root = params[:jws_online_root]
 
@@ -166,6 +167,7 @@ class AdminController < ApplicationController
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
+    Seek::Config.morpheus_enabled = string_to_boolean(params[:morpheus_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
     Seek::Config.isa_json_compliance_enabled = string_to_boolean(params[:isa_json_compliance_enabled])
     Seek::Config.project_single_page_folders_enabled= string_to_boolean(params[:project_single_page_folders_enabled])
@@ -365,19 +367,9 @@ class AdminController < ApplicationController
   end
 
   def restart_delayed_job
-    error = nil
-    unless Rails.env.test?
-      begin
-        Seek::Workers.restart
-        wait_for_delayed_job_to_start
-      rescue SystemExit => e
-        Rails.logger.info("Exit code #{e.status}")
-      rescue => e
-        Seek::Errors::ExceptionForwarder.send_notification(e, data:{message:'Problem restarting delayed job'})
-      end
-    end
-
-    redirect_with_status(error, 'background tasks')
+    command = "bundle exec rake seek:workers:restart"
+    error = execute_command(command)
+    redirect_with_status(error, 'background job workers')
   end
 
   def clear_cache
@@ -521,6 +513,10 @@ class AdminController < ApplicationController
       partial = 'user_stats_list'
       collection = Person.pals
       title = 'List of PALs'
+    when 'profiles_with_users'
+      partial = 'user_stats_list'
+      collection  = Person.registered
+      title = 'Profiles with users'
     when 'none'
       partial = 'none'
     end
@@ -697,22 +693,25 @@ class AdminController < ApplicationController
   def execute_command(command)
     return nil if Rails.env.test?
     begin
+      Rails.logger.info("executing admin shell command '#{command}'")
       cl = Terrapin::CommandLine.new(command)
       cl.run
+      Rails.logger.info('admin shell command successfully executed!')
       return nil
     rescue Terrapin::CommandNotFoundError => e
-      return 'The command to restart the background tasks could not be found!'
+      return 'The command could not be found!'
     rescue => e
       error = e.message
+      Rails.logger.error("Error executing admin shell command: #{error}")
       return error
     end
   end
 
   def redirect_with_status(error, process)
     if error.blank?
-      flash[:notice] = "The #{process} was restarted"
+      flash[:notice] = "Successfully restarted the #{process}"
     else
-      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
+      flash[:error] = "There was a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
     end
     redirect_to action: :show
   end

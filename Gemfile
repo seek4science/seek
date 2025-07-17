@@ -81,7 +81,6 @@ gem 'rack-attack'
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails-html-sanitizer'
 gem 'rails-observers'
-gem 'rails-static-router'
 gem 'rails_autolink'
 gem 'rdf-virtuoso'
 gem 'RedCloth'
@@ -157,3 +156,8 @@ group :test, :development do
   gem 'teaspoon-mocha'
   gem 'webmock'
 end
+
+gem "minitar"
+gem "bzip2-ffi"
+gem "seven-zip", require: 'seven_zip_ruby'
+gem "ruby-xz", require: 'xz'

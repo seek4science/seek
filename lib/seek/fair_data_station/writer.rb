@@ -1,6 +1,7 @@
 module Seek
   module FairDataStation
     class ExternalIdMismatchException < RuntimeError; end
+    class MissingSampleTypeException < RuntimeError; end
 
     class Writer
       def construct_isa(datastation_inv, contributor, projects, policy)
@@ -118,7 +119,7 @@ module Seek
       def update_entity(seek_entity, datastation_entity, contributor)
         attributes = datastation_entity.seek_attributes
         seek_entity.assign_attributes(attributes)
-        update_extended_metadata(seek_entity, datastation_entity)
+        populate_extended_metadata(seek_entity, datastation_entity)
         record_update_activity_if_changed(seek_entity, contributor)
         seek_entity
       end
@@ -193,7 +194,9 @@ module Seek
 
       def populate_extended_metadata(seek_entity, datastation_entity)
         if (emt = datastation_entity.find_closest_matching_extended_metadata_type)
-          seek_entity.extended_metadata = ExtendedMetadata.new(extended_metadata_type: emt)
+          if emt != seek_entity.extended_metadata&.extended_metadata_type
+            seek_entity.build_extended_metadata(extended_metadata_type: emt)
+          end
           update_extended_metadata(seek_entity, datastation_entity)
         end
       end
@@ -207,9 +210,11 @@ module Seek
       end
 
       def populate_sample(seek_sample, datastation_sample)
-        if (sample_type = datastation_sample.find_closest_matching_sample_type)
+        if (sample_type = datastation_sample.find_closest_matching_sample_type(seek_sample.contributor))
           seek_sample.sample_type = sample_type
           update_sample_metadata(seek_sample, datastation_sample)
+        else
+          raise MissingSampleTypeException, 'Unable to find a matching Sample Type with suitable access rights'
         end
       end
 

@@ -1,6 +1,7 @@
 module Ror
   class Client
-    ENDPOINT = 'https://api.ror.org'.freeze
+    ENDPOINT = 'https://api.ror.org/v2'.freeze
+
 
     def initialize(endpoint = ENDPOINT)
       @endpoint = RestClient::Resource.new(endpoint)
@@ -9,7 +10,9 @@ module Ror
     # Search for an institution by name
     def query_name(query)
       encoded_query = URI.encode_www_form_component(query)
-      request("organizations?query=#{encoded_query}")
+      response = request("organizations?query=#{encoded_query}*")
+      items = response['items']&.map { |item| extract_details(item) } || []
+      {items: items}
     end
 
     # define a method to extract the ror id from the link "https://ror.org/04rcqnp59"
@@ -21,7 +24,13 @@ module Ror
 
     # Fetch institution details by ROR ID
     def fetch_by_id(ror_id)
-      request("organizations/#{ror_id}")
+      response = request("organizations/#{ror_id}")
+
+      if response.key?(:error)
+        return { error: response[:error]}
+      else
+        return extract_details(response)
+      end
     end
 
     private
@@ -40,5 +49,36 @@ module Ror
     rescue StandardError => e
       { error: "Unexpected error: #{e.message}" }
     end
+
+
+    def extract_details(data)
+      begin
+        location = data['locations']&.first&.dig('geonames_details') || {}
+        names = data['names'] || []
+
+        name = names.find { |n| (n['types'] || []).include?('ror_display') }&.[]('value') || ''
+        alt_names = names.reject { |n| (n['types'] || []).include?('ror_display') }
+                         .map { |n| n['value'] }.uniq.join(', ')
+
+        webpage = (data['links'] || []).find { |l| l['type'] == 'website' }&.[]('value')
+        type = (data['types'] || []).first
+
+        {
+          name: name,
+          id: extract_ror_id(data['id']) || '',
+          type: type,
+          altNames: alt_names,
+          country: location['country_name'] || 'N/A',
+          countrycode: location['country_code'] || 'N/A',
+          city: location['name'] || 'N/A',
+          webpage: webpage
+        }
+      rescue => e
+        puts "Error extracting data info: #{e.message}"
+        {}
+      end
+    end
+
+
   end
 end

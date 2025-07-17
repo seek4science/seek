@@ -49,7 +49,16 @@ class ISAAssaysController < ApplicationController
 
   def create
     update_sharing_policies @isa_assay.assay
-    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
+    unless @isa_assay.assay.is_assay_stream?
+      level = if @isa_assay.sample_type.level
+                @isa_assay.sample_type.level&.split(' - ').map(&:capitalize).join(' - ')
+              else
+                'Custom'
+              end
+      @isa_assay.sample_type.policy = @isa_assay.assay.policy
+      @isa_assay.sample_type.title = "#{@isa_assay.assay.title} - '#{level}' Sample Type" if @isa_assay.sample_type.title.blank?
+      @isa_assay.sample_type.description = "'#{level}' Sample Type linked to Assay '#{@isa_assay.assay.title}'." if @isa_assay.sample_type.description.blank?
+    end
     if @isa_assay.save
       flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
       respond_to do |format|
@@ -101,10 +110,20 @@ class ISAAssaysController < ApplicationController
     return unless @isa_assay.assay.is_isa_json_compliant?
     return if @isa_assay.assay.is_assay_stream? # Should not fix anything when creating an assay stream
     return unless @isa_assay.sample_type.present? # Just to be sure
+    return if @isa_assay.assay.assay_stream.child_assays == [@isa_assay.assay] # No need to fix sample type linkage if it's the only assay in the assay stream
 
     previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
     next_sample_types = previous_sample_type.next_linked_sample_types
     next_sample_types.delete @isa_assay.sample_type
+
+    # Ignore sample types that don't belong in the current assay stream
+    # They should not affect sample type linkage
+    next_sample_types.map do |sample_type|
+      unless sample_type.assays&.first&.assay_stream_id == @isa_assay.assay.assay_stream_id
+        next_sample_types.delete sample_type
+      end
+    end
+
     next_sample_type = next_sample_types.first
 
     # In case an assay is inserted right at the end of an assay stream,
@@ -207,14 +226,15 @@ class ISAAssaysController < ApplicationController
       { id: attr.id, title: attr.title }
     end
   end
+
   def update_sample_json_metadata
     attribute_changes = @isa_assay.sample_type.sample_attributes.map do |attr|
       old_attr = @old_attributes.detect { |oa| oa[:id] == attr.id }
       next if old_attr.nil?
 
-      {id: attr.id, old_title: old_attr[:title], new_title: attr.title} unless old_attr[:title] == attr.title
+      { id: attr.id, old_title: old_attr[:title], new_title: attr.title } unless old_attr[:title] == attr.title
     end.compact
-    return  if attribute_changes.blank?
+    return if attribute_changes.blank?
 
     UpdateSampleMetadataJob.perform_later(@isa_assay.sample_type, @current_user, attribute_changes)
   end

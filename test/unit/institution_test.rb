@@ -52,6 +52,15 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal('an institution', i.title)
   end
 
+  test 'title combines title and department correctly' do
+
+    assert_equal 'Science, University', FactoryBot.create(:institution, title: 'University', department: 'Science').title
+    assert_equal 'University', FactoryBot.create(:institution, title: 'University', department: '').title
+    assert_equal 'University', FactoryBot.create(:institution, title: 'University', department: nil).title
+    assert_equal 'A Minimal Institution', FactoryBot.create(:min_institution).title
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', FactoryBot.create(:max_institution).title
+  end
+
   def test_update_first_letter
     i = FactoryBot.create(:institution, title: 'an institution', country: 'NL')
     assert_equal 'A', i.first_letter
@@ -271,9 +280,27 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'fetch_ror_details adds error if ROR ID is invalid' do
-    institution = Institution.new(ror_id: 'invalid_id')
+    institution = Institution.new( title: 'test', ror_id: 'invalid_id')
     institution.valid?
-    assert_includes institution.errors[:ror_id], "'invalid_id' is not a valid ROR ID"
+    assert_equal "Ror 'invalid_id' is not a valid ROR ID", institution.errors.full_messages.join(', ')
+  end
+
+
+  test 'validate raw title presence' do
+    institution = FactoryBot.build(:institution, title: nil)
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution.title = ''
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution = FactoryBot.build(:institution, title: nil, department: 'Department of Science')
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution.title = 'Valid Title'
+    assert institution.valid?
   end
 
 end

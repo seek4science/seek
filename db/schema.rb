@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -678,6 +678,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.index ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id"
   end
 
+  create_table "fair_data_station_uploads", force: :cascade do |t|
+    t.bigint "contributor_id"
+    t.bigint "project_id"
+    t.bigint "investigation_id"
+    t.bigint "content_blob_id"
+    t.bigint "policy_id"
+    t.string "investigation_external_identifier", limit: 2048
+    t.integer "purpose", limit: 2
+    t.boolean "show_status", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contributor_id"], name: "index_fair_data_station_uploads_on_contributor_id"
+    t.index ["investigation_id"], name: "index_fair_data_station_uploads_on_investigation_id"
+    t.index ["project_id"], name: "index_fair_data_station_uploads_on_project_id"
+    t.index ["purpose"], name: "index_fair_data_station_uploads_on_purpose"
+  end
+
   create_table "favourite_group_memberships", id: :integer, force: :cascade do |t|
     t.integer "person_id"
     t.integer "favourite_group_id"
@@ -757,6 +774,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "external_identifier", limit: 2048
+    t.string "deleted_contributor"
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -926,6 +944,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.string "ror_id"
+    t.string "department"
   end
 
   create_table "investigation_auth_lookup", force: :cascade do |t|
@@ -1370,6 +1389,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.bigint "project_id"
     t.integer "data_file_id"
     t.string "external_identifier", limit: 2048
+    t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
@@ -1805,7 +1825,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.string "ols_root_term_uris"
     t.string "short_name"
     t.string "key"
-    t.integer "template_id"
   end
 
   create_table "sample_resource_links", id: :integer, force: :cascade do |t|
@@ -2153,6 +2172,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_141118) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "exception"
+    t.text "error_message"
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 

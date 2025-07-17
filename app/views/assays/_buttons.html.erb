@@ -64,8 +64,8 @@
   <% end %>
 <% end %>
 
-<% if show_nels_button?(item) %>
-  <%= button_link_to('Add data from NeLS', 'add', assay_nels_path(item.id)) %>
+<% if show_nels_button_for_assay?(item) %>
+  <%= button_link_to('Add data from NeLS', 'nels_logo_small', assay_nels_path(item.id)) %>
 <% end -%>
 
 <%= item_actions_dropdown do %>

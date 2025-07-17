@@ -1,6 +1,7 @@
 class TreeviewBuilder
   include ImagesHelper
   include ActionView::Helpers::SanitizeHelper
+
   def initialize(project, folders)
     @project = project
     @folders = folders
@@ -16,7 +17,7 @@ class TreeviewBuilder
     @project.investigations.map do |investigation|
       if investigation.is_isa_json_compliant?
         investigation.studies.map do |study|
-          assay_stream_items = study.assay_streams.sort_by{ |stream| stream.position }.map do |assay_stream|
+          assay_stream_items = study.assay_streams.sort_by { |stream| stream.position }.map do |assay_stream|
             assay_items = assay_stream.child_assays.order(:position).map do |child_assay|
               build_assay_item(child_assay)
             end
@@ -37,7 +38,7 @@ class TreeviewBuilder
 
     # Documents folder
     if Seek::Config.project_single_page_folders_enabled
-    @folders.reverse_each.map { |f| investigation_items.unshift(folder_node(f)) } if @folders.respond_to? :each
+      @folders.reverse_each.map { |f| investigation_items.unshift(folder_node(f)) } if @folders.respond_to? :each
     end
     sanitize(JSON[[build_project_item(@project, investigation_items)]])
   end
@@ -58,14 +59,22 @@ class TreeviewBuilder
       obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
     end
 
+    is_opened_node = %w[assay source_table study_samples_table assay_samples_table].none? obj[:_type]
     node = { id: obj[:id], text: obj[:text], a_attr: obj[:a_attr], count: obj[:count],
-             data: { id: obj[:_id], type: obj[:_type], project_id: obj[:project_id], folder_id: obj[:folder_id] }, state: { opened: true, separate: { label: obj[:label] } }, children: obj[:children], icon: get_icon(obj[:resource]) }
+             data: { id: obj[:_id],
+                     type: obj[:_type] == 'assay_stream' ? 'assay' : obj[:_type],
+                     project_id: obj[:project_id],
+                     folder_id: obj[:folder_id] },
+             state: { opened: is_opened_node,
+                      separate: { label: obj[:label] } },
+             children: obj[:children],
+             icon: get_icon(obj[:resource]) }
     deep_compact(node)
   end
 
   def get_icon(resource)
     ActionController::Base.helpers.asset_path(resource_avatar_path(resource) ||
-    icon_filename_for_key("#{resource.class.name.downcase}_avatar"))
+                                              icon_filename_for_key("#{resource.class.name.downcase}_avatar"))
   end
 
   def deep_compact(hash)
@@ -77,7 +86,7 @@ class TreeviewBuilder
   end
 
   def create_sample_node(sample_type)
-    create_node({ text: 'samples', _type: 'sample', resource: Sample.new,	count: sample_type.samples.length,
+    create_node({ text: 'samples', _type: 'sample', resource: Sample.new, count: sample_type.samples.length,
                   _id: sample_type.id })
   end
 
@@ -135,7 +144,7 @@ class TreeviewBuilder
   end
 
   def build_assay_stream_item(assay_stream, child_assays)
-    create_node({ text: assay_stream.title, _type: 'assay', label: 'Assay Stream', _id: assay_stream.id, a_attr: BOLD,
+    create_node({ text: assay_stream.title, _type: 'assay_stream', label: 'Assay Stream', _id: assay_stream.id, a_attr: BOLD,
                   children: isa_assay_elements(assay_stream) + child_assays, resource: assay_stream })
   end
 

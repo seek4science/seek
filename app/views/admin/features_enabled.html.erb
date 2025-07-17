@@ -5,7 +5,14 @@
   <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
                              "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.") %>
 
-  <%= admin_checkbox_setting(:filtering_enabled, 1, Seek::Config.filtering_enabled, "Filtering enabled", "Whether filtering system is enabled on index pages.") %>
+  <%= admin_checkbox_setting(:filtering_enabled, 1, Seek::Config.filtering_enabled,
+                             "Filtering enabled", "Whether filtering system is enabled on index pages.",
+                             onchange: toggle_appear_javascript('filtering_details')) %>
+  <div id="filtering_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.filtering_enabled -%>">
+    <%= admin_text_setting(:max_filters, Seek::Config.max_filters,
+                           'Filters limit', 'The maximum number of filters that can be applied, after which additional filters cannot be added',
+                           onkeypress: "javascript: return onlyNumbers(event);") %>
+  </div>
 
   <%= render :partial => 'admin/email' %>
 
@@ -130,6 +137,8 @@
   <%= admin_checkbox_setting(:copasi_enabled, 1, Seek::Config.copasi_enabled,
                              "Copasi enabled", "Whether support for running a publicly available model in Copasi is enabled.") %>
 
+  <%= admin_checkbox_setting(:morpheus_enabled, 1, Seek::Config.morpheus_enabled,
+                             "Morpheus enabled", "Whether support for running a publicly available model in Morpheus is enabled.") %>
 
   <%= admin_checkbox_setting(:require_cookie_consent, 1, Seek::Config.require_cookie_consent,
                              "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below.

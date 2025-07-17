@@ -24,7 +24,8 @@ class ProjectsController < ApplicationController
                                                asset_report populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request
-                                               import_from_fairdata_station submit_fairdata_station]
+                                               import_from_fairdata_station submit_fairdata_station
+                                               fair_data_station_import_status hide_fair_data_station_import_status]
 
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
@@ -34,7 +35,8 @@ class ProjectsController < ApplicationController
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
-  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station], unless: :admin_logged_in?
+  before_action :member_of_this_project, only: [:asset_report, :import_from_fairdata_station, :submit_fairdata_station,
+                                                :fair_data_station_import_status, :hide_fair_data_station_import_status], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
   before_action :validate_message_log_for_create, only: [:administer_create_project_request, :respond_create_project_request]
@@ -129,7 +131,7 @@ class ProjectsController < ApplicationController
     validation_error_msg=nil;
 
     if params[:accept_request]=='1'
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:id, :title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
 
       if @institution.id
@@ -150,7 +152,7 @@ class ProjectsController < ApplicationController
           Mailer.notify_admins_project_join_accepted(current_person, requester, @project).deliver_later
         end
         flash[:notice] = "Request accepted and #{requester.name} added to #{t('project')}"
-        flash[:notice] += " and notified" if Seek::Config.email_enabled
+        flash[:notice] += ' and notified' if Seek::Config.email_enabled
         @message_log.respond('Accepted')
       end
     else
@@ -165,7 +167,7 @@ class ProjectsController < ApplicationController
           Mailer.notify_admins_project_join_rejected(current_person, requester, @project, comments).deliver_later
           flash[:notice]="Request rejected and #{requester.name} has been notified"
         else
-          flash[:notice]="Request rejected"
+          flash[:notice]='Request rejected'
         end
       end
     end
@@ -184,7 +186,7 @@ class ProjectsController < ApplicationController
     raise 'no projects defined' if @projects.empty?
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:id, :title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
@@ -195,46 +197,104 @@ class ProjectsController < ApplicationController
         Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later if Seek::Config.email_enabled
       end
     end
-    flash.now[:notice]="Thank you, your request to join has been sent"
+    flash.now[:notice]='Thank you, your request to join has been sent'
     respond_to do |format|
       format.html
     end
   end
 
   def submit_fairdata_station
-    path = params[:datastation_data].path
-    policy = Policy.new
-    policy.set_attributes_with_sharing(policy_params)
-    fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id,[@project])
-
-    if @existing_investigation
-      flash.now[:error] = "An #{t('investigation')} with that external identifier already exists for this #{t('project')}"
-      respond_to do |format|
-        format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
+    error = nil
+    in_progress = []
+    if params[:datastation_data].present?
+      path = params[:datastation_data].path
+      policy = Policy.new
+      policy.set_attributes_with_sharing(policy_params)
+      fair_data_station_inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+      if fair_data_station_inv.present?
+        @existing_investigation = Investigation.by_external_identifier(fair_data_station_inv.external_id, [@project])
+        in_progress = FairDataStationUpload.matching_imports_in_progress(@project, fair_data_station_inv.external_id)
+      else
+        error = "Unable to find an #{t('investigation')} within the file"
       end
     else
-      @investigation = Seek::FairDataStation::Writer.new.construct_isa(fair_data_station_inv, current_person, [@project], policy)
-      @investigation.save!
+      error = 'No file was submitted'
+    end
 
-      respond_to do |format|
-        format.html { redirect_to(@investigation) }
+    if @existing_investigation
+      error = "An #{t('investigation')} with that external identifier already exists for this #{t('project')}"
+    elsif in_progress.any?
+      error = "An #{t('investigation')} with that external identifier is currently already being imported for this #{t('project')}"
+    end
+
+    if error.nil?
+      content_blob = ContentBlob.new(tmp_io_object: params[:datastation_data],
+                                     original_filename: params[:datastation_data].original_filename)
+      fair_data_station_upload = FairDataStationUpload.new(project: @project, contributor: current_person,
+                                                           investigation_external_identifier: fair_data_station_inv.external_id,
+                                                           policy: policy, purpose: :import,
+                                                           content_blob: content_blob
+      )
+      if fair_data_station_upload.save
+        FairDataStationImportJob.new(fair_data_station_upload).queue_job
+        redirect_to import_from_fairdata_station_project_path(@project)
+      else
+        error = 'Unable to save the record'
       end
     end
 
+    if error.present?
+      flash[:error] = error
+      respond_to do |format|
+        format.html { render action: :import_from_fairdata_station, status: :unprocessable_entity }
+      end
+    end
+
+  end
+
+  def fair_data_station_import_status
+    upload = FairDataStationUpload.for_project_and_contributor(@project, current_person).import_purpose.where(id: params[:upload_id]).first
+    if upload
+      respond_to do |format|
+        format.html { render partial: 'fair_data_station_import_status', locals: { upload: upload } }
+      end
+    else
+      respond_to do |format|
+        format.html { render plain:'', status: :forbidden }
+      end
+    end
+  end
+
+  def hide_fair_data_station_import_status
+    upload = FairDataStationUpload.for_project_and_contributor(@project, current_person).import_purpose.where(id: params[:upload_id]).first
+    if upload && (upload.import_task.completed? || upload.import_task.cancelled?)
+      upload.update_attribute(:show_status, false)
+      respond_to do |format|
+        format.html { render plain:'' }
+      end
+    else
+      respond_to do |format|
+        format.html { render plain:'', status: :forbidden }
+      end
+    end
   end
 
   def request_create
     proj_params = params.require(:project).permit([:title, :web_page, :description])
     @project = Project.new(proj_params)
 
+    institution_params = params[:institution]
+    department = institution_params[:department]
+    ror_id     = institution_params[:ror_id]
+    title      = institution_params[:title]
+    id         = institution_params[:id]
 
-    @institution = Institution.find_by_id(params[:institution][:id]) ||
-      (params[:institution][:ror_id].present? && Institution.find_by(ror_id: params[:institution][:ror_id])) ||
-      Institution.find_by(title: params[:institution][:title])
+    @institution = Institution.find_by(id:id, department: department) ||
+      (Institution.find_by(ror_id: ror_id, department: department) if ror_id.present? ) ||
+                      Institution.find_by(title: title, department: department)
 
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
@@ -324,43 +384,43 @@ class ProjectsController < ApplicationController
   def request_import
     # Import a project from a DMP file which follows the RDA DMP Common Standard
     proj_params = params.require(:project).permit([:dmp])
-    file = JSON.parse(proj_params["dmp"].read)
+    file = JSON.parse(proj_params['dmp'].read)
 
-    unless file.has_key?("dmp")
-      flash[:error] = "Invalid file format, missing top-level \"dmp\" tag"
+    unless file.has_key?('dmp')
+      flash[:error] = 'Invalid file format, missing top-level "dmp" tag'
       redirect_back fallback_location: import_projects_path
       return
     end
-    dmp = file["dmp"]
+    dmp = file['dmp']
 
-    unless dmp.has_key?("project")
-      flash[:error] = "Invalid file format, missing project properties"
+    unless dmp.has_key?('project')
+      flash[:error] = 'Invalid file format, missing project properties'
       redirect_back fallback_location: import_projects_path
       return
     end
-    project_data = dmp["project"][0]
+    project_data = dmp['project'][0]
 
     # Create project
     @project = Project.new(
-      title:       project_data["title"],
-      description: project_data["description"],
-      start_date:  project_data["start"],
-      end_date:    project_data["end"]
+      title:       project_data['title'],
+      description: project_data['description'],
+      start_date:  project_data['start'],
+      end_date:    project_data['end']
     )
 
     # Create institution
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
-      inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country, :ror_id])
+      inst_params = params.require(:institution).permit([:id, :title, :department, :web_page, :city, :country, :ror_id])
       @institution = Institution.new(inst_params)
     end
 
     # Create people
-    @people = dmp["contributor"].map { |person| Person.new(
-      first_name: person["name"].split(" ")[0],
-      last_name:  person["name"].split(" ")[-1],
-      email:      person["mbox"]
-    ) } if dmp.has_key?("contributor")
+    @people = dmp['contributor'].map { |person| Person.new(
+      first_name: person['name'].split(' ')[0],
+      last_name:  person['name'].split(' ')[-1],
+      email:      person['mbox']
+    ) } if dmp.has_key?('contributor')
 
     # A Programme has been selected, or it is a Site Managed Programme
     if params[:programme_id].present?
@@ -459,7 +519,7 @@ class ProjectsController < ApplicationController
     end
   end
 
-  
+
   # GET /projects/1
   def show
     respond_to do |format|
@@ -660,7 +720,7 @@ class ProjectsController < ApplicationController
       format.html { redirect_to project_path(@project) }
     end
   end
-  
+
   def admin_members
     respond_with(@project)
   end
@@ -732,7 +792,8 @@ class ProjectsController < ApplicationController
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id]))
+        @institution = Institution.new(params.require(:institution).permit([:title, :department,:web_page, :city,
+:country, :ror_id]))
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
@@ -771,7 +832,7 @@ class ProjectsController < ApplicationController
           Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
           flash[:notice] = "Request rejected and #{requester.name} has been notified"
         else
-          flash[:notice] = "Request rejected"
+          flash[:notice] = 'Request rejected'
         end
 
       end
@@ -793,7 +854,8 @@ class ProjectsController < ApplicationController
       if params['institution']['id']
         @institution = Institution.find(params['institution']['id'])
       else
-        @institution = Institution.new(params.require(:institution).permit([:title, :web_page, :city, :country, :ror_id]))
+        @institution = Institution.new(params.require(:institution).permit([:title,:department, :web_page, :city,
+:country, :ror_id]))
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
@@ -890,7 +952,7 @@ class ProjectsController < ApplicationController
           Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
           flash[:notice] = "Request rejected and #{requester.name} has been notified"
         else
-          flash[:notice] = "Request rejected"
+          flash[:notice] = 'Request rejected'
         end
 
       end
@@ -1047,10 +1109,10 @@ class ProjectsController < ApplicationController
 
     if @message_log
       error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
-      error_msg ||= ("incorrect type of message log" unless @message_log.project_membership_request?)
-      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+      error_msg ||= ('incorrect type of message log' unless @message_log.project_membership_request?)
+      error_msg ||= ('message has already been responded to' if @message_log.responded?)
     else
-      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+      error_msg = 'message cannot be found, it is possible it has been deleted by another administrator'
     end
 
     if error_msg
@@ -1062,11 +1124,11 @@ class ProjectsController < ApplicationController
   def validate_message_log_for_create
     @message_log = ProjectCreationMessageLog.find_by_id(params[:message_log_id])
     if @message_log
-      error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
-      error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
-      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+      error_msg ||= 'you do not have permission to respond to this request' unless @message_log.can_respond_project_creation_request?(current_user)
+      error_msg ||= ('incorrect type of message log' unless @message_log.project_creation_request?)
+      error_msg ||= ('message has already been responded to' if @message_log.responded?)
     else
-      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+      error_msg = 'message cannot be found, it is possible it has been deleted by another administrator'
     end
 
     if error_msg
@@ -1079,11 +1141,11 @@ class ProjectsController < ApplicationController
   def validate_message_log_for_import
     @message_log = ProjectImportationMessageLog.find_by_id(params[:message_log_id])
     if @message_log
-      error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_importation_request?(current_user)
-      error_msg ||= ("incorrect type of message log" unless @message_log.project_importation_request?)
-      error_msg ||= ("message has already been responded to" if @message_log.responded?)
+      error_msg ||= 'you do not have permission to respond to this request' unless @message_log.can_respond_project_importation_request?(current_user)
+      error_msg ||= ('incorrect type of message log' unless @message_log.project_importation_request?)
+      error_msg ||= ('message has already been responded to' if @message_log.responded?)
     else
-      error_msg = "message cannot be found, it is possible it has been deleted by another administrator"
+      error_msg = 'message cannot be found, it is possible it has been deleted by another administrator'
     end
 
     if error_msg
@@ -1101,15 +1163,11 @@ class ProjectsController < ApplicationController
     @institution = details.institution
     @people = details.people
     if @institution&.new_record?
-      existing_institution =
-        if @institution.ror_id.present?
-          Institution.find_by(ror_id: @institution.ror_id)
-        elsif @institution.title.present?
-          Institution.find_by(title: @institution.title)
-        end
-
-      @institution = existing_institution if existing_institution.present?
+      existing_institution = Institution.find_by(ror_id: @institution.ror_id, department: @institution.department.presence) ||
+        Institution.find_by(title: @institution[:title], department: @institution.department.presence)
+      @institution = existing_institution if existing_institution
     end
+
   end
 
   # check programme permissions for responding to a MessageLog
@@ -1126,7 +1184,7 @@ class ProjectsController < ApplicationController
     end
 
     if @programme.new_record?
-      error_msg = "You need to be an administrator" unless User.admin_logged_in?
+      error_msg = 'You need to be an administrator' unless User.admin_logged_in?
     else
       error_msg = "No rights to administer #{t('programme')}" unless @programme.can_associate_projects?
     end

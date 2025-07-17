@@ -2158,7 +2158,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert flash[:error].include?("Web page is not a valid URL")
         assert_equal 'new inst', assigns(:institution).title
         assert_equal 'description', assigns(:project).description
-        assert_equal '', assigns(:project).title
+        assert_nil assigns(:project).title # set to nil by auto_strip_attributes
         assert_equal 'invalid', assigns(:project).web_page
         assert_equal programme.id, params[:programme_id]
       end
@@ -2204,7 +2204,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, nil) do
       params = {
         project: { title: 'The Project',description:'description',web_page:'web_page'},
-        institution: {id: [institution.id]}
+        institution: {id: institution.id}
       }
       assert_enqueued_emails(0) do
         assert_difference('ProjectCreationMessageLog.count',1) do
@@ -2237,7 +2237,7 @@ class ProjectsControllerTest < ActionController::TestCase
     with_config_value(:managed_programme_id, programme.id) do
       params = {
         project: { title: 'The Project', description:'description', web_page:'web_page'},
-        institution: { title: institution_existing.title},
+        institution: { title: institution_existing[:title], department:'Manchester Institute of Biotechnology' },
         programme_id: '',
         programme: {title: 'the prog'}
       }
@@ -2256,11 +2256,15 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       assert flash[:notice]
 
-      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
-
+      assert_select 'p' do
+        assert_select 'a', text: 'Manchester Institute of Biotechnology, University of Manchester'
+        assert_select 'p', /You have indicated that you are associated with/
+      end
     end
 
 
+    # institution_existing has the department.
+    # if creating a new institution with the same title or ror id, but without department, it is considered a new institution
     with_config_value(:managed_programme_id, programme.id) do
       params = {
         project: { title: 'The Project', description:'description', web_page:'web_page'},
@@ -2281,9 +2285,7 @@ class ProjectsControllerTest < ActionController::TestCase
       end
 
       assert_response :success
-      assert flash[:notice]
-
-      assert_select 'p', text: /You have indicated that you are associated with #{institution_existing.title}/
+      assert_select 'p', text: /You have described a new Institution with the following details:/
 
     end
 
@@ -2453,7 +2455,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_equal 'the inst', assigns(:institution).title
         assert_equal 'https://example.com/inst', assigns(:institution).web_page
         assert_equal 'description', assigns(:project).description
-        assert_equal '', assigns(:project).title
+        assert_nil assigns(:project).title #set to nil by auto_strip_attributes
         assert_equal 'https://example.com', assigns(:project).web_page
         assert_equal 'A Cool Programme', assigns(:programme).title
       end
@@ -2890,7 +2892,7 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
 
-    assert_equal "The Institution is invalid, Title can't be blank",flash[:error]
+    assert_includes flash[:error],"The Institution is invalid, Title can't be blank"
     project.reload
     refute_includes project.people, sender
 
@@ -3017,21 +3019,25 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(person)
     project = Project.new(title:'new project')
-    institution = Institution.new(title:'my new institution', ror_id: institution_existing.ror_id, country: "GB")
+    institution = Institution.new(title:'my new institution', department:'Manchester Institute of Biotechnology', ror_id: institution_existing.ror_id)
     log = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
 
     assert_response :success
-    assert_select 'div', text: /They wish to be associated with University of Manchester/
+    assert_select 'div' do
+      assert_select 'a', text: 'Manchester Institute of Biotechnology, University of Manchester'
+      assert_select 'div', /They wish to be associated with/
+    end
 
-    institution2 = Institution.new(title: institution_existing.title)
+    institution2 = Institution.new(title: institution_existing[:title], department:'Manchester Institute of Biotechnology')
     log2 = ProjectCreationMessageLog.log_request(sender:FactoryBot.create(:person), project:project, institution:institution2)
     get :administer_create_project_request, params:{message_log_id:log2.id}
 
     assert_response :success
-    assert_select 'div', text: /They wish to be associated with University of Manchester/
-
-
+    assert_select 'div' do
+      assert_select 'a', text: 'Manchester Institute of Biotechnology, University of Manchester'
+      assert_select 'div', /They wish to be associated with/
+    end
   end
 
 
@@ -5197,6 +5203,69 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(other_project)
   end
 
+  test 'show import from fair data station task status' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    login_as(person)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-status', count: 0
+
+
+    upload = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, investigation_external_identifier:'the-ext-id')
+    upload2 = FactoryBot.create(:fair_data_station_upload, investigation_external_identifier:'the-other-ext-id')
+    upload3 = FactoryBot.create(:fair_data_station_upload, contributor: person, project: project, show_status: false, investigation_external_identifier:'the-ext-id-closed')
+    upload.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload2.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload3.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Queued/
+      assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
+
+    upload.import_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Active/
+      assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
+
+    upload.import_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-warning', text:/Failed. An administrator will have been notified of the problem, but you could try again./
+      assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
+
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
+    upload.update_attribute(:investigation_id, FactoryBot.create(:investigation, contributor: person).id)
+    get :import_from_fairdata_station, params: {id: project}
+    assert_response :success
+    assert_select 'div.fair-data-station-status', count: 1
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-success', text:/Completed/ do
+        assert_select 'a.btn-primary[href=?]', investigation_path(upload.investigation), text:/View imported Investigation/
+        assert_select 'strong', text:/FAIR Data Station import status \( ID: the-ext-id \)/
+      end
+    end
+    assert_select "div#fair-data-station-import-#{upload2.id}", count: 0
+    assert_select "div#fair-data-station-import-#{upload3.id}", count: 0
+  end
+
   test 'dont show import from fair data station if disabled' do
     person = FactoryBot.create(:person)
     refute person.is_admin?
@@ -5247,76 +5316,171 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'import from fairdata station ttl' do
-
+  test 'submit fairdata station ttl' do
     person = FactoryBot.create(:person)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
     project = person.projects.first
     another_person = FactoryBot.create(:person)
     login_as(person)
 
     ttl_file = fixture_file_upload('fair_data_station/demo.ttl')
 
-    assert_difference('ActivityLog.count',40) do
-      post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
-                                               policy_attributes: {
-                                                 access_type: Policy::VISIBLE,
-                                                 permissions_attributes: {
-                                                   '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
-                                                   }
-                                                 }
-                                               }
-      }
+    assert_difference('FairDataStationUpload.count') do
+      assert_difference('Policy.count') do
+        assert_difference('ContentBlob.count') do
+          assert_enqueued_jobs(1, only: FairDataStationImportJob) do
+
+            post :submit_fairdata_station, params: { id: project, datastation_data: ttl_file,
+                                                     policy_attributes: {
+                                                       access_type: Policy::VISIBLE,
+                                                       permissions_attributes: {
+                                                         '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                         }
+                                                       }
+                                                     }
+            }
+            assert_redirected_to import_from_fairdata_station_project_path(project)
+          end
+
+        end
+      end
     end
 
-    assert investigation = assigns(:investigation)
-    assert_redirected_to investigation
-
-    assert_equal person, investigation.contributor
-    assert_equal 1, investigation.studies.count
-    study = investigation.studies.first
-    assert_equal 9, study.assays.count
-    assert_equal 2, study.observation_units.count
-    assert_equal 4, study.observation_units.first.samples.count
-
-    obs_unit = study.observation_units.first
-    sample = obs_unit.samples.first
-
-    assert_equal person, study.contributor
-    assert_equal person, obs_unit.contributor
-    assert_equal person, sample.contributor
-
-    assert_equal Policy::VISIBLE, investigation.policy.access_type
-    assert_equal 1, investigation.policy.permissions.count
-    assert_equal another_person, investigation.policy.permissions.first.contributor
-    assert_equal Policy::MANAGING, investigation.policy.permissions.first.access_type
-
-    assert_equal Policy::VISIBLE, study.policy.access_type
-    assert_equal 1, study.policy.permissions.count
-    assert_equal another_person, study.policy.permissions.first.contributor
-    assert_equal Policy::MANAGING, study.policy.permissions.first.access_type
-
-    assert_equal Policy::VISIBLE, obs_unit.policy.access_type
-    assert_equal 1, obs_unit.policy.permissions.count
-    assert_equal another_person, obs_unit.policy.permissions.first.contributor
-    assert_equal Policy::MANAGING, obs_unit.policy.permissions.first.access_type
-
-    assert_equal Policy::VISIBLE, sample.policy.access_type
-    assert_equal 1, sample.policy.permissions.count
-    assert_equal another_person, sample.policy.permissions.first.contributor
-    assert_equal Policy::MANAGING, sample.policy.permissions.first.access_type
-
+    fds_upload = FairDataStationUpload.last
+    assert fds_upload.import_purpose?
+    assert_equal person, fds_upload.contributor
+    assert_equal project, fds_upload.project
+    assert_nil fds_upload.investigation
+    policy = fds_upload.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal another_person, policy.permissions.first.contributor
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal 'INV_DRP007092', fds_upload.investigation_external_identifier
+    content_blob = fds_upload.content_blob
+    assert_equal 'demo.ttl', content_blob.original_filename
+    assert_equal 'text/turtle', content_blob.content_type
+    assert_equal ttl_file.size, content_blob.file_size
+    assert fds_upload.import_task&.pending?
+    refute fds_upload.update_task&.pending?
   end
 
-  test 'import from fairdata station ttl existing external id' do
+  test 'submit fairdata station existing external id' do
     person = FactoryBot.create(:person)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
     project = person.projects.first
     another_person = FactoryBot.create(:person)
     login_as(person)
 
     investigation = FactoryBot.create(:investigation, external_identifier: 'seek-test-investigation', projects:[project], contributor: person)
 
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                                  policy_attributes:{
+                                                    access_type: Policy::VISIBLE,
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
+                                                  }
+          }
+        end
+      end
+    end
+    assert_response :unprocessable_entity
+    assert_match /An Investigation with that external identifier already exists for this Project/, flash[:error]
+    assert_select 'div#existing-investigation.panel' do
+      assert_select 'a[href=?]', investigation_path(investigation), text:investigation.title
+      assert_select 'a[href=?]', update_from_fairdata_station_investigation_path(investigation)
+    end
+
+  end
+
+  test 'submit fairdata station no file' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project,
+                                                  policy_attributes:{
+                                                    access_type: Policy::VISIBLE,
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
+                                                  }
+          }
+        end
+      end
+    end
+    assert_response :unprocessable_entity
+    assert_match /No file was submitted/, flash[:error]
+  end
+
+  test 'submit fairdata station invalid file' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    ttl_file = fixture_file_upload('fair_data_station/empty.ttl')
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                                  policy_attributes:{
+                                                    access_type: Policy::VISIBLE,
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
+                                                  }
+          }
+        end
+      end
+    end
+    assert_response :unprocessable_entity
+    assert_match /Unable to find an Investigation within the file/, flash[:error]
+  end
+
+  test 'submit fairdata station unable to save' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :submit_fairdata_station, params: {id: project, datastation_data: ttl_file,
+                                                  policy_attributes:{
+                                                    access_type: 100, # invalid, causing a validation error
+                                                    permissions_attributes: {
+                                                      '0' => { contributor_type: 'Person', contributor_id: another_person.id, access_type: Policy::MANAGING
+                                                      }
+                                                    }
+                                                  }
+          }
+        end
+      end
+    end
+    assert_response :unprocessable_entity
+    assert_match /Unable to save the record/, flash[:error]
+  end
+
+  test 'submit fairdata station task in progress' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    another_person = FactoryBot.create(:person)
+    login_as(person)
+
+    upload = FactoryBot.create(:fair_data_station_upload, investigation_external_identifier: 'seek-test-investigation', project: project)
+    upload.import_task.update_attribute(:status, Task::STATUS_QUEUED)
 
     ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-test-case.ttl')
     assert_no_difference('Investigation.count') do
@@ -5331,12 +5495,99 @@ class ProjectsControllerTest < ActionController::TestCase
       }
     end
     assert_response :unprocessable_entity
-    assert_match /An Investigation with that external identifier already exists for this Project/, flash[:error]
-    assert_select 'div#existing-investigation.panel' do
-      assert_select 'a[href=?]', investigation_path(investigation), text:investigation.title
-      assert_select 'a[href=?]', update_from_fairdata_station_investigation_path(investigation)
+    assert_match /An Investigation with that external identifier is currently already being imported for this Project/, flash[:error]
+  end
+
+  test 'fair_data_station_import_status' do
+    upload = FactoryBot.create(:fair_data_station_upload)
+    upload_other_project = FactoryBot.create(:fair_data_station_upload)
+    upload.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload_other_project.import_task.update_attribute(:status, Task::STATUS_QUEUED)
+
+    login_as(upload.contributor)
+
+    get :fair_data_station_import_status, params: {id: upload.project, upload_id: upload.id}
+    assert_response :success
+    assert_select "div#fair-data-station-import-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Queued/
     end
 
+    # not a member of the project
+    get :fair_data_station_import_status, params: {id: upload_other_project.project, upload_id: upload_other_project.id}
+    assert_redirected_to upload_other_project.project
+    assert_empty @response.body
+
+    # different person
+    other_person = FactoryBot.create(:person)
+    other_person.add_to_project_and_institution(upload.project, other_person.institutions.first)
+    other_person.save!
+    upload.update_column(:contributor_id, other_person.id)
+    get :fair_data_station_import_status, params: {id: upload.project, upload_id: upload.id}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # invalid id
+    get :fair_data_station_import_status, params: {id: upload.project, upload_id: FairDataStationUpload.last.id + 1}
+    assert_response :forbidden
+    assert_empty @response.body
+
+  end
+
+  test 'hide_fair_data_station_import_status' do
+    upload = FactoryBot.create(:fair_data_station_upload, purpose: :import)
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    project = person.projects.first
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :success
+    upload.reload
+    refute upload.show_status?
+  end
+
+  test 'hide_fair_data_station_import_status not the owner' do
+    upload = FactoryBot.create(:fair_data_station_upload, purpose: :import)
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
+    project = upload.project
+    another_person = FactoryBot.create(:person)
+    another_person.add_to_project_and_institution(project, another_person.institutions.first)
+    another_person.save!
+    assert upload.show_status?
+    login_as(another_person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_import_status wrong purpose' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.import_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    project = person.projects.first
+    upload.project = project
+    upload.save!
+    assert upload.update_purpose?
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_import_status not finished' do
+    upload = FactoryBot.create(:fair_data_station_upload, purpose: :import)
+    upload.import_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    person = upload.contributor
+    project = person.projects.first
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_import_status, params: {id: project, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
   end
 
   private

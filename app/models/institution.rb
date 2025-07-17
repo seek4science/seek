@@ -1,16 +1,16 @@
 class Institution < ApplicationRecord
 
   acts_as_yellow_pages
-  title_trimmer
 
-  auto_strip_attributes :web_page
+  auto_strip_attributes :web_page, :title
 
   before_validation :fetch_ror_details, if: -> { ror_id.present? && ror_id_changed? }
 
-  validates :title, uniqueness: true
-  validates :ror_id, uniqueness: true, allow_blank: true
+  validates :title, presence: true, uniqueness: { scope: :department }
+  validates :ror_id, uniqueness: { scope: :department }, allow_blank: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
+  validate :validate_base_title_presence
 
   has_many :work_groups, dependent: :destroy, inverse_of: :institution
   has_many :projects, through: :work_groups,  inverse_of: :institutions
@@ -23,6 +23,15 @@ class Institution < ApplicationRecord
   searchable(auto_index: false) do
     text :city, :address
   end if Seek::Config.solr_enabled
+
+
+  def title
+    department.present? ? "#{department}, #{super}" : super
+  end
+
+  def base_title
+    read_attribute(:title) || ''
+  end
 
   def can_edit?(user = User.current_user)
     return false unless user
@@ -59,6 +68,12 @@ class Institution < ApplicationRecord
 
   private
 
+  def validate_base_title_presence
+    if base_title.blank?
+      errors.add(:title, "can't be blank")
+    end
+  end
+
   def fetch_ror_details
 
     ror_client = Ror::Client.new
@@ -69,10 +84,10 @@ class Institution < ApplicationRecord
       return
     end
 
-    self.title = response['name']
-    self.city = response.dig('addresses', 0, 'city')
-    self.country = response.dig('country', 'country_code')
-    self.web_page = response.dig('links', 0)
+    self.title = response[:name]
+    self.city = response[:city]
+    self.country = response[:countrycode]
+    self.web_page = response[:webpage]
 
   end
 

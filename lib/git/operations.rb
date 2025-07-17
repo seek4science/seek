@@ -60,7 +60,7 @@ module Git
       tree.total_size
     end
 
-    def empty?
+    def no_content?
       persisted? && blobs.empty? && trees.empty?
     end
 
@@ -100,10 +100,22 @@ module Git
       end
     end
 
-    def add_files(path_io_pairs, message: nil)
+    # If the `replace` flag is set, remove any files not present in the new set.
+    def add_files(path_io_pairs, message: nil, replace: false)
       message ||= "Added/updated #{path_io_pairs.count} files"
       begin
         perform_commit(message) do |index|
+          if replace
+            to_keep = Set.new(path_io_pairs.map(&:first))
+            to_remove = []
+            index.entries.each do |entry|
+              to_remove << entry[:path] unless to_keep.include?(entry[:path])
+            end
+            to_remove.each do |path|
+              index.remove(path)
+              git_annotations.where(path: path).destroy_all if respond_to?(:git_annotations)
+            end
+          end
           path_io_pairs.each do |path, io|
             write_blob(index, path, io)
           end
@@ -111,6 +123,10 @@ module Git
       rescue Rugged::TreeError
         raise Git::InvalidPathException.new
       end
+    end
+
+    def replace_files(path_io_pairs, message: nil)
+      add_files(path_io_pairs, message: message, replace: true)
     end
 
     def remove_file(path, update_annotations: true)

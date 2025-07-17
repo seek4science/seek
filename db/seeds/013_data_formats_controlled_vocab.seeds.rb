@@ -1,0 +1,1 @@
+Seek::Data::SeedControlledVocab.seed("data-format-annotations-controlled-vocab.json", :data_formats)
