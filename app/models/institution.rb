@@ -84,10 +84,10 @@ class Institution < ApplicationRecord
       return
     end
 
-    self.title = response['name']
-    self.city = response.dig('addresses', 0, 'city')
-    self.country = response.dig('country', 'country_code')
-    self.web_page = response.dig('links', 0)
+    self.title = response[:name]
+    self.city = response[:city]
+    self.country = response[:countrycode]
+    self.web_page = response[:webpage]
 
   end
 

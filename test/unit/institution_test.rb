@@ -280,9 +280,9 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'fetch_ror_details adds error if ROR ID is invalid' do
-    institution = Institution.new(ror_id: 'invalid_id')
+    institution = Institution.new( title: 'test', ror_id: 'invalid_id')
     institution.valid?
-    assert_includes institution.errors[:ror_id], "'invalid_id' is not a valid ROR ID"
+    assert_equal "Ror 'invalid_id' is not a valid ROR ID", institution.errors.full_messages.join(', ')
   end
 
 
