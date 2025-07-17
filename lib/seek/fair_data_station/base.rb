@@ -223,22 +223,11 @@ module Seek
       end
 
       def query_all_annotations
-        sparql = SPARQL::Client.new(graph)
-        query = sparql.select.where(
-          [:object, RDF.type, RDF::URI(rdf_type_uri)],
-          [:object, :property, :value]
-        )
-        query.execute.collect do |solution|
-          # display some clues as to why test occasionally fails
-          if solution.respond_to?(:property)
-            solution.property.to_s
-          else
-            pp solution.inspect
-            pp "solution[:property]: #{solution[:property].inspect}"
-            solution.property.to_s
-          end
-
-        end.uniq
+        query_str = "SELECT DISTINCT ?annotation WHERE { ?subject a <#{rdf_type_uri}> . ?subject ?annotation ?object . }"
+        query = SPARQL.parse(query_str)
+        graph.query(query).collect do |solution|
+          solution.annotation.to_s
+        end
       end
 
       def find_annotation_value(property)
