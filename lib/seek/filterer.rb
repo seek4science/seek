@@ -142,13 +142,7 @@ module Seek
 
       active_filters.each do |key, values|
         filter = get_filter(key)
-
-        if filter.is_a? Seek::Filtering::BooleanFilter
-          bool = values&.first&.downcase == 'true'
-          filtered_collection = filter.apply(filtered_collection, bool)
-        else
-          filtered_collection = filter.apply(filtered_collection, values)
-        end
+        filtered_collection = filter.apply(filtered_collection, values)
       end
 
       filtered_collection
