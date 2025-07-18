@@ -79,22 +79,6 @@ module Seek
     end
 
     class BooleanFilter < Filter
-      attr_reader :field, :includes, :joins
-
-      def initialize(field: nil, includes: [], joins: [])
-        @field = field
-        @includes = includes
-        @joins = joins
-      end
-
-      def apply(collection, values)
-        bool = values&.first&.downcase == 'true'
-
-        collection = apply_joins(collection) || []
-        return collection if bool.nil?
-        collection.where("#{field} = ?", bool)
-      end
-
       def options(collection, active_values = [])
         collection = apply_joins(collection) || []
         true_result = apply(collection, ['true'])
@@ -107,16 +91,6 @@ module Seek
         ]
         options.compact.sort
       end
-
-      private
-
-      def apply_joins(collection)
-        collection = collection.includes(includes) if includes
-        collection = collection.joins(joins) if joins
-
-        collection
-      end
-
-    end
+   end
   end
 end
