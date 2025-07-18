@@ -80,7 +80,7 @@ module Seek
     end
 
     def is_tbz?(blob = self)
-      blob.content_type_file_extensions.include?('tbz')
+      blob.content_type_file_extensions.include?('tbz2')
     end
 
     def is_txz?(blob = self)
