@@ -56,7 +56,7 @@ module Seek
     
     # is any zipped format, that can be extracted from
     def is_unzippable_datafile?(blob = self)
-      blob.file_exists? && (is_zip?(blob)|| is_tar?(blob) || is_tgz?(blob) || is_tbz?(blob) || is_7zip?(blob) || is_txz?(blob))
+      blob.file_exists? && (is_zip?(blob)|| is_tar?(blob) || is_tgz?(blob) || is_tbz2?(blob) || is_7zip?(blob) || is_txz?(blob))
     end
 
     def is_in_simulatable_size_limit?(blob = self)
@@ -79,8 +79,8 @@ module Seek
       blob.content_type_file_extensions.include?('tgz')
     end
 
-    def is_tbz?(blob = self)
-      blob.content_type_file_extensions.include?('tbz')
+    def is_tbz2?(blob = self)
+      blob.content_type_file_extensions.include?('tbz2')
     end
 
     def is_txz?(blob = self)
