@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   tests:
     name: Tests
-    runs-on: ${{matrix.os}}
+    runs-on: [ubuntu-22.04,ubuntu-24.04]
     env:
       RAILS_ENV: test
       TERM: dumb-color
@@ -45,8 +45,6 @@ jobs:
         suite:
           - rails test test/unit
           - rails test test/functional
-        os: [ubuntu-22.04,ubuntu-24.04]
-
         include:
           - database: sqlite3
             suite: rails test test/unit
