@@ -11,8 +11,8 @@ module Seek
             unzip_zip(tmp_dir)
           elsif content_blob.is_tgz?
             unzip_tgz(tmp_dir)
-          elsif content_blob.is_tbz?
-            unzip_tbz(tmp_dir)
+          elsif content_blob.is_tbz2?
+            unzip_tbz2(tmp_dir)
           elsif content_blob.is_txz?
             unzip_txz(tmp_dir)
           elsif content_blob.is_tar?
@@ -35,7 +35,7 @@ module Seek
             Minitar.unpack(input, tmp_dir)
         end
 
-        def unzip_tbz(tmp_dir)
+        def unzip_tbz2(tmp_dir)
           Tempfile.create('decompressed_tar') do |temp_tar|
             Bzip2::FFI::Reader.open(content_blob.filepath) do |reader|
               IO.copy_stream(reader, temp_tar)
