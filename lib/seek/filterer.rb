@@ -25,9 +25,6 @@ module Seek
         country_name: ->(codes) { codes.map { |code| CountryCodes.country(code) } },
         boolean: -> (value) {
           value == ['true']
-        },
-        isa_json_compliance_label: ->(bool) {
-          [{ true: 'Yes' }, { false: 'No' }]
         }
     }.freeze
 
@@ -123,12 +120,10 @@ module Seek
         isa_json_compliance: Seek::Filtering::BooleanFilter.new(
           value_field: 'investigations.is_isa_json_compliant',
           joins: [:investigation],
-          label_field: MAPPINGS[:is_isa_json_compliant],
           value_mapping: MAPPINGS[:boolean]
         ),
         is_isa_json_compliant: Seek::Filtering::BooleanFilter.new(
           value_field: 'is_isa_json_compliant',
-          label_field: MAPPINGS[:is_isa_json_compliant],
           value_mapping: MAPPINGS[:boolean]
         )
     }.freeze
