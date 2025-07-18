@@ -23,8 +23,8 @@ module Seek
           uris.map { |uri| Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[uri]&.label }
         },
         country_name: ->(codes) { codes.map { |code| CountryCodes.country(code) } },
-        boolean: -> (value) {
-          value == ['true']
+        bool_to_yes_no_label: ->(bool) {
+          [bool ? 'Yes' : 'No']
         }
     }.freeze
 
@@ -120,11 +120,11 @@ module Seek
         isa_json_compliance: Seek::Filtering::BooleanFilter.new(
           value_field: 'investigations.is_isa_json_compliant',
           joins: [:investigation],
-          value_mapping: MAPPINGS[:boolean]
+          label_mapping: MAPPINGS[:bool_to_yes_no_label]
         ),
         is_isa_json_compliant: Seek::Filtering::BooleanFilter.new(
           value_field: 'is_isa_json_compliant',
-          value_mapping: MAPPINGS[:boolean]
+          label_mapping: MAPPINGS[:bool_to_yes_no_label]
         )
     }.freeze
 
