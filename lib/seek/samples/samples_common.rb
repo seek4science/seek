@@ -31,6 +31,31 @@ module Seek
           end
           { results: results, errors: errors }
         end
+
+        def batch_update_samples(params)
+          errors = []
+          results = []
+          param_converter = Seek::Api::ParameterConverter.new("samples")
+          Sample.transaction do
+            params[:data].each do |par|
+              begin
+                converted_params = param_converter.convert(par)
+                sample = Sample.find(par[:id])
+                raise 'shouldn\'t get this far without editing rights' unless sample.can_edit?
+                sample = update_sample_with_params(converted_params, sample)
+                if sample.save
+                  results.push({ ex_id: par[:ex_id], id: sample.id })
+                else
+                  errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+                end
+              rescue StandardError => e
+                errors.push({ ex_id: par[:ex_id], error: "Can not be updated.\n#{e.message}" }) unless saved
+              end
+            end
+            raise ActiveRecord::Rollback if errors.any?
+          end
+          { results: results, errors: errors }
+        end
       end
     end
 end

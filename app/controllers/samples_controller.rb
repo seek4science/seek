@@ -155,25 +155,9 @@ class SamplesController < ApplicationController
   end
 
   def batch_update
-    errors = []
-    param_converter = Seek::Api::ParameterConverter.new("samples")
-    Sample.transaction do
-      params[:data].each do |par|
-        begin
-          converted_params = param_converter.convert(par)
-          sample = Sample.find(par[:id])
-          raise 'shouldnt get this far without manage rights' unless sample.can_manage?
-          sample = update_sample_with_params(converted_params, sample)
-          saved = sample.save
-          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
-        rescue
-          errors.push({ ex_id: par[:ex_id], error: "Can not be updated." })
-        end
-      end
-      raise ActiveRecord::Rollback if errors.any?
-    end
+    results, errors = batch_update_samples(params).values_at(:results, :errors)
     status = errors.empty? ? :ok : :unprocessable_entity
-    render json: { status: status, errors: errors }, status: :ok
+    render json: { status: status, errors: errors, results: results }, status: :ok
   end
 
   def batch_delete
