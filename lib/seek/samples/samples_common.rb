@@ -49,7 +49,7 @@ module Seek
                   errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
                 end
               rescue StandardError => e
-                errors.push({ ex_id: par[:ex_id], error: "Can not be updated.\n#{e.message}" }) unless saved
+                errors.push({ ex_id: par[:ex_id], error: "Can not be updated.\n#{e.message}" })
               end
             end
             raise ActiveRecord::Rollback if errors.any?

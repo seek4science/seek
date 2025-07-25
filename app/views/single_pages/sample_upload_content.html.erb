@@ -84,12 +84,16 @@
     $j('#close-upload-xlsx-modal-btn').prop('disabled', true);
 
     try{
-      const postCall = await uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
-      const putCall = await uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
-        let errors = {newSamples: postCall.errors, updatedSamples: putCall.errors};
-        if (errors.newSamples.length > 0 || errors.updatedSamples.length > 0) {
-            throw new Error(JSON.stringify(errors));
-        }
+      const body = { data: JSON.stringify({
+          sampleTypeId: <%= @sample_type.id %>,
+          newSamples: newSamples,
+          updatedSamples: updatedSamples,
+        })
+      };
+      const uploadSamplesCall = await uploadAjaxCall("<%= upload_samples_single_pages_path %>", "POST", body);
+      if (uploadSamplesCall.status !== 'ok') {
+          throw new Error(JSON.stringify(uploadSamplesCall.result));
+      }
       $j('#sample-upload-spinner').hide();
       closeModalForm();
       location.reload();
@@ -222,7 +226,7 @@
       },
       error: function(err) {
         console.log("err", err);
-        alert(json.stringify(err));
+        alert(JSON.stringify(err));
       }
     });
   };
