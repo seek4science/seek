@@ -516,6 +516,33 @@ class CollectionsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can get index featuring collection with avatar' do
+    Collection.delete_all
+    collection = FactoryBot.create(:public_collection)
+    disable_authorization_checks do
+      FactoryBot.build(:avatar, owner: collection).save!
+    end
+    avatar = collection.reload.avatar
+    assert avatar
+
+    get :index
+
+    assert_response :success
+    assert_select 'img[src=?]', avatar.public_asset_url(60)
+  end
+
+  test 'can get index featuring collection with missing avatar' do
+    Collection.delete_all
+    collection = FactoryBot.create(:public_collection, avatar_id: (Avatar.maximum(:id) || 0) + 10)
+    assert collection.reload.avatar_id
+    refute collection.avatar
+
+    get :index
+
+    assert_response :success
+    assert_select 'img[src=?]', '/assets/avatars/avatar-collection.png'
+  end
+
   private
 
   def valid_collection
