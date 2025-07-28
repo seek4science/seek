@@ -518,17 +518,14 @@ class CollectionsControllerTest < ActionController::TestCase
 
   test 'can get index featuring collection with avatar' do
     Collection.delete_all
-    collection = FactoryBot.create(:public_collection)
-    disable_authorization_checks do
-      FactoryBot.build(:avatar, owner: collection).save!
-    end
+    collection = FactoryBot.create(:public_collection, :with_avatar)
     avatar = collection.reload.avatar
     assert avatar
 
     get :index
 
     assert_response :success
-    assert_select 'img[src=?]', avatar.public_asset_url(60)
+    assert_select 'img[src=?]', Seek::Util.routes.polymorphic_path([collection, avatar], size: '60x60')
   end
 
   test 'can get index featuring collection with missing avatar' do

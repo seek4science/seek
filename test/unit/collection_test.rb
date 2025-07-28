@@ -196,10 +196,7 @@ class CollectionTest < ActiveSupport::TestCase
   end
 
   test 'selected avatar id is nullified when avatar deleted' do
-    collection = FactoryBot.create(:public_collection)
-    disable_authorization_checks do
-      FactoryBot.build(:avatar, owner: collection).save!
-    end
+    collection = FactoryBot.create(:public_collection, :with_avatar)
     avatar = collection.reload.avatar
     assert avatar
     assert collection.avatar_selected?
