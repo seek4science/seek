@@ -22,7 +22,7 @@ class Avatar < ApplicationRecord
              polymorphic: true
 
   after_create :select_avatar
-  after_destroy_commit :nullify_foreign_key
+  after_destroy_commit :deselect_avatar
 
   def select!
     if selected?
@@ -67,7 +67,7 @@ class Avatar < ApplicationRecord
     select! unless owner.nil? || owner.avatar_selected?
   end
 
-  def nullify_foreign_key
+  def deselect_avatar
     owner.update_column(:avatar_id, nil) if owner&.persisted?
   end
 end
