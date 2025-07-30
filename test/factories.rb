@@ -16,6 +16,12 @@ FactoryBot.define do
       end
     end
   end
+
+  trait :with_avatar do
+    after(:create) do |resource|
+      resource.avatars = [FactoryBot.create(:avatar, owner: resource)]
+    end
+  end
 end
 
 FactoryBot.class_eval do
