@@ -627,6 +627,31 @@ class FilterTest < ActiveSupport::TestCase
     refute real_opt.active?
   end
 
+  test 'get ISA-JSON compliance filter options' do
+    contributor = FactoryBot.create(:person)
+
+    isa_json_compliance_filter = Seek::Filterer::FILTERS[:isa_json_compliance]
+
+    project = contributor.projects.first
+    isa_json_compliant_investigation = FactoryBot.create(:investigation, projects: [project], is_isa_json_compliant: true, contributor: contributor)
+    non_isa_json_compliant_investigation = FactoryBot.create(:investigation, projects: [project], is_isa_json_compliant: false, contributor: contributor)
+    studies = []
+    (1..5).each do |i|
+      studies << FactoryBot.create(:isa_json_compliant_study, investigation: isa_json_compliant_investigation, contributor: contributor)
+    end
+    (1..3).each do |i|
+      studies << FactoryBot.create(:study, investigation: non_isa_json_compliant_investigation, contributor: contributor)
+    end
+
+    collection = Study.where(id: studies.pluck(:id))
+    isa_json_compliance_options = isa_json_compliance_filter.options(collection)
+    assert_equal 2, isa_json_compliance_options.length
+    assert_equal get_option(isa_json_compliance_options, 'true').count, 5
+    assert_equal get_option(isa_json_compliance_options, 'true').label, 'Yes'
+    assert_equal get_option(isa_json_compliance_options, 'false').count, 3
+    assert_equal get_option(isa_json_compliance_options, 'false').label, 'No'
+  end
+
   private
 
   def assert_includes_all(collection, things)

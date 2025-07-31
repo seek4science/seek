@@ -66,7 +66,7 @@ class Assay < ApplicationRecord
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
 
-  has_filter :assay_class, :assay_type, :technology_type
+  has_filter :assay_class, :assay_type, :technology_type, :isa_json_compliance
 
   enforce_authorization_on_association :study, :view
 
