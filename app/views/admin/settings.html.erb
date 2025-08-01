@@ -66,7 +66,7 @@
 
     <%= admin_setting_block('Recommended data licenses', "The licenses to recommend when data, such as a #{t('data_file')} or #{t('document')}, is registered.") do %>
       <%= associations_list('recommended-data-licenses', 'associations/general',
-                            Seek::Config.recommended_data_licenses.map { |id| { id: id, title: Seek::License.find(id).title } }.to_json,
+                            Seek::Config.recommended_data_licenses.map { |id| { id: id, title: Seek::License.find(id).full_display_title } }.to_json,
                             'data-field-name' => 'recommended_data_licenses',
                             empty_text: 'No recommended licenses') %>
       <%= license_select(:_recommended_data_license_select, nil, prompt: 'Select a license to add it to the list...', class: 'form-control') %>
@@ -74,7 +74,7 @@
 
     <%= admin_setting_block('Recommended software licenses', "The licenses to recommend when software, such as a #{t('workflow')}, is registered.") do %>
       <%= associations_list('recommended-software-licenses', 'associations/general',
-                            Seek::Config.recommended_software_licenses.map { |id| { id: id, title: Seek::License.find(id).title } }.to_json,
+                            Seek::Config.recommended_software_licenses.map { |id| { id: id, title: Seek::License.find(id).full_display_title } }.to_json,
                             'data-field-name' => 'recommended_software_licenses',
                             empty_text: 'No recommended licenses') %>
       <%= license_select(:_recommended_software_license_select, nil, prompt: 'Select a license to add it to the list...', class: 'form-control') %>
