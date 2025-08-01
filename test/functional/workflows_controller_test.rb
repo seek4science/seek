@@ -212,7 +212,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow }
 
-    assert_select '.panel .panel-body span#null_license', text: "#{I18n.t('null_license')} (notspecified)"
+    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
 
   test 'should display license' do

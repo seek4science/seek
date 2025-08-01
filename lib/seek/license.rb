@@ -53,7 +53,11 @@ module Seek
     end
 
     def full_display_title
-      "#{title} (#{id})"
+      if is_null_license?
+        title
+      else
+        "#{title} (#{id})"
+      end
     end
 
     def self.combined

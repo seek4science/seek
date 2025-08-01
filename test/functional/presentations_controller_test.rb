@@ -369,7 +369,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: presentation }
 
-    assert_select '.panel .panel-body span#null_license', text: "#{I18n.t('null_license')} (notspecified)"
+    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
   end
 
   test 'should display license' do
