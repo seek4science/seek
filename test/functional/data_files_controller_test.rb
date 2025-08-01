@@ -2191,7 +2191,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df }
 
-    assert_select '.panel .panel-body span#null_license', text: I18n.t('null_license')
+    assert_select '.panel .panel-body span#null_license', text: "#{I18n.t('null_license')} (notspecified)"
   end
 
   test 'should display license' do
@@ -2199,7 +2199,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'should display license for current version' do
@@ -2210,11 +2210,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
 
     get :show, params: { id: df, version: dfv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal (CC0-1.0)'
   end
 
   test 'should update license' do
@@ -2228,7 +2228,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: df }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
     assert_equal 'CC-BY-SA-4.0', assigns(:data_file).license
   end
 
@@ -2237,17 +2237,17 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, params: { id: df }
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
 
     df2 = FactoryBot.create :data_file, license: nil, policy: FactoryBot.create(:public_policy)
 
     get :edit, params: { id: df2 }
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: I18n.t('null_license')
+    assert_select '#license-select option[selected=?]', 'selected', text: "#{I18n.t('null_license')} (notspecified)"
 
     register_content_blob
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'can disambiguate sample type' do
