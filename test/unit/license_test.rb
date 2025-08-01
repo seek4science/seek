@@ -168,7 +168,7 @@ class LicenseTest < ActiveSupport::TestCase
     assert_equal 'BSD 2-Clause "Simplified" License (BSD-2-Clause)', license.full_display_title
 
     license = Seek::License.find(Seek::License::NULL_LICENSE)
-    assert_equal 'No license - no permission to use unless the owner grants a licence (notspecified)', license.full_display_title
+    assert_equal 'No license - no permission to use unless the owner grants a licence', license.full_display_title
   end
 
 end
