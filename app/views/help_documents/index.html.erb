@@ -1,14 +1,84 @@
-<% if admin_logged_in? -%>
-    <%= button_link_to("Create New Page", 'new', new_help_document_path) -%>
-<% end -%>
+<% content_for :title, "SPARQL Query Interface" %>
 
-<h1>Help Index</h1>
-<div style="padding-left: 2em;">
-  List of topics:<br/>
-  <ul class="bulleted_list">
-    <%= "No topics found" if @help_documents.empty? %>
-    <% @help_documents.each do |doc| %>
-      <li><%= link_to doc.title, doc %></li>
-    <% end %>
-  </ul>
+<div class="sparql-interface">
+  <div class="page-header">
+    <h1>SPARQL Query Interface</h1>
+    <p class="lead">Query the SEEK knowledge graph using SPARQL</p>
+  </div>
+
+  <%= form_with url: query_sparql_index_path, method: :post, local: true, class: "sparql-form" do |form| %>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <%= form.label :sparql_query, "SPARQL Query:", class: "control-label" %>
+          <%= form.text_area :sparql_query, value: @sparql_query,
+                             class: "form-control sparql-textarea",
+                             rows: 12,
+                             placeholder: "Enter your SPARQL query here...\n\nExample:\nSELECT ?subject ?predicate ?object\nWHERE {\n  ?subject ?predicate ?object .\n}\nLIMIT 10" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <%= form.label :format, "Output Format:", class: "control-label" %>
+          <%= form.select :format,
+                          [['Table', 'table'], ['JSON', 'json'], ['XML', 'xml']],
+                          { selected: @format },
+                          { class: "form-control" } %>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-actions" style="margin-top: 25px;">
+          <%= form.submit "Execute Query", class: "btn btn-primary" %>
+          <button type="button" class="btn btn-default" id="clear-query">Clear</button>
+          <button type="button" class="btn btn-info" id="validate-query">Validate</button>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @error %>
+    <div class="alert alert-danger">
+      <h4><i class="glyphicon glyphicon-exclamation-sign"></i> Query Error:</h4>
+      <pre><%= @error %></pre>
+    </div>
+  <% end %>
+
+  <% if @results && @results.any? %>
+    <div class="sparql-results">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <i class="glyphicon glyphicon-ok-circle"></i>
+            Query Results (<%= @result_count %> results)
+          </h3>
+        </div>
+        <div class="panel-body">
+          <%= render partial: "results", locals: { results: @results, format: @format } %>
+        </div>
+      </div>
+    </div>
+  <% elsif @results && @results.empty? && @error.nil? %>
+    <div class="alert alert-info">
+      <i class="glyphicon glyphicon-info-sign"></i>
+      No results found for your query.
+    </div>
+  <% end %>
+
+  <!-- Example Queries Section -->
+  <div class="sparql-examples">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <i class="glyphicon glyphicon-list-alt"></i>
+          Example Queries
+        </h3>
+      </div>
+      <div class="panel-body">
+        <%= render partial: "example_queries" %>
+      </div>
+    </div>
+  </div>
 </div>
