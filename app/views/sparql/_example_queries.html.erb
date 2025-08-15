@@ -1,0 +1,87 @@
+<div class="row">
+  <div class="col-md-6">
+    <div class="example-query">
+      <div class="query-title">
+        <strong>Basic Triple Pattern</strong>
+        <span class="label label-info">Beginner</span>
+      </div>
+      <p class="text-muted">Get the first 10 triples from the knowledge graph</p>
+      <pre class="query-code">SELECT ?subject ?predicate ?object
+WHERE {
+  ?subject ?predicate ?object .
+}
+LIMIT 10</pre>
+      <button class="btn btn-sm btn-default use-query" data-query="SELECT ?subject ?predicate ?object
+WHERE {
+  ?subject ?predicate ?object .
+}
+LIMIT 10">Use this query</button>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="example-query">
+      <div class="query-title">
+        <strong>Count All Triples</strong>
+        <span class="label label-info">Beginner</span>
+      </div>
+      <p class="text-muted">Count the total number of triples in the knowledge graph</p>
+      <pre class="query-code">SELECT (COUNT(*) AS ?count)
+WHERE {
+  ?subject ?predicate ?object .
+}</pre>
+      <button class="btn btn-sm btn-default use-query" data-query="SELECT (COUNT(*) AS ?count)
+WHERE {
+  ?subject ?predicate ?object .
+}">Use this query</button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="example-query">
+      <div class="query-title">
+        <strong>Find Data Files</strong>
+        <span class="label label-warning">Intermediate</span>
+      </div>
+      <p class="text-muted">Find all resources of type DataFile</p>
+      <pre class="query-code">SELECT ?datafile ?title
+WHERE {
+  ?datafile a &lt;http://jermontology.org/ontology/JERMOntology#Data&gt; .
+  ?datafile &lt;http://purl.org/dc/terms/title&gt; ?title .
+}
+LIMIT 20</pre>
+      <button class="btn btn-sm btn-default use-query" data-query="SELECT ?datafile ?title
+WHERE {
+  ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+  ?datafile <http://purl.org/dc/terms/title> ?title .
+}
+LIMIT 20">Use this query</button>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="example-query">
+      <div class="query-title">
+        <strong>Project Resources</strong>
+        <span class="label label-warning">Intermediate</span>
+      </div>
+      <p class="text-muted">Find resources associated with projects</p>
+      <pre class="query-code">SELECT ?project ?resource ?title
+WHERE {
+  ?project a &lt;http://jermontology.org/ontology/JERMOntology#Project&gt; .
+  ?resource ?relation ?project .
+  ?resource &lt;http://purl.org/dc/terms/title&gt; ?title .
+}
+LIMIT 15</pre>
+      <button class="btn btn-sm btn-default use-query" data-query="SELECT ?project ?resource ?title
+WHERE {
+  ?project a <http://jermontology.org/ontology/JERMOntology#Project> .
+  ?resource ?relation ?project .
+  ?resource <http://purl.org/dc/terms/title> ?title .
+}
+LIMIT 15">Use this query</button>
+    </div>
+  </div>
+</div>

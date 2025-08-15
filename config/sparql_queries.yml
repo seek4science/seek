@@ -1,0 +1,109 @@
+---
+# SPARQL Example Queries
+# Format: 
+#   query_name:
+#     title: "Human readable title"
+#     description: "Optional description"
+#     query: |
+#       SPARQL query here
+
+basic_exploration:
+  title: "List all classes"
+  description: "Find all RDF classes used in the dataset"
+  query: |
+    SELECT DISTINCT ?class
+    WHERE {
+      [] a ?class
+    }
+    LIMIT 20
+
+basic_triples:
+  title: "Sample triples"
+  description: "Show basic subject-predicate-object patterns"
+  query: |
+    SELECT ?subject ?predicate ?object
+    WHERE {
+      ?subject ?predicate ?object .
+    }
+    LIMIT 10
+
+properties:
+  title: "List all properties"
+  description: "Find all predicates/properties used"
+  query: |
+    SELECT DISTINCT ?property
+    WHERE {
+      [] ?property []
+    }
+    LIMIT 20
+
+count_by_type:
+  title: "Count entities by type"
+  description: "Count how many entities exist for each class"
+  query: |
+    SELECT ?type (COUNT(?entity) as ?count)
+    WHERE {
+      ?entity a ?type
+    }
+    GROUP BY ?type
+    ORDER BY DESC(?count)
+
+describe_example:
+  title: "Describe a resource"
+  description: "Get all information about a specific resource (replace with actual URI)"
+  query: |
+    DESCRIBE <http://example.org/resource>
+
+organisms:
+  title: "Find organisms"
+  description: "Look for organism-related data"
+  query: |
+    SELECT DISTINCT ?organism ?label
+    WHERE {
+      ?organism a ?type .
+      FILTER(CONTAINS(LCASE(STR(?type)), "organism") || 
+             CONTAINS(LCASE(STR(?type)), "species") ||
+             CONTAINS(LCASE(STR(?type)), "taxon"))
+      OPTIONAL { ?organism rdfs:label ?label }
+    }
+    LIMIT 10
+
+projects:
+  title: "Find projects"
+  description: "Look for project-related data"
+  query: |
+    SELECT DISTINCT ?project ?title
+    WHERE {
+      ?project a ?type .
+      FILTER(CONTAINS(LCASE(STR(?type)), "project"))
+      OPTIONAL { ?project dc:title ?title }
+      OPTIONAL { ?project dcterms:title ?title }
+      OPTIONAL { ?project rdfs:label ?title }
+    }
+    LIMIT 10
+
+studies:
+  title: "Find studies"
+  description: "Look for study-related data"
+  query: |
+    SELECT DISTINCT ?study ?title
+    WHERE {
+      ?study a ?type .
+      FILTER(CONTAINS(LCASE(STR(?type)), "study"))
+      OPTIONAL { ?study dc:title ?title }
+      OPTIONAL { ?study dcterms:title ?title }
+      OPTIONAL { ?study rdfs:label ?title }
+    }
+    LIMIT 10
+
+graph_exploration:
+  title: "List named graphs"
+  description: "Show all named graphs in the dataset"
+  query: |
+    SELECT DISTINCT ?graph
+    WHERE {
+      GRAPH ?graph {
+        ?s ?p ?o
+      }
+    }
+    LIMIT 10
