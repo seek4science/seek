@@ -4,13 +4,15 @@ project = Project.where(title: 'Default Project').first_or_create(:programme_id 
 institution = Institution.where(title: 'Default Institution').first_or_create(country: 'United Kingdom')
 workgroup = WorkGroup.where(project_id: project.id, institution_id: institution.id).first_or_create
 
+## Create an admin and a guest user
+
+# Admin
 admin_user = User.where(login: 'admin').first_or_create(
   login: 'admin',
   email: 'admin@test1000.com',
   password: 'adminadmin', password_confirmation: 'adminadmin'
 )
 
-# Admin and guest
 admin_user.activate
 admin_user.build_person(first_name: 'Admin', last_name: 'User', email: 'admin@test1000.com') unless admin_user.person
 admin_user.save!
@@ -19,6 +21,7 @@ admin_person = admin_user.person
 admin_person.save
 puts 'Seeded 1 admin.'
 
+## Guest
 guest_user = User.where(login: 'guest').first_or_create(
   login: 'guest',
   email: 'guest@test1000.com',
@@ -237,6 +240,16 @@ puts 'Seeded 1 publication.'
                      activity_loggable: item,
                      data: item.title)
 end
+
+# Updating programme
+disable_authorization_checks do
+  program.programme_administrators = [guest_person, admin_person]
+  program.projects = [project]
+  # program.funding_codes_as_text = ['123456789'] # TODO cannot set funding codes
+  # Discussion links...
+  program.save!
+  end
+
 
 Seek::Config.home_description = '<p style="text-align:center;font-size:larger;font-weight:bolder">Welcome to the SEEK Sandbox</p>
 <p style="text-align:center;font-size:larger;font-weight:bolder">You can log in with the username: <em>guest</em> and password: <em>guest</em></p>
