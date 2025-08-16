@@ -1,5 +1,6 @@
 # Project, Institution, Workgroup
-project = Project.where(title: 'Default Project').first_or_create
+program = Programme.where(title: 'Default Programme').first_or_create(web_page: 'http://www.seek4science.org', funding_details: 'Funding H2020X01Y001', description: 'This is a test programme for the SEEK sandbox.')
+project = Project.where(title: 'Default Project').first_or_create(:programme_id => program.id) # TODO this link is not working
 institution = Institution.where(title: 'Default Institution').first_or_create(country: 'United Kingdom')
 workgroup = WorkGroup.where(project_id: project.id, institution_id: institution.id).first_or_create
 
@@ -47,24 +48,47 @@ study.investigation = investigation
 study.save
 puts 'Seeded 1 study.'
 
+## Observation unit
+observation_unit = ObservationUnit.new(title: 'Large scale bioreactor')
+observation_unit.contributor = guest_person
+observation_unit.policy = Policy.create(name: 'default policy', access_type: 1)
+observation_unit.study = study
+disable_authorization_checks { observation_unit.save }
+puts 'Seeded 1 observation unit'
+
+## Assays ##
+
+## Experimental assay?
 exp_assay = Assay.new(title: 'Reconstituted system reference state',
                       description: 'The four purified enzymes were incubated in assay buffer and consumption of 3PG and production of F6P were measured in time, together with GAP and DHAP concentrations.')
 exp_assay.contributor = guest_person
 exp_assay.policy = Policy.create(name: 'default policy', access_type: 1)
 exp_assay.study = study
-exp_assay.assay_class = AssayClass.first
+exp_assay.assay_class = AssayClass.experimental
 exp_assay.save
-puts 'Seeded 1 experimental assay.'
+puts "exp_assay: Seeded 1 #{exp_assay.assay_class.long_key.downcase}."
 
+# Modeling assay?
 model_assay = Assay.new(title: 'Model reconstituted system',
                         description: 'Mathematical model for the reconstituted system with PGK, GAPDH, TPI and FBPAase.')
 model_assay.contributor = guest_person
 model_assay.policy = Policy.create(name: 'default policy', access_type: 1)
 model_assay.study = study
-model_assay.assay_class = AssayClass.last
+model_assay.assay_class = AssayClass.modelling
 model_assay.save
-puts 'Seeded 1 modelling analysis.'
+puts "Seeded 1 #{model_assay.assay_class.long_key.downcase}."
 
+# Assay stream
+assay_stream = Assay.new(title: 'Assay stream',
+                         description: 'A stream of assays? This is a test assay stream for the example data.',)
+assay_stream.contributor = guest_person
+assay_stream.policy = Policy.create(name: 'default policy', access_type: 1)
+assay_stream.study = study
+assay_stream.assay_class = AssayClass.assay_stream
+assay_stream.save
+puts "Seeded 1 assay stream #{model_assay.assay_class.long_key.downcase}."
+#
+#######
 # Assets
 # TODO check filesize
 data_file1 = DataFile.new(title: 'Metabolite concentrations during reconstituted enzyme incubation',
@@ -222,6 +246,8 @@ Seek::Config.home_description = '<p style="text-align:center;font-size:larger;fo
 <p style="text-align:center">For more information about SEEK and to see a video, please visit our <a href="http://www.seek4science.org">Website</a>.</p>'
 
 Seek::Config.solr_enabled = true
+Seek::Config.isa_enabled = true
+Seek::Config.observation_units_enabled = true
 Seek::Config.programmes_enabled = true
 Seek::Config.programme_user_creation_enabled = true
 Seek::Config.noreply_sender = 'no-reply@fair-dom.org'
