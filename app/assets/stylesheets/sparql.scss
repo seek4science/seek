@@ -1,0 +1,107 @@
+.sparql-interface {
+  .sparql-textarea {
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+
+    &:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+  }
+
+  .sparql-results {
+    margin-top: 2rem;
+
+    .table-responsive {
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch; // Smooth scrolling on mobile
+    }
+
+    table {
+      font-size: 12px;
+      min-width: 100%;
+      white-space: nowrap; // Prevent cell content from wrapping
+
+      th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        min-width: 150px; // Minimum column width
+      }
+
+      td {
+        min-width: 150px; // Minimum column width
+      }
+
+      .external-link {
+        word-break: break-all;
+        max-width: 300px; // Limit URI column width
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .code-block {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+
+      pre {
+        background: #f8f9fa;
+        border: none;
+        border-radius: 0;
+        margin: 0;
+        padding: 1rem;
+        font-size: 11px;
+        white-space: pre-wrap;
+      }
+    }
+  }
+
+  .sparql-examples {
+    margin-top: 2rem;
+
+    .example-query {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+
+      .query-title {
+        margin-bottom: 0.5rem;
+
+        .label {
+          margin-left: 0.5rem;
+        }
+      }
+
+      .query-code {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 0.75rem;
+        font-size: 11px;
+        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        margin: 0.5rem 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .use-query {
+        margin-top: 0.5rem;
+      }
+    }
+  }
+
+  .form-actions {
+    .btn + .btn {
+      margin-left: 0.5rem;
+    }
+  }
+}

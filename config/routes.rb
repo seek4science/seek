@@ -838,6 +838,13 @@ SEEK::Application.routes.draw do
     resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
   end
 
+  ### SPARQL ###
+  resources :sparql, only: [:index] do
+    collection do
+      post :query
+    end
+  end
+
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search
   get '/search/save' => 'search#save', as: :save_search
