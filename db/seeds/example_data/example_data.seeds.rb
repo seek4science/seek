@@ -1,8 +1,28 @@
 # Project, Institution, Workgroup
 program = Programme.where(title: 'Default Programme').first_or_create(web_page: 'http://www.seek4science.org', funding_details: 'Funding H2020X01Y001', description: 'This is a test programme for the SEEK sandbox.')
-project = Project.where(title: 'Default Project').first_or_create(:programme_id => program.id) # TODO this link is not working
+project = Project.where(title: 'Default Project').first_or_create(:programme_id => program.id, description: 'A description for the default project') # TODO this link is not working
 institution = Institution.where(title: 'Default Institution').first_or_create(country: 'United Kingdom')
 workgroup = WorkGroup.where(project_id: project.id, institution_id: institution.id).first_or_create
+
+
+# Create a strain
+strain = Strain.where(title: 'Sulfolobus solfataricus strain 98/2').first_or_create()
+strain.projects = [project]
+strain.policy = Policy.create(name: 'default policy', access_type: 1)
+strain.organism = Organism.where(title: 'Sulfolobus solfataricus').first_or_create()
+strain.provider_name = 'BacDive'
+strain.provider_id = '123456789'
+strain.synonym = '98/2'
+strain.comment = 'This is a test strain.'
+strain.save!
+puts 'Seeded 1 strain.'
+
+# Create an organism
+organism = Organism.where(title: 'Sulfolobus solfataricus').first_or_create()
+organism.projects = [project]
+organism.strains = [strain]
+organism.save!
+puts 'Seeded 1 organism.'
 
 ## Create an admin and a guest user
 
@@ -35,12 +55,35 @@ guest_person = guest_user.person
 guest_person.save
 puts 'Seeded 1 guest.'
 
+# Update project
+disable_authorization_checks do
+  project.description = 'This is a test project for the SEEK sandbox.'
+  project.web_page = 'http://www.seek4science.org'
+  project.pals = [guest_person]
+  project.save!
+  puts 'Seeded 1 project.'
+end
+
+# Update institution
+disable_authorization_checks do
+  institution.country = 'United Kingdom'
+  institution.city = 'Manchester' # Overridden by ROR
+  institution.web_page = 'http://www.seek4science.org' # Overridden by ROR
+  institution.ror_id = '027m9bs27'
+  institution.address = '10 Downing Street' # Stays the same
+  institution.department = 'Department of SEEK for Science'
+  # Logo?
+  institution.save!
+  puts 'Seeded 1 institution.'
+end
+
 # ISA
 investigation = Investigation.new(title: 'Central Carbon Metabolism of Sulfolobus solfataricus',
                                   description: 'An investigation in the CCM of S. solfataricus with a focus on the unique temperature adaptations and regulation; using a combined modelling and experimental approach.')
 investigation.projects = [project]
 investigation.contributor = guest_person
 investigation.policy = Policy.create(name: 'default policy', access_type: 1)
+investigation.annotate_with(['metabolism', 'thermophile'], 'tag', guest_person)
 investigation.save
 puts 'Seeded 1 investigation.'
 
@@ -48,13 +91,17 @@ study = Study.new(title: 'Carbon loss at high T')
 study.contributor = guest_person
 study.policy = Policy.create(name: 'default policy', access_type: 1)
 study.investigation = investigation
+study.annotate_with(['thermophile', 'high temperature'], 'tag', guest_person)
 study.save
 puts 'Seeded 1 study.'
 
 ## Observation unit
 observation_unit = ObservationUnit.new(title: 'Large scale bioreactor')
+observation_unit.description = 'A large scale bioreactor with a 1000 mL reservoir.'
+observation_unit.other_creators = [admin_person.name, 'Jane Doe']
 observation_unit.contributor = guest_person
 observation_unit.policy = Policy.create(name: 'default policy', access_type: 1)
+observation_unit.annotate_with(['bioreactor'], 'tag', guest_person)
 observation_unit.study = study
 disable_authorization_checks { observation_unit.save }
 puts 'Seeded 1 observation unit'
@@ -67,7 +114,9 @@ exp_assay = Assay.new(title: 'Reconstituted system reference state',
 exp_assay.contributor = guest_person
 exp_assay.policy = Policy.create(name: 'default policy', access_type: 1)
 exp_assay.study = study
+# exp_assay.observation_units = [observation_unit] # TODO ActiveRecord::HasManyThroughNestedAssociationsAreReadonly: Cannot modify association 'Assay#observation_units' because it goes through more than one other association. (ActiveRecord::HasManyThroughNestedAssociationsAreReadonly)
 exp_assay.assay_class = AssayClass.experimental
+exp_assay.organisms = [organism]
 exp_assay.save
 puts "exp_assay: Seeded 1 #{exp_assay.assay_class.long_key.downcase}."
 
@@ -90,7 +139,7 @@ assay_stream.study = study
 assay_stream.assay_class = AssayClass.assay_stream
 assay_stream.save
 puts "Seeded 1 assay stream #{model_assay.assay_class.long_key.downcase}."
-#
+
 #######
 # Assets
 # TODO check filesize
@@ -166,24 +215,22 @@ model.content_blobs.each do |blob|
 end
 puts 'Seeded 1 model.'
 
-# sop
-=begin
-sop = Sop.new(title: "Default title",
-                  description: "Default description"
-)
+# Sop creation
+sop = Sop.new(title: 'Reconstituted Enzyme System Protocol',
+              description: 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.')
 sop.contributor = guest_person
 sop.projects = [project]
-sop.assays = [exp_assay]
+sop.assays = [exp_assay, model_assay]
 sop.policy = Policy.create(name: 'default policy', access_type: 1)
 sop.content_blob = ContentBlob.new(original_filename: 'test_sop.txt',
-                                      content_type: 'text'
-)
-disable_authorization_checks {sop.save}
+                                   content_type: 'text')
 AssetsCreator.create(asset_id: sop.id, creator_id: guest_person.id, asset_type: sop.class.name)
-#copy file
 FileUtils.cp File.dirname(__FILE__) + '/' + sop.content_blob.original_filename, sop.content_blob.filepath
-puts "Seeded 1 sop."
-=end
+
+disable_authorization_checks {sop.save!}
+sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', guest_person)
+puts 'Seeded 1 SOP.'
+
 
 # publication
 publication = Publication.new(
@@ -205,7 +252,8 @@ publication.projects << project
 
 # Build policy through the association
 publication.build_policy(name: 'default policy', access_type: 1)
-
+# Publication date
+publication.published_date = Date.today.to_s
 # Build publication authors
 authors = [
   { first_name: 'T.', last_name: 'Kouril', author_index: 1 },
@@ -215,6 +263,8 @@ authors = [
   { first_name: 'B.', last_name: 'Siebers', author_index: 5 },
   { first_name: 'J.', last_name: 'Snoep', author_index: 6 }
 ]
+# Citation
+publication.citation = "Kouril, T. et al. Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus. FEBS J. 2015;687:100-108."
 
 authors.each do |author_attrs|
   publication.publication_authors.build(author_attrs)
