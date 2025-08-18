@@ -9,12 +9,9 @@ module Seek
         true_active_actions = active_values.include? 'true'
         false_active_actions = active_values.include? 'false'
 
-        false_label = label_mapping ? label_mapping&.call(false)&.first : 'false'
-        true_label = label_mapping ? label_mapping&.call(true)&.first : 'true'
-
         [
-          Seek::Filtering::Option.new(true_label, 'true', true_result.count, true_active_actions, { replace_filters: true }),
-          Seek::Filtering::Option.new(false_label, 'false', false_result.count, false_active_actions, { replace_filters: true })
+          Seek::Filtering::Option.new('Yes', 'true', true_result.count, true_active_actions, { replace_filters: true }),
+          Seek::Filtering::Option.new('No', 'false', false_result.count, false_active_actions, { replace_filters: true })
         ]
       end
     end

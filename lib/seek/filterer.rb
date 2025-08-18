@@ -22,10 +22,7 @@ module Seek
         technology_type_label: ->(uris) {
           uris.map { |uri| Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[uri]&.label }
         },
-        country_name: ->(codes) { codes.map { |code| CountryCodes.country(code) } },
-        bool_to_yes_no_label: ->(bool) {
-          [bool ? 'Yes' : 'No']
-        }
+        country_name: ->(codes) { codes.map { |code| CountryCodes.country(code) } }
     }.freeze
 
     # Pre-defined filters that may or may not be re-used for multiple types.
@@ -119,12 +116,10 @@ module Seek
         ),
         isa_json_compliance: Seek::Filtering::BooleanFilter.new(
           value_field: 'investigations.is_isa_json_compliant',
-          joins: [:investigation],
-          label_mapping: MAPPINGS[:bool_to_yes_no_label]
+          joins: [:investigation]
         ),
         is_isa_json_compliant: Seek::Filtering::BooleanFilter.new(
-          value_field: 'is_isa_json_compliant',
-          label_mapping: MAPPINGS[:bool_to_yes_no_label]
+          value_field: 'is_isa_json_compliant'
         )
     }.freeze
 
