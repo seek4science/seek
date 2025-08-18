@@ -90,13 +90,12 @@
           updatedSamples: updatedSamples,
         })
       };
-      const uploadSamplesCall = await uploadAjaxCall("<%= upload_samples_single_pages_path %>", "POST", body);
+      const uploadSamplesCall = await uploadAjaxCall("<%= spreadsheet_upload_samples_path %>", "POST", body);
       if (uploadSamplesCall.status !== 'ok') {
           throw new Error(JSON.stringify(uploadSamplesCall.result));
       }
       $j('#sample-upload-spinner').hide();
       closeModalForm();
-      location.reload();
     } catch (error){
         alert(`Error: ${error}`);
         $j('#sample-upload-spinner').hide();

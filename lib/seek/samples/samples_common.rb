@@ -1,20 +1,13 @@
 # frozen_string_literal: true
 module Seek
-    module Samples
+  module Samples
 
-      module SamplesCommon
-        def update_sample_with_params(parameters = params, sample)
-          sample.assign_attributes(sample_params(sample.sample_type, parameters))
-          update_sharing_policies(sample, parameters)
-          update_annotations(parameters[:tag_list], sample)
-          update_relationships(sample, parameters)
-          sample
-        end
-
-        def batch_create_samples(params)
-          errors = []
-          results = []
-          param_converter = Seek::Api::ParameterConverter.new("samples")
+    module SamplesCommon
+      def batch_create_samples(params, user)
+        errors = []
+        results = []
+        param_converter = Seek::Api::ParameterConverter.new("samples")
+        User.with_current_user(user) do
           Sample.transaction do
             params[:data].each do |par|
               converted_params = param_converter.convert(par)
@@ -29,13 +22,15 @@ module Seek
             end
             raise ActiveRecord::Rollback if errors.any?
           end
-          { results: results, errors: errors }
         end
+        { results: results, errors: errors }
+      end
 
-        def batch_update_samples(params)
-          errors = []
-          results = []
-          param_converter = Seek::Api::ParameterConverter.new("samples")
+      def batch_update_samples(params, user)
+        errors = []
+        results = []
+        param_converter = Seek::Api::ParameterConverter.new("samples")
+        User.with_current_user(user) do
           Sample.transaction do
             params[:data].each do |par|
               begin
@@ -54,8 +49,9 @@ module Seek
             end
             raise ActiveRecord::Rollback if errors.any?
           end
-          { results: results, errors: errors }
         end
+        { results: results, errors: errors }
       end
     end
+  end
 end

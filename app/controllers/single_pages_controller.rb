@@ -235,44 +235,7 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  def upload_samples_by_spreadsheet
-    # new_samples_params = params.require(:newSamples).permit
-    # updated_samples_params = params.require(:updatedSamples).permit(:updatedSamples)
-    # sample_type = SampleType.find(params[:sampleTypeId])
-    new_samples_params, updated_samples_params, sample_type_id = spreadsheet_upload_params.values_at(:new_samples, :updated_samples, :sample_type_id)
-
-    sample_type = SampleType.find(sample_type_id)
-    project = sample_type.projects.first
-    if sample_type.locked?
-      raise 'Batch upload not permitted. Sample Type is locked! Wait until the lock is removed and try again.'
-    end
-
-    SamplesBatchCreateJob.perform_later(sample_type, new_samples_params, false, @current_user)
-    SamplesBatchUpdateJob.perform_later(sample_type, updated_samples_params, false, @current_user)
-
-    result = 'A background job has been launched. Samples are being added as we speak!'
-    status = :ok
-    flash[:notice] = result
-  rescue StandardError => e
-    flash[:error] = e.message
-    result = "An error occurred!\n#{e.message}\n#{e.backtrace.join("\n")}"
-    status = :bad_request
-  ensure
-    render json: { result: result, status: status }
-  end
-
   private
-
-  def spreadsheet_upload_params
-    new_sample_params = params.require(:newSamples).permit!
-    updated_sample_params = params.require(:updatedSamples).permit!
-
-    {
-      new_samples: new_sample_params,
-      updated_samples: updated_sample_params,
-      sample_type_id: params.require(:sampleTypeId),
-    }
-  end
 
   def get_spreadsheet_data(samples_sheet)
     sample_fields = samples_sheet.row(1).actual_cells.map { |field| field&.value&.sub(' *', '') }.compact

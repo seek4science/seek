@@ -149,13 +149,13 @@ class SamplesController < ApplicationController
   end
 
   def batch_create
-    results, errors = batch_create_samples(params).values_at(:results, :errors)
+    results, errors = batch_create_samples(params, @current_user).values_at(:results, :errors)
     status = errors.empty? ? :ok : :unprocessable_entity
     render json: { status: status, errors: errors, results: results }, status: :ok
   end
 
   def batch_update
-    results, errors = batch_update_samples(params).values_at(:results, :errors)
+    results, errors = batch_update_samples(params, @current_user).values_at(:results, :errors)
     status = errors.empty? ? :ok : :unprocessable_entity
     render json: { status: status, errors: errors, results: results }, status: :ok
   end
@@ -251,6 +251,14 @@ class SamplesController < ApplicationController
   end
 
   private
+
+  def update_sample_with_params(parameters = params, sample)
+    sample.assign_attributes(sample_params(sample.sample_type, parameters))
+    update_sharing_policies(sample, parameters)
+    update_annotations(parameters[:tag_list], sample)
+    update_relationships(sample, parameters)
+    sample
+  end
 
   def sample_params(sample_type = nil, parameters = params)
 
