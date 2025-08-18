@@ -12,6 +12,8 @@ en:
     oidc: 'OpenID Connect'
 
   single_page: "Single Page"
+  is_isa_json_compliant: 'ISA-JSON compliance' # Used for consistency among is_isa_json_compliant / isa_json_compliance filters
+  isa_json_compliance: 'ISA-JSON compliance' # Used for consistency among is_isa_json_compliant / isa_json_compliance filters
   default_view: "Default View"
   investigation: &investigation "Investigation"
   study: &study "Study"
