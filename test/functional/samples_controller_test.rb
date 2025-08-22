@@ -1843,8 +1843,7 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person)
 
     sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
-    # refute sample_type.locked?
-    new_samples_params = new_samples_spreadsheet_upload_params(5, sample_type.id, project.id)
+    new_samples_params = new_samples_spreadsheet_upload_params(5, sample_type.id)
     params = { sampleTypeId: sample_type.id,
                newSamples: { data: new_samples_params },
                updatedSamples: { data: [] }}
@@ -1855,7 +1854,25 @@ class SamplesControllerTest < ActionController::TestCase
     response_body = JSON.parse(response.body)
     assert_response :success
     assert_equal response_body['result'], 'Samples successfully created.'
+  end
 
+  test 'upload new samples by spreadsheet as background job' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    new_samples_params = new_samples_spreadsheet_upload_params(101, sample_type.id)
+    params = { sampleTypeId: sample_type.id,
+               newSamples: { data: new_samples_params },
+               updatedSamples: { data: [] }}
+    assert_enqueued_jobs(1, only: SamplesBatchUploadJob) do
+      post :upload_samples_by_spreadsheet, params: params
+    end
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    assert_equal response_body['result'], 'A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.'
+    assert sample_type.batch_upload_in_progress?
   end
 
   def rdf_test_object
@@ -1864,10 +1881,11 @@ class SamplesControllerTest < ActionController::TestCase
 
   private
 
-  def new_samples_spreadsheet_upload_params(n, sample_type_id, project_id)
+  def new_samples_spreadsheet_upload_params(n, sample_type_id)
     params = []
     (0..n-1).each do |i|
-      params << { sampleTypeId: sample_type_id,
+      params << {
+        sampleTypeId: sample_type_id,
         ex_id: "new-#{i}-#{sample_type_id}",
         data: {
           type: "samples",
