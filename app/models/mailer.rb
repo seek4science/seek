@@ -367,9 +367,13 @@ class Mailer < ActionMailer::Base
     @item_id = item_id
     @results = results
     @errors = errors
-    subject = ''
+    subject = if errors.empty?
+                "Spreadsheet upload completed successfully"
+              else
+                "spreadsheet upload Failed"
+              end
     mail(from: Seek::Config.noreply_sender,
-         to: notifiee.email_with_name,
+         to: user.email_with_name,
          subject: subject,
          template_name: :notify_user_after_spreadsheet_extraction,)
   end

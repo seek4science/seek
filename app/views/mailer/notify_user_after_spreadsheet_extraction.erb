@@ -1,0 +1,14 @@
+Hi <%= @notifiee.person.name %>,
+
+<% if @errors.empty? %>
+  Your spreadsheet extraction has been successfully completed.
+  Here are the results:
+  <% @results.each do |res| %>
+    <li><%= res %></li>
+  <% end %>
+<% else %>
+  Your spreadsheet extraction encountered one or more errors. Please correct them and try again.
+  <% @errors.each do |err| %>
+    <li><%= err %></li>
+  <% end %>
+<% end %>
