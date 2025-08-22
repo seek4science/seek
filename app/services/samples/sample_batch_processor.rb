@@ -60,7 +60,7 @@ module Samples
             sample_id = par[:id]
             sample = Sample.find(sample_id)
             raise "Sample with id '#{sample_id}' not found." if sample.nil?
-            raise "Not permitted to update sample." if sample.can_edit?(@user)
+            raise "Not permitted to update sample." unless sample.can_edit?(@user)
             sample.assign_attributes(par)
             if sample.save
               result_message = "Sample '[ID: #{sample.id}] #{sample.title}' successfully updated."

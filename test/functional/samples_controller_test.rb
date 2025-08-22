@@ -1853,7 +1853,7 @@ class SamplesControllerTest < ActionController::TestCase
     end
     response_body = JSON.parse(response.body)
     assert_response :success
-    assert_equal response_body['result'], 'Samples successfully created.'
+    assert_equal response_body['result'], 'Samples uploaded successfully!'
   end
 
   test 'upload new samples by spreadsheet as background job' do
@@ -1875,6 +1875,66 @@ class SamplesControllerTest < ActionController::TestCase
     assert sample_type.batch_upload_in_progress?
   end
 
+  test ' upload updated samples by spreadsheet' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    samples = []
+    (1..5).each do |i|
+      samples << Sample.create(sample_type: sample_type,
+                               data: {
+                                 "the_title": "Zebra fish #{i}",
+                               },
+                               project_ids: [person.projects.first.id],
+                               policy: sample_type.policy,
+                               contributor: person)
+    end
+    sample_type.reload
+    assert samples.none? { |s| s.title.downcase.include? 'updated' }
+    update_samples_params = update_samples_spreadsheet_upload_params(samples)
+    params = { sampleTypeId: sample_type.id,
+               newSamples: { data: [] },
+               updatedSamples: { data: update_samples_params }}
+    post :upload_samples_by_spreadsheet, params: params
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    assert_equal response_body['result'], 'Samples uploaded successfully!'
+    samples.map(&:reload)
+    assert samples.all? { |s| s.title.downcase.include? 'updated' }
+  end
+
+  test ' upload updated samples by spreadsheet as a background job' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    samples = []
+    (1..101).each do |i|
+      samples << Sample.create(sample_type: sample_type,
+                               data: {
+                                 "the_title": "Zebra fish #{i}",
+                               },
+                               project_ids: [person.projects.first.id],
+                               policy: sample_type.policy,
+                               contributor: person)
+    end
+    sample_type.reload
+    assert samples.none? { |s| s.title.downcase.include? 'updated' }
+    update_samples_params = update_samples_spreadsheet_upload_params(samples)
+    params = { sampleTypeId: sample_type.id,
+               newSamples: { data: [] },
+               updatedSamples: { data: update_samples_params }}
+    assert_enqueued_jobs(1, only: SamplesBatchUploadJob) do
+      post :upload_samples_by_spreadsheet, params: params
+    end
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    assert_equal response_body['result'], 'A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.'
+  end
+
   def rdf_test_object
     FactoryBot.create(:max_sample, policy: FactoryBot.create(:public_policy))
   end
@@ -1892,6 +1952,25 @@ class SamplesControllerTest < ActionController::TestCase
           attributes: {
             attribute_map: {
               the_title: "Mouse #{i}"
+            }
+          }
+        }
+      }
+    end
+    params
+  end
+
+  def update_samples_spreadsheet_upload_params(samples)
+    params = []
+    samples.each do |sample|
+      params << {
+        "ex_id": "update-#{sample.id}-#{sample.sample_type.id}",
+        "id": "#{ sample.id }",
+        "data": {
+          "type": "samples",
+          "attributes": {
+            "attribute_map": {
+              "the_title": "#{sample.title} - Updated"
             }
           }
         }

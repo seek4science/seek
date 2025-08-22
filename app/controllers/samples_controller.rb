@@ -173,7 +173,7 @@ class SamplesController < ApplicationController
       processor.process!
       raise "The following errors occurred: #{processor.errors.join("\n")}" unless processor.errors.empty?
 
-      result = 'Samples successfully created.'
+      result = 'Samples uploaded successfully!'
     else
       SamplesBatchUploadJob.perform_later(sample_type_id, new_sample_params, updated_sample_params, @current_user, true)
       result = 'A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.'
@@ -315,7 +315,8 @@ class SamplesController < ApplicationController
       raw_updated_samples_params = parameters.fetch(:updatedSamples, {}).dig(:data)
       unless raw_updated_samples_params.blank?
         raw_updated_samples_params.each do |par|
-          converted_updated_samples_params << sample_params(sample_type, param_converter.convert(par))
+          sample_id = par[:id]
+          converted_updated_samples_params << sample_params(sample_type, param_converter.convert(par)).merge(id: sample_id)
         end
       end
     end
