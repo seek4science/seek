@@ -67,6 +67,7 @@ class SampleType < ApplicationRecord
   has_task :sample_metadata_update
   has_task :samples_batch_create
   has_task :samples_batch_update
+  has_task :sample_batch_upload
 
   def investigations
     return [] if studies.empty? && assays.empty?
@@ -116,7 +117,11 @@ class SampleType < ApplicationRecord
   end
 
   def locked?
-    [sample_metadata_update_task, samples_batch_create_task, samples_batch_update_task].map(&:in_progress?).any?
+    sample_metadata_update_task.in_progress?
+  end
+
+  def batch_upload_in_progess?
+    sample_batch_upload_task.in_progress?
   end
 
   def validate_value?(attribute_name, value)
