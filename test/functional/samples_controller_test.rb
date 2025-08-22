@@ -1837,11 +1837,66 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal flash[:error], 'This sample type is locked. You cannot edit the sample.'
   end
 
+  test 'upload new samples by spreadsheet' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    # refute sample_type.locked?
+    new_samples_params = new_samples_spreadsheet_upload_params(5, sample_type.id, project.id)
+    params = { sampleTypeId: sample_type.id,
+               newSamples: { data: new_samples_params },
+               updatedSamples: { data: [] }}
+
+    assert_difference('Sample.count', 5) do
+      post :upload_samples_by_spreadsheet, params: params
+    end
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    assert_equal response_body['result'], 'Samples successfully created.'
+
+  end
+
   def rdf_test_object
     FactoryBot.create(:max_sample, policy: FactoryBot.create(:public_policy))
   end
 
   private
+
+  def new_samples_spreadsheet_upload_params(n, sample_type_id, project_id)
+    params = []
+    (0..n-1).each do |i|
+      params << { sampleTypeId: sample_type_id,
+        ex_id: "new-#{i}-#{sample_type_id}",
+        data: {
+          type: "samples",
+          attributes: {
+            attribute_map: {
+              the_title: "Mouse #{i}"
+            },
+            policy: {
+              access: "edit",
+              permissions: [
+                {
+                  resource: {
+                    type: "Project",
+                    id: project_id
+                  },
+                  access: "no_access"
+                }
+              ]
+            }
+          },
+          relationships: {
+            projects: { data: [{ type: "projects", id: project_id }] },
+            sample_type: { data: { type: "sample_types", id: sample_type_id } }
+          }
+        }
+      }
+    end
+    params
+  end
 
   def populated_patient_sample
     person = FactoryBot.create(:person)
