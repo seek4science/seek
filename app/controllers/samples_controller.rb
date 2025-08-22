@@ -168,7 +168,7 @@ class SamplesController < ApplicationController
           sample = Sample.find(par[:id])
           errors.push({ ex_id: par[:ex_id], error: "Can not be deleted." }) if !(sample.can_delete? && sample.destroy)
         rescue 
-          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+          errors.push({ ex_id: par[:ex_id], error: sample&.errors&.messages })
         end
       end
       raise ActiveRecord::Rollback if errors.any?
@@ -252,12 +252,33 @@ class SamplesController < ApplicationController
 
   private
 
-  def update_sample_with_params(parameters = params, sample)
-    sample.assign_attributes(sample_params(sample.sample_type, parameters))
-    update_sharing_policies(sample, parameters)
-    update_annotations(parameters[:tag_list], sample)
-    update_relationships(sample, parameters)
-    sample
+  def spreadsheet_upload_params(parameters = params)
+    sample_type_id = parameters.permit(:sampleTypeId).dig(:sampleTypeId)
+    sample_type = SampleType.find(sample_type_id)
+
+    param_converter = Seek::Api::ParameterConverter.new("samples")
+
+    converted_new_samples_params = []
+    if parameters.key?(:newSamples)
+      raw_new_samples_params = parameters.fetch(:newSamples, {}).dig(:data)
+      unless raw_new_samples_params.blank?
+        raw_new_samples_params.each do |par|
+          converted_new_samples_params << sample_params(sample_type, param_converter.convert(par))
+        end
+      end
+    end
+
+    converted_updated_samples_params = []
+    if parameters.key?(:updatedSamples)
+      raw_updated_samples_params = parameters.fetch(:updatedSamples, {}).dig(:data)
+      unless raw_updated_samples_params.blank?
+        raw_updated_samples_params.each do |par|
+          converted_updated_samples_params << sample_params(sample_type, param_converter.convert(par))
+        end
+      end
+    end
+
+    { sample_type_id: sample_type_id, new_sample_params: converted_new_samples_params, updated_sample_params: converted_updated_samples_params }
   end
 
   def sample_params(sample_type = nil, parameters = params)
@@ -282,6 +303,13 @@ class SamplesController < ApplicationController
   end
 
 
+  def update_sample_with_params(parameters = params, sample)
+    sample.assign_attributes(sample_params(sample.sample_type, parameters))
+    update_sharing_policies(sample, parameters)
+    update_annotations(parameters[:tag_list], sample)
+    update_relationships(sample, parameters)
+    sample
+  end
 
   def find_index_assets
     if params[:sample_type_id]
