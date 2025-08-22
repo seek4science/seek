@@ -148,6 +148,45 @@ class SamplesController < ApplicationController
     end
   end
 
+  def upload_samples_by_spreadsheet
+    new_samples_params, updated_samples_params, sample_type_id = spreadsheet_upload_params(params).values_at(:new_sample_params, :updated_sample_params, :sample_type_id)
+
+    sample_type = SampleType.find(sample_type_id)
+
+    raise "Sample Type with ID '#{sample_type_id}' not found." if sample_type.nil?
+
+    if sample_type.locked?
+      raise 'Batch upload not allowed. Sample Type is currently locked! Wait until the lock is removed and try again.'
+    end
+
+    if sample_type.batch_upload_in_progess?
+      raise 'Batch upload not allowed. There is already a background job in progress for this Sample Type. Please wait and try again later.'
+    end
+
+    unless sample_type.can_view?
+      raise 'Batch upload not allowed. You need at least viewing permission to the sample type!'
+    end
+
+    total_transactions = new_samples_params.count + updated_samples_params.count
+    if total_transactions <100
+      SamplesBatchUploadJob.perform_now(sample_type_id, new_samples_params, updated_samples_params, @current_user)
+      result = 'Samples successfully created.'
+    else
+      SamplesBatchUploadJob.perform_later(sample_type_id, new_samples_params, updated_samples_params, @current_user)
+      result = 'A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.'
+    end
+
+    status = :ok
+    flash[:notice] = result
+  rescue StandardError => e
+    flash[:error] = e.message
+    result = "An error occurred!\n#{e.message}\n#{e.backtrace.join("\n")}"
+    status = :bad_request
+  ensure
+    render json: { result: result, status: status }, status: status
+  end
+
+
   def batch_create
     results, errors = batch_create_samples(params, @current_user).values_at(:results, :errors)
     status = errors.empty? ? :ok : :unprocessable_entity

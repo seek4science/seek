@@ -713,6 +713,7 @@ SEEK::Application.routes.draw do
       delete :batch_delete
       get :query_form
       post :query
+      post :spreadsheet_upload, action: :upload_samples_by_spreadsheet
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :sops,
               :publications, :samples, :sample_types, :strains, :organisms, :collections,
