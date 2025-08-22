@@ -158,7 +158,7 @@
 
       attrMap["sampleUploadAction"] = action;
 
-    if (action === "update"){
+    if (action === "update") {
       return {
         id: objId,
         ex_id: `update-${index}-<%= @sample_type.id %>`,
@@ -170,38 +170,38 @@
         }
       };
     } else {
-        return {
-          ex_id: `new-${index}-<%= @sample_type.id %>`,
-            data:{
-              type: "samples",
-              tags: null,
-              attributes: {
-              policy: {
-                access: getAccess(projectDefaultPolicy),
-                permissions: [
-                  {
-                    resource: { type: "Project", id: <%= @project.id %> },
-                    access: getPermission(projectDefaultPolicy, <%= @project.id %>)
-                  }
-                ]
-              },
-              attribute_map: attrMap
-              },
-              relationships: {
-                projects: {
-                  data: [
-                    {type: "projects", id: <%= @project.id %>}
-                  ]
-                },
-                sample_type: {
-                  data: {
-                    type: "sample_types",
-                    id: <%= @sample_type.id %>
-                  }
+      return {
+        ex_id: `new-${index}-<%= @sample_type.id %>`,
+        data: {
+          type: "samples",
+          tags: null,
+          attributes: {
+            policy: {
+              access: getAccess(projectDefaultPolicy),
+              permissions: [
+                {
+                  resource: {type: "Project", id: <%= @project.id %>},
+                  access: getPermission(projectDefaultPolicy, <%= @project.id %>)
                 }
+              ]
+            },
+            attribute_map: attrMap
+          },
+          relationships: {
+            projects: {
+              data: [
+                {type: "projects", id: <%= @project.id %>}
+              ]
+            },
+            sample_type: {
+              data: {
+                type: "sample_types",
+                id: <%= @sample_type.id %>
               }
             }
-        };
+          }
+        }
+      };
     }
   }
 
