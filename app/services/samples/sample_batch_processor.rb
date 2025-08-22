@@ -2,7 +2,8 @@
 module Samples
   class SampleBatchProcessor
 
-    def initialize(sample_type_id:, new_sample_params:, updated_sample_params:, user:, send_email:)
+    attr_reader :errors
+    def initialize(sample_type_id:, new_sample_params:, updated_sample_params:, user:, send_email: false)
       @sample_type = SampleType.find(sample_type_id)
       @projects = @sample_type.projects
       @new_sample_params = new_sample_params
@@ -35,7 +36,7 @@ module Samples
       User.with_current_user(@user) do
         Sample.transaction do
           @new_sample_params.each do |par|
-            sample = Sample.new(sample_type: @sample_type)
+            sample = Sample.new(sample_type: @sample_type, policy: @sample_type.policy, projects: @projects)
             sample.assign_attributes(par)
             if sample.save
               result_message = "Sample '#{sample.title}' successfully created."
@@ -58,9 +59,17 @@ module Samples
           @updated_sample_params.each do |par|
             sample_id = par[:id]
             sample = Sample.find(sample_id)
-            raise "Not permitted to update sample" if sample.can_edit?(@user)
+            raise "Sample with id '#{sample_id}' not found." if sample.nil?
+            raise "Not permitted to update sample." if sample.can_edit?(@user)
             sample.assign_attributes(par)
-            unless sample.save
+            if sample.save
+              result_message = "Sample '[ID: #{sample.id}] #{sample.title}' successfully updated."
+              @results << result_message
+              Rails.logger.info result_message
+            else
+              error_message = "Sample could be created. Please correct these errors:\n#{sample.errors.full_messages.to_sentence}."
+              @errors << error_message
+              Rails.logger.error error_message
               raise ActiveRecord::Rollback
             end
           end

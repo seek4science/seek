@@ -4,7 +4,7 @@ class SamplesBatchUploadJob < TaskJob
   queue_with_priority 1
   queue_as QueueNames::SAMPLES
 
-  def perform(sample_type_id, new_sample_params, updated_sample_params, user, send_email=false)
+  def perform(sample_type_id, new_sample_params, updated_sample_params, user, send_email)
     processor = Samples::SampleBatchProcessor.new(sample_type_id:, new_sample_params:, updated_sample_params:, user:, send_email:)
     processor.process!
   end

@@ -1874,23 +1874,7 @@ class SamplesControllerTest < ActionController::TestCase
           attributes: {
             attribute_map: {
               the_title: "Mouse #{i}"
-            },
-            policy: {
-              access: "edit",
-              permissions: [
-                {
-                  resource: {
-                    type: "Project",
-                    id: project_id
-                  },
-                  access: "no_access"
-                }
-              ]
             }
-          },
-          relationships: {
-            projects: { data: [{ type: "projects", id: project_id }] },
-            sample_type: { data: { type: "sample_types", id: sample_type_id } }
           }
         }
       }

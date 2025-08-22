@@ -120,7 +120,7 @@ class SampleType < ApplicationRecord
     sample_metadata_update_task.in_progress?
   end
 
-  def batch_upload_in_progess?
+  def batch_upload_in_progress?
     sample_batch_upload_task.in_progress?
   end
 

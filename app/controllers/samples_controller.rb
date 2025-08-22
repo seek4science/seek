@@ -149,7 +149,7 @@ class SamplesController < ApplicationController
   end
 
   def upload_samples_by_spreadsheet
-    new_samples_params, updated_samples_params, sample_type_id = spreadsheet_upload_params(params).values_at(:new_sample_params, :updated_sample_params, :sample_type_id)
+    new_sample_params, updated_sample_params, sample_type_id = spreadsheet_upload_params(params).values_at(:new_sample_params, :updated_sample_params, :sample_type_id)
 
     sample_type = SampleType.find(sample_type_id)
 
@@ -159,7 +159,7 @@ class SamplesController < ApplicationController
       raise 'Batch upload not allowed. Sample Type is currently locked! Wait until the lock is removed and try again.'
     end
 
-    if sample_type.batch_upload_in_progess?
+    if sample_type.batch_upload_in_progress?
       raise 'Batch upload not allowed. There is already a background job in progress for this Sample Type. Please wait and try again later.'
     end
 
@@ -167,12 +167,15 @@ class SamplesController < ApplicationController
       raise 'Batch upload not allowed. You need at least viewing permission to the sample type!'
     end
 
-    total_transactions = new_samples_params.count + updated_samples_params.count
+    total_transactions = new_sample_params.count + updated_sample_params.count
     if total_transactions <100
-      SamplesBatchUploadJob.perform_now(sample_type_id, new_samples_params, updated_samples_params, @current_user)
+      processor = Samples::SampleBatchProcessor.new(sample_type_id:, new_sample_params:, updated_sample_params:, user: @current_user)
+      processor.process!
+      raise "The following errors occurred: #{processor.errors.join("\n")}" unless processor.errors.empty?
+
       result = 'Samples successfully created.'
     else
-      SamplesBatchUploadJob.perform_later(sample_type_id, new_samples_params, updated_samples_params, @current_user)
+      SamplesBatchUploadJob.perform_later(sample_type_id, new_sample_params, updated_sample_params, @current_user, true)
       result = 'A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.'
     end
 
@@ -180,7 +183,7 @@ class SamplesController < ApplicationController
     flash[:notice] = result
   rescue StandardError => e
     flash[:error] = e.message
-    result = "An error occurred!\n#{e.message}\n#{e.backtrace.join("\n")}"
+    result = "One or more errors occurred:\n#{e.message}\n#{e.backtrace.join("\n")}"
     status = :bad_request
   ensure
     render json: { result: result, status: status }, status: status
