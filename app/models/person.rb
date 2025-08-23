@@ -130,6 +130,8 @@ class Person < ApplicationRecord
   after_destroy :updated_contributed_items_contributor_after_destroy
   after_destroy :update_publication_authors_after_destroy
 
+  include Seek::Merging::PersonMerge
+
   # to make it look like a User
   def person
     self
