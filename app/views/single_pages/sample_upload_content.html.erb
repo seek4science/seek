@@ -39,7 +39,7 @@
     </div>
   <% end %>
 
-  <% if (@can_upload and !any_samples_to_upload?) %>
+  <% if @can_upload && !any_samples_to_upload? %>
     <div class="alert alert-info alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h3>No changes detected</h3>
@@ -74,6 +74,7 @@
     const newSamples = { data: getNewSamples() };
     const updatedSamples= { data: getUpdateSamples() };
 
+    debugger;
     if (newSamples.data === "abort") return;
     makeSampleUploadAjaxCalls(newSamples, updatedSamples);
  }
@@ -119,21 +120,19 @@
       }
     }
 
-    const sampleObjects = createRows.map((cr, index) => createSampleObject(cr, "new", index));
-    return sampleObjects;
+    return createRows.map((cr, index) => createSampleObject(cr, "new", index));
   }
 
   function getUpdateSamples(){
     const updateRows = $j('#update-samples-table [id*="updated"]').toArray();
 
-    const sampleObjects = updateRows.map((ur, index) => createSampleObject(ur, "update", index));
-    return sampleObjects
+    return updateRows.map((ur, index) => createSampleObject(ur, "update", index));
   }
 
   function createSampleObject(row, action, index){
 
-    cells = $j(row).find('td:not(:has(".danger"))').toArray();
-    samplesObj = {};
+    let cells = $j(row).find('td:not(:has(".danger"))').toArray();
+    let samplesObj = {};
     cells.map(function(cell){
       const val = cell.textContent;
       const key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
@@ -156,52 +155,16 @@
 
     const {id: objId, ...attrMap} = samplesObj;
 
-      attrMap["sampleUploadAction"] = action;
+    attrMap["sampleUploadAction"] = action;
+    const pid = '<%= @project.id %>';
+    const sampleTypeId = '<%= @sample_type.id %>';
+    const defaultPermissions = '<%= @sample_type.policy_id %>';
+    const assayId = '<%= @assay&.id %>';
 
     if (action === "update") {
-      return {
-        id: objId,
-        ex_id: `update-${index}-<%= @sample_type.id %>`,
-        data: {
-          type: "samples",
-          attributes: {
-            attribute_map: attrMap
-          }
-        }
-      };
+      return batchSampleUpdateStruct(`update-${index}-${sampleTypeId}`, attrMap, objId);
     } else {
-      return {
-        ex_id: `new-${index}-<%= @sample_type.id %>`,
-        data: {
-          type: "samples",
-          tags: null,
-          attributes: {
-            policy: {
-              access: getAccess(projectDefaultPolicy),
-              permissions: [
-                {
-                  resource: {type: "Project", id: <%= @project.id %>},
-                  access: getPermission(projectDefaultPolicy, <%= @project.id %>)
-                }
-              ]
-            },
-            attribute_map: attrMap
-          },
-          relationships: {
-            projects: {
-              data: [
-                {type: "projects", id: <%= @project.id %>}
-              ]
-            },
-            sample_type: {
-              data: {
-                type: "sample_types",
-                id: <%= @sample_type.id %>
-              }
-            }
-          }
-        }
-      };
+      return batchSampleCreateStruct(`new-${index}-${sampleTypeId}`,attrMap, sampleTypeId, pid, defaultPermissions, assayId);
     }
   }
 
