@@ -183,7 +183,7 @@ class SamplesController < ApplicationController
     flash[:notice] = result
   rescue StandardError => e
     flash[:error] = e.message
-    result = "One or more errors occurred:\n#{e.message}\n#{e.backtrace.join("\n")}"
+    result = "One or more errors occurred:\n#{e.message}"
     status = :bad_request
   ensure
     render json: { result: result, status: status }, status: status
