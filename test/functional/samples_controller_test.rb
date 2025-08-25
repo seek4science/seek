@@ -1933,6 +1933,23 @@ class SamplesControllerTest < ActionController::TestCase
     response_body = JSON.parse(response.body)
     assert_response :success
     assert_equal response_body['result'], 'A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.'
+
+    # Should not be able to samples through a spreadsheet when a background job is running
+    new_samples_params = new_samples_spreadsheet_upload_params(5, sample_type.id)
+    update_samples_params = update_samples_spreadsheet_upload_params(samples.first(5))
+
+    params = {
+      sampleTypeId: sample_type.id,
+      newSamples: { data: new_samples_params },
+      updatedSamples: { data: update_samples_params }
+    }
+
+    assert_no_difference('Sample.count') do
+      post :upload_samples_by_spreadsheet, params: params
+    end
+    response_body = JSON.parse(response.body)
+    assert_response :bad_request
+    assert_equal response_body['result'], "One or more errors occurred:\nBatch upload not allowed. There is already a background job in progress for this Sample Type. Please wait and try again later."
   end
 
   def rdf_test_object
