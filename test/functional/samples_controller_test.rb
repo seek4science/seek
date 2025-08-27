@@ -1134,7 +1134,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal "2", json_response["errors"][0]["ex_id"].to_s
   end
 
-
   test 'batch_update' do
     creator = FactoryBot.create(:person)
     login_as(creator)
@@ -1147,12 +1146,14 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_no_difference('Sample.count') do
       put :batch_update, params: {data: [
-        {id: sample1.id, 
+        {id: sample1.id,
+         ex_id: '1',
          data: {type: "samples", 
                 attributes: { attribute_map: { "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, 
                               creator_ids: [creator.id]}}},
-        {id: sample2.id, 
-         data: {type: "samples", 
+        {id: sample2.id,
+         ex_id: '2',
+         data: {type: "samples",
                 attributes: { attribute_map: { "full name": 'David Tailor', "age": '33', "weight": '33.1' }, 
                               creator_ids: [creator.id]}}}],
                                   sample_type_id: type.id}
@@ -1182,15 +1183,14 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'batch_delete' do
     person = FactoryBot.create(:person)
-    sample1 = FactoryBot.create(:patient_sample, contributor: person)
-    sample2 = FactoryBot.create(:patient_sample, contributor: person)
-    type1 = sample1.sample_type
-    type2 = sample1.sample_type
+    type = FactoryBot.create(:patient_sample_type, contributor: person, projects: [person.projects.first])
+    sample1 = FactoryBot.create(:patient_sample, contributor: person, sample_type: type, projects: [person.projects.first])
+    sample2 = FactoryBot.create(:patient_sample, contributor: person, sample_type: type, projects: [person.projects.first])
     login_as(person.user)
     assert sample1.can_delete?
     assert sample2.can_delete?
     assert_difference('Sample.count', -2) do
-      delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
+      delete :batch_delete, params: { data: [ { id: sample1.id, ex_id: '1' }, { id: sample2.id, ex_id: '2' } ], sample_type_id: type.id }
     end
 
       # For the Single Page to work properly, these must be included in the response

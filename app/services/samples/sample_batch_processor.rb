@@ -4,11 +4,10 @@ module Samples
 
     attr_reader :errors
     attr_reader :results
-    def initialize(sample_type_id:, new_sample_params: [], updated_sample_params: [], user:, send_email: false)
+    def initialize(sample_type_id:, batch_process_params: [], user:, send_email: false)
       @sample_type = SampleType.find(sample_type_id)
       @projects = @sample_type.projects
-      @new_sample_params = new_sample_params
-      @updated_sample_params = updated_sample_params
+      @batch_process_params = batch_process_params
       @user = user
       @send_email = send_email
       @results = []
@@ -33,20 +32,23 @@ module Samples
       send_email if @send_email && Seek::Config::email_enabled && !@user.nil?
     end
 
+    def delete!
+      delete_samples
+    end
+
     private
 
     def validate!
       raise "Missing sample_type_id or sample type not found" if @sample_type.nil?
       raise "No projects associated with this Sample Type" if @projects.empty?
-      raise "Missing new_sample_params" if @new_sample_params.nil?
-      raise "Missing updated_sample_params" if @updated_sample_params.nil?
+      raise "Missing new_sample_params" if @batch_process_params.nil?
       raise "Missing user" if @user.nil?
     end
 
     def create_samples
       User.with_current_user(@user) do
         Sample.transaction do
-          @new_sample_params.each do |par|
+          @batch_process_params.each do |par|
             ex_id = par.delete(:ex_id)
             sample = Sample.new(sample_type: @sample_type, policy: @sample_type.policy, projects: @projects)
             sample.assign_attributes(par)
@@ -57,7 +59,7 @@ module Samples
             else
               error = { ex_id: ex_id, message: "Sample '#{sample.title}' could not be created. Please correct these errors:\n#{sample.errors.full_messages.to_sentence}." }
               @errors << error
-              Rails.logger.error error
+              Rails.logger.info error
               raise ActiveRecord::Rollback
             end
           end
@@ -68,18 +70,18 @@ module Samples
     def update_samples
       User.with_current_user(@user) do
         Sample.transaction do
-          @updated_sample_params.each do |par|
+          @batch_process_params.each do |par|
             ex_id = par.delete(:ex_id)
             sample_id = par[:id]
             sample = Sample.find(sample_id)
 
             if sample.nil?
-              @errors << "Sample with id '#{sample_id}' not found."
+              @errors << { ex_id: ex_id, message: "Sample with id '#{sample_id}' not found." }
               next
             end
 
             unless sample.can_edit?(@user)
-              @errors << "Not permitted to update this sample."
+              @errors << { ex_id: ex_id, message: "Not permitted to update this sample." }
               next
             end
 
@@ -91,7 +93,38 @@ module Samples
             else
               error = { ex_id: ex_id, message: "Sample '[ID: #{sample.id}] #{sample.title}' could not be updated. Please correct these errors:\n#{sample.errors.full_messages.to_sentence}." }
               @errors << error
-              Rails.logger.error error
+              Rails.logger.info error
+              raise ActiveRecord::Rollback
+            end
+          end
+        end
+      end
+    end
+
+    def delete_samples
+      User.with_current_user(@user) do
+        Sample.transaction do
+          @batch_process_params.each do |par|
+            ex_id = par.delete(:ex_id)
+            sample_id = par[:id]
+            sample = Sample.find(sample_id)
+
+            if sample.nil?
+              @errors << { ex_id: ex_id, message: "Sample with id '#{sample_id}' not found." }
+              next
+            end
+
+            unless sample.can_delete?
+              @errors << { ex_id: ex_id, message: "Not permitted to delete this sample." }
+              next
+            end
+
+            if sample.destroy
+              @results << { ex_id: ex_id, message: "Sample '[ID: #{sample.id}] #{sample.title}' successfully deleted." }
+            else
+              error = { ex_id: ex_id, error: sample.errors.full_messages.to_sentence }
+              @errors << error
+              Rails.logger.info error
               raise ActiveRecord::Rollback
             end
           end
