@@ -806,7 +806,6 @@ SEEK::Application.routes.draw do
       post :export_to_excel, action: :export_to_excel
       get :download_samples_excel, action: :download_samples_excel
       post :preview_upload_samples, action: :preview_upload_samples
-      post :upload_samples, action: :upload_samples_by_spreadsheet
     end
   end
 

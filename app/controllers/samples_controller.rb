@@ -2,7 +2,6 @@ class SamplesController < ApplicationController
   respond_to :html
   include Seek::PreviewHandling
   include Seek::AssetsCommon
-  include Seek::Publishing::PublishingCommon
   include Seek::IndexPager
   include Seek::JSONMetadata
 
@@ -16,6 +15,7 @@ class SamplesController < ApplicationController
   before_action :auth_to_create, only: %i[new create batch_create]
 
   include Seek::ISAGraphExtensions
+  include Seek::Publishing::PublishingCommon
 
   api_actions :index, :show, :create, :update, :destroy, :batch_create
 

@@ -65,8 +65,6 @@ class SampleType < ApplicationRecord
   has_annotation_type :sample_type_tag, method_name: :tags
 
   has_task :sample_metadata_update
-  has_task :samples_batch_create
-  has_task :samples_batch_update
   has_task :sample_batch_upload
 
   def investigations
