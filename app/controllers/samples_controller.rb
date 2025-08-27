@@ -1,7 +1,6 @@
 class SamplesController < ApplicationController
   respond_to :html
   include Seek::PreviewHandling
-  include Seek::Samples::SamplesCommon
   include Seek::AssetsCommon
   include Seek::Publishing::PublishingCommon
   include Seek::IndexPager
@@ -148,58 +147,100 @@ class SamplesController < ApplicationController
     end
   end
 
-  def upload_samples_by_spreadsheet
-    new_sample_params, updated_sample_params, sample_type_id = spreadsheet_upload_params(params).values_at(:new_sample_params, :updated_sample_params, :sample_type_id)
-
+  def batch_create
+    errors = []
+    results = []
+    sample_type_id = params.permit(:sample_type_id).dig(:sample_type_id)
+    parameters = batch_upload_sample_params(params, sample_type_id, false)
     sample_type = SampleType.find(sample_type_id)
 
-    raise "Sample Type with ID '#{sample_type_id}' not found." if sample_type.nil?
+    if sample_type.nil?
+      err_message = "Sample Type with ID '#{sample_type_id}' not found."
+      errors.push err_message
+      raise err_message
+    end
 
     if sample_type.locked?
-      raise 'Batch upload not allowed. Sample Type is currently locked! Wait until the lock is removed and try again.'
+      err_message = 'Batch upload not allowed. Sample Type is currently locked! Wait until the lock is removed and try again.'
+      errors.push err_message
+      raise err_message
     end
 
-    if sample_type.batch_upload_in_progress?
-      raise 'Batch upload not allowed. There is already a background job in progress for this Sample Type. Please wait and try again later.'
-    end
-
-    unless sample_type.can_view?
-      raise 'Batch upload not allowed. You need at least viewing permission to the sample type!'
-    end
-
-    total_transactions = new_sample_params.count + updated_sample_params.count
-    if total_transactions <100
-      processor = Samples::SampleBatchProcessor.new(sample_type_id:, new_sample_params:, updated_sample_params:, user: @current_user)
-      processor.process!
-      raise "The following errors occurred: #{processor.errors.join("\n")}" unless processor.errors.empty?
-
-      result = 'Samples uploaded successfully!'
+    if parameters.count < 100
+      batch_create_processor = Samples::SampleBatchProcessor.new(sample_type_id: sample_type_id,
+                                        new_sample_params: parameters,
+                                        updated_sample_params: [],
+                                        user: @current_user)
+      batch_create_processor.create!
+      results.concat(batch_create_processor.results)
+      errors.concat(batch_create_processor.errors)
+      raise "The following errors occurred: #{errors.join("\n")}" unless errors.empty?
     else
-      SamplesBatchUploadJob.perform_later(sample_type_id, new_sample_params, updated_sample_params, @current_user, true)
-      result = 'A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.'
+      SamplesBatchCreateJob.perform_later(sample_type_id, parameters, @current_user, true)
+      results = ['A background job has been launched.']
     end
-
     status = :ok
-    flash[:notice] = result
   rescue StandardError => e
     flash[:error] = e.message
-    result = "One or more errors occurred:\n#{e.message}"
-    status = :bad_request
+    status = :unprocessable_entity
   ensure
-    render json: { result: result, status: status }, status: status
-  end
-
-
-  def batch_create
-    results, errors = batch_create_samples(params, @current_user).values_at(:results, :errors)
-    status = errors.empty? ? :ok : :unprocessable_entity
-    render json: { status: status, errors: errors, results: results }, status: :ok
+    render json: {
+      errors: errors,
+      results: results,
+      status: status
+    },
+    status: status
   end
 
   def batch_update
-    results, errors = batch_update_samples(params, @current_user).values_at(:results, :errors)
-    status = errors.empty? ? :ok : :unprocessable_entity
-    render json: { status: status, errors: errors, results: results }, status: :ok
+    errors = []
+    results = []
+    sample_type_id = params.permit(:sample_type_id).dig(:sample_type_id)
+    parameters = batch_upload_sample_params(params, sample_type_id, true)
+    sample_type = SampleType.find(sample_type_id)
+
+    if sample_type.nil?
+      err_message = "Sample Type with ID '#{sample_type_id}' not found."
+      errors.push err_message
+      raise err_message
+    end
+
+    if sample_type.locked?
+      err_message = 'Batch upload not allowed. Sample Type is currently locked! Wait until the lock is removed and try again.'
+      errors.push err_message
+      raise err_message
+    end
+
+    if sample_type.batch_upload_in_progress?
+      err_message = 'Batch upload not allowed. There is already a background job in progress for this Sample Type. Please wait and try again later.'
+      errors.push err_message
+      raise err_message
+    end
+
+    if parameters.count < 100
+      batch_update_processor = Samples::SampleBatchProcessor.new(sample_type_id: sample_type_id,
+                                                                 new_sample_params: [],
+                                                                 updated_sample_params: parameters,
+                                                                 user: @current_user)
+      batch_update_processor.update!
+      errors.concat(batch_update_processor.errors)
+      results.concat(batch_update_processor.results)
+      raise "The following errors occurred: #{errors.join("\n")}" unless errors.empty?
+    else
+      SamplesBatchUpdateJob.perform_later(sample_type_id, [], parameters, @current_user, true)
+      results = ['A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.']
+    end
+    status = :ok
+  rescue StandardError => e
+    flash[:error] = e.message
+    status = :unprocessable_entity
+  ensure
+    render json: {
+      errors: errors,
+      results: results,
+      status: status
+    },
+    status: status
   end
 
   def batch_delete
@@ -294,34 +335,21 @@ class SamplesController < ApplicationController
 
   private
 
-  def spreadsheet_upload_params(parameters = params)
-    sample_type_id = parameters.permit(:sampleTypeId).dig(:sampleTypeId)
-    sample_type = SampleType.find(sample_type_id)
-
+  def batch_upload_sample_params(parameters = params, sample_type_id, upload)
     param_converter = Seek::Api::ParameterConverter.new("samples")
-
-    converted_new_samples_params = []
-    if parameters.key?(:newSamples)
-      raw_new_samples_params = parameters.fetch(:newSamples, {}).dig(:data)
-      unless raw_new_samples_params.blank?
-        raw_new_samples_params.each do |par|
-          converted_new_samples_params << sample_params(sample_type, param_converter.convert(par))
-        end
+    batch_params = []
+    parameters[:data].each do |par|
+      converted_params = param_converter.convert(par)
+      ex_id = par[:ex_id]
+      sample_type = SampleType.find_by_id(sample_type_id)
+      conv_par = sample_params(sample_type, converted_params).merge(ex_id: ex_id)
+      if upload
+        sample_id = par[:id]
+        conv_par.merge!(id: sample_id)
       end
+      batch_params << conv_par
     end
-
-    converted_updated_samples_params = []
-    if parameters.key?(:updatedSamples)
-      raw_updated_samples_params = parameters.fetch(:updatedSamples, {}).dig(:data)
-      unless raw_updated_samples_params.blank?
-        raw_updated_samples_params.each do |par|
-          sample_id = par[:id]
-          converted_updated_samples_params << sample_params(sample_type, param_converter.convert(par)).merge(id: sample_id)
-        end
-      end
-    end
-
-    { sample_type_id: sample_type_id, new_sample_params: converted_new_samples_params, updated_sample_params: converted_updated_samples_params }
+    batch_params
   end
 
   def sample_params(sample_type = nil, parameters = params)
