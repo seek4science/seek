@@ -8,6 +8,7 @@ SEEK::Application.configure do
   Mime::Type.register_alias "image/svg+xml", :svg
   Mime::Type.register_alias "text/plain", :dot
   Mime::Type.register "text/turtle", :rdf, ["application/rdf", "application/x-turtle"]
+  Mime::Type.register "text/turtle", :ttl
   Mime::Type.register "application/vnd.wf4ever.robundle+zip", :ro
 
   api_mime_types = %W(

@@ -12,9 +12,10 @@ module Seek
         base.before_destroy :remove_rdf
       end
 
-      def to_rdf
+      def to_rdf(format = :ttl)
         rdf_graph = to_rdf_graph
-        RDF::Writer.for(:ttl).buffer(prefixes: ns_prefixes) do |writer|
+        writer_format = format == :rdf ? :rdf : :ttl
+        RDF::Writer.for(writer_format).buffer(prefixes: ns_prefixes) do |writer|
           rdf_graph.each_statement do |statement|
             writer << statement
           end

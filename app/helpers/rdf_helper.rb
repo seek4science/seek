@@ -3,7 +3,8 @@ module RdfHelper
   include ResourceHelper
 
   def asset_rdf
-    resource_for_controller.to_rdf
+    format = request.format.symbol == :ttl ? :ttl : :rdf
+    resource_for_controller.to_rdf(format)
   end
 
   def schema_ld_script_block
