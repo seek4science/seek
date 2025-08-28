@@ -31,6 +31,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
+      format.ttl { render template: 'rdf/show' }
       format.json {render json: @person, include: [params[:include]]}
     end
   end

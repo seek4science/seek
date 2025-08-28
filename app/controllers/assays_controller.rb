@@ -160,6 +160,7 @@ class AssaysController < ApplicationController
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {}) }
       format.rdf { render template: 'rdf/show' }
+      format.ttl { render template: 'rdf/show' }
       format.json { render json: @assay, include: [params[:include]] }
     end
   end

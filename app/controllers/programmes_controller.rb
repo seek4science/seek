@@ -91,6 +91,7 @@ class ProgrammesController < ApplicationController
       format.html
       format.json {render json: @programme, include: [params[:include]]}
       format.rdf { render template: 'rdf/show' }
+      format.ttl { render template: 'rdf/show' }
     end
   end
 

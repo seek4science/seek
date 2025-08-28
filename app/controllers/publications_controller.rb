@@ -24,6 +24,7 @@ class PublicationsController < ApplicationController
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})} # show.html.erb
       format.rdf { render template: 'rdf/show' }
+      format.ttl { render template: 'rdf/show' }
       format.json {render json: @publication, include: [params[:include]]}
       format.any( *Publication::EXPORT_TYPES.keys ) do
         begin

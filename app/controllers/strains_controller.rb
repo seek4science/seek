@@ -59,6 +59,7 @@ class StrainsController < ApplicationController
   def show
     respond_to do |format|
       format.rdf { render template: 'rdf/show' }
+      format.ttl { render template: 'rdf/show' }
       format.html
       # format.json {render json: @strain}
       format.json {render json: :not_implemented, status: :not_implemented }

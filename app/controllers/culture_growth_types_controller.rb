@@ -5,6 +5,7 @@ class CultureGrowthTypesController < ApplicationController
     respond_to do |format|
       format.all { render plain: @culture_growth_type.title }
       format.rdf { render template: 'rdf/show' }
+      format.ttl { render template: 'rdf/show' }
     end
   end
 
