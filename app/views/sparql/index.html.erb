@@ -1,90 +1,84 @@
-<h1>SPARQL Interface</h1>
+<% content_for :title, "SPARQL Query Interface" %>
 
-<div style="background: #f0f0f0; padding: 10px; margin-bottom: 20px;">
-  <h3>Configuration Status:</h3>
-  <% if flash[:warning] %>
-    <p style="color: orange;">⚠️ <%= flash[:warning] %></p>
-  <% else %>
-    <p style="color: green;">✅ SPARQL endpoint is configured and ready</p>
-    <p><small>Endpoint: <%= controller.send(:get_virtuoso_uri) rescue 'N/A' %></small></p>
-    <%= form_with url: query_sparql_index_path, method: :post, local: true, format: :html do |form| %>
-      <div>
-        <label>SPARQL Query:</label><br>
-        <%= form.text_area :sparql_query, value: @sparql_query,
-                           rows: 8,
-                           style: "width: 100%; font-family: monospace;",
-                           placeholder: "Enter your SPARQL query here...\n\nExample:\nSELECT ?subject ?predicate ?object\nWHERE {\n  ?subject ?predicate ?object .\n}\nLIMIT 10" %>
+<div class="sparql-interface">
+  <div class="page-header">
+    <h1>SPARQL Query Interface</h1>
+    <p class="lead">Query the SEEK knowledge graph using SPARQL</p>
+  </div>
+
+  <%= form_with url: query_sparql_index_path, method: :post, local: true, class: "sparql-form" do |form| %>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <%= form.label :sparql_query, "SPARQL Query:", class: "control-label" %>
+          <%= form.text_area :sparql_query, value: @sparql_query,
+                             class: "form-control sparql-textarea",
+                             rows: 12,
+                             placeholder: "Enter your SPARQL query here...\n\nExample:\nSELECT ?subject ?predicate ?object\nWHERE {\n  ?subject ?predicate ?object .\n}\nLIMIT 10" %>
+        </div>
       </div>
-      <br>
-      <div>
-        <label>Output Format:</label>
-        <%= form.select :format, [['Table', 'table'], ['JSON', 'json'], ['XML', 'xml']], {}, {style: "margin-left: 10px;"} %>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <%= form.label :format, "Output Format:", class: "control-label" %>
+          <%= form.select :format,
+                          [['Table', 'table'], ['JSON', 'json'], ['XML', 'xml']],
+                          { selected: @format },
+                          { class: "form-control" } %>
+        </div>
       </div>
-      <br>
-      <div>
-        <%= form.submit "Execute Query", style: "background: #007bff; color: white; padding: 8px 16px; border: none;" %>
-        <button type="button" onclick="document.querySelector('textarea').value = ''" style="margin-left: 10px; padding: 8px 16px;">Clear</button>
-        
-        <% if @example_queries && @example_queries.any? %>
-          <select id="example-queries" style="margin-left: 10px; padding: 8px;">
-            <option value="">Load Example Query...</option>
-            <% @example_queries.each do |key, query_data| %>
-              <option value="<%= key %>" data-query="<%= CGI.escapeHTML(query_data['query'].to_s.strip) %>" data-title="<%= CGI.escapeHTML(query_data['title']) %>" data-description="<%= CGI.escapeHTML(query_data['description']) %>">
-                <%= query_data['title'] %>
-              </option>
-            <% end %>
-          </select>
-        <% end %>
+      <div class="col-md-6">
+        <div class="form-actions" style="margin-top: 25px;">
+          <%= form.submit "Execute Query", class: "btn btn-primary" %>
+          <button type="button" class="btn btn-default" id="clear-query">Clear</button>
+          <button type="button" class="btn btn-info" id="validate-query">Validate</button>
+        </div>
       </div>
-    <% end %>
-<% end %>
+    </div>
+  <% end %>
+
+  <% if @error %>
+    <div class="alert alert-danger">
+      <h4><i class="glyphicon glyphicon-exclamation-sign"></i> Query Error:</h4>
+      <pre><%= @error %></pre>
+    </div>
+  <% end %>
+
+  <% if @results && @results.any? %>
+    <div class="sparql-results">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <i class="glyphicon glyphicon-ok-circle"></i>
+            Query Results (<%= @result_count %> results)
+          </h3>
+        </div>
+        <div class="panel-body">
+          <%= render partial: "results", locals: { results: @results, format: @format } %>
+        </div>
+      </div>
+    </div>
+  <% elsif @results && @results.empty? && @error.nil? %>
+    <div class="alert alert-info">
+      <i class="glyphicon glyphicon-info-sign"></i>
+      No results found for your query.
+    </div>
+  <% end %>
+
+  <!-- Example Queries Section -->
+  <div class="sparql-examples">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <i class="glyphicon glyphicon-list-alt"></i>
+          Example Queries
+        </h3>
+      </div>
+      <div class="panel-body">
+        <%= render partial: "example_queries" %>
+      </div>
+    </div>
+  </div>
 </div>
-
-
-<% if @error %>
-  <div style="background: #ffebee; border: 1px solid #f44336; padding: 15px; margin-top: 20px;">
-    <h4 style="color: #f44336;">Query Error:</h4>
-    <pre style="color: #f44336;"><%= @error %></pre>
-  </div>
-<% end %>
-
-<% if @results && @results.any? %>
-  <div style="background: #e8f5e8; border: 1px solid #4caf50; padding: 15px; margin-top: 20px;">
-    <h4 style="color: #4caf50;">Query Results (<%= @result_count %> results):</h4>
-
-    <% if @format == 'table' && @results.first.is_a?(Hash) %>
-      <div style="overflow-x: auto; max-width: 100%;">
-        <table border="1" style="min-width: 100%; border-collapse: collapse; white-space: nowrap;">
-          <thead>
-          <tr>
-            <% @results.first.keys.each do |key| %>
-              <th style="background: #f5f5f5; padding: 8px; min-width: 150px;"><%= key %></th>
-            <% end %>
-          </tr>
-          </thead>
-          <tbody>
-          <% @results.each do |row| %>
-            <tr>
-              <% row.values.each do |value| %>
-                <td style="padding: 8px; min-width: 150px;">
-                  <% if value.to_s.start_with?('http') %>
-                    <a href="<%= value %>" target="_blank" class="external-link" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; display: inline-block;"><%= value %></a>
-                  <% else %>
-                    <%= value %>
-                  <% end %>
-                </td>
-              <% end %>
-            </tr>
-          <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% else %>
-      <pre><%= JSON.pretty_generate(@results) %></pre>
-    <% end %>
-  </div>
-<% elsif defined?(@results) && @results && @results.empty? %>
-  <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; margin-top: 20px;">
-    <p>No results found for your query.</p>
-  </div>
-<% end %>
