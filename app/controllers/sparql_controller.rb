@@ -1,13 +1,15 @@
+require 'sparql/client'
+require 'net/http'
 
 class SparqlController < ApplicationController
   layout 'application'
 
-  before_action :login_required, if: -> { Seek::Config.respond_to?(:public_seek_enabled) && !Seek::Config.public_seek_enabled }
+  # before_action :login_required
 
   def index
     # Main SPARQL interface page
     unless rdf_repository_configured?
-      flash.now[:warning] = "SPARQL endpoint is not configured. Please check your virtuoso_settings.yml configuration."
+      flash.now[:error] = "SPARQL endpoint is not configured. Please check your virtuoso_settings.yml configuration."
     end
 
     @resource = nil
@@ -49,8 +51,6 @@ class SparqlController < ApplicationController
 
   def execute_sparql_query(query)
     # Always use direct SPARQL client (no authentication needed for queries)
-    require 'sparql/client'
-    
     # Get URI from RDF repository config if available, otherwise use fallback
     if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured?
       config = Seek::Rdf::RdfRepository.instance.get_configuration
@@ -94,21 +94,21 @@ class SparqlController < ApplicationController
     end
 
     # Fallback to checking Virtuoso configuration directly
-    config_file = Rails.root.join('config', 'virtuoso_settings.yml')
-    return false unless File.exist?(config_file)
-
-    begin
-      config = YAML.safe_load(ERB.new(File.read(config_file)).result)
-      env_config = config[Rails.env]
-      return false if env_config.nil? || env_config['disabled']
-
-      # Check if URI is present and not just the default localhost
-      uri = env_config['uri']
-      uri.present? && !uri.include?('localhost:8890/sparql') ||
-        (uri.include?('localhost:8890/sparql') && virtuoso_available?)
-    rescue
-      false
-    end
+    # config_file = Rails.root.join('config', 'virtuoso_settings.yml')
+    # return false unless File.exist?(config_file)
+    #
+    # begin
+    #   config = YAML.safe_load(ERB.new(File.read(config_file)).result)
+    #   env_config = config[Rails.env]
+    #   return false if env_config.nil? || env_config['disabled']
+    #
+    #   # Check if URI is present and not just the default localhost
+    #   uri = env_config['uri']
+    #   uri.present? && !uri.include?('localhost:8890/sparql') ||
+    #     (uri.include?('localhost:8890/sparql') && virtuoso_available?)
+    # rescue
+    #   false
+    # end
   end
 
   private
@@ -116,7 +116,6 @@ class SparqlController < ApplicationController
   def virtuoso_available?
     # Quick check to see if Virtuoso is actually running on localhost:8890
     begin
-      require 'net/http'
       uri = URI('http://localhost:8890/sparql/')
       response = Net::HTTP.get_response(uri)
       response.code.to_i < 500  # Accept any response that's not a server error
