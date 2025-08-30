@@ -47,10 +47,5 @@
     <%= render_menu_group(t('menu.vocabularies'), [
         [t('human_disease').pluralize, human_diseases_path, Seek::Config.human_diseases_enabled]
     ]) %>
-    
-    <!-- Add SPARQL interface to the menu -->
-    <%= render_menu_group('Tools', [
-        ['SPARQL Query', sparql_index_path, defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured?]
-    ]) %>
   </ul>
 </li>

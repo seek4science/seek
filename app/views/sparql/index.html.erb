@@ -6,7 +6,7 @@
     <p class="lead">Query the SEEK knowledge graph using SPARQL</p>
   </div>
 
-  <%= form_with url: query_sparql_index_path, method: :post, local: true, class: "sparql-form" do |form| %>
+  <%= form_with url: sparql_index_path, method: :post, local: true, class: "sparql-form" do |form| %>
     <div class="row">
       <div class="col-md-12">
         <div class="form-group">
@@ -26,14 +26,13 @@
           <%= form.select :format,
                           [['Table', 'table'], ['JSON', 'json'], ['XML', 'xml']],
                           { selected: @format },
-                          { class: "form-control" } %>
+                          { class: "form-control sparql-format-select" } %>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="form-actions" style="margin-top: 25px;">
+        <div class="form-actions">
           <%= form.submit "Execute Query", class: "btn btn-primary" %>
           <button type="button" class="btn btn-default" id="clear-query">Clear</button>
-          <button type="button" class="btn btn-info" id="validate-query">Validate</button>
         </div>
       </div>
     </div>
