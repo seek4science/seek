@@ -9,13 +9,35 @@ class SparqlController < ApplicationController
   def index
     # Main SPARQL interface page
     unless rdf_repository_configured?
-      flash.now[:error] = "SPARQL endpoint is not configured. Please check your virtuoso_settings.yml configuration."
+      flash.now[:error] = "SPARQL endpoint is not configured. Please check your RDF repository configuration."
     end
 
     @resource = nil
-    @sparql_query = ""
-    @format = "table"
+    @sparql_query = params[:sparql_query] || ""
+    @format = params[:format] || "table"
     @example_queries = load_example_queries
+
+    # If this is a POST request with a query, execute it
+    if request.post? && @sparql_query.present?
+      begin
+        unless rdf_repository_configured?
+          raise "SPARQL endpoint not configured. Please configure your RDF repository settings."
+        end
+
+        @results = execute_sparql_query(@sparql_query)
+        @result_count = @results.length
+      rescue => e
+        @error = e.message
+        Rails.logger.error("SPARQL Query Error: #{e.message}")
+      end
+    end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @results || [] }
+      format.xml { render xml: (@results || []).to_xml }
+      format.any { render :index }
+    end
   end
 
   def query
@@ -27,11 +49,11 @@ class SparqlController < ApplicationController
     if @sparql_query.present?
       begin
         unless rdf_repository_configured?
-          raise "SPARQL endpoint not configured. Please configure virtuoso_settings.yml"
+          raise "SPARQL endpoint not configured. Please configure your RDF repository settings."
         end
 
         @results = execute_sparql_query(@sparql_query)
-        @result_count = @results.is_a?(Array) ? @results.length : 0
+        @result_count = @results.length
       rescue => e
         @error = e.message
         Rails.logger.error("SPARQL Query Error: #{e.message}")
@@ -50,22 +72,43 @@ class SparqlController < ApplicationController
   private
 
   def execute_sparql_query(query)
-    # Always use direct SPARQL client (no authentication needed for queries)
-    # Get URI from RDF repository config if available, otherwise use fallback
+    # Use the repository object directly if configured
     if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured?
-      config = Seek::Rdf::RdfRepository.instance.get_configuration
-      virtuoso_uri = config.uri
-    else
-      virtuoso_uri = get_virtuoso_uri
+      begin
+        repository = Seek::Rdf::RdfRepository.instance.get_repository_object
+        if repository
+          results = repository.query(query)
+          return convert_sparql_results(results)
+        end
+      rescue => e
+        Rails.logger.warn("Repository object query failed, trying direct SPARQL client: #{e.message}")
+        # Fallback to direct SPARQL client without authentication
+        return execute_sparql_query_direct(query)
+      end
     end
     
-    sparql_client = SPARQL::Client.new(virtuoso_uri)
-    results = sparql_client.query(query)
-    convert_sparql_results(results)
+    # If we get here, the endpoint is not properly configured
+    raise "SPARQL endpoint is not configured. Please configure your RDF repository settings."
+  end
+
+  def execute_sparql_query_direct(query)
+    # Direct SPARQL client approach without authentication
+    if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured?
+      config = Seek::Rdf::RdfRepository.instance.get_configuration
+      # Use only the base SPARQL endpoint without authentication
+      sparql_client = SPARQL::Client.new(config.uri)
+      results = sparql_client.query(query)
+      return convert_sparql_results(results)
+    end
+    
+    raise "SPARQL endpoint is not configured."
   end
 
   def convert_sparql_results(results)
-    return [] if results.nil? || results.empty?
+    return [] if results.nil?
+    
+    # Handle empty collections
+    return [] if results.respond_to?(:empty?) && results.empty?
 
     # Handle different result formats
     if results.respond_to?(:map)
@@ -79,7 +122,8 @@ class SparqlController < ApplicationController
         end
       end
     else
-      [results.to_s]
+      # This handles ASK queries (boolean) and any other single values
+      [{ 'result' => results.to_s }]
     end
   end
 
@@ -87,74 +131,54 @@ class SparqlController < ApplicationController
     # Check if SEEK's RDF repository is configured
     if defined?(Seek::Rdf::RdfRepository)
       begin
-        return Seek::Rdf::RdfRepository.instance.configured?
-      rescue => e
-        Rails.logger.debug("RDF Repository check failed: #{e.message}")
-      end
-    end
-
-    # Fallback to checking Virtuoso configuration directly
-    # config_file = Rails.root.join('config', 'virtuoso_settings.yml')
-    # return false unless File.exist?(config_file)
-    #
-    # begin
-    #   config = YAML.safe_load(ERB.new(File.read(config_file)).result)
-    #   env_config = config[Rails.env]
-    #   return false if env_config.nil? || env_config['disabled']
-    #
-    #   # Check if URI is present and not just the default localhost
-    #   uri = env_config['uri']
-    #   uri.present? && !uri.include?('localhost:8890/sparql') ||
-    #     (uri.include?('localhost:8890/sparql') && virtuoso_available?)
-    # rescue
-    #   false
-    # end
-  end
-
-  private
-
-  def virtuoso_available?
-    # Quick check to see if Virtuoso is actually running on localhost:8890
-    begin
-      uri = URI('http://localhost:8890/sparql/')
-      response = Net::HTTP.get_response(uri)
-      response.code.to_i < 500  # Accept any response that's not a server error
-    rescue
-      false
-    end
-  end
-
-  def get_virtuoso_uri
-    # Try to get URI from SEEK's RDF repository first
-    if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured?
-      begin
-        config = Seek::Rdf::RdfRepository.instance.get_configuration
-        if config.respond_to?(:uri) && config.uri.present?
-          uri = config.uri
-          # Ensure the URI ends with a slash for SPARQL endpoint
-          return uri.end_with?('/') ? uri : "#{uri}/"
+        repository = Seek::Rdf::RdfRepository.instance
+        if repository.configured?
+          # Try to get repository object, but don't fail if it has issues
+          begin
+            repo_obj = repository.get_repository_object
+            return repo_obj.present?
+          rescue => e
+            Rails.logger.warn("Repository object creation failed, trying basic connectivity test: #{e.message}")
+            # Fallback: test basic connectivity
+            return test_basic_sparql_connectivity(repository.get_configuration)
+          end
         end
-      rescue
-        # Fall through to file-based config
+      rescue => e
+        Rails.logger.error("RDF Repository check failed: #{e.message}")
+        Rails.logger.error("Error backtrace: #{e.backtrace.first(5).join("\n")}")
       end
     end
+    
+    false
+  end
 
-    # Fallback to reading configuration file directly
-    config_file = Rails.root.join('config', 'virtuoso_settings.yml')
-    if File.exist?(config_file)
-      config = YAML.safe_load(ERB.new(File.read(config_file)).result)
-      env_config = config[Rails.env]
-      if env_config && env_config['uri']
-        uri = env_config['uri']
-        # Ensure the URI ends with a slash for SPARQL endpoint
-        return uri.end_with?('/') ? uri : "#{uri}/"
-      end
+  def test_basic_sparql_connectivity(config)
+    # Try without authentication first (public read-only access)
+    uri = URI(config.uri)
+    request = Net::HTTP::Post.new(uri)
+    request['Content-Type'] = 'application/sparql-query'
+    request.body = 'ASK WHERE { ?s ?p ?o }'
+    
+    response = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      http.request(request)
     end
-
-    # Default fallback with trailing slash
-    'http://localhost:8890/sparql/'
-  rescue
-    'http://localhost:8890/sparql/'
+    
+    # If successful without auth, great!
+    return true if response.code.to_i < 400
+    
+    # If 401/403, try with authentication
+    if [401, 403].include?(response.code.to_i) && config.username
+      request.basic_auth(config.username, config.password)
+      response = Net::HTTP.start(uri.hostname, uri.port) do |http|
+        http.request(request)
+      end
+      return response.code.to_i < 400
+    end
+    
+    false
+  rescue => e
+    Rails.logger.debug("Basic SPARQL connectivity test failed: #{e.message}")
+    false
   end
 
   def load_example_queries
