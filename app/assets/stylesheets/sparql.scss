@@ -66,6 +66,14 @@
   .sparql-examples {
     margin-top: 2rem;
 
+    .example-query-filter {
+      margin-bottom: 1.5rem;
+      
+      .input-group {
+        max-width: 400px;
+      }
+    }
+
     .example-query {
       background: #f8f9fa;
       border: 1px solid #dee2e6;
