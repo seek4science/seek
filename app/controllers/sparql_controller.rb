@@ -40,34 +40,6 @@ class SparqlController < ApplicationController
     end
   end
 
-  def query
-    @sparql_query = params[:sparql_query]
-    @format = params[:format] || 'table'
-    @resource = nil
-    @example_queries = load_example_queries
-
-    if @sparql_query.present?
-      begin
-        unless rdf_repository_configured?
-          raise "SPARQL endpoint not configured. Please configure your RDF repository settings."
-        end
-
-        @results = execute_sparql_query(@sparql_query)
-        @result_count = @results.length
-      rescue => e
-        @error = e.message
-        Rails.logger.error("SPARQL Query Error: #{e.message}")
-      end
-    end
-
-    # Always respond with HTML for form submissions
-    respond_to do |format|
-      format.html { render :index }
-      format.json { render json: @results || [] }
-      format.xml { render xml: (@results || []).to_xml }
-      format.any { render :index } # Fallback for any unknown format
-    end
-  end
 
   private
 
