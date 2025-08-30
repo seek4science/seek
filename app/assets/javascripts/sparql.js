@@ -96,4 +96,56 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Example query filter functionality
+    const queryFilter = document.getElementById('query-filter');
+    const queriesContainer = document.getElementById('example-queries-container');
+    const noQueriesMessage = document.getElementById('no-queries-message');
+    
+    if (queryFilter && queriesContainer) {
+        queryFilter.addEventListener('input', function() {
+            const filterText = this.value.toLowerCase().trim();
+            const exampleQueries = queriesContainer.querySelectorAll('.example-query');
+            let visibleCount = 0;
+            
+            exampleQueries.forEach(function(query) {
+                const title = query.querySelector('.query-title strong');
+                const description = query.querySelector('.text-muted');
+                const queryCode = query.querySelector('.query-code');
+                
+                const titleText = title ? title.textContent.toLowerCase() : '';
+                const descriptionText = description ? description.textContent.toLowerCase() : '';
+                const codeText = queryCode ? queryCode.textContent.toLowerCase() : '';
+                
+                const matchesFilter = filterText === '' || 
+                    titleText.includes(filterText) || 
+                    descriptionText.includes(filterText) ||
+                    codeText.includes(filterText);
+                
+                if (matchesFilter) {
+                    query.parentElement.style.display = '';
+                    visibleCount++;
+                } else {
+                    query.parentElement.style.display = 'none';
+                }
+            });
+            
+            // Show/hide "no results" message
+            if (noQueriesMessage) {
+                if (visibleCount === 0 && filterText !== '') {
+                    noQueriesMessage.style.display = 'block';
+                } else {
+                    noQueriesMessage.style.display = 'none';
+                }
+            }
+        });
+        
+        // Clear filter when escape key is pressed
+        queryFilter.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                this.dispatchEvent(new Event('input'));
+            }
+        });
+    }
 });
