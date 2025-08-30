@@ -99,7 +99,14 @@
     }
   }
 
+  .sparql-format-select {
+    width: auto;
+    display: inline-block;
+  }
+
   .form-actions {
+    margin-top: 25px;
+    
     .btn + .btn {
       margin-left: 0.5rem;
     }

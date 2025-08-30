@@ -10,28 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validate query button (basic validation)
-    const validateBtn = document.getElementById('validate-query');
-    if (validateBtn && queryTextarea) {
-        validateBtn.addEventListener('click', function() {
-            const query = queryTextarea.value.trim();
-            if (!query) {
-                alert('Please enter a SPARQL query to validate.');
-                return;
-            }
-
-            // Basic SPARQL syntax validation
-            const hasSelect = /SELECT\s+/i.test(query);
-            const hasWhere = /WHERE\s*\{/i.test(query);
-            const hasClosingBrace = /\}/.test(query);
-
-            if (hasSelect && hasWhere && hasClosingBrace) {
-                alert('Query appears to have valid basic SPARQL syntax.');
-            } else {
-                alert('Query may have syntax issues. Please check:\n- SELECT clause\n- WHERE clause with { }\n- Proper closing braces');
-            }
-        });
-    }
 
     // Use example query buttons
     const useQueryButtons = document.querySelectorAll('.use-query');
