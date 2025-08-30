@@ -14,7 +14,7 @@
           <% row.values.each do |value| %>
             <td>
               <% if value.to_s.start_with?('http') %>
-                <%= link_to value, value, target: '_blank', class: 'external-link' %>
+                <%= link_to value, value, class: 'external-link' %>
               <% else %>
                 <%= value %>
               <% end %>
