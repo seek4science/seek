@@ -6,7 +6,7 @@ debug = false
 #####################################
 
 if debug
-  secret_pwd = 'florakevinrafael'
+  secret_pwd = 'seek'
 else
   secret_pwd = UUID.new.generate
 end
@@ -23,17 +23,21 @@ end
 # Colors
 # TODO: Make the colors depend on the type of branding instead of hard-coded colors
 # REQUIREMENT: branding configuration in seek
-datahub_blue = '486273'
-datahub_yellow = 'F2b035'
+header_fg_color = '486273'
+header_bg_color = 'F2b035'
 
 # Cell Styles
 unlocked = workbook.styles.add_style locked: false
 locked = workbook.styles.add_style locked: true
-title_style = workbook.styles.add_style(bg_color: datahub_yellow,
-                                        fg_color: datahub_blue,
+title_style = workbook.styles.add_style(bg_color: header_bg_color,
+                                        fg_color: header_fg_color,
                                         b: true,
                                         u: true,
                                         sz: 18)
+
+########################################################################################################################
+# Adding the Sample Type metadata sheet
+########################################################################################################################
 
 workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.add_row ['Study:'], style: title_style
@@ -57,7 +61,10 @@ workbook.add_worksheet(name: 'Metadata') do |sheet|
   sheet.sheet_protection.password = secret_pwd
 end
 
-# CV / Ontologies sheet
+########################################################################################################################
+# Adding CV / Ontologies sheet
+########################################################################################################################
+
 ## Function to get a fixed size matrix
 def transposed_filled_arrays(arrays)
   raise 'Input is no array' unless arrays.is_a?(Array)
@@ -91,7 +98,10 @@ workbook.add_worksheet name: 'cv_ontology', state: :hidden do |sheet|
   sheet.sheet_protection.password = secret_pwd
 end
 
-# Sample sheet
+########################################################################################################################
+# Adding the Sample sheet
+########################################################################################################################
+
 workbook.add_worksheet(name: 'Samples') do |sheet|
   ## Adding the header cells
   header_row = @sa_cv_terms.map do |sa_cv_term|
