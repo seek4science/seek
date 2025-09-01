@@ -99,7 +99,7 @@ module DynamicTableHelper
   def dt_cols(sample_type)
     attribs = sample_type.sample_attributes.map do |a|
       attribute = { title: a.title, name: sample_type.id.to_s, required: a.required, description: a.description,
-                    is_title: a.is_title, attribute_type: a.sample_attribute_type }
+                    is_title: a.is_title, attribute_type: a.sample_attribute_type&.base_type }
 
       if a.sample_attribute_type&.controlled_vocab?
         cv_allows_free_text = a.allow_cv_free_text
@@ -163,7 +163,7 @@ module DynamicTableHelper
     sample_types.flat_map.with_index do |s, i|
       s.sample_attributes.map do |a|
         attribute = { title: a.title, name: s.id.to_s, required: a.required, description: a.description,
-                      is_title: a.is_title, attribute_type: a.sample_attribute_type }
+                      is_title: a.is_title, attribute_type: a.sample_attribute_type&.base_type }
         is_seek_sample_multi = a.sample_attribute_type.seek_sample_multi?
         is_seek_sample = a.sample_attribute_type.seek_sample?
         is_cv_list = a.sample_attribute_type.seek_cv_list?

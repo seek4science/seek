@@ -94,11 +94,11 @@ const handleSelect = (e) => {
         let isRegisteredDataFile = false;
         let isRegisteredStrain = false;
         if (c.attribute_type) {
-          isRegisteredSample = c.attribute_type.base_type.includes("SeekSample");
-          isCVList = c.attribute_type.base_type === "CVList";
-          isRegisteredSop = c.attribute_type.base_type === "SeekSop";
-          isRegisteredDataFile = c.attribute_type.base_type === "SeekDataFile";
-          isRegisteredStrain = c.attribute_type.base_type === "SeekStrain";
+          isRegisteredSample = c.attribute_type.includes("SeekSample");
+          isCVList = c.attribute_type === "CVList";
+          isRegisteredSop = c.attribute_type === "SeekSop";
+          isRegisteredDataFile = c.attribute_type === "SeekDataFile";
+          isRegisteredStrain = c.attribute_type === "SeekStrain";
         }
 
         if (isRegisteredSample) {
@@ -616,7 +616,7 @@ function getNonTextAttributes(st_attributes) {
   return st_attributes
     .filter(
       (attr) => {
-        const baseType = attr?.attribute_type?.base_type ?? stringType;
+        const baseType = attr?.attribute_type ?? stringType;
         return baseType !== stringType;
       })
     .map(function (attr) {
