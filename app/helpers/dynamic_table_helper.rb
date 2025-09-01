@@ -107,7 +107,11 @@ module DynamicTableHelper
       end
 
       if a.sample_attribute_type&.seek_sample_multi? || a.sample_attribute_type&.seek_sample?
-        attribute.merge!({ multi_link: a.sample_attribute_type&.seek_sample_multi?, linked_sample_type: a.linked_sample_type_id })
+        attribute.merge!(linked_sample_type: a.linked_sample_type_id)
+      end
+
+      if a.input_attribute?
+        attribute.merge!(is_input: true)
       end
 
       attribute
@@ -156,18 +160,21 @@ module DynamicTableHelper
   end
 
   def dt_cumulative_cols(sample_types)
-    sample_types.flat_map do |s|
+    sample_types.flat_map.with_index do |s, i|
       s.sample_attributes.map do |a|
         attribute = { title: a.title, name: s.id.to_s, required: a.required, description: a.description,
                       is_title: a.is_title, attribute_type: a.sample_attribute_type }
         is_seek_sample_multi = a.sample_attribute_type.seek_sample_multi?
         is_seek_sample = a.sample_attribute_type.seek_sample?
         is_cv_list = a.sample_attribute_type.seek_cv_list?
-        attribute.merge!({ multi_link: true, linked_sample_type: a.linked_sample_type.id }) if is_seek_sample_multi
-        attribute.merge!({ multi_link: false, linked_sample_type: a.linked_sample_type.id }) if is_seek_sample
-        attribute.merge!({ is_cv_list: true }) if is_cv_list
+        is_input = a.input_attribute?
+        attribute.merge!(linked_sample_type: a.linked_sample_type.id) if is_seek_sample_multi || is_seek_sample
+        # The first input has to show up in the experiment view,
+        # that's why when i=0, the `is_first_input` flag is set to true.
+        attribute.merge!({ is_input: true, is_first_input: i == 0 }) if is_input
+        attribute.merge!(is_cv_list: true) if is_cv_list
         attribute
-      end.unshift({ title: 'id' }, { title: 'uuid' })
+      end.unshift({ title: 'id', is_id_field: true }, { title: 'uuid', is_id_field: true })
     end
   end
 end
