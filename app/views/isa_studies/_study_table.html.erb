@@ -41,7 +41,7 @@
 
         function createSampleTypeOptions(types){
             $j("#options_container").append('<div id="checkbox_group" class="btn-group" data-toggle="buttons"></div>')
-            let studyTitle = '<%= study&.title.nil? ? 'Study' : study&.title %>';
+            let studyTitle = '<%= study&.title || 'Study' %>';
             let sourceSampleType = types[0];
             let sampleSampleType = types[1];
             let source_elem = `<label class="btn btn-default active sp-btn-variant-0"><input id="checkbox-${sourceSampleType.id}" type="checkbox" checked onchange="toggleSampleType(${sourceSampleType.id}, $j(this))" />${studyTitle} - sources</label>`;
