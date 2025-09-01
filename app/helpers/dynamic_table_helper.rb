@@ -25,7 +25,7 @@ module DynamicTableHelper
       end
     columns = dt_cumulative_cols(sample_types)
     rows = dt_cumulative_rows(sample_types, columns.length)
-    { columns:, rows:, sample_types: sample_types.map { |s| { title: s.title, id: s.id } } }
+    { columns:, rows:, sample_types: sample_types.map { |s| { title: s.title, id: s.id, assay_title: s.assays.first&.title } } }
   end
 
   private
