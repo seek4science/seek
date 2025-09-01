@@ -136,7 +136,7 @@ module Samples
       if @sample_type.assays.empty? && @sample_type.studies.any?
         item_type = 'study'
         item_id = @sample_type.studies.first
-      elsif @sample_type.assays.any? &&@sample_type.studies.empty?
+      elsif @sample_type.assays.any? && @sample_type.studies.empty?
         item_type = 'assay'
         item_id = @sample_type.assays.first
       else
@@ -144,7 +144,7 @@ module Samples
         item_id = @sample_type.id
       end
 
-      Mailer.notify_user_after_spreadsheet_extraction(@user, @projects, item_type, item_id, results, errors).deliver_now
+      Mailer.notify_user_after_spreadsheet_extraction(@user, @projects, item_type, item_id, @results, @errors).deliver_now
     end
   end
 end

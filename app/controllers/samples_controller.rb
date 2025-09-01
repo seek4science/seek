@@ -225,7 +225,7 @@ class SamplesController < ApplicationController
       results.concat(batch_update_processor.results)
       raise "The following errors occurred: #{errors.join("\n")}" unless errors.empty?
     else
-      SamplesBatchUpdateJob.perform_later(sample_type_id, [], parameters, @current_user, true)
+      SamplesBatchUpdateJob.perform_later(sample_type_id, parameters, @current_user, true)
       results = ['A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.']
     end
     status = :ok

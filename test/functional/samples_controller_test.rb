@@ -1877,7 +1877,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert response_body['results'].include?('A background job has been launched.')
   end
 
-  test ' upload updated samples by spreadsheet' do
+  test 'upload updated samples by spreadsheet' do
     person = FactoryBot.create(:person)
     project = person.projects.first
     login_as(person)
@@ -1906,7 +1906,7 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
-  test ' upload updated samples by spreadsheet as a background job' do
+  test 'upload updated samples by spreadsheet as a background job' do
     person = FactoryBot.create(:person)
     project = person.projects.first
     login_as(person)

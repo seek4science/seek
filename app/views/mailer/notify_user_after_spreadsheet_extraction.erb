@@ -1,14 +1,16 @@
-Hi <%= @notifiee.person.name %>,
+Hi <%= @user.person.name %>,
 
 <% if @errors.empty? %>
-  Your spreadsheet extraction has been successfully completed.
+  Your spreadsheet extraction for <%= @item_type.humanize %> with ID '<%= @item_id %>' has been successfully completed.
   Here are the results:
   <% @results.each do |res| %>
-    <li><%= res %></li>
+    - <%= res %>
+
   <% end %>
 <% else %>
-  Your spreadsheet extraction encountered one or more errors. Please correct them and try again.
+  Your spreadsheet extraction for <%= @item_type.humanize %> with ID '<%= @item_id %>' encountered one or more errors. Please correct them and try again.
   <% @errors.each do |err| %>
-    <li><%= err %></li>
+    - <%= err %>
+    
   <% end %>
 <% end %>
