@@ -158,6 +158,23 @@ class ApplicationHelperTest < ActionView::TestCase
 
     date = Time.parse('2011-10-28')
     assert_equal '28th Oct 2011', date_as_string(date)
+
+    travel_to Time.zone.local(2025, 9, 2, 01, 04, 44) do
+      date = Time.zone.parse('2025-08-31T23:16:01.000Z')
+      assert_equal '1st Sep 2025 at 00:16', date_as_string(date, true)
+
+      date = Time.zone.parse('2025-08-31T23:16:01.000Z')
+      assert_equal '1st Sep 2025', date_as_string(date)
+
+      date = Time.zone.parse('2025-08-31T23:16:01.000Z')
+      assert_equal "1st Sep 2025 at 00:16\t(1st Sep 2025 at 01:16 (Brussels))", date_as_string(date, true, false, 'Brussels')
+
+      date = Time.zone.parse('2025-08-31T23:16:01.000Z')
+      assert_equal "1st Sep 2025\t(1st Sep 2025 (Brussels))", date_as_string(date, false, false, 'Brussels')
+
+      date = Time.zone.parse('2025-01-01')
+      assert_equal "2025", date_as_string(date, false, true)
+    end
   end
 
   test 'date_as_string with nil date' do
