@@ -114,6 +114,13 @@ module Seek
           label_field: 'sample_types.title',
           joins: [:sample_type]
         ),
+        isa_json_compliance: Seek::Filtering::BooleanFilter.new(
+          value_field: 'investigations.is_isa_json_compliant',
+          joins: [:investigation]
+        ),
+        is_isa_json_compliant: Seek::Filtering::BooleanFilter.new(
+          value_field: 'is_isa_json_compliant'
+        )
     }.freeze
 
     def initialize(klass)

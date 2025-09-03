@@ -34,10 +34,14 @@ module AvatarsHelper
 
   def avatar_according_to_user_upload(alternative, item, size, css_class = 'framed')
     if item.avatar_selected?
-      image_tag avatar_url(item, item.avatar, size), alt: alternative, class: css_class
-    else
-      default_avatar(item.class.name, size, alternative, '', css_class)
+      if item.avatars.include?(item.avatar)
+        return image_tag avatar_url(item, item.avatar, size), alt: alternative, class: css_class
+      else
+        raise 'Avatar does not belong to instance' unless Rails.env.production?
+      end
     end
+
+    default_avatar(item.class.name, size, alternative, '', css_class)
   end
 
   def avatar_alternative_and_tooltip_text(alt, show_tooltip, title)
@@ -53,11 +57,7 @@ module AvatarsHelper
   def avatar_url(owner, avatar, size = nil)
     #serve_from_public = Rails.configuration.assets.enabled
     if Rails.env.production?
-      if owner.avatars.include?(avatar)
-        avatar.public_asset_url(size)
-      else
-        raise 'Avatar does not belong to instance'
-      end
+      avatar.public_asset_url(size)
     else
       basic_url = polymorphic_path([owner, avatar])
       append_size_parameter(basic_url, size)
