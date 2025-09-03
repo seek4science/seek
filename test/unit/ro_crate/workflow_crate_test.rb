@@ -34,4 +34,12 @@ class WorkflowCrateTest < ActiveSupport::TestCase
     assert_includes ids, '#test_suite2'
     assert_includes ids, '#test_suite3'
   end
+
+  test 'diagram types match spec' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    crate = ROCrate::WorkflowCrate.new
+
+    e = workflow.diagram.to_crate_entity(crate)
+    assert_equal ['File', 'ImageObject'], e.type.sort
+  end
 end
