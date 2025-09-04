@@ -100,57 +100,15 @@ class SparqlController < ApplicationController
   end
 
   def rdf_repository_configured?
-    # Check if SEEK's RDF repository is configured
-    if defined?(Seek::Rdf::RdfRepository)
-      begin
-        repository = Seek::Rdf::RdfRepository.instance
-        if repository.configured?
-          # Try to get repository object, but don't fail if it has issues
-          begin
-            repo_obj = repository.get_repository_object
-            return !repo_obj.nil?
-          rescue => e
-            Rails.logger.warn("Repository object creation failed, trying basic connectivity test: #{e.message}")
-            # Fallback: test basic connectivity
-            return test_basic_sparql_connectivity(repository.get_configuration)
-          end
-        end
-      rescue => e
-        Rails.logger.error("RDF Repository check failed: #{e.message}")
-        Rails.logger.error("Error backtrace: #{e.backtrace.first(5).join("\n")}")
-      end
-    end
-    
-    false
-  end
+    repository = Seek::Rdf::RdfRepository.instance
+    return false unless repository&.configured?
 
-  def test_basic_sparql_connectivity(config)
-    # Try without authentication first (public read-only access)
-    uri = URI(config.uri)
-    request = Net::HTTP::Post.new(uri)
-    request['Content-Type'] = 'application/sparql-query'
-    request.body = 'ASK WHERE { ?s ?p ?o }'
-    
-    response = Net::HTTP.start(uri.hostname, uri.port) do |http|
-      http.request(request)
+    begin
+      repository.select('ask where {?s ?p ?o}')
+    rescue RuntimeError => e
+      Rails.logger.error("Error trying a simple query: #{e.message}")
+      false
     end
-    
-    # If successful without auth, great!
-    return true if response.code.to_i < 400
-    
-    # If 401/403, try with authentication
-    if [401, 403].include?(response.code.to_i) && config.username
-      request.basic_auth(config.username, config.password)
-      response = Net::HTTP.start(uri.hostname, uri.port) do |http|
-        http.request(request)
-      end
-      return response.code.to_i < 400
-    end
-    
-    false
-  rescue => e
-    Rails.logger.debug("Basic SPARQL connectivity test failed: #{e.message}")
-    false
   end
 
   def load_example_queries
