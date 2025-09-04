@@ -826,6 +826,34 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
   end
 
+  test 'Should not run sample metadata updating callbacks and tasks when updating assay streams' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    project = person.projects.first
+
+    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+    study = FactoryBot.create(:study, contributor: person, investigation: investigation)
+    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study: study, title: 'my asay stream', description: 'Original assay stream')
+
+    assert assay_stream.can_edit?
+
+    parameters = {
+      assay: {
+        title: 'my assay stream',
+        description: 'Updated assay stream'
+      }
+    }
+
+    assert_no_enqueued_jobs(only: UpdateSampleMetadataJob) do
+      patch :update, params: { id: assay_stream.id, isa_assay: parameters }
+    end
+
+    assert_response :redirect
+    assay_stream.reload
+    assert_equal assay_stream.title, 'my assay stream'
+    assert_equal assay_stream.description, 'Updated assay stream'
+  end
+
   private
 
   def create_material_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=nil, counter=1)
