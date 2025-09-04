@@ -22,8 +22,8 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'post query' do
-
-  end
+  # test 'post query' do
+  #
+  # end
 
 end
