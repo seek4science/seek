@@ -10,7 +10,6 @@ class SinglePagesController < ApplicationController
   before_action :check_user_logged_in,
                 only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
   respond_to :html, :js
-
   def show
     @project = Project.find(params[:id])
     @folders = project_folders
@@ -118,7 +117,7 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  def upload_samples
+  def preview_upload_samples
     uploaded_file = params[:file]
     project_id = params[:project_id]
     @project = Project.find(project_id)

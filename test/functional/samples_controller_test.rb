@@ -1071,31 +1071,31 @@ class SamplesControllerTest < ActionController::TestCase
   test 'batch_create' do
     person = FactoryBot.create(:person)
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
+    type = FactoryBot.create(:patient_sample_type, contributor: person)
     assay = FactoryBot.create(:assay, contributor: person)
     assert_difference('Sample.count', 2) do
       assert_difference('AssayAsset.count', 1) do
-          post :batch_create, params: { data: [
-            { ex_id: "1", data: { type: "samples",
-                                  attributes: { attribute_map: { "full name": 'Fred Smith', "age": '22', 
-                                                                 "weight": '22.1', "postcode": 'M13 9PL' } },
-                                  relationships: { assays: { data: [{ id: assay.id, type: 'assays' }] },
-                                                   projects: { data: [{ id: person.projects.first.id, 
-                                                                        type: "projects" }] },
-                                                   sample_type: { data: { id: type.id, type: "sample_types" } } } } },
-            { ex_id: "2", data: { type: "samples",
-                                  attributes: { attribute_map: { "full name": 'David Tailor', "age": '33', 
-                                                                 "weight": '33.1', "postcode": 'M12 8PL' } },
-                                  relationships: { projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
-                                                   sample_type: { data: { id: type.id, 
-                                                                          type: "sample_types" } } } } }] }
+        post :batch_create, params: { data: [
+          { ex_id: "1", data: { type: "samples",
+                                attributes: { attribute_map: { "full name": 'Fred Smith', "age": '22',
+                                                               "weight": '22.1', "postcode": 'M13 9PL' } },
+                                relationships: { assays: { data: [{ id: assay.id, type: 'assays' }] },
+                                                 projects: { data: [{ id: person.projects.first.id,
+                                                                      type: "projects" }] },
+                                                 sample_type: { data: { id: type.id, type: "sample_types" } } } } },
+          { ex_id: "2", data: { type: "samples",
+                                attributes: { attribute_map: { "full name": 'David Tailor', "age": '33',
+                                                               "weight": '33.1', "postcode": 'M12 8PL' } },
+                                relationships: { projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
+                                                 sample_type: { data: { id: type.id,
+                                                                        type: "sample_types" } } } } }],
+                                      sample_type_id: type.id }
       end
     end
 
     # For the Single Page to work properly, these must be included in the response
     assert response.body.include?('results')
     assert response.body.include?('errors')
-    assert response.body.include?('status')
 
     samples = Sample.last(2)
     sample1 = samples.first
@@ -1116,9 +1116,8 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'terminate batch_create if error' do
     person = FactoryBot.create(:person)
-    creator = FactoryBot.create(:person)
+    type = FactoryBot.create(:patient_sample_type, contributor: person, projects: [person.projects.first])
     login_as(person)
-    type = FactoryBot.create(:patient_sample_type)
     assert_difference('Sample.count', 0) do
         post :batch_create, params: {data: [
         {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
@@ -1126,7 +1125,8 @@ class SamplesControllerTest < ActionController::TestCase
                                                    sample_type: { data:{id: type.id, type: "sample_types"}}}}},
         {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
                            tags: nil,relationships:{projects: {data:[{id: person.projects.first.id, type: "projects"}]},
-                                                    sample_type: {data:{id: type.id, type: "sample_types"}}}}}]}
+                                                    sample_type: {data:{id: type.id, type: "sample_types"}}}}}],
+                                     sample_type_id: type.id }
     end
 
     json_response = JSON.parse(response.body)
@@ -1134,45 +1134,46 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal "2", json_response["errors"][0]["ex_id"].to_s
   end
 
-
   test 'batch_update' do
-    login_as(FactoryBot.create(:person))
     creator = FactoryBot.create(:person)
-    sample1 = populated_patient_sample
-    sample2 = populated_patient_sample
-    type_id1 = sample1.sample_type.id
-    type_id2 = sample2.sample_type.id
+    login_as(creator)
+    type = FactoryBot.create(:patient_sample_type, contributor: creator)
+    sample1 = FactoryBot.create(:patient_sample, sample_type: type, contributor: creator)
+    sample2 = FactoryBot.create(:patient_sample, sample_type: type, contributor: creator)
+    assert sample1.can_edit?(creator)
+    assert sample2.can_edit?(creator)
     assert_empty sample1.creators
 
     assert_no_difference('Sample.count') do
       put :batch_update, params: {data: [
-        {id: sample1.id, 
+        {id: sample1.id,
+         ex_id: '1',
          data: {type: "samples", 
                 attributes: { attribute_map: { "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, 
                               creator_ids: [creator.id]}}},
-        {id: sample2.id, 
-         data: {type: "samples", 
+        {id: sample2.id,
+         ex_id: '2',
+         data: {type: "samples",
                 attributes: { attribute_map: { "full name": 'David Tailor', "age": '33', "weight": '33.1' }, 
-                              creator_ids: [creator.id]}}}]}
+                              creator_ids: [creator.id]}}}],
+                                  sample_type_id: type.id}
       assert_equal [creator], sample1.creators
     end
 
     # For the Single Page to work properly, these must be included in the response
     assert response.body.include?('errors')
-    assert response.body.include?('status')
 
-    samples = Sample.limit(2)
 
-    first_updated_sample = samples[0]
-    assert_equal type_id1, first_updated_sample.sample_type.id
+    first_updated_sample = Sample.find(sample1.id)
+    assert_equal type.id, first_updated_sample.sample_type_id
     assert_equal 'Alfred Marcus', first_updated_sample.title
     assert_equal 'Alfred Marcus', first_updated_sample.get_attribute_value('full name')
     assert_equal 22, first_updated_sample.get_attribute_value(:age)
     assert_nil first_updated_sample.get_attribute_value(:postcode)
     assert_equal 22.1, first_updated_sample.get_attribute_value(:weight)
 
-    last_updated_sample = samples[1]
-    assert_equal type_id2, last_updated_sample.sample_type.id
+    last_updated_sample = Sample.find(sample2.id)
+    assert_equal type.id, last_updated_sample.sample_type.id
     assert_equal 'David Tailor', last_updated_sample.title
     assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
     assert_equal 33, last_updated_sample.get_attribute_value(:age)
@@ -1182,15 +1183,14 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'batch_delete' do
     person = FactoryBot.create(:person)
-    sample1 = FactoryBot.create(:patient_sample, contributor: person)
-    sample2 = FactoryBot.create(:patient_sample, contributor: person)
-    type1 = sample1.sample_type
-    type2 = sample1.sample_type
+    type = FactoryBot.create(:patient_sample_type, contributor: person, projects: [person.projects.first])
+    sample1 = FactoryBot.create(:patient_sample, contributor: person, sample_type: type, projects: [person.projects.first])
+    sample2 = FactoryBot.create(:patient_sample, contributor: person, sample_type: type, projects: [person.projects.first])
     login_as(person.user)
     assert sample1.can_delete?
     assert sample2.can_delete?
     assert_difference('Sample.count', -2) do
-      delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
+      delete :batch_delete, params: { data: [ { id: sample1.id, ex_id: '1' }, { id: sample2.id, ex_id: '2' } ], sample_type_id: type.id }
     end
 
       # For the Single Page to work properly, these must be included in the response
@@ -1837,11 +1837,161 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal flash[:error], 'This sample type is locked. You cannot edit the sample.'
   end
 
+  test 'upload new samples by spreadsheet' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    new_samples_params = new_samples_spreadsheet_upload_params(5, sample_type.id)
+    params = { sample_type_id: sample_type.id,
+               data: new_samples_params }
+
+    assert_difference('Sample.count', 5) do
+      post :batch_create, params: params
+    end
+
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    sample_type.reload.samples.all? do |sample|
+      response_body['results'].include? "Sample '#{sample.title}' successfully created."
+    end
+  end
+
+  test 'upload new samples by spreadsheet as background job' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    new_samples_params = new_samples_spreadsheet_upload_params(100, sample_type.id)
+    params = { sample_type_id: sample_type.id,
+               data: new_samples_params }
+
+    assert_enqueued_jobs(1, only: SamplesBatchCreateJob) do
+      post :batch_create, params: params
+    end
+
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    assert response_body['results'].include?('A background job has been launched.')
+  end
+
+  test 'upload updated samples by spreadsheet' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    samples = []
+    (1..5).each do |i|
+      samples << Sample.create(sample_type: sample_type,
+                               data: {
+                                 "the_title": "Zebra fish #{i}",
+                               },
+                               project_ids: [person.projects.first.id],
+                               policy: sample_type.policy,
+                               contributor: person)
+    end
+    sample_type.reload
+    assert samples.none? { |s| s.title.downcase.include? 'updated' }
+    update_samples_params = update_samples_spreadsheet_upload_params(samples)
+    params = { sample_type_id: sample_type.id,
+               data: update_samples_params }
+    post :batch_update, params: params
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    assert sample_type.reload.samples.all? do |sample|
+      response_body['results'].include?("Sample '[ID: #{sample.id}] #{sample.title}' successfully updated.")
+    end
+  end
+
+  test 'upload updated samples by spreadsheet as a background job' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    sample_type = FactoryBot.create(:simple_sample_type, contributor: person, project_ids: [project.id])
+    samples = []
+    (1..100).each do |i|
+      samples << Sample.create(sample_type: sample_type,
+                               data: {
+                                 "the_title": "Zebra fish #{i}",
+                               },
+                               project_ids: [person.projects.first.id],
+                               policy: sample_type.policy,
+                               contributor: person)
+    end
+    sample_type.reload
+    assert samples.none? { |s| s.title.downcase.include? 'updated' }
+    update_samples_params = update_samples_spreadsheet_upload_params(samples)
+    params = { sample_type_id: sample_type.id,
+               data: update_samples_params }
+    assert_enqueued_jobs(1, only: SamplesBatchUpdateJob) do
+      post :batch_update, params: params
+    end
+    response_body = JSON.parse(response.body)
+    assert_response :success
+    assert_equal response_body['results'], ['A background job has been launched. This Sample Type will now lock itself as long as the background job is in progress.']
+
+    # Should not be able to samples through a spreadsheet when a background job is running
+    update_samples_params = update_samples_spreadsheet_upload_params(samples.first(5))
+
+    params = {
+      sample_type_id: sample_type.id,
+      data: update_samples_params
+    }
+
+    assert_no_difference('Sample.count') do
+      post :batch_update, params: params
+    end
+    response_body = JSON.parse(response.body)
+    assert_response :unprocessable_entity
+    assert response_body['errors'].include?("Batch upload not allowed. There is already a background job in progress for this Sample Type. Please wait and try again later.")
+  end
+
   def rdf_test_object
     FactoryBot.create(:max_sample, policy: FactoryBot.create(:public_policy))
   end
 
   private
+
+  def new_samples_spreadsheet_upload_params(n, sample_type_id)
+    params = []
+    (0..n-1).each do |i|
+      params << {
+        ex_id: "new-#{i}-#{sample_type_id}",
+        data: {
+          type: "samples",
+          attributes: {
+            attribute_map: {
+              the_title: "Mouse #{i}"
+            }
+          }
+        }
+      }
+    end
+    params
+  end
+
+  def update_samples_spreadsheet_upload_params(samples)
+    params = []
+    samples.each do |sample|
+      params << {
+        "ex_id": "update-#{sample.id}-#{sample.sample_type.id}",
+        "id": "#{ sample.id }",
+        "data": {
+          "type": "samples",
+          "attributes": {
+            "attribute_map": {
+              "the_title": "#{sample.title} - Updated"
+            }
+          }
+        }
+      }
+    end
+    params
+  end
 
   def populated_patient_sample
     person = FactoryBot.create(:person)

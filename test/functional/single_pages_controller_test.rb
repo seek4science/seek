@@ -103,8 +103,8 @@ class SinglePagesControllerTest < ActionController::TestCase
         :project, :source_sample_type
       )
 
-      post :upload_samples, params: { file:, project_id: project.id,
-                                      sample_type_id: source_sample_type.id }
+      post :preview_upload_samples, params: { file:, project_id: project.id,
+                                              sample_type_id: source_sample_type.id }
 
       assert_response :bad_request
       assert_equal flash[:error], "Please upload a valid spreadsheet file with extension '.xlsx'"
@@ -120,8 +120,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       file_path = 'upload_single_page/01_combo_update_sources_spreadsheet.xlsx'
       file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-      post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                                 sample_type_id: sample_collection_sample_type.id }
+      post :preview_upload_samples, as: :json, params: { file:, project_id: project.id,
+                                                         sample_type_id: sample_collection_sample_type.id }
 
       assert_response :bad_request
     end
@@ -136,8 +136,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       file_path = 'upload_single_page/02_invalid_workbook.xlsx'
       file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-      post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                                 sample_type_id: source_sample_type.id }
+      post :preview_upload_samples, as: :json, params: { file:, project_id: project.id,
+                                                         sample_type_id: source_sample_type.id }
 
       assert_response :bad_request
     end
@@ -152,8 +152,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       file_path = 'upload_single_page/01_combo_update_sources_spreadsheet.xlsx'
       file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-      post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                                 sample_type_id: source_sample_type.id }
+      post :preview_upload_samples, as: :json, params: { file:, project_id: project.id,
+                                                         sample_type_id: source_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
       db_samples = response_data['dbSamples']
@@ -167,8 +167,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_equal new_samples.size, 2
       assert_equal possible_duplicates.size, 1
 
-      post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                                 sample_type_id: source_sample_type.id }
+      post :preview_upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                         sample_type_id: source_sample_type.id }
 
       assert_response :success
 
@@ -207,8 +207,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       file_path = 'upload_single_page/03_combo_update_samples_spreadsheet.xlsx'
       file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-      post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                                 sample_type_id: sample_collection_sample_type.id }
+      post :preview_upload_samples, as: :json, params: { file:, project_id: project.id,
+                                                         sample_type_id: sample_collection_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
       updated_samples = response_data['updateSamples']
@@ -220,8 +220,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_equal new_samples.size, 2
       assert_equal possible_duplicates.size, 1
 
-      post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                                 sample_type_id: sample_collection_sample_type.id }
+      post :preview_upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                         sample_type_id: sample_collection_sample_type.id }
 
       assert_response :success
 
@@ -260,8 +260,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       file_path = 'upload_single_page/04_combo_update_assay_samples_spreadsheet.xlsx'
       file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-      post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                                 sample_type_id: assay_sample_type.id }
+      post :preview_upload_samples, as: :json, params: { file:, project_id: project.id,
+                                                         sample_type_id: assay_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
       updated_samples = response_data['updateSamples']
@@ -273,8 +273,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert_equal new_samples.size, 1
       assert_equal possible_duplicates.size, 1
 
-      post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                                 sample_type_id: assay_sample_type.id }
+      post :preview_upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                         sample_type_id: assay_sample_type.id }
 
       assert_response :success
 
@@ -315,8 +315,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       file_path = 'upload_single_page/01_combo_update_sources_spreadsheet.xlsx'
       file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-      post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                                 sample_type_id: source_sample_type.id }
+      post :preview_upload_samples, as: :json, params: { file:, project_id: project.id,
+                                                         sample_type_id: source_sample_type.id }
 
       response_data = JSON.parse(response.body)['uploadData']
       updated_samples = response_data['updateSamples']
@@ -331,8 +331,8 @@ class SinglePagesControllerTest < ActionController::TestCase
       possible_duplicates = response_data['possibleDuplicates']
       assert(possible_duplicates.size, 1)
 
-      post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                                 sample_type_id: source_sample_type.id }
+      post :preview_upload_samples, as: :html, params: { file:, project_id: project.id,
+                                                         sample_type_id: source_sample_type.id }
 
       assert_response :success
 

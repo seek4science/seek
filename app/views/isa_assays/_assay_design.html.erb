@@ -5,6 +5,7 @@
 	assay_protocol_action = displaying_single_page? ? "highlightTreeviewItem('assay_protocol')" : "loadDynamicTableFromDefaultView('assay_protocol')"
 	assay_samples_table_action = displaying_single_page? ? "highlightTreeviewItem('assay_samples_table')" : "loadDynamicTableFromDefaultView('assay_samples_table')"
 	assay_experiment_overview_action = displaying_single_page? ? "highlightTreeviewItem('assay_experiment_overview')" : "loadDynamicTableFromDefaultView('assay_experiment_overview')"
+  assay_sample_type_table_is_readonly = [:batch_upload_in_progress?, :locked?].any? { |method| assay&.sample_type.send(method) }
 %>
 
 <% if valid_study && valid_assay %>
@@ -26,7 +27,15 @@
 					<%= render :partial=>"isa_studies/sop", locals: { sops: assay&.sops} -%>
 			</div>
 			<div id="assay_samples_table" class="tab-pane fade">
-					<%= render :partial=>"isa_assays/assay_samples", locals: { assay: assay} -%>
+        <% if assay_sample_type_table_is_readonly %>
+          <div class="alert alert-warning">
+            <p>This table is currently locked because of a background job in progress. </p>
+            <p>Please try again later! </p>
+          </div>
+        <% end %>
+        <div <%= assay_sample_type_table_is_readonly ? "inert" : '' %>>
+          <%= render :partial=>"isa_assays/assay_samples", locals: { assay: assay} -%>
+        </div>
 			</div>
 			<div id="assay_experiment_overview" class="tab-pane fade">
 					<%= render :partial=>"isa_assays/assay_table", locals: { assay: assay} -%>
