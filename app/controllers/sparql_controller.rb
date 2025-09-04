@@ -108,7 +108,7 @@ class SparqlController < ApplicationController
           # Try to get repository object, but don't fail if it has issues
           begin
             repo_obj = repository.get_repository_object
-            return repo_obj.present?
+            return !repo_obj.nil?
           rescue => e
             Rails.logger.warn("Repository object creation failed, trying basic connectivity test: #{e.message}")
             # Fallback: test basic connectivity
