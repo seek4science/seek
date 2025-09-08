@@ -69,15 +69,56 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, json.length
   end
 
+  test 'cannot insert with sparql query' do
+    id = (DataFile.last&.id || 0) + 1 #get a non existing id
+    graph = @repository.get_configuration.public_graph
+    count = all_triples_count
+    query = "INSERT DATA INTO GRAPH <#{graph}> {
+                <http://localhost:3000/data_files/#{id}> <http://jermontology.org/ontology/JERMOntology#description> 'some description' .
+            }"
+
+    path = sparql_index_path
+    post path, params: { sparql_query: query, format: 'json' }
+
+    #should probably be a different response (not authorized) when fixed
+    assert_response :success
+    assert_equal count, all_triples_count
+  end
+
+  test 'cannot delete with sparql query' do
+    create_some_triples
+    id = DataFile.last.id
+    graph = @repository.get_configuration.public_graph
+    count = all_triples_count
+
+    query = "DELETE FROM <#{graph}> {
+              <http://localhost:3000/data_files/#{id}> ?p ?o .
+             } WHERE {
+                <http://localhost:3000/data_files/#{id}> ?p ?o .
+             }"
+
+    path = sparql_index_path
+    post path, params: { sparql_query: query, format: 'json' }
+
+    #should probably be a different response (not authorized) when fixed
+    assert_equal count, all_triples_count
+  end
+
   private
 
   def create_some_triples
     private_df = FactoryBot.create(:max_data_file, title:'private data file')
     private_df.send_rdf_to_repository
 
-    private_df = FactoryBot.create(:max_data_file, title:'public data file', policy: FactoryBot.create(:public_policy))
-    private_df.send_rdf_to_repository
+    public_df = FactoryBot.create(:max_data_file, title:'public data file', policy: FactoryBot.create(:public_policy))
+    public_df.send_rdf_to_repository
 
+    pp public_df.id
+  end
+
+  def all_triples_count
+    q = @repository.query.select.where(%i[s p o])
+    @repository.select(q).count
   end
 
 end
