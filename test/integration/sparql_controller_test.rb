@@ -33,24 +33,51 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'post query format json' do
+  test 'post sparql query and json response' do
     path = sparql_index_path
     create_some_triples
-    query = 'SELECT (COUNT(*) AS ?count) WHERE {?subject ?predicate ?object}'
+    query = 'SELECT ?datafile ?title ?graph
+      WHERE {
+        GRAPH ?graph {
+          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+          ?datafile <http://purl.org/dc/terms/title> "public data file" .
+          ?datafile <http://purl.org/dc/terms/title> ?title .
+        }
+      }'
+
     post path, params: { sparql_query: query, format: 'json' }
     assert_response :success
     json = JSON.parse(@response.body)
-    count = json[0]['count'].to_i
 
-    # count may vary, but a rough approximation to check it works. Expect count to be lower when querying the public graph
-    assert count.between?(3000, 8000)
+    # should be 1 when it's fixed to only check the public graph
+    assert_equal 2, json.length
+
+    query = 'SELECT ?datafile ?title ?graph
+      WHERE {
+        GRAPH ?graph {
+          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+          ?datafile <http://purl.org/dc/terms/title> "private data file" .
+          ?datafile <http://purl.org/dc/terms/title> ?title .
+        }
+      }'
+
+    post path, params: { sparql_query: query, format: 'json' }
+    assert_response :success
+    json = JSON.parse(@response.body)
+
+    # should be 1 when it's fixed to only check the public graph
+    assert_equal 1, json.length
   end
 
   private
 
   def create_some_triples
-    df = FactoryBot.create(:max_data_file)
-    df.send_rdf_to_repository
+    private_df = FactoryBot.create(:max_data_file, title:'private data file')
+    private_df.send_rdf_to_repository
+
+    private_df = FactoryBot.create(:max_data_file, title:'public data file', policy: FactoryBot.create(:public_policy))
+    private_df.send_rdf_to_repository
+
   end
 
 end
