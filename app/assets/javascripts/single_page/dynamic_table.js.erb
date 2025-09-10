@@ -245,7 +245,7 @@ const handleSelect = (e) => {
                 currentCell.blur();
               }
             }
-          },
+          },/**/
           draw () {
             ObjectsInput.init();
           },
@@ -300,58 +300,6 @@ const handleSelect = (e) => {
         });
       $j('[data-toggle="tooltip"]').tooltip();
       highlightTitleCol(this.table);
-    },
-    pasteFromClipboard: function () {
-      try {
-        navigator.clipboard.readText().then((text) => {
-          const colsCount = this.table.columns().data().length;
-          const splitter = text.includes("\r\n") ? "\r\n" : "\n";
-          const delimeter = "\t";
-          const _defaultCols = defaultCols.map((c) => c.defaultValue || "");
-
-          const cols = this.table.settings()[0].aoColumns;
-          const nonTextColumns = getNonTextAttributes(cols);
-          const nonTextColumnIndexes = nonTextColumns.map((x) => x.idx).sort((a, b) => b - a);
-          const nonTextColumnTitles = nonTextColumns.map((x) => x.title);
-
-          const rows = text
-            .split(splitter)
-            .filter((x) => x)
-            .map((r) => {
-              // Preserve row status, id and uuid
-              let splitted = [rowStatus.new, "", ""].concat(r.split(delimeter));
-              const missingColsCount = colsCount - defaultCols.length - splitted.length;
-              splitted = _defaultCols.concat(splitted);
-
-              // Preserve empty placeholder for columns of type of 'Registered Sample List'
-              nonTextColumnIndexes.forEach((x) => splitted.splice(x, 0, []));
-
-              return missingColsCount < 0 ?
-                splitted.slice(0, colsCount) :
-                splitted.concat(Array(missingColsCount).fill(""));
-            })
-            .filter((x) => x);
-
-          this.table.rows.add(rows).draw();
-
-          if (nonTextColumnTitles.length)
-            alert(
-              "No value is pasted for the following column(s): \n" +
-              nonTextColumnTitles.map((x) => `"${x}"`).join(", ") +
-              "\nYou need to manually input them."
-            );
-        }).catch((error) => {
-          alert(`Paste action aborted:\n\n${error}\n\nNote: Some browsers require to click 'paste' to paste the information in the table.`);
-        });
-
-      } catch (error) {
-        if (error instanceof TypeError && navigator.userAgent.toLowerCase().includes('firefox')) {
-          if (confirm('Your Firefox browser might not support clipboard access. By clicking OK, you\'ll be redirected to the official documentation.')) {
-            window.open("<%= Seek::Help::HelpDictionary.instance.help_link(:clipboard_api_mozilla) %>", "_blank");
-          }
-        }
-        console.log('An error occurred:', error);
-      }
     },
     newRow: function () {
       const colsCount = this.table.columns().data().length;
