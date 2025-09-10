@@ -20,9 +20,7 @@
 
 <% if item.can_edit? -%>
   <% if Seek::Config.isa_json_compliance_enabled && item.is_isa_json_compliant? %>
-    <% if item&.sample_types.present? %>
-      <%= button_link_to("Design #{t('assays.assay_stream')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_assay_stream: true)) %>
-    <% end -%>
+    <%= button_link_to("Design #{t('assays.assay_stream')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_assay_stream: true)) %>
   <% else -%>
     <%= add_new_item_to_dropdown(item) %>
   <% end -%>
