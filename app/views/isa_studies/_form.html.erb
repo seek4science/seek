@@ -52,10 +52,13 @@
 
 <% end -%>
 
-
-
-
 <%= form_submit_buttons(@isa_study.study) %>
+
+<%= render partial: 'projects/implicit_project_selector', locals: { action: action,
+                                                                    select_id: '#isa_study_study_investigation_id',
+                                                                    parents: Investigation.authorized_for('edit'),
+                                                                    skip_on_page_load: true} %>
+
 
 <script>
     const templates = <%= load_templates().to_json.html_safe %>
