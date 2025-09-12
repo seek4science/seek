@@ -652,6 +652,34 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal get_option(isa_json_compliance_options, 'false').label, 'No'
   end
 
+  test 'get isa template group filter options' do
+    contributor = FactoryBot.create(:person)
+
+    isa_template_group_filter = Seek::Filterer::FILTERS[:isa_template_group]
+
+    groups = ['ArrayExpress', 'ENA', 'BioSamples', 'BioImage Archive', 'MetaboLights']
+
+    project = contributor.projects.first
+    templates = []
+    (1..5).each do |i|
+      group = groups[i-1]
+      (1..i).each do |j|
+        title = "#{group} template #{j}"
+        templates << FactoryBot.create(:min_template, title: title, contributor: contributor, projects: [project], group: group)
+      end
+    end
+
+    collection = Template.where(id: templates.pluck(:id))
+    isa_template_group_options = isa_template_group_filter.options(collection, [])
+
+    assert_equal 5, isa_template_group_options.length
+    assert_equal get_option(isa_template_group_options, 'ArrayExpress').count, 1
+    assert_equal get_option(isa_template_group_options, 'ENA').count, 2
+    assert_equal get_option(isa_template_group_options, 'BioSamples').count, 3
+    assert_equal get_option(isa_template_group_options, 'BioImage Archive').count, 4
+    assert_equal get_option(isa_template_group_options, 'MetaboLights').count, 5
+  end
+
   private
 
   def assert_includes_all(collection, things)
