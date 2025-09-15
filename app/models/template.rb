@@ -15,6 +15,7 @@ class Template < ApplicationRecord
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
 
+  has_filter :isa_template_group
   def can_delete?(user = User.current_user)
     super && sample_types.empty? && children.none?
   end
