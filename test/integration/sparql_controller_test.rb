@@ -112,8 +112,6 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     public_df = FactoryBot.create(:max_data_file, title:'public data file', policy: FactoryBot.create(:public_policy))
     public_df.send_rdf_to_repository
-
-    pp public_df.id
   end
 
   def all_triples_count
