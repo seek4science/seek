@@ -805,7 +805,7 @@ SEEK::Application.routes.draw do
       post :batch_sharing_permission_changed
       post :export_to_excel, action: :export_to_excel
       get :download_samples_excel, action: :download_samples_excel
-      post :upload_samples, action: :upload_samples
+      post :preview_upload_samples, action: :preview_upload_samples
     end
   end
 

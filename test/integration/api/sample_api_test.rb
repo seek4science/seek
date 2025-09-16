@@ -236,15 +236,16 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     project = FactoryBot.create(:project)
     institution = FactoryBot.create(:institution)
     person.add_to_project_and_institution(project, institution)
-    investigation = FactoryBot.create(:investigation, contributor: person)
-    study = FactoryBot.create(:study, contributor: person)
-    type = FactoryBot.create(:patient_sample_type, contributor: person)
-    assay = FactoryBot.create(:assay, contributor: person, sample_type: type)
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: [project])
+    study = FactoryBot.create(:study, contributor: person, investigation: investigation)
+    type = FactoryBot.create(:patient_sample_type, contributor: person, projects: [project])
+    assay = FactoryBot.create(:assay, contributor: person, sample_type: type, study: study)
 
     other_person = FactoryBot.create(:person)
     user_login(other_person)
     other_person.add_to_project_and_institution(project, institution)
     params = {
+      "sample_type_id": "#{type.id}",
       "data": [
         {
           "ex_id": "1",
@@ -283,7 +284,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
       assert_difference('AssayAsset.count', 0) do
         assert_difference('SampleType.count', 0) do
           post "/samples/batch_create", as: :json, params: params, headers: { 'Authorization' => write_access_auth }
-          assert_response :success
+          assert_response :unprocessable_entity
         end
       end
     end
