@@ -69,6 +69,30 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, json.length
   end
 
+  test 'post sparql query and html response' do
+    path = sparql_index_path
+    create_some_triples
+    query = 'SELECT ?datafile ?title ?graph
+      WHERE {
+        GRAPH ?graph {
+          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+          ?datafile <http://purl.org/dc/terms/title> "public data file" .
+          ?datafile <http://purl.org/dc/terms/title> ?title .
+        }
+      }'
+
+    post path, params: { sparql_query: query }
+    assert_response :success
+    # this will change when restricting to public graph, and only include 1 result
+    assert_select 'div.sparql-results table' do
+      assert_select 'tbody tr', count: 2
+      assert_select 'thead th', count: 3
+      assert_select 'td', text:'public data file', count: 2
+      assert_select 'td', text:'seek-testing:private', count:1 #should be zero
+      assert_select 'td', text:'seek-testing:public', count:1
+    end
+  end
+
   test 'cannot insert with sparql query' do
     id = (DataFile.last&.id || 0) + 1 #get a non existing id
     graph = @repository.get_configuration.public_graph
