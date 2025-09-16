@@ -274,6 +274,13 @@ const handleSelect = (e) => {
           },
           draw () {
             ObjectsInput.init();
+
+            const tooltips = $j('[data-toggle="tooltip"]')
+            tooltips.tooltip('destroy');
+            tooltips.tooltip({
+              container: 'body',
+              placement: 'top'
+            });
           },
         },
         ajax: options.ajax
@@ -320,11 +327,8 @@ const handleSelect = (e) => {
           }
           $j(x)
             .attr("title", columns[i].description)
-            .attr("data-toggle", "tooltip")
-            .attr("data-placement", "top")
-            .attr("data-container", "body");
+            .attr("data-toggle", "tooltip");
         });
-      $j('[data-toggle="tooltip"]').tooltip();
       highlightTitleCol(this.table);
     },
     pasteFromClipboard: function () {
