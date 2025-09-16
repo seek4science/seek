@@ -94,11 +94,11 @@ const handleSelect = (e) => {
         let isRegisteredDataFile = false;
         let isRegisteredStrain = false;
         if (c.attribute_type) {
-          isRegisteredSample = c.attribute_type.base_type.includes("SeekSample");
-          isCVList = c.attribute_type.base_type === "CVList";
-          isRegisteredSop = c.attribute_type.base_type === "SeekSop";
-          isRegisteredDataFile = c.attribute_type.base_type === "SeekDataFile";
-          isRegisteredStrain = c.attribute_type.base_type === "SeekStrain";
+          isRegisteredSample = c.attribute_type.includes("SeekSample");
+          isCVList = c.attribute_type === "CVList";
+          isRegisteredSop = c.attribute_type === "SeekSop";
+          isRegisteredDataFile = c.attribute_type === "SeekDataFile";
+          isRegisteredStrain = c.attribute_type === "SeekStrain";
         }
 
         if (isRegisteredSample) {
@@ -173,17 +173,43 @@ const handleSelect = (e) => {
       });
       // Retrieve the column index of the multi-input cells (select2 items)
       // if column has a multi-input cell, it adds the index to the t array (=accumulator)
-      let multi_link_idx = columns.reduce((t, c, i) => (c.multi_link ? [...t, i + 1] : t), []);
-      // If it's Assay level table keep the first, otherwise hide all of them
-      if (options.level == "assay") multi_link_idx = multi_link_idx.slice(1);
-      this.hiddenColumns = multi_link_idx;
+      let input_col_ids = columns.reduce((t, c, i) => (c.is_input ? [...t, i + 1] : t), []);
+
+      if (options.readonly) {
+        this.hiddenColumns = columns
+          .map((col, index) => {
+          if (
+            // If it's Assay level table keep the first input in the experiment overview,
+            // otherwise hide all inputs.
+            (col.is_input && !col.is_first_input) ||
+            // Hide ID related fields (id, uuid, ...)
+            col.is_id_field ||
+            // Hide the status column
+            col.title === 'status'
+          ){
+            return index + 1;
+          } else {
+            return -1;
+          }
+        })
+          .filter(index => index !== -1);
+      } else {
+        this.hiddenColumns = columns
+          .map((col, index) => {
+            // Hide the status column
+            if (col.title === 'status') {
+              return index + 1;
+            } else {
+              return -1;
+            }
+          })
+          .filter(index => index !== -1);
+      }
       columns.unshift(...defaultCols);
 
-      const columnDefs = [{
-        targets: options.readonly ? [0] : [0, 1]
-      },
+      const columnDefs = [
         {
-          targets: options.readonly ? [0, ...multi_link_idx] : [1],
+          targets: options.readonly ? [0, ...this.hiddenColumns] : [1, 3, ...this.hiddenColumns],
           visible: false,
           searchable: false
         },
@@ -590,7 +616,7 @@ function getNonTextAttributes(st_attributes) {
   return st_attributes
     .filter(
       (attr) => {
-        const baseType = attr?.attribute_type?.base_type ?? stringType;
+        const baseType = attr?.attribute_type ?? stringType;
         return baseType !== stringType;
       })
     .map(function (attr) {
