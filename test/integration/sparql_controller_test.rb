@@ -4,9 +4,14 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
+    skip('these tests need a configured triple store setup') unless @repository.configured?
     @private_graph = RDF::URI.new @repository.get_configuration.private_graph
     @public_graph = RDF::URI.new @repository.get_configuration.public_graph
-    skip('these tests need a configured triple store setup') unless @repository.configured?
+
+    VCR.configure do |c|
+      c.allow_http_connections_when_no_cassette = true
+    end
+
   end
   def teardown
     return unless @repository.configured?
@@ -15,6 +20,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
     @repository.delete(q)
+    VCR.configure do |c|
+      c.allow_http_connections_when_no_cassette = false
+    end
   end
 
 
@@ -83,6 +91,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     post path, params: { sparql_query: query }
     assert_response :success
+    assert_select 'div#query-error', count: 0
     # this will change when restricting to public graph, and only include 1 result
     assert_select 'div.sparql-results table' do
       assert_select 'tbody tr', count: 2
@@ -91,6 +100,35 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
       assert_select 'td', text:'seek-testing:private', count:1 #should be zero
       assert_select 'td', text:'seek-testing:public', count:1
     end
+  end
+
+  test 'post invalid sparql' do
+    path = sparql_index_path
+    create_some_triples
+
+    query = 'SEECT ?datafile ?invalid ?graph
+      WHERE {
+        GRAPH ?graph {
+          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+          ?datafile <http://purl.org/dc/terms/title> "public data file" .
+          ?datafile <http://purl.org/dc/terms/title> ?title .
+        }
+      }'
+
+    post path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select 'div#query-error.alert-danger' do
+      assert_select 'h4', text:/Query Error/
+      assert_select 'pre', text:/SPARQL compiler, line 2: syntax error at 'SEECT'/
+    end
+
+    post path, params: { sparql_query: query, format: 'json' }
+    assert_response :success
+    json = JSON.parse(@response.body)
+
+    assert_match /SPARQL compiler, line 2: syntax error at 'SEECT'/, json['error']
+
   end
 
   test 'cannot insert with sparql query' do
