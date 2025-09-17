@@ -20,7 +20,8 @@ culture_sample_type.sample_attributes.build(
   title: 'Culture Name',
   sample_attribute_type: string_attr_type,
   required: true,
-  is_title: true
+  is_title: true,
+  description: 'A unique name for the bacterial culture'
 )
 
 culture_sample_type.sample_attributes.build(
@@ -31,15 +32,17 @@ culture_sample_type.sample_attributes.build(
 )
 
 culture_sample_type.sample_attributes.build(
-  title: 'Growth Temperature (°C)',
+  title: 'Growth Temperature',
   sample_attribute_type: float_attr_type,
+  unit: Unit.find_by_symbol('°C'),
   required: true,
   description: 'Temperature at which the culture was grown'
 )
 
 culture_sample_type.sample_attributes.build(
-  title: 'Culture Volume (mL)',
+  title: 'Culture Volume',
   sample_attribute_type: float_attr_type,
+  unit: Unit.find_by_symbol('mL'),
   required: false,
   description: 'Volume of the bacterial culture'
 )
@@ -82,26 +85,30 @@ enzyme_sample_type.sample_attributes.build(
   title: 'EC Number',
   sample_attribute_type: string_attr_type,
   required: false,
-  description: 'Enzyme Commission number'
+  description: 'Enzyme Commission number',
+  pid: 'http://purl.uniprot.org/core/enzyme'
 )
 
 enzyme_sample_type.sample_attributes.build(
-  title: 'Concentration (mg/mL)',
+  title: 'Concentration',
   sample_attribute_type: float_attr_type,
+  unit: Unit.find_by_symbol('mg/mL'),
   required: true,
   description: 'Protein concentration of the enzyme preparation'
 )
 
 enzyme_sample_type.sample_attributes.build(
-  title: 'Specific Activity (U/mg)',
+  title: 'Specific Activity',
   sample_attribute_type: float_attr_type,
+  unit: Unit.find_by_symbol('U/mg'),
   required: false,
   description: 'Specific enzymatic activity'
 )
 
 enzyme_sample_type.sample_attributes.build(
-  title: 'Storage Temperature (°C)',
+  title: 'Storage Temperature',
   sample_attribute_type: integer_attr_type,
+  unit: Unit.find_by_symbol('°C'),
   required: false,
   description: 'Temperature for enzyme storage'
 )
@@ -127,8 +134,8 @@ culture1.contributor = $guest_person
 culture1.policy = Policy.create(name: 'default policy', access_type: 1)
 culture1.set_attribute_value('Culture Name', 'S. solfataricus Culture #1')
 culture1.set_attribute_value('Strain Used', 'Sulfolobus solfataricus strain 98/2')
-culture1.set_attribute_value('Growth Temperature (°C)', 80.0)
-culture1.set_attribute_value('Culture Volume (mL)', 500.0)
+culture1.set_attribute_value('Growth Temperature', 80.0)
+culture1.set_attribute_value('Culture Volume', 500.0)
 culture1.set_attribute_value('pH', 2.5)
 culture1.set_attribute_value('Growth Phase Complete', true)
 disable_authorization_checks { culture1.save! }
@@ -141,8 +148,8 @@ culture2.contributor = $guest_person
 culture2.policy = Policy.create(name: 'default policy', access_type: 1)
 culture2.set_attribute_value('Culture Name', 'S. solfataricus Culture #2')
 culture2.set_attribute_value('Strain Used', 'Sulfolobus solfataricus strain 98/2')
-culture2.set_attribute_value('Growth Temperature (°C)', 75.0)
-culture2.set_attribute_value('Culture Volume (mL)', 1000.0)
+culture2.set_attribute_value('Growth Temperature', 75.0)
+culture2.set_attribute_value('Culture Volume', 1000.0)
 culture2.set_attribute_value('pH', 2.8)
 culture2.set_attribute_value('Growth Phase Complete', false)
 disable_authorization_checks { culture2.save! }
@@ -156,9 +163,9 @@ enzyme1.contributor = $guest_person
 enzyme1.policy = Policy.create(name: 'default policy', access_type: 1)
 enzyme1.set_attribute_value('Enzyme Name', 'Phosphoglycerate Kinase')
 enzyme1.set_attribute_value('EC Number', 'EC 2.7.2.3')
-enzyme1.set_attribute_value('Concentration (mg/mL)', 2.5)
-enzyme1.set_attribute_value('Specific Activity (U/mg)', 125.0)
-enzyme1.set_attribute_value('Storage Temperature (°C)', -20)
+enzyme1.set_attribute_value('Concentration', 2.5)
+enzyme1.set_attribute_value('Specific Activity', 125.0)
+enzyme1.set_attribute_value('Storage Temperature', -20)
 enzyme1.set_attribute_value('Purification Steps', 4)
 disable_authorization_checks { enzyme1.save! }
 puts 'Seeded enzyme sample 1.'
@@ -170,9 +177,9 @@ enzyme2.contributor = $guest_person
 enzyme2.policy = Policy.create(name: 'default policy', access_type: 1)
 enzyme2.set_attribute_value('Enzyme Name', 'Glyceraldehyde-3-phosphate Dehydrogenase')
 enzyme2.set_attribute_value('EC Number', 'EC 1.2.1.12')
-enzyme2.set_attribute_value('Concentration (mg/mL)', 1.8)
-enzyme2.set_attribute_value('Specific Activity (U/mg)', 89.3)
-enzyme2.set_attribute_value('Storage Temperature (°C)', -20)
+enzyme2.set_attribute_value('Concentration', 1.8)
+enzyme2.set_attribute_value('Specific Activity', 89.3)
+enzyme2.set_attribute_value('Storage Temperature', -20)
 enzyme2.set_attribute_value('Purification Steps', 3)
 disable_authorization_checks { enzyme2.save! }
 puts 'Seeded enzyme sample 2.'
@@ -184,9 +191,9 @@ enzyme3.contributor = $guest_person
 enzyme3.policy = Policy.create(name: 'default policy', access_type: 1)
 enzyme3.set_attribute_value('Enzyme Name', 'Triose Phosphate Isomerase')
 enzyme3.set_attribute_value('EC Number', 'EC 5.3.1.1')
-enzyme3.set_attribute_value('Concentration (mg/mL)', 3.2)
-enzyme3.set_attribute_value('Specific Activity (U/mg)', 210.5)
-enzyme3.set_attribute_value('Storage Temperature (°C)', -20)
+enzyme3.set_attribute_value('Concentration', 3.2)
+enzyme3.set_attribute_value('Specific Activity', 210.5)
+enzyme3.set_attribute_value('Storage Temperature', -20)
 enzyme3.set_attribute_value('Purification Steps', 2)
 disable_authorization_checks { enzyme3.save! }
 puts 'Seeded enzyme sample 3.'
@@ -198,9 +205,9 @@ enzyme4.contributor = $guest_person
 enzyme4.policy = Policy.create(name: 'default policy', access_type: 1)
 enzyme4.set_attribute_value('Enzyme Name', 'Fructose-1,6-bisphosphate Aldolase/Phosphatase')
 enzyme4.set_attribute_value('EC Number', 'EC 4.1.2.13')
-enzyme4.set_attribute_value('Concentration (mg/mL)', 1.5)
-enzyme4.set_attribute_value('Specific Activity (U/mg)', 67.8)
-enzyme4.set_attribute_value('Storage Temperature (°C)', -20)
+enzyme4.set_attribute_value('Concentration', 1.5)
+enzyme4.set_attribute_value('Specific Activity', 67.8)
+enzyme4.set_attribute_value('Storage Temperature', -20)
 enzyme4.set_attribute_value('Purification Steps', 5)
 disable_authorization_checks { enzyme4.save! }
 puts 'Seeded enzyme sample 4.'
