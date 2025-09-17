@@ -1,6 +1,4 @@
 class Institution < ApplicationRecord
-  include Seek::Rdf::RdfGeneration
-
   acts_as_yellow_pages
 
   auto_strip_attributes :web_page, :title
