@@ -31,7 +31,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     get path
     assert_response :success
     assert_select '#content .container-fluid' do
-      assert_select 'div#error_flash', text: /SPARQL endpoint is not configured/, count: 0
+      assert_select 'div#error_flash', count: 0
       assert_select 'div.sparql-interface' do
         assert_select 'form[action=?][method=?]', sparql_index_path, 'post' do
           assert_select 'textarea.sparql-textarea'

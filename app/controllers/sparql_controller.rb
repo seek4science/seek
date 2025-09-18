@@ -4,12 +4,12 @@ require 'net/http'
 class SparqlController < ApplicationController
   layout 'application'
 
-  # before_action :login_required
+  before_action :rdf_repository_configured?
 
   def index
     # Main SPARQL interface page
-    unless rdf_repository_configured?
-      flash.now[:error] = "SPARQL endpoint is not configured. Please check your RDF repository configuration."
+    unless rdf_repository_available?
+      flash.now[:error] = "SPARQL endpoint is configured, but not currently available."
     end
 
     @resource = nil
@@ -20,8 +20,8 @@ class SparqlController < ApplicationController
     # If this is a POST request with a query, execute it
     if request.post? && @sparql_query.present?
       begin
-        unless rdf_repository_configured?
-          raise "SPARQL endpoint not configured. Please configure your RDF repository settings."
+        unless rdf_repository_available?
+          raise "SPARQL endpoint is configured, but not currently available."
         end
 
         @results = execute_sparql_query(@sparql_query)
@@ -99,15 +99,18 @@ class SparqlController < ApplicationController
     end
   end
 
-  def rdf_repository_configured?
-    repository = Seek::Rdf::RdfRepository.instance
-    return false unless repository&.configured?
-
+  def rdf_repository_available?
     begin
-      repository.select('ask where {?s ?p ?o}')
+      Seek::Rdf::RdfRepository.instance.select('ask where {?s ?p ?o}')
     rescue RuntimeError => e
       Rails.logger.error("Error trying a simple query: #{e.message}")
       false
+    end
+  end
+  def rdf_repository_configured?
+    unless Seek::Rdf::RdfRepository.instance&.configured?
+      flash[:error] = "SPARQL endpoint is not configured."
+      redirect_to main_app.root_path
     end
   end
 
