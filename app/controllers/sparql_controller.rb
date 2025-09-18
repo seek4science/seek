@@ -13,6 +13,7 @@ class SparqlController < ApplicationController
     end
 
     @resource = nil
+    @results = []
     @sparql_query = params[:sparql_query] || ""
     @format = params[:format] || "table"
     @example_queries = load_example_queries
@@ -32,13 +33,12 @@ class SparqlController < ApplicationController
     end
 
     respond_to do |format|
-      format.html
-      format.json { render json: @results || [] }
-      format.xml { render xml: (@results || []).to_xml }
-      format.any { render :index }
+      status = @error ? :unprocessable_entity : nil # can't use :success but is the default if nil
+      format.json { render json: { 'results': @results, 'error': @error }.compact, status: status }
+      format.xml { render xml: @results.to_xml, status: status }
+      format.any { render :index, status: status }
     end
   end
-
 
   private
 
