@@ -72,13 +72,9 @@ class SparqlController < ApplicationController
   end
 
   def rdf_repository_available?
-    begin
-      Seek::Rdf::RdfRepository.instance.select('ask where {?s ?p ?o}')
-    rescue RuntimeError => e
-      Rails.logger.error("Error trying a simple query: #{e.message}")
-      false
-    end
+    Seek::Rdf::RdfRepository.instance.available?
   end
+
   def rdf_repository_configured?
     unless Seek::Rdf::RdfRepository.instance&.configured?
       flash[:error] = "SPARQL endpoint is not configured."

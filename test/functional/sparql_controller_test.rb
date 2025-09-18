@@ -7,7 +7,7 @@ class SparqlControllerTest < ActionController::TestCase
   # please see the test/integration/sparql_controller_test
 
   test 'index' do
-    Seek::Rdf::VirtuosoRepository.instance.stub(:configured?, ->(){ false }) do
+    Seek::Rdf::RdfRepository.instance.stub(:configured?, ->(){ false }) do
       refute Seek::Rdf::VirtuosoRepository.instance.configured?
       get :index
       assert_redirected_to :root
@@ -16,7 +16,7 @@ class SparqlControllerTest < ActionController::TestCase
   end
 
   test 'post sparql to index' do
-    Seek::Rdf::VirtuosoRepository.instance.stub(:configured?, ->(){ false }) do
+    Seek::Rdf::RdfRepository.instance.stub(:configured?, ->(){ false }) do
       refute Seek::Rdf::VirtuosoRepository.instance.configured?
       query = 'ask where {?s ?p ?o}'
       post :index, params: { query: query, format: 'json' }

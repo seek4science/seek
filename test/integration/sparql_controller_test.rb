@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class SparqlControllerTest < ActionDispatch::IntegrationTest
 
@@ -191,6 +192,30 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_equal count, all_triples_count
     json = JSON.parse(@response.body)
     assert_match /SECURITY: No permission to execute procedure/, json['error']
+  end
+
+  test 'repository not available' do
+    path = sparql_index_path
+    Seek::Rdf::RdfRepository.instance.stub(:available?, ->(){ false }) do
+      get sparql_index_path
+      assert_response :success
+      assert_equal 'SPARQL endpoint is configured, but not currently available.', flash[:error]
+      assert_select 'div#error_flash', text:/SPARQL endpoint is configured, but not currently available/
+
+      query = 'ask where {?s ?p ?o}'
+      post path, params: { sparql_query: query }
+      assert_response :unprocessable_entity
+      assert_equal 'SPARQL endpoint is configured, but not currently available.', flash[:error]
+      assert_select 'div#error_flash', text:/SPARQL endpoint is configured, but not currently available/
+      assert_empty assigns(:results)
+
+      query = 'ask where {?s ?p ?o}'
+      post path, params: { sparql_query: query, format: 'json' }
+      assert_response :unprocessable_entity
+      assert_empty assigns(:results)
+      json = JSON.parse(@response.body)
+      assert_match /SPARQL endpoint is configured, but not currently available/, json['error']
+    end
   end
 
   private
