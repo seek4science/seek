@@ -132,6 +132,28 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
   end
 
+  test 'handle single result e.g ask' do
+      path = sparql_index_path
+      create_some_triples
+      query = 'ask where {?s ?p ?o}'
+
+      post path, params: { sparql_query: query, format: 'json' }
+      assert_response :success
+      json = JSON.parse(@response.body)
+      expected = {'result' => 'true'}
+      assert_equal expected, json['results'].first
+
+      post path, params: { sparql_query: query }
+      assert_response :success
+      assert_select 'div.sparql-results table' do
+        assert_select 'tbody tr', count: 1
+        assert_select 'tbody td', text:'true', count: 1
+        assert_select 'thead th', count: 1
+        assert_select 'thead th', text:'Result', count: 1
+      end
+
+  end
+
   test 'cannot insert with sparql query' do
     id = (DataFile.last&.id || 0) + 1 #get a non existing id
     graph = @repository.get_configuration.public_graph
