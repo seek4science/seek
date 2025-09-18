@@ -74,7 +74,8 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     json = JSON.parse(@response.body)
 
     # should be 1 when it's fixed to only check the public graph
-    assert_equal 1, json.length
+    assert_equal 1, json['results'].length
+    assert_nil json['error']
   end
 
   test 'post sparql query and html response' do
@@ -116,7 +117,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
       }'
 
     post path, params: { sparql_query: query }
-    assert_response :success
+    assert_response :unprocessable_entity
 
     assert_select 'div#query-error.alert-danger' do
       assert_select 'h4', text:/Query Error/
@@ -124,7 +125,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     end
 
     post path, params: { sparql_query: query, format: 'json' }
-    assert_response :success
+    assert_response :unprocessable_entity
     json = JSON.parse(@response.body)
 
     assert_match /SPARQL compiler, line 2: syntax error at 'SEECT'/, json['error']
@@ -143,8 +144,10 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     post path, params: { sparql_query: query, format: 'json' }
 
     #should probably be a different response (not authorized) when fixed
-    assert_response :success
+    assert_response :unprocessable_entity
     assert_equal count, all_triples_count
+    json = JSON.parse(@response.body)
+    assert_match /SECURITY: No permission to execute procedure/, json['error']
   end
 
   test 'cannot delete with sparql query' do
@@ -162,8 +165,10 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     path = sparql_index_path
     post path, params: { sparql_query: query, format: 'json' }
 
-    #should probably be a different response (not authorized) when fixed
+    assert_response :unprocessable_entity
     assert_equal count, all_triples_count
+    json = JSON.parse(@response.body)
+    assert_match /SECURITY: No permission to execute procedure/, json['error']
   end
 
   private
