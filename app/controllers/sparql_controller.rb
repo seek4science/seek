@@ -23,7 +23,6 @@ class SparqlController < ApplicationController
         unless rdf_repository_available?
           raise "SPARQL endpoint is configured, but not currently available."
         end
-
         @results = execute_sparql_query(@sparql_query)
         @result_count = @results.length
       rescue => e
@@ -44,36 +43,9 @@ class SparqlController < ApplicationController
   private
 
   def execute_sparql_query(query)
-    # Use the repository object directly if configured
-    if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured?
-      begin
-        repository = Seek::Rdf::RdfRepository.instance.get_repository_object
-        if repository
-          results = repository.query(query)
-          return convert_sparql_results(results)
-        end
-      rescue => e
-        Rails.logger.warn("Repository object query failed, trying direct SPARQL client: #{e.message}")
-        # Fallback to direct SPARQL client without authentication
-        return execute_sparql_query_direct(query)
-      end
-    end
-    
-    # If we get here, the endpoint is not properly configured
-    raise "SPARQL endpoint is not configured. Please configure your RDF repository settings."
-  end
-
-  def execute_sparql_query_direct(query)
-    # Direct SPARQL client approach without authentication
-    if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured?
-      config = Seek::Rdf::RdfRepository.instance.get_configuration
-      # Use only the base SPARQL endpoint without authentication
-      sparql_client = SPARQL::Client.new(config.uri)
-      results = sparql_client.query(query)
-      return convert_sparql_results(results)
-    end
-    
-    raise "SPARQL endpoint is not configured."
+    sparql_client = SPARQL::Client.new(Seek::Rdf::RdfRepository.instance.get_configuration.uri)
+    results = sparql_client.query(query)
+    convert_sparql_results(results)
   end
 
   def convert_sparql_results(results)
