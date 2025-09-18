@@ -12,32 +12,36 @@ class SparqlController < ApplicationController
       flash.now[:error] = "SPARQL endpoint is configured, but not currently available."
     end
 
-    @resource = nil
-    @results = []
     @sparql_query = params[:sparql_query] || ""
     @format = params[:format] || "table"
     @example_queries = load_example_queries
 
     # If this is a POST request with a query, execute it
+    #FIXME: this will be simpler if split up into separate action
     if request.post? && @sparql_query.present?
       begin
         unless rdf_repository_available?
           raise "SPARQL endpoint is configured, but not currently available."
         end
         @results = execute_sparql_query(@sparql_query)
-        @result_count = @results.length
       rescue => e
         @error = e.message
         Rails.logger.error("SPARQL Query Error: #{e.message}")
       end
+      respond_to do |format|
+        status = @error ? :unprocessable_entity : nil # can't use :success but is the default if nil
+        @results ||= []
+        format.json { render json: { 'results': @results, 'error': @error }.compact, status: status }
+        format.xml { render xml: @results.to_xml, status: status }
+        # FIXME: have to do this because of @foramt being used, and 'table' isn't a mime type
+        format.any { render :index, status: status }
+      end
+    else
+      respond_to do |format|
+        format.html
+      end
     end
 
-    respond_to do |format|
-      status = @error ? :unprocessable_entity : nil # can't use :success but is the default if nil
-      format.json { render json: { 'results': @results, 'error': @error }.compact, status: status }
-      format.xml { render xml: @results.to_xml, status: status }
-      format.any { render :index, status: status }
-    end
   end
 
   private
