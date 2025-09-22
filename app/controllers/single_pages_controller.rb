@@ -55,7 +55,7 @@ class SinglePagesController < ApplicationController
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay.id.to_s + ', Title: ' + @assay.title : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title}]</b> downloaded:<br/><ul>"
+    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay&.id.to_s + ', Title: ' + @assay&.title.to_s : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title.to_s}]</b> downloaded:<br/><ul>"
     notice_message << "<li class='checkmark'><b>#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}</b> visible to you #{@samples.count != 1 ? 'were' : 'was'} included</li>"
     raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
