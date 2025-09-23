@@ -30,7 +30,7 @@ module DynamicTableHelper
 
   private
 
-  ALLOWED_MODELS = %w[Sop Sample]
+  ALLOWED_MODELS = %w[Sop Sample DataFile Strain]
 
   # Links all sample_types in a sequence of sample_types
   def link_sequence(sample_type)
@@ -46,9 +46,16 @@ module DynamicTableHelper
     registered_sample_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_sample? }
     registered_sample_multi_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_sample_multi? }
     registered_sop_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_sop? }
+    registered_data_file_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_data_file? }
+    strain_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_strain? }
 
     sample_type.samples.map do |s|
-      sanitized_json_metadata = sanitize_metadata(JSON.parse(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes, registered_sop_attributes)
+      sanitized_json_metadata = sanitize_metadata(JSON.parse(s.json_metadata),
+                                                  registered_sample_attributes,
+                                                  registered_sample_multi_attributes,
+                                                  registered_sop_attributes,
+                                                  registered_data_file_attributes,
+                                                  strain_attributes)
       if s.can_view?
         { 'selected' => '', 'id' => s.id, 'uuid' => s.uuid }.merge!(sanitized_json_metadata)
       else
@@ -57,7 +64,12 @@ module DynamicTableHelper
     end
   end
 
-  def sanitize_metadata(json_metadata, registered_sample_attributes, registered_sample_multi_attributes, registered_sop_attributes)
+  def sanitize_metadata(json_metadata,
+                        registered_sample_attributes,
+                        registered_sample_multi_attributes,
+                        registered_sop_attributes,
+                        registered_data_file_attributes,
+                        strain_attributes)
     registered_sample_multi_attributes.map(&:title).each do |rsma|
       json_metadata = transform_non_text_attributes_multi(json_metadata, rsma)
     end
@@ -66,6 +78,14 @@ module DynamicTableHelper
     end
     registered_sop_attributes.map(&:title).each do |rsa|
       json_metadata = transform_non_text_attributes_single(json_metadata, rsa)
+    end
+
+    registered_data_file_attributes.map(&:title).each do |rda|
+      json_metadata = transform_non_text_attributes_single(json_metadata, rda)
+    end
+
+    strain_attributes.map(&:title).each do |strain_attr|
+      json_metadata = transform_non_text_attributes_single(json_metadata, strain_attr)
     end
 
     json_metadata
@@ -94,7 +114,7 @@ module DynamicTableHelper
 
     item =model.constantize.find(obj['id']) if obj['id'].present?
     item_exists = !item.nil?
-    if item_exists && !item.can_view?
+    if item_exists && !item&.can_view?
       { 'id' => obj['id'], 'type' => obj['type'], 'title' => '#HIDDEN' }
     else
       obj
