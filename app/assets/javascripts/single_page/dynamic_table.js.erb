@@ -659,7 +659,7 @@ function retrieveLinkedSamples(url) {
 
 function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
   const existingOptions = data.map((e) => {
-    isHiddenInput = (e.title == '#HIDDEN');
+    const isHiddenInput = (e.title === '#HIDDEN');
     if (isHiddenInput) {
       return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
     } else {
@@ -678,7 +678,7 @@ function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
       }
       return filtered;
     }, []);
-    const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
+    const hasUnlinkedSamples = unLinkedSamples.length > 0;
 
     const limit = multiInput ? '' : '1'
     const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
