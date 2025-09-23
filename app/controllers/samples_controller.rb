@@ -169,7 +169,7 @@ class SamplesController < ApplicationController
     render json: { status: status, errors: errors, results: results }, status: :ok
   end
 
-  def batch_update 
+  def batch_update
     errors = []
     param_converter = Seek::Api::ParameterConverter.new("samples")
     Sample.transaction do
