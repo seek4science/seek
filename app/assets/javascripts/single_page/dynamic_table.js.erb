@@ -661,7 +661,7 @@ function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
   const existingOptions = data.map((e) => {
     const isHiddenInput = (e.title === '#HIDDEN');
     if (isHiddenInput) {
-      return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
+      return `<option selected="selected" title="ID: hidden" value="hidden">#HIDDEN</option>`
     } else {
       return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`
     }
@@ -673,7 +673,7 @@ function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
     const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
 
     const unLinkedSamples = data.reduce(function (filtered, sample) {
-      if (!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title != '#HIDDEN') {
+      if (!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title !== '#HIDDEN') {
         filtered.push(sample);
       }
       return filtered;
