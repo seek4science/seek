@@ -841,7 +841,7 @@ SEEK::Application.routes.draw do
   ### SPARQL ###
   resources :sparql, only: [:index] do
     collection do
-      post '', action: :index  # Allow POST to index to handle form submission
+      post :query
     end
   end
 
