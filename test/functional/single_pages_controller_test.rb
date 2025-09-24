@@ -47,7 +47,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       study_id = study.id
       assay_id = nil
 
-      post_params = { sample_data: source_ids.to_json,
+      post_params = { sample_ids: source_ids.to_json,
                       sample_type_id: sample_type_id.to_json,
                       study_id: study_id.to_json,
                       assay_id: assay_id.to_json }
@@ -76,7 +76,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       study_id = study.id
       assay_id = assay.id
 
-      post_params = { sample_data: source_sample_ids.to_json,
+      post_params = { sample_ids: source_sample_ids.to_json,
                       sample_type_id: sample_type_id.to_json,
                       study_id: study_id.to_json,
                       assay_id: assay_id.to_json }
