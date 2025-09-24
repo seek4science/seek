@@ -340,6 +340,31 @@ class SinglePagesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Should not be able to use the download feature if isa_json_compliance_enabled is false' do
+    with_config_value(:isa_json_compliance_enabled, false) do
+      id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
+        :id_label, :person, :project, :study, :source_sample_type, :sources
+      )
+
+      source_ids = sources.map { |s| { id_label => s.id } }
+      sample_type_id = source_sample_type.id
+      study_id = study.id
+      assay_id = nil
+
+      post_params = { sample_ids: source_ids.to_json,
+                      sample_type_id: sample_type_id.to_json,
+                      study_id: study_id.to_json,
+                      assay_id: assay_id.to_json }
+
+      post :export_to_excel, params: post_params, format: :json
+
+      assert_response :unprocessable_entity
+
+      response_body = JSON.parse(response.body)
+      assert_equal response_body, {"title" => "ISA JSON compliance are disabled"}
+    end
+  end
+
   private
 
   def setup_file_upload

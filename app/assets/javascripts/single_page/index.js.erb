@@ -279,6 +279,9 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
   // If succes => Redirect to download path for retrieving excel file
   $j.ajax({
     type: 'POST',
+    headers: {
+      'Accept': 'application/json'
+    },
     url: '<%= export_to_excel_single_pages_path() %>',
     data: { sample_ids: JSON.stringify(sampleIds),
       sample_type_id: JSON.stringify(sampleTypeId),
@@ -290,7 +293,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
     window.location.href = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
   })
   .fail( function(response){
-    alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
+    alert(`Failed to export through excel!\nStatus: ${response.status} - ${JSON.stringify(response.error().statusText)}\nError: ${response.responseText}`);
   })
   .always( function(response){
     setTimeout(() => {location.reload()}, 2000);
@@ -329,7 +332,7 @@ async function handleUploadSubmit(formData){
       $j('#upload-excel').html(response);
     },
     error: function(err){
-        alert(`Failed to upload file!\nStatus: ${err.status}\nError: ${err.statusText}`);
+        alert(`Failed to upload file!\nStatus: ${err.status} - ${err.statusText}\nError: ${err.responseText}`);
       location.reload(); // Page needs reloading for the notice message to appear
     }
   });
