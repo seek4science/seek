@@ -6,7 +6,9 @@ class SinglePagesController < ApplicationController
   include Seek::Data::SpreadsheetExplorerRepresentation
 
   before_action :set_up_instance_variable
-  before_action :project_single_page_enabled?
+  before_action :project_single_page_enabled?,
+                only: %i[show index project_folders]
+  before_action :isa_json_compliance_enabled?
   before_action :check_user_logged_in,
                 only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
   respond_to :html, :js
