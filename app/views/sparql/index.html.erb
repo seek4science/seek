@@ -29,7 +29,7 @@
         <div class="form-group">
           <%= form.label :format, "Output Format:", class: "control-label" %>
           <%= form.select :format,
-                          [['Table', 'table'], ['JSON', 'json'], ['XML', 'xml']],
+                          [['Table', 'html'], ['JSON', 'json'], ['XML', 'xml']],
                           { selected: @format },
                           { class: "form-control sparql-format-select" } %>
         </div>

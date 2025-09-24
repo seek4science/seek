@@ -1,16 +1,5 @@
 <% if results.present? %>
-  <% case format %>
-<% when 'table' %>
     <%= render partial: "results_table", locals: { results: results } %>
-  <% when 'json' %>
-    <div class="code-block">
-      <pre class="language-json"><%= JSON.pretty_generate(results) %></pre>
-    </div>
-  <% when 'xml' %>
-    <div class="code-block">
-      <pre class="language-xml"><%= results.to_xml(root: 'sparql_results', skip_types: true) %></pre>
-    </div>
-  <% end %>
 <% else %>
   <p class="text-muted">No results found.</p>
 <% end %>
