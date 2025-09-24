@@ -155,6 +155,17 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
   end
 
+  test 'respond with json when using content negotiation' do
+    path = query_sparql_index_path
+    query = 'ask where {?s ?p ?o}'
+
+    post path, params: { sparql_query: query }, headers: { 'Accept' => 'application/json' }
+    assert_response :success
+    json = JSON.parse(@response.body)
+    expected = {'result' => 'true'}
+    assert_equal expected, json['results'].first
+  end
+
   test 'cannot insert with sparql query' do
     id = (DataFile.last&.id || 0) + 1 #get a non existing id
     graph = @repository.get_configuration.public_graph

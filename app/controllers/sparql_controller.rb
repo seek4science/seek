@@ -8,36 +8,38 @@ class SparqlController < ApplicationController
 
   def index
     # Main SPARQL interface page
-    unless rdf_repository_available?
-      flash.now[:error] = "SPARQL endpoint is configured, but not currently available."
-    end
+    flash.now[:error] = 'SPARQL endpoint is configured, but not currently available.' unless rdf_repository_available?
 
     @example_queries = load_example_queries
 
     respond_to(&:html)
   end
-  
+
   def query
-    @sparql_query = params[:sparql_query] || ""
-    @format = params[:format] || "table"
-    @example_queries = load_example_queries
-    begin
-      unless rdf_repository_available?
-        raise "SPARQL endpoint is configured, but not currently available."
+    @sparql_query = params[:sparql_query] || ''
+
+    if rdf_repository_available?
+      begin
+        @results = execute_sparql_query(@sparql_query)
+      rescue StandardError => e
+        @error = e.message
+        Rails.logger.error("SPARQL Query Error: #{e.message}")
       end
-      @results = execute_sparql_query(@sparql_query)
-    rescue StandardError => e
-      @error = e.message
-      flash[:error] = @error
-      Rails.logger.error("SPARQL Query Error: #{e.message}")
+    else
+      @error = 'SPARQL endpoint is configured, but not currently available.'
     end
+
+    status = @error ? :unprocessable_entity : nil # can't use :success but is the default if nil
+    flash[:error] = @error
+    @results ||= []
+
     respond_to do |format|
-      status = @error ? :unprocessable_entity : nil # can't use :success but is the default if nil
-      @results ||= []
+      format.html do
+        @example_queries = load_example_queries
+        render :index, status: status
+      end
       format.json { render json: { 'results': @results, 'error': @error }.compact, status: status }
       format.xml { render xml: @results.to_xml, status: status }
-      # FIXME: have to do this because of @foramt being used, and 'table' isn't a mime type
-      format.any { render :index, status: status }
     end
   end
 
@@ -51,7 +53,7 @@ class SparqlController < ApplicationController
 
   def convert_sparql_results(results)
     return [] if results.nil?
-    
+
     # Handle empty collections
     return [] if results.respond_to?(:empty?) && results.empty?
 
@@ -78,7 +80,7 @@ class SparqlController < ApplicationController
 
   def rdf_repository_configured?
     unless Seek::Rdf::RdfRepository.instance&.configured?
-      flash[:error] = "SPARQL endpoint is not configured."
+      flash[:error] = 'SPARQL endpoint is not configured.'
       redirect_to main_app.root_path
     end
   end
