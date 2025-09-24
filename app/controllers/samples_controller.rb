@@ -182,7 +182,7 @@ class SamplesController < ApplicationController
           saved = sample.save
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
         rescue StandardError => e
-          errors.push({ ex_id: par[:ex_id], error: e.message }) unless saved
+          errors.push({ ex_id: par[:ex_id], error: e.message })
         end
       end
       raise ActiveRecord::Rollback if errors.any?
