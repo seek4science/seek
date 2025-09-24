@@ -34,7 +34,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_select '#content .container-fluid' do
       assert_select 'div#error_flash', count: 0
       assert_select 'div.sparql-interface' do
-        assert_select 'form[action=?][method=?]', sparql_index_path, 'post' do
+        assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
           assert_select 'textarea.sparql-textarea'
         end
         assert_select 'div.sparql-examples div.panel'
@@ -43,7 +43,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'post sparql query and json response' do
-    path = sparql_index_path
+    path = query_sparql_index_path
     create_some_triples
     query = 'SELECT ?datafile ?title ?graph
       WHERE {
@@ -59,7 +59,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     json = JSON.parse(@response.body)
 
     # should be 1 when it's fixed to only check the public graph
-    assert_equal 2, json.length
+    assert_equal 2, json['results'].length
 
     query = 'SELECT ?datafile ?title ?graph
       WHERE {
@@ -80,7 +80,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'post sparql query and html response' do
-    path = sparql_index_path
+    path = query_sparql_index_path
     create_some_triples
     query = 'SELECT ?datafile ?title ?graph
       WHERE {
@@ -105,7 +105,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'post invalid sparql' do
-    path = sparql_index_path
+    path = query_sparql_index_path
     create_some_triples
 
     query = 'SEECT ?datafile ?invalid ?graph
@@ -134,7 +134,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'handle single result e.g ask' do
-      path = sparql_index_path
+      path = query_sparql_index_path
       create_some_triples
       query = 'ask where {?s ?p ?o}'
 
@@ -163,7 +163,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
                 <http://localhost:3000/data_files/#{id}> <http://jermontology.org/ontology/JERMOntology#description> 'some description' .
             }"
 
-    path = sparql_index_path
+    path = query_sparql_index_path
     post path, params: { sparql_query: query, format: 'json' }
 
     #should probably be a different response (not authorized) when fixed
@@ -185,7 +185,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
                 <http://localhost:3000/data_files/#{id}> ?p ?o .
              }"
 
-    path = sparql_index_path
+    path = query_sparql_index_path
     post path, params: { sparql_query: query, format: 'json' }
 
     assert_response :unprocessable_entity
@@ -195,7 +195,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'repository not available' do
-    path = sparql_index_path
+    path = query_sparql_index_path
     Seek::Rdf::RdfRepository.instance.stub(:available?, ->(){ false }) do
       get sparql_index_path
       assert_response :success
