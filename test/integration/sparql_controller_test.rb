@@ -45,22 +45,58 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   test 'post sparql query and json response' do
     path = query_sparql_index_path
     create_some_triples
-    query = 'SELECT ?datafile ?title ?graph
+    query = 'SELECT ?datafile ?title
       WHERE {
-        GRAPH ?graph {
-          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-          ?datafile <http://purl.org/dc/terms/title> "public data file" .
-          ?datafile <http://purl.org/dc/terms/title> ?title .
-        }
+        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+        ?datafile <http://purl.org/dc/terms/title> "public data file" .
+        ?datafile <http://purl.org/dc/terms/title> ?title .
       }'
 
     post path, params: { sparql_query: query, format: 'json' }
     assert_response :success
     json = JSON.parse(@response.body)
 
-    # should be 1 when it's fixed to only check the public graph
-    assert_equal 2, json['results'].length
+    assert_equal 1, json['results'].length
 
+    query = 'SELECT ?datafile ?title
+      WHERE {
+        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+        ?datafile <http://purl.org/dc/terms/title> "private data file" .
+        ?datafile <http://purl.org/dc/terms/title> ?title .
+      }'
+
+    post path, params: { sparql_query: query, format: 'json' }
+    assert_response :success
+    json = JSON.parse(@response.body)
+
+    assert_empty json['results']
+    assert_nil json['error']
+  end
+
+  test 'post sparql query and html response' do
+    path = query_sparql_index_path
+    create_some_triples
+    query = 'SELECT ?datafile ?title
+      WHERE {
+        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
+        ?datafile <http://purl.org/dc/terms/title> "public data file" .
+        ?datafile <http://purl.org/dc/terms/title> ?title .
+      }'
+
+    post path, params: { sparql_query: query }
+    assert_response :success
+    assert_select 'div#query-error', count: 0
+
+    assert_select 'div.sparql-results table' do
+      assert_select 'tbody tr', count: 1
+      assert_select 'thead th', count: 2
+      assert_select 'td', text: 'public data file', count: 1
+    end
+  end
+
+  test 'demonstrate that the default public graph can be worked around' do
+    path = query_sparql_index_path
+    create_some_triples
     query = 'SELECT ?datafile ?title ?graph
       WHERE {
         GRAPH ?graph {
@@ -74,34 +110,10 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(@response.body)
 
-    # should be 1 when it's fixed to only check the public graph
     assert_equal 1, json['results'].length
+    assert_equal 'private data file', json['results'].first['title']
+    assert_equal 'seek-testing:private', json['results'].first['graph']
     assert_nil json['error']
-  end
-
-  test 'post sparql query and html response' do
-    path = query_sparql_index_path
-    create_some_triples
-    query = 'SELECT ?datafile ?title ?graph
-      WHERE {
-        GRAPH ?graph {
-          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-          ?datafile <http://purl.org/dc/terms/title> "public data file" .
-          ?datafile <http://purl.org/dc/terms/title> ?title .
-        }
-      }'
-
-    post path, params: { sparql_query: query }
-    assert_response :success
-    assert_select 'div#query-error', count: 0
-    # this will change when restricting to public graph, and only include 1 result
-    assert_select 'div.sparql-results table' do
-      assert_select 'tbody tr', count: 2
-      assert_select 'thead th', count: 3
-      assert_select 'td', text:'public data file', count: 2
-      assert_select 'td', text:'seek-testing:private', count:1 #should be zero
-      assert_select 'td', text:'seek-testing:public', count:1
-    end
   end
 
   test 'post invalid sparql' do

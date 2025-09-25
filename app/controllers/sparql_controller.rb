@@ -46,7 +46,9 @@ class SparqlController < ApplicationController
   private
 
   def execute_sparql_query(query)
-    sparql_client = SPARQL::Client.new(Seek::Rdf::RdfRepository.instance.get_configuration.uri)
+    public_graph = Seek::Rdf::RdfRepository.instance.get_configuration.public_graph
+    endpoint = Seek::Rdf::RdfRepository.instance.get_configuration.uri
+    sparql_client = SPARQL::Client.new(endpoint, graph: public_graph)
     results = sparql_client.query(query)
     convert_sparql_results(results)
   end
