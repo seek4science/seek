@@ -119,6 +119,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     post path, params: { sparql_query: query }
     assert_response :unprocessable_entity
+    assert_nil flash[:error] # a query error is shown in the results box
 
     assert_select 'div#query-error.alert-danger' do
       assert_select 'h4', text:/Query Error/
