@@ -27,10 +27,10 @@ class SparqlController < ApplicationController
       end
     else
       @error = 'SPARQL endpoint is configured, but not currently available.'
+      flash[:error] = @error
     end
 
     status = @error ? :unprocessable_entity : nil # can't use :success but is the default if nil
-    flash[:error] = @error
     @results ||= []
 
     respond_to do |format|
