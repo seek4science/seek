@@ -177,12 +177,12 @@ class SamplesController < ApplicationController
         begin
           converted_params = param_converter.convert(par)
           sample = Sample.find(par[:id])
-          raise 'shouldnt get this far without manage rights' unless sample.can_manage?
+          raise 'You are not allowed to edit this sample.' unless sample.can_edit?
           sample = update_sample_with_params(converted_params, sample)
           saved = sample.save
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
-        rescue
-          errors.push({ ex_id: par[:ex_id], error: "Can not be updated." })
+        rescue StandardError => e
+          errors.push({ ex_id: par[:ex_id], error: e.message })
         end
       end
       raise ActiveRecord::Rollback if errors.any?

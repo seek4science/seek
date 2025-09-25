@@ -6,7 +6,9 @@ class SinglePagesController < ApplicationController
   include Seek::Data::SpreadsheetExplorerRepresentation
 
   before_action :set_up_instance_variable
-  before_action :project_single_page_enabled?
+  before_action :project_single_page_enabled?,
+                only: %i[show index project_folders]
+  before_action :isa_json_compliance_enabled?
   before_action :check_user_logged_in,
                 only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
   respond_to :html, :js
@@ -55,7 +57,7 @@ class SinglePagesController < ApplicationController
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay.id.to_s + ', Title: ' + @assay.title : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title}]</b> downloaded:<br/><ul>"
+    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay&.id.to_s + ', Title: ' + @assay&.title.to_s : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title.to_s}]</b> downloaded:<br/><ul>"
     notice_message << "<li class='checkmark'><b>#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}</b> visible to you #{@samples.count != 1 ? 'were' : 'was'} included</li>"
     raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
@@ -104,15 +106,13 @@ class SinglePagesController < ApplicationController
 
   def export_to_excel
     cache_uuid = UUID.new.generate
-    id_label = "#{Seek::Config.instance_name} id"
-    sample_ids = JSON.parse(params[:sample_data]).map { |sample| sample[id_label] }
+    sample_ids = JSON.parse(params[:sample_ids])
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
     assay_id = JSON.parse(params[:assay_id])
 
     Rails.cache.write(cache_uuid, { "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
                       expires_in: 1.minute)
-
     respond_to do |format|
       format.json { render json: { uuid: cache_uuid } }
     end
