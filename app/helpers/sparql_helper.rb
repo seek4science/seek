@@ -1,7 +1,7 @@
 module SparqlHelper
 
   def sparql_results_panel_title
-    "<i class='glyphicon glyphicon-ok-circle'></i>&nbspQuery Results (#{@results.length} results)"
+    "<i class=\"glyphicon glyphicon-ok-circle\"></i>&nbsp;Query Results (#{@results.length} results)"
   end
 
   def sparql_examples_panel_title

@@ -19,7 +19,7 @@ class SparqlControllerTest < ActionController::TestCase
     Seek::Rdf::RdfRepository.instance.stub(:configured?, ->(){ false }) do
       refute Seek::Rdf::VirtuosoRepository.instance.configured?
       query = 'ask where {?s ?p ?o}'
-      post :index, params: { query: query, format: 'json' }
+      post :index, params: { sparql_query: query, format: 'json' }
       assert_redirected_to :root
       assert_equal 'SPARQL endpoint is not configured.', flash[:error]
     end
