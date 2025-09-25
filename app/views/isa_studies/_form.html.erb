@@ -34,9 +34,6 @@
 
     <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @isa_study.study} -%>
 
-    <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
-                                                                          select_id: '#study_investigation_id',
-                                                                          parents: Investigation.authorized_for('edit') } %>
 
     <%= folding_panel("Define #{t(:sample_type)} for Source") do %>
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type", action: action } if @isa_study.source %>
@@ -55,10 +52,13 @@
 
 <% end -%>
 
-
-
-
 <%= form_submit_buttons(@isa_study.study) %>
+
+<%= render partial: 'projects/implicit_project_selector', locals: { action: action,
+                                                                    select_id: '#isa_study_study_investigation_id',
+                                                                    parents: Investigation.authorized_for('edit'),
+                                                                    skip_on_page_load: true} %>
+
 
 <script>
     const templates = <%= load_templates().to_json.html_safe %>
