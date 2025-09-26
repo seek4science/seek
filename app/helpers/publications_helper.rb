@@ -5,8 +5,8 @@ module PublicationsHelper
     projects = Project.includes(:people)
     grouped = projects.map do |p|
       [
-          p.title,
-          p.people.map {|m| ["#{m.name}#{' (suggested)' if !selected_id && suggestion == m}", m.id]}
+        p.title,
+        p.people.map {|m| ["#{m.name}#{' (suggested)' if !selected_id && suggestion == m}", m.id]}
       ]
     end
 
@@ -41,6 +41,37 @@ module PublicationsHelper
       html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' data-tooltip='#{tooltip(explanation)}' >" + image('destroy', alt: 'Delete', class: 'disabled') + " Delete (cannot be reverted) </span></li>"
       return html.html_safe
     end
+  end
+  # app/helpers/publications_helper.rb
+  def publication_authors_form_field(element_name, publication, allow_new: true, limit: nil)
+    object_struct = Struct.new(:id, :title, :first_name, :last_name, :person_id, :count)
+
+    existing_objects = publication.publication_authors.map do |pa|
+      name = pa.person&.title || "#{pa.first_name} #{pa.last_name}".strip
+      object_struct.new(
+        name,          # id = full name
+        name,          # text/display
+        pa.first_name,
+        pa.last_name,
+        pa.person_id,
+        1
+      )
+    end
+
+    typeahead = {
+      handlebars_template: 'typeahead/publication_author',
+      query_url: typeahead_publication_authors_people_path
+    }
+
+    objects_input(
+      element_name,
+      existing_objects,
+      typeahead: typeahead,
+      limit: limit,
+      allow_new: allow_new,
+      placeholder: 'Add authors…',
+      class: 'form-control'
+    )
   end
 end
 

@@ -295,6 +295,7 @@ SEEK::Application.routes.draw do
   resources :people, concerns: [:publishable, :has_avatar] do
     collection do
       get :typeahead
+      get :typeahead_publication_authors
       get :register
       get :current
       get :is_this_you
