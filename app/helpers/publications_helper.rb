@@ -42,25 +42,16 @@ module PublicationsHelper
       return html.html_safe
     end
   end
-  # app/helpers/publications_helper.rb
-  def publication_authors_form_field(element_name, publication, allow_new: true, limit: nil)
-    object_struct = Struct.new(:id, :title, :first_name, :last_name, :person_id, :count)
 
+  def publication_authors_form_field(element_name, publication, allow_new: true, limit: nil)
     existing_objects = publication.publication_authors.map do |pa|
-      name = pa.person&.title || "#{pa.first_name} #{pa.last_name}".strip
-      object_struct.new(
-        name,          # id = full name
-        name,          # text/display
-        pa.first_name,
-        pa.last_name,
-        pa.person_id,
-        1
-      )
+      full_name = [pa.first_name, pa.last_name].compact.join(" ")
+      Struct.new(:id, :title).new(full_name, full_name)
     end
 
     typeahead = {
       handlebars_template: 'typeahead/publication_author',
-      query_url: typeahead_publication_authors_people_path
+      query_url: typeahead_publication_authors_publications_path
     }
 
     objects_input(
@@ -69,10 +60,10 @@ module PublicationsHelper
       typeahead: typeahead,
       limit: limit,
       allow_new: allow_new,
-      placeholder: 'Add authors…',
       class: 'form-control'
     )
   end
+
 end
 
 

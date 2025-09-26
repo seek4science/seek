@@ -281,6 +281,56 @@ class PublicationsController < ApplicationController
     end
   end
 
+
+  def typeahead_publication_authors
+    q = params[:q].to_s.strip
+
+    # Fetch all matching authors and remove empty names
+    results = PublicationAuthor
+                .where("first_name LIKE :q OR last_name LIKE :q", q: "%#{q}%")
+                .select(:id, :first_name, :last_name, :person_id)
+                .reject { |a| a.first_name.blank? || a.last_name.blank? }
+
+    # Separate authors with and without person_id
+    authors_with_id, authors_without_id = results.partition(&:person_id)
+
+    # Group authors with person_id and count occurrences
+    grouped_with_id = authors_with_id
+                        .group_by(&:person_id)
+                        .map do |person_id, group|
+      first_name = group.first.first_name
+      last_name = group.first.last_name
+      full_name = [first_name, last_name].compact.join(" ")
+      {
+        id: full_name,
+        text: full_name,
+        first_name: first_name,
+        last_name: last_name,
+        person_id: person_id,
+        count: group.size
+      }
+    end
+
+    # Authors without person_id, each as a separate entry with count = 1
+    without_id_items = authors_without_id.map do |author|
+      full_name = [author.first_name, author.last_name].compact.join(" ")
+      {
+        id: full_name,
+        text: full_name,
+        first_name: author.first_name,
+        last_name: author.last_name,
+        person_id: nil,
+        count: 1
+      }
+    end
+
+    # Combine both lists
+    items = grouped_with_id + without_id_items
+
+    render json: { results: items }
+  end
+
+
   # Try and relate non_seek_authors to people in SEEK based on name and project
   def suggest_authors
     @publication.publication_authors.each do |author|

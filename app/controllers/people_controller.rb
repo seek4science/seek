@@ -223,25 +223,6 @@ class PeopleController < ApplicationController
     end
   end
 
-  def typeahead_publication_authors
-    query = params[:q].to_s.strip
-    results = Person.with_name(query).limit(params[:limit] || 10)
-
-    items = results.map do |person|
-      {
-        id: person.title,
-        text: "#{person.first_name} #{person.last_name}",
-        first_name: person.first_name,
-        last_name: person.last_name,
-        person_id: person.id,
-      }
-    end
-
-    respond_to do |format|
-      format.json { render json: { results: items } }
-    end
-  end
-
   private
 
   def person_params

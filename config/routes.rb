@@ -295,7 +295,6 @@ SEEK::Application.routes.draw do
   resources :people, concerns: [:publishable, :has_avatar] do
     collection do
       get :typeahead
-      get :typeahead_publication_authors
       get :register
       get :current
       get :is_this_you
@@ -635,6 +634,7 @@ SEEK::Application.routes.draw do
     collection do
       get :query_authors
       get :query_authors_typeahead
+      get :typeahead_publication_authors
       get :export
       post :fetch_preview
       post :update_metadata
