@@ -224,7 +224,8 @@
 </div>
 
 <script type="text/javascript">
-    jQuery(document).ready(function() {
+    $j(document).ready(function() {
+
         $j('#fetch_publication').on('ajax:before', function () {
             $j('#spinner').show();
         });
@@ -235,61 +236,61 @@
 
         // activate tab of current subaction, but only if no hash is set
         if( !window.location.hash) {
-            var newpublications_tabs = jQuery('#new_publication_tabs');
+            var newpublications_tabs = $j('#new_publication_tabs');
             var activate_tab_hash = newpublications_tabs.data('subaction');
             var activate_tab = newpublications_tabs.find('a[href="#' + activate_tab_hash + '"]');
             activate_tab.trigger('click');
         }
 
         // activate popovers
-        jQuery('[data-toggle="popover"]').popover();
+        $j('[data-toggle="popover"]').popover();
 
-        jQuery('select.projects-multiselect').multiselect({
+        $j('select.projects-multiselect').multiselect({
             enableCaseInsensitiveFiltering: true
         });
 
-        jQuery('#retrieve_from_crossref').on('click', function(e){
+        $j('#retrieve_from_crossref').on('click', function(e){
             e.preventDefault(); // prevent the default form submit action
 
-            var doi = jQuery('#publication_doi').val();
+            var doi = $j('#publication_doi').val();
             doi = doi.replace(/^(https?:\/\/)?(dx\.)?doi\.org/, '');
 
-            jQuery.ajax({
+            $j.ajax({
                 url: 'https://doi.org/' + doi,
                 accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
                 dataType: 'json',
                 success: function(data, textStatus, jqXHR) {
                     //console.log("DOI:"+data);
-                    jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
-                    jQuery('#publication_doi').parents('.form-group').addClass('has-success');
-                    jQuery('#crossref_id').val(data.DOI);
-                    jQuery('#publication_title').val(data.title);
-                    jQuery('#publication_journal').val(data.publisher);
+                    $j('#publication_doi').parents('.form-group').removeClass('has-error');
+                    $j('#publication_doi').parents('.form-group').addClass('has-success');
+                    $j('#crossref_id').val(data.DOI);
+                    $j('#publication_title').val(data.title);
+                    $j('#publication_journal').val(data.publisher);
                     published_data = data["published-online"] || data["published-print"];
                     //console.log("published_data:"+published_data);
                     year=published_data["date-parts"][0][0];
                     month= published_data["date-parts"][0][1];
                     day= published_data["date-parts"][0][2];
                     var date_published = year+"-"+month+"-"+day;
-                    jQuery('#publication_published_date').val(date_published);
+                    $j('#publication_published_date').val(date_published);
 
                     //console.log("DOI:", data);
-                    jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
-                    jQuery('#publication_doi').parents('.form-group').addClass('has-success');
-                    jQuery('#crossref_id').val(data.DOI);
-                    jQuery('#publication_title').val(data.title);
-                    jQuery('#publication_journal').val(data["container-title"]);
-                    jQuery('#publication_publisher').val(data["publisher"]);
-                    jQuery('#publication_publisher').val(data["publisher"]);
+                    $j('#publication_doi').parents('.form-group').removeClass('has-error');
+                    $j('#publication_doi').parents('.form-group').addClass('has-success');
+                    $j('#crossref_id').val(data.DOI);
+                    $j('#publication_title').val(data.title);
+                    $j('#publication_journal').val(data["container-title"]);
+                    $j('#publication_publisher').val(data["publisher"]);
+                    $j('#publication_publisher').val(data["publisher"]);
 
                     if (typeof data["abstract"] !== 'undefined') {
                         var regex = /(<([^>]+)>)/ig
                         var  result = data["abstract"].replace(regex, "").slice(9);
                         //console.log("abstract:",result);
-                        jQuery('#publication_abstract').val(result);
+                        $j('#publication_abstract').val(result);
                     }
 
-                    if (!jQuery('#publication_citation').val()) {
+                    if (!$j('#publication_citation').val()) {
                         var publication_citation = data["container-title"];
 
                         if (typeof data["volume"] !== 'undefined') {
@@ -304,7 +305,7 @@
                             publication_citation += ':' + data["page"];
                         }
                         console.log("citation:",publication_citation);
-                        jQuery('#publication_citation').val(publication_citation);
+                        $j('#publication_citation').val(publication_citation);
                     }
 
                     published_data = data["published-online"] || data["published-print"] || data["accepted"];
@@ -313,16 +314,16 @@
                     month= published_data["date-parts"][0][1];
                     day= published_data["date-parts"][0][2];
                     var date_published = year+"-"+month+"-"+day;
-                    jQuery('#publication_published_date').val(date_published);
+                    $j('#publication_published_date').val(date_published);
 
                     var authorlist = [];
                     data.author.forEach(function(item,index){
                         author_name = item.given+' '+item.family;
                         console.log ('author_name:'+ author_name);
                         console.log ('index:'+ index);
-                        jQuery('#author-'+index).text (author_name);
-                        jQuery('#publication_publication_authors_attributes_'+index+'_person_first_name').val (item.given);
-                        jQuery('#publication_publication_authors_attributes_'+index+'_person_last_name').val (item.family);
+                        $j('#author-'+index).text (author_name);
+                        $j('#publication_publication_authors_attributes_'+index+'_person_first_name').val (item.given);
+                        $j('#publication_publication_authors_attributes_'+index+'_person_last_name').val (item.family);
                         authorlist.push({"first_name": item.given, "last_name": item.family});
                     });
                     addAuthorsToPublication(authorlist,'#publication_publication_authors');
@@ -336,15 +337,15 @@
                     406: function() { console.log("DOI: " + doi + " Can't serve any requested content type.");}
                 },
                 error: function() {
-                    jQuery('#publication_doi').parents('.form-group').removeClass('has-success');
-                    jQuery('#publication_doi').parents('.form-group').addClass('has-error');
+                    $j('#publication_doi').parents('.form-group').removeClass('has-success');
+                    $j('#publication_doi').parents('.form-group').addClass('has-error');
                 }
             });
         });
-        jQuery('#retrieve_from_pubmed').on('click', function(e){
+        $j('#retrieve_from_pubmed').on('click', function(e){
             e.preventDefault(); // prevent the default form submit action
-            var pubmedid = jQuery('#publication_pubmed_id').val();
-            jQuery.ajax({
+            var pubmedid = $j('#publication_pubmed_id').val();
+            $j.ajax({
                 url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi',
                 data: {
                     'db': 'pubmed',
@@ -354,29 +355,29 @@
                 },
                 dataType: 'xml',
                 success: function(data, textStatus, jqXHR) {
-                    jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-error');
-                    jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-success');
-                    var doc = jQuery(data);
+                    $j('#publication_pubmed_id').parents('.form-group').removeClass('has-error');
+                    $j('#publication_pubmed_id').parents('.form-group').addClass('has-success');
+                    var doc = $j(data);
                     console.log("Pudmed ID:", data);
-                    var doi_elem = jQuery(data).find('PubmedArticleSet > PubmedArticle > PubmedData > ArticleIdList > ArticleId[IdType="doi"]');
+                    var doi_elem = $j(data).find('PubmedArticleSet > PubmedArticle > PubmedData > ArticleIdList > ArticleId[IdType="doi"]');
                     if( doi_elem.length != 0) {
-                        jQuery('#publication_doi').val(doi_elem.html());
+                        $j('#publication_doi').val(doi_elem.html());
                     }
-                    var article = jQuery(data).find('PubmedArticleSet > PubmedArticle > MedlineCitation > Article');
+                    var article = $j(data).find('PubmedArticleSet > PubmedArticle > MedlineCitation > Article');
                     var title_elem = article.find('ArticleTitle');
                     if( title_elem.length != 0) {
-                        jQuery('#publication_title').val(title_elem.html());
+                        $j('#publication_title').val(title_elem.html());
                     }
                     var abstract_elem = article.find('Abstract > AbstractText');
                     if( abstract_elem.length != 0) {
-                        jQuery('#publication_abstract').val(abstract_elem.html());
+                        $j('#publication_abstract').val(abstract_elem.html());
                     }
                     var journal_elem = article.find('Journal > Title');
                     if( journal_elem.length != 0) {
-                        jQuery('#publication_journal').val(journal_elem.html())
+                        $j('#publication_journal').val(journal_elem.html())
                     }
 
-                    if (!jQuery('#publication_citation').val()) {
+                    if (!$j('#publication_citation').val()) {
                         var journalIssue_Title = article.find('Journal > Title');
                         var publication_citation = journalIssue_Title.html();
                         //console.log("JournalIssue_Title:", journalIssue_Title.html());
@@ -395,7 +396,7 @@
                             publication_citation += ':' + article.find('Pagination > MedlinePgn').html();
                             //console.log("Page:", article.find('Pagination > MedlinePgn').html());
                         }
-                        jQuery('#publication_citation').val(publication_citation);
+                        $j('#publication_citation').val(publication_citation);
                     }
 
                     var published_date1 = article.find('Journal > JournalIssue > PubDate');
@@ -406,24 +407,24 @@
                         published_date1.find('Day').length == 0){
 
                         var date_published = published_date2.find('Year').html()+"-"+published_date2.find('Month').html()+"-"+published_date2.find('Day').html();
-                        jQuery('#publication_published_date').val(date_published);
+                        $j('#publication_published_date').val(date_published);
 
                     }else {
                         var date_published = published_date1.find('Year').html()+"-"+published_date1.find('Month').html()+"-"+published_date1.find('Day').html();
-                        jQuery('#publication_published_date').val(date_published);
+                        $j('#publication_published_date').val(date_published);
                     }
 
                     var authorlist = [];
                     var author_list_elem = article.find('AuthorList > Author').each( function(index, element){
-                        var firstname = jQuery(element).find('ForeName').html();
-                        var lastname = jQuery(element).find('LastName').html();
+                        var firstname = $j(element).find('ForeName').html();
+                        var lastname = $j(element).find('LastName').html();
                         authorlist.push({"first_name": firstname, "last_name": lastname});
                     });
                     addAuthorsToPublication(authorlist,'#publication_publication_authors');
                 },
                 error: function() {
-                    jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-success');
-                    jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-error');
+                    $j('#publication_pubmed_id').parents('.form-group').removeClass('has-success');
+                    $j('#publication_pubmed_id').parents('.form-group').addClass('has-error');
                 }
             });
         });
