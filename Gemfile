@@ -100,6 +100,8 @@ gem 'rugged'
 gem 'sample-template-generator'
 gem 'sass-rails'
 gem 'seedbank'
+gem 'shrine'
+gem "aws-sdk-s3", "~> 1.14"
 gem 'simple-spreadsheet-extractor'
 gem 'sitemap_generator'
 gem 'sprockets-rails'

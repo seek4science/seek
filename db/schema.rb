@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -255,6 +255,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "original_filename"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text "image_data"
     t.index ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id"
   end
 

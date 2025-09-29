@@ -3,16 +3,9 @@
 
 <%= error_messages_for :avatar -%>
 
-<%= form_tag({ action: :create }, multipart: true) do %>
-    <%= hidden_field_tag(:return_to, return_path) -%>
 
-    <div class="form-group">
-      <label class="required">Picture file: </label>
-      <%= file_field 'avatar', 'image_file' %>
-    </div>
-
-    <div>
-      <%= submit_tag "Upload", data: { disable_with: 'Uploading...' }, :class => "btn btn-primary" %>
-      or <%= cancel_button(return_path) -%>
-    </div>
+<%= form_for [@parent_resource, @avatar] do |f| %>
+    <%= f.hidden_field :image, value: @avatar.cached_image_data, id: nil  %>
+    <%= f.file_field :image %>
+    <%= f.submit %>
 <% end %>
