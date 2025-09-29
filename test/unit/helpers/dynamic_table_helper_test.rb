@@ -30,7 +30,7 @@ class DynamicTableHelperTest < ActionView::TestCase
     assert dt_columns.all? { |dt_column| default_column_titles.concat(@source_sample_type.sample_attributes.map(&:title)).include? dt_column[:title] }
   end
 
-  test'should return aggregated columns of study' do
+  test 'should return aggregated columns of study' do
     dt_aggregated_columns = dt_cumulative_cols(@study.sample_types)
     study_aggregated_column_names = []
     @study.sample_types.each do |type|
