@@ -135,14 +135,14 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     assert_select 'div#query-error.alert-danger' do
       assert_select 'h4', text:/Query Error/
-      assert_select 'pre', text:/SPARQL compiler, line 2: syntax error at 'SEECT'/
+      assert_select 'pre', text:/SPARQL compiler, line 3: syntax error at 'SEECT'/
     end
 
     post path, params: { sparql_query: query, format: 'json' }
     assert_response :unprocessable_entity
     json = JSON.parse(@response.body)
 
-    assert_match /SPARQL compiler, line 2: syntax error at 'SEECT'/, json['error']
+    assert_match /SPARQL compiler, line 3: syntax error at 'SEECT'/, json['error']
 
   end
 
@@ -170,6 +170,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
   test 'respond with json when using content negotiation' do
     path = query_sparql_index_path
+    create_some_triples
     query = 'ask where {?s ?p ?o}'
 
     post path, params: { sparql_query: query }, headers: { 'Accept' => 'application/json' }
