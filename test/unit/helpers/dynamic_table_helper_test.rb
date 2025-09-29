@@ -134,4 +134,176 @@ class DynamicTableHelperTest < ActionView::TestCase
     assert_equal sample1_metadata[0][3], rows_case2[0][4]
     assert_equal sample1_metadata[0][4], rows_case2[0][3]
   end
+
+  test 'Should sanitize unauthorized samples' do
+    other_person = FactoryBot.create(:person)
+
+    # Add sources
+    # Sources 1,3,5 => other_person
+    # sources 2,4 => @person
+    (1..5).each do |i|
+      contributor = if i % 2 == 0
+                      @person
+                    else
+                      other_person
+                    end
+      FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: contributor, title: "source #{i}")
+    end
+
+    User.with_current_user(other_person.user) do
+      rows = dt_rows(@source_sample_type)
+      assert_equal rows.length, 5
+
+      # Even sources belong to @person, meaning two sample should have '#HIDDEN' as id.
+      hidden_rows = rows.select { |r| r['id'] == '#HIDDEN' }
+      assert_equal hidden_rows.length, 2
+    end
+  end
+
+  test 'Should not return values of registered sample fields when unauthorized' do
+    other_person = FactoryBot.create(:person)
+    sources = []
+
+    # Add sources
+    # Sources 1,3,5 => other_person
+    # sources 2,4 => @person
+    (1..5).each do |i|
+      contributor = if i % 2 == 0
+                      @person
+                    else
+                      other_person
+                    end
+      sources << FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: contributor, title: "source #{i}")
+    end
+
+    # Add samples
+    (1..5).each do |i|
+      # source 1 => input for collected sample 1
+      # ...
+      # source 5 => input for collected sample 5
+      linked_sample = sources[i-1]
+      FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, contributor: @person, title: "collected sample #{i}", linked_samples: [linked_sample])
+    end
+    # Add extra sample with two inputs:
+    # source 1 => Owned by other_person
+    # source 2 => Owned by @person
+    FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, contributor: @person, title: "collected sample with two inputs", linked_samples: [sources[0], sources[1]])
+
+    # Input attribute = Registered Sample multi type
+    input_attribute = @sample_collection_sample_type.sample_attributes.detect { |sa| sa.input_attribute? }
+    refute_nil input_attribute
+
+    User.with_current_user(@person.user) do
+      rows = dt_rows(@sample_collection_sample_type)
+      assert_equal rows.length, 6
+
+      # No collected sample should be completely hidden => 'id' == '#HIDDEN'
+      assert_equal rows.select { |r| r['id'] == '#HIDDEN' }.count, 0
+
+      # Get input value
+      registered_sample_values = rows.map { |r| r[input_attribute.title] }
+
+      # 4 samples have inputs that are hidden to @person
+      samples_with_hidden_inputs = registered_sample_values.select { |rsv| rsv.any? { |input| input['title'] == "#HIDDEN" } }
+      assert_equal samples_with_hidden_inputs.length,4
+
+      # last sample has one hidden input (source 1) and a visible one (source 2)
+      assert_equal registered_sample_values.last.map { |input| input['title'] }, ['#HIDDEN', 'source 2']
+    end
+
+    User.with_current_user(@person.user) do
+      # Delete source 4 (owned by @person)
+      deleted_source = @source_sample_type.samples.detect { |sample| sample.title == 'source 4' }
+      deleted_source.destroy
+      @source_sample_type.reload
+      assert_equal @source_sample_type.samples.length, 4
+
+      # Deleted samples are not sanitized because the validation happens in the front end.
+      # Users need to know the name of the deleted sample.
+      rows = dt_rows(@sample_collection_sample_type)
+      samples_with_deleted_input = rows.select { |row| row[input_attribute.title].any? { |input| input['title'] == deleted_source.title } }
+      assert_equal samples_with_deleted_input.length, 1
+    end
+  end
+
+  test 'Should not return values of registered data file fields when unauthorized' do
+    other_person = FactoryBot.create(:person)
+    data_file_attribute = FactoryBot.create(:data_file_sample_attribute, sample_type: @source_sample_type, title: 'data file', required: false, is_title: false)
+    @source_sample_type.sample_attributes << data_file_attribute
+
+    person_df = FactoryBot.create(:min_data_file, title: 'Person\'s data file.', projects: [@project], contributor: @person)
+    other_person_df = FactoryBot.create(:min_data_file, title: 'Other person\'s data file', projects: [@project], contributor: other_person)
+
+    policy = FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:manage_permission, contributor: @person), FactoryBot.create(:manage_permission, contributor: other_person)])
+
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: @person, title: "Person\'s data file", policy: policy, data: { 'data file': person_df.id })
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: other_person, title: "Other person\'s data file", policy: policy, data: { 'data file': other_person_df.id })
+
+    assert_equal @source_sample_type.samples.count, 2
+
+    # Both samples are manageable by both users
+    [@person, other_person].all? { |person| @source_sample_type.samples.map { |sample| sample.can_manage?(person) } }
+
+    # Other person's data file should be hidden to @person
+    User.with_current_user(@person.user) do
+      rows = dt_rows(@source_sample_type)
+      hidden_df_row = rows.select { |row| row[data_file_attribute.title]['title'] == '#HIDDEN' }
+      assert_equal hidden_df_row.length, 1
+      assert_equal hidden_df_row.first[data_file_attribute.title]['id'], other_person_df.id
+    end
+  end
+
+  test 'Should not return values of registered sop fields when unauthorized' do
+    other_person = FactoryBot.create(:person)
+    sop_attribute = FactoryBot.create(:sop_sample_attribute, sample_type: @source_sample_type, title: 'registered SOP', required: false, is_title: false)
+    @source_sample_type.sample_attributes << sop_attribute
+
+    person_sop = FactoryBot.create(:min_sop, title: 'Person\'s sop.', projects: [@project], contributor: @person)
+    other_person_sop = FactoryBot.create(:min_sop, title: 'Other person\'s sop', projects: [@project], contributor: other_person)
+
+    policy = FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:manage_permission, contributor: @person), FactoryBot.create(:manage_permission, contributor: other_person)])
+
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: @person, title: "Person\'s SOP", policy: policy, data: { 'registered SOP': person_sop.id })
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: other_person, title: "Other person\'s SOP", policy: policy, data: { 'registered SOP': other_person_sop.id })
+
+    assert_equal @source_sample_type.samples.count, 2
+
+    # Both samples are manageable by both users
+    [@person, other_person].all? { |person| @source_sample_type.samples.map { |sample| sample.can_manage?(person) } }
+
+    # Other person's SOP should be hidden to @person
+    User.with_current_user(@person.user) do
+      rows = dt_rows(@source_sample_type)
+      hidden_df_row = rows.select { |row| row[sop_attribute.title]['title'] == '#HIDDEN' }
+      assert_equal hidden_df_row.length, 1
+      assert_equal hidden_df_row.first[sop_attribute.title]['id'], other_person_sop.id
+    end
+  end
+
+  test 'Should not return values of strain fields when unauthorized' do
+    other_person = FactoryBot.create(:person)
+    strain_attribute = FactoryBot.create(:strain_sample_attribute, sample_type: @source_sample_type, title: 'strain used', required: false, is_title: false)
+    @source_sample_type.sample_attributes << strain_attribute
+    aliens = FactoryBot.create(:min_organism)
+    person_strain = FactoryBot.create(:strain, organism: aliens, title: 'Person\'s strain', projects: [@project], contributor: @person, policy: FactoryBot.create(:private_policy))
+    other_person_strain = FactoryBot.create(:strain, organism: aliens, title: 'Other person\'s strain', projects: [@project], contributor: other_person, policy: FactoryBot.create(:private_policy))
+
+    policy = FactoryBot.create(:private_policy, permissions: [FactoryBot.create(:manage_permission, contributor: @person), FactoryBot.create(:manage_permission, contributor: other_person)])
+
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: @person, title: "Person\'s strain", policy: policy, data: { 'strain used': person_strain.id })
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: other_person, title: "Other person\'s strain", policy: policy, data: { 'strain used': other_person_strain.id })
+
+    assert_equal @source_sample_type.samples.count, 2
+
+    # Both samples are manageable by both users
+    [@person, other_person].all? { |person| @source_sample_type.samples.map { |sample| sample.can_manage?(person) } }
+
+    # Other person's SOP should be hidden to @person
+    User.with_current_user(@person.user) do
+      rows = dt_rows(@source_sample_type)
+      hidden_df_row = rows.select { |row| row[strain_attribute.title]['title'] == '#HIDDEN' }
+      assert_equal hidden_df_row.length, 1
+      assert_equal hidden_df_row.first[strain_attribute.title]['id'], other_person_strain.id
+    end
+  end
 end
