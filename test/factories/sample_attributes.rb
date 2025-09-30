@@ -25,6 +25,11 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :sop_sample_attribute_type
     required { true }
   end
+
+  factory(:strain_sample_attribute, parent: :sample_attribute) do
+    association :sample_attribute_type, factory: :strain_sample_attribute_type
+    required { true }
+  end
   
   factory(:sample_sample_attribute, parent: :sample_attribute) do
     sequence(:title) { |n| "sample attribute #{n}" }

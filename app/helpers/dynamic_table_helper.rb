@@ -112,7 +112,7 @@ module DynamicTableHelper
     model = obj['type']
     raise "Not allowed to look up #{model}!" unless ALLOWED_MODELS.include?(model)
 
-    item = model.constantize.find(obj['id']) if obj['id'].present?
+    item = model.constantize.find_by(id: obj['id']) if obj['id'].present?
     item_exists = !item.nil?
     if item_exists && !item&.can_view?
       { 'id' => obj['id'], 'type' => obj['type'], 'title' => '#HIDDEN' }
