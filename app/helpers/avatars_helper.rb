@@ -36,7 +36,7 @@ module AvatarsHelper
     if item.avatar_selected?
       if item.avatars.include?(item.avatar)
         if item.is_a?(Person)
-          return image_tag item.avatar.image_url, size: size, alt: alternative, class: css_class
+          return image_tag item.avatar.image.derivation_url(:thumbnail, size), alt: alternative, class: css_class
         else
           return image_tag avatar_url(item, item.avatar, size), alt: alternative, class: css_class
         end

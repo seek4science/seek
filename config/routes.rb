@@ -838,6 +838,8 @@ SEEK::Application.routes.draw do
     resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
   end
 
+  mount ImageUploader.derivation_endpoint => "/derivations/image"
+
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search
   get '/search/save' => 'search#save', as: :save_search

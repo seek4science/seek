@@ -43,6 +43,7 @@ gem 'google-analytics-rails'
 gem 'handlebars_assets'
 gem 'html-pipeline'
 gem 'i18n-js', '~> 3.9.2' # Version 4+ does not support the asset pipeline
+gem "image_processing", "~> 1.8"
 gem 'indefinite_article'
 gem 'jbuilder'
 gem 'jbuilder-json_api'
