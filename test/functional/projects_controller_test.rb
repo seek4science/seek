@@ -5598,7 +5598,7 @@ class ProjectsControllerTest < ActionController::TestCase
       project.default_license = 'CC0-1.0'
       project.default_policy = FactoryBot.create(:private_policy)
       project.use_default_policy = true
-      project.discipline_annotations = 'Biology'
+      project.discipline_annotations = ['Biochemistry, Genetics and Molecular Biology']
       project.save!
     end
     login_as(person)
@@ -5608,7 +5608,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     data = JSON.parse(response.body)
     assert_equal 0, data.dig('policy', 'access_type')
-    assert_equal ['Biology'], data['disciplines']
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], data['disciplines']
     assert_equal 'CC0-1.0', data['license']
   end
 

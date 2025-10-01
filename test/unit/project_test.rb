@@ -985,30 +985,30 @@ class ProjectTest < ActiveSupport::TestCase
     workflow = FactoryBot.create(:workflow, projects: [project])
     workflow_with_disciplines = FactoryBot.create(:workflow, projects: [project])
     User.with_current_user(workflow_with_disciplines.contributor.user) do
-      workflow_with_disciplines.discipline_annotations = 'Physics'
+      workflow_with_disciplines.discipline_annotations = ['Physics and Astronomy']
       workflow_with_disciplines.save!
     end
-    assert_equal ['Physics'], workflow_with_disciplines.reload.discipline_annotation_labels
+    assert_equal ['Physics and Astronomy'], workflow_with_disciplines.reload.discipline_annotation_labels
 
     assert_empty workflow.discipline_annotation_labels
     assert_empty project.discipline_annotation_labels
 
     User.with_current_user(workflow.contributor.user) do
-      project.discipline_annotations = 'Biology'
+      project.discipline_annotations = ['Biochemistry, Genetics and Molecular Biology']
       project.save!
     end
 
-    assert_equal ['Biology'], project.discipline_annotation_labels
-    assert_equal ['Biology'], workflow.reload.discipline_annotation_labels
-    assert_equal ['Physics'], workflow_with_disciplines.reload.discipline_annotation_labels
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], project.discipline_annotation_labels
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], workflow.reload.discipline_annotation_labels
+    assert_equal ['Physics and Astronomy'], workflow_with_disciplines.reload.discipline_annotation_labels
 
     User.with_current_user(workflow.contributor.user) do
-      workflow.discipline_annotations = 'Chemistry'
+      workflow.discipline_annotations = ['Chemistry']
       workflow.save!
     end
 
-    assert_equal ['Biology'], project.discipline_annotation_labels
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], project.discipline_annotation_labels
     assert_equal ['Chemistry'], workflow.discipline_annotation_labels
-    assert_equal ['Physics'], workflow_with_disciplines.reload.discipline_annotation_labels
+    assert_equal ['Physics and Astronomy'], workflow_with_disciplines.reload.discipline_annotation_labels
   end
 end

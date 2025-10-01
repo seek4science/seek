@@ -964,10 +964,10 @@ class WorkflowTest < ActiveSupport::TestCase
 
     workflow = FactoryBot.create(:workflow)
     User.with_current_user(workflow.contributor.user) do
-      workflow.discipline_annotations = ['', 'Physics']
+      workflow.discipline_annotations = ['', 'Physics and Astronomy']
       assert workflow.save
     end
 
-    assert_equal ['Physics'], workflow.reload.discipline_annotation_labels
+    assert_equal ['Physics and Astronomy'], workflow.reload.discipline_annotation_labels
   end
 end
