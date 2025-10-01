@@ -61,8 +61,6 @@
     <%= render :partial=> "projects/select_add_current_user_to_project" %>
 <% end %>
 
-<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: @project, property: :disciplines} -%>
-
 <%= f.fancy_multiselect :organisms, { possibilities: Organism.order(:title).all, hidden: false } %>
 
 <%= f.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
