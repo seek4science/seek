@@ -1100,7 +1100,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'should display license for current version' do
@@ -1111,11 +1111,11 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
 
     get :show, params: { id: model, version: modelv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal (CC0-1.0)'
   end
 
   test 'should update license' do
@@ -1130,7 +1130,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: model }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
     assert_equal 'CC-BY-SA-4.0', assigns(:model).license
   end
 

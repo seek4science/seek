@@ -52,6 +52,14 @@ module Seek
       id == NULL_LICENSE
     end
 
+    def full_display_title
+      if is_null_license?
+        title
+      else
+        "#{title} (#{id})"
+      end
+    end
+
     def self.combined
       @combined ||= open_definition.merge(spdx) do |key, od_license, spdx_license|
         spdx_license['urls'] |= od_license['urls'] # Merge together alternate URLs

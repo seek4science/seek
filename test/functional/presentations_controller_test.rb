@@ -377,7 +377,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: presentation }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'should display license for current version' do
@@ -388,11 +388,11 @@ class PresentationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: presentation, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
 
     get :show, params: { id: presentation, version: presentationv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal (CC0-1.0)'
   end
 
   test 'should update license' do
@@ -407,7 +407,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: presentation }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
     assert_equal 'CC-BY-SA-4.0', assigns(:presentation).license
   end
 

@@ -31,4 +31,11 @@ class LicenseHelperTest < ActionView::TestCase
 
   end
 
+  test 'describe license' do
+    assert_equal '<a target="_blank" href="https://spdx.org/licenses/CC-BY-4.0">Creative Commons Attribution 4.0 International (CC-BY-4.0)</a>', describe_license('CC-BY-4.0')
+
+    assert_match /<a target="_blank" href="https:\/\/choosealicense.com\/no-permission\/">No license - no permission to use unless the owner grants a licence<\/a>/, describe_license(nil)
+    assert_match /<a target="_blank" href="https:\/\/choosealicense.com\/no-permission\/">No license - no permission to use unless the owner grants a licence<\/a>/, describe_license(Seek::License::NULL_LICENSE)
+  end
+
 end
