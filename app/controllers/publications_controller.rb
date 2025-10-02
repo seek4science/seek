@@ -199,20 +199,19 @@ class PublicationsController < ApplicationController
 
     # Fetch all matching authors and remove empty names
     results = PublicationAuthor
-                .where("first_name LIKE :q OR last_name LIKE :q", q: "%#{q}%")
+                .where("CONCAT_WS(' ', first_name, last_name) LIKE ?", "%#{q}%")
                 .select(:id, :first_name, :last_name, :person_id)
                 .reject { |a| a.first_name.blank? || a.last_name.blank? }
 
-    # Separate authors with and without person_id
-    authors_with_id, authors_without_id = results.partition(&:person_id)
 
-    # Group authors with person_id and count occurrences
-    grouped_with_id = authors_with_id
-                        .group_by(&:person_id)
-                        .map do |person_id, group|
-      first_name = group.first.first_name
-      last_name = group.first.last_name
+    # Group by full name (ignore person_id when grouping)
+    grouped = results.group_by { |a| [a.first_name, a.last_name] }
+
+    items = grouped.map do |(first_name, last_name), group|
       full_name = [first_name, last_name].compact.join(" ")
+
+      person_id = group.map(&:person_id).compact.first
+
       {
         id: full_name,
         text: full_name,
@@ -223,24 +222,10 @@ class PublicationsController < ApplicationController
       }
     end
 
-    # Authors without person_id, each as a separate entry with count = 1
-    without_id_items = authors_without_id.map do |author|
-      full_name = [author.first_name, author.last_name].compact.join(" ")
-      {
-        id: full_name,
-        text: full_name,
-        first_name: author.first_name,
-        last_name: author.last_name,
-        person_id: nil,
-        count: 1
-      }
-    end
-
-    # Combine both lists
-    items = grouped_with_id + without_id_items
-
     render json: { results: items }
   end
+
+
 
 
   # Try and relate non_seek_authors to people in SEEK based on name and project
@@ -431,10 +416,10 @@ class PublicationsController < ApplicationController
       end
     else
       @subaction = 'Create'
-        respond_to do |format|
-          format.html { render action: 'new' }
-          format.json { render json: @publication, status: :ok, include: [params[:include]] }
-        end
+      respond_to do |format|
+        format.html { render action: 'new' }
+        format.json { render json: @publication, status: :ok, include: [params[:include]] }
+      end
     end
   end
 

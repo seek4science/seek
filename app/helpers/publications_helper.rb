@@ -54,14 +54,15 @@ module PublicationsHelper
       query_url: typeahead_publication_authors_publications_path
     }
 
-    objects_input(
-      element_name,
-      existing_objects,
+    options = {
       typeahead: typeahead,
       limit: limit,
       allow_new: allow_new,
-      class: 'form-control'
-    )
+      class: 'form-control',
+      'data-role': 'seek-objectsinput'
+    }
+
+    objects_input(element_name, existing_objects, options)
   end
 
 end
