@@ -54,12 +54,6 @@ module LicenseHelper
     current_user.person.projects_with_default_license.any?
   end
 
-  # JSON that creates a lookup for project license by id
-  def project_licenses_json
-    projects = current_user.person.projects_with_default_license
-    Hash[projects.collect { |proj| [proj.id, proj.default_license] }].to_json.html_safe
-  end
-
   private
 
   def license_description_content(license)

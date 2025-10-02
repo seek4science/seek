@@ -958,4 +958,16 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal 0, policy.permissions.count
     end
   end
+
+  test 'ignores blank value when setting disciplines' do
+    FactoryBot.create(:disciplines_controlled_vocab) unless SampleControlledVocab::SystemVocabs.disciplines_controlled_vocab
+
+    workflow = FactoryBot.create(:workflow)
+    User.with_current_user(workflow.contributor.user) do
+      workflow.discipline_annotations = ['', 'Physics and Astronomy']
+      assert workflow.save
+    end
+
+    assert_equal ['Physics and Astronomy'], workflow.reload.discipline_annotation_labels
+  end
 end
