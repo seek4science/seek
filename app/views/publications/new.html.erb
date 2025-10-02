@@ -307,33 +307,7 @@
                     }
 
                     $j('#publication_citation').val(citation);
-
-
-
-// Assuming your select has id 'publication_publication_authors'
-                    const select = $j('#publication_publication_authors');
-
-// Clear any existing selection first
-                    select.val(null).trigger('change');
-
-// Loop through DOI authors
-                    data.author.forEach(author => {
-                        const fullName = `${author.given} ${author.family}`;
-
-                        // Check if option already exists
-                        let option = select.find(`option[value="${fullName}"]`);
-                        if (!option.length) {
-                            // Create a new option (Select2 supports tagging)
-                            option = new Option(fullName, fullName, true, true);
-                            select.append(option);
-                        } else {
-                            option.prop('selected', true);
-                        }
-                    });
-
-// Notify Select2 to update
-                    $j('#publication_publication_authors option[value=""]').remove();
-                    select.trigger('change');
+                    populateAuthors($j('#publication_publication_authors'), data.author);
 
                 },
 
@@ -365,7 +339,8 @@
                     $j('#publication_pubmed_id').parents('.form-group').removeClass('has-error');
                     $j('#publication_pubmed_id').parents('.form-group').addClass('has-success');
                     var doc = $j(data);
-                    console.log("Pudmed ID:", data);
+                    console.log(data);
+
                     var doi_elem = $j(data).find('PubmedArticleSet > PubmedArticle > PubmedData > ArticleIdList > ArticleId[IdType="doi"]');
                     if( doi_elem.length != 0) {
                         $j('#publication_doi').val(doi_elem.html());
@@ -421,13 +396,22 @@
                         $j('#publication_published_date').val(date_published);
                     }
 
-                    var authorlist = [];
-                    var author_list_elem = article.find('AuthorList > Author').each( function(index, element){
-                        var firstname = $j(element).find('ForeName').html();
-                        var lastname = $j(element).find('LastName').html();
-                        authorlist.push({"first_name": firstname, "last_name": lastname});
+
+                    var authors = [];
+                    article.find('AuthorList > Author').each(function() {
+                        var given = $j(this).find('ForeName').text().trim();
+                        var family = $j(this).find('LastName').text().trim();
+
+                        if (given || family) {
+                            authors.push({ given: given, family: family });
+                        }
                     });
-                    addAuthorsToPublication(authorlist,'#publication_publication_authors');
+
+
+                    var select = $j('#publication_publication_authors');
+                    populateAuthors(select, authors);
+
+
                 },
                 error: function() {
                     $j('#publication_pubmed_id').parents('.form-group').removeClass('has-success');
@@ -450,5 +434,47 @@
             registerForm.append(element);
         }
     }
+
+    /**
+     * Populate a Select2 element with authors.
+     * Supports PubMed XML format or {given, family} arrays.
+     * @param {jQuery} select - The Select2 element
+     * @param {Array|Object} authors - Either XML AuthorList or array of {given, family}
+     */
+    function populateAuthors(select, authors) {
+        let authorArray = [];
+
+        // Check if authors come from PubMed XML
+        if (authors.AuthorList) {
+            const list = Array.isArray(authors.AuthorList.Author)
+                ? authors.AuthorList.Author
+                : [authors.AuthorList.Author];
+
+            authorArray = list.map(a => ({ given: a.ForeName, family: a.LastName }));
+        } else if (Array.isArray(authors)) {
+            // Already in {given, family} format
+            authorArray = authors;
+        } else {
+            console.warn("Unsupported author format:", authors);
+            return;
+        }
+
+        // Populate Select2
+        authorArray.forEach(author => {
+            const fullName = `${author.given} ${author.family}`;
+            let option = select.find(`option[value="${fullName}"]`);
+            if (!option.length) {
+                const newOption = new Option(fullName, fullName, true, true);
+                select.append(newOption);
+            } else {
+                option.prop('selected', true);
+            }
+        });
+
+        // Remove empty option and trigger update
+        select.find('option[value=""]').remove();
+        select.trigger('change');
+    }
+
 
 </script>
