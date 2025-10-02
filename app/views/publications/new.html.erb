@@ -266,28 +266,24 @@
                 accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
                 dataType: 'json',
                 success: function(data, textStatus, jqXHR) {
-                    //console.log("DOI:"+data);
+
                     $j('#publication_doi').parents('.form-group').removeClass('has-error');
                     $j('#publication_doi').parents('.form-group').addClass('has-success');
                     $j('#crossref_id').val(data.DOI);
                     $j('#publication_title').val(data.title);
-                    $j('#publication_journal').val(data.publisher);
-                    published_data = data["published-online"] || data["published-print"];
-                    //console.log("published_data:"+published_data);
-                    year=published_data["date-parts"][0][0];
-                    month= published_data["date-parts"][0][1];
-                    day= published_data["date-parts"][0][2];
-                    var date_published = year+"-"+month+"-"+day;
+                    $j('#publication_publisher').val(data.publisher);
+                    $j('#publication_url').val(data.URL)
+
+
+                    const published_data = data.created;
+                    const year = published_data["date-parts"][0][0];
+                    const month = published_data["date-parts"][0][1];
+                    const day = published_data["date-parts"][0][2];
+                    const date_published = `${year}-${month}-${day}`;
+                    console.log("Published date:", date_published);
                     $j('#publication_published_date').val(date_published);
 
-                    //console.log("DOI:", data);
-                    $j('#publication_doi').parents('.form-group').removeClass('has-error');
-                    $j('#publication_doi').parents('.form-group').addClass('has-success');
-                    $j('#crossref_id').val(data.DOI);
-                    $j('#publication_title').val(data.title);
-                    $j('#publication_journal').val(data["container-title"]);
-                    $j('#publication_publisher').val(data["publisher"]);
-                    $j('#publication_publisher').val(data["publisher"]);
+
 
                     if (typeof data["abstract"] !== 'undefined') {
                         var regex = /(<([^>]+)>)/ig
@@ -296,43 +292,48 @@
                         $j('#publication_abstract').val(result);
                     }
 
-                    if (!$j('#publication_citation').val()) {
-                        var publication_citation = data["container-title"];
+                    let citation = data["container-title"] || "";
 
-                        if (typeof data["volume"] !== 'undefined') {
-                            publication_citation += ','+data["volume"];
-                        }
-
-                        if (typeof data["issue"] !== 'undefined') {
-                            publication_citation += '('+ data["issue"]+')';
-                        }
-
-                        if (typeof data["page"] !== 'undefined') {
-                            publication_citation += ':' + data["page"];
-                        }
-                        console.log("citation:",publication_citation);
-                        $j('#publication_citation').val(publication_citation);
+                    if (typeof data["volume"] !== 'undefined') {
+                        citation += ', ' + data["volume"];
                     }
 
-                    published_data = data["published-online"] || data["published-print"] || data["accepted"];
-                    //console.log("published_data:", published_data);
-                    year=published_data["date-parts"][0][0];
-                    month= published_data["date-parts"][0][1];
-                    day= published_data["date-parts"][0][2];
-                    var date_published = year+"-"+month+"-"+day;
-                    $j('#publication_published_date').val(date_published);
+                    if (typeof data["issue"] !== 'undefined') {
+                        citation += '(' + data["issue"] + ')';
+                    }
 
-                    var authorlist = [];
-                    data.author.forEach(function(item,index){
-                        author_name = item.given+' '+item.family;
-                        console.log ('author_name:'+ author_name);
-                        console.log ('index:'+ index);
-                        $j('#author-'+index).text (author_name);
-                        $j('#publication_publication_authors_attributes_'+index+'_person_first_name').val (item.given);
-                        $j('#publication_publication_authors_attributes_'+index+'_person_last_name').val (item.family);
-                        authorlist.push({"first_name": item.given, "last_name": item.family});
+                    if (typeof data["page"] !== 'undefined') {
+                        citation += ':' + data["page"];
+                    }
+
+                    $j('#publication_citation').val(citation);
+
+
+
+// Assuming your select has id 'publication_publication_authors'
+                    const select = $j('#publication_publication_authors');
+
+// Clear any existing selection first
+                    select.val(null).trigger('change');
+
+// Loop through DOI authors
+                    data.author.forEach(author => {
+                        const fullName = `${author.given} ${author.family}`;
+
+                        // Check if option already exists
+                        let option = select.find(`option[value="${fullName}"]`);
+                        if (!option.length) {
+                            // Create a new option (Select2 supports tagging)
+                            option = new Option(fullName, fullName, true, true);
+                            select.append(option);
+                        } else {
+                            option.prop('selected', true);
+                        }
                     });
-                    addAuthorsToPublication(authorlist,'#publication_publication_authors');
+
+// Notify Select2 to update
+                    $j('#publication_publication_authors option[value=""]').remove();
+                    select.trigger('change');
 
                 },
 
