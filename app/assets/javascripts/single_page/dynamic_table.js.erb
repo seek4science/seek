@@ -144,7 +144,7 @@ const handleSelect = (e) => {
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
             return simpleObjectsInput(c, data, options, registeredSopUrl, multipleValuesAllowed);
-          } else if (isControlledVocabulary && sanitizedData !== "#HIDDEN") {
+          } else if (isControlledVocabulary && multipleValuesAllowed && sanitizedData !== "#HIDDEN") {
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data.map((e) => {
               if (e?.id) {
