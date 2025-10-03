@@ -133,6 +133,8 @@ module WorkflowExtraction
       remotes.each do |path, url|
         crate.add_external_file(url)
       end
+
+      crate['datePublished'] = git_version.commit_object&.time
     else
       unless crate.main_workflow
         crate.main_workflow = ROCrate::Workflow.new(crate, content_blob.filepath, content_blob.original_filename, contentSize: content_blob.file_size)
@@ -156,6 +158,7 @@ module WorkflowExtraction
     merge_entities(crate, self)
 
     crate['isBasedOn'] = source_link_url if source_link_url && !crate['isBasedOn']
+    crate['datePublished'] = Time.now unless crate['datePublished']
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
