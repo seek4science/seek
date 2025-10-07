@@ -1,5 +1,7 @@
 
-
+<%
+  term_and_conditions_required = User.any? && Seek::Config.terms_enabled
+%>
 
 <% if User.count == 0 -%>
     <%= alert_box('info', :hide_button => true) do %>
@@ -80,7 +82,7 @@
               <%= f.password_field :password_confirmation,:placeholder=> 'Password', :class => 'form-control' %>
             </div>
 
-            <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary' %>
+            <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary', disabled: term_and_conditions_required %>
           <% end -%>
         <% end %>
 
@@ -114,7 +116,7 @@
         <% end #omniauth enabled and providers available %>
 
       </div>
-      <% if (User.any? && Seek::Config.terms_enabled) %>
+      <% if term_and_conditions_required %>
         <div class="form-group text-center">
           <label>
             <%= check_box_tag "tc_agree","1",false -%> I have read and agree to the
@@ -135,7 +137,7 @@
 
 <script type="text/javascript">
     $j(document).ready(function () {
-        <% if (User.any? && Seek::Config.terms_enabled ) %>
+        <% if term_and_conditions_required %>
           $j("[name=commit]").attr("disabled", true);
         <% end %>
         $j('input:checkbox').change(

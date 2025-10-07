@@ -357,7 +357,7 @@ class UsersControllerTest < ActionController::TestCase
       assert User.any?
       get :new
       assert_response :success
-      assert_select "form.new_user input#tc_agree[type=checkbox]", count:1
+      assert_select "input#tc_agree[type=checkbox]", count:1
       assert_select "form.new_user input.btn[type=submit][disabled]", count:1
       assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:0
     end
@@ -370,7 +370,7 @@ class UsersControllerTest < ActionController::TestCase
       refute User.any?
       get :new
       assert_response :success
-      assert_select "form.new_user input#tc_agree[type=checkbox]", count:0
+      assert_select "input#tc_agree[type=checkbox]", count:0
       assert_select "form.new_user input.btn[type=submit][disabled]", count:0
       assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:1
     end
@@ -381,7 +381,7 @@ class UsersControllerTest < ActionController::TestCase
       assert User.any?
       get :new
       assert_response :success
-      assert_select "form.new_user input#tc_agree[type=checkbox]", count:0
+      assert_select "input#tc_agree[type=checkbox]", count:0
       assert_select "form.new_user input.btn[type=submit][disabled]", count:0
       assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:1
     end
@@ -435,6 +435,60 @@ class UsersControllerTest < ActionController::TestCase
     assert user.reload.active?
     assert flash[:error].include?('already')
     assert_equal me, User.current_user
+  end
+
+  test 'should have only seek registration' do
+    with_config_value(:omniauth_enabled, false) do
+      assert !Seek::Config.omniauth_enabled
+      get :new
+      assert_response :success
+      assert_select 'title', text: 'Signup', count: 1
+      assert_select '#login-panel form', 1
+    end
+  end
+
+  test 'should have omniauth registration options' do
+    with_config_value(:omniauth_enabled, true) do # This should be true by default in test env
+      get :new
+      assert_response :success
+      assert_select '#login-panel form', 2
+      assert_select '#ldap_login input[name="username"]', 1
+      assert_select '#ldap_login input[name="password"]', 1
+      assert_select '#elixir_aai_login a', 1
+    end
+  end
+
+  test 'should only have enabled omniauth registration options' do
+    with_config_value(:omniauth_enabled, true) do
+      with_config_value(:omniauth_ldap_enabled, false) do
+        with_config_value(:omniauth_elixir_aai_enabled, true) do
+          get :new
+          assert_response :success
+          assert_select '#login-panel form', 1
+          assert_select '#ldap_login input[name="username"]', 0
+          assert_select '#ldap_login input[name="password"]', 0
+          assert_select '#elixir_aai_login a', 1
+        end
+      end
+      with_config_value(:omniauth_ldap_enabled, true) do
+        with_config_value(:omniauth_elixir_aai_enabled, false) do
+          with_config_value(:omniauth_oidc_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select '#login-panel form', 2
+            assert_select '#ldap_login input[name="username"]', 1
+            assert_select '#ldap_login input[name="password"]', 1
+            assert_select '#elixir_aai_login a', 0
+            assert_select '#oidc_login a', 0
+          end
+        end
+      end
+      with_config_value(:omniauth_oidc_enabled, true) do
+        get :new
+        assert_response :success
+        assert_select '#oidc_login a', 1
+      end
+    end
   end
 
   protected
