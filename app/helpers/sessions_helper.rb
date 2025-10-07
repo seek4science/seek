@@ -59,16 +59,16 @@ module SessionsHelper
     name
   end
 
-  def oidc_login_button(original_path, text = "Sign in with #{Seek::Config.omniauth_oidc_name}")
+  def oidc_login_button(original_path, text = "Sign in with #{Seek::Config.omniauth_oidc_name}", disabled = false)
     link = omniauth_authorize_path(:oidc, state: "return_to:#{original_path}")
     if Seek::Config.omniauth_oidc_image_id && (avatar = Avatar.find_by_id(Seek::Config.omniauth_oidc_image_id))
-      link_to(image_tag(avatar.public_asset_url, alt: text), link, name: 'commit', method: :post)
+      link_to(image_tag(avatar.public_asset_url, alt: text), link, name: 'commit', disabled: disabled, method: :post)
     else
-      button_link_to(text, 'lock', link, name: 'commit', method: :post)
+      button_link_to(text, 'lock', link, name: 'commit', disabled: disabled, method: :post)
     end
   end
 
-  def oidc_register_button
-    oidc_login_button('/', "Register with #{Seek::Config.omniauth_oidc_name}")
+  def oidc_register_button(disabled)
+    oidc_login_button('/', "Register with #{Seek::Config.omniauth_oidc_name}", disabled)
   end
 end

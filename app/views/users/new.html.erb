@@ -90,26 +90,26 @@
           <% if show_elixir_aai_login? %>
             <%= content_tag(:div, id: 'elixir_aai_login', role: 'tabpanel', class: strategy == 'elixir_aai' ? 'tab-pane active' : 'tab-pane') do %>
               <div class='text-center'>
-                <%= link_to image('ls_aai_login'), omniauth_authorize_path(:elixir_aai, state: "return_to:/"), name: 'commit', class: 'btn', method: :post %>
+                <%= link_to image('ls_aai_login'), omniauth_authorize_path(:elixir_aai, state: "return_to:/"), name: 'commit', class: 'btn', method: :post, disabled: term_and_conditions_required %>
               </div>
             <% end %>
           <% end %>
           <% if show_ldap_login? %>
             <%= content_tag(:div, id: 'ldap_login', role: 'tabpanel', class: strategy == 'ldap' ? 'tab-pane active' : 'tab-pane') do %>
-              <%= render partial: 'identities/ldap_form', locals: { original_path: '/', button_text: 'Register' } %>
+              <%= render partial: 'identities/ldap_form', locals: { original_path: '/', button_text: 'Register', disabled: term_and_conditions_required } %>
             <% end %>
           <% end %>
           <% if show_github_login? %>
             <%= content_tag(:div, id: 'github_login', role: 'tabpanel', class: strategy == 'github' ? 'tab-pane active' : 'tab-pane') do %>
               <div class='text-center'>
-                <%= button_link_to 'Register with GitHub', 'github_large', omniauth_authorize_path(:github, state: "return_to:/"), name: 'commit', method: :post %>
+                <%= button_link_to 'Register with GitHub', 'github_large', omniauth_authorize_path(:github, state: "return_to:/"), name: 'commit', disabled: term_and_conditions_required, method: :post %>
               </div>
             <% end %>
           <% end %>
           <% if show_oidc_login? %>
             <%= content_tag(:div, id: 'oidc_login', role: 'tabpanel', class: strategy == 'oidc' ? 'tab-pane active' : 'tab-pane') do %>
               <div class='text-center'>
-                <%= oidc_register_button %>
+                <%= oidc_register_button(term_and_conditions_required) %>
               </div>
             <% end %>
           <% end %>
@@ -137,9 +137,6 @@
 
 <script type="text/javascript">
     $j(document).ready(function () {
-        <% if term_and_conditions_required %>
-          $j("[name=commit]").attr("disabled", true);
-        <% end %>
         $j('input:checkbox').change(
             function () {
                 if ($j(this).is(':checked')) {

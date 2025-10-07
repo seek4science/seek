@@ -355,11 +355,24 @@ class UsersControllerTest < ActionController::TestCase
   test 'terms and conditions checkbox' do
     with_config_value :terms_enabled,true do
       assert User.any?
-      get :new
-      assert_response :success
-      assert_select "input#tc_agree[type=checkbox]", count:1
-      assert_select "form.new_user input.btn[type=submit][disabled]", count:1
-      assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:0
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:omniauth_elixir_aai_enabled, true) do
+            with_config_value(:omniauth_github_enabled, true) do
+              with_config_value(:omniauth_oidc_enabled, true) do
+                get :new
+                assert_response :success
+                assert_select "input#tc_agree[type=checkbox]", count:1
+                assert_select "form.new_user input.btn[type=submit][disabled]", count:1
+                assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:0
+                # all the buttons, including 3rd party auth
+                assert_select '.btn[name=commit][disabled]', count:5
+                assert_select '.btn[name=commit]:not([disabled])', count:0
+              end
+            end
+          end
+        end
+      end
     end
   end
 
@@ -368,22 +381,48 @@ class UsersControllerTest < ActionController::TestCase
     with_config_value :terms_enabled,true do
       User.destroy_all
       refute User.any?
-      get :new
-      assert_response :success
-      assert_select "input#tc_agree[type=checkbox]", count:0
-      assert_select "form.new_user input.btn[type=submit][disabled]", count:0
-      assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:1
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:omniauth_elixir_aai_enabled, true) do
+            with_config_value(:omniauth_github_enabled, true) do
+              with_config_value(:omniauth_oidc_enabled, true) do
+                get :new
+                assert_response :success
+                assert_select "input#tc_agree[type=checkbox]", count: 0
+                assert_select "form.new_user input.btn[type=submit][disabled]", count: 0
+                assert_select "form.new_user input.btn[type=submit]:not([disabled])", count: 1
+                # all the buttons, including 3rd party auth
+                assert_select '.btn[name=commit][disabled]', count: 0
+                assert_select '.btn[name=commit]:not([disabled])', count: 5
+              end
+            end
+          end
+        end
+      end
     end
   end
 
   test "no terms and conditions if disabled" do
     with_config_value :terms_enabled,false do
       assert User.any?
-      get :new
-      assert_response :success
-      assert_select "input#tc_agree[type=checkbox]", count:0
-      assert_select "form.new_user input.btn[type=submit][disabled]", count:0
-      assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:1
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:omniauth_elixir_aai_enabled, true) do
+            with_config_value(:omniauth_github_enabled, true) do
+              with_config_value(:omniauth_oidc_enabled, true) do
+                get :new
+                assert_response :success
+                assert_select "input#tc_agree[type=checkbox]", count: 0
+                assert_select "form.new_user input.btn[type=submit][disabled]", count: 0
+                assert_select "form.new_user input.btn[type=submit]:not([disabled])", count: 1
+                # all the buttons, including 3rd party auth
+                assert_select '.btn[name=commit][disabled]', count: 0
+                assert_select '.btn[name=commit]:not([disabled])', count: 5
+              end
+            end
+          end
+        end
+      end
     end
   end
 

@@ -1,5 +1,6 @@
 <%
   button_text ||= 'Log in'
+  disabled ||= false
 %>
 <%= form_tag omniauth_callback_path(:ldap) do %>
   <% original_path ||= request.original_fullpath %>
@@ -19,6 +20,6 @@
   </div>
 
   <div class="form-group">
-    <%= submit_tag button_text, class: 'btn btn-primary', id: "login_ldap_button" %>
+    <%= submit_tag button_text, class: 'btn btn-primary', id: "login_ldap_button", disabled: disabled %>
   </div>
 <% end #form %>
