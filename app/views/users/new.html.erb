@@ -8,7 +8,7 @@
         You will also be added to a default <%= t('project') %> and <%= t('institution') %> which you will be able to edit later.
     <% end %>
 <% end -%>
-
+<% strategy = params[:strategy] || 'password' %>
 
 <% if Seek::Config.registration_disabled -%>
 <div class="panel panel-default" id="home_description">
@@ -25,42 +25,105 @@
       <h4 class="panel-title">Register an account for <%= Seek::Config.instance_name %></h4>
     </div>
     <div class="panel-body">
+      <% if show_omniauth_login? %>
+        <ul class="nav nav-tabs" role="tablist">
+          <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
+            <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
+          <% end %>
+          <% if show_elixir_aai_login? %>
+            <%= content_tag(:li, role: 'presentation', class: strategy == 'elixir_aai' ? 'active' : nil) do %>
+              <a href="#elixir_aai_login" aria-controls="elixir_aai_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:elixir_aai) %></a>
+            <% end %>
+          <% end %>
+          <% if show_ldap_login? %>
+            <%= content_tag(:li, role: 'presentation', class: strategy == 'ldap' ? 'active' : nil) do %>
+              <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:ldap) %></a>
+            <% end %>
+          <% end %>
+          <% if show_github_login? %>
+            <%= content_tag(:li, role: 'presentation', class: strategy == 'github' ? 'active' : nil) do %>
+              <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:github) %></a>
+            <% end %>
+          <% end %>
+          <% if show_oidc_login? %>
+            <%= content_tag(:li, role: 'presentation', class: strategy == 'oidc' ? 'active' : nil) do %>
+              <a href="#oidc_login" aria-controls="oidc_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:oidc) %></a>
+            <% end %>
+          <% end %>
+        </ul>
+      <% end #omniauth enabled and providers available %>
 
-      <%= form_for @user do |f| -%>
+      <div class="tab-content">
+        <%= content_tag(:div, id: 'password_login', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
+          <%= form_for @user do |f| -%>
 
 
-          <div class="form-group">
-            <label>Username</label>
-            <%= f.text_field :login, :placeholder => 'Username', :class => 'form-control' %>
-            <p class="help-block">The username should contain a minimum of 3 characters.</p>
-          </div>
+            <div class="form-group">
+              <label>Username</label>
+              <%= f.text_field :login, :placeholder => 'Username', :class => 'form-control' %>
+              <p class="help-block">The username should contain a minimum of 3 characters.</p>
+            </div>
 
-          <div class="form-group">
-            <label>Email address</label>
-            <%= f.text_field :email, placeholder:'Email address',:class => 'form-control' %>
-          </div>
+            <div class="form-group">
+              <label>Email address</label>
+              <%= f.text_field :email, placeholder:'Email address',:class => 'form-control' %>
+            </div>
 
-          <div class="form-group">
-            <label>Password</label>
-            <%= f.password_field :password, :placeholder => 'Password', :class => 'form-control' %>
-            <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
-          </div>
+            <div class="form-group">
+              <label>Password</label>
+              <%= f.password_field :password, :placeholder => 'Password', :class => 'form-control' %>
+              <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
+            </div>
 
-          <div class="form-group">
-            <label>Confirm Password</label>
-            <%= f.password_field :password_confirmation,:placeholder=> 'Password', :class => 'form-control' %>
-          </div>
-        <% if (User.any? && Seek::Config.terms_enabled) %>
-          <div class="form-group">
-            <label>
-              <%= check_box_tag "tc_agree","1",false -%> I have read and agree to the
-              <%= link_to 'Terms and Conditions and the Data Policy', terms_home_path ,'data-popup' => true,
-              :onclick=>"window.open(this.href,'terms', 'height=700, width=600, left=500, top=100'); return false;" %>
-            </label>
-          </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <%= f.password_field :password_confirmation,:placeholder=> 'Password', :class => 'form-control' %>
+            </div>
+
+            <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary' %>
+          <% end -%>
         <% end %>
-          <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary', :disabled => (User.any? && Seek::Config.terms_enabled ) %>
-      <% end -%>
+
+        <% if show_omniauth_login? %>
+          <% if show_elixir_aai_login? %>
+            <%= content_tag(:div, id: 'elixir_aai_login', role: 'tabpanel', class: strategy == 'elixir_aai' ? 'tab-pane active' : 'tab-pane') do %>
+              <div class='text-center'>
+                <%= link_to image('ls_aai_login'), omniauth_authorize_path(:elixir_aai, state: "return_to:/"), name: 'commit', class: 'btn', method: :post %>
+              </div>
+            <% end %>
+          <% end %>
+          <% if show_ldap_login? %>
+            <%= content_tag(:div, id: 'ldap_login', role: 'tabpanel', class: strategy == 'ldap' ? 'tab-pane active' : 'tab-pane') do %>
+              <%= render partial: 'identities/ldap_form', locals: { original_path: '/', button_text: 'Register' } %>
+            <% end %>
+          <% end %>
+          <% if show_github_login? %>
+            <%= content_tag(:div, id: 'github_login', role: 'tabpanel', class: strategy == 'github' ? 'tab-pane active' : 'tab-pane') do %>
+              <div class='text-center'>
+                <%= button_link_to 'Register with GitHub', 'github_large', omniauth_authorize_path(:github, state: "return_to:/"), name: 'commit', method: :post %>
+              </div>
+            <% end %>
+          <% end %>
+          <% if show_oidc_login? %>
+            <%= content_tag(:div, id: 'oidc_login', role: 'tabpanel', class: strategy == 'oidc' ? 'tab-pane active' : 'tab-pane') do %>
+              <div class='text-center'>
+                <%= oidc_register_button %>
+              </div>
+            <% end %>
+          <% end %>
+        <% end #omniauth enabled and providers available %>
+
+      </div>
+      <% if (User.any? && Seek::Config.terms_enabled) %>
+        <div class="form-group text-center">
+          <label>
+            <%= check_box_tag "tc_agree","1",false -%> I have read and agree to the
+            <%= link_to 'Terms and Conditions and the Data Policy', terms_home_path ,'data-popup' => true,
+                        :onclick=>"window.open(this.href,'terms', 'height=700, width=600, left=500, top=100'); return false;" %>
+          </label>
+        </div>
+      <% end %>
+
     </div>
     <div class="panel-footer">
       <%= link_to "Already registered? - goto Login", login_path %>
@@ -68,43 +131,21 @@
   </div>
 <% end -%>
 
-<% if show_omniauth_login? && Seek::Config.omniauth_user_create %>
-  <br/><hr/>
-  <h3>Alternatively...</h3>
-  <ul>
-    <% if show_elixir_aai_login? %>
-      <li>
-        <%= link_to(omniauth_authorize_path(:elixir_aai, state: "return_to:/"), method: :post) do %>
-          Log in using <%= omniauth_method_name(:elixir_aai) -%><br/>
-          <%= image('elixir_aai_login') %>
-        <% end %>
-      </li>
-    <% end %>
-    <% if show_ldap_login? %>
-      <li><%= link_to "Log in using #{omniauth_method_name(:ldap)}", login_path(anchor: 'ldap_login') %></li>
-    <% end %>
-    <% if show_github_login? %>
-      <li>
-        <%= link_to(omniauth_authorize_path(:github, state: "return_to:/"), method: :post) do%>
-          Log in using <%= omniauth_method_name(:github) -%> <%= image('github') %>
-      <% end %>
-      </li>
-    <% end %>
-    <% if show_oidc_login? %>
-      <li><%= link_to "Log in using #{omniauth_method_name(:oidc)}", omniauth_authorize_path(:oidc, state: "return_to:/") %></li>
-    <% end %>
-  </ul>
-<% end %>
+
 
 <script type="text/javascript">
-
-    $j('input:checkbox').change(
-        function () {
-            if ($j(this).is(':checked')) {
-                $j("[name=commit]").attr("disabled", false);
-            } else {
-                $j("[name=commit]").attr("disabled", true);
-            }
-        });
+    $j(document).ready(function () {
+        <% if (User.any? && Seek::Config.terms_enabled ) %>
+          $j("[name=commit]").attr("disabled", true);
+        <% end %>
+        $j('input:checkbox').change(
+            function () {
+                if ($j(this).is(':checked')) {
+                    $j("[name=commit]").attr("disabled", false);
+                } else {
+                    $j("[name=commit]").attr("disabled", true);
+                }
+            });
+    });
 
 </script>
