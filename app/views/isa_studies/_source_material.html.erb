@@ -73,7 +73,7 @@ uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
         }
 
         function sourceExportExcel() {
-            exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+            exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>', '<%= project.id %>');
         }
 
         function sourceUploadExcel(){
