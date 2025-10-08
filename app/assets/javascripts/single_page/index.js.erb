@@ -223,7 +223,7 @@ function rowHasHiddenFields(row) {
 // This function is called when 'excel-export' btn is clicked.
 // Posts the content of the dynamic table to the single_pages_controller,
 // which generates an excel workbook based on a template.
-async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
+async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
   const table = $j(`table[id=${tableName}]`);
 
   // Checks whether the dynamic table has errors
@@ -296,7 +296,16 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
     alert(`Failed to export through excel!\nStatus: ${response.status} - ${JSON.stringify(response.error().statusText)}\nError: ${response.responseText}`);
   })
   .always( function(response){
-    setTimeout(() => {location.reload()}, 2000);
+    setTimeout(() => {
+      const itemType = assayId === null ? 'study' : 'assay';
+      const itemId = assayId === null ? studyId : assayId;
+      if (projectId && itemType && itemId) {
+        window.location.href = `/single_pages/${projectId}?item_type=${itemType}&item_id=${itemId}`;
+      } else {
+        // If one of the variables is missing, just reload the current page.
+        location.reload();
+      }
+    }, 2000);
   });
 }
 
