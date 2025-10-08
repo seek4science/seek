@@ -30,33 +30,33 @@
       <% if show_omniauth_login? %>
         <ul class="nav nav-tabs" role="tablist">
           <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
-            <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
+            <a href="#password_registration" aria-controls="password_registration" role="tab" data-toggle="tab">SEEK login</a>
           <% end %>
           <% if show_elixir_aai_login? %>
             <%= content_tag(:li, role: 'presentation', class: strategy == 'elixir_aai' ? 'active' : nil) do %>
-              <a href="#elixir_aai_login" aria-controls="elixir_aai_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:elixir_aai) %></a>
+              <a href="#elixir_aai_registration" aria-controls="elixir_aai_registration" role="tab" data-toggle="tab"><%= omniauth_method_name(:elixir_aai) %></a>
             <% end %>
           <% end %>
           <% if show_ldap_login? %>
             <%= content_tag(:li, role: 'presentation', class: strategy == 'ldap' ? 'active' : nil) do %>
-              <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:ldap) %></a>
+              <a href="#ldap_registration" aria-controls="ldap_registration" role="tab" data-toggle="tab"><%= omniauth_method_name(:ldap) %></a>
             <% end %>
           <% end %>
           <% if show_github_login? %>
             <%= content_tag(:li, role: 'presentation', class: strategy == 'github' ? 'active' : nil) do %>
-              <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:github) %></a>
+              <a href="#github_registration" aria-controls="github_registration" role="tab" data-toggle="tab"><%= omniauth_method_name(:github) %></a>
             <% end %>
           <% end %>
           <% if show_oidc_login? %>
             <%= content_tag(:li, role: 'presentation', class: strategy == 'oidc' ? 'active' : nil) do %>
-              <a href="#oidc_login" aria-controls="oidc_login" role="tab" data-toggle="tab"><%= omniauth_method_name(:oidc) %></a>
+              <a href="#oidc_registration" aria-controls="oidc_registration" role="tab" data-toggle="tab"><%= omniauth_method_name(:oidc) %></a>
             <% end %>
           <% end %>
         </ul>
       <% end #omniauth enabled and providers available %>
 
       <div class="tab-content">
-        <%= content_tag(:div, id: 'password_login', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
+        <%= content_tag(:div, id: 'password_registration', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
           <%= form_for @user do |f| -%>
 
 
@@ -88,26 +88,26 @@
 
         <% if show_omniauth_login? %>
           <% if show_elixir_aai_login? %>
-            <%= content_tag(:div, id: 'elixir_aai_login', role: 'tabpanel', class: strategy == 'elixir_aai' ? 'tab-pane active' : 'tab-pane') do %>
+            <%= content_tag(:div, id: 'elixir_aai_registration', role: 'tabpanel', class: strategy == 'elixir_aai' ? 'tab-pane active' : 'tab-pane') do %>
               <div class='text-center'>
                 <%= link_to image('ls_aai_login'), omniauth_authorize_path(:elixir_aai, state: "return_to:/"), name: 'commit', class: 'btn', method: :post, disabled: term_and_conditions_required %>
               </div>
             <% end %>
           <% end %>
           <% if show_ldap_login? %>
-            <%= content_tag(:div, id: 'ldap_login', role: 'tabpanel', class: strategy == 'ldap' ? 'tab-pane active' : 'tab-pane') do %>
+            <%= content_tag(:div, id: 'ldap_registration', role: 'tabpanel', class: strategy == 'ldap' ? 'tab-pane active' : 'tab-pane') do %>
               <%= render partial: 'identities/ldap_form', locals: { original_path: '/', button_text: 'Register', disabled: term_and_conditions_required } %>
             <% end %>
           <% end %>
           <% if show_github_login? %>
-            <%= content_tag(:div, id: 'github_login', role: 'tabpanel', class: strategy == 'github' ? 'tab-pane active' : 'tab-pane') do %>
+            <%= content_tag(:div, id: 'github_registration', role: 'tabpanel', class: strategy == 'github' ? 'tab-pane active' : 'tab-pane') do %>
               <div class='text-center'>
                 <%= button_link_to 'Register with GitHub', 'github_large', omniauth_authorize_path(:github, state: "return_to:/"), name: 'commit', disabled: term_and_conditions_required, method: :post %>
               </div>
             <% end %>
           <% end %>
           <% if show_oidc_login? %>
-            <%= content_tag(:div, id: 'oidc_login', role: 'tabpanel', class: strategy == 'oidc' ? 'tab-pane active' : 'tab-pane') do %>
+            <%= content_tag(:div, id: 'oidc_registration', role: 'tabpanel', class: strategy == 'oidc' ? 'tab-pane active' : 'tab-pane') do %>
               <div class='text-center'>
                 <%= oidc_register_button(term_and_conditions_required) %>
               </div>
@@ -117,7 +117,7 @@
 
       </div>
       <% if term_and_conditions_required %>
-        <div class="form-group text-center">
+        <div id="register-terms-and-conds" class="text-center">
           <label>
             <%= check_box_tag "tc_agree","1",false -%> I have read and agree to the
             <%= link_to 'Terms and Conditions and the Data Policy', terms_home_path ,'data-popup' => true,

@@ -91,9 +91,9 @@ class UsersControllerTest < ActionController::TestCase
     assert_enqueued_emails(0) do
       assert_no_difference('ActivationEmailMessageLog.count') do
         post :resend_activation_email, params: { id: user }
-      end      
+      end
     end
-    
+
     assert_empty person.activation_email_logs
 
     assert_not_nil flash[:error]
@@ -353,75 +353,57 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'terms and conditions checkbox' do
-    with_config_value :terms_enabled,true do
+    with_config_value :terms_enabled, true do
       assert User.any?
-      with_config_value(:omniauth_enabled, true) do
-        with_config_value(:omniauth_ldap_enabled, true) do
-          with_config_value(:omniauth_elixir_aai_enabled, true) do
-            with_config_value(:omniauth_github_enabled, true) do
-              with_config_value(:omniauth_oidc_enabled, true) do
-                get :new
-                assert_response :success
-                assert_select "input#tc_agree[type=checkbox]", count:1
-                assert_select "form.new_user input.btn[type=submit][disabled]", count:1
-                assert_select "form.new_user input.btn[type=submit]:not([disabled])", count:0
-                # all the buttons, including 3rd party auth
-                assert_select '.btn[name=commit][disabled]', count:5
-                assert_select '.btn[name=commit]:not([disabled])', count:0
-              end
-            end
-          end
-        end
+      with_config_values(omniauth_enabled: true, omniauth_ldap_enabled: true,
+                         omniauth_elixir_aai_enabled: true, omniauth_github_enabled: true,
+                         omniauth_oidc_enabled: true) do
+        get :new
+        assert_response :success
+        assert_select 'div#register-terms-and-conds input#tc_agree[type=checkbox]', count: 1
+        assert_select 'form.new_user input.btn[type=submit][disabled]', count: 1
+        assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 0
+        # all the buttons, including 3rd party auth
+        assert_select '.btn[name=commit][disabled]', count: 5
+        assert_select '.btn[name=commit]:not([disabled])', count: 0
       end
     end
   end
 
   # First user is the admin user that sets it up, so no T & C's to agree to
   test 'no terms and conditions checkbox for first user' do
-    with_config_value :terms_enabled,true do
+    with_config_value :terms_enabled, true do
       User.destroy_all
       refute User.any?
-      with_config_value(:omniauth_enabled, true) do
-        with_config_value(:omniauth_ldap_enabled, true) do
-          with_config_value(:omniauth_elixir_aai_enabled, true) do
-            with_config_value(:omniauth_github_enabled, true) do
-              with_config_value(:omniauth_oidc_enabled, true) do
-                get :new
-                assert_response :success
-                assert_select "input#tc_agree[type=checkbox]", count: 0
-                assert_select "form.new_user input.btn[type=submit][disabled]", count: 0
-                assert_select "form.new_user input.btn[type=submit]:not([disabled])", count: 1
-                # all the buttons, including 3rd party auth
-                assert_select '.btn[name=commit][disabled]', count: 0
-                assert_select '.btn[name=commit]:not([disabled])', count: 5
-              end
-            end
-          end
-        end
+      with_config_values(omniauth_enabled: true, omniauth_ldap_enabled: true,
+                         omniauth_elixir_aai_enabled: true, omniauth_github_enabled: true,
+                         omniauth_oidc_enabled: true) do
+        get :new
+        assert_response :success
+        assert_select 'div#register-terms-and-conds input#tc_agree[type=checkbox]', count: 0
+        assert_select 'form.new_user input.btn[type=submit][disabled]', count: 0
+        assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 1
+        # all the buttons, including 3rd party auth
+        assert_select '.btn[name=commit][disabled]', count: 0
+        assert_select '.btn[name=commit]:not([disabled])', count: 5
       end
     end
   end
 
-  test "no terms and conditions if disabled" do
-    with_config_value :terms_enabled,false do
+  test 'no terms and conditions if disabled' do
+    with_config_value :terms_enabled, false do
       assert User.any?
-      with_config_value(:omniauth_enabled, true) do
-        with_config_value(:omniauth_ldap_enabled, true) do
-          with_config_value(:omniauth_elixir_aai_enabled, true) do
-            with_config_value(:omniauth_github_enabled, true) do
-              with_config_value(:omniauth_oidc_enabled, true) do
-                get :new
-                assert_response :success
-                assert_select "input#tc_agree[type=checkbox]", count: 0
-                assert_select "form.new_user input.btn[type=submit][disabled]", count: 0
-                assert_select "form.new_user input.btn[type=submit]:not([disabled])", count: 1
-                # all the buttons, including 3rd party auth
-                assert_select '.btn[name=commit][disabled]', count: 0
-                assert_select '.btn[name=commit]:not([disabled])', count: 5
-              end
-            end
-          end
-        end
+      with_config_values(omniauth_enabled: true, omniauth_ldap_enabled: true,
+                         omniauth_elixir_aai_enabled: true, omniauth_github_enabled: true,
+                         omniauth_oidc_enabled: true) do
+        get :new
+        assert_response :success
+        assert_select 'div#register-terms-and-conds input#tc_agree[type=checkbox]', count: 0
+        assert_select 'form.new_user input.btn[type=submit][disabled]', count: 0
+        assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 1
+        # all the buttons, including 3rd party auth
+        assert_select '.btn[name=commit][disabled]', count: 0
+        assert_select '.btn[name=commit]:not([disabled])', count: 5
       end
     end
   end
@@ -491,41 +473,36 @@ class UsersControllerTest < ActionController::TestCase
       get :new
       assert_response :success
       assert_select '#login-panel form', 2
-      assert_select '#ldap_login input[name="username"]', 1
-      assert_select '#ldap_login input[name="password"]', 1
-      assert_select '#elixir_aai_login a', 1
+      assert_select '#ldap_registration input[name="username"]', 1
+      assert_select '#ldap_registration input[name="password"]', 1
+      assert_select '#elixir_aai_registration a', 1
     end
   end
 
   test 'should only have enabled omniauth registration options' do
     with_config_value(:omniauth_enabled, true) do
-      with_config_value(:omniauth_ldap_enabled, false) do
-        with_config_value(:omniauth_elixir_aai_enabled, true) do
-          get :new
-          assert_response :success
-          assert_select '#login-panel form', 1
-          assert_select '#ldap_login input[name="username"]', 0
-          assert_select '#ldap_login input[name="password"]', 0
-          assert_select '#elixir_aai_login a', 1
-        end
+      with_config_values(omniauth_ldap_enabled: false, omniauth_elixir_aai_enabled: true) do
+        get :new
+        assert_response :success
+        assert_select '#login-panel form', 1
+        assert_select '#ldap_registration input[name="username"]', 0
+        assert_select '#ldap_registration input[name="password"]', 0
+        assert_select '#elixir_aai_registration a', 1
       end
-      with_config_value(:omniauth_ldap_enabled, true) do
-        with_config_value(:omniauth_elixir_aai_enabled, false) do
-          with_config_value(:omniauth_oidc_enabled, false) do
-            get :new
-            assert_response :success
-            assert_select '#login-panel form', 2
-            assert_select '#ldap_login input[name="username"]', 1
-            assert_select '#ldap_login input[name="password"]', 1
-            assert_select '#elixir_aai_login a', 0
-            assert_select '#oidc_login a', 0
-          end
-        end
+      with_config_values(omniauth_ldap_enabled: true, omniauth_elixir_aai_enabled: false,
+                         omniauth_oidc_enabled: false) do
+        get :new
+        assert_response :success
+        assert_select '#login-panel form', 2
+        assert_select '#ldap_registration input[name="username"]', 1
+        assert_select '#ldap_registration input[name="password"]', 1
+        assert_select '#elixir_aai_registration a', 0
+        assert_select '#oidc_registration a', 0
       end
       with_config_value(:omniauth_oidc_enabled, true) do
         get :new
         assert_response :success
-        assert_select '#oidc_login a', 1
+        assert_select '#oidc_registration a', 1
       end
     end
   end
