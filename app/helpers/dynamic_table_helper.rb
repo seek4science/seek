@@ -201,7 +201,7 @@ module DynamicTableHelper
         attribute.merge!({ is_input: true, is_first_input: i == 0 }) if is_input
         attribute.merge!(is_cv_list: true) if is_cv_list
         attribute
-      end.unshift({ title: 'id', is_id_field: true }, { title: 'uuid', is_id_field: true })
+      end.unshift({ title: 'id', is_id_field: true, unit: {} }, { title: 'uuid', is_id_field: true, unit: {} })
     end
   end
 end
