@@ -1,16 +1,16 @@
 
 <%
   term_and_conditions_required = User.any? && Seek::Config.terms_enabled
+  strategy = params[:strategy] || 'password'
 %>
 
 <% if User.count == 0 -%>
-    <%= alert_box('info', :hide_button => true) do %>
+    <%= alert_box('info', hide_button: true) do %>
         There are currently no users defined in the system. You should now register an initial user.
         This initial user will become the Administrator of the system.<br/>
         You will also be added to a default <%= t('project') %> and <%= t('institution') %> which you will be able to edit later.
     <% end %>
 <% end -%>
-<% strategy = params[:strategy] || 'password' %>
 
 <% if Seek::Config.registration_disabled -%>
 <div class="panel panel-default" id="home_description">
@@ -62,27 +62,27 @@
 
             <div class="form-group">
               <label>Username</label>
-              <%= f.text_field :login, :placeholder => 'Username', :class => 'form-control' %>
+              <%= f.text_field :login, placeholder: 'Username', class: 'form-control' %>
               <p class="help-block">The username should contain a minimum of 3 characters.</p>
             </div>
 
             <div class="form-group">
               <label>Email address</label>
-              <%= f.text_field :email, placeholder:'Email address',:class => 'form-control' %>
+              <%= f.text_field :email, placeholder:'Email address',class: 'form-control' %>
             </div>
 
             <div class="form-group">
               <label>Password</label>
-              <%= f.password_field :password, :placeholder => 'Password', :class => 'form-control' %>
+              <%= f.password_field :password, placeholder: 'Password', class: 'form-control' %>
               <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
             </div>
 
             <div class="form-group">
               <label>Confirm Password</label>
-              <%= f.password_field :password_confirmation,:placeholder=> 'Password', :class => 'form-control' %>
+              <%= f.password_field :password_confirmation, placeholder: 'Password', class: 'form-control' %>
             </div>
 
-            <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary', disabled: term_and_conditions_required %>
+            <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, class: 'btn btn-primary', disabled: term_and_conditions_required %>
           <% end -%>
         <% end %>
 
@@ -120,8 +120,8 @@
         <div id="register-terms-and-conds" class="text-center">
           <label>
             <%= check_box_tag "tc_agree","1",false -%> I have read and agree to the
-            <%= link_to 'Terms and Conditions and the Data Policy', terms_home_path ,'data-popup' => true,
-                        :onclick=>"window.open(this.href,'terms', 'height=700, width=600, left=500, top=100'); return false;" %>
+            <%= link_to 'Terms and Conditions and the Data Policy', terms_home_path ,'data-popup': true,
+                        onclick: "window.open(this.href,'terms', 'height=700, width=600, left=500, top=100'); return false;" %>
           </label>
         </div>
       <% end %>
