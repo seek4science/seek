@@ -18,7 +18,7 @@ class DynamicTableHelperTest < ActionView::TestCase
   test 'should return default dynamic table columns' do
     User.with_current_user(@person) do
       dt_def_col_name = @source_sample_type.id.to_s
-      assert_equal dt_default_cols(dt_def_col_name), [{ title: 'status', name: dt_def_col_name, status: true }, { title: 'id', name: dt_def_col_name }, { title: 'uuid', name: dt_def_col_name }]
+      assert_equal dt_default_cols(dt_def_col_name), [{ title: 'status', name: dt_def_col_name, status: true, unit: {} }, { title: 'id', name: dt_def_col_name, unit: {} }, { title: 'uuid', name: dt_def_col_name, unit: {} }]
     end
   end
 
