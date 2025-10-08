@@ -16,6 +16,7 @@ namespace :seek do
     db:seed:004_model_recommended_environments
     update_rdf
     update_morpheus_model
+    db:seed:018_discipline_vocab
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

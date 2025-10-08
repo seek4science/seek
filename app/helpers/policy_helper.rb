@@ -120,7 +120,6 @@ module PolicyHelper
       # Mark associated project permissions as "mandatory"
       if permission.contributor_type == 'Project' && project_ids.include?(permission.contributor_id)
         project_ids.delete(permission.contributor_id)
-        h[:isMandatory] = true
       end
 
       h[:title] = permission_title(permission)
@@ -133,8 +132,7 @@ module PolicyHelper
       hash[:permissions] << { access_type: policy.access_type,
                               contributor_id: project.id,
                               contributor_type: 'Project',
-                              title: project.title,
-                              isMandatory: true }
+                              title: project.title }
     end
 
     hash
@@ -142,16 +140,6 @@ module PolicyHelper
 
   def policy_json(policy, associated_projects)
     policy_hash(policy, associated_projects).to_json.html_safe
-  end
-
-  def project_policies_json(projects)
-    hash = {}
-
-    projects.each do |p|
-      hash[p.id] = policy_hash(p.default_policy, [p]) if p.use_default_policy
-    end
-
-    hash.to_json.html_safe
   end
 
   def project_policy_json(project)

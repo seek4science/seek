@@ -159,4 +159,16 @@ class LicenseTest < ActiveSupport::TestCase
     assert sop.errors.added?(:license, "isn't a recognized license")
     assert_equal 'CCZZ', sop.license
   end
+
+  test 'full_display_title' do
+    license = Seek::License.find('CC-BY-4.0')
+    assert_equal 'Creative Commons Attribution 4.0 International (CC-BY-4.0)', license.full_display_title
+
+    license = Seek::License.find('BSD-2-Clause')
+    assert_equal 'BSD 2-Clause "Simplified" License (BSD-2-Clause)', license.full_display_title
+
+    license = Seek::License.find(Seek::License::NULL_LICENSE)
+    assert_equal 'No license - no permission to use unless the owner grants a licence', license.full_display_title
+  end
+
 end

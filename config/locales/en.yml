@@ -162,6 +162,7 @@ en:
     data_format_annotation_values: 'Data format annotations'
     topic_annotation_values: 'Topic annotations'
     operation_annotation_values: 'Operation annotations'
+    discipline_annotation_values: 'Scientific disciplines'
     contributor: 'Submitter'
     # Mostly for associations in other models (has_one or has_many)
     programme: *programme
