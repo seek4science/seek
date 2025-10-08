@@ -123,8 +123,9 @@ module DynamicTableHelper
 
   def dt_cols(sample_type)
     attribs = sample_type.sample_attributes.map do |a|
+      unit = a.unit.slice(:id, :title, :symbol, :comment) if a.unit
       attribute = { title: a.title, name: sample_type.id.to_s, required: a.required, description: a.description,
-                    is_title: a.is_title, attribute_type: a.sample_attribute_type&.base_type }
+                    is_title: a.is_title, attribute_type: a.sample_attribute_type&.base_type, unit: unit || {} }
 
       if a.sample_attribute_type&.controlled_vocab?
         cv_allows_free_text = a.allow_cv_free_text
@@ -145,7 +146,7 @@ module DynamicTableHelper
   end
 
   def dt_default_cols(name)
-    [{ title: 'status', name:, status: true }, { title: 'id', name: }, { title: 'uuid', name: }]
+    [{ title: 'status', name:, status: true, unit: {} }, { title: 'id', name: , unit: {}}, { title: 'uuid', name: , unit: {} }]
   end
 
   def dt_cumulative_rows(sample_types, col_count)
@@ -187,8 +188,9 @@ module DynamicTableHelper
   def dt_cumulative_cols(sample_types)
     sample_types.flat_map.with_index do |s, i|
       s.sample_attributes.map do |a|
+        unit = a.unit.slice(:id, :title, :symbol, :comment) if a.unit
         attribute = { title: a.title, name: s.id.to_s, required: a.required, description: a.description,
-                      is_title: a.is_title, attribute_type: a.sample_attribute_type&.base_type }
+                      is_title: a.is_title, attribute_type: a.sample_attribute_type&.base_type, unit: unit || {} }
         is_seek_sample_multi = a.sample_attribute_type.seek_sample_multi?
         is_seek_sample = a.sample_attribute_type.seek_sample?
         is_cv_list = a.sample_attribute_type.seek_cv_list?
