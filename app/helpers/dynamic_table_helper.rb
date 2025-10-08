@@ -146,7 +146,7 @@ module DynamicTableHelper
   end
 
   def dt_default_cols(name)
-    [{ title: 'status', name:, status: true, unit: {} }, { title: 'id', name: , unit: {}}, { title: 'uuid', name: , unit: {} }]
+    [{ title: 'status', name: , status: true, unit: {} }, { title: 'id', name: , unit: {}}, { title: 'uuid', name: , unit: {} }]
   end
 
   def dt_cumulative_rows(sample_types, col_count)
