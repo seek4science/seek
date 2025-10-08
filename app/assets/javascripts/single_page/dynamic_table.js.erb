@@ -335,7 +335,7 @@ const handleSelect = (e) => {
             $j(x).append("<span class='required-attribute'>*</span>");
           }
           if (unit) {
-            $j(x).append(`<span>[${unit.symbol}]</span>`);
+            $j(x).append(`<span>( ${unit.symbol} )</span>`);
           }
           $j(x)
             .attr("title", columns[i].description)
