@@ -89,16 +89,19 @@ const handleSelect = (e) => {
         let registeredSopUrl;
 
         let isRegisteredSample = false;
-        let isCVList = false;
+        let isControlledVocabulary = false;
+        let multipleValuesAllowed = false;
         let isRegisteredSop = false;
         let isRegisteredDataFile = false;
         let isRegisteredStrain = false;
+
         if (c.attribute_type) {
-          isRegisteredSample = c.attribute_type.includes("SeekSample");
-          isCVList = c.attribute_type === "CVList";
+          isRegisteredSample = ["SeekSample","SeekSampleMulti"].includes(c.attribute_type);
+          isControlledVocabulary = c.attribute_type === "CV" || c.attribute_type === "CVList";
           isRegisteredSop = c.attribute_type === "SeekSop";
           isRegisteredDataFile = c.attribute_type === "SeekDataFile";
           isRegisteredStrain = c.attribute_type === "SeekStrain";
+          multipleValuesAllowed = c.attribute_type === "CVList" || c.attribute_type === "SeekSampleMulti";
         }
 
         if (isRegisteredSample) {
@@ -107,25 +110,25 @@ const handleSelect = (e) => {
           c.linkedSampleIds = linkedSamples.map((ls) => ls.id);
         }
 
-        if (isCVList && 'cv_id' in c) {
+        if (isControlledVocabulary && 'cv_id' in c) {
           cvUrl = typeaheadCVUrl.replace("_CVID_", c.cv_id);
         }
 
         if (isRegisteredSop) {
-          if (!registeredSopsEnabled) {
+          if (!registeredSopsEnabled && !options.readonly /** only show the alert once!**/ ) {
             alert("A 'Registered SOP' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
           }
           registeredSopUrl = typeaheadSopsUrl.replace('__STUDY_ID__', options.studyId).replace('__ASSAY_ID__', options.assayId);
         }
 
         if (isRegisteredDataFile) {
-          if (!registeredDataFilesEnabled) {
+          if (!registeredDataFilesEnabled && !options.readonly /** only show the alert once!**/ ) {
             alert("A 'Registered Data File' attribute has been detected but the setting has been disabled. Please contact the administrator to enable the setting.")
           }
         }
 
         if (isRegisteredStrain) {
-          if (!registeredOrganismsEnabled) {
+          if (!registeredOrganismsEnabled && !options.readonly /** only show the alert once!**/ ) {
             alert("A 'Registered Strain' attribute has been detected but the 'organisms' setting has been disabled. Please contact the administrator to enable the setting.")
           }
         }
@@ -136,12 +139,12 @@ const handleSelect = (e) => {
           if (isRegisteredSample) {
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
-            return registeredSamplesObjectsInput(c, data, options, linkedSamplesUrl);
+            return registeredSamplesObjectsInput(c, data, options, linkedSamplesUrl, multipleValuesAllowed);
           } else if (isRegisteredSop) {
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
-            return simpleObjectsInput(c, data, options, registeredSopUrl);
-          } else if (isCVList && sanitizedData !== "#HIDDEN") {
+            return simpleObjectsInput(c, data, options, registeredSopUrl, multipleValuesAllowed);
+          } else if (isControlledVocabulary && multipleValuesAllowed && sanitizedData !== "#HIDDEN") {
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data.map((e) => {
               if (e?.id) {
@@ -150,15 +153,15 @@ const handleSelect = (e) => {
                 return e
               }
             });
-            return cvListObjectsInput(c, data, options, cvUrl);
+            return cvListObjectsInput(c, data, options, cvUrl, multipleValuesAllowed);
           } else if (isRegisteredDataFile) {
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
-            return simpleObjectsInput(c, data, options, typeaheadDataFilesUrl);
+            return simpleObjectsInput(c, data, options, typeaheadDataFilesUrl, multipleValuesAllowed);
           } else if (isRegisteredStrain) {
             data = sanitizedData && Array.isArray(sanitizedData) ? sanitizedData : [sanitizedData];
             data = data[0]?.id ? data : [];
-            return simpleObjectsInput(c, data, options, typeaheadStrainsUrl);
+            return simpleObjectsInput(c, data, options, typeaheadStrainsUrl, multipleValuesAllowed);
           } else if (sanitizedData === "#HIDDEN") {
             return "<em><small>Hidden</small></em>";
           } else {
@@ -654,11 +657,11 @@ function retrieveLinkedSamples(url) {
   return linkedSamples;
 }
 
-function registeredSamplesObjectsInput(column, data, options, url) {
+function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
   const existingOptions = data.map((e) => {
-    isHiddenInput = (e.title == '#HIDDEN');
+    const isHiddenInput = (e.title === '#HIDDEN');
     if (isHiddenInput) {
-      return `<option selected="selected" title="ID: hidden" value="hidden">hidden</option>`
+      return `<option selected="selected" title="ID: hidden" value="hidden">#HIDDEN</option>`
     } else {
       return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`
     }
@@ -670,14 +673,14 @@ function registeredSamplesObjectsInput(column, data, options, url) {
     const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
 
     const unLinkedSamples = data.reduce(function (filtered, sample) {
-      if (!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title != '#HIDDEN') {
+      if (!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title !== '#HIDDEN') {
         filtered.push(sample);
       }
       return filtered;
     }, []);
-    const hasUnlinkedSamples = unLinkedSamples.length > 0 ? true : false;
+    const hasUnlinkedSamples = unLinkedSamples.length > 0;
 
-    const hasMultipleInputs = column.multi_link ? '100' : '1'
+    const limit = multiInput ? '' : '1'
     const extraClass = hasUnlinkedSamples ? 'select2__error' : '';
     const titleText = hasUnlinkedSamples ? `Sample(s) '${unLinkedSamples.map(uls => uls.title).join(', ')}' not recognised as input. Please correct this issue!` : '';
     setTimeout(ObjectsInput.init);
@@ -689,18 +692,19 @@ function registeredSamplesObjectsInput(column, data, options, url) {
       .replace('_OPTIONS_', existingOptions)
       .replace('_EXTRACLASS_', extraClass)
       .replace('_TITLE_', titleText)
-      .replace('_LIMIT?_', hasMultipleInputs)
+      .replace('_LIMIT?_', limit)
       .replace('_ALLOW_FREE_TEXT_', false);
   }
 }
 
-function cvListObjectsInput(column, data, options, url) {
+function cvListObjectsInput(column, data, options, url, multiInput) {
   const existingOptions = data.map((e) => `<option selected="selected" value="${sanitizeData(e)}">${sanitizeData(e)}</option>`);
   if (options.readonly) {
     return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
   } else {
     const typeaheadTemplate = 'typeahead/controlled_vocab_term';
     const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
+    const limit = multiInput ? '' : '1'
     const extraClass = '';
     const titleText = '';
     const allowNewItems = column.cv_allows_free_text;
@@ -713,18 +717,19 @@ function cvListObjectsInput(column, data, options, url) {
       .replace('_OPTIONS_', existingOptions)
       .replace('_EXTRACLASS_', extraClass)
       .replace('_TITLE_', titleText)
-      .replace('_LIMIT?_', '')
+      .replace('_LIMIT?_', limit)
       .replace('_ALLOW_FREE_TEXT_', allowNewItems.toString());
   }
 }
 
-function simpleObjectsInput(column, data, options, url) {
+function simpleObjectsInput(column, data, options, url, multiInput) {
   const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`);
   if (options.readonly) {
     return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
   } else {
     const typeaheadTemplate = 'typeahead/single_pages_samples';
     const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
+    const limit = multiInput ? '' : '1'
     const extraClass = '';
     const titleText = '';
     const allowNewItems = false;
@@ -737,7 +742,7 @@ function simpleObjectsInput(column, data, options, url) {
       .replace('_OPTIONS_', existingOptions)
       .replace('_EXTRACLASS_', extraClass)
       .replace('_TITLE_', titleText)
-      .replace('_LIMIT?_', '1')
+      .replace('_LIMIT?_', limit)
       .replace('_ALLOW_FREE_TEXT_', allowNewItems.toString());
   }
 }
@@ -755,8 +760,9 @@ const handleFailure = (table, res) => {
       if (errorColNames.includes(colTitle)) {
         $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
         $j(this.node()).attr("title", error.error[colTitle]);
-      } else if (error.error == "Can not be deleted.") {
+      } else if (['You are not allowed to edit this sample.', 'Can not be deleted.'].includes(error.error)) {
         $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
+        errors.add(error.error);
       }
     });
   });

@@ -30,6 +30,8 @@ module DynamicTableHelper
 
   private
 
+  ALLOWED_MODELS = %w[Sop Sample DataFile Strain]
+
   # Links all sample_types in a sequence of sample_types
   def link_sequence(sample_type)
     sequence = [sample_type]
@@ -41,59 +43,82 @@ module DynamicTableHelper
   end
 
   def dt_rows(sample_type)
-    registered_sample_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE }
-    registered_sample_multi_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI }
+    registered_sample_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_sample? }
+    registered_sample_multi_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_sample_multi? }
+    registered_sop_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_sop? }
+    registered_data_file_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_data_file? }
+    strain_attributes = sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.seek_strain? }
 
     sample_type.samples.map do |s|
-      sanitized_json_metadata = hide_unauthorized_inputs(JSON.parse(s.json_metadata), registered_sample_attributes, registered_sample_multi_attributes)
+      sanitized_json_metadata = sanitize_metadata(JSON.parse(s.json_metadata),
+                                                  registered_sample_attributes,
+                                                  registered_sample_multi_attributes,
+                                                  registered_sop_attributes,
+                                                  registered_data_file_attributes,
+                                                  strain_attributes)
       if s.can_view?
         { 'selected' => '', 'id' => s.id, 'uuid' => s.uuid }.merge!(sanitized_json_metadata)
       else
-        { 'selected' => '', 'id' => '#HIDDEN', 'uuid' => '#HIDDEN' }.merge!(sanitized_json_metadata&.transform_values { '#HIDDEN' })
+        { 'selected' => '', 'id' => '#HIDDEN', 'uuid' => '#HIDDEN' }.merge!(sanitized_json_metadata.transform_values { '#HIDDEN' })
       end
     end
   end
 
-  def hide_unauthorized_inputs(json_metadata, registered_sample_attributes, registered_sample_multi_attributes)
+  def sanitize_metadata(json_metadata,
+                        registered_sample_attributes,
+                        registered_sample_multi_attributes,
+                        registered_sop_attributes,
+                        registered_data_file_attributes,
+                        strain_attributes)
     registered_sample_multi_attributes.map(&:title).each do |rsma|
-      json_metadata = transform_registered_sample_multi(json_metadata, rsma)
+      json_metadata = transform_non_text_attributes_multi(json_metadata, rsma)
     end
     registered_sample_attributes.map(&:title).each do |rma|
-      json_metadata = transform_registered_sample_single(json_metadata, rma)
+      json_metadata = transform_non_text_attributes_single(json_metadata, rma)
+    end
+    registered_sop_attributes.map(&:title).each do |rsa|
+      json_metadata = transform_non_text_attributes_single(json_metadata, rsa)
+    end
+
+    registered_data_file_attributes.map(&:title).each do |rda|
+      json_metadata = transform_non_text_attributes_single(json_metadata, rda)
+    end
+
+    strain_attributes.map(&:title).each do |strain_attr|
+      json_metadata = transform_non_text_attributes_single(json_metadata, strain_attr)
     end
 
     json_metadata
   end
 
-  def transform_registered_sample_multi(json_metadata, input_key)
-    unless input_key.nil?
-        json_metadata[input_key] = json_metadata[input_key].map do |input|
-        input_exists = Sample.where(id: input['id']).any?
-        if !input_exists
-          input
-        elsif Sample.find(input['id']).can_view?
-          input
-        else
-          { 'id' => input['id'], 'type' => input['type'], 'title' => '#HIDDEN' }
-        end
+  def transform_non_text_attributes_multi(json_metadata, multi_non_text_attribute_title)
+    unless multi_non_text_attribute_title.nil?
+      original_metadata = json_metadata[multi_non_text_attribute_title]
+      json_metadata[multi_non_text_attribute_title] = original_metadata.map do |obj|
+        hide_unauthorized_metadata(obj)
       end
     end
     json_metadata
   end
 
-  def transform_registered_sample_single(json_metadata, input_key)
-    unless input_key.nil?
-      input = json_metadata[input_key]
-      input_exists = Sample.where(id: input['id']).any?
-      if !input_exists
-        json_metadata[input_key] = input
-      elsif Sample.find(input['id']).can_view?
-        json_metadata[input_key] = input
-      else
-        json_metadata[input_key] = { 'id' => input['id'], 'type' => input['type'], 'title' => '#HIDDEN' }
-      end
+  def transform_non_text_attributes_single(json_metadata, non_text_attribute_title)
+    unless non_text_attribute_title.nil?
+      json_metadata[non_text_attribute_title] = hide_unauthorized_metadata(json_metadata[non_text_attribute_title])
     end
     json_metadata
+  end
+
+  def hide_unauthorized_metadata(obj)
+    model = obj['type']
+    raise "Not allowed to look up #{model}!" unless ALLOWED_MODELS.include?(model)
+
+    item = model.constantize.find_by(id: obj['id']) if obj['id'].present?
+    item_exists = !item.nil?
+    if item_exists && !item&.can_view?
+      { 'id' => obj['id'], 'type' => obj['type'], 'title' => '#HIDDEN' }
+    else
+      obj
+    end
   end
 
   def dt_cols(sample_type)

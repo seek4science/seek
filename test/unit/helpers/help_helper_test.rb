@@ -6,20 +6,20 @@ class HelpHelperTest < ActionView::TestCase
   test 'help link' do
     link = help_link :investigation_checksum
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
-    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum.html', tag['href']
+    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal 'Help', tag.children.first.content
 
     link = help_link :investigation_checksum, link_text: 'chicken soup'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
-    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum.html', tag['href']
+    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal 'chicken soup', tag.children.first.content
   end
 
   test 'url only' do
     link = help_link :investigation_checksum, url_only: true
-    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum.html', link
+    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum', link
   end
 
   test 'include icon' do
@@ -44,7 +44,7 @@ class HelpHelperTest < ActionView::TestCase
     link = index_and_new_help_icon 'collection'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
     
-    assert_equal 'https://docs.seek4science.org/help/user-guide/collections.html', tag['href']
+    assert_equal 'https://docs.seek4science.org/help/user-guide/collections', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal t("info_text.collection"), tag['data-tooltip']
     assert_equal 'What is a Collection?', tag.children[1].content
@@ -61,7 +61,7 @@ class HelpHelperTest < ActionView::TestCase
     link = what_is_help_icon_with_link 'Collection', 'chicken soup'
     tag = Nokogiri::HTML::DocumentFragment.parse(link).children.first
 
-    assert_equal 'https://docs.seek4science.org/help/user-guide/collections.html', tag['href']
+    assert_equal 'https://docs.seek4science.org/help/user-guide/collections', tag['href']
     assert_equal '_blank', tag['target']
     assert_equal 'What is a Collection?', tag.children[1].content
     assert_equal 'chicken soup', tag['data-tooltip']
