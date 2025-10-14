@@ -1,5 +1,9 @@
-<span class="text">{{first_name}} {{last_name}}</span>
-<span class="badge">{{count}}</span>
-{{#if person_id}}
-<span class="glyphicon glyphicon-user"></span>
+{{#if first_name}}
+  <span class="text">{{first_name}} {{last_name}}</span>
+  <span class="badge">{{count}}</span>
+  {{#if person_id}}
+    <span class="glyphicon glyphicon-user"></span>
+  {{/if}}
+{{else}}
+  <span class="text">"{{text}}"</span>
 {{/if}}

@@ -194,92 +194,39 @@ class PublicationsController < ApplicationController
     end
   end
 
-  def query_authors
-    # query authors by first and last name each
-    authors_q = params[:authors]
+  def typeahead_publication_authors
+    q = params[:q].to_s.strip
 
-    unless authors_q
-      error = 'require query parameter authors'
-      respond_to do |format|
-        format.json { render json: { error: error }, status: 422 }
-      end
+    # Fetch all matching authors and remove empty names
+    results = PublicationAuthor
+                .where("CONCAT_WS(' ', first_name, last_name) LIKE ?", "%#{q}%")
+                .select(:id, :first_name, :last_name, :person_id)
+                .reject { |a| a.first_name.blank? || a.last_name.blank? }
 
-      return
-    end
 
-    authors = []
-    authors_q.each do |_author_i, author_q|
-      params = {}
-      if author_q.key?('full_name')
-        first_name, last_name = PublicationAuthor.split_full_name author_q['full_name']
-        params = { first_name: first_name, last_name: last_name }
-      else
-        params = { first_name: author_q['first_name'], last_name: author_q['last_name'] }
-      end
+    # Group by full name (ignore person_id when grouping)
+    grouped = results.group_by { |a| [a.first_name, a.last_name] }
 
-      authors_db = PublicationAuthor.where(params)
-                                    .group(:person_id, :first_name, :last_name, :author_index)
-                                    .count
-                                    .collect do |groups, count|
-        {
-          person_id: groups[0],
-          first_name: groups[1],
-          last_name: groups[2],
-          count: count
-        }
-      end
+    items = grouped.map do |(first_name, last_name), group|
+      full_name = [first_name, last_name].compact.join(" ")
 
-      if !authors_db.empty? # found at least one author
-        authors << authors_db[0]
-      else # no author found
-        users_db = Person.where(params)
-        if !users_db.empty? # is there a person with that name
-          user = users_db[0]
-          authors << { name: user.name }
-        else # just add the queried name as author
-          authors << { person_id: nil, first_name: params[:first_name], last_name: params[:last_name], count: 0 }
-        end
-      end
-    end
+      person_id = group.map(&:person_id).compact.first
 
-    respond_to do |format|
-      format.json { render json: authors.to_json }
-    end
-  end
-
-  def query_authors_typeahead
-    full_name = params[:full_name]
-    unless full_name
-      error = 'require query parameter full_name'
-      respond_to do |format|
-        format.json { render json: { error: error }, status: 422 }
-      end
-
-      return
-    end
-
-    first_name, last_name = PublicationAuthor.split_full_name full_name
-
-    # all authors
-    authors = PublicationAuthor.where('first_name LIKE :fnquery', fnquery: "#{first_name}%")
-                               .where('last_name LIKE :lnquery', lnquery: "#{last_name}%")
-                               .group(:person_id, :first_name, :last_name, :author_index)
-                               .count
-                               .collect do |groups, count|
       {
-        person_id: groups[0],
-        first_name: groups[1],
-        last_name: groups[2],
-        count: count
+        id: full_name,
+        text: full_name,
+        first_name: first_name,
+        last_name: last_name,
+        person_id: person_id,
+        count: group.size
       }
     end
-    authors.delete_if { |author| author[:first_name].empty? && author[:last_name].empty? }
-    author = PublicationAuthor.where(first_name: first_name, last_name: last_name).limit(1)
 
-    respond_to do |format|
-      format.json { render json: authors.to_json }
-    end
+    render json: { results: items }
   end
+
+
+
 
   # Try and relate non_seek_authors to people in SEEK based on name and project
   def suggest_authors
@@ -469,10 +416,10 @@ class PublicationsController < ApplicationController
       end
     else
       @subaction = 'Create'
-        respond_to do |format|
-          format.html { render action: 'new' }
-          format.json { render json: @publication, status: :ok, include: [params[:include]] }
-        end
+      respond_to do |format|
+        format.html { render action: 'new' }
+        format.json { render json: @publication, status: :ok, include: [params[:include]] }
+      end
     end
   end
 
