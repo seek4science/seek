@@ -1048,18 +1048,16 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'query authors with the same last name' do
     FactoryBot.create_list(:publication_with_author, 6)
     query = 'Last'
-    get :typeahead_publication_authors, params: { format: :json, full_name: query }
+    get :typeahead_publication_authors, params: { format: :json, q: query }
+
     assert_response :success
     authors = JSON.parse(@response.body)['results']
 
-    # Ensure 6 results are returned
-    assert_equal 6, authors.size
+    # 6 are from PublicationAuthors + 3 from People
+    assert_equal 9, authors.size
     # Ensure all authors have "Last" as last_name
-    assert authors.all? { |a| a['last_name'] == 'Last' }
+    assert authors.all? { |a| a['last_name'].include?('Last') }
 
-    # Ensure first names are unique
-    first_names = authors.map { |a| a['first_name'] }
-    assert_equal first_names.uniq.sort, first_names.sort
 
     # Ensure ids are full names
     authors.each do |a|
@@ -1067,17 +1065,11 @@ class PublicationsControllerTest < ActionController::TestCase
       assert_equal expected_full_name, a['id']
       assert_equal expected_full_name, a['text']
     end
-
-    # Ensure all person_ids are nil in this setup
-    assert authors.all? { |a| a['person_id'].nil? }
-
-    # Ensure count is always 1
-    assert authors.all? { |a| a['count'] == 1 }
   end
 
   test 'query a single unknown author' do
     query = 'Nobody knows this person'
-    get :typeahead_publication_authors, params: { format: :json, full_name: query }
+    get :typeahead_publication_authors, params: { format: :json, q: query }
     assert_response :success
     authors = JSON.parse(@response.body)['results']
     assert_equal 0, authors.size
