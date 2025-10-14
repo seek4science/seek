@@ -1597,6 +1597,71 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
+
+
+  test 'should return authors matching the query' do
+    FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe')
+    FactoryBot.create(:publication_author, first_name: 'Jane', last_name: 'Smith')
+    FactoryBot.create(:publication_author, first_name: 'Alice', last_name: 'Johnson')
+
+    get :typeahead_publication_authors, params: { q: 'John' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 2, results.size
+    assert_equal 'John Doe', results.first['text']
+    assert_equal 'Alice Johnson', results.last['text']
+  end
+
+  test 'should return people matching the query' do
+    FactoryBot.create(:person, first_name: 'John', last_name: 'Doe')
+    FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith')
+    FactoryBot.create(:person, first_name: 'Alice', last_name: 'Johnson')
+
+    get :typeahead_publication_authors, params: { q: 'Jane' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 1, results.size
+    assert_equal 'Jane Smith', results.first['text']
+  end
+
+  test 'should not return duplicate authors and people' do
+    FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe', person_id: 1)
+    FactoryBot.create(:person, first_name: 'John', last_name: 'Doe', id: 1)
+
+    get :typeahead_publication_authors, params: { q: 'John' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 1, results.size
+    assert_equal 'John Doe', results.first['text']
+  end
+
+  test 'should return empty results for unmatched query' do
+    FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe')
+    FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith')
+
+    get :typeahead_publication_authors, params: { q: 'Nonexistent' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 0, results.size
+  end
+
+
+  test 'should return unique author with correct count for duplicate names' do
+    25.times { FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe') }
+    FactoryBot.create(:person, first_name: 'John', last_name: 'Doe', id: 1)
+    get :typeahead_publication_authors, params: { q: 'John' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 1, results.size
+    assert_equal 'John Doe', results.first['text']
+    assert_equal 25, results.first['count']
+  end
+
   private
 
   def publication_for_export_tests
@@ -1618,4 +1683,7 @@ class PublicationsControllerTest < ActionController::TestCase
             publication_type: FactoryBot.create(:journal)
     )
   end
+
+
+
 end
