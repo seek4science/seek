@@ -196,10 +196,11 @@ class PublicationsController < ApplicationController
 
   def typeahead_publication_authors
     q = params[:q].to_s.strip.downcase
+    return render json: { results: [] } if q.blank?
 
     # --- Fetch authors ---
     authors_results = PublicationAuthor
-                        .where.not(first_name: [nil, ''], last_name: [nil, ''])
+                        .where.not("(first_name IS NULL OR first_name = '') AND (last_name IS NULL OR last_name = '')")
                         .where("LOWER(CONCAT_WS(' ', first_name, last_name)) LIKE ?", "%#{q}%")
                         .select(:first_name, :last_name, :person_id)
 
@@ -222,7 +223,6 @@ class PublicationsController < ApplicationController
 
     # --- Fetch people ---
     people_results = Person
-                       .where.not(first_name: [nil, ''], last_name: [nil, ''])
                        .where("LOWER(CONCAT_WS(' ', first_name, last_name)) LIKE ?", "%#{q}%")
                        .select(:first_name, :last_name, :id)
 
