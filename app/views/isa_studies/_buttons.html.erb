@@ -1,21 +1,15 @@
 
 <%
 add_row||="SampleAddNewRow()"
-paste_cb||="SamplePasteFromClipboard()"
 delete||="SampleSetAsDeleted()"
 save||="SampleSave()"
 permissions||="loadBatchPermission('sampleDynamicTable',this)"
 exportToExcel||="sampleExportExcel()"
 uploadExcel||="studySampleUploadExcel()"
-paste_from_clipboard_help_text = "This functionality has limitations. This will skip any column in the table which is not purely text based. You need to fill those in manually."
 %>
 
 <div class="btn-group">
   <input class="btn btn-default" type="button" value="Add row" onClick=<%=add_row%> />
-  <button class="btn btn-default fa-circle-info" type="button" onClick=<%=paste_cb%> title=<%= paste_from_clipboard_help_text %>>
-    Paste From Clipboard
-    <%= help_icon(paste_from_clipboard_help_text) %>
-  </button>
   <input class="btn btn-default" type="button" value="Delete selected" onClick=<%=delete%> />
   <input class="btn btn-default btn_set_permission" type="button" value="Batch sharing permissions" onClick=<%=permissions%> />
   <input class="btn btn-default" type="button" value="Batch download to Excel" onClick=<%=exportToExcel%> />

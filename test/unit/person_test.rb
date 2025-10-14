@@ -1414,4 +1414,22 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal [project, project2, project3], person.projects.sort_by(&:id)
     assert_equal [project,project2], person.administered_projects.sort_by(&:id)
   end
+
+  test 'selected avatar id is nullified when avatar deleted' do
+    person = FactoryBot.create(:person)
+    disable_authorization_checks do
+      FactoryBot.build(:avatar, owner: person).save!
+    end
+    avatar = person.reload.avatar
+    assert avatar
+    assert person.avatar_selected?
+
+    assert_difference('Avatar.count', -1) do
+      avatar.destroy!
+    end
+
+    assert_nil person.reload.avatar_id
+    assert_nil person.avatar
+    refute person.avatar_selected?
+  end
 end

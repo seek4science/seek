@@ -203,81 +203,97 @@ async function batchDeleteSample(sampleTypes) {
   }
 }
 
+// Helper function
+// Returns `true` if `row` has '#HIDDEN' as a value for one of the fields
+function rowHasHiddenFields(row) {
+    let hasHiddenFields = false;
+    for (const attr in row) {
+      const val = row[attr];
+      if (Array.isArray(val)) {
+        hasHiddenFields = hasHiddenFields || val.some(input => input.title === '#HIDDEN'); // Sample has hidden Registered Samples in list
+      } else if (typeof val === 'object' && val !== null && 'title' in val) {
+        hasHiddenFields = hasHiddenFields || (val.title === '#HIDDEN'); // Sample has hidden Registered Sample
+      } else {
+        hasHiddenFields = hasHiddenFields || (val === '#HIDDEN'); // Sample is completely hidden
+      }
+    }
+  return hasHiddenFields;
+}
+
 // This function is called when 'excel-export' btn is clicked.
 // Posts the content of the dynamic table to the single_pages_controller,
 // which generates an excel workbook based on a template.
 async function exportToExcel(tableName, studyId, assayId, sampleTypeId) {
-  const headerRow = $j(`table[id=${tableName}] thead tr`)["0"];
-
-  // Cells from the table body => Each row = array
-  // For some reason they contain null values, which should be filtered out
-  let bodyCells = $j(`table[id=${tableName}]`).DataTable().data().toArray().map(subarray => subarray.filter(function(el){return el != null}));
+  const table = $j(`table[id=${tableName}]`);
 
   // Checks whether the dynamic table has errors
   // The excel export will be aborted as long as the dynamic table has errors
-  hasErrorcells = $j(`table[id=${tableName}]`).find('select.select2__error').size() > 0
+  hasErrorcells = table.find('select.select2__error').size() > 0
   if (hasErrorcells) {
     alert('It appears this sample table has some errors. Please correct the errors in the current sample table and try downloading again.');
     return;
   }
 
-  // Return array of table header cells from headerRow
-  let headerCells = [];
-  $j.each(headerRow.cells, function (i, v) {
-      headerCells.push(v.textContent);
+  // Fetch headers and rows
+  const headers = table.DataTable().columns().titles().toArray();
+  const rows = table.DataTable().data().toArray();
+
+  // Check whether the rows have the same number of values as the header
+  const rowValsMatchHeaders = rows.every((row, index) => {
+    if(row.length !== headers.length) {
+      console.error(`The number of values in row '${index}' is different from the header length.`);
+      return false;
+    }
+    return true;
   });
 
-  // Construct the 'struct' of the table data
-  let data = [];
-  for (let i = 0; i < bodyCells.length; i++) {
-    const row = bodyCells[i];
-    // If a row has been checked / unchecked,
-    // the datatable body gets one extra hidden cell at index 1,
-    // compared to the table header. This has to be removed.
-    if (row.length !== headerCells.length)row.splice(1,1);
-    let obj = {};
-    let hasHiddenInputs = false;
-    for (let j = 0; j < headerCells.length; j++) {
-      const attr = headerCells[j];
-      const val = row[j];
-
-      // Check whether sample has one or more hidden Inputs or if sample is completely hidden
-      if (Array.isArray(val)){
-        hasHiddenInputs = hasHiddenInputs || val.some(input => input.title === '#HIDDEN'); // Sample has hidden Registered Samples in list
-      } else if(typeof val === 'object' && val !== null && 'title' in val){
-        hasHiddenInputs = hasHiddenInputs || (val.title === '#HIDDEN'); // Sample has hidden Registered Sample
-      } else {
-        hasHiddenInputs = hasHiddenInputs || (val === '#HIDDEN'); // Sample is completely hidden
-      }
-
-      // The source inputs are wrapped in an object and must be unwrapped first
-      // And then packaged as a single element
-      if(j === 0) {
-        obj["selected"] = (val === "") ? false : val;
-      } else {
-        obj[attr] = val;
-      }
-    }
-    if (!hasHiddenInputs && obj["selected"]) data.push(obj);
+  if (!rowValsMatchHeaders) {
+    alert("Invalid request! See console for more information.");
+    return false;
   }
+
+  // Get the ID field (instance name + " id")
+  const idFieldName = "<%= Seek::Config.instance_name %> id";
+
+  // Construct the list of objects
+  const sampleIds = rows.map((row) => {
+    return headers.reduce((obj, header, i) => {
+      // The first cell is the checkbox and  its header is empty string
+      if (header === '' && i === 0){
+        obj['selected'] = row[i];
+      } else {
+        obj[header] = row[i];
+      }
+      return obj;
+      },
+      {});
+  })
+  // Only include selected rows
+    .filter(row => row.selected)
+  // Exclude rows with hidden values
+    .filter(row => !rowHasHiddenFields(row))
+  // Finally only use the sample IDs
+    .map(row => row[idFieldName]);
 
   // Use ajax for POST request with table data in the body
   // If succes => Redirect to download path for retrieving excel file
   $j.ajax({
     type: 'POST',
+    headers: {
+      'Accept': 'application/json'
+    },
     url: '<%= export_to_excel_single_pages_path() %>',
-    data: { sample_data: JSON.stringify(data),
+    data: { sample_ids: JSON.stringify(sampleIds),
       sample_type_id: JSON.stringify(sampleTypeId),
       study_id: JSON.stringify(studyId),
       assay_id: JSON.stringify(assayId),
     }
   })
   .done( function(response){
-    downloadUrl = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
-    window.location.href = downloadUrl;
+    window.location.href = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
   })
   .fail( function(response){
-    alert(`Failed to export through excel!\nStatus: ${response.status}\nError: ${JSON.stringify(response.error().statusText)}`);
+    alert(`Failed to export through excel!\nStatus: ${response.status} - ${JSON.stringify(response.error().statusText)}\nError: ${response.responseText}`);
   })
   .always( function(response){
     setTimeout(() => {location.reload()}, 2000);
@@ -316,7 +332,7 @@ async function handleUploadSubmit(formData){
       $j('#upload-excel').html(response);
     },
     error: function(err){
-        alert(`Failed to upload file!\nStatus: ${err.status}\nError: ${err.statusText}`);
+        alert(`Failed to upload file!\nStatus: ${err.status} - ${err.statusText}\nError: ${err.responseText}`);
       location.reload(); // Page needs reloading for the notice message to appear
     }
   });

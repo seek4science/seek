@@ -336,7 +336,7 @@ SEEK::Application.routes.draw do
       get :project_join_requests
       get :project_creation_requests
       get :project_importation_requests
-      get  :typeahead
+      get :typeahead
     end
     member do
       get :asset_report
@@ -357,6 +357,7 @@ SEEK::Application.routes.draw do
       post :hide_fair_data_station_import_status
       post :submit_fairdata_station
       post :update_annotations_ajax
+      get :default_data
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :observation_units, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
@@ -632,8 +633,7 @@ SEEK::Application.routes.draw do
 
   resources :publications, concerns: [:asset, :has_content_blobs] do
     collection do
-      get :query_authors
-      get :query_authors_typeahead
+      get :typeahead_publication_authors
       get :export
       post :fetch_preview
       post :update_metadata

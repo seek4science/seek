@@ -75,7 +75,7 @@ module Seek
       end
 
       def validate_template_file
-        if template && !compatible_template_file?
+        if template && !compatible_template_file? && !is_isa_json_compliant?
           errors.add(:template, 'Not a valid template file')
         end
       end

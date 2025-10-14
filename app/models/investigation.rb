@@ -3,6 +3,7 @@ class Investigation < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
+  has_filter :is_isa_json_compliant
   has_many :studies
   has_many :study_publications, through: :studies, source: :publications
   has_many :assays, through: :studies

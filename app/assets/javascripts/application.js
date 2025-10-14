@@ -29,6 +29,7 @@
 //= require bootstrap_tab_memory
 //= require associations
 //= require people
+//= require publications
 //= require search
 //= require tooltips
 //= require sample_types

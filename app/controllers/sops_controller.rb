@@ -76,7 +76,7 @@ class SopsController < ApplicationController
     raise "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for #{study_id.present? ? "study ID '#{study_id}'." : "assay ID '#{assay_id}'."}" if asset.nil?
 
     sops = asset.sops || []
-    filtered_sops = sops.select { |sop| sop.title&.downcase&.include?(query.downcase) }
+    filtered_sops = sops.authorized_for('view').select { |sop| sop.title&.downcase&.include?(query.downcase) }
     items = filtered_sops.collect { |sop| { id: sop.id, text: sop.title } }
 
     respond_to do |format|

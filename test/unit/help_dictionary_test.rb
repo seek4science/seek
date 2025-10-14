@@ -8,13 +8,13 @@ class HelpDictionaryTest < ActiveSupport::TestCase
 
   test 'all_links' do
     refute_empty @dic.all_links
-    assert_includes @dic.all_links, 'https://docs.seek4science.org/tech/investigation-checksum.html'
+    assert_includes @dic.all_links, 'https://docs.seek4science.org/tech/investigation-checksum'
   end
 
   test 'help link' do
-    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum.html', @dic.help_link(:investigation_checksum)
-    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum.html', @dic.help_link('investigation_checksum')
-    assert_equal 'https://docs.seek4science.org/help/user-guide/roles.html', @dic.help_link(:roles)
+    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum', @dic.help_link(:investigation_checksum)
+    assert_equal 'https://docs.seek4science.org/tech/investigation-checksum', @dic.help_link('investigation_checksum')
+    assert_equal 'https://docs.seek4science.org/help/user-guide/roles', @dic.help_link(:roles)
     assert_nil @dic.help_link(:funky_fish)
   end
 

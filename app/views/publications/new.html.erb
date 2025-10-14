@@ -4,573 +4,249 @@
 <%= index_and_new_help_icon controller_name %>
 
 <div>
-<%= error_messages_for('publication', :message => nil) %>
+  <%= error_messages_for('publication', :message => nil) %>
 
-<!-- Nav tabs -->
-<% subaction = @subaction || 'Register' # default tab is the old Register %>
-<ul class="nav nav-tabs" role="tablist" id="new_publication_tabs" data-subaction="<%= subaction %>">
-  <li role="presentation"><a href="#Register" aria-controls="Register" role="tab" data-toggle="tab">From Identifier</a></li>
-  <li role="presentation"><a href="#Create" aria-controls="Create" role="tab" data-toggle="tab">Enter manually</a></li>
-  <li role="presentation"><a href="#Import" aria-controls="Import" role="tab" data-toggle="tab">Import from file</a></li>
-</ul>
+  <!-- Nav tabs -->
+  <% subaction = @subaction || 'Register' # default tab is the old Register %>
+  <ul class="nav nav-tabs" role="tablist" id="new_publication_tabs" data-subaction="<%= subaction %>">
+    <li role="presentation"><a href="#Register" aria-controls="Register" role="tab" data-toggle="tab">From Identifier</a></li>
+    <li role="presentation"><a href="#Create" aria-controls="Create" role="tab" data-toggle="tab">Enter manually</a></li>
+    <li role="presentation"><a href="#Import" aria-controls="Import" role="tab" data-toggle="tab">Import from file</a></li>
+  </ul>
 
-<!-- Tab panes -->
-<div class="tab-content">
-  <div role="tabpanel" class="tab-pane" id="Register">
-    <%= form_tag(fetch_preview_publications_path, { remote: true, id: 'fetch_publication' }) do %>
-    <p>
-      Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br>
-      If SEEK successfully retrieves your publication, click "Register" to process to the next step.
-    </p>
-    <div id="publication_error" class="alert alert-danger" style="display:none"></div>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane" id="Register">
+      <%= form_tag(fetch_preview_publications_path, { remote: true, id: 'fetch_publication' }) do %>
+        <p>
+          Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br>
+          If SEEK successfully retrieves your publication, click "Register" to process to the next step.
+        </p>
+        <div id="publication_error" class="alert alert-danger" style="display:none"></div>
 
-      <div class="form-group">
-        <div class="row">
-          <div class="col-sm-3">
-            <span id="publication_type_info" style="display:none;"></span>
-             <span id="publication_type_selection">
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-3">
+              <span id="publication_type_info" style="display:none;"></span>
+              <span id="publication_type_selection">
               <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
                                     {:selected => PublicationType.Journal.id},
-                              {:class => 'form-control'}  -%>
+                                    {:class => 'form-control'}  -%>
       </span>
+            </div>
           </div>
         </div>
-      </div>
 
-    <div class="form-group">
-      <div class="row">
-        <div class="col-sm-3 col-xs-5">
-          <%= select_tag("protocol", options_for_select([["PubMed ID","pubmed"],["DOI","doi"]]), :class => 'form-control') %>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-3 col-xs-5">
+              <%= select_tag("protocol", options_for_select([["PubMed ID","pubmed"],["DOI","doi"]]), :class => 'form-control') %>
+            </div>
+            <div class="col-sm-9 col-xs-7">
+              <%= text_field_tag("key", '', :class => 'form-control') %>
+            </div>
+          </div>
         </div>
-        <div class="col-sm-9 col-xs-7">
-          <%= text_field_tag("key", '', :class => 'form-control') %>
-        </div>
-      </div>
+
+        <p>
+          Please select the <%= t('project').pluralize %> this publication is related to. You must select a <%= t('project') %>, and it must be a <%= t('project') %>
+          you are a member of.
+        </p>
+
+        <%= fields_for(@publication) {|f|  f.hidden_field :parent_name } -%>
+        <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication } -%>
+
+        <%= submit_tag 'Fetch',:id=>"fetch_button", :class => 'btn btn-default' %>
+        <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
+      <% end %>
+
+      <div id="publication_preview_container" style="display:none;"></div>
     </div>
 
-    <p>
-      Please select the <%= t('project').pluralize %> this publication is related to. You must select a <%= t('project') %>, and it must be a <%= t('project') %>
-      you are a member of.
-    </p>
-
-    <%= fields_for(@publication) {|f|  f.hidden_field :parent_name } -%>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication } -%>
-
-    <%= submit_tag 'Fetch',:id=>"fetch_button", :class => 'btn btn-default' %>
-    <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
-    <% end %>
-
-    <div id="publication_preview_container" style="display:none;"></div>
-</div>
-
-<div role="tabpanel" class="tab-pane" id="Create">
-<%= form_for @publication, :html => { :class => 'form-horizontal', :multipart => true } , :url => url_for( :action => :create) do |publication_form| %>
-  <%= publication_form.hidden_field :parent_name %>
-  <%= publication_form.hidden_field :registered_mode %>
-  <div class="form-group">
-    <%= label_tag :project_ids, t('project').pluralize, :class => 'control-label col-sm-2 required' %>
-    <div class="col-sm-10">
-      <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
-    </div>
-  </div>
-    <div class="form-group">
-      <%= label_tag :publication_types, 'Publication Type', :class => 'control-label col-sm-2 required' %>
-      <div class="col-sm-2">
-        <span id="publication_type_info" style="display:none;"></span>
-        <span id="publication_type_selection">
+    <div role="tabpanel" class="tab-pane" id="Create">
+      <%= form_for @publication, :html => { :class => 'form-horizontal', :multipart => true } , :url => url_for( :action => :create) do |publication_form| %>
+        <%= publication_form.hidden_field :parent_name %>
+        <%= publication_form.hidden_field :registered_mode %>
+        <div class="form-group">
+          <%= label_tag :project_ids, t('project').pluralize, :class => 'control-label col-sm-2 required' %>
+          <div class="col-sm-10">
+            <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :publication_types, 'Publication Type', :class => 'control-label col-sm-2 required' %>
+          <div class="col-sm-2">
+            <span id="publication_type_info" style="display:none;"></span>
+            <span id="publication_type_selection">
         <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
                               {:selected => PublicationType.Journal.id},
                               {:class => 'form-control'} -%>
       </span>
-      </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :pubmed_id, "Pubmed ID", :class => 'control-label col-sm-2' %>
+          <div class="col-sm-6">
+            <%= publication_form.text_field :pubmed_id, :class => 'form-control' %>
+          </div>
+          <div class=" col-sm-4">
+            <button id="retrieve_from_pubmed" class="btn btn-default">PUBMED</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :doi, "DOI", :class => 'control-label col-sm-2' %>
+          <div class="col-sm-6">
+            <%= publication_form.text_field :doi, :class => 'form-control' %>
+          </div>
+          <div class=" col-sm-4">
+            <button id="retrieve_from_crossref" class="btn btn-default">DOI</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :title, 'Title', :class => 'control-label col-sm-2 required' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_area :title, :class => 'form-control', :rows => 2, :cols => 100 %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :publication_authors, 'Authors', :class => 'control-label col-sm-2' %>
+          <div class="col-sm-9">
+            <%= publication_authors_form_field('publication[publication_authors]', @publication, allow_new: true, limit: nil) %>
+          </div>
+          <div class="col-sm-1">
+            <button type="button"
+                    class="btn btn-sm btn-info"
+                    data-toggle="popover"
+                    data-html="true"
+                    data-placement="right"
+                    data-container="body"
+                    data-content="
+            <div style='min-width:220px;'>
+              <p><span class='glyphicon glyphicon-user'></span> <strong>Registered Author</strong></p>
+              <p><span class='badge'>Num</span> <strong>of publications linked to this author</strong></p>
+            </div>
+          ">
+              Explain
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <% if Seek::Config.allow_publications_fulltext %>
+            <%= label_tag :full_text, nil, :class => 'control-label col-sm-2' %>
+            <div class="col-sm-10">
+              <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@publication} -%>
+            </div>
+          <% end %>
+          <%= label_tag :abstract, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_area :abstract, :class => 'form-control', :rows => 5, :cols => 100 %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :journal, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :journal, :class => 'form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :citation, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :citation, :class => 'form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :url, 'URL', :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :url, :class => 'form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :publisher, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :publisher, :class => 'form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :booktitle, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :booktitle, :class => 'form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :editor, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :editor, :class => 'form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :published_date, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.text_field :published_date, data: { calendar: true }, class: 'calendar form-control' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-2 col-sm-offset-2">
+            <%= publication_form.submit 'Create', :name => "subaction", :value => 'Create', :class => 'btn btn-primary' %>
+          </div>
+        </div>
+      <% end %>
     </div>
-    <div class="form-group">
-    <%= label_tag :pubmed_id, "Pubmed ID", :class => 'control-label col-sm-2' %>
-    <div class="col-sm-6">
-      <%= publication_form.text_field :pubmed_id, :class => 'form-control' %>
-    </div>
-    <div class=" col-sm-4">
-      <button id="retrieve_from_pubmed" class="btn btn-default">PUBMED</button>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= label_tag :doi, "DOI", :class => 'control-label col-sm-2' %>
-    <div class="col-sm-6">
-      <%= publication_form.text_field :doi, :class => 'form-control' %>
-    </div>
-    <div class=" col-sm-4">
-      <button id="retrieve_from_crossref" class="btn btn-default">DOI</button>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= label_tag :title, 'Title', :class => 'control-label col-sm-2 required' %>
-    <div class="col-sm-10">
-      <%= publication_form.text_area :title, :class => 'form-control', :rows => 2, :cols => 100 %>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= label_tag :publication_authors, 'Authors', :class => 'control-label col-sm-2' %>
-    <div class="col-sm-9">
-      <%= publication_form.collection_select :publication_authors, @publication.publication_authors, :full_name, :full_name, {:selected => @publication.publication_authors.map(&:id)}, :class => 'form-control', :multiple => 'multiple' %>
-    </div>
-    <div class="col-sm-1">
-      <button type="button" class="btn btn-sm" data-toggle="popover" data-html="true" data-content="
-        <span class='tag label label-primary'>Author linked to User</span><br>
-        <span class='tag label label-success'>User</span><br>
-        <span class='tag label label-warning'>Known Author</span><br>
-        <span class='tag label label-danger'>New Author</span>
-      ">
-        Explain
-      </button>
-    </div>
-  </div>
-  <div class="form-group">
-    <% if Seek::Config.allow_publications_fulltext %>
-      <%= label_tag :full_text, nil, :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@publication} -%>
-      </div>
-    <% end %>
-    <%= label_tag :abstract, nil, :class => 'control-label col-sm-2' %>
-    <div class="col-sm-10">
-      <%= publication_form.text_area :abstract, :class => 'form-control', :rows => 5, :cols => 100 %>
-    </div>
-  </div>
-  <div class="form-group">
-  <%= label_tag :journal, nil, :class => 'control-label col-sm-2' %>
-  <div class="col-sm-10">
-      <%= publication_form.text_field :journal, :class => 'form-control' %>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= label_tag :citation, nil, :class => 'control-label col-sm-2' %>
-    <div class="col-sm-10">
-      <%= publication_form.text_field :citation, :class => 'form-control' %>
-    </div>
-  </div>
-    <div class="form-group">
-      <%= label_tag :url, 'URL', :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-        <%= publication_form.text_field :url, :class => 'form-control' %>
-      </div>
-    </div>
-    <div class="form-group">
-      <%= label_tag :publisher, nil, :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-        <%= publication_form.text_field :publisher, :class => 'form-control' %>
-      </div>
-    </div>
-    <div class="form-group">
-      <%= label_tag :booktitle, nil, :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-        <%= publication_form.text_field :booktitle, :class => 'form-control' %>
-      </div>
-    </div>
-    <div class="form-group">
-      <%= label_tag :editor, nil, :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-        <%= publication_form.text_field :editor, :class => 'form-control' %>
-      </div>
-    </div>
-    <div class="form-group">
-      <%= label_tag :published_date, nil, :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-        <%= publication_form.text_field :published_date, data: { calendar: true }, class: 'calendar form-control' %>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="col-sm-2 col-sm-offset-2">
-        <%= publication_form.submit 'Create', :name => "subaction", :value => 'Create', :class => 'btn btn-primary' %>
-      </div>
-    </div>
-<% end %>
-</div>
 
-<div role="tabpanel" class="tab-pane" id="Import">
-  <%= form_for @publication, :html => { :class => 'form-horizontal' } do |publication_form| %>
-    <%= publication_form.hidden_field :parent_name %>
-    <div class="form-group">
-      <%= label_tag :project_ids, t('project').pluralize, :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-        <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
-      </div>
-    </div>
-    <div class="form-group">
-      <%= label_tag :bibtex_file, nil, :class => 'control-label col-sm-2' %>
-      <div class="col-sm-10">
-        <%= publication_form.file_field :bibtex_file %>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="col-sm-5 col-sm-offset-2">
-        <p>On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the first article from the imported file.</p>
-      </div>
-      <div class="col-sm-5">
-        <p>On successful import, all publications will be saved. Any changes will need to be made individually afterwards.</p>
-      </div>
-      <div class="col-sm-5 col-sm-offset-2">
-        <%= publication_form.button 'Import first', :name => "subaction", :value => 'Import', :class => 'btn btn-primary' %>
-      </div>
-      <div class="col-sm-5">
-        <%= publication_form.button 'Import all', :name => "subaction", :value => 'ImportMultiple', :class => 'btn btn-primary' %>
-      </div>
+    <div role="tabpanel" class="tab-pane" id="Import">
+      <%= form_for @publication, :html => { :class => 'form-horizontal' } do |publication_form| %>
+        <%= publication_form.hidden_field :parent_name %>
+        <div class="form-group">
+          <%= label_tag :project_ids, t('project').pluralize, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :bibtex_file, nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-10">
+            <%= publication_form.file_field :bibtex_file %>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-5 col-sm-offset-2">
+            <p>On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the first article from the imported file.</p>
+          </div>
+          <div class="col-sm-5">
+            <p>On successful import, all publications will be saved. Any changes will need to be made individually afterwards.</p>
+          </div>
+          <div class="col-sm-5 col-sm-offset-2">
+            <%= publication_form.button 'Import first', :name => "subaction", :value => 'Import', :class => 'btn btn-primary' %>
+          </div>
+          <div class="col-sm-5">
+            <%= publication_form.button 'Import all', :name => "subaction", :value => 'ImportMultiple', :class => 'btn btn-primary' %>
+          </div>
 
+        </div>
+      <% end %>
     </div>
-  <% end %>
-</div>
 
-</div><!--end Tab panes -->
+  </div><!--end Tab panes -->
 
 </div>
 
 <script type="text/javascript">
-function addAuthorsToPublication( authorlist, selector_tagsinput) {
-  var tagsinput_elem = jQuery(selector_tagsinput);
-  if( tagsinput_elem.length == 0) {
-    return;
-  }
+    $j(document).ready(function() {
 
-  tagsinput_elem.tagsinput('removeAll');
-
-  if( authorlist.length == 0) {
-    return;
-  }
-
-  jQuery.ajax({
-    url: "<%= query_authors_publications_path :format => :json %>",
-    datatype: 'json',
-    contentType: "application/json",
-    data: { "authors": authorlist },
-    success: function(authors){
-      authors.forEach( function(item,index){
-        tagsinput_elem.tagsinput('add', item);
-      });
-    }
-  });
-}
-
-function addAuthorsFromSelect() {
-  // convert all options of the multiselect to an authorlist
-  var authorlist = jQuery('#publication_publication_authors option').map( function(index,element){
-   return { full_name: jQuery(element).val()};
-  }).get();
-  
-  addAuthorsToPublication( authorlist, '#publication_publication_authors');
-
-  
-  // jQuery('#publication_publication_authors option').each(function(index,element){
-    // console.log('value:' + jQuery(element).val());
-    // jQuery('#publication_publication_authors').tagsinput('add', jQuery(element).val());
-  // });
-}
-
-jQuery(document).ready(function() {
-  $j('#fetch_publication').on('ajax:before', function () {
-    $j('#spinner').show();
-  });
-
-  $j('#fetch_publication').on('ajax:complete', function () {
-    $j('#spinner').hide();
-  });
-
-  // activate tab of current subaction, but only if no hash is set
-  if( !window.location.hash) {
-    var newpublications_tabs = jQuery('#new_publication_tabs');
-    var activate_tab_hash = newpublications_tabs.data('subaction');
-    var activate_tab = newpublications_tabs.find('a[href="#' + activate_tab_hash + '"]');
-    activate_tab.trigger('click');
-  }
-  
-  // activate popovers
-  jQuery('[data-toggle="popover"]').popover();
-  
-  jQuery('select.projects-multiselect').multiselect({
-    enableCaseInsensitiveFiltering: true
-  });
-  
-  var bloodhound_authors = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace(['first_name','last_name']),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    remote: {
-      url: '<%= query_authors_typeahead_publications_path :format => :json, :full_name => 'FULL_NAME_QUERY' %>',
-      wildcard: 'FULL_NAME_QUERY'
-    },
-    limit: 10
-  });
-  bloodhound_authors.initialize();
-
-  var bloodhound_users = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    remote: {
-      url: '<%= typeahead_people_path :format => :json, :query => 'FULL_NAME_QUERY' %>',
-      wildcard: 'FULL_NAME_QUERY'
-    },
-    limit: 10
-  });
-  bloodhound_authors.initialize();
-  bloodhound_users.initialize();
-  
-  jQuery('#publication_publication_authors').tagsinput({
-    tagClass: function(item){
-      // person/user and not an author
-      if( item.name && typeof(item.count) == "undefined") return 'label label-success';
-      // this author does not exist yet
-      if( item.count == 0) return 'label label-danger';
-      // this author is associated with a know person
-      if( item.person_id) return 'label label-primary';
-      // this is an author that is already associated with a publication
-      return 'label label-warning';
-    },
-    freeInput: false,
-    allowDuplicates: true,
-    itemText: function(item) { return item.name ? item.name : item.first_name + " " + item.last_name; },
-    itemValue: function(item) { return item.name ? item.name : item.first_name + " " + item.last_name; },
-    itemTitle: function(item) { return item.name ? item.name : ( item.first_name + " " + item.last_name + ": #publications " + item.count + ", seek_person? " + (item.person_id ? "yes" : "no")); },
-    typeaheadjs: [{
-        highlight: true,
-        minLength: 1
-      },
-      [
-        {
-          name: "typed",
-          displayKey: function(item){ return item.name;},
-          source: function(q, sync) {
-            return sync([{name: q, count: 0}]);
-          },
-          templates: {
-            header: 'New Author',
-            suggestion: HandlebarsTemplates['typeahead/hint']
-          }
-        },
-          {
-              name: "typed-several",
-              displayKey: function(item){ return item.name;},
-              source: function(q, sync) {
-                  return sync([{name: q, count: 0}]);
-              },
-              templates: {
-                  header: 'Comma separated new Author',
-                  suggestion: HandlebarsTemplates['typeahead/hint']
-              }
-          },
-        {
-          name: "authors",
-          displayKey: function(item){ return item.first_name + " " + item.last_name;},
-          source: bloodhound_authors.ttAdapter(),
-          templates: {
-            header: 'Known Authors',
-            suggestion: HandlebarsTemplates['typeahead/publication_author']
-          }
-        },{
-          name: "users",
-          displayKey: function(item){ return item.name;},
-          source: bloodhound_users.ttAdapter(),
-          templates: {
-            header: 'People',
-            suggestion: HandlebarsTemplates['typeahead/hint']
-          }
+        // activate tab of current subaction, but only if no hash is set
+        if( !window.location.hash) {
+            var newpublications_tabs = $j('#new_publication_tabs');
+            var activate_tab_hash = newpublications_tabs.data('subaction');
+            var activate_tab = newpublications_tabs.find('a[href="#' + activate_tab_hash + '"]');
+            activate_tab.trigger('click');
         }
-      ]
-    ]
-  });
 
-  // add all options of the multiselect
-  addAuthorsFromSelect();
+        $j('[data-toggle="popover"]').popover();
 
-    jQuery('#retrieve_from_crossref').on('click', function(e){
-        e.preventDefault(); // prevent the default form submit action
-
-        var doi = jQuery('#publication_doi').val();
-        doi = doi.replace(/^(https?:\/\/)?(dx\.)?doi\.org/, '');
-
-        jQuery.ajax({
-            url: 'https://doi.org/' + doi,
-            accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
-            dataType: 'json',
-            success: function(data, textStatus, jqXHR) {
-                //console.log("DOI:"+data);
-                jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
-                jQuery('#publication_doi').parents('.form-group').addClass('has-success');
-                jQuery('#crossref_id').val(data.DOI);
-                jQuery('#publication_title').val(data.title);
-                jQuery('#publication_journal').val(data.publisher);
-                published_data = data["published-online"] || data["published-print"];
-                //console.log("published_data:"+published_data);
-                year=published_data["date-parts"][0][0];
-                month= published_data["date-parts"][0][1];
-                day= published_data["date-parts"][0][2];
-                var date_published = year+"-"+month+"-"+day;
-                jQuery('#publication_published_date').val(date_published);
-
-                //console.log("DOI:", data);
-                jQuery('#publication_doi').parents('.form-group').removeClass('has-error');
-                jQuery('#publication_doi').parents('.form-group').addClass('has-success');
-                jQuery('#crossref_id').val(data.DOI);
-                jQuery('#publication_title').val(data.title);
-                jQuery('#publication_journal').val(data["container-title"]);
-                jQuery('#publication_publisher').val(data["publisher"]);
-                jQuery('#publication_publisher').val(data["publisher"]);
-
-                if (typeof data["abstract"] !== 'undefined') {
-                    var regex = /(<([^>]+)>)/ig
-                    var  result = data["abstract"].replace(regex, "").slice(9);
-                    //console.log("abstract:",result);
-                    jQuery('#publication_abstract').val(result);
-                }
-
-                if (!jQuery('#publication_citation').val()) {
-                    var publication_citation = data["container-title"];
-
-                    if (typeof data["volume"] !== 'undefined') {
-                        publication_citation += ','+data["volume"];
-                    }
-
-                    if (typeof data["issue"] !== 'undefined') {
-                        publication_citation += '('+ data["issue"]+')';
-                    }
-
-                    if (typeof data["page"] !== 'undefined') {
-                        publication_citation += ':' + data["page"];
-                    }
-                    console.log("citation:",publication_citation);
-                    jQuery('#publication_citation').val(publication_citation);
-                }
-
-                published_data = data["published-online"] || data["published-print"] || data["accepted"];
-                //console.log("published_data:", published_data);
-                year=published_data["date-parts"][0][0];
-                month= published_data["date-parts"][0][1];
-                day= published_data["date-parts"][0][2];
-                var date_published = year+"-"+month+"-"+day;
-                jQuery('#publication_published_date').val(date_published);
-
-                var authorlist = [];
-                data.author.forEach(function(item,index){
-                    author_name = item.given+' '+item.family;
-                    console.log ('author_name:'+ author_name);
-                    console.log ('index:'+ index);
-                    jQuery('#author-'+index).text (author_name);
-                    jQuery('#publication_publication_authors_attributes_'+index+'_person_first_name').val (item.given);
-                    jQuery('#publication_publication_authors_attributes_'+index+'_person_last_name').val (item.family);
-                    authorlist.push({"first_name": item.given, "last_name": item.family});
-                });
-                addAuthorsToPublication(authorlist,'#publication_publication_authors');
-
-            },
-
-            statusCode: {
-                // 200: function() { console.log("DOI: " + doi + " The request was OK.");},
-                204: function() { console.log("DOI: " + doi + " The request was OK but there was no metadata available.");},
-                404: function() { console.log("DOI: " + doi + " The DOI requested doesn't exist.");},
-                406: function() { console.log("DOI: " + doi + " Can't serve any requested content type.");}
-            },
-            error: function() {
-                jQuery('#publication_doi').parents('.form-group').removeClass('has-success');
-                jQuery('#publication_doi').parents('.form-group').addClass('has-error');
-            }
+        $j('select.projects-multiselect').multiselect({
+            enableCaseInsensitiveFiltering: true
         });
+
+        $j('#retrieve_from_crossref').on('click', retrieveFromCrossref);
+        $j('#retrieve_from_pubmed').on('click', retrieveFromPubmed);
     });
-    jQuery('#retrieve_from_pubmed').on('click', function(e){
-        e.preventDefault(); // prevent the default form submit action
-        var pubmedid = jQuery('#publication_pubmed_id').val();
-        jQuery.ajax({
-            url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi',
-            data: {
-                'db': 'pubmed',
-                'id': pubmedid,
-                'retmode': 'xml',
-                'retmax': 1
-            },
-            dataType: 'xml',
-            success: function(data, textStatus, jqXHR) {
-                jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-error');
-                jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-success');
-                var doc = jQuery(data);
-                console.log("Pudmed ID:", data);
-                var doi_elem = jQuery(data).find('PubmedArticleSet > PubmedArticle > PubmedData > ArticleIdList > ArticleId[IdType="doi"]');
-                if( doi_elem.length != 0) {
-                    jQuery('#publication_doi').val(doi_elem.html());
-                }
-                var article = jQuery(data).find('PubmedArticleSet > PubmedArticle > MedlineCitation > Article');
-                var title_elem = article.find('ArticleTitle');
-                if( title_elem.length != 0) {
-                    jQuery('#publication_title').val(title_elem.html());
-                }
-                var abstract_elem = article.find('Abstract > AbstractText');
-                if( abstract_elem.length != 0) {
-                    jQuery('#publication_abstract').val(abstract_elem.html());
-                }
-                var journal_elem = article.find('Journal > Title');
-                if( journal_elem.length != 0) {
-                    jQuery('#publication_journal').val(journal_elem.html())
-                }
-
-                if (!jQuery('#publication_citation').val()) {
-                    var journalIssue_Title = article.find('Journal > Title');
-                    var publication_citation = journalIssue_Title.html();
-                    //console.log("JournalIssue_Title:", journalIssue_Title.html());
-
-                    if (article.find('Journal > JournalIssue > Volume').length > 0) {
-                        publication_citation += ','+article.find('Journal > JournalIssue > Volume').html();
-                        //console.log("JournalIssue_Volume:", article.find('Journal > JournalIssue > Volume').html());
-                    }
-
-                    if (article.find('Journal > JournalIssue > Issue').length > 0) {
-                        publication_citation += '('+article.find('Journal > JournalIssue > Issue').html()+')';
-                        //console.log("JournalIssue_Issue:", article.find('Journal > JournalIssue > Issue').html());
-                    }
-
-                    if (article.find('Pagination > MedlinePgn').length > 0) {
-                        publication_citation += ':' + article.find('Pagination > MedlinePgn').html();
-                        //console.log("Page:", article.find('Pagination > MedlinePgn').html());
-                    }
-                    jQuery('#publication_citation').val(publication_citation);
-                }
-
-                var published_date1 = article.find('Journal > JournalIssue > PubDate');
-                var published_date2 = article.find('ArticleDate');
-
-                if(  published_date1.find('Year').length == 0 ||
-                    published_date1.find('Month').length == 0 ||
-                    published_date1.find('Day').length == 0){
-
-                    var date_published = published_date2.find('Year').html()+"-"+published_date2.find('Month').html()+"-"+published_date2.find('Day').html();
-                    jQuery('#publication_published_date').val(date_published);
-
-                }else {
-                    var date_published = published_date1.find('Year').html()+"-"+published_date1.find('Month').html()+"-"+published_date1.find('Day').html();
-                    jQuery('#publication_published_date').val(date_published);
-                }
-
-                var authorlist = [];
-                var author_list_elem = article.find('AuthorList > Author').each( function(index, element){
-                    var firstname = jQuery(element).find('ForeName').html();
-                    var lastname = jQuery(element).find('LastName').html();
-                    authorlist.push({"first_name": firstname, "last_name": lastname});
-                });
-                addAuthorsToPublication(authorlist,'#publication_publication_authors');
-            },
-            error: function() {
-                jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-success');
-                jQuery('#publication_pubmed_id').parents('.form-group').addClass('has-error');
-            }
-        });
-    });
-});
-
-function transferProjectIds() {
-  // need to transfer project ids from the project selector to the hidden element in the 'register' form
-  var selectedProjects = Sharing.projectsSelector.selected.map(function (n) {
-    return n.id
-  });
-
-  var registerForm = $j('form#new_publication');
-
-  for (var i = 0; i < selectedProjects.length; i++) {
-    var element = "<input multiple='multiple' value='" + selectedProjects[i] + "' type='hidden' name='publication[project_ids][]' id='publication_project_ids'>";
-    registerForm.append(element);
-  }
-}
-
 </script>

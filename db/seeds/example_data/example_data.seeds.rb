@@ -35,13 +35,13 @@ puts 'Seeded 1 guest.'
 investigation = Investigation.new(title: 'Central Carbon Metabolism of Sulfolobus solfataricus',
                                   description: 'An investigation in the CCM of S. solfataricus with a focus on the unique temperature adaptations and regulation; using a combined modelling and experimental approach.')
 investigation.projects = [project]
-investigation.contributor = guest_user
+investigation.contributor = guest_person
 investigation.policy = Policy.create(name: 'default policy', access_type: 1)
 investigation.save
 puts 'Seeded 1 investigation.'
 
 study = Study.new(title: 'Carbon loss at high T')
-study.contributor = guest_user
+study.contributor = guest_person
 study.policy = Policy.create(name: 'default policy', access_type: 1)
 study.investigation = investigation
 study.save
@@ -69,7 +69,7 @@ puts 'Seeded 1 modelling analysis.'
 # TODO check filesize
 data_file1 = DataFile.new(title: 'Metabolite concentrations during reconstituted enzyme incubation',
                           description: 'The purified enzymes, PGK, GAPDH, TPI and FBPAase were incubated at 70 C en conversion of 3PG to F6P was followed.')
-data_file1.contributor = guest_user
+data_file1.contributor = guest_person
 data_file1.projects = [project]
 relationship = RelationshipType.where(title: 'Validation data').first
 data_file1.policy = Policy.create(name: 'default policy', access_type: 1)
@@ -88,7 +88,7 @@ puts 'Seeded data file 1.'
 
 data_file2 = DataFile.new(title: 'Model simulation and Exp data for reconstituted system',
                           description: 'Experimental data for the reconstituted system are plotted together with the model prediction.')
-data_file2.contributor = guest_user
+data_file2.contributor = guest_person
 data_file2.projects = [project]
 data_file2.policy = Policy.create(name: 'default policy', access_type: 1)
 data_file2.content_blob = ContentBlob.new(original_filename: 'combinedPlot.jpg',
@@ -109,7 +109,7 @@ puts 'Seeded data file 2.'
 model = Model.new(title: 'Mathematical model for the combined four enzyme system',
                   description: 'The PGK, GAPDH, TPI and FBPAase were modelled together using the individual rate equations. Closed system.')
 model.model_format = ModelFormat.find_by_title('SBML')
-model.contributor = guest_user
+model.contributor = guest_person
 model.projects = [project]
 model.assays = [model_assay]
 model.policy = Policy.create(name: 'default policy', access_type: 1)
@@ -131,7 +131,7 @@ cb6 = ContentBlob.new(original_filename: 'ssolfGluconeogenesis.xml',
                       content_type: 'text/xml')
 model.content_blobs = [cb1, cb2, cb3, cb4, cb5, cb6]
 disable_authorization_checks { model.save }
-AssetsCreator.create(asset_id: model.id, creator_id: guest_user.id, asset_type: model.class.name)
+AssetsCreator.create(asset_id: model.id, creator_id: guest_person.id, asset_type: model.class.name)
 # copy file
 model.content_blobs.each do |blob|
   FileUtils.cp File.dirname(__FILE__) + '/' + blob.original_filename, blob.filepath
@@ -144,7 +144,7 @@ puts 'Seeded 1 model.'
 sop = Sop.new(title: "Default title",
                   description: "Default description"
 )
-sop.contributor = guest_user
+sop.contributor = guest_person
 sop.projects = [project]
 sop.assays = [exp_assay]
 sop.policy = Policy.create(name: 'default policy', access_type: 1)
@@ -152,61 +152,70 @@ sop.content_blob = ContentBlob.new(original_filename: 'test_sop.txt',
                                       content_type: 'text'
 )
 disable_authorization_checks {sop.save}
-AssetsCreator.create(asset_id: sop.id, creator_id: guest_user.id, asset_type: sop.class.name)
+AssetsCreator.create(asset_id: sop.id, creator_id: guest_person.id, asset_type: sop.class.name)
 #copy file
 FileUtils.cp File.dirname(__FILE__) + '/' + sop.content_blob.original_filename, sop.content_blob.filepath
 puts "Seeded 1 sop."
 =end
 
 # publication
-publication = Publication.new(pubmed_id: '23865479',
-                              title: 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus',
-                              abstract: "Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus were purified and kinetically characterized. The enzymes were reconstituted in vitro to quantify the contribution of temperature instability of the pathway intermediates to carbon loss from the system.
-                                         The reconstituted system, consisting of phosphoglycerate kinase, glyceraldehyde 3-phosphate dehydrogenase, triose phosphate isomerase and the fructose 1,6-bisphosphate aldolase/phosphatase, maintained a constant consumption rate of 3-phosphoglycerate and production of
-                                         fructose 6-phosphate over a 1-h period. Cofactors ATP and NADPH were regenerated via pyruvate kinase and glucose dehydrogenase. A mathematical model was constructed on the basis of the kinetics of the purified enzymes and the measured half-life times of the pathway intermediates.
-                                         The model quantitatively predicted the system fluxes and metabolite concentrations. Relative enzyme concentrations were chosen such that half the carbon in the system was lost due to degradation of the thermolabile intermediates dihydroxyacetone phosphate, glyceraldehyde 3-phosphate
-                                         and 1,3-bisphosphoglycerate, indicating that intermediate instability at high temperature can significantly affect pathway efficiency.",
-                              published_date: '2015',
-                              journal: 'FEBS J')
+publication = Publication.new(
+  publication_type_id: PublicationType.where(title:"Journal").first.id,
+  pubmed_id: '23865479',
+  title: 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus',
+  abstract: "Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus were purified and kinetically characterized. The enzymes were reconstituted in vitro to quantify the contribution of temperature instability of the pathway intermediates to carbon loss from the system.
+             The reconstituted system, consisting of phosphoglycerate kinase, glyceraldehyde 3-phosphate dehydrogenase, triose phosphate isomerase and the fructose 1,6-bisphosphate aldolase/phosphatase, maintained a constant consumption rate of 3-phosphoglycerate and production of
+             fructose 6-phosphate over a 1-h period. Cofactors ATP and NADPH were regenerated via pyruvate kinase and glucose dehydrogenase. A mathematical model was constructed on the basis of the kinetics of the purified enzymes and the measured half-life times of the pathway intermediates.
+             The model quantitatively predicted the system fluxes and metabolite concentrations. Relative enzyme concentrations were chosen such that half the carbon in the system was lost due to degradation of the thermolabile intermediates dihydroxyacetone phosphate, glyceraldehyde 3-phosphate
+             and 1,3-bisphosphoglycerate, indicating that intermediate instability at high temperature can significantly affect pathway efficiency.",
+  published_date: '2015',
+  journal: 'FEBS J'
+)
 
-publication.contributor = guest_user
-publication.projects = [project]
-publication.policy = Policy.create(name: 'default policy', access_type: 1)
-publication_author1 = PublicationAuthor.new(first_name: 'T.',
-                                            last_name: 'Kouril',
-                                            author_index: 1)
-publication_author2 = PublicationAuthor.new(first_name: 'D.',
-                                            last_name: 'Esser',
-                                            author_index: 1)
-publication_author3 = PublicationAuthor.new(first_name: 'J.',
-                                            last_name: 'Kort',
-                                            author_index: 1)
-publication_author4 = PublicationAuthor.new(first_name: 'H. V.',
-                                            last_name: 'Westerhoff',
-                                            author_index: 1)
-publication_author5 = PublicationAuthor.new(first_name: 'B.',
-                                            last_name: 'Siebers',
-                                            author_index: 1)
-publication_author6 = PublicationAuthor.new(first_name: 'J.',
-                                            last_name: 'Snoep',
-                                            author_index: 1)
+# Set contributor and projects
+publication.contributor = guest_person
+publication.projects << project
 
-publication.publication_authors = [publication_author1, publication_author2, publication_author3, publication_author4, publication_author5, publication_author6]
+# Build policy through the association
+publication.build_policy(name: 'default policy', access_type: 1)
+
+# Build publication authors
+authors = [
+  { first_name: 'T.', last_name: 'Kouril', author_index: 1 },
+  { first_name: 'D.', last_name: 'Esser', author_index: 2 },
+  { first_name: 'J.', last_name: 'Kort', author_index: 3 },
+  { first_name: 'H. V.', last_name: 'Westerhoff', author_index: 4 },
+  { first_name: 'B.', last_name: 'Siebers', author_index: 5 },
+  { first_name: 'J.', last_name: 'Snoep', author_index: 6 }
+]
+
+authors.each do |author_attrs|
+  publication.publication_authors.build(author_attrs)
+end
+
+# Save publication with all associations
 disable_authorization_checks do
-  publication.save
+  publication.save!  # raises an error if something is invalid
   publication.associate(exp_assay)
   publication.associate(model_assay)
 end
-AssetsCreator.create(asset_id: publication.id, creator_id: guest_user.id, asset_type: publication.class.name)
+
+# Create asset
+AssetsCreator.create(asset_id: publication.id, creator_id: guest_person.id, asset_type: publication.class.name)
+
 puts 'Seeded 1 publication.'
 
+# Log activity
 [project, investigation, study, exp_assay, model_assay, data_file1, data_file2, model, publication].each do |item|
-  ActivityLog.create(action: 'create',
-                     culprit: guest_user,
-                     controller_name: item.class.name.underscore.pluralize,
-                     activity_loggable: item,
-                     data: item.title)
+  ActivityLog.create(
+    action: 'create',
+    culprit: guest_user,
+    controller_name: item.class.name.underscore.pluralize,
+    activity_loggable: item,
+    data: item.title
+  )
 end
+
 
 Seek::Config.home_description = '<p style="text-align:center;font-size:larger;font-weight:bolder">Welcome to the SEEK Sandbox</p>
 <p style="text-align:center;font-size:larger;font-weight:bolder">You can log in with the username: <em>guest</em> and password: <em>guest</em></p>
