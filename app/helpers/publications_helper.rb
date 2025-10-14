@@ -58,6 +58,7 @@ module PublicationsHelper
       typeahead: typeahead,
       limit: limit,
       allow_new: allow_new,
+      token_separators: [','],
       class: 'form-control',
       'data-role': 'seek-objectsinput'
     }
