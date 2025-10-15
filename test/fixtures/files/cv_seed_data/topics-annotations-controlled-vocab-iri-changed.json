@@ -1,0 +1,33 @@
+{
+  "title": "Topics updated",
+  "description": "Topics description updated",
+  "ols_root_term_uris": "http://edamontology.org/topic_0003",
+  "source_ontology": "edam",
+  "sample_controlled_vocab_terms_attributes": [
+    {
+      "label": "Topic",
+      "iri": "http://edamontology.org/topic_0003",
+      "parent_iri": ""
+    },
+    {
+      "label": "Environmental sciences",
+      "iri": "http://edamontology.org/topic_3855",
+      "parent_iri": "http://edamontology.org/topic_0004"
+    },
+    {
+      "label": "Carbon cycle updated",
+      "iri": "http://edamontology.org/topic_4020",
+      "parent_iri": "http://edamontology.org/topic_3855"
+    },
+    {
+      "label": "Microbial ecology",
+      "iri": "http://edamontology.org/new_topic_3697",
+      "parent_iri": "http://edamontology.org/topic_0610"
+    },
+    {
+      "label": "Metabarcoding",
+      "iri": "http://edamontology.org/new_topic_4038",
+      "parent_iri": "http://edamontology.org/topic_3697"
+    }
+  ]
+}

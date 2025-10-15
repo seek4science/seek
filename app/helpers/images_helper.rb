@@ -110,8 +110,15 @@ module ImagesHelper
    html.html_safe
  end
 
- def file_type_icon(item)
+  def file_type_icon(item)
     url = file_type_icon_url(item)
+    image_tag url, class: 'icon'
+  end
+
+  # bases the icon on the file extension
+  def file_type_icon_for_filename(filename)
+    mime = mime_types_for_extension(filename.split('.').last).first
+    url = mime_icon_url(mime)
     image_tag url, class: 'icon'
   end
 

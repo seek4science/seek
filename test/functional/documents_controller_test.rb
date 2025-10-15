@@ -678,6 +678,42 @@ class DocumentsControllerTest < ActionController::TestCase
 
     get :index
     assert_select '.index-filters', count: 1
+    assert_select '.alert-warning', count: 0
+  end
+
+  test 'dont show filters if max met and remove excess' do
+    document = FactoryBot.create(:document)
+    contributor = document.contributor
+    project = document.projects.first
+    with_config_value(:max_filters, 2) do
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1], creator: [1,2] } }
+      assert_equal 2, assigns(:filters).values.flatten.length
+      assert_select '.index-filters', count: 0
+      assert_select '.alert-warning', text:/maximum of 2 filters has been reached/, count: 1
+    end
+  end
+
+  test 'do show filters if max met but user logged in' do
+    document = FactoryBot.create(:document)
+    contributor = document.contributor
+    project = document.projects.first
+    login_as(FactoryBot.create(:user))
+    with_config_value(:max_filters, 2) do
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1] } }
+      assert_equal 3, assigns(:filters).values.flatten.length
+      assert_select '.index-filters', count: 1
+      assert_select '.alert-warning', count: 0
+    end
+  end
+
+  test 'dont remove excess filters if an api call' do
+    document = FactoryBot.create(:document)
+    contributor = document.contributor
+    project = document.projects.first
+    with_config_value(:max_filters, 2) do
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1], creator: [1,2] } }, format: :json
+      assert_equal 5, assigns(:filters).values.flatten.length
+    end
   end
 
   test 'do not show filters on index if disabled' do
@@ -1480,6 +1516,20 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_redirected_to root_path
       assert flash[:error].include?('Parent resource not recognized')
     end
+  end
+
+  test 'can filter search result set with many results and sort by relevance' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    documents = FactoryBot.create_list(:document, 85, contributor: person)
+    first_doc = documents.delete_at(31) # Pick a random doc from the middle of the collection and move it to the front
+    documents.unshift(first_doc)
+    assert_equal first_doc, documents.first
+    Document.stub(:solr_cache, -> (q) { documents.map(&:id) }) do
+      get :index, params: { filter: { query: 'test', contributor: person.id } }
+    end
+
+    assert_equal first_doc, assigns(:documents).first
   end
 
   private

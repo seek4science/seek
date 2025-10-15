@@ -29,14 +29,22 @@ class WorkflowCrateExtractor
       end
       self.git_version.name = @crate['version'].to_s if @crate['version']
       git_version.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
-      git_version.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id) if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
-      git_version.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id) if @crate.main_workflow&.cwl_description && !@crate.main_workflow.cwl_description.remote?
+      if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
+        git_version.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id)
+      else
+        git_version.diagram_path = nil
+      end
+      if @crate.main_workflow&.cwl_description && !@crate.main_workflow.cwl_description.remote?
+        git_version.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id)
+      else
+        git_version.abstract_cwl_path = nil
+      end
       files = []
       @crate.entries.each do |path, entry|
         next if entry.directory?
         files << [path, entry.source]
       end
-      git_version.add_files(files)
+      git_version.replace_files(files)
 
       extractor = Seek::WorkflowExtractors::ROCrate.new(git_version)
       workflow.provide_metadata(extractor.metadata)

@@ -1,32 +1,13 @@
 <%= f.error_messages -%>
-
-<div class="form-group">
-  <%= f.label :title, class: 'required' -%>
-  <%= f.text_field :title, :class=>"form-control" -%>
+<div>
+  <div class="tab-pane fade active in" id="search-by-name-tab" role="tabpanel" aria-labelledby="search-by-name-tab">
+    <%= render partial: 'institution_fields', locals: {f:f, institution:institution} %>
+  </div>
 </div>
 
-<div class="form-group">
-  <%= f.label :web_page -%>
-  <%= f.text_field :web_page, :class=>"form-control" -%>
-</div>
-
-<div class="form-group">
-  <%= f.label :address -%>
-  <%= f.text_area :address, :rows => 5, :class=>"form-control" -%>
-</div>
-
-<div class="form-group">
-  <%= f.label :city -%>
-  <%= f.text_field :city, :class=>"form-control" -%>
-</div>
-
-<div class="form-group">
-  <%= f.label :country -%>
-  <%= f.country_select :country, { include_blank: 'Please select...' }, class: 'form-control' -%>
-</div>
-
-<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @institution} -%>
+<%= render partial: "assets/discussion_links_form", locals:{ resource:@institution} -%>
 
 <%= f.submit(institution ? "Update" : "Create",data: { disable_with: (institution ? "Updating..." : "Creating...") },
-             :class => 'btn btn-primary') -%> or
+             class:'btn btn-primary') -%> or
 <%= cancel_button(institution ? institution_path(institution.id) : institutions_path) -%>
+

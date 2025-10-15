@@ -12,6 +12,9 @@ en:
     oidc: 'OpenID Connect'
 
   single_page: "Single Page"
+  is_isa_json_compliant: 'ISA-JSON compliance' # Used for consistency among is_isa_json_compliant / isa_json_compliance filters
+  isa_json_compliance: 'ISA-JSON compliance' # Used for consistency among is_isa_json_compliant / isa_json_compliance filters
+  isa_template_group: 'Experiment Sample Template Group'
   default_view: "Default View"
   investigation: &investigation "Investigation"
   study: &study "Study"
@@ -53,9 +56,9 @@ en:
   placeholder: "Placeholder"
   collection: &collection "Collection"
 
-  observation_unit: &observation_unit "Observation Unit"
   sample: &sample "Sample"
   sample_type: &sample_type "Sample type"
+  extended_metadata_type: &extended_metadata_type "Extended Metadata Type"
   template: &template "Template"
   strain: &strain "Strain"
   scale: "Scale"
@@ -159,6 +162,7 @@ en:
     data_format_annotation_values: 'Data format annotations'
     topic_annotation_values: 'Topic annotations'
     operation_annotation_values: 'Operation annotations'
+    discipline_annotation_values: 'Scientific disciplines'
     contributor: 'Submitter'
     # Mostly for associations in other models (has_one or has_many)
     programme: *programme
@@ -241,6 +245,7 @@ en:
       sample_type: *sample_type
       strain: *strain
       organism: *organism
+      extended_metadata_type: *extended_metadata_type
     attributes:
       person:
         title: "Full name"
@@ -272,6 +277,8 @@ en:
   git:
     modify_immutable_remote_error: 'You cannot make changes to an imported repository.'
     modify_immutable_error: 'You cannot make changes to a frozen version.'
+  fair_data_station:
+    upload_file_label: 'FAIR Data Station turtle (.ttl) metadata file to upload'
 
   about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
     A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote
@@ -345,5 +352,3 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   tooltips:
     batch_permission_changes_button: "You can change the sharing policy and permissions for your items as a batch. A preview of selected items will be given before you choose new permissions for them."
     publish_your_items_button: "Publish your owned items as a batch. A preview will be given before publishing"
-
-  extended_metadata_type: "Extended Metadata Type"

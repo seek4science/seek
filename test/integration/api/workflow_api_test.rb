@@ -59,7 +59,7 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
       post '/workflows.json', params: template, as: :json, headers: { 'Authorization' => write_access_auth }
       assert_response :success
 
-      validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
+      assert_nothing_raised { validate_json(response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response") }
       res = JSON.parse(response.body)
       tools = res['data']['attributes']['tools']
       assert_equal 3, tools.length

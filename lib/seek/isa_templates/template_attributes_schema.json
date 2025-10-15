@@ -1,112 +1,140 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema",
-	"title": "ISA tempalte attribute schema",
-	"description": "JSON-schema representing an ISA template attribute in DataHub",
-	"type": "object",
-	"properties": {
-		"iri": {
-			"anyOf": [
-				{
-					"type": "string",
-					"format": "uri"
-				},
-				{
-					"type": "null"
-				}
-			]
-		},
-		"name": { "type": "string" },
-		"description": { "type": "string" },
-		"required": {
-			"anyOf": [
-				{
-					"type": "boolean"
-				},
-				{
-					"type": "null"
-				}
-			]
-		},
-		"ontology": {
-			"anyOf": [
-				{
-					"type": "object",
-					"properties": {
-						"name": { "type": "string" },
-						"version": {
-							"anyOf": [{ "type": "string" }, { "type": "number" }]
-						},
-						"description": { "type": "string" },
-						"rootTermURI": { "type": "string", "format": "uri" }
-					}
-				},
-				{
-					"type": "null"
-				}
-			]
-		},
-		"dataType": {
-			"type": "string",
-			"enum": [
-				"Date time",
-				"Date",
-				"Real number",
-				"Integer",
-				"Web link",
-				"Email address",
-				"Text",
-				"String",
-				"Boolean",
-				"Registered Sample",
-				"Registered Sample List",
-				"Controlled Vocabulary",
-				"URI",
-				"Registered Data file",
-				"ENA custom date"
-			]
-		},
-		"CVList": {
-			"anyOf": [
-				{
-					"type": "array"
-				},
-				{
-					"type": "null"
-				}
-			]
-		},
-		"isaTag": {
-			"anyOf": [
-				{
-					"type": "string",
-					"enum": [
-						"source",
-						"sample",
-						"protocol",
-						"source_characteristic",
-						"sample_characteristic",
-						"other_material",
-						"other_material_characteristic",
-						"data_file",
-						"data_file_comment",
-						"parameter_value"
-					]
-				},
-				{
-					"type": "null"
-				}
-			]
-		},
-		"title": {
-			"anyOf": [
-				{
-					"type": "boolean"
-				},
-				{
-					"type": "null"
-				}
-			]
-		}
-	},
-	"additionalProperties": false
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "ISA tempalte attribute schema",
+  "description": "JSON-schema representing an ISA template attribute in DataHub",
+  "type": "object",
+  "properties": {
+    "iri": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "required": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ontology": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "description": {
+              "type": "string"
+            },
+            "rootTermURI": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "dataType": {
+      "type": "string",
+      "enum": [
+        "Date time",
+        "Date",
+        "Real number",
+        "Integer",
+        "Web link",
+        "Email address",
+        "Text",
+        "String",
+        "Boolean",
+        "Registered Sample",
+        "Registered Sample List",
+        "Controlled Vocabulary",
+        "URI",
+        "Registered Data file",
+        "ENA custom date"
+      ]
+    },
+    "allowCVFreeText": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "CVList": {
+      "anyOf": [
+        {
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "isaTag": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "source",
+            "sample",
+            "protocol",
+            "source_characteristic",
+            "sample_characteristic",
+            "other_material",
+            "other_material_characteristic",
+            "data_file",
+            "data_file_comment",
+            "parameter_value"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "title": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
 }

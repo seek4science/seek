@@ -53,7 +53,9 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
   # 3
   test 'ISA-JSON content MUST validate against the ISA-JSON schemas' do
     investigation = @json
-    valid_isa_json?(JSON.generate(investigation))
+    assert_nothing_raised do
+      valid_isa_json?(JSON.generate(investigation))
+    end
   end
 
   # 4
@@ -68,7 +70,7 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
     values = nested_hash_value(investigation, 'submissionDate')
     values += nested_hash_value(investigation, 'publicReleaseDate')
     values += nested_hash_value(investigation, 'date')
-    values.each { |v| assert v == '' || valid_date?(v) }
+    assert values.all? { |v| v == '' || valid_date?(v) }
   end
 
   # 8
@@ -80,10 +82,10 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
     characteristics = characteristics.map { |c| c['category']['@id'] }
     categories = categories.map { |c| c['@id'] }
 
-    categories.each { |c| assert characteristics.include?(c) }
+    assert categories.all? { |c| characteristics.include?(c) }
 
     # 9 'Characteristics must reference a Characteristic Category declaration'
-    characteristics.each { |c| assert categories.include?(c) }
+    assert characteristics.all? { |c| categories.include?(c) }
   end
 
   # # 10
@@ -105,7 +107,7 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
     all_sources_and_samples = @source.samples.map { |s| "#source/#{s.id}" }
     all_sources_and_samples += @sample_collection.samples.map { |s| "#sample/#{s.id}" }
 
-    all_sources_and_samples.each { |s| assert materials.include?(s) }
+    assert all_sources_and_samples.all? { |s|  materials.include?(s) }
   end
 
   # 13
@@ -125,7 +127,7 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
     m = m.map { |s| s.samples.map { |sample| "#other_material/#{sample.id}" } }
     d = assay_level_types.select { |s| s.sample_attributes.detect { |sa| sa.isa_tag&.isa_data_file? } }
     d = d.map { |s| s.samples.map { |sample| "#other_material/#{sample.id}" } }
-    (m + d).flatten.each { |s| assert other_materials.include?(s) }
+    assert (m + d).flatten.all? { |s| other_materials.include?(s) }
   end
 
   # 14
@@ -163,10 +165,10 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
       s['assays'].each { |a| protocol_refs += a['processSequence'].map { |p| p['executesProtocol']['@id'] } }
     end
 
-    protocols.each { |p| assert protocol_refs.include?(p) }
+    assert protocols.all? { |p| protocol_refs.include?(p) }
 
     # 16 'Protocol REFs MUST reference a Protocol declaration'
-    protocol_refs.each { |p| assert protocols.include?(p) }
+    assert protocol_refs.all? { |p| protocols.include?(p) }
   end
 
   # # 17
@@ -195,7 +197,7 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
     end
     materials = materials.map { |so| so['@id'] }
     processes = processes.flatten.map { |p| p['@id'] }
-materials.each { |p| assert processes.include?(p) }
+    assert materials.all? { |p| processes.include?(p) }
   end
 
   # 23
@@ -208,7 +210,7 @@ materials.each { |p| assert processes.include?(p) }
         processes = a['processSequence'].map { |p| p['inputs'] + p['outputs'] }
         processes = processes.flatten.map { |p| p['@id'] }
 
-        other_materials.each { |p| assert processes.include?(p) }
+        assert other_materials.all? { |p| processes.include?(p) }
       end
     end
   end
@@ -218,7 +220,7 @@ materials.each { |p| assert processes.include?(p) }
     studies = @json['studies']
     studies.each do |s|
       assert s['filename'].present?
-      s['assays'].each { |a| assert a['filename'].present? }
+      assert s['assays'].all? { |a| a['filename'].present? }
     end
   end
 
@@ -231,14 +233,14 @@ materials.each { |p| assert processes.include?(p) }
     ontologies = ontologies.uniq.reject(&:empty?)
 
     # 27 'Ontology Source References MUST contain a Term Source Name'
-    ontology_refs.each { |ref| assert ref['name'].present? }
+    assert ontology_refs.all? { |ref| ref['name'].present? }
 
     ontology_refs = ontology_refs.map { |o| o['name'] }.uniq
 
-    ontology_refs.each { |p| assert ontologies.include?(p) }
+    assert ontology_refs.all? { |p| ontologies.include?(p) }
 
     # 26 'Ontology Annotations MUST reference a Ontology Source Reference declaration'
-    ontologies.each { |p| assert ontology_refs.include?(p) }
+    assert ontologies.all? { |p| ontology_refs.include?(p) }
   end
 
   # # 28
@@ -330,13 +332,21 @@ materials.each { |p| assert processes.include?(p) }
         contributor: person
       )
 
+    assay_stream = FactoryBot.create(
+      :assay_stream,
+      study: study,
+      contributor: person,
+      position: 0
+    )
+
     FactoryBot.create(
       :assay,
       study: study,
       sample_type: assay_sample_type,
       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
       contributor: person,
-      position: 0
+      position: 0,
+      assay_stream: assay_stream
     )
 
     # Create samples

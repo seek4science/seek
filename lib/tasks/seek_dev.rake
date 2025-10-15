@@ -50,13 +50,45 @@ namespace :seek_dev do
     printer.print(STDOUT, {})
   end
 
+  # to fix an issue where MIT samples didn't link to assay following a job timeout
+  task(:linked_missed_mit_samples_to_assays, [:data_file_id, :assay_ids] => :environment) do |_t, args|
+    data_file_id = args.data_file_id
+    assay_ids = args.assay_ids
+
+    unless assay_ids.blank? || data_file_id.blank?
+      data_file = DataFile.find(data_file_id)
+      samples = data_file.extracted_samples
+      requested_assays = Assay.find(assay_ids.split(' '))
+      matching_assays = requested_assays & data_file.assays
+      puts "About to link assays: #{matching_assays.collect(&:id).join(', ')} with #{samples.count} samples extracted from data file #{data_file.id}"
+      puts "Enter y to continue, or anything else to exit"
+      if STDIN.gets.chomp == 'y'
+        samples.each do |sample|
+          if sample.assays.empty?
+            disable_authorization_checks do
+              data_file.copy_assay_associations([sample], matching_assays)
+            end
+            puts "Updated sample #{sample.id}"
+          else
+            puts "Assays already linked for sample #{sample.id}"
+          end
+        end
+      else
+        puts "exited"
+      end
+    else
+      puts "Both data file id and assay ids needed needed. Assay ids should be a space seprated list"
+      puts "Usage: bundle exec rake seek_dev:linked_missed_mit_samples_to_assays['<df_id>','<assay_id_1> <assay_id_2> ...']"
+      puts "e.g: bundle exec rake seek_dev:linked_missed_mit_samples_to_assays['1','5 6 7']"
+    end
+  end
 
   task(:dump_controlled_vocab, [:id] => :environment) do |_t, args|
     vocab = SampleControlledVocab.find(args.id)
     json = { title: vocab.title, description: vocab.description, ols_root_term_uris: vocab.ols_root_term_uris,
-             source_ontology: vocab.source_ontology, terms: [] }
+             source_ontology: vocab.source_ontology, sample_controlled_vocab_terms_attributes: [] }
     vocab.sample_controlled_vocab_terms.each do |term|
-      json[:terms] << { label: term.label, iri: term.iri, parent_iri: term.parent_iri }
+      json[:sample_controlled_vocab_terms_attributes] << { label: term.label, iri: term.iri, parent_iri: term.parent_iri }
     end
     File.open("cv-dump-#{args.id}.json", 'w') do |f|
       f.write(JSON.pretty_generate(json))
@@ -416,5 +448,20 @@ namespace :seek_dev do
       permission.update(access_type: Policy::MANAGING)
     end
 
+  end
+
+  task fetch_openalex_fields: :environment do
+    url = 'https://api.openalex.org/domains'
+    puts "Fetching from: #{url}"
+    res = URI.open(url)
+    json = res.read
+    doc = JSON.parse(json)
+    domains = doc['results'].map do |dom|
+      dom.slice('id', 'display_name', 'fields')
+    end
+
+    filename = Rails.root.join('config', 'default_data', 'controlled-vocabs', 'openalex_fields.json')
+    File.write(filename, JSON.pretty_generate(domains))
+    puts "Written to: #{filename}"
   end
 end

@@ -18,7 +18,7 @@
     <script>
         let assayOverviewInitialLoad = true;
         $j(document).ready(function () {
-            const dt = <%= sanitize(dt_aggregated(assay.study, assay).to_json) %>
+            const dt = <%= sanitize(dt_aggregated(assay&.study, assay).to_json) %>
             window.assayDynamicTable = new $j.dynamicTable('#assay-table')
             const ajax = {
                 url: dynamicTableDataPath,
@@ -27,8 +27,8 @@
                         assayOverviewInitialLoad = false;
                         return;
                     }
-                    d.study_id = '<%=assay.study.id%>';
-                    d.assay_id = '<%=assay.id%>';
+                    d.study_id = '<%=assay&.study&.id%>';
+                    d.assay_id = '<%=assay&.id%>';
                     d.rows_pad = "true";
                 }
             }
@@ -40,7 +40,8 @@
         function createSampleTypeOptions(types){
             $j("#options_container").append('<div id="checkbox_group" class="btn-group" data-toggle="buttons"></div>')
                 types.forEach( (t, i) => {
-                    let elem = `<label class="btn btn-default active sp-btn-variant-${i%2}"><input id="checkbox-${t.id}" type="checkbox" checked onchange="toggleSampleType(${t.id}, $j(this))" />${t.title}</label>`
+                    let assayTitle = t.assay_title;
+                    let elem = `<label class="btn btn-default active sp-btn-variant-${i%2}"><input id="checkbox-${t.id}" type="checkbox" checked onchange="toggleSampleType(${t.id}, $j(this))" />${assayTitle}</label>`
                     $j("#checkbox_group").append(elem)
                 })
         }

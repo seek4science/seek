@@ -4,7 +4,7 @@
 
 <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
-<%= render partial: 'general/show_page_tab_definitions', locals: { versioned_resource: @display_workflow } %>
+<%= render partial: 'general/show_page_tab_definitions', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
 
 <div class="tab-content">
   <%= tab_pane('overview') do %>
@@ -85,7 +85,7 @@
     </div>
   <% end %>
 
-  <% if @display_workflow.is_git_versioned? && @display_workflow.can_download? %>
+  <% if @display_workflow.is_git_versioned? && can_download_asset?(@workflow, params[:code]) %>
     <%= tab_pane('files') do %>
       <%= render partial: 'git/files', locals: { resource: @workflow, git_version: @display_workflow } %>
     <% end %>

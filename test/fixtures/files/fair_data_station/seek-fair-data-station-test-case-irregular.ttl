@@ -1,0 +1,327 @@
+# not all description for S.O.Sa.A contain all the attributes
+
+@prefix base:     <http://fairbydesign.nl/ontology> .
+@prefix bibo:     <http://purl.org/ontology/bibo/> .
+@prefix dc:       <http://purl.org/dc/terms/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix empusa:   <http://empusa.org/0.1/> .
+@prefix fair:     <http://fairbydesign.nl/ontology/> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix gbol:     <http://gbol.life/0.1/> .
+@prefix jerm:     <http://jermontology.org/ontology/JERMOntology#> .
+@prefix mixs:     <https://w3id.org/mixs/> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix ppeo:     <http://purl.org/ppeo/PPEO.owl#> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sample:   <http://fairbydesign.nl/sample/> .
+@prefix schema:   <http://schema.org/> .
+@prefix sschema:  <https://schema.org/> .
+@prefix uniprot:  <http://purl.uniprot.org/core/> .
+@prefix unlock:   <http://m-unlock.nl/ontology/> .
+@prefix void:     <http://m-unlock.nl/ontology/> .
+@prefix wd:       <http://www.wikidata.org/wiki/> .
+@prefix wdt:      <http://www.wikidata.org/wiki/Property:> .
+@prefix wv:       <http://vocab.org/waiver/terms/norms> .
+@prefix xml:      <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+fair:inv_seek-test-investigation
+        rdf:type                     jerm:Investigation ;
+        fair:associated_publication  "10.1371/journal.pone.0071377" ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1> , <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2> ;
+        schema:contributor           <http://fairbydesign.nl/ontology/inv_seek-test-investigation/person/5b473460c252a5d3c42c8fdb8a98a747> ;
+        schema:description           "testing testing testing testing testing testing testing testing testing testing inv" ;
+        schema:identifier            "seek-test-investigation" ;
+        schema:title                 "An Investigation for a SEEK test case" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/person/5b473460c252a5d3c42c8fdb8a98a747>
+        rdf:type           schema:Person ;
+        schema:department  "Computer Science" ;
+        schema:email       <mailto:tom@email.com> ;
+        schema:familyName  "Jones" ;
+        schema:givenName   "Tom Jones" ;
+        schema:memberOf    <http://m-unlock.nl/ontology/organization/University_of_Manchester> .
+
+<http://m-unlock.nl/ontology/organization/University_of_Manchester>
+        rdf:type          schema:Organization ;
+        schema:legalName  "University of Manchester" .
+
+schema:identifier  rdf:type   rdf:Property ;
+        rdfs:label            "investigation identifier" ;
+        schema:description    "Identifier corresponding to the investigation" ;
+        schema:valuePattern   "^[a-zA-Z0-9-_]*${5,25}" ;
+        schema:valueRequired  true .
+
+schema:description  rdf:type  rdf:Property ;
+        rdfs:label            "investigation description" ;
+        schema:description    "Description of the investigation" ;
+        schema:valuePattern   ".*{50,}" ;
+        schema:valueRequired  true .
+
+schema:title  rdf:type        rdf:Property ;
+        rdfs:label            "investigation title" ;
+        schema:description    "Title describing the investigation" ;
+        schema:valuePattern   ".*{10,}" ;
+        schema:valueRequired  true .
+
+fair:associated_publication
+        rdf:type              rdf:Property ;
+        rdfs:label            "associated publication" ;
+        schema:description    "An identifier for a literature publication where the investigation is described. Use of DOIs is recommended." ;
+        schema:valuePattern   "^(10\\.\\d{4,5}\\/[\\S]+[^;,.\\s])$" ;
+        schema:valueRequired  false .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1>
+        rdf:type                     jerm:Study ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1/obs_seek-test-obs-unit-1> ;
+        schema:description           "testing testing testing testing testing testing testing testing testing testing study 1" ;
+        schema:identifier            "seek-test-study-1" ;
+        schema:title                 "test study 1" .
+
+fair:start_date_of_study
+        rdf:type              rdf:Property ;
+        rdfs:label            "start date of study" ;
+        schema:description    "Date and, if relevant, time when the experiment started" ;
+        schema:valuePattern   ".+" ;
+        schema:valueRequired  false .
+
+fair:end_date_of_study
+        rdf:type              rdf:Property ;
+        rdfs:label            "end date of study" ;
+        schema:description    "Date and, if relevant, time when the experiment ended" ;
+        schema:valuePattern   ".+" ;
+        schema:valueRequired  false .
+
+fair:experimental_site_name
+        rdf:type              rdf:Property ;
+        rdfs:label            "experimental site name" ;
+        schema:description    "The name of the natural site, experimental field, greenhouse, phenotyping facility, etc. where the experiment took place." ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  false .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2>
+        rdf:type                     jerm:Study ;
+        fair:end_date_of_study       "2024-08-18"^^xsd:date ;
+        fair:experimental_site_name  "manchester test site" ;
+        fair:start_date_of_study     "2024-08-10"^^xsd:date ;
+        jerm:hasPart                 <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2> , <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3> ;
+        schema:description           "testing testing testing testing testing testing testing testing testing testing study 2" ;
+        schema:identifier            "seek-test-study-2" ;
+        schema:title                 "test study 2" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1/obs_seek-test-obs-unit-1>
+        rdf:type            ppeo:observation_unit ;
+        jerm:hasPart        <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1/obs_seek-test-obs-unit-1/sam_seek-test-sample-1> ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-1.csv> ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing obs unit 1" ;
+        schema:identifier   "seek-test-obs-unit-1" ;
+        schema:name         "test obs unit 1" .
+
+schema:name  rdf:type         rdf:Property ;
+        rdfs:label            "observation unit name" ;
+        schema:description    "Name of the entity being observed" ;
+        schema:valuePattern   ".*{10,}" ;
+        schema:valueRequired  true .
+
+fair:date_of_birth  rdf:type  rdf:Property ;
+        rdfs:label            "date of birth" ;
+        schema:description    "Date of birth of subject the sample was derived from." ;
+        schema:valuePattern   ".+" ;
+        schema:valueRequired  false .
+
+mixs:0000811  rdf:type        rdf:Property ;
+        rdfs:label            "host sex" ;
+        schema:description    "Gender or sex of the host." ;
+        schema:valuePattern   "(female|hermaphrodite|male|neuter|not applicable|not collected|not provided|other|restricted access)" ;
+        schema:valueRequired  false .
+
+fair:birth_weight  rdf:type   rdf:Property ;
+        rdfs:label            "birth weight" ;
+        schema:description    "Individual birth weight of piglets" ;
+        schema:unitCode       "g" ;
+        schema:valuePattern   "^(\\-|\\+)?(\\d+)(\\.\\d+)? ?(g)" ;
+        schema:valueRequired  false .
+
+<http://fairbydesign.nl/data_sample/test-file-1.csv>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "file" ;
+        schema:identifier   "test-file-1.csv" .
+
+sschema:dataset  rdf:type     rdf:Property ;
+        rdfs:label            "file" ;
+        schema:description    "Filename or the path of a file" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  false .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2>
+        rdf:type            ppeo:observation_unit ;
+        jerm:hasPart        <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-2> , <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-3> ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-1.csv> ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing obs unit 2" ;
+        schema:identifier   "seek-test-obs-unit-2" ;
+        schema:name         "test obs unit 2" ;
+        mixs:0000811        "female" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3>
+        rdf:type            ppeo:observation_unit ;
+        fair:birth_weight   "1236g" ;
+        fair:date_of_birth  "2020-01-12"^^xsd:date ;
+        jerm:hasPart        <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-4> , <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-5> ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-2.csv> ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing obs unit 3" ;
+        schema:identifier   "seek-test-obs-unit-3" ;
+        schema:name         "test obs unit 3" ;
+        mixs:0000811        "male" .
+
+<http://fairbydesign.nl/data_sample/test-file-2.csv>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "file" ;
+        schema:identifier   "test-file-2.csv" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1/obs_seek-test-obs-unit-1/sam_seek-test-sample-1>
+        rdf:type              jerm:Sample ;
+        jerm:hasPart          <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1/obs_seek-test-obs-unit-1/sam_seek-test-sample-1/asy_seek-test-assay-1> ;
+        schema:description    "testing testing testing testing testing testing testing testing testing testing sample 1" ;
+        schema:identifier     "seek-test-sample-1" ;
+        schema:name           "test seek sample 1" .
+
+uniprot:organism  rdf:type    rdf:Property ;
+        rdfs:label            "ncbi taxonomy id" ;
+        schema:description    "Taxonomic identifier of the sample according to https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi for example use 2582415 for a blank sample or 1510822 for pig metagenome" ;
+        schema:valuePattern   "\\d+" ;
+        schema:valueRequired  true .
+
+gbol:scientificName  rdf:type  rdf:Property ;
+        rdfs:label            "scientific name" ;
+        schema:description    "Name of the organism" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+fair:biosafety_level  rdf:type  rdf:Property ;
+        rdfs:label            "biosafety level" ;
+        schema:description    "Biosafety level of the corresponding sample" ;
+        schema:valuePattern   "(1|2|3|4|unknown)" ;
+        schema:valueRequired  true .
+
+mixs:0000011  rdf:type        rdf:Property ;
+        rdfs:label            "collection date" ;
+        schema:description    "The date of sampling, either as an instance (single point in time) or interval. In case no exact time is available, the date/time can be right truncated i.e. all of these are valid ISO8601 compliant times: 2008-01-23T19:23:10+00:00; 2008-01-23T19:23:10; 2008-01-23; 2008-01; 2008." ;
+        schema:valuePattern   ".+" ;
+        schema:valueRequired  true .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-2>
+        rdf:type              jerm:Sample ;
+        fair:biosafety_level  1 ;
+        jerm:hasPart          <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-2/asy_seek-test-assay-2> ;
+        uniprot:organism      123457 ;
+        schema:description    "testing testing testing testing testing testing testing testing testing testing sample 2" ;
+        schema:identifier     "seek-test-sample-2" ;
+        schema:name           "test seek sample 2" ;
+        mixs:0000011          "2024-08-21"^^xsd:date .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-3>
+        rdf:type              jerm:Sample ;
+        gbol:scientificName   "cat" ;
+        jerm:hasPart          <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-3/asy_seek-test-assay-3> ;
+        uniprot:organism      123458 ;
+        schema:description    "testing testing testing testing testing testing testing testing testing testing sample 3" ;
+        schema:identifier     "seek-test-sample-3" ;
+        schema:name           "test seek sample 3" ;
+        mixs:0000011          "2024-08-22"^^xsd:date .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-4>
+        rdf:type              jerm:Sample ;
+        jerm:hasPart          <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-4/asy_seek-test-assay-4> ;
+        uniprot:organism      123459 ;
+        schema:description    "testing testing testing testing testing testing testing testing testing testing sample 4" ;
+        schema:identifier     "seek-test-sample-4" ;
+        schema:name           "test seek sample 4" ;
+        mixs:0000011          "2024-08-23"^^xsd:date .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-5>
+        rdf:type              jerm:Sample ;
+        jerm:hasPart          <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-5/asy_seek-test-assay-5> , <http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-5/asy_seek-test-assay-6> ;
+        schema:description    "testing testing testing testing testing testing testing testing testing testing sample 5" ;
+        schema:identifier     "seek-test-sample-5" ;
+        schema:name           "test seek sample 5" ;
+        mixs:0000011          "2024-08-24"^^xsd:date .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-1/obs_seek-test-obs-unit-1/sam_seek-test-sample-1/asy_seek-test-assay-1>
+        rdf:type            jerm:Assay ;
+        fair:facility       "test facility" ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-1.csv> ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing assay 1" ;
+        schema:identifier   "seek-test-assay-1" .
+
+fair:facility  rdf:type       rdf:Property ;
+        rdfs:label            "facility" ;
+        schema:description    "The facility that was used for generating the data" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+schema:dateCreated  rdf:type  rdf:Property ;
+        rdfs:label            "assay date" ;
+        schema:description    "The date when the data generation took place" ;
+        schema:valuePattern   ".+" ;
+        schema:valueRequired  true .
+
+fair:protocol  rdf:type       rdf:Property ;
+        rdfs:label            "protocol" ;
+        schema:description    "The protocol used for preparation or isolation (name or url) used to create the assay" ;
+        schema:valuePattern   ".*" ;
+        schema:valueRequired  true .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-2/asy_seek-test-assay-2>
+        rdf:type            jerm:Assay ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-2.csv> ;
+        schema:dateCreated  "2024-09-11"^^xsd:date ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing assay 2" ;
+        schema:identifier   "seek-test-assay-2" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-2/sam_seek-test-sample-3/asy_seek-test-assay-3>
+        rdf:type            jerm:Assay ;
+        fair:protocol       "sop 3" ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-3.csv> ;
+        schema:dateCreated  "2024-09-12"^^xsd:date ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing assay 3" ;
+        schema:identifier   "seek-test-assay-3" .
+
+<http://fairbydesign.nl/data_sample/test-file-3.csv>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "file" ;
+        schema:identifier   "test-file-3.csv" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-4/asy_seek-test-assay-4>
+        rdf:type            jerm:Assay ;
+        fair:facility       "test facility" ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-4.csv> ;
+        schema:dateCreated  "2024-09-13"^^xsd:date ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing assay 4" ;
+        schema:identifier   "seek-test-assay-4" .
+
+<http://fairbydesign.nl/data_sample/test-file-4.csv>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "file" ;
+        schema:identifier   "test-file-4.csv" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-5/asy_seek-test-assay-5>
+        rdf:type            jerm:Assay ;
+        fair:facility       "test facility" ;
+        fair:protocol       "sop 5" ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-5.csv> ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing assay 5" ;
+        schema:identifier   "seek-test-assay-5" .
+
+<http://fairbydesign.nl/data_sample/test-file-5.csv>
+        rdf:type            jerm:Data_sample ;
+        schema:description  "file" ;
+        schema:identifier   "test-file-5.csv" .
+
+<http://fairbydesign.nl/ontology/inv_seek-test-investigation/stu_seek-test-study-2/obs_seek-test-obs-unit-3/sam_seek-test-sample-5/asy_seek-test-assay-6>
+        rdf:type            jerm:Assay ;
+        fair:facility       "test facility" ;
+        schema:dataset      <http://fairbydesign.nl/data_sample/test-file-3.csv> ;
+        schema:description  "testing testing testing testing testing testing testing testing testing testing assay 6" ;
+        schema:identifier   "seek-test-assay-6" .

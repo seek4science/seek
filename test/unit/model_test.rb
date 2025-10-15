@@ -45,10 +45,12 @@ class ModelTest < ActiveSupport::TestCase
       FactoryBot.create :relationship, subject: object, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
       object.reload
       rdf = object.to_rdf
-      RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-        assert reader.statements.count > 1
-        assert_equal RDF::URI.new("http://localhost:3000/models/#{object.id}"), reader.statements.first.subject
+      graph = RDF::Graph.new do |graph|
+        RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
       end
+      assert graph.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/models/#{object.id}"), graph.statements.first.subject
+
     end
   end
 
@@ -99,6 +101,9 @@ class ModelTest < ActiveSupport::TestCase
 
     model = FactoryBot.create(:copasi_model)
     assert model.is_copasi_supported?
+
+    model = FactoryBot.create(:morpheus_model)
+    assert model.is_morpheus_supported?
 
     model = FactoryBot.create(:teusink_model)
     assert model.is_copasi_supported?

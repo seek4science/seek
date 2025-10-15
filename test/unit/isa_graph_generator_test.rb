@@ -2,14 +2,14 @@
 
 require 'test_helper'
 
-class IsaGraphGeneratorTest < ActiveSupport::TestCase
+class ISAGraphGeneratorTest < ActiveSupport::TestCase
   test 'investigation with studies and assays' do
     assay = FactoryBot.create(:assay)
     study = assay.study
     investigation = assay.investigation
     assay2 = FactoryBot.create(:assay, contributor: assay.contributor, study: study)
 
-    generator = Seek::IsaGraphGenerator.new(investigation)
+    generator = Seek::ISAGraphGenerator.new(investigation)
 
     # Shallow
     shallow_result = generator.generate
@@ -54,7 +54,7 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
       AssayAsset.create!(assay: sibling_assay, asset: niece_sop)
     end
 
-    result = Seek::IsaGraphGenerator.new(assay).generate(parent_depth: nil, sibling_depth: 1)
+    result = Seek::ISAGraphGenerator.new(assay).generate(parent_depth: nil, sibling_depth: 1)
 
     assert_equal 5, result[:nodes].length # Investigation, Study, 2 Assays, DataFile
     assert_equal 4, result[:edges].length
@@ -81,7 +81,7 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
       AssayAsset.create!(assay: sibling_assay, asset: niece_sop)
     end
 
-    result = Seek::IsaGraphGenerator.new(assay).generate(parent_depth: nil, sibling_depth: nil)
+    result = Seek::ISAGraphGenerator.new(assay).generate(parent_depth: nil, sibling_depth: nil)
 
     assert_equal 7, result[:nodes].length # Investigation, Study, 2 Assays, DataFile, Model, Sop
     assert_equal 6, result[:edges].length
@@ -98,7 +98,7 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     study = assay.study
     investigation = assay.investigation
     assay2 = FactoryBot.create(:assay, contributor: assay.contributor, study: study)
-    generator = Seek::IsaGraphGenerator.new(investigation)
+    generator = Seek::ISAGraphGenerator.new(investigation)
     result = generator.generate
 
     study_node = result[:nodes].detect { |n| n.object == study }
@@ -120,7 +120,7 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     study4 = FactoryBot.create(:study, contributor: person, investigation: investigation)
     assay = FactoryBot.create(:assay, contributor: person, study: study)
 
-    generator = Seek::IsaGraphGenerator.new(assay)
+    generator = Seek::ISAGraphGenerator.new(assay)
     result = generator.generate(parent_depth: nil)
 
     investigation_node = result[:nodes].detect { |n| n.object == investigation }
@@ -154,7 +154,7 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     assert_empty assay.study.investigation.publications
     assert_equal [publication, publication2].sort, assay.study.investigation.related_publications.sort
 
-    generator = Seek::IsaGraphGenerator.new(assay)
+    generator = Seek::ISAGraphGenerator.new(assay)
     result = generator.generate(parent_depth: nil)
 
     assert_equal 5, result[:nodes].count
@@ -176,5 +176,38 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     inv_pub_edges = result[:edges].select { |edge| edge.include?(assay.study.investigation) && edge.include?(publication2) }
     assert_empty inv_pub_edges
 
+  end
+
+  test 'aggregated_children' do
+    assert_equal 5, Seek::ISAGraphGenerator::MIN_AGGREGATED_CHILDREN
+    person = FactoryBot.create(:person)
+    samples = FactoryBot.create_list(:sample, 6, contributor: person)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person, samples: samples)
+    assert_equal 6, obs_unit.samples.count
+
+    generator = Seek::ISAGraphGenerator.new(obs_unit)
+    result = generator.generate(parent_depth: nil)
+
+    assert_equal 3, result[:edges].count
+    assert_equal 1, result[:edges].select { |edge| edge[1].is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 0, result[:edges].select { |edge| edge[1].is_a?(Sample) }.count
+    assert_equal 4, result[:nodes].count
+    assert_equal 1, result[:nodes].select { |node| node.object.is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 0, result[:nodes].select { |node| node.object.is_a?(Sample) }.count
+
+    #below threshold
+    samples = FactoryBot.create_list(:sample, 5, contributor: person)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person, samples: samples)
+    assert_equal 5, obs_unit.samples.count
+
+    generator = Seek::ISAGraphGenerator.new(obs_unit)
+    result = generator.generate(parent_depth: nil)
+
+    assert_equal 7, result[:edges].count
+    assert_equal 0, result[:edges].select { |edge| edge[1].is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 5, result[:edges].select { |edge| edge[1].is_a?(Sample) }.count
+    assert_equal 8, result[:nodes].count
+    assert_equal 0, result[:nodes].select { |node| node.object.is_a?(Seek::ObjectAggregation) }.count
+    assert_equal 5, result[:nodes].select { |node| node.object.is_a?(Sample) }.count
   end
 end

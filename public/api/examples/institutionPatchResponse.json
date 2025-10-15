@@ -1,18 +1,20 @@
 {
   "data": {
-    "id": "1572",
+    "id": "980192435",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
 
       ],
       "avatar": null,
-      "title": "Patched institution",
-      "country": "Germany",
-      "country_code": "DE",
-      "city": "Heidelberg",
+      "title": "University of Manchester",
+      "department": null,
+      "ror_id": "027m9bs27",
+      "country": "United Kingdom",
+      "country_code": "GB",
+      "city": "Manchester",
       "address": "NoName street 23",
-      "web_page": "http://my.institution.com"
+      "web_page": "http://www.manchester.ac.uk/"
     },
     "relationships": {
       "people": {
@@ -27,14 +29,14 @@
       }
     },
     "links": {
-      "self": "/institutions/1572"
+      "self": "/institutions/980192435"
     },
     "meta": {
-      "created": "2024-11-20T10:14:31.000Z",
-      "modified": "2024-11-20T10:14:31.000Z",
+      "created": "2025-05-12T10:01:49.310Z",
+      "modified": "2025-05-12T10:01:49.326Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "2864d0a0-8956-013d-24a2-0a81884ed284"
+      "uuid": "0b6c3040-1146-013e-72d8-7efdca78d793"
     }
   },
   "jsonapi": {

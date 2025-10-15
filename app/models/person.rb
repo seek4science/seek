@@ -7,7 +7,7 @@ class Person < ApplicationRecord
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
-  alias_attribute :title, :name
+
 
   acts_as_yellow_pages
 
@@ -27,8 +27,15 @@ class Person < ApplicationRecord
 
   has_one :user, dependent: :destroy
 
-  has_many :group_memberships, dependent: :destroy, inverse_of: :person
-  has_many :work_groups, through: :group_memberships, inverse_of: :people
+  has_many :group_memberships, after_add: :subscribe_to_project_subscription,
+           after_remove: :unsubscribe_from_project_subscription, dependent: :destroy, inverse_of: :person
+  has_many :work_groups, through: :group_memberships, after_add: :subscribe_to_project_subscription,
+           after_remove: :unsubscribe_from_project_subscription, inverse_of: :people
+  has_many :project_subscriptions, before_add: proc { |person, ps| ps.person = person }, dependent: :destroy
+  has_many :subscribed_projects, through: :project_subscriptions, class_name: 'Project', source: :project
+  accepts_nested_attributes_for :project_subscriptions, allow_destroy: true
+
+  has_many :subscriptions, dependent: :destroy
 
   has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
            class_name: 'GroupMembership', dependent: :destroy
@@ -115,7 +122,6 @@ class Person < ApplicationRecord
 
   alias_attribute :webpage, :web_page
 
-  include Seek::Subscriptions::PersonProjectSubscriptions
   include Seek::OrcidSupport
 
   after_commit :queue_update_auth_table
@@ -259,6 +265,7 @@ class Person < ApplicationRecord
     lastname = last_name || ''
     "#{firstname} #{lastname}".strip
   end
+  alias title name
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
   def only_first_admin_person?
@@ -435,4 +442,32 @@ class Person < ApplicationRecord
       end
     end
   end
+
+  def subscribe_to_project_subscription(workgroup_or_membership)
+    project = workgroup_or_membership.project
+    if project
+      project_subscriptions.build project: project unless project_subscriptions.find { |ps| ps.project_id == project.id }
+      project.touch
+    end
+  end
+
+  def unsubscribe_from_project_subscription(workgroup_or_membership)
+    if work_groups.empty?
+      project_subscriptions.delete_all
+      subscriptions.delete_all
+    else
+      if workgroup_or_membership.is_a?(WorkGroup)
+        pid = workgroup_or_membership.project_id_before_last_save
+      else
+        pid = workgroup_or_membership.work_group.try(:project_id_before_last_save)
+      end
+
+      if pid && (ps = project_subscriptions.find { |ps| ps.project_id == pid })
+        # unsunscribe direct project subscriptions
+        project_subscriptions.delete ps
+      end
+    end
+    workgroup_or_membership.project&.touch
+  end
+
 end

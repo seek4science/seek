@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class IsaStudiesControllerTest < ActionController::TestCase
+class ISAStudiesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -137,6 +137,64 @@ class IsaStudiesControllerTest < ActionController::TestCase
     refute @isa_study.source.can_manage?(second_person.user)
     assert @isa_study.sample_collection.can_view?(second_person.user)
     refute @isa_study.sample_collection.can_manage?(second_person.user)
+  end
+
+  test 'should update sample metadata when updating the isa study sample type' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+    source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
+    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project], linked_sample_type: source_type)
+
+    FactoryBot.create(:sample, sample_type: source_type, contributor: person, project_ids: [project.id], data: { 'Source Name': 'source1', 'Source Characteristic 1': 'source 1 characteristic 1', 'Source Characteristic 2': 'Bramley' })
+    FactoryBot.create(:sample, sample_type: source_type, contributor: person, project_ids: [project.id], data: { 'Source Name': 'source2', 'Source Characteristic 1': 'source 2 characteristic 1', 'Source Characteristic 2': 'Granny Smith' })
+
+    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: person, project_ids: [project.id], data: { 'Sample Name': 'sample1', 'sample collection': 'collection method 1', Input: 'source1', 'sample characteristic 1': 'value sample 1', 'sample collection parameter value 1': 'value 1' })
+    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: person, project_ids: [project.id], data: { 'Sample Name': 'sample2', 'sample collection': 'collection method 1', Input: 'source2', 'sample characteristic 1': 'value sample 2', 'sample collection parameter value 1': 'value 2' })
+
+    study = FactoryBot.create(:study, investigation: investigation, contributor: person, sample_types: [source_type, sample_collection_type])
+
+    title_attribute = study.sample_types.first.sample_attributes.detect(&:is_title)
+
+    login_as person.user
+
+    patch :update, params: { id: study, isa_study:
+      { source_sample_type:
+          { sample_attributes: [
+            { id: title_attribute.id, title: 'New Source Name' }
+          ] }
+      }
+    }
+
+    assert_response :redirect
+    assert_enqueued_with(job: UpdateSampleMetadataJob)
+    study.sample_types.first.reload
+    assert_equal study.sample_types.first.sample_attributes.detect(&:is_title).title, 'New Source Name'
+    assert study.sample_types.first.locked?
+  end
+
+  test 'should auto-populate the sample type title and description' do
+    projects = User.current_user.person.projects
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person, is_isa_json_compliant: true)
+    source_sample_type_no_title = source_attributes(projects)
+    source_sample_type_no_title.delete(:title)
+    sample_collection_sample_type_no_title = sample_collection_attributes(projects)
+    sample_collection_sample_type_no_title.delete(:title)
+
+    assert_difference('Study.count', 1) do
+      assert_difference('SampleType.count', 2) do
+        post :create, params: { isa_study: { study: { title: 'test', investigation_id: inv.id, sop_id: FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id },
+                                             source_sample_type: source_sample_type_no_title ,
+                                             sample_collection_sample_type: sample_collection_sample_type_no_title } }
+      end
+    end
+
+    assert_response :redirect
+    isa_study = assigns(:isa_study)
+
+    assert_equal isa_study.source.title, "#{isa_study.study.title} - Source Sample Type"
+    assert_equal isa_study.sample_collection.title, "#{isa_study.study.title} - Sample Collection Sample Type"
   end
 
   private

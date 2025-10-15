@@ -1,6 +1,8 @@
 class ExtendedMetadataTypesController < ApplicationController
   respond_to :json, :html
   skip_before_action :project_membership_required
+
+  before_action :fair_data_station_enabled?, only:[:create_from_fair_ds_ttl]
   before_action :is_user_admin_auth, except: [:form_fields, :show, :index]
   before_action :find_requested_item, only: [:administer_update, :show, :destroy]
   include Seek::IndexPager
@@ -35,7 +37,7 @@ class ExtendedMetadataTypesController < ApplicationController
     end
 
     uploaded_file = params[:emt_json_file]
-    @extended_metadata_type = Seek::ExtendedMetadataType::EMTExtractor.extract_extended_metadata_type(uploaded_file)
+    @extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(uploaded_file)
 
     if @extended_metadata_type.save
       flash[:notice] = 'Extended metadata type was successfully created.'
@@ -49,6 +51,62 @@ class ExtendedMetadataTypesController < ApplicationController
     redirect_to new_extended_metadata_type_path
   end
 
+  def create_from_fair_ds_ttl
+    if params[:emt_fair_ds_ttl_file].blank?
+      flash[:error] = 'Please select a file to upload!'
+      redirect_to new_extended_metadata_type_path and return
+    end
+
+    uploaded_file = params[:emt_fair_ds_ttl_file]
+    @jsons = []
+    @existing_extended_metadata_types = []
+    Tempfile.create('fds-ttl') do |file|
+      file << uploaded_file.read.force_encoding('UTF-8')
+      Seek::FairDataStation::Reader.new.candidates_for_extended_metadata(file.path).each do |candidate|
+        emt = candidate.find_exact_matching_extended_metadata_type
+        if emt
+          @existing_extended_metadata_types << emt
+        else
+          @jsons << candidate.to_extended_metadata_type_json
+        end
+      end
+    end
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def submit_jsons
+    jsons = params['emt_jsons']
+    titles = params['emt_titles']
+    failures = []
+    successes = []
+    jsons.zip(titles).each do |json, title|
+      begin
+        extended_metadata_type = Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(StringIO.new(json))
+        extended_metadata_type.title = title
+        extended_metadata_type.activity_logs.build(culprit: current_user, action: 'create')
+        if extended_metadata_type.save
+          successes << "#{extended_metadata_type.title}(#{extended_metadata_type.supported_type})"
+        else
+          failures << "#{extended_metadata_type.title}(#{extended_metadata_type.supported_type}) - #{extended_metadata_type.errors.full_messages.join(', ')}"
+        end
+      rescue JSON::ParserError
+        failures << "Failed to parse JSON"
+      rescue StandardError => e
+        failures << e.message
+      end
+    end
+    if successes.any?
+      flash[:notice] = "#{successes.count} #{t('extended_metadata_type').pluralize(successes.count)} successfully created for: #{successes.join(', ')}."
+    end
+    if failures.any?
+      flash[:error] = "#{failures.count} #{t('extended_metadata_type').pluralize(failures.count)} failed to be created: #{failures.join(', ')}."
+    end
+
+    redirect_to administer_extended_metadata_types_path
+  end
 
   def new
     respond_to do |format|

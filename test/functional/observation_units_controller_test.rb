@@ -205,4 +205,13 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'preview observation unit' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    obs_unit = FactoryBot.create(:observation_unit, title: 'preview obs unit', policy: FactoryBot.create(:public_policy), contributor:person)
+    get :preview, xhr: true, params: { id: obs_unit.id }
+    assert_response :success
+    assert_includes response.body, "<a href=\\\"/observation_units/#{obs_unit.id}\\\">preview obs unit<\\/a>"
+  end
+
 end

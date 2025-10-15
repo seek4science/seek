@@ -9,7 +9,7 @@ namespace :seek_rdf do
   task(generate: :environment) do
     Seek::Util.rdf_capable_types.sort_by(&:name).each do |type|
       begin
-        RdfGenerationQueue.enqueue(type.all)
+        RdfGenerationQueue.enqueue(type.all, refresh_dependents: false)
       rescue Exception => e
         puts("Error generating rdf for #{type.name}} - #{e.message}")
       end

@@ -1,0 +1,32 @@
+<%= modal(id: 'upload-metadata-file', size: 'm', class: 'text-left') do %>
+  <%= form_tag({action: :add_metadata}, multipart: true) do %>
+    <%= modal_header('Add metadata') %>
+    <%= modal_body do %>
+      <%= render partial: "assets/upload_box", locals: {action_text: "upload metadata", hide_remote: true} -%>
+    <% end %>
+    <%= modal_footer do %>
+      <%= create_button id:"data_file_submit_btn", button_text:'Add',
+                        onclick:"return NelsBrowser.validateMetadataFile();",
+                        class:'btn btn-primary' %>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    <% end %>
+  <% end %>
+<% end %>
+
+<script>
+    $j(document).ready(function () {
+        $j('.add_metadata').on('click', function () {
+            // Show upload file form and populate the params as hidden fields
+            $j('#upload-metadata-file').modal('show');
+            const project_id = $j(this).data('project-id');
+            const dataset_id = $j(this).data('dataset-id');
+            const subtype_name = $j(this).data('subtype-name');
+
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="project_id" value="${project_id}" />`);
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="dataset_id" value="${dataset_id}" />`);
+            $j('#upload-metadata-file form').append(`<input type="hidden" name="subtype_name" value="${subtype_name}" />`);
+
+            return false;
+        });
+    });
+</script>

@@ -14,6 +14,13 @@ FactoryBot.define do
       end
     end
   end
+
+  factory(:data_file_with_no_content_blob, parent: :data_file) do
+    after(:create) do |data_file|
+      data_file.content_blob = nil
+      data_file.save!
+    end
+  end
   
   factory(:public_data_file, parent: :data_file) do
     policy { FactoryBot.create(:downloadable_public_policy) }

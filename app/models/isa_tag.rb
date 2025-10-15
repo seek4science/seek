@@ -1,4 +1,4 @@
-class IsaTag < ApplicationRecord
+class ISATag < ApplicationRecord
   validates :title, presence: true
 
   has_many :template_attributes, inverse_of: :isa_tag
@@ -58,6 +58,6 @@ class IsaTag < ApplicationRecord
       Seek::ISA::TagType::ALL_TYPES
     end
 
-    tags.map { |tag| IsaTag.find_by(title: tag) }
+    tags.map { |tag| ISATag.find_by(title: tag) }
   end
 end

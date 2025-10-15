@@ -8,34 +8,16 @@ class PublicationsController < ApplicationController
   include Seek::UploadHandling::DataUpload
 
   before_action :publications_enabled?
+  before_action :override_page_for_export, only: [:index]
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf soft_delete_fulltext]
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include PublicationsHelper
 
   api_actions :index, :show
-
-  def export
-    @query = Publication.ransack(params[:query])
-    @publications = @query.result(distinct: true)
-                        .includes(:publication_authors, :projects)
-    # @query.build_condition
-    @query.build_sort if @query.sorts.empty?
-
-    respond_to do |format|
-      format.html
-      format.any(*Publication::EXPORT_TYPES.keys) do
-        send_data(
-          @publications.collect { |publication| publication.export(request.format.to_sym) }.join("\n\n"),
-          type: request.format.to_sym,
-          filename: "publications.#{request.format.to_sym}"
-        )
-      end
-    end
-  end
 
   # GET /publications/1
   def show
@@ -212,92 +194,58 @@ class PublicationsController < ApplicationController
     end
   end
 
-  def query_authors
-    # query authors by first and last name each
-    authors_q = params[:authors]
+  def typeahead_publication_authors
+    q = params[:q].to_s.strip.downcase
+    return render json: { results: [] } if q.blank?
 
-    unless authors_q
-      error = 'require query parameter authors'
-      respond_to do |format|
-        format.json { render json: { error: error }, status: 422 }
-      end
+    # --- Fetch authors ---
+    authors_results = PublicationAuthor
+                        .where.not("(first_name IS NULL OR first_name = '') AND (last_name IS NULL OR last_name = '')")
+                        .where("LOWER(CONCAT_WS(' ', first_name, last_name)) LIKE ?", "%#{q}%")
+                        .select(:first_name, :last_name, :person_id)
 
-      return
-    end
+    # Group authors by full name
+    authors_group = authors_results.group_by { |a| [a.first_name, a.last_name] }
 
-    authors = []
-    authors_q.each do |_author_i, author_q|
-      params = {}
-      if author_q.key?('full_name')
-        first_name, last_name = PublicationAuthor.split_full_name author_q['full_name']
-        params = { first_name: first_name, last_name: last_name }
-      else
-        params = { first_name: author_q['first_name'], last_name: author_q['last_name'] }
-      end
-
-      authors_db = PublicationAuthor.where(params)
-                                    .group(:person_id, :first_name, :last_name, :author_index)
-                                    .count
-                                    .collect do |groups, count|
-        {
-          person_id: groups[0],
-          first_name: groups[1],
-          last_name: groups[2],
-          count: count
-        }
-      end
-
-      if !authors_db.empty? # found at least one author
-        authors << authors_db[0]
-      else # no author found
-        users_db = Person.where(params)
-        if !users_db.empty? # is there a person with that name
-          user = users_db[0]
-          authors << { name: user.name }
-        else # just add the queried name as author
-          authors << { person_id: nil, first_name: params[:first_name], last_name: params[:last_name], count: 0 }
-        end
-      end
-    end
-
-    respond_to do |format|
-      format.json { render json: authors.to_json }
-    end
-  end
-
-  def query_authors_typeahead
-    full_name = params[:full_name]
-    unless full_name
-      error = 'require query parameter full_name'
-      respond_to do |format|
-        format.json { render json: { error: error }, status: 422 }
-      end
-
-      return
-    end
-
-    first_name, last_name = PublicationAuthor.split_full_name full_name
-
-    # all authors
-    authors = PublicationAuthor.where('first_name LIKE :fnquery', fnquery: "#{first_name}%")
-                               .where('last_name LIKE :lnquery', lnquery: "#{last_name}%")
-                               .group(:person_id, :first_name, :last_name, :author_index)
-                               .count
-                               .collect do |groups, count|
-      {
-        person_id: groups[0],
-        first_name: groups[1],
-        last_name: groups[2],
-        count: count
+    # Build author items hash, keyed by full_name
+    authors_items_hash = {}
+    authors_group.each do |(first_name, last_name), group|
+      full_name = "#{first_name} #{last_name}"
+      authors_items_hash[full_name] = {
+        id: full_name,
+        text: full_name,
+        first_name: first_name,
+        last_name: last_name,
+        person_id: group.map(&:person_id).compact.first,
+        count: group.size
       }
     end
-    authors.delete_if { |author| author[:first_name].empty? && author[:last_name].empty? }
-    author = PublicationAuthor.where(first_name: first_name, last_name: last_name).limit(1)
 
-    respond_to do |format|
-      format.json { render json: authors.to_json }
+    # --- Fetch people ---
+    people_results = Person
+                       .where("LOWER(CONCAT_WS(' ', first_name, last_name)) LIKE ?", "%#{q}%")
+                       .select(:first_name, :last_name, :id)
+
+    # Add people only if they are not already in authors
+    people_results.each do |person|
+      full_name = "#{person.first_name} #{person.last_name}"
+      next if authors_items_hash.key?(full_name) # skip duplicates
+
+      authors_items_hash[full_name] = {
+        id: full_name,
+        text: full_name,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        person_id: person.id,
+        count: 0
+      }
     end
+
+    # Return all unique items
+    render json: { results: authors_items_hash.values }
   end
+
+
 
   # Try and relate non_seek_authors to people in SEEK based on name and project
   def suggest_authors
@@ -487,10 +435,10 @@ class PublicationsController < ApplicationController
       end
     else
       @subaction = 'Create'
-        respond_to do |format|
-          format.html { render action: 'new' }
-          format.json { render json: @publication, status: :ok, include: [params[:include]] }
-        end
+      respond_to do |format|
+        format.html { render action: 'new' }
+        format.json { render json: @publication, status: :ok, include: [params[:include]] }
+      end
     end
   end
 
@@ -709,5 +657,9 @@ class PublicationsController < ApplicationController
       end
     end
     replace_str
+  end
+
+  def override_page_for_export
+    params[:page] = 'all' if Publication::EXPORT_TYPES.keys.include?(request.format.to_sym)
   end
 end

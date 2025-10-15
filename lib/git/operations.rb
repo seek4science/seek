@@ -60,7 +60,7 @@ module Git
       tree.total_size
     end
 
-    def empty?
+    def no_content?
       persisted? && blobs.empty? && trees.empty?
     end
 
@@ -91,18 +91,42 @@ module Git
 
     def add_file(path, io, message: nil)
       message ||= "#{file_exists?(path) ? 'Updated' : 'Added'} #{path}"
-      perform_commit(message) do |index|
-        write_blob(index, path, io)
+      begin
+        perform_commit(message) do |index|
+          write_blob(index, path, io)
+        end
+      rescue Rugged::TreeError
+        raise Git::InvalidPathException.new(path: path)
       end
     end
 
-    def add_files(path_io_pairs, message: nil)
+    # If the `replace` flag is set, remove any files not present in the new set.
+    def add_files(path_io_pairs, message: nil, replace: false)
       message ||= "Added/updated #{path_io_pairs.count} files"
-      perform_commit(message) do |index|
-        path_io_pairs.each do |path, io|
-          write_blob(index, path, io)
+      begin
+        perform_commit(message) do |index|
+          if replace
+            to_keep = Set.new(path_io_pairs.map(&:first))
+            to_remove = []
+            index.entries.each do |entry|
+              to_remove << entry[:path] unless to_keep.include?(entry[:path])
+            end
+            to_remove.each do |path|
+              index.remove(path)
+              git_annotations.where(path: path).destroy_all if respond_to?(:git_annotations)
+            end
+          end
+          path_io_pairs.each do |path, io|
+            write_blob(index, path, io)
+          end
         end
+      rescue Rugged::TreeError
+        raise Git::InvalidPathException.new
       end
+    end
+
+    def replace_files(path_io_pairs, message: nil)
+      add_files(path_io_pairs, message: message, replace: true)
     end
 
     def remove_file(path, update_annotations: true)
@@ -120,19 +144,19 @@ module Git
     def move_file(oldpath, newpath, update_annotations: true)
       raise Git::PathNotFoundException.new(path: oldpath) unless file_exists?(oldpath)
 
-      c = perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
-        existing = index[oldpath]
-        begin
+      begin
+        c = perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
+          existing = index[oldpath]
           index.add(path: newpath, oid: existing[:oid], mode: 0100644)
-        rescue Rugged::IndexError
-          raise Git::InvalidPathException.new(path: newpath)
+          index.remove(oldpath)
         end
-        index.remove(oldpath)
+
+        git_annotations.where(path: oldpath).update_all(path: newpath) if respond_to?(:git_annotations) && update_annotations
+
+        c
+      rescue Rugged::TreeError
+        raise Git::InvalidPathException.new(path: newpath)
       end
-
-      git_annotations.where(path: oldpath).update_all(path: newpath) if respond_to?(:git_annotations) && update_annotations
-
-      c
     end
 
     private

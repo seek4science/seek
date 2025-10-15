@@ -1,0 +1,21 @@
+<% unless resource.nil? -%>
+
+  <div data-tooltip='<%= tooltip(h(resource.description)) %>'>
+    <p class="title">
+      <%= list_item_title resource -%>
+    </p>
+
+    <%= list_item_authorized_list([resource.investigation], t('investigation'), false, 50, true ) %>
+
+    <%= list_item_authorized_list([resource.study], t('study'), false, 50, true ) %>
+
+    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => false} -%>
+
+    <%= list_item_contributors resource -%>
+
+    <%= list_item_simple_list resource.creators, t('creator').capitalize.pluralize -%>
+
+    <%= list_item_description resource.description -%>
+  </div>
+
+<% end -%>

@@ -342,6 +342,7 @@ class StudiesControllerTest < ActionController::TestCase
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::EDITING)]))
     get :edit, params: { id: study.id }
+    assert_response :success
   end
 
   test 'should show the contributor avatar' do

@@ -14,7 +14,7 @@ class SopsController < ApplicationController
 
   include Seek::Doi::Minting
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -55,6 +55,39 @@ class SopsController < ApplicationController
       end
     end
   end
+
+  def dynamic_table_typeahead
+    study_id = params[:study_id] if params[:study_id].present? && !%w[null undefined].include?(params[:study_id].to_s)
+    assay_id = params[:assay_id] if params[:assay_id].present? && !%w[null undefined].include?(params[:assay_id].to_s)
+
+    if study_id.blank? && assay_id.blank?
+      raise "Invalid parameters! Either study id '#{params[:study_id]}' or assay id '#{params[:assay_id]}' must be a valid id."
+    end
+
+    query = params[:query] || ''
+    asset = if study_id.present?
+              study = Study.includes(:sops).find_by_id(study_id)
+              study if study&.can_view?
+            else
+              assay = Assay.includes(:sops).find_by_id(assay_id)
+              assay if assay&.can_view?
+            end
+
+    raise "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for #{study_id.present? ? "study ID '#{study_id}'." : "assay ID '#{assay_id}'."}" if asset.nil?
+
+    sops = asset.sops || []
+    filtered_sops = sops.authorized_for('view').select { |sop| sop.title&.downcase&.include?(query.downcase) }
+    items = filtered_sops.collect { |sop| { id: sop.id, text: sop.title } }
+
+    respond_to do |format|
+      format.json { render json: { results: items }.to_json }
+    end
+  rescue Exception=>e
+    respond_to do |format|
+      format.json { render json: { error: e.message }, status: :unprocessable_entity }
+    end
+  end
+
 
   private
 

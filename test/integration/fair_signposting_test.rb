@@ -129,14 +129,16 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
     get file_templates_path
 
     assert_response :success
-    assert_nil response.headers['Link'], 'Should not have any signposting links'
+    links = parse_link_header.reject { |link, props| link.include?('assets/application.') } # Ignore Rails' CSS/JS Links
+    assert_empty links, 'Should not have any signposting links'
   end
 
   test 'fair signposting for privacy page' do
     get privacy_home_path
 
     assert_response :success
-    assert_nil response.headers['Link'], 'Should not have any signposting links'
+    links = parse_link_header.reject { |link, props| link.include?('assets/application.') } # Ignore Rails' CSS/JS Links
+    assert_empty links, 'Should not have any signposting links'
   end
 
   private

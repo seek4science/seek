@@ -21,29 +21,14 @@ class Avatar < ApplicationRecord
   belongs_to :owner,
              polymorphic: true
 
-  has_many :people,
-           foreign_key: :avatar_id,
-           dependent: :nullify
-
-  has_many :projects,
-           foreign_key: :avatar_id,
-           dependent: :nullify
-
-  has_many :institutions,
-           foreign_key: :avatar_id,
-           dependent: :nullify
-
-  has_many :programmes,
-           foreign_key: :avatar_id,
-           dependent: :nullify
-
   after_create :select_avatar
+  after_destroy_commit :deselect_avatar
 
   def select!
     if selected?
       false
     else
-      owner.update_attribute :avatar_id, id
+      owner.update_attribute(:avatar_id, id)
       true
     end
   end
@@ -80,5 +65,9 @@ class Avatar < ApplicationRecord
 
   def select_avatar
     select! unless owner.nil? || owner.avatar_selected?
+  end
+
+  def deselect_avatar
+    owner.update_column(:avatar_id, nil) if owner&.persisted?
   end
 end

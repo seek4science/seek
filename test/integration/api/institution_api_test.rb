@@ -1,12 +1,14 @@
 require 'test_helper'
 
 class InstitutionApiTest < ActionDispatch::IntegrationTest
+  include MockHelper
   include ReadApiTestSuite
   include WriteApiTestSuite
 
   def setup
     admin_login
     @institution = FactoryBot.create(:institution)
+    ror_mock
   end
 
   def populate_extra_attributes(hash)

@@ -1,6 +1,6 @@
 require_relative 'metadata_builder'
 
-module DataCite
+module Datacite
   class Metadata < Hash
     REQUIRED_FIELDS = %i[title identifier publisher year creators resource_type].freeze
     GENERAL_TYPES = %w(Audiovisual Collection DataPaper Dataset Event Image InteractiveResource Model PhysicalObject
@@ -12,7 +12,7 @@ module DataCite
 
     def build
       validate
-      DataCite::MetadataBuilder.new(self).build
+      Datacite::MetadataBuilder.new(self).build
     end
 
     def to_s

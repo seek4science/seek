@@ -1,0 +1,62 @@
+<div class="alert alert-info">
+  <b>Three Ways to Enter Institution Data</b>
+  <ul>
+    <li>Option 1: Search for the institution <b>title</b> and select it from the suggestion list.</li>
+    <li>Option 2: Retrieve the data by entering the institution's <b>ROR ID</b>.
+    </li>
+    <li>Option 3: If your institution does not have a ROR ID, <b>manually</b> fill in the required fields.</li>
+  </ul>
+</div>
+
+<div id="ror_query_name"  class="form-group">
+  <div class="form-group">
+    <%= f.label :title, class: "required" %> <%= link_to "Clear Fields", "#", id: "clear-fields", class: "link-primary small" %>
+    <%= f.text_field :title, class: "form-control typeahead", id: "institution_title", value: f.object.base_title %>
+    <small class="form-text text-muted">
+      <em>
+      Begin typing to activate a suggestion list. Please choose an institution from the list, if available. If your institution is not listed, continue typing to enter its title manually.
+      </em>
+    </small>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :ror_id, 'ROR ID' -%>
+    <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
+    <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
+   To find out more and get your ORCID ID please visit https://ror.org/') -%>
+    <%= f.text_field :ror_id, class:"form-control" -%>
+    <small class="form-text text-muted">
+      <div id="ror-error-message" class="text-danger" style="display: none;"></div>
+      <em>Enter the ID only (e.g., 01f7bcy98), then click on the fetch button.</em>
+    </small>
+    <button type="button" id="fetch-ror-data-with-id" class="btn btn-sm btn-primary">fetch</button>
+  </div>
+  <div class="form-group">
+    <%= f.label :department -%>
+    <%= f.text_field :department, class:"form-control" -%>
+  </div>
+  <div class="form-group">
+    <%= f.label :city -%>
+    <%= f.text_field :city, class:"form-control" -%>
+  </div>
+  <div class="form-group">
+    <%= f.label :country -%>
+    <%= f.country_select :country, { include_blank: 'Please select...' },  value: @institution.nil? ? nil:CountryCodes.country(@institution.country), class: 'form-control' -%>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :web_page -%>
+    <%= f.text_field :web_page, class:"form-control" -%>
+  </div>
+
+
+  <div class="form-group">
+    <%= f.label :address -%>
+    <%= f.text_area :address, rows:5, class:"form-control" -%>
+    <small class="text-left form-text text-muted">
+      <em>
+        ROR doesn’t include detailed address information, please enter the address manually.
+      </em>
+    </small>
+  </div>
+</div>

@@ -6,6 +6,15 @@
   <%= tab_pane('overview') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
+
+        <p class="ror_id">
+          <strong>Department: </strong><%= text_or_not_specified @institution.department -%>
+        </p>
+
+        <p class="ror_id">
+          <strong>ROR ID: </strong><%= ror_link(@institution.ror_id) -%>
+        </p>
+
         <p class="web_page">
           <strong>Web page: </strong><%= text_or_not_specified(@institution.web_page, :external_link => true) -%>
         </p>
@@ -21,6 +30,18 @@
         <p class="address">
           <strong>Address: </strong><%= text_or_not_specified @institution.address, :address => true %>
         </p>
+
+        <% if other_departments(@institution).present? %>
+          <p class="related-departments">
+            <strong>Related Departments: </strong>
+            <% other_departments(@institution).each do |related_dep| %>
+              <div>
+                <%= link_to(related_dep.title, related_dep) %>
+              </div>
+            <% end %>
+          </p>
+        <% end  %>
+
       </div>
 
       <div class="col-md-3 col-sm-4">

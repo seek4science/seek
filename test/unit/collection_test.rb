@@ -20,15 +20,16 @@ class CollectionTest < ActiveSupport::TestCase
     refute_empty object.creators
 
     rdf = object.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/collections/#{object.id}"), reader.statements.first.subject
-
-      #check for OPSK-1281 - where the creators weren't appearing
-      assert_includes reader.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
-      assert_includes reader.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/collections/#{object.id}"), graph.statements.first.subject
+
+    #check for OPSK-1281 - where the creators weren't appearing
+    assert_includes graph.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
+    assert_includes graph.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+
   end
 
   test 'title trimmed' do
@@ -192,5 +193,42 @@ class CollectionTest < ActiveSupport::TestCase
 
       assert_includes collection.reload.assets, asset
     end
+  end
+
+  test 'selected avatar id is nullified when avatar deleted' do
+    collection = FactoryBot.create(:public_collection, :with_avatar)
+    avatar = collection.reload.avatar
+    assert avatar
+    assert collection.avatar_selected?
+
+    assert_difference('Avatar.count', -1) do
+      avatar.destroy!
+    end
+
+    assert_nil collection.reload.avatar_id
+    assert_nil collection.avatar
+    refute collection.avatar_selected?
+  end
+
+  test 'avatars cleaned up when collection destroyed' do
+    collection = FactoryBot.create(:public_collection)
+    a1 = a2 = nil
+    disable_authorization_checks do
+      a1 = FactoryBot.create(:avatar, owner: collection)
+      a2 = FactoryBot.create(:avatar, owner: collection)
+    end
+    avatar = collection.reload.avatar
+    assert_equal a1, avatar
+    assert collection.avatar_selected?
+
+    assert_difference('Collection.count', -1) do
+      assert_difference('Avatar.count', -2) do
+        disable_authorization_checks { collection.destroy! }
+      end
+    end
+
+    refute Collection.exists?(collection.id)
+    refute Avatar.exists?(a1.id)
+    refute Avatar.exists?(a2.id)
   end
 end

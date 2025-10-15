@@ -102,4 +102,23 @@ module MockHelper
     file = options[:content_file]
     stub_request(:post, url).to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end
+
+  def ror_mock
+    file_path = "#{Rails.root}/test/fixtures/files/mocking/ror_response.json"
+    stub_request(:get, "https://api.ror.org/v2/organizations/027m9bs27")
+      .to_return(
+        status: 200,
+        body: File.read(file_path),
+        headers: { 'Content-Type' => 'application/json' }
+      )
+
+    stub_request(:get, "https://api.ror.org/v2/organizations/invalid_id")
+      .to_return(
+        status: 400,
+        body: {
+          errors: ["'invalid_id' is not a valid ROR ID"]
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )
+  end
 end

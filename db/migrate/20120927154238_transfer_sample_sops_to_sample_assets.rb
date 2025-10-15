@@ -5,7 +5,7 @@ class TransferSampleSopsToSampleAssets < ActiveRecord::Migration
       sample_id=ActiveRecord::Base.connection.quote item["sample_id"]
       sop_id=ActiveRecord::Base.connection.quote item["sop_id"]
       sop_version=ActiveRecord::Base.connection.quote item["sop_version"]
-      now = ActiveRecord::Base.connection.quote Time.now.to_s(:db)
+      now = ActiveRecord::Base.connection.quote Time.now.to_fs(:db)
       execute "INSERT INTO sample_assets(sample_id,asset_id,asset_type,version,created_at,updated_at) VALUES (#{sample_id},#{sop_id},'Sop',#{sop_version},#{now},#{now})"
     end
   end

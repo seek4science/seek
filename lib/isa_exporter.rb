@@ -1,5 +1,5 @@
 # noinspection ALL
-module IsaExporter
+module ISAExporter
   class Exporter
     def initialize(investigation, user)
       @investigation = investigation
@@ -103,42 +103,67 @@ module IsaExporter
       isa_study[:people] = people
       isa_study[:studyDesignDescriptors] = []
       isa_study[:characteristicCategories] = convert_characteristic_categories(study)
+      protocols_maps = fetch_study_protocols(study)
+      isa_study[:protocols] = protocols_maps.map { |p| p[:protocols] }.compact.flatten
       isa_study[:materials] = {
         sources: convert_materials_sources(study.sample_types.first),
         samples: convert_materials_samples(study.sample_types.second)
       }
 
-      protocols = []
 
-      with_tag_protocol_study = study.sample_types.second.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
-      with_tag_parameter_value_study =
-        study.sample_types.second.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
-      raise "Protocol ISA tag not found in #{t(:study)} #{study.id}" if with_tag_protocol_study.blank?
-      # raise "The Study with the title '#{study.title}' does not have any SOP" if study.sops.blank?
-      protocols << convert_protocol(study.sops, study.id, with_tag_protocol_study, with_tag_parameter_value_study)
-
-      study.assay_streams.map(&:child_assays).flatten.each do |a|
-        # There should be only one attribute with isa_tag == protocol
-        protocol_attribute = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
-        with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
-        raise "Protocol ISA tag not found in #{t(:assay)} #{a.id}" if protocol_attribute.blank?
-
-        # raise "The #{t(:study)} with the title '#{study.title}' does not have an SOP" if a.sops.blank?
-        protocols << convert_protocol(a.sops, a.id, protocol_attribute, with_tag_parameter_value)
-      end
-      isa_study[:protocols] = protocols
-
-      isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
+      study_protocols_map = protocols_maps.detect { |pm| pm[:sample_type_id] == study.sample_types.second.id }
+      isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study_protocols_map)
 
       unless study.assays.all?(&:is_isa_json_compliant?)
         raise "All assays in study `#{study.title}` should be ISA-JSON compliant."
       end
 
-      isa_study[:assays] = study.assay_streams.map { |assay_stream| convert_assays(assay_stream) }.compact
+      isa_study[:assays] = study.assay_streams.map { |assay_stream| convert_assays(assay_stream, protocols_maps) }.compact
       isa_study[:factors] = []
       isa_study[:unitCategories] = []
 
       isa_study
+    end
+
+    def fetch_study_protocols(study)
+      protocols_maps = []
+
+      # Get all sample types from study and its assays
+      sample_type_objcts = [{ sample_type: study.sample_types.second, isa: 'study', isa_id: study.id }]
+      sample_type_objcts += study.assay_streams.map(&:child_assays).flatten.map(&:sample_type).map do |sample_type|
+        { sample_type: sample_type, isa: 'assay', isa_id: sample_type.assays.first.id }
+      end
+
+      sample_type_objcts.each do |sample_type_object|
+        sample_type, isa, isa_id = sample_type_object[:sample_type], sample_type_object[:isa], sample_type_object[:isa_id]
+        protocol_attribute = sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
+        parameter_attributes = sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }.compact
+        next if protocol_attribute.blank?
+
+        is_registered_sop = protocol_attribute.sample_attribute_type.seek_sop?
+        # Get used SOPs
+        if is_registered_sop
+          used_sops = sample_type.samples.map do |sample|
+            sop = sample.get_attribute_value(protocol_attribute)
+            raise "Sample {#{sample.id}: #{sample.title}} has no registered SOP as protocol" if sop.blank?
+            Sop.find_by_id(sop['id'])
+          end.uniq
+        else
+          used_sops = sample_type.samples.map do |sample|
+            protocol_title = sample.get_attribute_value(protocol_attribute)
+            raise "Sample {#{sample.id}: #{sample.title}} has no protocol" if protocol_title.blank?
+            { id: protocol_attribute.id, title: protocol_title, description: '' }
+          end.uniq
+        end
+
+        # generate & append to protcols
+        protocols_maps.append({ protocols: used_sops.map do |sop|
+          id = "#protocol/#{isa}_#{isa_id}_#{sop[:id]}"
+          convert_protocol(sop, id, protocol_attribute, parameter_attributes)
+        end, isa: isa, isa_id: isa_id, sample_type_id: sample_type.id })
+      end
+
+      protocols_maps
     end
 
     def convert_annotation(term_uri)
@@ -179,7 +204,7 @@ module IsaExporter
       assay_comments.compact
     end
 
-    def convert_assays(assay_stream)
+    def convert_assays(assay_stream, protocols_maps)
       child_assays = assay_stream.child_assays
       return unless assay_stream.can_view?(@current_user)
       return unless child_assays.all? { |a| a.can_view?(@current_user) }
@@ -215,7 +240,10 @@ module IsaExporter
         otherMaterials: convert_other_materials(all_sample_types)
       }
       isa_assay[:processSequence] =
-        child_assays.map { |a| convert_process_sequence(a.sample_type, a.sops.map(&:id).join("_"), a.id) }.flatten
+        child_assays.map do |assay|
+          assay_protocols_map = protocols_maps.detect { |pm| pm[:sample_type_id] == assay.sample_type.id }
+          convert_process_sequence(assay.sample_type,assay_protocols_map)
+        end.flatten
       isa_assay[:dataFiles] = convert_data_files(all_sample_types)
       isa_assay[:unitCategories] = []
       isa_assay
@@ -286,34 +314,34 @@ module IsaExporter
       source_ontologies.uniq.map { |s| { name: s, file: '', version: '', description: '' } }
     end
 
-    def convert_protocol(sops, id, protocol, parameter_values)
+    def convert_protocol(sop, id, protocol_attrbute, parameter_attributes)
       isa_protocol = {}
 
-      isa_protocol['@id'] = "#protocol/#{sops.map(&:id).join("-")}_#{id}"
-      isa_protocol[:name] = protocol.title # sop.title
+      isa_protocol['@id'] = id
+      isa_protocol[:name] = sop[:title]
 
-      ontology = get_ontology_details(protocol, protocol.title, false)
+      ontology = get_ontology_details(protocol_attrbute, protocol_attrbute.title, false)
 
       isa_protocol[:protocolType] = {
-        annotationValue: protocol.title,
+        annotationValue: protocol_attrbute.title,
         termAccession: ontology[:termAccession],
         termSource: ontology[:termSource]
       }
-      isa_protocol[:description] = sops&.first&.description || ''
+      isa_protocol[:description] = sop[:description] || ''
       isa_protocol[:uri] = ontology[:termAccession]
       isa_protocol[:version] = ''
       isa_protocol[:parameters] =
-        parameter_values.map do |parameter_value|
+        parameter_attributes.map do |parameter|
           parameter_value_ontology =
-            if parameter_value.pid.present?
-              get_ontology_details(parameter_value, parameter_value.title, false)
+            if parameter.pid.present?
+              get_ontology_details(parameter, parameter.title, false)
             else
               { termAccession: '', termSource: '' }
             end
           {
-            '@id': "#parameter/#{parameter_value.id}",
+            '@id': "#parameter/#{parameter.id}",
             parameterName: {
-              annotationValue: parameter_value.title,
+              annotationValue: parameter.title,
               termAccession: parameter_value_ontology[:termAccession],
               termSource: parameter_value_ontology[:termSource]
             }
@@ -352,13 +380,14 @@ module IsaExporter
       with_tag_sample = sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_sample? }
       with_tag_sample_characteristic =
         sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_sample_characteristic? }
-      seek_sample_multi_attribute = sample_type.sample_attributes.detect(&:seek_sample_multi?)
+      input_attribute = sample_type.sample_attributes.detect(&:input_attribute?)
       sample_type.samples.map do |s|
+        # To Do: FactorValues is empty. This relates to # 1869: https://github.com/seek4science/seek/issues/1869
         if s.can_view?(@current_user)
           {
             '@id': "#sample/#{s.id}",
             name: s.get_attribute_value(with_tag_sample),
-            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            derivesFrom: extract_sample_ids(s.get_attribute_value(input_attribute), 'source'),
             characteristics: convert_characteristics(s, with_tag_sample_characteristic),
             factorValues: [
               {
@@ -378,7 +407,7 @@ module IsaExporter
           {
             '@id': "#sample/HIDDEN",
             name: '',
-            derivesFrom: extract_sample_ids(s.get_attribute_value(seek_sample_multi_attribute), 'source'),
+            derivesFrom: extract_sample_ids(s.get_attribute_value(input_attribute), 'source'),
             characteristics: [],
             factorValues: [
               {
@@ -399,12 +428,12 @@ module IsaExporter
     end
 
     def convert_characteristics(sample, attributes)
-      attributes.map do |c|
-        value = sample.can_view?(@current_user) ? (sample.get_attribute_value(c) || '') : ''
-        ontology = get_ontology_details(c, value, true)
+      attributes.map do |attribute|
+        value = convert_attribute_value(sample, attribute)
+        ontology = get_ontology_details(attribute, value, true)
         {
           category: {
-            '@id': normalize_id("#characteristic_category/#{c.title}_#{c.id}")
+            '@id': normalize_id("#characteristic_category/#{attribute.title}_#{attribute.id}")
           },
           value: {
             annotationValue: value,
@@ -413,6 +442,18 @@ module IsaExporter
           },
           unit: get_unit
         }
+      end
+    end
+
+    def convert_attribute_value(sample, attribute)
+      return '' unless sample.can_view?(@current_user)
+
+      if attribute.sample_attribute_type.seek_sample? || attribute.sample_attribute_type.seek_sample_multi? || attribute.sample_attribute_type.seek_strain? || attribute.sample_attribute_type.seek_data_file? || attribute.sample_attribute_type.seek_sop?
+        sample.get_attribute_value(attribute).to_json || ''
+      elsif attribute.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+        sample.get_attribute_value(attribute).join(', ')
+      else
+        sample.get_attribute_value(attribute) || ''
       end
     end
 
@@ -440,7 +481,7 @@ module IsaExporter
       end
     end
 
-    def convert_process_sequence(sample_type, sop_ids, id)
+    def convert_process_sequence(sample_type, protocols_map)
       # This method is meant to be used for both Studies and Assays
       return [] unless sample_type.samples.any?
 
@@ -456,25 +497,28 @@ module IsaExporter
       # should be in a different process in the processSequence
       samples_grouped_by_input_and_parameter_value = group_samples_by_input_and_parameter_value(sample_type)
       result = []
-      samples_grouped_by_input_and_parameter_value.map do |input_ids, samples_group|
-        output_ids = samples_group.pluck(:id).join('_')
+      samples_grouped_by_input_and_parameter_value.map do |sample_group|
+        # It's fine to take the first output to get the protocol name since the outputs are grouped by protocol as well.
+        protocols, isa, isa_id, _sample_type_id = protocols_map.values_at(:protocols, :isa, :isa_id, :sample_type_id)
+        executed_protocol = protocols_map[:protocols].detect { |p| p[:name] == sample_group[:executed_protocol][:title] }
+        output_ids = sample_group[:outputs].map { |s| s[:id] }.join('_')
         process = {
           '@id': normalize_id("#process/#{protocol_attribute.title}/#{output_ids}"),
           name: '',
           executesProtocol: {
-            '@id': "#protocol/#{sop_ids}_#{id}"
+            '@id': executed_protocol["@id"]
           },
-          parameterValues: convert_parameter_values(samples_group, isa_parameter_value_attributes),
+          parameterValues: convert_parameter_values(sample_group[:outputs], isa_parameter_value_attributes),
           performer: '',
           date: '',
-          inputs: process_sequence_input(input_ids.first, type),
-          outputs: process_sequence_output(samples_group)
+          inputs: process_sequence_input(sample_group[:inputs], type),
+          outputs: process_sequence_output(sample_group[:outputs])
         }
         # Study processes don't have a previousProcess and nextProcess
         unless type == 'source'
           process.merge!({
-                           previousProcess: previous_process(samples_group),
-                           nextProcess: next_process(samples_group)
+                           previousProcess: previous_process(sample_group[:outputs]),
+                           nextProcess: next_process(sample_group[:outputs])
                          })
         end
         result.push(process)
@@ -567,6 +611,15 @@ module IsaExporter
 
     private
 
+    def detect_material(sample_type)
+      sample_type.sample_attributes.detect do |sa|
+        [
+          Seek::ISA::TagType::SOURCE,
+          Seek::ISA::TagType::SAMPLE,
+          Seek::ISA::TagType::OTHER_MATERIAL
+        ].include? sa.isa_tag&.title
+      end
+    end
     def detect_sample(sample_type)
       sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_sample? }
     end
@@ -595,8 +648,8 @@ module IsaExporter
       sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_other_material? }
     end
 
-    def detect_sample_multi(sample_type)
-      sample_type.sample_attributes.detect(&:seek_sample_multi?)
+    def detect_input_attribute(sample_type)
+      sample_type.sample_attributes.detect(&:input_attribute?)
     end
 
     def next_process(samples_hash)
@@ -642,12 +695,27 @@ module IsaExporter
         }.merge(metadata).transform_keys!(&:to_sym)
       end
 
-      input_attribute = detect_sample_multi(sample_type)&.title&.to_sym
-      parameter_value_attributes = select_parameter_values(sample_type).map(&:title).map(&:to_sym)
-      group_attributes = parameter_value_attributes.unshift(input_attribute)
+      input_attribute_name = detect_input_attribute(sample_type)&.title&.to_sym
+      parameter_value_attribute_names = select_parameter_values(sample_type).map(&:title).map(&:to_sym)
+      protocol_attribute_name = detect_protocol(sample_type)&.title&.to_sym
+      material_attribute_name = detect_material(sample_type)&.title&.to_sym
+      group_attribute_names = parameter_value_attribute_names.unshift(protocol_attribute_name).unshift(input_attribute_name)
 
-      grouped_samples = samples_metadata.group_by { |smd| group_attributes.map { |attr| smd[attr] } }
-      grouped_samples.transform_keys { |key| group_id(key) }
+      # grouped_samples = samples_metadata.group_by { |smd| group_attributes.map { |attr| smd[attr] } }
+      sample_groups = samples_metadata.group_by { |smd| group_attribute_names.map { |attr| smd[attr] }.flatten }.map { |_key, val| val }
+
+      sample_groups.map do |sample_group|
+        inputs = sample_group.first[input_attribute_name]
+        executed_protocol = detect_protocol(sample_type).sample_attribute_type.seek_sop? ? sample_group.first[protocol_attribute_name] : { id: detect_protocol(sample_type)&.id, title: sample_group.first[protocol_attribute_name] }
+        parameter_values = sample_group.first.slice(*parameter_value_attribute_names)
+        outputs = sample_group.map { |sample| {id: sample[:id], title: sample[material_attribute_name] } }
+        {
+          inputs: inputs.map { |input| input.transform_keys!(&:to_sym) },
+          executed_protocol: executed_protocol.transform_keys!(&:to_sym),
+          parameter_values: parameter_values.transform_keys!(&:to_sym),
+          outputs: outputs.map { |input| input.transform_keys!(&:to_sym) }
+        }
+      end
     end
 
     def process_sequence_input(inputs, type)
@@ -688,7 +756,7 @@ module IsaExporter
       # So retrieving the first one in the group should be fine.
       sample = Sample.find(sample_group_hash.first[:id])
       isa_parameter_value_attributes.map do |p|
-        value = sample.get_attribute_value(p) || ''
+        value = convert_attribute_value(sample, p)
         ontology = get_ontology_details(p, value, true)
         {
           category: {

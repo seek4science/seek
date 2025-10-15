@@ -9,7 +9,29 @@
   <%= f.error_messages -%>
 
   <% if show_projects %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => resource } %>
+    <%= render partial: 'projects/project_selector', locals: { resource: resource } %>
+  <% elsif resource.is_a?(Study) %>
+    <%= folding_panel("#{t('investigation')} details") do %>
+      <label class="required"><%= t('investigation') %></label>
+      <div id="investigation_collection">
+        <%= render partial: 'studies/investigation_list', locals: {
+          investigations: Investigation.all.select { |i| current_user.person.member_of?(i.projects)} } -%>
+      </div>
+    <% end %>
+
+    <%= render partial: 'projects/implicit_project_selector', locals: { action: 'manage',
+                                                                        select_id: '#study_investigation_id',
+                                                                        parents: Investigation.authorized_for('edit') } %>
+  <% elsif resource.is_a?(Assay) %>
+    <div class="form-group">
+      <label class="required"><%= t('study') -%></label>
+
+      <%= resource_study_selection('assay[study_id]', @assay.study) %>
+    </div>
+
+    <%= render partial: 'projects/implicit_project_selector', locals: { action: 'manage',
+                                                                        select_id: '#assay_study_id',
+                                                                        parents: Study.authorized_for('edit') } %>
   <% end %>
   <%= render partial: 'assets/manage_specific_attributes', locals: {f: f, sharing_link: sharing_link} %>
 

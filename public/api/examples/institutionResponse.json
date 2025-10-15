@@ -1,22 +1,24 @@
 {
   "data": {
-    "id": "1568",
+    "id": "980192431",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
         {
-          "id": "62",
+          "id": "50",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
       "avatar": null,
-      "title": "A Maximal Institution",
+      "title": "University of Manchester",
+      "department": "Manchester Institute of Biotechnology",
+      "ror_id": "027m9bs27",
       "country": "United Kingdom",
       "country_code": "GB",
       "city": "Manchester",
       "address": "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom",
-      "web_page": "http://www.mib.ac.uk/"
+      "web_page": "http://www.manchester.ac.uk/"
     },
     "relationships": {
       "people": {
@@ -31,14 +33,14 @@
       }
     },
     "links": {
-      "self": "/institutions/1568"
+      "self": "/institutions/980192431"
     },
     "meta": {
-      "created": "2024-11-20T10:14:31.000Z",
-      "modified": "2024-11-20T10:14:31.000Z",
+      "created": "2025-05-12T10:01:49.186Z",
+      "modified": "2025-05-12T10:01:49.186Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "283e6e30-8956-013d-24a2-0a81884ed284"
+      "uuid": "0b585ca0-1146-013e-72d8-7efdca78d793"
     }
   },
   "jsonapi": {

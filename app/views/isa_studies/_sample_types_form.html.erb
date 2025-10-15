@@ -13,16 +13,6 @@
     <% end %>
 	<% end %>
 
-  <div class="form-group">
-      <label>Title</label><%= required_span %>
-      <%= field.text_field :title, class: 'form-control', placeholder: 'Sample type name' %>
-  </div>
-
-  <div class="form-group">
-    <label>Description</label>
-    <%= field.text_area :description, class: "form-control rich-text-edit", rows: 5 -%>
-  </div>
-
   <%= field.hidden_field :template_id, { id: "isa_study#{id_suffix}template_parent_id" } %>
 
   <div class="tab-content">

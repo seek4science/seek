@@ -100,9 +100,9 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :css_appended, 'fish' do
       with_config_value :css_prepended, 'apple' do
         tags = seek_stylesheet_tags 'carrot'
-        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/prepended/apple.css" />'
-        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/carrot.css" />'
-        assert_includes tags, '<link rel="stylesheet" media="screen" href="/stylesheets/appended/fish.css" />'
+        assert_includes tags, '<link rel="stylesheet" href="/stylesheets/prepended/apple.css" />'
+        assert_includes tags, '<link rel="stylesheet" href="/stylesheets/carrot.css" />'
+        assert_includes tags, '<link rel="stylesheet" href="/stylesheets/appended/fish.css" />'
         assert tags.index('fish.css') > tags.index('carrot.css')
         assert tags.index('carrot.css') > tags.index('apple.css')
         refute_equal 0, tags.index('apple.css')
@@ -158,6 +158,18 @@ class ApplicationHelperTest < ActionView::TestCase
 
     date = Time.parse('2011-10-28')
     assert_equal '28th Oct 2011', date_as_string(date)
+
+    travel_to(Time.zone.local(2025, 9, 2, 01, 04, 44)) do
+      date = Time.zone.parse('2025-08-31T23:16:01.000Z')
+      start_of_year_date = Time.zone.parse('2025-01-01')
+      with_timezone('Europe/London') do
+        assert_equal '1st Sep 2025 at 00:16', date_as_string(date, true)
+        assert_equal '1st Sep 2025', date_as_string(date)
+        assert_equal "1st Sep 2025 at 00:16\t(1st Sep 2025 at 01:16 (Brussels))", date_as_string(date, true, false, 'Brussels')
+        assert_equal "1st Sep 2025\t(1st Sep 2025 (Brussels))", date_as_string(date, false, false, 'Brussels')
+        assert_equal "2025", date_as_string(start_of_year_date, false, true)
+      end
+    end
   end
 
   test 'date_as_string with nil date' do
@@ -382,16 +394,16 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test 'markdown generation allows block quotes without compromising HTML sanitization' do
-    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("> quote", markdown: true).to_s
-    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified(" > quote", markdown: true).to_s
-    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("  > quote", markdown: true).to_s
-    assert_equal "<pre><code>&gt; quote\n</code></pre>\n", text_or_not_specified("    > quote", markdown: true).to_s
-    assert_equal "<pre><code>    &gt; quote\n</code></pre>\n", text_or_not_specified("        > quote", markdown: true).to_s
-    assert_equal "<p>test&gt; quote</p>\n", text_or_not_specified("test> quote", markdown: true).to_s
-    assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("Hello\nWorld\n\n> quote", markdown: true).to_s
-    assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("Hello</div></div></div>\nWorld\n\n> quote", markdown: true).to_s
-    assert_equal "<p><i>Hello</i>\n<b>World</b></p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("<i>Hello</i></div></div></div>\n<b>World</b>\n\n> quote", markdown: true).to_s
-    assert_equal "<p>alert('hi');</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("<script>alert('hi');</script>\n\n> quote", markdown: true).to_s
+    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>", text_or_not_specified("> quote", markdown: true).to_s
+    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>", text_or_not_specified(" > quote", markdown: true).to_s
+    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>", text_or_not_specified("  > quote", markdown: true).to_s
+    assert_equal "<pre><code>&gt; quote\n</code></pre>", text_or_not_specified("    > quote", markdown: true).to_s
+    assert_equal "<pre><code>    &gt; quote\n</code></pre>", text_or_not_specified("        > quote", markdown: true).to_s
+    assert_equal "<p>test&gt; quote</p>", text_or_not_specified("test> quote", markdown: true).to_s
+    assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>", text_or_not_specified("Hello\nWorld\n\n> quote", markdown: true).to_s
+    assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>", text_or_not_specified("Hello</div></div></div>\nWorld\n\n> quote", markdown: true).to_s
+    assert_equal "<p><i>Hello</i>\n<b>World</b></p>\n<blockquote>\n<p>quote</p>\n</blockquote>", text_or_not_specified("<i>Hello</i></div></div></div>\n<b>World</b>\n\n> quote", markdown: true).to_s
+    assert_equal "<p>alert('hi');</p>\n<blockquote>\n<p>quote</p>\n</blockquote>", text_or_not_specified("<script>alert('hi');</script>\n\n> quote", markdown: true).to_s
 
     assert_equal "&gt; quote", text_or_not_specified("> quote", markdown: false).to_s
     assert_equal "Hello\nWorld\n\n&gt; quote", text_or_not_specified("Hello</div></div></div>\nWorld\n\n> quote", markdown: false).to_s
@@ -400,15 +412,26 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test 'markdown generation does not double encode special characters' do
-    assert_equal "<p>&amp;&amp; &quot;&quot; &lt; &gt;\n<code>&amp;&amp;</code></p>\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: true).to_s
+    assert_equal "<p>&amp;&amp; &quot;&quot; &lt; &gt;\n<code>&amp;&amp;</code></p>", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: true).to_s
     assert_equal "&amp;&amp; \"\" &lt; &gt;\n```&amp;&amp;```\n\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: false).to_s
   end
 
   test 'markdown generation allows tables without compromising HTML sanitization' do
-    assert_equal "<table><tr><td>hey</td></tr></table>\n",
+    assert_equal "<table><tr><td>hey</td></tr></table>",
                  text_or_not_specified("<table><tr><td>hey</td></tr></table>", markdown: true).to_s
-    assert_equal "<table><tr><td>\nalert('hi');hey</td></tr></table>\n",
+    assert_equal "<table><tr><td>\nalert('hi');hey</td></tr></table>",
                  text_or_not_specified("<table><tr><td><script>alert('hi');</script>hey</td></tr></table>", markdown: true).to_s
   end
 
+  test 'markdown renderer handles blank input' do
+    assert_equal '', Seek::Markdown.render('')
+  end
+
+  test 'markdown renderer replaces non-UTF-8 characters' do
+    assert_equal "<p>x � y</p>", Seek::Markdown.render("x \xD7 y")
+  end
+
+  test 'markdown renderer allows non-ASCII characters' do
+    assert_equal "<p>x🍌y</p>", Seek::Markdown.render("x🍌y")
+  end
 end

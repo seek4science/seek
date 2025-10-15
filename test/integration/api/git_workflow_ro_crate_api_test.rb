@@ -64,6 +64,12 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         assert_equal 'main.nf', new_version.main_workflow_path
         assert_equal 'main.nf', workflow.ro_crate.main_workflow.id
         assert_equal 'concat_two_files.ga', old_version.main_workflow_path
+
+        assert new_version.file_exists?('main.nf')
+        refute new_version.file_exists?('concat_two_files.ga')
+
+        refute old_version.file_exists?('main.nf')
+        assert old_version.file_exists?('concat_two_files.ga')
       end
     end
   end
@@ -222,6 +228,15 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         assert assigns(:workflow).git_version.total_size > 100
         assert_equal 'sort-and-change-case.ga', assigns(:workflow).ro_crate.main_workflow.id
         assert_equal '1.0.0', assigns(:workflow).git_version.name
+
+        workflow.reload
+        assert_equal 2, workflow.version
+        old_version = workflow.find_version(1)
+        new_version = workflow.git_version
+        refute new_version.file_exists?('concat_two_files.ga')
+        assert new_version.file_exists?('sort-and-change-case.ga')
+        assert old_version.file_exists?('concat_two_files.ga')
+        refute old_version.file_exists?('sort-and-change-case.ga')
       end
     end
   end

@@ -63,10 +63,17 @@
       <% if @sample_type.new_record? %>
           <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-template' -%>" id="from-template">
             <div class="form-group">
-              <label class="required">File to upload</label>
-              <%= file_field_tag "content_blobs[][data]", { "data-batch-upload": false } -%>
+              <label class="required">Excel file to upload</label>
+              <%= file_field_tag "content_blobs[][data]", "data-batch-upload": false, class: 'form-control'  -%>
             </div>
           </div>
+
+        <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-fair-ds-ttl' -%>" id="from-fair-ds-ttl">
+          <div class="form-group">
+            <label class="required"><%= t('fair_data_station.upload_file_label') %></label>
+            <%= file_field_tag "content_blobs[][data]", accept: '.ttl', "data-batch-upload": false, class: 'form-control'  -%>
+          </div>
+        </div>
       <% end %>
     </div>
 

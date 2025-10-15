@@ -136,13 +136,21 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'smtp_settings authentication' do
-    assert_equal :plain, Seek::Config.smtp_settings('authentication')
+    assert_equal '', Seek::Config.smtp_settings('authentication')
   end
   test 'noreply_sender' do
     assert_equal 'no-reply@sysmo-db.org', Seek::Config.noreply_sender
   end
   test 'jws enabled' do
     assert Seek::Config.jws_enabled
+  end
+
+  test 'copasi enabled' do
+    assert Seek::Config.copasi_enabled
+  end
+
+  test 'morpheus enabled' do
+    assert Seek::Config.morpheus_enabled
   end
 
   test 'exception_notification_enabled' do
@@ -486,6 +494,11 @@ class ConfigTest < ActiveSupport::TestCase
     refute_equal key, Seek::Config.secret_key_base
   end
 
+  test 'application secret_key_base monkey patch' do
+    expected = '3daa438adac605595e91478ba4d9291ddcae049c9f0a922731b9f94fa7f65804db54fb19554490e45436ab8b7beb738f97c2c98ca9d00f5ac3d12749611c80f3'
+    assert_equal expected, Rails.application.secret_key_base
+  end
+
   test 'project-specific setting' do
     many_bananas_project = FactoryBot.create(:project)
     no_bananas_project = FactoryBot.create(:project)
@@ -638,6 +651,23 @@ class ConfigTest < ActiveSupport::TestCase
 
     with_config_value(:isa_json_compliance_enabled, true) do
       assert Seek::Config.templates_enabled
+    end
+  end
+
+  test 'nels sbi url' do
+    assert_equal 'https://test-fe.cbu.uib.no/nels-api', Seek::Config.nels_api_url
+    assert_equal 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage', Seek::Config.nels_sbi_url
+    with_config_value(:nels_api_url, 'https://fish.com/sub/the-nels-api') do
+      assert_equal 'https://fish.com/nels-web/#/sbi-storage', Seek::Config.nels_sbi_url
+    end
+    with_config_value(:nels_api_url, '') do
+      assert_nil Seek::Config.nels_sbi_url
+    end
+    with_config_value(:nels_api_url, nil) do
+      assert_nil Seek::Config.nels_sbi_url
+    end
+    with_config_value(:nels_api_url, 'not a url') do
+      assert_nil Seek::Config.nels_sbi_url
     end
   end
 end

@@ -1,0 +1,4753 @@
+{
+  "title": "Data types",
+  "description": "Data types, used for annotating. Describes information that is that can be processed by dedicated computational tools that can use the data as input or produce it as output. Initially seeded from the EDAM ontology",
+  "ols_root_term_uris": "http://edamontology.org/data_0006",
+  "source_ontology": "edam",
+  "sample_controlled_vocab_terms_attributes": [
+    {
+      "label": "Data",
+      "iri": "http://edamontology.org/data_0006",
+      "parent_iri": ""
+    },
+    {
+      "label": "Ontology data",
+      "iri": "http://edamontology.org/data_2353",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Ontology concept",
+      "iri": "http://edamontology.org/data_2858",
+      "parent_iri": "http://edamontology.org/data_2353"
+    },
+    {
+      "label": "Ontology concept data",
+      "iri": "http://edamontology.org/data_0967",
+      "parent_iri": "http://edamontology.org/data_2353"
+    },
+    {
+      "label": "Ontology term",
+      "iri": "http://edamontology.org/data_0966",
+      "parent_iri": "http://edamontology.org/data_0967"
+    },
+    {
+      "label": "Ontology concept definition",
+      "iri": "http://edamontology.org/data_1731",
+      "parent_iri": "http://edamontology.org/data_0967"
+    },
+    {
+      "label": "Ontology",
+      "iri": "http://edamontology.org/data_0582",
+      "parent_iri": "http://edamontology.org/data_2353"
+    },
+    {
+      "label": "Data management plan",
+      "iri": "http://edamontology.org/data_4040",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Simulation",
+      "iri": "http://edamontology.org/data_3869",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Topology data",
+      "iri": "http://edamontology.org/data_3872",
+      "parent_iri": "http://edamontology.org/data_3869"
+    },
+    {
+      "label": "Forcefield parameters",
+      "iri": "http://edamontology.org/data_3871",
+      "parent_iri": "http://edamontology.org/data_3869"
+    },
+    {
+      "label": "Trajectory data",
+      "iri": "http://edamontology.org/data_3870",
+      "parent_iri": "http://edamontology.org/data_3869"
+    },
+    {
+      "label": "Molecular simulation data",
+      "iri": "http://edamontology.org/data_3842",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Query script",
+      "iri": "http://edamontology.org/data_3786",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Over-representation data",
+      "iri": "http://edamontology.org/data_3753",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Pathway overrepresentation data",
+      "iri": "http://edamontology.org/data_3953",
+      "parent_iri": "http://edamontology.org/data_3753"
+    },
+    {
+      "label": "GO-term enrichment data",
+      "iri": "http://edamontology.org/data_3754",
+      "parent_iri": "http://edamontology.org/data_3753"
+    },
+    {
+      "label": "Sequence variations",
+      "iri": "http://edamontology.org/data_3498",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Spectrum",
+      "iri": "http://edamontology.org/data_3483",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "NMR spectrum",
+      "iri": "http://edamontology.org/data_3488",
+      "parent_iri": "http://edamontology.org/data_3483"
+    },
+    {
+      "label": "Data reference",
+      "iri": "http://edamontology.org/data_2093",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "ID list",
+      "iri": "http://edamontology.org/data_2872",
+      "parent_iri": "http://edamontology.org/data_2093"
+    },
+    {
+      "label": "Ontology mapping",
+      "iri": "http://edamontology.org/data_3509",
+      "parent_iri": "http://edamontology.org/data_2093"
+    },
+    {
+      "label": "Annotated URI",
+      "iri": "http://edamontology.org/data_1883",
+      "parent_iri": "http://edamontology.org/data_2093"
+    },
+    {
+      "label": "Database cross-mapping",
+      "iri": "http://edamontology.org/data_0954",
+      "parent_iri": "http://edamontology.org/data_2093"
+    },
+    {
+      "label": "Experimental measurement",
+      "iri": "http://edamontology.org/data_3108",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Raw microarray data",
+      "iri": "http://edamontology.org/data_3110",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Protein structure raw data",
+      "iri": "http://edamontology.org/data_2537",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "CD spectra",
+      "iri": "http://edamontology.org/data_0939",
+      "parent_iri": "http://edamontology.org/data_2537"
+    },
+    {
+      "label": "Raw NMR data",
+      "iri": "http://edamontology.org/data_0938",
+      "parent_iri": "http://edamontology.org/data_2537"
+    },
+    {
+      "label": "Electron density map",
+      "iri": "http://edamontology.org/data_0937",
+      "parent_iri": "http://edamontology.org/data_2537"
+    },
+    {
+      "label": "Mass spectrometry data",
+      "iri": "http://edamontology.org/data_2536",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Peptide mass fingerprint",
+      "iri": "http://edamontology.org/data_0944",
+      "parent_iri": "http://edamontology.org/data_2536"
+    },
+    {
+      "label": "Mass spectrum",
+      "iri": "http://edamontology.org/data_0943",
+      "parent_iri": "http://edamontology.org/data_2536"
+    },
+    {
+      "label": "Volume map",
+      "iri": "http://edamontology.org/data_0940",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "RH scores",
+      "iri": "http://edamontology.org/data_0926",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Sequence trace",
+      "iri": "http://edamontology.org/data_0924",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Protein interaction raw data",
+      "iri": "http://edamontology.org/data_0905",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Cultivation parameter",
+      "iri": "http://edamontology.org/data_3724",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Morphology parameter",
+      "iri": "http://edamontology.org/data_3723",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Physiology parameter",
+      "iri": "http://edamontology.org/data_3722",
+      "parent_iri": "http://edamontology.org/data_3108"
+    },
+    {
+      "label": "Taxonomy",
+      "iri": "http://edamontology.org/data_3028",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Reaction data",
+      "iri": "http://edamontology.org/data_2978",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Enzyme kinetics data",
+      "iri": "http://edamontology.org/data_2024",
+      "parent_iri": "http://edamontology.org/data_2978"
+    },
+    {
+      "label": "Hanes Woolf plot",
+      "iri": "http://edamontology.org/data_2026",
+      "parent_iri": "http://edamontology.org/data_2024"
+    },
+    {
+      "label": "Michaelis Menten plot",
+      "iri": "http://edamontology.org/data_2025",
+      "parent_iri": "http://edamontology.org/data_2024"
+    },
+    {
+      "label": "Km",
+      "iri": "http://edamontology.org/data_0910",
+      "parent_iri": "http://edamontology.org/data_2024"
+    },
+    {
+      "label": "Vmax",
+      "iri": "http://edamontology.org/data_0909",
+      "parent_iri": "http://edamontology.org/data_2024"
+    },
+    {
+      "label": "Molecular property",
+      "iri": "http://edamontology.org/data_2087",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Carbohydrate property",
+      "iri": "http://edamontology.org/data_3425",
+      "parent_iri": "http://edamontology.org/data_2087"
+    },
+    {
+      "label": "Carbohydrate conformational map",
+      "iri": "http://edamontology.org/data_2753",
+      "parent_iri": "http://edamontology.org/data_3425"
+    },
+    {
+      "label": "Peptide property",
+      "iri": "http://edamontology.org/data_2979",
+      "parent_iri": "http://edamontology.org/data_2087"
+    },
+    {
+      "label": "Peptide identification",
+      "iri": "http://edamontology.org/data_0945",
+      "parent_iri": "http://edamontology.org/data_2979"
+    },
+    {
+      "label": "Molecular property (general)",
+      "iri": "http://edamontology.org/data_2050",
+      "parent_iri": "http://edamontology.org/data_2087"
+    },
+    {
+      "label": "Concentration",
+      "iri": "http://edamontology.org/data_2140",
+      "parent_iri": "http://edamontology.org/data_2050"
+    },
+    {
+      "label": "QSAR descriptor",
+      "iri": "http://edamontology.org/data_0847",
+      "parent_iri": "http://edamontology.org/data_2050"
+    },
+    {
+      "label": "QSAR descriptor (molecular)",
+      "iri": "http://edamontology.org/data_1205",
+      "parent_iri": "http://edamontology.org/data_0847"
+    },
+    {
+      "label": "QSAR descriptor (topological)",
+      "iri": "http://edamontology.org/data_1204",
+      "parent_iri": "http://edamontology.org/data_0847"
+    },
+    {
+      "label": "QSAR descriptor (geometrical)",
+      "iri": "http://edamontology.org/data_1203",
+      "parent_iri": "http://edamontology.org/data_0847"
+    },
+    {
+      "label": "QSAR descriptor (electronic)",
+      "iri": "http://edamontology.org/data_1202",
+      "parent_iri": "http://edamontology.org/data_0847"
+    },
+    {
+      "label": "QSAR descriptor (constitutional)",
+      "iri": "http://edamontology.org/data_1201",
+      "parent_iri": "http://edamontology.org/data_0847"
+    },
+    {
+      "label": "Chemical formula",
+      "iri": "http://edamontology.org/data_0846",
+      "parent_iri": "http://edamontology.org/data_2050"
+    },
+    {
+      "label": "SMILES string",
+      "iri": "http://edamontology.org/data_2301",
+      "parent_iri": "http://edamontology.org/data_0846"
+    },
+    {
+      "label": "Molecular charge",
+      "iri": "http://edamontology.org/data_0845",
+      "parent_iri": "http://edamontology.org/data_2050"
+    },
+    {
+      "label": "Molecular mass",
+      "iri": "http://edamontology.org/data_0844",
+      "parent_iri": "http://edamontology.org/data_2050"
+    },
+    {
+      "label": "Amino acid property",
+      "iri": "http://edamontology.org/data_2016",
+      "parent_iri": "http://edamontology.org/data_2087"
+    },
+    {
+      "label": "Amino acid pair-wise contact potentials",
+      "iri": "http://edamontology.org/data_1503",
+      "parent_iri": "http://edamontology.org/data_2016"
+    },
+    {
+      "label": "Amino acid index",
+      "iri": "http://edamontology.org/data_1501",
+      "parent_iri": "http://edamontology.org/data_2016"
+    },
+    {
+      "label": "Amino acid index (van der Waals radii)",
+      "iri": "http://edamontology.org/data_1508",
+      "parent_iri": "http://edamontology.org/data_1501"
+    },
+    {
+      "label": "Amino acid index (White-Wimley data)",
+      "iri": "http://edamontology.org/data_1507",
+      "parent_iri": "http://edamontology.org/data_1501"
+    },
+    {
+      "label": "Amino acid index (hydropathy)",
+      "iri": "http://edamontology.org/data_1506",
+      "parent_iri": "http://edamontology.org/data_1501"
+    },
+    {
+      "label": "Amino acid index (molecular weight)",
+      "iri": "http://edamontology.org/data_1505",
+      "parent_iri": "http://edamontology.org/data_1501"
+    },
+    {
+      "label": "Amino acid index (chemical classes)",
+      "iri": "http://edamontology.org/data_1502",
+      "parent_iri": "http://edamontology.org/data_1501"
+    },
+    {
+      "label": "Comparison matrix (amino acid)",
+      "iri": "http://edamontology.org/data_1449",
+      "parent_iri": "http://edamontology.org/data_2016"
+    },
+    {
+      "label": "Atomic property",
+      "iri": "http://edamontology.org/data_1917",
+      "parent_iri": "http://edamontology.org/data_2087"
+    },
+    {
+      "label": "Isotropic B factor",
+      "iri": "http://edamontology.org/data_1858",
+      "parent_iri": "http://edamontology.org/data_1917"
+    },
+    {
+      "label": "Atomic occupancy",
+      "iri": "http://edamontology.org/data_1857",
+      "parent_iri": "http://edamontology.org/data_1917"
+    },
+    {
+      "label": "Atomic coordinate",
+      "iri": "http://edamontology.org/data_1743",
+      "parent_iri": "http://edamontology.org/data_1917"
+    },
+    {
+      "label": "Nucleic acid property",
+      "iri": "http://edamontology.org/data_0912",
+      "parent_iri": "http://edamontology.org/data_2087"
+    },
+    {
+      "label": "Nucleic acid thermodynamic data",
+      "iri": "http://edamontology.org/data_2985",
+      "parent_iri": "http://edamontology.org/data_0912"
+    },
+    {
+      "label": "Nucleic acid entropy",
+      "iri": "http://edamontology.org/data_1585",
+      "parent_iri": "http://edamontology.org/data_2985"
+    },
+    {
+      "label": "Nucleic acid enthalpy",
+      "iri": "http://edamontology.org/data_1584",
+      "parent_iri": "http://edamontology.org/data_2985"
+    },
+    {
+      "label": "Nucleic acid melting profile",
+      "iri": "http://edamontology.org/data_1583",
+      "parent_iri": "http://edamontology.org/data_2985"
+    },
+    {
+      "label": "Nucleic acid melting temperature",
+      "iri": "http://edamontology.org/data_2139",
+      "parent_iri": "http://edamontology.org/data_2985"
+    },
+    {
+      "label": "DNA base structural data",
+      "iri": "http://edamontology.org/data_2088",
+      "parent_iri": "http://edamontology.org/data_0912"
+    },
+    {
+      "label": "Dinucleotide property",
+      "iri": "http://edamontology.org/data_2720",
+      "parent_iri": "http://edamontology.org/data_2088"
+    },
+    {
+      "label": "Base pairing probability matrix dotplot",
+      "iri": "http://edamontology.org/data_1595",
+      "parent_iri": "http://edamontology.org/data_2088"
+    },
+    {
+      "label": "DNA base trimer roll angles data",
+      "iri": "http://edamontology.org/data_1590",
+      "parent_iri": "http://edamontology.org/data_2088"
+    },
+    {
+      "label": "DNA base pair twist angle data",
+      "iri": "http://edamontology.org/data_1589",
+      "parent_iri": "http://edamontology.org/data_2088"
+    },
+    {
+      "label": "DNA base pair stacking energies data",
+      "iri": "http://edamontology.org/data_1588",
+      "parent_iri": "http://edamontology.org/data_2088"
+    },
+    {
+      "label": "Protein property",
+      "iri": "http://edamontology.org/data_0897",
+      "parent_iri": "http://edamontology.org/data_2087"
+    },
+    {
+      "label": "Rate of association",
+      "iri": "http://edamontology.org/data_3451",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein geometry data",
+      "iri": "http://edamontology.org/data_2991",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Ramachandran plot",
+      "iri": "http://edamontology.org/data_1544",
+      "parent_iri": "http://edamontology.org/data_2991"
+    },
+    {
+      "label": "Protein hydropathy data",
+      "iri": "http://edamontology.org/data_2970",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein globularity",
+      "iri": "http://edamontology.org/data_1526",
+      "parent_iri": "http://edamontology.org/data_2970"
+    },
+    {
+      "label": "Protein crystallizability",
+      "iri": "http://edamontology.org/data_1525",
+      "parent_iri": "http://edamontology.org/data_2970"
+    },
+    {
+      "label": "Protein solubility",
+      "iri": "http://edamontology.org/data_1524",
+      "parent_iri": "http://edamontology.org/data_2970"
+    },
+    {
+      "label": "Protein sequence hydropathy plot",
+      "iri": "http://edamontology.org/data_1522",
+      "parent_iri": "http://edamontology.org/data_2970"
+    },
+    {
+      "label": "Protein aliphatic index",
+      "iri": "http://edamontology.org/data_1521",
+      "parent_iri": "http://edamontology.org/data_2970"
+    },
+    {
+      "label": "Peptide hydrophobic moment",
+      "iri": "http://edamontology.org/data_1520",
+      "parent_iri": "http://edamontology.org/data_2970"
+    },
+    {
+      "label": "Protein secondary structure",
+      "iri": "http://edamontology.org/data_2956",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein dipole moment",
+      "iri": "http://edamontology.org/data_1545",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein solvent accessibility",
+      "iri": "http://edamontology.org/data_1542",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Peptide immunogenicity data",
+      "iri": "http://edamontology.org/data_1534",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Hopp and Woods plot",
+      "iri": "http://edamontology.org/data_2957",
+      "parent_iri": "http://edamontology.org/data_1534"
+    },
+    {
+      "label": "Protein optical density",
+      "iri": "http://edamontology.org/data_1532",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein extinction coefficient",
+      "iri": "http://edamontology.org/data_1531",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein hydrogen exchange rate",
+      "iri": "http://edamontology.org/data_1530",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein pKa value",
+      "iri": "http://edamontology.org/data_1529",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein isoelectric point",
+      "iri": "http://edamontology.org/data_1528",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein ionisation curve",
+      "iri": "http://edamontology.org/data_2165",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein titration curve",
+      "iri": "http://edamontology.org/data_1527",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein charge plot",
+      "iri": "http://edamontology.org/data_1523",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Peptide molecular weights",
+      "iri": "http://edamontology.org/data_1519",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein interaction data",
+      "iri": "http://edamontology.org/data_0906",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Protein-ligand interaction report",
+      "iri": "http://edamontology.org/data_1566",
+      "parent_iri": "http://edamontology.org/data_0906"
+    },
+    {
+      "label": "Protein hydrogen bonds",
+      "iri": "http://edamontology.org/data_1549",
+      "parent_iri": "http://edamontology.org/data_0906"
+    },
+    {
+      "label": "Protein residue 3D cluster",
+      "iri": "http://edamontology.org/data_1548",
+      "parent_iri": "http://edamontology.org/data_0906"
+    },
+    {
+      "label": "Protein contact map",
+      "iri": "http://edamontology.org/data_1547",
+      "parent_iri": "http://edamontology.org/data_0906"
+    },
+    {
+      "label": "Protein distance matrix",
+      "iri": "http://edamontology.org/data_1546",
+      "parent_iri": "http://edamontology.org/data_0906"
+    },
+    {
+      "label": "Ordination plot",
+      "iri": "http://edamontology.org/data_3743",
+      "parent_iri": "http://edamontology.org/data_0897"
+    },
+    {
+      "label": "Matrix",
+      "iri": "http://edamontology.org/data_2082",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Distance matrix",
+      "iri": "http://edamontology.org/data_2855",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Structural distance matrix",
+      "iri": "http://edamontology.org/data_2856",
+      "parent_iri": "http://edamontology.org/data_2855"
+    },
+    {
+      "label": "Sequence distance matrix",
+      "iri": "http://edamontology.org/data_0870",
+      "parent_iri": "http://edamontology.org/data_2855"
+    },
+    {
+      "label": "Position-specific scoring matrix",
+      "iri": "http://edamontology.org/data_2854",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Fingerprint",
+      "iri": "http://edamontology.org/data_1365",
+      "parent_iri": "http://edamontology.org/data_2854"
+    },
+    {
+      "label": "Information content matrix",
+      "iri": "http://edamontology.org/data_1363",
+      "parent_iri": "http://edamontology.org/data_2854"
+    },
+    {
+      "label": "Position weight matrix",
+      "iri": "http://edamontology.org/data_1362",
+      "parent_iri": "http://edamontology.org/data_2854"
+    },
+    {
+      "label": "Position frequency matrix",
+      "iri": "http://edamontology.org/data_1361",
+      "parent_iri": "http://edamontology.org/data_2854"
+    },
+    {
+      "label": "Count matrix",
+      "iri": "http://edamontology.org/data_3917",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Gene order",
+      "iri": "http://edamontology.org/data_3479",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Emission matrix",
+      "iri": "http://edamontology.org/data_3355",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Transition matrix",
+      "iri": "http://edamontology.org/data_3354",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Gene expression matrix",
+      "iri": "http://edamontology.org/data_3112",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Structural transformation matrix",
+      "iri": "http://edamontology.org/data_1494",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Amino acid word frequencies table",
+      "iri": "http://edamontology.org/data_1268",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Amino acid frequencies table",
+      "iri": "http://edamontology.org/data_1267",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Base word frequencies table",
+      "iri": "http://edamontology.org/data_1266",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Base frequencies table",
+      "iri": "http://edamontology.org/data_1265",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Protein sequence-structure scoring matrix",
+      "iri": "http://edamontology.org/data_0892",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "3D-1D scoring matrix",
+      "iri": "http://edamontology.org/data_1499",
+      "parent_iri": "http://edamontology.org/data_0892"
+    },
+    {
+      "label": "Comparison matrix",
+      "iri": "http://edamontology.org/data_0874",
+      "parent_iri": "http://edamontology.org/data_2082"
+    },
+    {
+      "label": "Comparison matrix (nucleotide)",
+      "iri": "http://edamontology.org/data_1448",
+      "parent_iri": "http://edamontology.org/data_0874"
+    },
+    {
+      "label": "Database search results",
+      "iri": "http://edamontology.org/data_2080",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Sequence search results",
+      "iri": "http://edamontology.org/data_0857",
+      "parent_iri": "http://edamontology.org/data_2080"
+    },
+    {
+      "label": "Report",
+      "iri": "http://edamontology.org/data_2048",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Sequence signature report",
+      "iri": "http://edamontology.org/data_2762",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Nucleic acid signature",
+      "iri": "http://edamontology.org/data_3492",
+      "parent_iri": "http://edamontology.org/data_2762"
+    },
+    {
+      "label": "Protein signature",
+      "iri": "http://edamontology.org/data_1355",
+      "parent_iri": "http://edamontology.org/data_2762"
+    },
+    {
+      "label": "Quality control report",
+      "iri": "http://edamontology.org/data_3914",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Electronic health record",
+      "iri": "http://edamontology.org/data_3861",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Resource metadata",
+      "iri": "http://edamontology.org/data_2337",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Sample annotation",
+      "iri": "http://edamontology.org/data_3113",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "System metadata",
+      "iri": "http://edamontology.org/data_3106",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "Ontology metadata",
+      "iri": "http://edamontology.org/data_2223",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "Database entry metadata",
+      "iri": "http://edamontology.org/data_2193",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "User metadata",
+      "iri": "http://edamontology.org/data_0960",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "Tool metadata",
+      "iri": "http://edamontology.org/data_0958",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "Database metadata",
+      "iri": "http://edamontology.org/data_0957",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "Workflow metadata",
+      "iri": "http://edamontology.org/data_0949",
+      "parent_iri": "http://edamontology.org/data_2337"
+    },
+    {
+      "label": "Pathway or network report",
+      "iri": "http://edamontology.org/data_2984",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Structure report",
+      "iri": "http://edamontology.org/data_2085",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Carbohydrate report",
+      "iri": "http://edamontology.org/data_2313",
+      "parent_iri": "http://edamontology.org/data_2085"
+    },
+    {
+      "label": "Nucleic acid structure report",
+      "iri": "http://edamontology.org/data_3128",
+      "parent_iri": "http://edamontology.org/data_2085"
+    },
+    {
+      "label": "Protein structure report",
+      "iri": "http://edamontology.org/data_1537",
+      "parent_iri": "http://edamontology.org/data_2085"
+    },
+    {
+      "label": "Protein structural quality report",
+      "iri": "http://edamontology.org/data_1539",
+      "parent_iri": "http://edamontology.org/data_1537"
+    },
+    {
+      "label": "Small molecule report",
+      "iri": "http://edamontology.org/data_0962",
+      "parent_iri": "http://edamontology.org/data_2085"
+    },
+    {
+      "label": "Drug report",
+      "iri": "http://edamontology.org/data_1696",
+      "parent_iri": "http://edamontology.org/data_0962"
+    },
+    {
+      "label": "Lipid report",
+      "iri": "http://edamontology.org/data_2879",
+      "parent_iri": "http://edamontology.org/data_2085"
+    },
+    {
+      "label": "Nucleic acid report",
+      "iri": "http://edamontology.org/data_2084",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Gene family report",
+      "iri": "http://edamontology.org/data_3148",
+      "parent_iri": "http://edamontology.org/data_2084"
+    },
+    {
+      "label": "RNA family report",
+      "iri": "http://edamontology.org/data_2354",
+      "parent_iri": "http://edamontology.org/data_3148"
+    },
+    {
+      "label": "Nucleic acid folding report",
+      "iri": "http://edamontology.org/data_1596",
+      "parent_iri": "http://edamontology.org/data_2084"
+    },
+    {
+      "label": "Genetic linkage report",
+      "iri": "http://edamontology.org/data_0927",
+      "parent_iri": "http://edamontology.org/data_2084"
+    },
+    {
+      "label": "Chromosome report",
+      "iri": "http://edamontology.org/data_0919",
+      "parent_iri": "http://edamontology.org/data_2084"
+    },
+    {
+      "label": "Gene report",
+      "iri": "http://edamontology.org/data_0916",
+      "parent_iri": "http://edamontology.org/data_2084"
+    },
+    {
+      "label": "Sequence report",
+      "iri": "http://edamontology.org/data_2955",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Sequence image",
+      "iri": "http://edamontology.org/data_2969",
+      "parent_iri": "http://edamontology.org/data_2955"
+    },
+    {
+      "label": "Sequence trace image",
+      "iri": "http://edamontology.org/data_2168",
+      "parent_iri": "http://edamontology.org/data_2969"
+    },
+    {
+      "label": "Restriction map",
+      "iri": "http://edamontology.org/data_1289",
+      "parent_iri": "http://edamontology.org/data_2969"
+    },
+    {
+      "label": "Sequence property",
+      "iri": "http://edamontology.org/data_1254",
+      "parent_iri": "http://edamontology.org/data_2955"
+    },
+    {
+      "label": "Sequence composition report",
+      "iri": "http://edamontology.org/data_1261",
+      "parent_iri": "http://edamontology.org/data_1254"
+    },
+    {
+      "label": "Nucleic acid density plot",
+      "iri": "http://edamontology.org/data_2167",
+      "parent_iri": "http://edamontology.org/data_1261"
+    },
+    {
+      "label": "Sequence composition plot",
+      "iri": "http://edamontology.org/data_2166",
+      "parent_iri": "http://edamontology.org/data_1261"
+    },
+    {
+      "label": "Base position variability plot",
+      "iri": "http://edamontology.org/data_1263",
+      "parent_iri": "http://edamontology.org/data_1261"
+    },
+    {
+      "label": "Sequence ambiguity report",
+      "iri": "http://edamontology.org/data_1260",
+      "parent_iri": "http://edamontology.org/data_1254"
+    },
+    {
+      "label": "Sequence complexity report",
+      "iri": "http://edamontology.org/data_1259",
+      "parent_iri": "http://edamontology.org/data_1254"
+    },
+    {
+      "label": "Text mining report",
+      "iri": "http://edamontology.org/data_0972",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Data index report",
+      "iri": "http://edamontology.org/data_0956",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Genotype/phenotype report",
+      "iri": "http://edamontology.org/data_0920",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Disease report",
+      "iri": "http://edamontology.org/data_1622",
+      "parent_iri": "http://edamontology.org/data_0920"
+    },
+    {
+      "label": "Pharmacogenomic test report",
+      "iri": "http://edamontology.org/data_1621",
+      "parent_iri": "http://edamontology.org/data_0920"
+    },
+    {
+      "label": "Protein report",
+      "iri": "http://edamontology.org/data_0896",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Protein features",
+      "iri": "http://edamontology.org/data_1277",
+      "parent_iri": "http://edamontology.org/data_0896"
+    },
+    {
+      "label": "Protein family report",
+      "iri": "http://edamontology.org/data_0907",
+      "parent_iri": "http://edamontology.org/data_0896"
+    },
+    {
+      "label": "Structure alignment report",
+      "iri": "http://edamontology.org/data_0887",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Protocol",
+      "iri": "http://edamontology.org/data_2531",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Organism report",
+      "iri": "http://edamontology.org/data_2530",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Genome report",
+      "iri": "http://edamontology.org/data_2711",
+      "parent_iri": "http://edamontology.org/data_2530"
+    },
+    {
+      "label": "Cell line report",
+      "iri": "http://edamontology.org/data_0963",
+      "parent_iri": "http://edamontology.org/data_2530"
+    },
+    {
+      "label": "Isolation report",
+      "iri": "http://edamontology.org/data_3717",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Isolation source",
+      "iri": "http://edamontology.org/data_3721",
+      "parent_iri": "http://edamontology.org/data_3717"
+    },
+    {
+      "label": "Geographic location",
+      "iri": "http://edamontology.org/data_3720",
+      "parent_iri": "http://edamontology.org/data_3717"
+    },
+    {
+      "label": "Biosafety report",
+      "iri": "http://edamontology.org/data_3716",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Biosafety classification",
+      "iri": "http://edamontology.org/data_3719",
+      "parent_iri": "http://edamontology.org/data_3716"
+    },
+    {
+      "label": "Pathogenicity report",
+      "iri": "http://edamontology.org/data_3718",
+      "parent_iri": "http://edamontology.org/data_3716"
+    },
+    {
+      "label": "Reference sample report",
+      "iri": "http://edamontology.org/data_3567",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Clinical trial report",
+      "iri": "http://edamontology.org/data_3558",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Image metadata",
+      "iri": "http://edamontology.org/data_3546",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Sequence alignment report",
+      "iri": "http://edamontology.org/data_0867",
+      "parent_iri": "http://edamontology.org/data_2048"
+    },
+    {
+      "label": "Sequence assembly report",
+      "iri": "http://edamontology.org/data_3181",
+      "parent_iri": "http://edamontology.org/data_0867"
+    },
+    {
+      "label": "Sequence similarity plot",
+      "iri": "http://edamontology.org/data_2161",
+      "parent_iri": "http://edamontology.org/data_0867"
+    },
+    {
+      "label": "Dotplot",
+      "iri": "http://edamontology.org/data_0862",
+      "parent_iri": "http://edamontology.org/data_0867"
+    },
+    {
+      "label": "Sequence",
+      "iri": "http://edamontology.org/data_2044",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Nucleic acid sequence",
+      "iri": "http://edamontology.org/data_2977",
+      "parent_iri": "http://edamontology.org/data_2044"
+    },
+    {
+      "label": "RNA sequence",
+      "iri": "http://edamontology.org/data_3495",
+      "parent_iri": "http://edamontology.org/data_2977"
+    },
+    {
+      "label": "DNA sequence",
+      "iri": "http://edamontology.org/data_3494",
+      "parent_iri": "http://edamontology.org/data_2977"
+    },
+    {
+      "label": "Nucleic acid sequence record",
+      "iri": "http://edamontology.org/data_2887",
+      "parent_iri": "http://edamontology.org/data_2977"
+    },
+    {
+      "label": "Protein sequence",
+      "iri": "http://edamontology.org/data_2976",
+      "parent_iri": "http://edamontology.org/data_2044"
+    },
+    {
+      "label": "Protein sequence record",
+      "iri": "http://edamontology.org/data_2886",
+      "parent_iri": "http://edamontology.org/data_2976"
+    },
+    {
+      "label": "Sequence record",
+      "iri": "http://edamontology.org/data_0849",
+      "parent_iri": "http://edamontology.org/data_2044"
+    },
+    {
+      "label": "Evidence",
+      "iri": "http://edamontology.org/data_2042",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Map data",
+      "iri": "http://edamontology.org/data_2019",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Sequence coordinates",
+      "iri": "http://edamontology.org/data_2012",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Cytoband position",
+      "iri": "http://edamontology.org/data_3236",
+      "parent_iri": "http://edamontology.org/data_2012"
+    },
+    {
+      "label": "Alignment",
+      "iri": "http://edamontology.org/data_1916",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Secondary structure alignment",
+      "iri": "http://edamontology.org/data_2366",
+      "parent_iri": "http://edamontology.org/data_1916"
+    },
+    {
+      "label": "RNA secondary structure alignment",
+      "iri": "http://edamontology.org/data_0881",
+      "parent_iri": "http://edamontology.org/data_2366"
+    },
+    {
+      "label": "Protein secondary structure alignment",
+      "iri": "http://edamontology.org/data_0878",
+      "parent_iri": "http://edamontology.org/data_2366"
+    },
+    {
+      "label": "Sequence-structure alignment",
+      "iri": "http://edamontology.org/data_0893",
+      "parent_iri": "http://edamontology.org/data_1916"
+    },
+    {
+      "label": "Structural (3D) profile alignment",
+      "iri": "http://edamontology.org/data_0890",
+      "parent_iri": "http://edamontology.org/data_1916"
+    },
+    {
+      "label": "Structure alignment",
+      "iri": "http://edamontology.org/data_0886",
+      "parent_iri": "http://edamontology.org/data_1916"
+    },
+    {
+      "label": "Nucleic acid structure alignment",
+      "iri": "http://edamontology.org/data_1482",
+      "parent_iri": "http://edamontology.org/data_0886"
+    },
+    {
+      "label": "DNA structure alignment",
+      "iri": "http://edamontology.org/data_3924",
+      "parent_iri": "http://edamontology.org/data_1482"
+    },
+    {
+      "label": "RNA structure alignment",
+      "iri": "http://edamontology.org/data_1493",
+      "parent_iri": "http://edamontology.org/data_1482"
+    },
+    {
+      "label": "Protein structure alignment",
+      "iri": "http://edamontology.org/data_1481",
+      "parent_iri": "http://edamontology.org/data_0886"
+    },
+    {
+      "label": "Structure alignment (pair)",
+      "iri": "http://edamontology.org/data_1479",
+      "parent_iri": "http://edamontology.org/data_0886"
+    },
+    {
+      "label": "Sequence alignment",
+      "iri": "http://edamontology.org/data_0863",
+      "parent_iri": "http://edamontology.org/data_1916"
+    },
+    {
+      "label": "Hybrid sequence alignment",
+      "iri": "http://edamontology.org/data_1385",
+      "parent_iri": "http://edamontology.org/data_0863"
+    },
+    {
+      "label": "Protein sequence alignment",
+      "iri": "http://edamontology.org/data_1384",
+      "parent_iri": "http://edamontology.org/data_0863"
+    },
+    {
+      "label": "Nucleic acid sequence alignment",
+      "iri": "http://edamontology.org/data_1383",
+      "parent_iri": "http://edamontology.org/data_0863"
+    },
+    {
+      "label": "Pair sequence alignment",
+      "iri": "http://edamontology.org/data_1381",
+      "parent_iri": "http://edamontology.org/data_0863"
+    },
+    {
+      "label": "Sequence signature matches",
+      "iri": "http://edamontology.org/data_0858",
+      "parent_iri": "http://edamontology.org/data_1916"
+    },
+    {
+      "label": "Image",
+      "iri": "http://edamontology.org/data_2968",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Cell migration track image",
+      "iri": "http://edamontology.org/data_3449",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Raw image",
+      "iri": "http://edamontology.org/data_3424",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "EM Micrograph",
+      "iri": "http://edamontology.org/data_3808",
+      "parent_iri": "http://edamontology.org/data_3424"
+    },
+    {
+      "label": "EM Movie",
+      "iri": "http://edamontology.org/data_3807",
+      "parent_iri": "http://edamontology.org/data_3424"
+    },
+    {
+      "label": "MRI image",
+      "iri": "http://edamontology.org/data_3442",
+      "parent_iri": "http://edamontology.org/data_3424"
+    },
+    {
+      "label": "Northern blot image",
+      "iri": "http://edamontology.org/data_2586",
+      "parent_iri": "http://edamontology.org/data_3424"
+    },
+    {
+      "label": "2D PAGE image",
+      "iri": "http://edamontology.org/data_0942",
+      "parent_iri": "http://edamontology.org/data_3424"
+    },
+    {
+      "label": "Microarray spots image",
+      "iri": "http://edamontology.org/data_1714",
+      "parent_iri": "http://edamontology.org/data_3424"
+    },
+    {
+      "label": "Protein image",
+      "iri": "http://edamontology.org/data_3153",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Protein structure image",
+      "iri": "http://edamontology.org/data_2992",
+      "parent_iri": "http://edamontology.org/data_3153"
+    },
+    {
+      "label": "Protein secondary structure image",
+      "iri": "http://edamontology.org/data_1709",
+      "parent_iri": "http://edamontology.org/data_3153"
+    },
+    {
+      "label": "Helical net",
+      "iri": "http://edamontology.org/data_2163",
+      "parent_iri": "http://edamontology.org/data_1709"
+    },
+    {
+      "label": "Helical wheel",
+      "iri": "http://edamontology.org/data_2162",
+      "parent_iri": "http://edamontology.org/data_1709"
+    },
+    {
+      "label": "Sequence alignment image",
+      "iri": "http://edamontology.org/data_1711",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Structure image",
+      "iri": "http://edamontology.org/data_1710",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Chemical structure image",
+      "iri": "http://edamontology.org/data_1712",
+      "parent_iri": "http://edamontology.org/data_1710"
+    },
+    {
+      "label": "RNA secondary structure image",
+      "iri": "http://edamontology.org/data_1708",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Phylogenetic tree image",
+      "iri": "http://edamontology.org/data_1707",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Heat map",
+      "iri": "http://edamontology.org/data_1636",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Fate map",
+      "iri": "http://edamontology.org/data_1713",
+      "parent_iri": "http://edamontology.org/data_2968"
+    },
+    {
+      "label": "Sequence features metadata",
+      "iri": "http://edamontology.org/data_2914",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Sequence feature qualifier",
+      "iri": "http://edamontology.org/data_1021",
+      "parent_iri": "http://edamontology.org/data_2914"
+    },
+    {
+      "label": "Sequence feature key",
+      "iri": "http://edamontology.org/data_1020",
+      "parent_iri": "http://edamontology.org/data_2914"
+    },
+    {
+      "label": "Sequence feature label",
+      "iri": "http://edamontology.org/data_1022",
+      "parent_iri": "http://edamontology.org/data_2914"
+    },
+    {
+      "label": "Sequence feature source",
+      "iri": "http://edamontology.org/data_0856",
+      "parent_iri": "http://edamontology.org/data_2914"
+    },
+    {
+      "label": "Expression data",
+      "iri": "http://edamontology.org/data_2603",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Clustered expression profiles",
+      "iri": "http://edamontology.org/data_3768",
+      "parent_iri": "http://edamontology.org/data_2603"
+    },
+    {
+      "label": "Microarray hybridisation data",
+      "iri": "http://edamontology.org/data_3117",
+      "parent_iri": "http://edamontology.org/data_2603"
+    },
+    {
+      "label": "Processed microarray data",
+      "iri": "http://edamontology.org/data_3111",
+      "parent_iri": "http://edamontology.org/data_3117"
+    },
+    {
+      "label": "Microarray metadata",
+      "iri": "http://edamontology.org/data_3115",
+      "parent_iri": "http://edamontology.org/data_2603"
+    },
+    {
+      "label": "Oligonucleotide probe annotation",
+      "iri": "http://edamontology.org/data_2717",
+      "parent_iri": "http://edamontology.org/data_3115"
+    },
+    {
+      "label": "Gene expression profile",
+      "iri": "http://edamontology.org/data_0928",
+      "parent_iri": "http://edamontology.org/data_2603"
+    },
+    {
+      "label": "Sequence tag profile",
+      "iri": "http://edamontology.org/data_2535",
+      "parent_iri": "http://edamontology.org/data_0928"
+    },
+    {
+      "label": "Pathway or network",
+      "iri": "http://edamontology.org/data_2600",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Hierarchy",
+      "iri": "http://edamontology.org/data_2589",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Score",
+      "iri": "http://edamontology.org/data_1772",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Localisation score",
+      "iri": "http://edamontology.org/data_3756",
+      "parent_iri": "http://edamontology.org/data_1772"
+    },
+    {
+      "label": "Alignment score or penalty",
+      "iri": "http://edamontology.org/data_1394",
+      "parent_iri": "http://edamontology.org/data_1772"
+    },
+    {
+      "label": "Gap penalty",
+      "iri": "http://edamontology.org/data_2137",
+      "parent_iri": "http://edamontology.org/data_1394"
+    },
+    {
+      "label": "Gap separation penalty",
+      "iri": "http://edamontology.org/data_1399",
+      "parent_iri": "http://edamontology.org/data_2137"
+    },
+    {
+      "label": "Gap extension penalty",
+      "iri": "http://edamontology.org/data_1398",
+      "parent_iri": "http://edamontology.org/data_2137"
+    },
+    {
+      "label": "Terminal gap extension penalty",
+      "iri": "http://edamontology.org/data_1411",
+      "parent_iri": "http://edamontology.org/data_1398"
+    },
+    {
+      "label": "Gap opening penalty",
+      "iri": "http://edamontology.org/data_1397",
+      "parent_iri": "http://edamontology.org/data_2137"
+    },
+    {
+      "label": "Terminal gap opening penalty",
+      "iri": "http://edamontology.org/data_1410",
+      "parent_iri": "http://edamontology.org/data_1397"
+    },
+    {
+      "label": "Drop off score",
+      "iri": "http://edamontology.org/data_1403",
+      "parent_iri": "http://edamontology.org/data_1394"
+    },
+    {
+      "label": "Mismatch penalty score",
+      "iri": "http://edamontology.org/data_1402",
+      "parent_iri": "http://edamontology.org/data_1394"
+    },
+    {
+      "label": "Match reward score",
+      "iri": "http://edamontology.org/data_1401",
+      "parent_iri": "http://edamontology.org/data_1394"
+    },
+    {
+      "label": "Statistical estimate score",
+      "iri": "http://edamontology.org/data_0951",
+      "parent_iri": "http://edamontology.org/data_1772"
+    },
+    {
+      "label": "Q-value",
+      "iri": "http://edamontology.org/data_3932",
+      "parent_iri": "http://edamontology.org/data_0951"
+    },
+    {
+      "label": "P-value",
+      "iri": "http://edamontology.org/data_1669",
+      "parent_iri": "http://edamontology.org/data_0951"
+    },
+    {
+      "label": "Z-value",
+      "iri": "http://edamontology.org/data_1668",
+      "parent_iri": "http://edamontology.org/data_0951"
+    },
+    {
+      "label": "E-value",
+      "iri": "http://edamontology.org/data_1667",
+      "parent_iri": "http://edamontology.org/data_0951"
+    },
+    {
+      "label": "Structure similarity score",
+      "iri": "http://edamontology.org/data_0888",
+      "parent_iri": "http://edamontology.org/data_1772"
+    },
+    {
+      "label": "Tanimoto similarity score",
+      "iri": "http://edamontology.org/data_1498",
+      "parent_iri": "http://edamontology.org/data_0888"
+    },
+    {
+      "label": "Root-mean-square deviation",
+      "iri": "http://edamontology.org/data_1497",
+      "parent_iri": "http://edamontology.org/data_0888"
+    },
+    {
+      "label": "Sequence similarity score",
+      "iri": "http://edamontology.org/data_0865",
+      "parent_iri": "http://edamontology.org/data_1772"
+    },
+    {
+      "label": "Sequence similarity",
+      "iri": "http://edamontology.org/data_1413",
+      "parent_iri": "http://edamontology.org/data_0865"
+    },
+    {
+      "label": "Bit score",
+      "iri": "http://edamontology.org/data_2335",
+      "parent_iri": "http://edamontology.org/data_1413"
+    },
+    {
+      "label": "Sequence identity",
+      "iri": "http://edamontology.org/data_1412",
+      "parent_iri": "http://edamontology.org/data_0865"
+    },
+    {
+      "label": "Regular expression",
+      "iri": "http://edamontology.org/data_1352",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Map",
+      "iri": "http://edamontology.org/data_1274",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Physical map",
+      "iri": "http://edamontology.org/data_1280",
+      "parent_iri": "http://edamontology.org/data_1274"
+    },
+    {
+      "label": "Radiation hybrid map",
+      "iri": "http://edamontology.org/data_2870",
+      "parent_iri": "http://edamontology.org/data_1280"
+    },
+    {
+      "label": "Cytogenetic map",
+      "iri": "http://edamontology.org/data_1283",
+      "parent_iri": "http://edamontology.org/data_1280"
+    },
+    {
+      "label": "Deletion map",
+      "iri": "http://edamontology.org/data_1859",
+      "parent_iri": "http://edamontology.org/data_1283"
+    },
+    {
+      "label": "Sequence map",
+      "iri": "http://edamontology.org/data_1279",
+      "parent_iri": "http://edamontology.org/data_1280"
+    },
+    {
+      "label": "Genome map",
+      "iri": "http://edamontology.org/data_1288",
+      "parent_iri": "http://edamontology.org/data_1279"
+    },
+    {
+      "label": "Plasmid map",
+      "iri": "http://edamontology.org/data_1286",
+      "parent_iri": "http://edamontology.org/data_1279"
+    },
+    {
+      "label": "Gene map",
+      "iri": "http://edamontology.org/data_1285",
+      "parent_iri": "http://edamontology.org/data_1279"
+    },
+    {
+      "label": "Genetic map",
+      "iri": "http://edamontology.org/data_1278",
+      "parent_iri": "http://edamontology.org/data_1274"
+    },
+    {
+      "label": "Haplotype map",
+      "iri": "http://edamontology.org/data_1863",
+      "parent_iri": "http://edamontology.org/data_1278"
+    },
+    {
+      "label": "QTL map",
+      "iri": "http://edamontology.org/data_1860",
+      "parent_iri": "http://edamontology.org/data_1278"
+    },
+    {
+      "label": "DNA transduction map",
+      "iri": "http://edamontology.org/data_1284",
+      "parent_iri": "http://edamontology.org/data_1278"
+    },
+    {
+      "label": "Sequence features",
+      "iri": "http://edamontology.org/data_1255",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Annotation track",
+      "iri": "http://edamontology.org/data_3002",
+      "parent_iri": "http://edamontology.org/data_1255"
+    },
+    {
+      "label": "Nucleic acid features",
+      "iri": "http://edamontology.org/data_1276",
+      "parent_iri": "http://edamontology.org/data_1255"
+    },
+    {
+      "label": "Gene transcript report",
+      "iri": "http://edamontology.org/data_3134",
+      "parent_iri": "http://edamontology.org/data_1276"
+    },
+    {
+      "label": "Feature table",
+      "iri": "http://edamontology.org/data_1270",
+      "parent_iri": "http://edamontology.org/data_1255"
+    },
+    {
+      "label": "Keyword",
+      "iri": "http://edamontology.org/data_0968",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "UniProt keyword",
+      "iri": "http://edamontology.org/data_2007",
+      "parent_iri": "http://edamontology.org/data_0968"
+    },
+    {
+      "label": "Data index",
+      "iri": "http://edamontology.org/data_0955",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Genome index",
+      "iri": "http://edamontology.org/data_3210",
+      "parent_iri": "http://edamontology.org/data_0955"
+    },
+    {
+      "label": "Mathematical model",
+      "iri": "http://edamontology.org/data_0950",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Kinetic model",
+      "iri": "http://edamontology.org/data_3241",
+      "parent_iri": "http://edamontology.org/data_0950"
+    },
+    {
+      "label": "Hidden Markov model",
+      "iri": "http://edamontology.org/data_1364",
+      "parent_iri": "http://edamontology.org/data_0950"
+    },
+    {
+      "label": "Profile HMM",
+      "iri": "http://edamontology.org/data_3949",
+      "parent_iri": "http://edamontology.org/data_1364"
+    },
+    {
+      "label": "Dirichlet distribution",
+      "iri": "http://edamontology.org/data_1347",
+      "parent_iri": "http://edamontology.org/data_0950"
+    },
+    {
+      "label": "DNA substitution model",
+      "iri": "http://edamontology.org/data_1439",
+      "parent_iri": "http://edamontology.org/data_0950"
+    },
+    {
+      "label": "Codon usage data",
+      "iri": "http://edamontology.org/data_0914",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Codon usage bias",
+      "iri": "http://edamontology.org/data_2865",
+      "parent_iri": "http://edamontology.org/data_0914"
+    },
+    {
+      "label": "Codon usage fraction difference",
+      "iri": "http://edamontology.org/data_1602",
+      "parent_iri": "http://edamontology.org/data_0914"
+    },
+    {
+      "label": "Codon usage bias plot",
+      "iri": "http://edamontology.org/data_1600",
+      "parent_iri": "http://edamontology.org/data_0914"
+    },
+    {
+      "label": "Genetic code",
+      "iri": "http://edamontology.org/data_1598",
+      "parent_iri": "http://edamontology.org/data_0914"
+    },
+    {
+      "label": "Codon usage table",
+      "iri": "http://edamontology.org/data_1597",
+      "parent_iri": "http://edamontology.org/data_0914"
+    },
+    {
+      "label": "Structural profile",
+      "iri": "http://edamontology.org/data_0889",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Structure",
+      "iri": "http://edamontology.org/data_0883",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Lipid structure",
+      "iri": "http://edamontology.org/data_2850",
+      "parent_iri": "http://edamontology.org/data_0883"
+    },
+    {
+      "label": "3D EM Mask",
+      "iri": "http://edamontology.org/data_3806",
+      "parent_iri": "http://edamontology.org/data_0883"
+    },
+    {
+      "label": "3D EM Map",
+      "iri": "http://edamontology.org/data_3805",
+      "parent_iri": "http://edamontology.org/data_0883"
+    },
+    {
+      "label": "Small molecule structure",
+      "iri": "http://edamontology.org/data_1463",
+      "parent_iri": "http://edamontology.org/data_0883"
+    },
+    {
+      "label": "Toxin structure",
+      "iri": "http://edamontology.org/data_2852",
+      "parent_iri": "http://edamontology.org/data_1463"
+    },
+    {
+      "label": "Drug structure",
+      "iri": "http://edamontology.org/data_2851",
+      "parent_iri": "http://edamontology.org/data_1463"
+    },
+    {
+      "label": "Carbohydrate structure",
+      "iri": "http://edamontology.org/data_1462",
+      "parent_iri": "http://edamontology.org/data_0883"
+    },
+    {
+      "label": "Protein structure",
+      "iri": "http://edamontology.org/data_1460",
+      "parent_iri": "http://edamontology.org/data_0883"
+    },
+    {
+      "label": "Protein complex",
+      "iri": "http://edamontology.org/data_2877",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "C-alpha trace",
+      "iri": "http://edamontology.org/data_1470",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "Protein domain",
+      "iri": "http://edamontology.org/data_1468",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "Protein chain",
+      "iri": "http://edamontology.org/data_1467",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "Protein-ligand complex",
+      "iri": "http://edamontology.org/data_1461",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "Protein residue",
+      "iri": "http://edamontology.org/data_1756",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "Protein atom",
+      "iri": "http://edamontology.org/data_1755",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "Protein structural motif",
+      "iri": "http://edamontology.org/data_2878",
+      "parent_iri": "http://edamontology.org/data_1460"
+    },
+    {
+      "label": "Nucleic acid structure",
+      "iri": "http://edamontology.org/data_1459",
+      "parent_iri": "http://edamontology.org/data_0883"
+    },
+    {
+      "label": "RNA structure",
+      "iri": "http://edamontology.org/data_1465",
+      "parent_iri": "http://edamontology.org/data_1459"
+    },
+    {
+      "label": "RNA secondary structure",
+      "iri": "http://edamontology.org/data_0880",
+      "parent_iri": "http://edamontology.org/data_1465"
+    },
+    {
+      "label": "tRNA structure",
+      "iri": "http://edamontology.org/data_1466",
+      "parent_iri": "http://edamontology.org/data_1465"
+    },
+    {
+      "label": "DNA structure",
+      "iri": "http://edamontology.org/data_1464",
+      "parent_iri": "http://edamontology.org/data_1459"
+    },
+    {
+      "label": "Sequence attribute",
+      "iri": "http://edamontology.org/data_2534",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Sequence checksum",
+      "iri": "http://edamontology.org/data_2190",
+      "parent_iri": "http://edamontology.org/data_2534"
+    },
+    {
+      "label": "Sequence length",
+      "iri": "http://edamontology.org/data_1249",
+      "parent_iri": "http://edamontology.org/data_2534"
+    },
+    {
+      "label": "Sequence range",
+      "iri": "http://edamontology.org/data_1017",
+      "parent_iri": "http://edamontology.org/data_2534"
+    },
+    {
+      "label": "Sequence position",
+      "iri": "http://edamontology.org/data_1016",
+      "parent_iri": "http://edamontology.org/data_2534"
+    },
+    {
+      "label": "Codon number",
+      "iri": "http://edamontology.org/data_2216",
+      "parent_iri": "http://edamontology.org/data_1016"
+    },
+    {
+      "label": "PDB insertion code",
+      "iri": "http://edamontology.org/data_1856",
+      "parent_iri": "http://edamontology.org/data_1016"
+    },
+    {
+      "label": "PDB residue number",
+      "iri": "http://edamontology.org/data_1742",
+      "parent_iri": "http://edamontology.org/data_1016"
+    },
+    {
+      "label": "Sequence version",
+      "iri": "http://edamontology.org/data_1771",
+      "parent_iri": "http://edamontology.org/data_2534"
+    },
+    {
+      "label": "Text data",
+      "iri": "http://edamontology.org/data_2526",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Abstract",
+      "iri": "http://edamontology.org/data_2849",
+      "parent_iri": "http://edamontology.org/data_2526"
+    },
+    {
+      "label": "Annotated text",
+      "iri": "http://edamontology.org/data_3779",
+      "parent_iri": "http://edamontology.org/data_2526"
+    },
+    {
+      "label": "Bibliography",
+      "iri": "http://edamontology.org/data_3505",
+      "parent_iri": "http://edamontology.org/data_2526"
+    },
+    {
+      "label": "Article",
+      "iri": "http://edamontology.org/data_0971",
+      "parent_iri": "http://edamontology.org/data_2526"
+    },
+    {
+      "label": "Citation",
+      "iri": "http://edamontology.org/data_0970",
+      "parent_iri": "http://edamontology.org/data_2526"
+    },
+    {
+      "label": "Text",
+      "iri": "http://edamontology.org/data_3671",
+      "parent_iri": "http://edamontology.org/data_2526"
+    },
+    {
+      "label": "Phylogenetic data",
+      "iri": "http://edamontology.org/data_2523",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Phylogenetic character weights",
+      "iri": "http://edamontology.org/data_2994",
+      "parent_iri": "http://edamontology.org/data_2523"
+    },
+    {
+      "label": "Phylogenetic character contrasts",
+      "iri": "http://edamontology.org/data_1444",
+      "parent_iri": "http://edamontology.org/data_2523"
+    },
+    {
+      "label": "Phylogenetic tree distances",
+      "iri": "http://edamontology.org/data_1442",
+      "parent_iri": "http://edamontology.org/data_2523"
+    },
+    {
+      "label": "Phylogenetic invariants",
+      "iri": "http://edamontology.org/data_1429",
+      "parent_iri": "http://edamontology.org/data_2523"
+    },
+    {
+      "label": "Phylogenetic character cliques",
+      "iri": "http://edamontology.org/data_1428",
+      "parent_iri": "http://edamontology.org/data_2523"
+    },
+    {
+      "label": "Phylogenetic tree",
+      "iri": "http://edamontology.org/data_0872",
+      "parent_iri": "http://edamontology.org/data_2523"
+    },
+    {
+      "label": "Species tree",
+      "iri": "http://edamontology.org/data_3272",
+      "parent_iri": "http://edamontology.org/data_0872"
+    },
+    {
+      "label": "Gene tree",
+      "iri": "http://edamontology.org/data_3271",
+      "parent_iri": "http://edamontology.org/data_0872"
+    },
+    {
+      "label": "Phylogenetic character data",
+      "iri": "http://edamontology.org/data_0871",
+      "parent_iri": "http://edamontology.org/data_2523"
+    },
+    {
+      "label": "Phylogenetic discrete data",
+      "iri": "http://edamontology.org/data_1427",
+      "parent_iri": "http://edamontology.org/data_0871"
+    },
+    {
+      "label": "Phylogenetic continuous quantitative data",
+      "iri": "http://edamontology.org/data_1426",
+      "parent_iri": "http://edamontology.org/data_0871"
+    },
+    {
+      "label": "Phylogenetic gene frequencies data",
+      "iri": "http://edamontology.org/data_2873",
+      "parent_iri": "http://edamontology.org/data_1426"
+    },
+    {
+      "label": "Plot",
+      "iri": "http://edamontology.org/data_2884",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Histogram",
+      "iri": "http://edamontology.org/data_3905",
+      "parent_iri": "http://edamontology.org/data_2884"
+    },
+    {
+      "label": "Fickett testcode plot",
+      "iri": "http://edamontology.org/data_2160",
+      "parent_iri": "http://edamontology.org/data_2884"
+    },
+    {
+      "label": "Ecological data",
+      "iri": "http://edamontology.org/data_3736",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Biodiversity data",
+      "iri": "http://edamontology.org/data_3707",
+      "parent_iri": "http://edamontology.org/data_3736"
+    },
+    {
+      "label": "Gamma diversity data",
+      "iri": "http://edamontology.org/data_3739",
+      "parent_iri": "http://edamontology.org/data_3707"
+    },
+    {
+      "label": "Beta diversity data",
+      "iri": "http://edamontology.org/data_3738",
+      "parent_iri": "http://edamontology.org/data_3707"
+    },
+    {
+      "label": "Alpha diversity data",
+      "iri": "http://edamontology.org/data_3737",
+      "parent_iri": "http://edamontology.org/data_3707"
+    },
+    {
+      "label": "Learning material",
+      "iri": "http://edamontology.org/data_3669",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Online course",
+      "iri": "http://edamontology.org/data_3670",
+      "parent_iri": "http://edamontology.org/data_3669"
+    },
+    {
+      "label": "Sequence signature data",
+      "iri": "http://edamontology.org/data_0860",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Sequence profile",
+      "iri": "http://edamontology.org/data_1354",
+      "parent_iri": "http://edamontology.org/data_0860"
+    },
+    {
+      "label": "Sequence motif",
+      "iri": "http://edamontology.org/data_1353",
+      "parent_iri": "http://edamontology.org/data_0860"
+    },
+    {
+      "label": "Sequence motif (protein)",
+      "iri": "http://edamontology.org/data_2071",
+      "parent_iri": "http://edamontology.org/data_1353"
+    },
+    {
+      "label": "Sequence motif (nucleic acid)",
+      "iri": "http://edamontology.org/data_2070",
+      "parent_iri": "http://edamontology.org/data_1353"
+    },
+    {
+      "label": "Sequence set",
+      "iri": "http://edamontology.org/data_0850",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Sequence cluster",
+      "iri": "http://edamontology.org/data_1235",
+      "parent_iri": "http://edamontology.org/data_0850"
+    },
+    {
+      "label": "Sequence cluster (nucleic acid)",
+      "iri": "http://edamontology.org/data_1246",
+      "parent_iri": "http://edamontology.org/data_1235"
+    },
+    {
+      "label": "Sequence cluster (protein)",
+      "iri": "http://edamontology.org/data_1245",
+      "parent_iri": "http://edamontology.org/data_1235"
+    },
+    {
+      "label": "Sequence set (nucleic acid)",
+      "iri": "http://edamontology.org/data_1234",
+      "parent_iri": "http://edamontology.org/data_0850"
+    },
+    {
+      "label": "PCR primers",
+      "iri": "http://edamontology.org/data_1240",
+      "parent_iri": "http://edamontology.org/data_1234"
+    },
+    {
+      "label": "Restriction digest",
+      "iri": "http://edamontology.org/data_1239",
+      "parent_iri": "http://edamontology.org/data_1234"
+    },
+    {
+      "label": "Sequence assembly",
+      "iri": "http://edamontology.org/data_0925",
+      "parent_iri": "http://edamontology.org/data_1234"
+    },
+    {
+      "label": "Sequence set (protein)",
+      "iri": "http://edamontology.org/data_1233",
+      "parent_iri": "http://edamontology.org/data_0850"
+    },
+    {
+      "label": "Peptide molecular weight hits",
+      "iri": "http://edamontology.org/data_1262",
+      "parent_iri": "http://edamontology.org/data_1233"
+    },
+    {
+      "label": "Proteolytic digest",
+      "iri": "http://edamontology.org/data_1238",
+      "parent_iri": "http://edamontology.org/data_1233"
+    },
+    {
+      "label": "Identifier",
+      "iri": "http://edamontology.org/data_0842",
+      "parent_iri": "http://edamontology.org/data_0006"
+    },
+    {
+      "label": "Name",
+      "iri": "http://edamontology.org/data_2099",
+      "parent_iri": "http://edamontology.org/data_0842"
+    },
+    {
+      "label": "Reference map name (SWISS-2DPAGE)",
+      "iri": "http://edamontology.org/data_2791",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "ConsensusPathDB entity name",
+      "iri": "http://edamontology.org/data_2777",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Phenotype name",
+      "iri": "http://edamontology.org/data_3275",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Ontology concept name",
+      "iri": "http://edamontology.org/data_2339",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Gene name",
+      "iri": "http://edamontology.org/data_2299",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Gene symbol",
+      "iri": "http://edamontology.org/data_1026",
+      "parent_iri": "http://edamontology.org/data_2299"
+    },
+    {
+      "label": "Data resource definition name",
+      "iri": "http://edamontology.org/data_2253",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "MIRIAM data type name",
+      "iri": "http://edamontology.org/data_1163",
+      "parent_iri": "http://edamontology.org/data_2253"
+    },
+    {
+      "label": "MIRIAM data type synonymous name",
+      "iri": "http://edamontology.org/data_1166",
+      "parent_iri": "http://edamontology.org/data_1163"
+    },
+    {
+      "label": "MIRIAM data type primary name",
+      "iri": "http://edamontology.org/data_1165",
+      "parent_iri": "http://edamontology.org/data_1163"
+    },
+    {
+      "label": "Database field name",
+      "iri": "http://edamontology.org/data_2219",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Organism name",
+      "iri": "http://edamontology.org/data_2909",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "KEGG organism code",
+      "iri": "http://edamontology.org/data_2102",
+      "parent_iri": "http://edamontology.org/data_2909"
+    },
+    {
+      "label": "Genbank common name",
+      "iri": "http://edamontology.org/data_1874",
+      "parent_iri": "http://edamontology.org/data_2909"
+    },
+    {
+      "label": "Taxonomic classification",
+      "iri": "http://edamontology.org/data_1872",
+      "parent_iri": "http://edamontology.org/data_2909"
+    },
+    {
+      "label": "Taxon",
+      "iri": "http://edamontology.org/data_1868",
+      "parent_iri": "http://edamontology.org/data_2909"
+    },
+    {
+      "label": "Family name",
+      "iri": "http://edamontology.org/data_2732",
+      "parent_iri": "http://edamontology.org/data_1868"
+    },
+    {
+      "label": "UTRdb taxon",
+      "iri": "http://edamontology.org/data_2595",
+      "parent_iri": "http://edamontology.org/data_1868"
+    },
+    {
+      "label": "UniGene taxon",
+      "iri": "http://edamontology.org/data_2594",
+      "parent_iri": "http://edamontology.org/data_1868"
+    },
+    {
+      "label": "NCBI taxon",
+      "iri": "http://edamontology.org/data_1875",
+      "parent_iri": "http://edamontology.org/data_1868"
+    },
+    {
+      "label": "Genus name",
+      "iri": "http://edamontology.org/data_1870",
+      "parent_iri": "http://edamontology.org/data_1868"
+    },
+    {
+      "label": "Species name",
+      "iri": "http://edamontology.org/data_1045",
+      "parent_iri": "http://edamontology.org/data_1868"
+    },
+    {
+      "label": "Kingdom name",
+      "iri": "http://edamontology.org/data_1044",
+      "parent_iri": "http://edamontology.org/data_1868"
+    },
+    {
+      "label": "Strain name",
+      "iri": "http://edamontology.org/data_1046",
+      "parent_iri": "http://edamontology.org/data_2909"
+    },
+    {
+      "label": "Cell line name",
+      "iri": "http://edamontology.org/data_2316",
+      "parent_iri": "http://edamontology.org/data_1046"
+    },
+    {
+      "label": "Cell line name (assonant)",
+      "iri": "http://edamontology.org/data_2320",
+      "parent_iri": "http://edamontology.org/data_2316"
+    },
+    {
+      "label": "Cell line name (no punctuation)",
+      "iri": "http://edamontology.org/data_2319",
+      "parent_iri": "http://edamontology.org/data_2316"
+    },
+    {
+      "label": "Cell line name (truncated)",
+      "iri": "http://edamontology.org/data_2318",
+      "parent_iri": "http://edamontology.org/data_2316"
+    },
+    {
+      "label": "Cell line name (exact)",
+      "iri": "http://edamontology.org/data_2317",
+      "parent_iri": "http://edamontology.org/data_2316"
+    },
+    {
+      "label": "RFAM name",
+      "iri": "http://edamontology.org/data_2606",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "CABRI catalogue name",
+      "iri": "http://edamontology.org/data_2597",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Sequence name",
+      "iri": "http://edamontology.org/data_2154",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "UniProt ID",
+      "iri": "http://edamontology.org/data_2291",
+      "parent_iri": "http://edamontology.org/data_2154"
+    },
+    {
+      "label": "Logical operator",
+      "iri": "http://edamontology.org/data_2133",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Operating system name",
+      "iri": "http://edamontology.org/data_2131",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "File format name",
+      "iri": "http://edamontology.org/data_2129",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "OBO file format name",
+      "iri": "http://edamontology.org/data_2254",
+      "parent_iri": "http://edamontology.org/data_2129"
+    },
+    {
+      "label": "Genetic code name",
+      "iri": "http://edamontology.org/data_2128",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Protein fold name",
+      "iri": "http://edamontology.org/data_1867",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "ORF name",
+      "iri": "http://edamontology.org/data_1807",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Protein family name",
+      "iri": "http://edamontology.org/data_1131",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "SMART domain name",
+      "iri": "http://edamontology.org/data_2782",
+      "parent_iri": "http://edamontology.org/data_1131"
+    },
+    {
+      "label": "Pfam domain name",
+      "iri": "http://edamontology.org/data_2757",
+      "parent_iri": "http://edamontology.org/data_1131"
+    },
+    {
+      "label": "InterPro entry name",
+      "iri": "http://edamontology.org/data_1132",
+      "parent_iri": "http://edamontology.org/data_1131"
+    },
+    {
+      "label": "Comparison matrix name",
+      "iri": "http://edamontology.org/data_1126",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "EMBOSS Uniform Sequence Address",
+      "iri": "http://edamontology.org/data_1095",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "WormBase name",
+      "iri": "http://edamontology.org/data_1091",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Codon usage table name",
+      "iri": "http://edamontology.org/data_1076",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Biological model name",
+      "iri": "http://edamontology.org/data_1170",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "QSAR descriptor name",
+      "iri": "http://edamontology.org/data_1061",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Database name",
+      "iri": "http://edamontology.org/data_1056",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Ontology name",
+      "iri": "http://edamontology.org/data_1051",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "File name",
+      "iri": "http://edamontology.org/data_1050",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "File base name",
+      "iri": "http://edamontology.org/data_1060",
+      "parent_iri": "http://edamontology.org/data_1050"
+    },
+    {
+      "label": "File name extension",
+      "iri": "http://edamontology.org/data_1059",
+      "parent_iri": "http://edamontology.org/data_1050"
+    },
+    {
+      "label": "Enumerated file name",
+      "iri": "http://edamontology.org/data_1058",
+      "parent_iri": "http://edamontology.org/data_1050"
+    },
+    {
+      "label": "Directory name",
+      "iri": "http://edamontology.org/data_1049",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Molecule name",
+      "iri": "http://edamontology.org/data_0984",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Protein name",
+      "iri": "http://edamontology.org/data_1009",
+      "parent_iri": "http://edamontology.org/data_0984"
+    },
+    {
+      "label": "Kinase name",
+      "iri": "http://edamontology.org/data_2775",
+      "parent_iri": "http://edamontology.org/data_1009"
+    },
+    {
+      "label": "Protein name (UniProt)",
+      "iri": "http://edamontology.org/data_2764",
+      "parent_iri": "http://edamontology.org/data_1009"
+    },
+    {
+      "label": "Transcription factor name",
+      "iri": "http://edamontology.org/data_2755",
+      "parent_iri": "http://edamontology.org/data_1009"
+    },
+    {
+      "label": "Enzyme name",
+      "iri": "http://edamontology.org/data_1012",
+      "parent_iri": "http://edamontology.org/data_1009"
+    },
+    {
+      "label": "Restriction enzyme name",
+      "iri": "http://edamontology.org/data_1013",
+      "parent_iri": "http://edamontology.org/data_1012"
+    },
+    {
+      "label": "Compound name",
+      "iri": "http://edamontology.org/data_0990",
+      "parent_iri": "http://edamontology.org/data_0984"
+    },
+    {
+      "label": "Drug name",
+      "iri": "http://edamontology.org/data_2899",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "Nucleotide code",
+      "iri": "http://edamontology.org/data_1007",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "HET group name",
+      "iri": "http://edamontology.org/data_1005",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "Chemical name (synonymous)",
+      "iri": "http://edamontology.org/data_1001",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "Chemical name (brand)",
+      "iri": "http://edamontology.org/data_1000",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "Chemical name (INN)",
+      "iri": "http://edamontology.org/data_0999",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "Chemical name (IUPAC)",
+      "iri": "http://edamontology.org/data_0998",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "Chemical name (ChEBI)",
+      "iri": "http://edamontology.org/data_0997",
+      "parent_iri": "http://edamontology.org/data_0990"
+    },
+    {
+      "label": "Chromosome name",
+      "iri": "http://edamontology.org/data_0987",
+      "parent_iri": "http://edamontology.org/data_0984"
+    },
+    {
+      "label": "Chromosome name (BioCyc)",
+      "iri": "http://edamontology.org/data_2706",
+      "parent_iri": "http://edamontology.org/data_0987"
+    },
+    {
+      "label": "EMBOSS Uniform Feature Object",
+      "iri": "http://edamontology.org/data_1023",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Atom name",
+      "iri": "http://edamontology.org/data_1757",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "PDB atom name",
+      "iri": "http://edamontology.org/data_1748",
+      "parent_iri": "http://edamontology.org/data_1757"
+    },
+    {
+      "label": "Toxin name",
+      "iri": "http://edamontology.org/data_2896",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Cell type name",
+      "iri": "http://edamontology.org/data_2892",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Sequencing metadata name",
+      "iri": "http://edamontology.org/data_3732",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Run number",
+      "iri": "http://edamontology.org/data_3735",
+      "parent_iri": "http://edamontology.org/data_3732"
+    },
+    {
+      "label": "Lane identifier",
+      "iri": "http://edamontology.org/data_3734",
+      "parent_iri": "http://edamontology.org/data_3732"
+    },
+    {
+      "label": "Flow cell identifier",
+      "iri": "http://edamontology.org/data_3733",
+      "parent_iri": "http://edamontology.org/data_3732"
+    },
+    {
+      "label": "Disease name",
+      "iri": "http://edamontology.org/data_3668",
+      "parent_iri": "http://edamontology.org/data_2099"
+    },
+    {
+      "label": "Accession",
+      "iri": "http://edamontology.org/data_2091",
+      "parent_iri": "http://edamontology.org/data_0842"
+    },
+    {
+      "label": "Pathway ID (BioSystems)",
+      "iri": "http://edamontology.org/data_2837",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "DPVweb ID",
+      "iri": "http://edamontology.org/data_2836",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (VBASE2)",
+      "iri": "http://edamontology.org/data_2835",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GeneSNP ID",
+      "iri": "http://edamontology.org/data_2805",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (ConoServer)",
+      "iri": "http://edamontology.org/data_2804",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (EcID)",
+      "iri": "http://edamontology.org/data_2802",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Orpha number",
+      "iri": "http://edamontology.org/data_2800",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (MfunGD)",
+      "iri": "http://edamontology.org/data_2799",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MaizeDB ID",
+      "iri": "http://edamontology.org/data_2798",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (LGICdb)",
+      "iri": "http://edamontology.org/data_2797",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "LINUCS ID",
+      "iri": "http://edamontology.org/data_2796",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ORF ID",
+      "iri": "http://edamontology.org/data_2794",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "SISYPHUS ID",
+      "iri": "http://edamontology.org/data_2793",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (PeroxiBase)",
+      "iri": "http://edamontology.org/data_2792",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (TopDB)",
+      "iri": "http://edamontology.org/data_2789",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NCBI genome accession",
+      "iri": "http://edamontology.org/data_2787",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NCBI Genome Project ID",
+      "iri": "http://edamontology.org/data_2786",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "RNAVirusDB ID",
+      "iri": "http://edamontology.org/data_2784",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein family ID (PANTHER)",
+      "iri": "http://edamontology.org/data_2783",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "REDIdb ID",
+      "iri": "http://edamontology.org/data_2781",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Stock number (TAIR)",
+      "iri": "http://edamontology.org/data_2780",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CCAP strain number",
+      "iri": "http://edamontology.org/data_2778",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ConsensusPathDB entity ID",
+      "iri": "http://edamontology.org/data_2776",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (JCVI)",
+      "iri": "http://edamontology.org/data_2774",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "IMGT/HLA ID",
+      "iri": "http://edamontology.org/data_2773",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HPA antibody id",
+      "iri": "http://edamontology.org/data_2772",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HIX ID",
+      "iri": "http://edamontology.org/data_2771",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HIT ID",
+      "iri": "http://edamontology.org/data_2770",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HAMAP ID",
+      "iri": "http://edamontology.org/data_2766",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (VectorBase)",
+      "iri": "http://edamontology.org/data_2759",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (DQCS)",
+      "iri": "http://edamontology.org/data_2670",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ModelDB ID",
+      "iri": "http://edamontology.org/data_2669",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "iRefIndex ID",
+      "iri": "http://edamontology.org/data_2668",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MMDB ID",
+      "iri": "http://edamontology.org/data_2667",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CABRI accession",
+      "iri": "http://edamontology.org/data_2380",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Spot ID (HSC-2DPAGE)",
+      "iri": "http://edamontology.org/data_2375",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Spot serial number",
+      "iri": "http://edamontology.org/data_2374",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ASTD ID",
+      "iri": "http://edamontology.org/data_2367",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ASTD ID (tss)",
+      "iri": "http://edamontology.org/data_2371",
+      "parent_iri": "http://edamontology.org/data_2367"
+    },
+    {
+      "label": "ASTD ID (polya)",
+      "iri": "http://edamontology.org/data_2370",
+      "parent_iri": "http://edamontology.org/data_2367"
+    },
+    {
+      "label": "ASTD ID (intron)",
+      "iri": "http://edamontology.org/data_2369",
+      "parent_iri": "http://edamontology.org/data_2367"
+    },
+    {
+      "label": "ASTD ID (exon)",
+      "iri": "http://edamontology.org/data_2368",
+      "parent_iri": "http://edamontology.org/data_2367"
+    },
+    {
+      "label": "RFAM accession",
+      "iri": "http://edamontology.org/data_2356",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (WikiPathways)",
+      "iri": "http://edamontology.org/data_3952",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "RNA central ID",
+      "iri": "http://edamontology.org/data_3856",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BRENDA ontology concept ID",
+      "iri": "http://edamontology.org/data_3769",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Unimod ID",
+      "iri": "http://edamontology.org/data_3757",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CDD ID",
+      "iri": "http://edamontology.org/data_2666",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "LipidBank ID",
+      "iri": "http://edamontology.org/data_2665",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GlycomeDB ID",
+      "iri": "http://edamontology.org/data_2664",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "T3DB ID",
+      "iri": "http://edamontology.org/data_2662",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BioNumbers ID",
+      "iri": "http://edamontology.org/data_2660",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (SMPDB)",
+      "iri": "http://edamontology.org/data_2659",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Compound ID (ChemIDplus)",
+      "iri": "http://edamontology.org/data_2658",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NeuroMorpho ID",
+      "iri": "http://edamontology.org/data_2657",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NeuronDB ID",
+      "iri": "http://edamontology.org/data_2656",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Target ID (TTD)",
+      "iri": "http://edamontology.org/data_2654",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Drug ID (TTD)",
+      "iri": "http://edamontology.org/data_2653",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Drug ID (PharmGKB)",
+      "iri": "http://edamontology.org/data_2652",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Disease ID (PharmGKB)",
+      "iri": "http://edamontology.org/data_2651",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (PharmGKB)",
+      "iri": "http://edamontology.org/data_2650",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PharmGKB ID",
+      "iri": "http://edamontology.org/data_2649",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "LGICdb identifier",
+      "iri": "http://edamontology.org/data_2647",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Compound ID (ChEMBL)",
+      "iri": "http://edamontology.org/data_2646",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (Unipathway)",
+      "iri": "http://edamontology.org/data_2645",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Reaction ID (Rhea)",
+      "iri": "http://edamontology.org/data_2644",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (ZFIN)",
+      "iri": "http://edamontology.org/data_2643",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (miRBase)",
+      "iri": "http://edamontology.org/data_2642",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Reaction ID (MACie)",
+      "iri": "http://edamontology.org/data_2641",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PubChem ID",
+      "iri": "http://edamontology.org/data_2639",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PubChem bioassay ID",
+      "iri": "http://edamontology.org/data_2638",
+      "parent_iri": "http://edamontology.org/data_2639"
+    },
+    {
+      "label": "PubChem CID",
+      "iri": "http://edamontology.org/data_1172",
+      "parent_iri": "http://edamontology.org/data_2639"
+    },
+    {
+      "label": "MGI accession",
+      "iri": "http://edamontology.org/data_3274",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Ensembl gene tree ID",
+      "iri": "http://edamontology.org/data_3270",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence cluster ID (UniRef)",
+      "iri": "http://edamontology.org/data_2346",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence cluster ID (UniRef50)",
+      "iri": "http://edamontology.org/data_2349",
+      "parent_iri": "http://edamontology.org/data_2346"
+    },
+    {
+      "label": "Sequence cluster ID (UniRef90)",
+      "iri": "http://edamontology.org/data_2348",
+      "parent_iri": "http://edamontology.org/data_2346"
+    },
+    {
+      "label": "Sequence cluster ID (UniRef100)",
+      "iri": "http://edamontology.org/data_2347",
+      "parent_iri": "http://edamontology.org/data_2346"
+    },
+    {
+      "label": "Pathway ID (ConsensusPathDB)",
+      "iri": "http://edamontology.org/data_2345",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (NCI-Nature)",
+      "iri": "http://edamontology.org/data_2344",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (KEGG)",
+      "iri": "http://edamontology.org/data_2343",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "DrugBank ID",
+      "iri": "http://edamontology.org/data_2326",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "REBASE enzyme number",
+      "iri": "http://edamontology.org/data_2325",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NCBI version",
+      "iri": "http://edamontology.org/data_2315",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GI number",
+      "iri": "http://edamontology.org/data_2314",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GI number (protein)",
+      "iri": "http://edamontology.org/data_2327",
+      "parent_iri": "http://edamontology.org/data_2314"
+    },
+    {
+      "label": "Reaction ID (SABIO-RK)",
+      "iri": "http://edamontology.org/data_2309",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Reaction kinetics ID (SABIO-RK)",
+      "iri": "http://edamontology.org/data_2648",
+      "parent_iri": "http://edamontology.org/data_2309"
+    },
+    {
+      "label": "STRING ID",
+      "iri": "http://edamontology.org/data_2302",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (HGNC)",
+      "iri": "http://edamontology.org/data_2298",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Compound ID (BioCyc)",
+      "iri": "http://edamontology.org/data_2105",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BioCyc ID",
+      "iri": "http://edamontology.org/data_2104",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (BioCyc)",
+      "iri": "http://edamontology.org/data_1157",
+      "parent_iri": "http://edamontology.org/data_2104"
+    },
+    {
+      "label": "Enzyme ID (BioCyc)",
+      "iri": "http://edamontology.org/data_2107",
+      "parent_iri": "http://edamontology.org/data_2104"
+    },
+    {
+      "label": "Reaction ID (BioCyc)",
+      "iri": "http://edamontology.org/data_2106",
+      "parent_iri": "http://edamontology.org/data_2104"
+    },
+    {
+      "label": "Pfam clan ID",
+      "iri": "http://edamontology.org/data_2758",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TCID",
+      "iri": "http://edamontology.org/data_2756",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GlycoMap ID",
+      "iri": "http://edamontology.org/data_2752",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MonosaccharideDB ID",
+      "iri": "http://edamontology.org/data_2746",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (UTR)",
+      "iri": "http://edamontology.org/data_2745",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (PseudoCAP)",
+      "iri": "http://edamontology.org/data_2744",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "AraC-XylS ID",
+      "iri": "http://edamontology.org/data_2742",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ABS ID",
+      "iri": "http://edamontology.org/data_2741",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (Genolist)",
+      "iri": "http://edamontology.org/data_2739",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (Xenbase)",
+      "iri": "http://edamontology.org/data_2738",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "FIG ID",
+      "iri": "http://edamontology.org/data_2737",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence feature ID (SwissRegulon)",
+      "iri": "http://edamontology.org/data_2736",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein family ID (GeneFarm)",
+      "iri": "http://edamontology.org/data_2731",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "COGEME unisequence ID",
+      "iri": "http://edamontology.org/data_2730",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "COGEME EST ID",
+      "iri": "http://edamontology.org/data_2729",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Ensembl transcript ID",
+      "iri": "http://edamontology.org/data_2725",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "cPath ID",
+      "iri": "http://edamontology.org/data_2637",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MatrixDB interaction ID",
+      "iri": "http://edamontology.org/data_2636",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Compound ID (3DMET)",
+      "iri": "http://edamontology.org/data_2635",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ISBN",
+      "iri": "http://edamontology.org/data_2634",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "SGD ID",
+      "iri": "http://edamontology.org/data_2632",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (SGD)",
+      "iri": "http://edamontology.org/data_1901",
+      "parent_iri": "http://edamontology.org/data_2632"
+    },
+    {
+      "label": "Gene ID (SGD)",
+      "iri": "http://edamontology.org/data_1034",
+      "parent_iri": "http://edamontology.org/data_2632"
+    },
+    {
+      "label": "ACLAME ID",
+      "iri": "http://edamontology.org/data_2631",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Enzyme ID (MEROPS)",
+      "iri": "http://edamontology.org/data_2629",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BioGRID interaction ID",
+      "iri": "http://edamontology.org/data_2628",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PeptideAtlas ID",
+      "iri": "http://edamontology.org/data_2626",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "LIPID MAPS ID",
+      "iri": "http://edamontology.org/data_2625",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Compound ID (HMDB)",
+      "iri": "http://edamontology.org/data_2622",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "RGD ID",
+      "iri": "http://edamontology.org/data_2620",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "RESID ID",
+      "iri": "http://edamontology.org/data_2619",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Signaling Gateway protein ID",
+      "iri": "http://edamontology.org/data_2617",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "DIP ID",
+      "iri": "http://edamontology.org/data_2616",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MINT ID",
+      "iri": "http://edamontology.org/data_2615",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TCDB ID",
+      "iri": "http://edamontology.org/data_2614",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "KEGG Glycan ID",
+      "iri": "http://edamontology.org/data_2613",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence cluster ID (CluSTr)",
+      "iri": "http://edamontology.org/data_2612",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ICD identifier",
+      "iri": "http://edamontology.org/data_2611",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Ensembl ID",
+      "iri": "http://edamontology.org/data_2610",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Ensembl gene ID",
+      "iri": "http://edamontology.org/data_1033",
+      "parent_iri": "http://edamontology.org/data_2610"
+    },
+    {
+      "label": "Ensembl protein ID",
+      "iri": "http://edamontology.org/data_2398",
+      "parent_iri": "http://edamontology.org/data_2610"
+    },
+    {
+      "label": "Drug ID (KEGG)",
+      "iri": "http://edamontology.org/data_2609",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HGMD ID",
+      "iri": "http://edamontology.org/data_3265",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "COSMIC ID",
+      "iri": "http://edamontology.org/data_3264",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Cell type ontology ID",
+      "iri": "http://edamontology.org/data_3238",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ATC code",
+      "iri": "http://edamontology.org/data_3103",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (EMBL/GenBank/DDBJ)",
+      "iri": "http://edamontology.org/data_3029",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NCBI genetic code ID",
+      "iri": "http://edamontology.org/data_3022",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "UniProt accession",
+      "iri": "http://edamontology.org/data_3021",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (Tropgene)",
+      "iri": "http://edamontology.org/data_1908",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (KOME)",
+      "iri": "http://edamontology.org/data_1907",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (MaizeGDB)",
+      "iri": "http://edamontology.org/data_1905",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (EntrezGene)",
+      "iri": "http://edamontology.org/data_1904",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (MIPS)",
+      "iri": "http://edamontology.org/data_2285",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence cluster ID (SYSTERS)",
+      "iri": "http://edamontology.org/data_2220",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Mutation ID",
+      "iri": "http://edamontology.org/data_2209",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gramene identifier",
+      "iri": "http://edamontology.org/data_2915",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gramene secondary identifier",
+      "iri": "http://edamontology.org/data_2293",
+      "parent_iri": "http://edamontology.org/data_2915"
+    },
+    {
+      "label": "Gramene primary identifier",
+      "iri": "http://edamontology.org/data_1102",
+      "parent_iri": "http://edamontology.org/data_2915"
+    },
+    {
+      "label": "BRENDA organism ID",
+      "iri": "http://edamontology.org/data_2593",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Brite hierarchy ID",
+      "iri": "http://edamontology.org/data_2591",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BlotBase blot ID",
+      "iri": "http://edamontology.org/data_2588",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BindingDB Monomer ID",
+      "iri": "http://edamontology.org/data_2580",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ArachnoServer ID",
+      "iri": "http://edamontology.org/data_2578",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (DisProt)",
+      "iri": "http://edamontology.org/data_2723",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "DiProDB ID",
+      "iri": "http://edamontology.org/data_2721",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "dbProbe ID",
+      "iri": "http://edamontology.org/data_2719",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "DBD ID",
+      "iri": "http://edamontology.org/data_2716",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (CuticleDB)",
+      "iri": "http://edamontology.org/data_2715",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CDD PSSM-ID",
+      "iri": "http://edamontology.org/data_2714",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Protein ID (CORUM)",
+      "iri": "http://edamontology.org/data_2713",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CleanEx entry name",
+      "iri": "http://edamontology.org/data_2709",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Clone ID (IMAGE)",
+      "iri": "http://edamontology.org/data_2704",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Enzyme ID (CAZy)",
+      "iri": "http://edamontology.org/data_2702",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CATH identifier",
+      "iri": "http://edamontology.org/data_2700",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CATH node ID",
+      "iri": "http://edamontology.org/data_1043",
+      "parent_iri": "http://edamontology.org/data_2700"
+    },
+    {
+      "label": "CATH node ID (family)",
+      "iri": "http://edamontology.org/data_2701",
+      "parent_iri": "http://edamontology.org/data_1043"
+    },
+    {
+      "label": "CATH domain ID",
+      "iri": "http://edamontology.org/data_1040",
+      "parent_iri": "http://edamontology.org/data_2700"
+    },
+    {
+      "label": "Locus ID (DictyBase)",
+      "iri": "http://edamontology.org/data_1903",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (MMP)",
+      "iri": "http://edamontology.org/data_1902",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NCBI locus tag",
+      "iri": "http://edamontology.org/data_1900",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (CMR)",
+      "iri": "http://edamontology.org/data_1899",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (CGD)",
+      "iri": "http://edamontology.org/data_1898",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (MGG)",
+      "iri": "http://edamontology.org/data_1897",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (ASPGD)",
+      "iri": "http://edamontology.org/data_1896",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Locus ID (AGI)",
+      "iri": "http://edamontology.org/data_1895",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "iHOP symbol",
+      "iri": "http://edamontology.org/data_1891",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Blattner number",
+      "iri": "http://edamontology.org/data_1886",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (GeneFarm)",
+      "iri": "http://edamontology.org/data_1885",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "iHOP organism ID",
+      "iri": "http://edamontology.org/data_1873",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (WormBase)",
+      "iri": "http://edamontology.org/data_1805",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (SGN)",
+      "iri": "http://edamontology.org/data_1804",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (Virginia microbial)",
+      "iri": "http://edamontology.org/data_1803",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (Gramene)",
+      "iri": "http://edamontology.org/data_1802",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (FlyBase)",
+      "iri": "http://edamontology.org/data_1796",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (EcoGene)",
+      "iri": "http://edamontology.org/data_1795",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (ECK)",
+      "iri": "http://edamontology.org/data_2297",
+      "parent_iri": "http://edamontology.org/data_1795"
+    },
+    {
+      "label": "Gene ID (PlasmoDB)",
+      "iri": "http://edamontology.org/data_1794",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (INOH)",
+      "iri": "http://edamontology.org/data_1158",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (reactome)",
+      "iri": "http://edamontology.org/data_1155",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "KEGG object identifier",
+      "iri": "http://edamontology.org/data_1154",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Reaction ID (KEGG)",
+      "iri": "http://edamontology.org/data_2608",
+      "parent_iri": "http://edamontology.org/data_1154"
+    },
+    {
+      "label": "Compound ID (KEGG)",
+      "iri": "http://edamontology.org/data_2605",
+      "parent_iri": "http://edamontology.org/data_1154"
+    },
+    {
+      "label": "OMIM ID",
+      "iri": "http://edamontology.org/data_1153",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HGVbase ID",
+      "iri": "http://edamontology.org/data_1151",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "EMAGE ID",
+      "iri": "http://edamontology.org/data_1149",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GermOnline ID",
+      "iri": "http://edamontology.org/data_1148",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GEO accession number",
+      "iri": "http://edamontology.org/data_1147",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "EMDB ID",
+      "iri": "http://edamontology.org/data_1146",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TRANSFAC accession number",
+      "iri": "http://edamontology.org/data_1143",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ProDom accession number",
+      "iri": "http://edamontology.org/data_1142",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TIGRFam ID",
+      "iri": "http://edamontology.org/data_1141",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Superfamily hidden Markov model number",
+      "iri": "http://edamontology.org/data_1140",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "SMART accession number",
+      "iri": "http://edamontology.org/data_1139",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pfam accession number",
+      "iri": "http://edamontology.org/data_1138",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PRINTS code",
+      "iri": "http://edamontology.org/data_1137",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PIRSF ID",
+      "iri": "http://edamontology.org/data_1136",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene3D ID",
+      "iri": "http://edamontology.org/data_1135",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "InterPro accession",
+      "iri": "http://edamontology.org/data_1133",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "InterPro secondary accession",
+      "iri": "http://edamontology.org/data_1134",
+      "parent_iri": "http://edamontology.org/data_1133"
+    },
+    {
+      "label": "IntAct accession number",
+      "iri": "http://edamontology.org/data_1130",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BIND accession number",
+      "iri": "http://edamontology.org/data_1129",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "AAindex ID",
+      "iri": "http://edamontology.org/data_1128",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PDB ID",
+      "iri": "http://edamontology.org/data_1127",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TreeFam accession number",
+      "iri": "http://edamontology.org/data_1124",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TreeBASE study accession number",
+      "iri": "http://edamontology.org/data_1123",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "JASPAR profile ID",
+      "iri": "http://edamontology.org/data_1119",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HMMER hidden Markov model ID",
+      "iri": "http://edamontology.org/data_1118",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence cluster ID (COG)",
+      "iri": "http://edamontology.org/data_1113",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "dbSNP ID",
+      "iri": "http://edamontology.org/data_1106",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "dbEST accession",
+      "iri": "http://edamontology.org/data_1105",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence cluster ID (UniGene)",
+      "iri": "http://edamontology.org/data_1104",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "EMBL/GenBank/DDBJ ID",
+      "iri": "http://edamontology.org/data_1103",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GenBank accession",
+      "iri": "http://edamontology.org/data_2292",
+      "parent_iri": "http://edamontology.org/data_1103"
+    },
+    {
+      "label": "EMBL accession",
+      "iri": "http://edamontology.org/data_2290",
+      "parent_iri": "http://edamontology.org/data_1103"
+    },
+    {
+      "label": "DDBJ accession",
+      "iri": "http://edamontology.org/data_2916",
+      "parent_iri": "http://edamontology.org/data_1103"
+    },
+    {
+      "label": "PIR identifier",
+      "iri": "http://edamontology.org/data_1100",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "RefSeq accession",
+      "iri": "http://edamontology.org/data_1098",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Clone ID (RefSeq)",
+      "iri": "http://edamontology.org/data_2803",
+      "parent_iri": "http://edamontology.org/data_1098"
+    },
+    {
+      "label": "Gene ID (NCBI)",
+      "iri": "http://edamontology.org/data_1027",
+      "parent_iri": "http://edamontology.org/data_1098"
+    },
+    {
+      "label": "RefSeq accession (protein)",
+      "iri": "http://edamontology.org/data_2385",
+      "parent_iri": "http://edamontology.org/data_1098"
+    },
+    {
+      "label": "FlyBase ID",
+      "iri": "http://edamontology.org/data_1089",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "FlyBase secondary identifier",
+      "iri": "http://edamontology.org/data_2174",
+      "parent_iri": "http://edamontology.org/data_1089"
+    },
+    {
+      "label": "FlyBase primary identifier",
+      "iri": "http://edamontology.org/data_2112",
+      "parent_iri": "http://edamontology.org/data_1089"
+    },
+    {
+      "label": "Medline UI",
+      "iri": "http://edamontology.org/data_1189",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "DOI",
+      "iri": "http://edamontology.org/data_1188",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "PubMed ID",
+      "iri": "http://edamontology.org/data_1187",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "myGrid concept ID",
+      "iri": "http://edamontology.org/data_1186",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MGED concept ID",
+      "iri": "http://edamontology.org/data_1185",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ChEBI concept ID",
+      "iri": "http://edamontology.org/data_1184",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "EMAP concept ID",
+      "iri": "http://edamontology.org/data_1183",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "FMA concept ID",
+      "iri": "http://edamontology.org/data_1182",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "UMLS concept ID",
+      "iri": "http://edamontology.org/data_1181",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Plant Ontology concept ID",
+      "iri": "http://edamontology.org/data_1180",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "NCBI taxonomy ID",
+      "iri": "http://edamontology.org/data_1179",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "HGNC concept ID",
+      "iri": "http://edamontology.org/data_1178",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MeSH concept ID",
+      "iri": "http://edamontology.org/data_1177",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GO concept ID",
+      "iri": "http://edamontology.org/data_1176",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "GO concept ID (molecular function)",
+      "iri": "http://edamontology.org/data_2583",
+      "parent_iri": "http://edamontology.org/data_1176"
+    },
+    {
+      "label": "GO concept ID (biological process)",
+      "iri": "http://edamontology.org/data_2582",
+      "parent_iri": "http://edamontology.org/data_1176"
+    },
+    {
+      "label": "GO concept ID (cellular component)",
+      "iri": "http://edamontology.org/data_2705",
+      "parent_iri": "http://edamontology.org/data_1176"
+    },
+    {
+      "label": "BioPax concept ID",
+      "iri": "http://edamontology.org/data_1175",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ChEBI ID",
+      "iri": "http://edamontology.org/data_1174",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "ChemSpider ID",
+      "iri": "http://edamontology.org/data_1173",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "BioModel ID",
+      "iri": "http://edamontology.org/data_1171",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Sequence alignment ID",
+      "iri": "http://edamontology.org/data_1066",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "SCOP domain identifier",
+      "iri": "http://edamontology.org/data_1039",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "SCOP sunid",
+      "iri": "http://edamontology.org/data_1042",
+      "parent_iri": "http://edamontology.org/data_1039"
+    },
+    {
+      "label": "SCOP concise classification string (sccs)",
+      "iri": "http://edamontology.org/data_1041",
+      "parent_iri": "http://edamontology.org/data_1039"
+    },
+    {
+      "label": "TIGR identifier",
+      "iri": "http://edamontology.org/data_1036",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "EC number",
+      "iri": "http://edamontology.org/data_1011",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Chemical registry number (Gmelin)",
+      "iri": "http://edamontology.org/data_1004",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Chemical registry number (Beilstein)",
+      "iri": "http://edamontology.org/data_1003",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "CAS number",
+      "iri": "http://edamontology.org/data_1002",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (GeneDB)",
+      "iri": "http://edamontology.org/data_1035",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (DictyBase)",
+      "iri": "http://edamontology.org/data_1032",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Gene ID (CGD)",
+      "iri": "http://edamontology.org/data_1031",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Taverna workflow ID",
+      "iri": "http://edamontology.org/data_1167",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MIRIAM URI",
+      "iri": "http://edamontology.org/data_1164",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "MIRIAM identifier",
+      "iri": "http://edamontology.org/data_1162",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (Panther)",
+      "iri": "http://edamontology.org/data_1161",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (CPDB)",
+      "iri": "http://edamontology.org/data_1160",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "Pathway ID (PATIKA)",
+      "iri": "http://edamontology.org/data_1159",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "WormBase wormpep ID",
+      "iri": "http://edamontology.org/data_2114",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "mFLJ/mKIAA number",
+      "iri": "http://edamontology.org/data_2393",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "UniParc accession",
+      "iri": "http://edamontology.org/data_2392",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "UTR accession",
+      "iri": "http://edamontology.org/data_2391",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "UNITE accession",
+      "iri": "http://edamontology.org/data_2390",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "UniSTS accession",
+      "iri": "http://edamontology.org/data_2389",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TAIR accession",
+      "iri": "http://edamontology.org/data_2387",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "TAIR accession (protein)",
+      "iri": "http://edamontology.org/data_2621",
+      "parent_iri": "http://edamontology.org/data_2387"
+    },
+    {
+      "label": "TAIR accession (gene)",
+      "iri": "http://edamontology.org/data_1037",
+      "parent_iri": "http://edamontology.org/data_2387"
+    },
+    {
+      "label": "TAIR accession (At gene)",
+      "iri": "http://edamontology.org/data_2388",
+      "parent_iri": "http://edamontology.org/data_1037"
+    },
+    {
+      "label": "EPD ID",
+      "iri": "http://edamontology.org/data_2386",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "IPI protein ID",
+      "iri": "http://edamontology.org/data_2384",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "EGA accession",
+      "iri": "http://edamontology.org/data_2383",
+      "parent_iri": "http://edamontology.org/data_2091"
+    },
+    {
+      "label": "URI",
+      "iri": "http://edamontology.org/data_1047",
+      "parent_iri": "http://edamontology.org/data_0842"
+    },
+    {
+      "label": "URN",
+      "iri": "http://edamontology.org/data_1053",
+      "parent_iri": "http://edamontology.org/data_1047"
+    },
+    {
+      "label": "LSID",
+      "iri": "http://edamontology.org/data_1055",
+      "parent_iri": "http://edamontology.org/data_1053"
+    },
+    {
+      "label": "URL",
+      "iri": "http://edamontology.org/data_1052",
+      "parent_iri": "http://edamontology.org/data_1047"
+    },
+    {
+      "label": "Identifier (by type of entity)",
+      "iri": "http://edamontology.org/data_0976",
+      "parent_iri": "http://edamontology.org/data_0842"
+    },
+    {
+      "label": "ORF identifier",
+      "iri": "http://edamontology.org/data_2795",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Gel ID",
+      "iri": "http://edamontology.org/data_2790",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Virus identifier",
+      "iri": "http://edamontology.org/data_2785",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Stock number",
+      "iri": "http://edamontology.org/data_2779",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Spot ID",
+      "iri": "http://edamontology.org/data_2373",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "RNA family identifier",
+      "iri": "http://edamontology.org/data_2355",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Cell type identifier",
+      "iri": "http://edamontology.org/data_2655",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Cell type accession",
+      "iri": "http://edamontology.org/data_2893",
+      "parent_iri": "http://edamontology.org/data_2655"
+    },
+    {
+      "label": "Format identifier",
+      "iri": "http://edamontology.org/data_3358",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Sample ID",
+      "iri": "http://edamontology.org/data_3273",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Ontology identifier",
+      "iri": "http://edamontology.org/data_2338",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Job identifier",
+      "iri": "http://edamontology.org/data_2098",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Genome identifier",
+      "iri": "http://edamontology.org/data_2749",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Genome build identifier",
+      "iri": "http://edamontology.org/data_2340",
+      "parent_iri": "http://edamontology.org/data_2749"
+    },
+    {
+      "label": "Genome accession",
+      "iri": "http://edamontology.org/data_2903",
+      "parent_iri": "http://edamontology.org/data_2749"
+    },
+    {
+      "label": "Promoter ID",
+      "iri": "http://edamontology.org/data_2727",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Book ID",
+      "iri": "http://edamontology.org/data_2633",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Mobile genetic element ID",
+      "iri": "http://edamontology.org/data_2630",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Protein modification ID",
+      "iri": "http://edamontology.org/data_2618",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Matrix identifier",
+      "iri": "http://edamontology.org/data_3036",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Amino acid index ID",
+      "iri": "http://edamontology.org/data_1073",
+      "parent_iri": "http://edamontology.org/data_3036"
+    },
+    {
+      "label": "Comparison matrix identifier",
+      "iri": "http://edamontology.org/data_1069",
+      "parent_iri": "http://edamontology.org/data_3036"
+    },
+    {
+      "label": "Structure identifier",
+      "iri": "http://edamontology.org/data_3035",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Structure ID",
+      "iri": "http://edamontology.org/data_1070",
+      "parent_iri": "http://edamontology.org/data_3035"
+    },
+    {
+      "label": "PDB model number",
+      "iri": "http://edamontology.org/data_1759",
+      "parent_iri": "http://edamontology.org/data_3035"
+    },
+    {
+      "label": "Sequence feature identifier",
+      "iri": "http://edamontology.org/data_3034",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Sequence feature ID",
+      "iri": "http://edamontology.org/data_1015",
+      "parent_iri": "http://edamontology.org/data_3034"
+    },
+    {
+      "label": "Ontology concept identifier",
+      "iri": "http://edamontology.org/data_3025",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Ontology concept ID",
+      "iri": "http://edamontology.org/data_1087",
+      "parent_iri": "http://edamontology.org/data_3025"
+    },
+    {
+      "label": "Sequence variation ID",
+      "iri": "http://edamontology.org/data_2294",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Catalogue ID",
+      "iri": "http://edamontology.org/data_2596",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Blot ID",
+      "iri": "http://edamontology.org/data_2587",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Mutation identifier",
+      "iri": "http://edamontology.org/data_2538",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Locus ID",
+      "iri": "http://edamontology.org/data_1893",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Gene ID",
+      "iri": "http://edamontology.org/data_2295",
+      "parent_iri": "http://edamontology.org/data_1893"
+    },
+    {
+      "label": "Organism identifier",
+      "iri": "http://edamontology.org/data_1869",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Strain identifier",
+      "iri": "http://edamontology.org/data_2379",
+      "parent_iri": "http://edamontology.org/data_1869"
+    },
+    {
+      "label": "Strain accession",
+      "iri": "http://edamontology.org/data_2912",
+      "parent_iri": "http://edamontology.org/data_2379"
+    },
+    {
+      "label": "Organism accession",
+      "iri": "http://edamontology.org/data_2908",
+      "parent_iri": "http://edamontology.org/data_1869"
+    },
+    {
+      "label": "Genetic code identifier",
+      "iri": "http://edamontology.org/data_2127",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Sequence profile ID",
+      "iri": "http://edamontology.org/data_1115",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Sequence motif identifier",
+      "iri": "http://edamontology.org/data_1114",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "UTRSite ID",
+      "iri": "http://edamontology.org/data_2761",
+      "parent_iri": "http://edamontology.org/data_1114"
+    },
+    {
+      "label": "Prosite accession number",
+      "iri": "http://edamontology.org/data_1117",
+      "parent_iri": "http://edamontology.org/data_1114"
+    },
+    {
+      "label": "ELM ID",
+      "iri": "http://edamontology.org/data_1116",
+      "parent_iri": "http://edamontology.org/data_1114"
+    },
+    {
+      "label": "Article ID",
+      "iri": "http://edamontology.org/data_1088",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Biological model ID",
+      "iri": "http://edamontology.org/data_1085",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Biological model accession",
+      "iri": "http://edamontology.org/data_2891",
+      "parent_iri": "http://edamontology.org/data_1085"
+    },
+    {
+      "label": "Data resource definition ID",
+      "iri": "http://edamontology.org/data_1084",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Data resource definition accession",
+      "iri": "http://edamontology.org/data_2902",
+      "parent_iri": "http://edamontology.org/data_1084"
+    },
+    {
+      "label": "Workflow ID",
+      "iri": "http://edamontology.org/data_1083",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Pathway or network identifier",
+      "iri": "http://edamontology.org/data_1082",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Pathway or network accession",
+      "iri": "http://edamontology.org/data_2365",
+      "parent_iri": "http://edamontology.org/data_1082"
+    },
+    {
+      "label": "Pathway or network name",
+      "iri": "http://edamontology.org/data_2342",
+      "parent_iri": "http://edamontology.org/data_1082"
+    },
+    {
+      "label": "Genotype and phenotype annotation ID",
+      "iri": "http://edamontology.org/data_1081",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Gene expression report ID",
+      "iri": "http://edamontology.org/data_1080",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Electron microscopy model ID",
+      "iri": "http://edamontology.org/data_1079",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Experiment annotation ID",
+      "iri": "http://edamontology.org/data_1078",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "ProteomeXchange ID",
+      "iri": "http://edamontology.org/data_3759",
+      "parent_iri": "http://edamontology.org/data_1078"
+    },
+    {
+      "label": "CleanEx dataset code",
+      "iri": "http://edamontology.org/data_2710",
+      "parent_iri": "http://edamontology.org/data_1078"
+    },
+    {
+      "label": "PRIDE experiment accession number",
+      "iri": "http://edamontology.org/data_1145",
+      "parent_iri": "http://edamontology.org/data_1078"
+    },
+    {
+      "label": "ArrayExpress accession number",
+      "iri": "http://edamontology.org/data_1144",
+      "parent_iri": "http://edamontology.org/data_1078"
+    },
+    {
+      "label": "Gene Expression Atlas Experiment ID",
+      "iri": "http://edamontology.org/data_3568",
+      "parent_iri": "http://edamontology.org/data_1078"
+    },
+    {
+      "label": "Transcription factor identifier",
+      "iri": "http://edamontology.org/data_1077",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Transcription factor accession",
+      "iri": "http://edamontology.org/data_2911",
+      "parent_iri": "http://edamontology.org/data_1077"
+    },
+    {
+      "label": "Protein family identifier",
+      "iri": "http://edamontology.org/data_1075",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Protein family accession",
+      "iri": "http://edamontology.org/data_2910",
+      "parent_iri": "http://edamontology.org/data_1075"
+    },
+    {
+      "label": "Protein interaction ID",
+      "iri": "http://edamontology.org/data_1074",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Structure alignment ID",
+      "iri": "http://edamontology.org/data_1072",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Structural (3D) profile ID",
+      "iri": "http://edamontology.org/data_1071",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Phylogenetic tree ID",
+      "iri": "http://edamontology.org/data_1068",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Sequence set ID",
+      "iri": "http://edamontology.org/data_1064",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Sequence assembly ID",
+      "iri": "http://edamontology.org/data_3266",
+      "parent_iri": "http://edamontology.org/data_1064"
+    },
+    {
+      "label": "Sequence cluster ID",
+      "iri": "http://edamontology.org/data_1112",
+      "parent_iri": "http://edamontology.org/data_1064"
+    },
+    {
+      "label": "Sequence identifier",
+      "iri": "http://edamontology.org/data_1063",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Sequence accession",
+      "iri": "http://edamontology.org/data_1093",
+      "parent_iri": "http://edamontology.org/data_1063"
+    },
+    {
+      "label": "Sequence accession (hybrid)",
+      "iri": "http://edamontology.org/data_2362",
+      "parent_iri": "http://edamontology.org/data_1093"
+    },
+    {
+      "label": "Sequence accession (nucleic acid)",
+      "iri": "http://edamontology.org/data_1097",
+      "parent_iri": "http://edamontology.org/data_1093"
+    },
+    {
+      "label": "Sequence accession (protein)",
+      "iri": "http://edamontology.org/data_1096",
+      "parent_iri": "http://edamontology.org/data_1093"
+    },
+    {
+      "label": "Database ID",
+      "iri": "http://edamontology.org/data_1048",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Protein domain ID",
+      "iri": "http://edamontology.org/data_1038",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Atom ID",
+      "iri": "http://edamontology.org/data_0983",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Molecule identifier",
+      "iri": "http://edamontology.org/data_0982",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Lipid identifier",
+      "iri": "http://edamontology.org/data_2812",
+      "parent_iri": "http://edamontology.org/data_0982"
+    },
+    {
+      "label": "Lipid accession",
+      "iri": "http://edamontology.org/data_2905",
+      "parent_iri": "http://edamontology.org/data_2812"
+    },
+    {
+      "label": "Molecule accession",
+      "iri": "http://edamontology.org/data_2901",
+      "parent_iri": "http://edamontology.org/data_0982"
+    },
+    {
+      "label": "Transcript ID",
+      "iri": "http://edamontology.org/data_2769",
+      "parent_iri": "http://edamontology.org/data_2901"
+    },
+    {
+      "label": "Clone ID",
+      "iri": "http://edamontology.org/data_1855",
+      "parent_iri": "http://edamontology.org/data_2769"
+    },
+    {
+      "label": "EST accession",
+      "iri": "http://edamontology.org/data_2728",
+      "parent_iri": "http://edamontology.org/data_1855"
+    },
+    {
+      "label": "Protein accession",
+      "iri": "http://edamontology.org/data_2907",
+      "parent_iri": "http://edamontology.org/data_2901"
+    },
+    {
+      "label": "Enzyme ID",
+      "iri": "http://edamontology.org/data_2321",
+      "parent_iri": "http://edamontology.org/data_2907"
+    },
+    {
+      "label": "Peptide ID",
+      "iri": "http://edamontology.org/data_2906",
+      "parent_iri": "http://edamontology.org/data_2901"
+    },
+    {
+      "label": "Carbohydrate accession",
+      "iri": "http://edamontology.org/data_2900",
+      "parent_iri": "http://edamontology.org/data_2901"
+    },
+    {
+      "label": "Oligonucleotide ID",
+      "iri": "http://edamontology.org/data_2718",
+      "parent_iri": "http://edamontology.org/data_2901"
+    },
+    {
+      "label": "Compound accession",
+      "iri": "http://edamontology.org/data_2894",
+      "parent_iri": "http://edamontology.org/data_2901"
+    },
+    {
+      "label": "Chemical registry number",
+      "iri": "http://edamontology.org/data_0991",
+      "parent_iri": "http://edamontology.org/data_2894"
+    },
+    {
+      "label": "Compound identifier",
+      "iri": "http://edamontology.org/data_1086",
+      "parent_iri": "http://edamontology.org/data_0982"
+    },
+    {
+      "label": "Carbohydrate identifier",
+      "iri": "http://edamontology.org/data_2663",
+      "parent_iri": "http://edamontology.org/data_1086"
+    },
+    {
+      "label": "UNII",
+      "iri": "http://edamontology.org/data_3104",
+      "parent_iri": "http://edamontology.org/data_1086"
+    },
+    {
+      "label": "Toxin identifier",
+      "iri": "http://edamontology.org/data_2576",
+      "parent_iri": "http://edamontology.org/data_1086"
+    },
+    {
+      "label": "Toxin accession",
+      "iri": "http://edamontology.org/data_2897",
+      "parent_iri": "http://edamontology.org/data_2576"
+    },
+    {
+      "label": "Monosaccharide identifier",
+      "iri": "http://edamontology.org/data_0996",
+      "parent_iri": "http://edamontology.org/data_1086"
+    },
+    {
+      "label": "Monosaccharide accession",
+      "iri": "http://edamontology.org/data_2898",
+      "parent_iri": "http://edamontology.org/data_0996"
+    },
+    {
+      "label": "Nucleotide identifier",
+      "iri": "http://edamontology.org/data_0995",
+      "parent_iri": "http://edamontology.org/data_1086"
+    },
+    {
+      "label": "Amino acid identifier",
+      "iri": "http://edamontology.org/data_0994",
+      "parent_iri": "http://edamontology.org/data_1086"
+    },
+    {
+      "label": "Amino acid name",
+      "iri": "http://edamontology.org/data_1006",
+      "parent_iri": "http://edamontology.org/data_0994"
+    },
+    {
+      "label": "Amino acid name (full name)",
+      "iri": "http://edamontology.org/data_2565",
+      "parent_iri": "http://edamontology.org/data_1006"
+    },
+    {
+      "label": "Amino acid name (three letter)",
+      "iri": "http://edamontology.org/data_2564",
+      "parent_iri": "http://edamontology.org/data_1006"
+    },
+    {
+      "label": "PDB residue name",
+      "iri": "http://edamontology.org/data_1758",
+      "parent_iri": "http://edamontology.org/data_2564"
+    },
+    {
+      "label": "Amino acid name (single letter)",
+      "iri": "http://edamontology.org/data_2563",
+      "parent_iri": "http://edamontology.org/data_1006"
+    },
+    {
+      "label": "Drug identifier",
+      "iri": "http://edamontology.org/data_0993",
+      "parent_iri": "http://edamontology.org/data_1086"
+    },
+    {
+      "label": "Drug accession",
+      "iri": "http://edamontology.org/data_2895",
+      "parent_iri": "http://edamontology.org/data_0993"
+    },
+    {
+      "label": "Protein identifier",
+      "iri": "http://edamontology.org/data_0989",
+      "parent_iri": "http://edamontology.org/data_0982"
+    },
+    {
+      "label": "Enzyme identifier",
+      "iri": "http://edamontology.org/data_1010",
+      "parent_iri": "http://edamontology.org/data_0989"
+    },
+    {
+      "label": "Peptide identifier",
+      "iri": "http://edamontology.org/data_0988",
+      "parent_iri": "http://edamontology.org/data_0982"
+    },
+    {
+      "label": "Polypeptide chain ID",
+      "iri": "http://edamontology.org/data_1008",
+      "parent_iri": "http://edamontology.org/data_0988"
+    },
+    {
+      "label": "Nucleic acid identifier",
+      "iri": "http://edamontology.org/data_2119",
+      "parent_iri": "http://edamontology.org/data_0982"
+    },
+    {
+      "label": "Plasmid identifier",
+      "iri": "http://edamontology.org/data_2208",
+      "parent_iri": "http://edamontology.org/data_2119"
+    },
+    {
+      "label": "Tool identifier",
+      "iri": "http://edamontology.org/data_0977",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Tool name",
+      "iri": "http://edamontology.org/data_1190",
+      "parent_iri": "http://edamontology.org/data_0977"
+    },
+    {
+      "label": "Tool name (EMBASSY package)",
+      "iri": "http://edamontology.org/data_1195",
+      "parent_iri": "http://edamontology.org/data_1190"
+    },
+    {
+      "label": "Tool name (EMBOSS)",
+      "iri": "http://edamontology.org/data_1194",
+      "parent_iri": "http://edamontology.org/data_1190"
+    },
+    {
+      "label": "Tool name (FASTA)",
+      "iri": "http://edamontology.org/data_1193",
+      "parent_iri": "http://edamontology.org/data_1190"
+    },
+    {
+      "label": "Tool name (BLAST)",
+      "iri": "http://edamontology.org/data_1192",
+      "parent_iri": "http://edamontology.org/data_1190"
+    },
+    {
+      "label": "Tool name (signature)",
+      "iri": "http://edamontology.org/data_1191",
+      "parent_iri": "http://edamontology.org/data_1190"
+    },
+    {
+      "label": "Gene identifier",
+      "iri": "http://edamontology.org/data_1025",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Person identifier",
+      "iri": "http://edamontology.org/data_2118",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Account authentication",
+      "iri": "http://edamontology.org/data_2101",
+      "parent_iri": "http://edamontology.org/data_2118"
+    },
+    {
+      "label": "Email address",
+      "iri": "http://edamontology.org/data_1691",
+      "parent_iri": "http://edamontology.org/data_2101"
+    },
+    {
+      "label": "Password",
+      "iri": "http://edamontology.org/data_1690",
+      "parent_iri": "http://edamontology.org/data_2101"
+    },
+    {
+      "label": "Username",
+      "iri": "http://edamontology.org/data_1689",
+      "parent_iri": "http://edamontology.org/data_2101"
+    },
+    {
+      "label": "Person name",
+      "iri": "http://edamontology.org/data_1692",
+      "parent_iri": "http://edamontology.org/data_2118"
+    },
+    {
+      "label": "Author ID",
+      "iri": "http://edamontology.org/data_1881",
+      "parent_iri": "http://edamontology.org/data_2118"
+    },
+    {
+      "label": "ORCID Identifier",
+      "iri": "http://edamontology.org/data_4022",
+      "parent_iri": "http://edamontology.org/data_1881"
+    },
+    {
+      "label": "DragonDB author identifier",
+      "iri": "http://edamontology.org/data_1882",
+      "parent_iri": "http://edamontology.org/data_1881"
+    },
+    {
+      "label": "Map identifier",
+      "iri": "http://edamontology.org/data_2117",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Map accession",
+      "iri": "http://edamontology.org/data_2904",
+      "parent_iri": "http://edamontology.org/data_2117"
+    },
+    {
+      "label": "Codon usage table ID",
+      "iri": "http://edamontology.org/data_2111",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Molecular property identifier",
+      "iri": "http://edamontology.org/data_2110",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Reaction ID",
+      "iri": "http://edamontology.org/data_2108",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Genotype experiment ID",
+      "iri": "http://edamontology.org/data_2382",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Disease identifier",
+      "iri": "http://edamontology.org/data_3667",
+      "parent_iri": "http://edamontology.org/data_0976"
+    },
+    {
+      "label": "Disease ID",
+      "iri": "http://edamontology.org/data_1150",
+      "parent_iri": "http://edamontology.org/data_3667"
+    },
+    {
+      "label": "Identifier (hybrid)",
+      "iri": "http://edamontology.org/data_2109",
+      "parent_iri": "http://edamontology.org/data_0842"
+    },
+    {
+      "label": "ConsensusPathDB identifier",
+      "iri": "http://edamontology.org/data_2917",
+      "parent_iri": "http://edamontology.org/data_2109"
+    },
+    {
+      "label": "WormBase identifier",
+      "iri": "http://edamontology.org/data_2113",
+      "parent_iri": "http://edamontology.org/data_2109"
+    },
+    {
+      "label": "WormBase class",
+      "iri": "http://edamontology.org/data_1092",
+      "parent_iri": "http://edamontology.org/data_2113"
+    }
+  ]
+}

@@ -56,7 +56,7 @@ module Seek
     
     # is any zipped format, that can be extracted from
     def is_unzippable_datafile?(blob = self)
-      blob.file_exists? && (is_zip?(blob))
+      blob.file_exists? && (is_zip?(blob)|| is_tar?(blob) || is_tgz?(blob) || is_tbz2?(blob) || is_7zip?(blob) || is_txz?(blob))
     end
 
     def is_in_simulatable_size_limit?(blob = self)
@@ -65,6 +65,28 @@ module Seek
     
     def is_zip?(blob = self)
       blob.content_type_file_extensions.include?('zip')
+    end
+
+    def is_7zip?(blob = self)
+      blob.content_type_file_extensions.include?('7z')
+    end
+
+    def is_tar?(blob = self)
+      blob.content_type_file_extensions.include?('tar')
+    end
+
+    def is_tgz?(blob = self)
+      blob.content_type_file_extensions.include?('tgz')
+    end
+
+    def is_tbz2?(blob = self)
+      blob.content_type_file_extensions.include?('tbz2')
+    end
+
+    def is_txz?(blob = self)
+      #Switched off until unzip.rb file is fixed
+      false
+      #blob.content_type_file_extensions.include?('txz')
     end
 
     def is_xlsx?(blob = self)
@@ -105,6 +127,10 @@ module Seek
 
     def is_copasi?(blob = self)
       check_content blob, '<copasi'
+    end
+
+    def is_morpheus?(blob = self)
+      check_content blob, '<morpheusmodel'
     end
 
     def is_xgmml?(blob = self)

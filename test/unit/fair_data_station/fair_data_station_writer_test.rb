@@ -10,9 +10,10 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     contributor = FactoryBot.create(:person)
     project = contributor.projects.first
     FactoryBot.create(:experimental_assay_class)
-    FactoryBot.create(:fairdatastation_virtual_demo_sample_type)
-
+    # private but visible to the contributor
+    sample_type = FactoryBot.create(:fairdatastation_virtual_demo_sample_type, contributor: contributor, policy: FactoryBot.create(:private_policy))
     investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
+
     studies = investigation.studies.to_a
     obs_units = studies.first.observation_units.to_a
     assays = studies.first.assays.to_a
@@ -57,6 +58,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'DRR243856_1.fastq.gz', data_files.first.external_identifier
     assert_equal 'HIV-1_positive', obs_units.first.external_identifier
     assert_equal 'DRS176892', samples.first.external_identifier
+    assert_equal sample_type, samples.first.sample_type
 
     assert_difference('Investigation.count', 1) do
       assert_difference('Study.count', 1) do
@@ -125,7 +127,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal assay_metadata_type, assay.extended_metadata.extended_metadata_type
 
     assert_equal 'NMIMR', assay.extended_metadata.get_attribute_value('Facility')
-    assert_equal 'MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in', assay.extended_metadata.get_attribute_value('Protocol')
+    assert_equal 'MiSeq Reagent Kit v3 (600-cycle) with a 20% PhiX (Illumina) spike-in',
+                 assay.extended_metadata.get_attribute_value('Protocol')
     assert_equal 'CCTACGGGNGGCWGCAG', assay.extended_metadata.get_attribute_value('Forward Primer')
     assert_equal 'Illumina MiSeq', assay.extended_metadata.get_attribute_value('Instrument Model')
     assert_equal 'PCR', assay.extended_metadata.get_attribute_value('Library Selection')
@@ -156,6 +159,27 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal 'Trader', sample.get_attribute_value('Occupation')
     assert_equal 'human gut metagenome', sample.get_attribute_value('Scientific name')
     assert_equal '408170', sample.get_attribute_value('Organism')
+  end
+
+  test 'ignore disabled EMT' do
+    contributor = FactoryBot.create(:person)
+    FactoryBot.create(:experimental_assay_class)
+    FactoryBot.create(:fairdatastation_test_case_sample_type, policy: Policy.public_policy)
+    FactoryBot.create(:fairdata_test_case_study_extended_metadata, enabled: false)
+    project = contributor.projects.first
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    investigation = nil
+    assert_difference('Study.count', 2) do
+      assert_no_difference('ExtendedMetadata.count') do
+        User.with_current_user(contributor.user) do
+          investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
+          investigation.save!
+        end
+      end
+    end
+    investigation.reload
+    assert_equal [nil, nil], investigation.studies.collect(&:extended_metadata)
   end
 
   test 'observation_unit and assay datasets created in construct_isa' do
@@ -242,6 +266,22 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal '2020-01-10', obvs_unit.extended_metadata.get_attribute_value('Date of birth')
   end
 
+  test 'no sample type during construct isa raises exception' do
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    disable_authorization_checks{ SampleType.destroy_all }
+    FactoryBot.create(:experimental_assay_class)
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+
+    assert_raises(Seek::FairDataStation::MissingSampleTypeException) do
+      Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], Policy.default)
+    end
+
+  end
+
   test 'update isa' do
     investigation = setup_test_case_investigation
     policy = investigation.policy
@@ -283,7 +323,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     end
 
     ActivityLog.last(18).each do |log|
-      assert_includes ['create', 'update'], log.action
+      assert_includes %w[create update], log.action
       assert_equal contributor, log.culprit
       assert_equal 'fair data station import', log.data
     end
@@ -444,7 +484,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal ['seek-test-sample-4'], obs_unit.samples.collect(&:external_identifier)
 
     study = Study.where(external_identifier: 'seek-test-study-1').first
-    assert_equal ['seek-test-obs-unit-1','seek-test-obs-unit-3'], study.observation_units.collect(&:external_identifier).sort
+    assert_equal %w[seek-test-obs-unit-1 seek-test-obs-unit-3],
+                 study.observation_units.collect(&:external_identifier).sort
     study = Study.where(external_identifier: 'seek-test-study-2').first
     assert_equal ['seek-test-obs-unit-2'], study.observation_units.collect(&:external_identifier).sort
 
@@ -484,7 +525,6 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
       investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
                                                                    projects, policy)
     end
-
   end
 
   test 'construct with nested extended metadata' do
@@ -498,7 +538,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
 
-    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, contributor.projects, Policy.default)
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, contributor.projects,
+                                                                    Policy.default)
     assert investigation.valid?
 
     assert_difference('ExtendedMetadata.count', 12) do
@@ -554,7 +595,7 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
   test 'construct with deep nested extended metadata' do
     FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
     study_emt = FactoryBot.create(:fairdata_test_case_deep_nested_study_extended_metadata)
-    obs_unit_emt = FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
     FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
     FactoryBot.create(:fairdatastation_test_case_sample_type)
     FactoryBot.create(:experimental_assay_class)
@@ -562,7 +603,8 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
     contributor = FactoryBot.create(:person)
 
-    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, contributor.projects, Policy.default)
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, contributor.projects,
+                                                                    Policy.default)
     assert investigation.valid?
 
     assert_difference('ExtendedMetadata.count', 12) do
@@ -589,10 +631,130 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
     assert_equal expected, study.extended_metadata.data
   end
 
+  test 'add EMT during update if previously nil' do
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    FactoryBot.create(:experimental_assay_class)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+    projects = contributor.projects
+    policy = Policy.default
+
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, projects, policy)
+    assert investigation.valid?
+    User.with_current_user(contributor.user) do
+      investigation.save!
+    end
+    investigation.reload
+    assert_nil investigation.extended_metadata
+
+    inv_emt = FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
+    study_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    obs_unit_emt = FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    assay_emt = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-modified-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    assert_no_difference('Investigation.count') do
+      assert_difference('Study.count', 1) do
+        assert_difference('ObservationUnit.count', 1) do
+          assert_difference('Sample.count', 1) do
+            assert_difference('Assay.count', 1) do
+              assert_difference('DataFile.count', 3) do
+                assert_difference('ObservationUnitAsset.count', 1) do
+                  assert_difference('AssayAsset.count', 2) do
+                    # 1 for new df, the other is for the sample
+                    assert_difference('ExtendedMetadata.count', 15) do
+                      User.with_current_user(contributor.user) do
+                        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                                     projects, policy)
+                        investigation.save!
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    investigation.reload
+    study = investigation.studies.first
+    obs_unit = study.observation_units.first
+    assay = obs_unit.samples.first.assays.first
+
+    assert_equal inv_emt, investigation.extended_metadata.extended_metadata_type
+    assert_equal study_emt, study.extended_metadata.extended_metadata_type
+    assert_equal obs_unit_emt, obs_unit.extended_metadata.extended_metadata_type
+    assert_equal assay_emt, assay.extended_metadata.extended_metadata_type
+
+    expected = HashWithIndifferentAccess.new({
+                                               'Experimental site name': 'manchester test site - changed',
+                                               'End date of Study': '2024-08-08',
+                                               'Start date of Study': '2024-08-01'
+
+                                             })
+
+    assert_equal expected, study.extended_metadata.data
+
+  end
+
+  test 'EMT replaced during update if better match found' do
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    study_emt_partial = FactoryBot.create(:fairdata_test_case_partial_study_extended_metadata)
+    FactoryBot.create(:experimental_assay_class)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    contributor = FactoryBot.create(:person)
+    projects = contributor.projects
+    policy = Policy.default
+
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, projects, policy)
+    assert investigation.valid?
+    User.with_current_user(contributor.user) do
+      assert_difference('ExtendedMetadata.count', 2) do
+        investigation.save!
+      end
+    end
+    investigation.reload
+    assert_equal study_emt_partial, investigation.studies.first.extended_metadata.extended_metadata_type
+    expected = HashWithIndifferentAccess.new({
+                                               'Experimental site name': 'manchester test site'
+                                             })
+
+    assert_equal expected, investigation.studies.first.extended_metadata.data
+
+    study_emt = FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-modified-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+
+    User.with_current_user(contributor.user) do
+      assert_difference('ExtendedMetadata.count', 1) do # 1 new study, other 2 had EMT replaced and old version removed
+        investigation = Seek::FairDataStation::Writer.new.update_isa(investigation, inv, contributor,
+                                                                     projects, policy)
+        investigation.save!
+      end
+    end
+
+    investigation.reload
+    assert_equal study_emt, investigation.studies.first.extended_metadata.extended_metadata_type
+    expected = HashWithIndifferentAccess.new({
+                                               'Experimental site name': 'manchester test site - changed',
+                                               'End date of Study': '2024-08-08',
+                                               'Start date of Study': '2024-08-01'
+
+                                             })
+
+    assert_equal expected, investigation.studies.first.extended_metadata.data
+  end
+
   test 'update isa with nested metadata' do
     FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
-    study_emt = FactoryBot.create(:fairdata_test_case_nested_study_extended_metadata)
-    obs_unit_emt = FactoryBot.create(:fairdata_test_case_nested_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_nested_study_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_nested_obsv_unit_extended_metadata)
     FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
     FactoryBot.create(:fairdatastation_test_case_sample_type)
     FactoryBot.create(:experimental_assay_class)
@@ -683,39 +845,6 @@ class FairDataStationWriterTest < ActiveSupport::TestCase
                                                }
                                              })
     assert_equal expected, obs_unit.extended_metadata.data
-
-  end
-
-  test 'detect extended metadata type' do
-    virtual_demo_assay = FactoryBot.create(:fairdata_virtual_demo_assay_extended_metadata)
-    seek_test_case_assay = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
-    FactoryBot.create(:simple_assay_extended_metadata_type)
-    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
-    FactoryBot.create(:simple_observation_unit_extended_metadata_type)
-    writer = Seek::FairDataStation::Writer.new
-
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
-    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    assay = inv.studies.first.assays.first
-    seek_assay = ::Assay.new
-    detected_type = writer.send(:detect_extended_metadata_type, seek_assay, assay)
-    assert_equal seek_test_case_assay, detected_type
-
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/demo.ttl"
-    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    assay = inv.studies.first.assays.first
-    detected_type = writer.send(:detect_extended_metadata_type, seek_assay, assay)
-    assert_equal virtual_demo_assay, detected_type
-
-    path = "#{Rails.root}/test/fixtures/files/fair_data_station/indpensim.ttl"
-    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
-    obs_unit = inv.studies.first.observation_units.first
-    detected_type = writer.send(:detect_extended_metadata_type, ::ObservationUnit.new, obs_unit)
-    assert_nil detected_type
-
-    inpensim_obs_unit = FactoryBot.create(:fairdata_indpensim_obsv_unit_extended_metadata)
-    detected_type = writer.send(:detect_extended_metadata_type, ::ObservationUnit.new, obs_unit)
-    assert_equal inpensim_obs_unit, detected_type
   end
 
   private

@@ -29,19 +29,35 @@ class CollectionsControllerTest < ActionController::TestCase
     assert assigns(:collections).any?
   end
 
-  test 'should not duplicate maintainer' do
+  test 'should get index when the contributor is deleted' do
+    FactoryBot.create_list(:public_collection, 3)
+
+    login_as(FactoryBot.create(:admin))
+    contributor = Collection.all.last.contributor
+    contributor.destroy
+    assert_not Person.exists?(contributor.id)
+    assert_equal "Person:#{contributor.id}", Collection.all.last.deleted_contributor
+
+    get :index
+    assert_response :success
+    assert assigns(:collections).any?
+  end
+
+  test 'should show other creators and not duplicate maintainer' do
     person = FactoryBot.create(:person)
+    person2 = FactoryBot.create(:person)
     login_as(person.user)
-    collection = FactoryBot.create(:public_collection, title: 'my collection',contributor:person, creators:[person, FactoryBot.create(:person)])
+    collection = FactoryBot.create(:public_collection, title: 'my collection',contributor:person, creators:[person, person2], other_creators:'other credit')
 
     get :index
     assert_response :success
     assert_equal 1, assigns(:collections).count
 
-    assert_select 'div.list_item' do
-      assert_select '.list_item_title', text:'my collection'
-      assert_select '.rli-person-list a[href=?]',person_path(person),count:1
-    end
+    assert_select 'div.list_item_title a[href=?]', collection_path(collection), text: 'my collection'
+    assert_select 'p.list_item_attribute', text: /Maintainers/, count: 1
+    assert_select 'p.list_item_attribute', text: /Maintainers: #{person.name}, #{person2.name}, other credit/, count: 1
+    assert_select 'p.list_item_attribute', text: /Number of items/, count: 1
+
   end
 
   test "shouldn't show hidden items in index" do
@@ -498,6 +514,30 @@ class CollectionsControllerTest < ActionController::TestCase
       assert_redirected_to root_path
       assert flash[:error].include?('disabled')
     end
+  end
+
+  test 'can get index featuring collection with avatar' do
+    Collection.delete_all
+    collection = FactoryBot.create(:public_collection, :with_avatar)
+    avatar = collection.reload.avatar
+    assert avatar
+
+    get :index
+
+    assert_response :success
+    assert_select 'img[src=?]', Seek::Util.routes.polymorphic_path([collection, avatar], size: '60x60')
+  end
+
+  test 'can get index featuring collection with missing avatar' do
+    Collection.delete_all
+    collection = FactoryBot.create(:public_collection, avatar_id: (Avatar.maximum(:id) || 0) + 10)
+    assert collection.reload.avatar_id
+    refute collection.avatar
+
+    get :index
+
+    assert_response :success
+    assert_select 'img[src=?]', '/assets/avatars/avatar-collection.png'
   end
 
   private

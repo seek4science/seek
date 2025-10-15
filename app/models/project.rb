@@ -5,7 +5,7 @@ class Project < ApplicationRecord
   include Seek::Taggable
 
   acts_as_yellow_pages
-  title_trimmer
+
   has_extended_metadata
 
   has_and_belongs_to_many :investigations
@@ -45,7 +45,6 @@ class Project < ApplicationRecord
 
   has_annotation_type :funding_code
 
-  enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
   
   belongs_to :programme
@@ -57,7 +56,7 @@ class Project < ApplicationRecord
 
   scope :without_programme, -> { where('programme_id IS NULL') }
 
-  auto_strip_attributes :web_page, :wiki_page
+  auto_strip_attributes :web_page, :wiki_page, :title
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :wiki_page, url: {allow_nil: true, allow_blank: true}
@@ -76,7 +75,7 @@ class Project < ApplicationRecord
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
-  has_controlled_vocab_annotations :topics
+  has_controlled_vocab_annotations :topics, :disciplines
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
@@ -93,6 +92,9 @@ class Project < ApplicationRecord
   has_many :project_subscriptions, dependent: :destroy
 
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
+
+  before_save :check_disciplines
+  after_save :propagate_disciplines
 
   def assets
     data_files | sops | models | publications | presentations | documents | workflows | collections
@@ -283,4 +285,20 @@ class Project < ApplicationRecord
     end
   end
 
+  def check_disciplines
+    @_disciplines = discipline_annotation_labels.sort
+  end
+
+  def propagate_disciplines
+    new_disciplines = discipline_annotation_labels.sort
+    unless @_disciplines == new_disciplines
+      disable_authorization_checks do
+        workflows.find_each do |workflow|
+          next if workflow.discipline_annotations.any?
+          workflow.discipline_annotations = new_disciplines
+          workflow.save(touch: false)
+        end
+      end
+    end
+  end
 end

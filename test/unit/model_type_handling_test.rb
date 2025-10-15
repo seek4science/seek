@@ -31,13 +31,14 @@ class ModelTypeHandlingTest < ActiveSupport::TestCase
   end
 
 
-  def test_copasi_content_blobs
-    model = FactoryBot.create :model, content_blobs: [FactoryBot.create(:teusink_model_content_blob), FactoryBot.create(:copasi_content_blob)]
-    assert_equal 2, model.content_blobs.size
+  def test_copasi_and_morpheus_content_blobs
+    model = FactoryBot.create :model, content_blobs: [FactoryBot.create(:teusink_model_content_blob), FactoryBot.create(:copasi_content_blob), FactoryBot.create(:morpheus_model_content_blob)]
+    assert_equal 3, model.content_blobs.size
     assert_equal 1, model.sbml_content_blobs.size
     assert_equal 2, model.copasi_supported_content_blobs.size
     assert model.content_blobs.first.is_sbml?
-    assert model.content_blobs.last.is_copasi?
+    assert model.content_blobs.second.is_copasi?
+    assert model.content_blobs.last.is_morpheus?
   end
 
   def test_contains_jws_dat

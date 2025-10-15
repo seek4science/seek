@@ -14,7 +14,7 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent
 
-  has_controlled_vocab_annotations :topics, :operations
+  has_controlled_vocab_annotations :topics, :operations, :disciplines
 
   validates :projects, presence: true, projects: { self: true }
 
@@ -44,6 +44,7 @@ class Workflow < ApplicationRecord
 
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
 
+    before_validation :remove_redundant_abstract_cwl_annotation
     before_save :refresh_internals, if: -> { main_workflow_path_changed? && main_workflow_blob && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
     after_commit :submit_to_life_monitor, on: [:create, :update], if: :should_submit_to_life_monitor?
@@ -96,6 +97,10 @@ class Workflow < ApplicationRecord
     # 2. If a new version was created, set the parent's test_status to nil, since it will not apply anymore.
     def sync_test_status
       parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_git_version?
+    end
+
+    def remove_redundant_abstract_cwl_annotation
+      abstract_cwl_annotation.mark_for_destruction if abstract_cwl_path && abstract_cwl_path == main_workflow_path
     end
   end
 

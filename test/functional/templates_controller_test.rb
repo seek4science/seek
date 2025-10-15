@@ -14,17 +14,18 @@ class TemplatesControllerTest < ActionController::TestCase
 
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
     @person = FactoryBot.create(:project_administrator)
+    @admin = FactoryBot.create(:admin)
     @project = @person.projects.first
     @project_ids = [@project.id]
     refute_nil @project
     login_as(@person)
     @template = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person)
-    @string_type = FactoryBot.create(:string_sample_attribute_type)
-    @int_type = FactoryBot.create(:integer_sample_attribute_type)
-    @registered_sample_attribute_type = FactoryBot.create(:sample_sample_attribute_type)
-    @registered_sample_multi_attribute_type = FactoryBot.create(:sample_multi_sample_attribute_type)
-    @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
-    @controlled_vocab_list_type = FactoryBot.create(:cv_list_attribute_type)
+    @string_type = SampleAttributeType.find_by(title: "String") || FactoryBot.create(:string_sample_attribute_type, title: "String")
+    @int_type = SampleAttributeType.find_by(title: "Integer") || FactoryBot.create(:integer_sample_attribute_type, title: "Integer")
+    @registered_sample_attribute_type = SampleAttributeType.find_by(title: "Registered Sample") || FactoryBot.create(:sample_sample_attribute_type, title: "Registered Sample")
+    @registered_sample_multi_attribute_type = SampleAttributeType.find_by(title: "Registered Sample List") || FactoryBot.create(:sample_multi_sample_attribute_type, title: "Registered Sample List")
+    @controlled_vocab_type = SampleAttributeType.find_by(title: "Controlled Vocabulary") || FactoryBot.create(:controlled_vocab_attribute_type, title: "Controlled Vocabulary")
+    @controlled_vocab_list_type = SampleAttributeType.find_by(title: "Controlled Vocabulary List") || FactoryBot.create(:cv_list_attribute_type, title: "Controlled Vocabulary List")
     @default_isa_tag = FactoryBot.create(:default_isa_tag)
   end
 
@@ -648,6 +649,72 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_select 'script#project-selector-possibilities-json', count: 1
     options = "[{\"id\":#{project.id},\"text\":\"#{project.title}\"}]"
     assert_select 'script#project-selector-possibilities-json', text: /#{options}/, count: 1
+  end
+
+  test 'should reuse existing controlled vocabularies' do
+    apples_cv = FactoryBot.create(:apples_sample_controlled_vocab, title: "apples controlled vocab for template", )
+    physics_ontology = FactoryBot.create(:sample_controlled_vocab, title: "physics ontology", source_ontology: "edam", ols_root_term_uris: "http://edamontology.org/topic_3318")
+    assert_equal SampleControlledVocab.count, 2
+
+    login_as(@admin)
+    ####################################################################################################################
+    # This file contains the JSON definition for 1 template with 6 template attributes:
+    # 1. Source Name (Sting) => New
+    # 2. Source Characteristic 1 (String) => New
+    # 3. apples controlled (CV) vocab for template => Reuse
+    # 4. physics ontology (CV, ontology) => Reuse
+    # 5. New CV (CV List) List => New
+    # 6. New ontology List (CV List, ontology) => New
+    # New template attributes should be 6
+    # New sample controlled vocabs should be 2
+    ####################################################################################################################
+    template_json = fixture_file_upload('upload_json_sample_type_template/test_apple_cv_template.json', 'application/json')
+
+    assert_enqueued_jobs 1, only: PopulateTemplatesJob do
+      post :populate_template, params: { template_json_file: template_json }
+    end
+
+
+    assert_difference('Template.count', 1) do
+      assert_difference('TemplateAttribute.count', 6) do
+        assert_difference('SampleControlledVocab.count', 2) do
+          perform_enqueued_jobs(only: PopulateTemplatesJob)
+        end
+      end
+    end
+    registered_template = Template.last
+    assert_equal registered_template.template_attributes.detect { |ta| ta.title == 'apples controlled vocab for template' }.sample_controlled_vocab, apples_cv
+    assert_equal registered_template.template_attributes.detect { |ta| ta.title == 'physics ontology' }.sample_controlled_vocab, physics_ontology
+  end
+
+  test 'should allow controlled vocab attributes to have free text in instance-wide templates' do
+    login_as(@admin)
+    ####################################################################################################################
+    # This file contains the JSON definition for 1 template with 6 template attribute:
+    # 1. Source Name (Sting) => allowCVFreeText: null (not present)
+    # 2. Source Characteristic 1 (String) => allowCVFreeText: null
+    # 3. apples controlled vocab for template => allowCVFreeText: true
+    # 4. physics ontology (CV, ontology) => allowCVFreeText: false
+    # 5. New CV List (CV List) => allowCVFreeText: null => Should resolve to false
+    # 6. New ontology (CV List, ontology) => allowCVFreeText: null  => Should resolve to false
+    ####################################################################################################################
+    template_json = fixture_file_upload('upload_json_sample_type_template/test_apple_cv_template.json', 'application/json')
+    assert_enqueued_jobs 1, only: PopulateTemplatesJob do
+      post :populate_template, params: { template_json_file: template_json }
+    end
+    assert_difference('Template.count', 1) do
+      assert_difference('TemplateAttribute.count', 6) do
+        perform_enqueued_jobs(only: PopulateTemplatesJob)
+      end
+    end
+
+    registered_template = Template.last
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'Source Name' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'Source Characteristic 1' }.allow_cv_free_text
+    assert registered_template.template_attributes.detect { |ta| ta.title == 'apples controlled vocab for template' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'physics ontology' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'New CV List' }.allow_cv_free_text
+    refute registered_template.template_attributes.detect { |ta| ta.title == 'New ontology List' }.allow_cv_free_text
   end
 
   def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)

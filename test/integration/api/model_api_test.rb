@@ -74,7 +74,7 @@ class ModelApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :forbidden
-    validate_json response.body, '#/components/schemas/forbiddenResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
     blob = pdf_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -97,7 +97,7 @@ class ModelApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :bad_request
-    validate_json response.body, '#/components/schemas/badRequestResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/badRequestResponse') }
     blob = pdf_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -122,7 +122,7 @@ class ModelApiTest < ActionDispatch::IntegrationTest
     assert_no_difference(-> { model.count }) do
       post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       assert_response :unprocessable_entity
-      validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
+      assert_nothing_raised { validate_json(response.body, '#/components/schemas/unprocessableEntityResponse') }
     end
 
     h = JSON.parse(response.body)

@@ -137,7 +137,7 @@ module Seek
       def send_statement_to_repository(statement, graph_uri)
         Rails.logger.debug("sending statement #{statement} to graph #{graph_uri}")
         graph = RDF::URI.new graph_uri
-        q = query.insert([statement.subject, statement.predicate, statement.object]).graph(graph)
+        q = query.insert_data([statement.subject, statement.predicate, statement.object]).graph(graph)
         Rails.logger.debug("Insert statement SPARQL: #{q}")
         result = insert(q)
         Rails.logger.debug(result)
@@ -152,7 +152,7 @@ module Seek
       end
 
       def with_statements(item)
-        RDF::Reader.for(:rdfxml).new(item.to_rdf) do |reader|
+        RDF::Reader.for(:ttl).new(item.to_rdf) do |reader|
           reader.each_statement do |statement|
             yield(statement)
           end

@@ -3,7 +3,6 @@
 
 module ApplicationHelper
   include FancyMultiselectHelper
-  include Recaptcha::ClientHelper
   include VersionHelper
   include ImagesHelper
   include SessionsHelper
@@ -67,12 +66,13 @@ module ApplicationHelper
       if date.blank?
         str = "<span class='none_text'>No date defined</span>"
       else
-        str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
-        str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+        date = date.localtime
+        format = ":day: %b %Y"
+        format += " at %H:%M" if show_time_of_day
+        str = date.strftime(format.sub(':day:', date.day.ordinalize))
         if time_zone.present?
           date_in_tz = date.in_time_zone(time_zone)
-          tz_str = date_in_tz.strftime("#{date_in_tz.day.ordinalize} %b %Y")
-          tz_str = date_in_tz.strftime("#{tz_str} at %H:%M") if show_time_of_day
+          tz_str = date_in_tz.strftime(format.sub(':day:', date_in_tz.day.ordinalize))
           str += "\t(#{tz_str} (#{time_zone}))"
         end
       end
@@ -212,9 +212,7 @@ module ApplicationHelper
   end
 
   def render_markdown(markdown)
-    doc = CommonMarker.render_doc(markdown, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
-    renderer = CommonMarker::SeekHtmlRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
-    renderer.render(doc)
+    Seek::Markdown.render(markdown)
   end
 
   def text_or_not_specified(text, options = {})

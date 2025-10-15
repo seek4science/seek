@@ -1,4 +1,4 @@
-class IsaAssaysController < ApplicationController
+class ISAAssaysController < ApplicationController
   include Seek::AssetsCommon
   include Seek::Publishing::PublishingCommon
 
@@ -7,6 +7,10 @@ class IsaAssaysController < ApplicationController
   before_action :initialize_isa_assay, only: :create
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
   after_action :fix_assay_linkage_for_new_assays, only: :create
+
+  # Update sample metadata when updating an assay
+  before_action :old_attributes, only: :update
+  after_action :update_sample_json_metadata, only: :update
 
   def new
     study = Study.find(params[:study_id])
@@ -29,12 +33,12 @@ class IsaAssaysController < ApplicationController
 
     @isa_assay =
       if params[:is_assay_stream]
-        IsaAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
+        ISAAssay.new({ assay: { assay_class_id: AssayClass.assay_stream.id,
                                 study_id: study.id,
                                 position: new_position },
                        input_sample_type_id: })
       else
-        IsaAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
+        ISAAssay.new({ assay: { assay_class_id: AssayClass.experimental.id,
                                 assay_stream_id: params[:assay_stream_id],
                                 study_id: study.id,
                                 position: new_position },
@@ -45,7 +49,16 @@ class IsaAssaysController < ApplicationController
 
   def create
     update_sharing_policies @isa_assay.assay
-    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
+    unless @isa_assay.assay.is_assay_stream?
+      level = if @isa_assay.sample_type.level
+                @isa_assay.sample_type.level&.split(' - ').map(&:capitalize).join(' - ')
+              else
+                'Custom'
+              end
+      @isa_assay.sample_type.policy = @isa_assay.assay.policy
+      @isa_assay.sample_type.title = "#{@isa_assay.assay.title} - '#{level}' Sample Type" if @isa_assay.sample_type.title.blank?
+      @isa_assay.sample_type.description = "'#{level}' Sample Type linked to Assay '#{@isa_assay.assay.title}'." if @isa_assay.sample_type.description.blank?
+    end
     if @isa_assay.save
       flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
       respond_to do |format|
@@ -70,7 +83,7 @@ class IsaAssaysController < ApplicationController
   def update
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.attributes = isa_assay_params[:assay]
-    @isa_assay.sample_type.policy = @isa_assay.assay.policy
+    @isa_assay.sample_type.policy = @isa_assay.assay.policy unless @isa_assay.assay.is_assay_stream?
     # update the sample_type
     unless @isa_assay&.assay&.is_assay_stream?
       if requested_item_authorized?(@isa_assay.sample_type)
@@ -97,17 +110,27 @@ class IsaAssaysController < ApplicationController
     return unless @isa_assay.assay.is_isa_json_compliant?
     return if @isa_assay.assay.is_assay_stream? # Should not fix anything when creating an assay stream
     return unless @isa_assay.sample_type.present? # Just to be sure
+    return if @isa_assay.assay.assay_stream.child_assays == [@isa_assay.assay] # No need to fix sample type linkage if it's the only assay in the assay stream
 
     previous_sample_type = SampleType.find(params[:isa_assay][:input_sample_type_id])
     next_sample_types = previous_sample_type.next_linked_sample_types
     next_sample_types.delete @isa_assay.sample_type
+
+    # Ignore sample types that don't belong in the current assay stream
+    # They should not affect sample type linkage
+    next_sample_types.map do |sample_type|
+      unless sample_type.assays&.first&.assay_stream_id == @isa_assay.assay.assay_stream_id
+        next_sample_types.delete sample_type
+      end
+    end
+
     next_sample_type = next_sample_types.first
 
     # In case an assay is inserted right at the end of an assay stream,
     # there is no next sample type and also no linkage to fix
     return if next_sample_type.nil?
 
-    next_sample_type.sample_attributes.detect(&:input_attribute?).update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
+    next_sample_type.sample_attributes.detect(&:input_attribute?)&.update_column(:linked_sample_type_id, @isa_assay.sample_type.id)
   end
 
   def rearrange_assay_positions_create_isa_assay
@@ -118,7 +141,7 @@ class IsaAssaysController < ApplicationController
   end
 
   def initialize_isa_assay
-    @isa_assay = IsaAssay.new(isa_assay_params)
+    @isa_assay = ISAAssay.new(isa_assay_params)
     update_sharing_policies @isa_assay.assay
     @isa_assay.assay.contributor = current_person
     @isa_assay.sample_type.contributor = User.current_user.person if isa_assay_params[:sample_type]
@@ -198,8 +221,30 @@ class IsaAssaysController < ApplicationController
     @single_page = true
   end
 
+  def old_attributes
+    return if @isa_assay.assay.is_assay_stream?
+
+    @old_attributes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      { id: attr.id, title: attr.title }
+    end
+  end
+
+  def update_sample_json_metadata
+    return if @isa_assay.assay.is_assay_stream?
+
+    attribute_changes = @isa_assay.sample_type.sample_attributes.map do |attr|
+      old_attr = @old_attributes.detect { |oa| oa[:id] == attr.id }
+      next if old_attr.nil?
+
+      { id: attr.id, old_title: old_attr[:title], new_title: attr.title } unless old_attr[:title] == attr.title
+    end.compact
+    return if attribute_changes.blank?
+
+    UpdateSampleMetadataJob.perform_later(@isa_assay.sample_type, @current_user, attribute_changes)
+  end
+
   def find_requested_item
-    @isa_assay = IsaAssay.new
+    @isa_assay = ISAAssay.new
     @isa_assay.populate(params[:id])
 
     if @isa_assay.assay.nil?
@@ -212,8 +257,10 @@ class IsaAssaysController < ApplicationController
     unless @isa_assay.assay&.is_assay_stream?
       if @isa_assay.sample_type.nil?
         @isa_assay.errors.add(:sample_type, 'Sample type not found.')
+      elsif @isa_assay.sample_type.locked?
+        @isa_assay.errors.add(:sample_type, "The #{t('isa_assay')}'s #{t('sample_type')} is locked by a background process and cannot be edited.")
       else
-        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this assay's #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this #{t('isa_assay')}'s #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
       end
     end
 

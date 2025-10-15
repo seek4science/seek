@@ -99,7 +99,7 @@ class SessionsController < ApplicationController
     flash[:notice] = notice || "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == 'on'
       @user.remember_me unless @user.remember_token?
-      cookies[:auth_token] = { value: @user.remember_token, expires: @user.remember_token_expires_at }
+      cookies[:auth_token] = { value: @user.remember_token, expires: @user.remember_token_expires_at, same_site: :strict }
     end
     respond_to do |format|
       return_to_path = determine_return_path_after_login

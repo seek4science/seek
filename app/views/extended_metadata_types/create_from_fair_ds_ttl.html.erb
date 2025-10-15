@@ -1,0 +1,33 @@
+<% if @jsons.empty? %>
+
+  <p class='alert alert-info'>
+    There were no new <%= t('extended_metadata_type').pluralize %> identified as needing to be created.
+    <br/><br/>
+    If this is unexpected then check the turtle(.ttl) file for errors.
+  </p>
+
+  <%= cancel_button administer_extended_metadata_types_path %>
+<% else %>
+  <%= form_tag submit_jsons_extended_metadata_types_path, method: "post" do %>
+
+    <% @jsons.each do |json| %>
+      <%= render partial: 'preview_json', locals: { json: json, editable_title: true } %>
+      <%= hidden_field_tag 'emt_jsons[]', JSON.generate(json) %>
+    <% end %>
+
+    <%= submit_tag('Create', class: 'btn btn-primary') %>
+    or
+    <%= cancel_button administer_extended_metadata_types_path %>
+  <% end %>
+<% end %>
+
+<% if @existing_extended_metadata_types.any? %>
+  <p>
+    Found <%= @existing_extended_metadata_types.count %> existing matching <%= t('extended_metadata_type').pluralize(@existing_extended_metadata_types.count) %> .
+  </p>
+  <ul class="existing-extended-metadata-types">
+    <% @existing_extended_metadata_types.each do |extended_metadata_type| %>
+    <li><%= extended_metadata_type.supported_type %> : <%= extended_metadata_type.title %></li>
+    <% end %>
+  </ul>
+<% end %>

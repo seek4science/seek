@@ -9,11 +9,12 @@ class SamplesController < ApplicationController
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
   before_action :check_if_locked_sample_type, only: %i[edit new create update]
+  before_action :authorize_sample_type, only: %i[new create]
   before_action :templates_enabled?, only: [:query, :query_form]
 
   before_action :auth_to_create, only: %i[new create batch_create]
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include Seek::Publishing::PublishingCommon
 
   api_actions :index, :show, :create, :update, :destroy, :batch_create
@@ -176,12 +177,12 @@ class SamplesController < ApplicationController
         begin
           converted_params = param_converter.convert(par)
           sample = Sample.find(par[:id])
-          raise 'shouldnt get this far without manage rights' unless sample.can_manage?
+          raise 'You are not allowed to edit this sample.' unless sample.can_edit?
           sample = update_sample_with_params(converted_params, sample)
           saved = sample.save
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
-        rescue
-          errors.push({ ex_id: par[:ex_id], error: "Can not be updated." })
+        rescue StandardError => e
+          errors.push({ ex_id: par[:ex_id], error: e.message })
         end
       end
       raise ActiveRecord::Rollback if errors.any?
@@ -224,7 +225,7 @@ class SamplesController < ApplicationController
 
   def query
     project_ids = params[:project_ids]&.map(&:to_i)
-    attribute_filter_value = params[:template_attribute_value]
+    attribute_filter_value = params[:template_attribute_value]&.downcase
     @result = params[:template_id].present? ?
       Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
 
@@ -232,11 +233,20 @@ class SamplesController < ApplicationController
       template_attribute = TemplateAttribute.find(params[:template_attribute_id])
       @result = @result.select do |s|
         sample_attribute = s.sample_type.sample_attributes.detect { |sa| template_attribute.sample_attributes.include? sa }
-        match_attribute_value(s, sample_attribute, attribute_filter_value)
+        sample_attribute_title = sample_attribute&.title
+        if sample_attribute&.sample_attribute_type&.seek_sample_multi?
+          attr_value = s.get_attribute_value(sample_attribute_title)
+          attr_value&.any? { |v| v&.dig(:title)&.downcase&.include?(attribute_filter_value) }
+        elsif sample_attribute&.sample_attribute_type&.seek_cv_list?
+          attr_value = s.get_attribute_value(sample_attribute_title)
+          attr_value&.any? { |v| v.downcase.include?(attribute_filter_value) }
+				else
+          s.get_attribute_value(sample_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
+        end
       end
     end
 
-    if params[:input_template_id].present? # linked
+    if params[:input_template_id].present? && params[:input_attribute_id].present? # linked
       input_template_attribute =
         TemplateAttribute.find(params[:input_attribute_id])
       @result = filter_linked_samples(@result, :linked_samples,
@@ -245,7 +255,7 @@ class SamplesController < ApplicationController
           template_id: params[:input_template_id] }, input_template_attribute)
     end
 
-    if params[:output_template_id].present? # linking
+    if params[:output_template_id].present? && params[:output_attribute_id].present? # linking
       output_template_attribute =
         TemplateAttribute.find(params[:output_attribute_id])
       @result = filter_linked_samples(@result, :linking_samples,
@@ -266,7 +276,9 @@ class SamplesController < ApplicationController
 
   def query_form
     @result = []
-    respond_to(&:html)
+    respond_to do |format|
+      format.html
+    end
   end
 
   private
@@ -323,13 +335,19 @@ class SamplesController < ApplicationController
   # @param template_attribute_title [String] the title of the template attribute to filter by
   # @return [Array<Sample>] the filtered list of samples
   def filter_linked_samples(samples, link, options, template_attribute)
-    unless %i[linked_samples linking_samples].include? link
-      raise ArgumentError, "Invalid linking method provided. '#{link}' is not allowed!"
-    end
+    raise ArgumentError, "Invalid linking method provided. '#{link.to_s}' is not allowed!" unless %i[linked_samples linking_samples].include? link
 
+    template_attribute_title = template_attribute&.title
     samples.select do |s|
       s.send(link).any? do |x|
-        selected = match_attribute_value(x, template_attribute, options[:attribute_value])
+        selected = x.sample_type.template_id == options[:template_id].to_i
+        if template_attribute.sample_attribute_type.seek_sample_multi?
+          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v&.dig(:title).downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
+        elsif template_attribute.sample_attribute_type.seek_cv_list?
+          selected = x.get_attribute_value(template_attribute_title)&.any? { |v| v.downcase.include?(options[:attribute_value]) } if template_attribute.present? && selected
+				else
+          selected = x.get_attribute_value(template_attribute_title)&.to_s&.downcase&.include?(options[:attribute_value]&.downcase) if template_attribute.present? && selected
+        end
         selected || filter_linked_samples([x], link, options, template_attribute).present?
       end
     end
@@ -350,24 +368,17 @@ class SamplesController < ApplicationController
     flash[:error] = 'This sample type is locked. You cannot edit the sample.'
     redirect_to sample_types_path(sample_type)
   end
-end
 
-def match_attribute_value(selected_sample, x_attribute, attribute_filter_value)
-  x_attribute_title = x_attribute&.title
-  attribute_filter_value = attribute_filter_value&.to_s&.downcase
-  if x_attribute&.sample_attribute_type&.seek_sample_multi?
-    attr_value = selected_sample.get_attribute_value(x_attribute_title)
-    result = attr_value&.any? { |v| v[:title]&.to_s&.downcase&.include?(attribute_filter_value) }
-  elsif x_attribute&.sample_attribute_type&.seek_sample?
-    result = selected_sample.get_attribute_value(x_attribute_title)[:title]&.to_s&.downcase&.include?(attribute_filter_value)
-  elsif x_attribute&.sample_attribute_type&.seek_cv_list?
-    attr_value = selected_sample.get_attribute_value(x_attribute_title)
-    result = attr_value&.any? { |v| v&.to_s&.downcase&.include?(attribute_filter_value) }
-  else
-    if x_attribute&.sample_attribute_type&.base_type == Seek::Samples::BaseType::FLOAT
-      attribute_filter_value = attribute_filter_value.gsub(',', '.')
+  def authorize_sample_type
+    id = params[:sample_type_id] || params.dig(:sample, :sample_type_id)
+    return unless id
+
+    sample_type = SampleType.find(id)
+    unless sample_type.can_view?
+      flash[:error] = "You are not authorized to use this #{t('sample_type')}"
+      redirect_to root_path
     end
-    result = selected_sample.get_attribute_value(x_attribute_title)&.to_s&.downcase&.include?(attribute_filter_value)
+
   end
-  result
+
 end

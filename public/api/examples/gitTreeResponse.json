@@ -1,0 +1,41 @@
+{
+  "id": "5fdf837f5936c801529f41a8e6e83165ca118b69",
+  "path": "/",
+  "tree": [
+    {
+      "id": "68c771a099958211169377d766a7389422f5573d",
+      "name": "LICENSE",
+      "type": "blob",
+      "path": "LICENSE",
+      "mode": "100644"
+    },
+    {
+      "id": "b4fe1f3b00d26561b3b3b947b2b262abfd367b6c",
+      "name": "README.md",
+      "type": "blob",
+      "path": "README.md",
+      "mode": "100644"
+    },
+    {
+      "id": "f7769031984e005a92c34c24272d69ad3c6c808b",
+      "name": "ro-crate-metadata.json",
+      "type": "blob",
+      "path": "ro-crate-metadata.json",
+      "mode": "100644"
+    },
+    {
+      "id": "5a199969223d8a17c0070cefd1c7d237aff55751",
+      "name": "sort-and-change-case.ga",
+      "type": "blob",
+      "path": "sort-and-change-case.ga",
+      "mode": "100644"
+    },
+    {
+      "id": "b80641f610fccaabbc8330817c958729d09d7281",
+      "name": "test",
+      "type": "tree",
+      "path": "test",
+      "mode": "040000"
+    }
+  ]
+}

@@ -320,4 +320,82 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
   end
 
+  test 'create and update from cv dump' do
+    # create first
+    json = open_fixture_file('cv_seed_data/topics-annotations-controlled-vocab.json').read
+    data = JSON.parse(json).with_indifferent_access
+    cv = SampleControlledVocab.new(data)
+    assert cv.valid?
+    disable_authorization_checks do
+      assert_difference('SampleControlledVocab.count', 1) do
+        assert_difference('SampleControlledVocabTerm.count', 4) do
+          cv.save!
+        end
+      end
+    end
+    assert_equal 'Topics test', cv.title
+    assert_equal 'Topics description',cv.description
+    assert_equal 'http://edamontology.org/topic_0003',cv.ols_root_term_uris
+    assert_equal 'edam',cv.source_ontology
+    assert_equal 4, cv.sample_controlled_vocab_terms.count
+    assert_equal ["Topic", "Environmental sciences", "Carbon cycle", "Ecology"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
+    assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/topic_0610"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
+    assert_equal ["", "http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_3855"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
+
+    # update without deletion
+    json = open_fixture_file('cv_seed_data/topics-annotations-controlled-vocab-update.json').read
+    data = JSON.parse(json).with_indifferent_access
+    disable_authorization_checks do
+      assert_no_difference('SampleControlledVocab.count') do
+        assert_difference('SampleControlledVocabTerm.count', 2) do
+          cv.update_from_json_dump(data, false)
+          assert cv.valid?
+          cv.save!
+        end
+      end
+    end
+    assert_equal 'Topics updated', cv.title
+    assert_equal 'Topics description updated',cv.description
+    assert_equal 'http://edamontology.org/topic_0003',cv.ols_root_term_uris
+    assert_equal 'edam',cv.source_ontology
+    assert_equal 6, cv.sample_controlled_vocab_terms.count
+    assert_equal ["Topic", "Environmental sciences", "Carbon cycle updated", "Ecology", "Microbial ecology", "Metabarcoding"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
+    assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697", "http://edamontology.org/topic_4038"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
+    assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
+
+    # update with deletion
+    data = JSON.parse(json).with_indifferent_access
+    disable_authorization_checks do
+      assert_no_difference('SampleControlledVocab.count') do
+        assert_difference('SampleControlledVocabTerm.count', -1) do
+          cv.update_from_json_dump(data, true)
+          assert cv.valid?
+          cv.save!
+        end
+      end
+    end
+    assert_equal 5, cv.sample_controlled_vocab_terms.count
+    assert_equal ["Topic", "Environmental sciences", "Carbon cycle updated", "Microbial ecology", "Metabarcoding"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
+    assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/topic_3697", "http://edamontology.org/topic_4038"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
+    assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
+
+    # update with 2 terms moving IRI
+    json = open_fixture_file('cv_seed_data/topics-annotations-controlled-vocab-iri-changed.json').read
+    data = JSON.parse(json).with_indifferent_access
+
+    disable_authorization_checks do
+      assert_no_difference('SampleControlledVocab.count') do
+        assert_no_difference('SampleControlledVocabTerm.count') do
+          cv.update_from_json_dump(data, true)
+          assert cv.valid?
+          cv.save!
+        end
+      end
+    end
+    assert_equal 5, cv.sample_controlled_vocab_terms.count
+    assert_equal ["Topic", "Environmental sciences", "Carbon cycle updated", "Microbial ecology", "Metabarcoding"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:label)
+    assert_equal ["http://edamontology.org/topic_0003", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_4020", "http://edamontology.org/new_topic_3697", "http://edamontology.org/new_topic_4038"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:iri)
+    assert_equal ["", "http://edamontology.org/topic_0004", "http://edamontology.org/topic_3855", "http://edamontology.org/topic_0610", "http://edamontology.org/topic_3697"], cv.sample_controlled_vocab_terms.sort_by(&:id).collect(&:parent_iri)
+  end
+
 end

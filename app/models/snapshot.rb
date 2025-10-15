@@ -9,12 +9,13 @@ class Snapshot < ApplicationRecord
   after_save :reindex_parent_resource
 
   # Must quack like an asset version to behave with DOI code
-  alias_attribute :parent, :resource
+  alias parent resource
   alias_attribute :parent_id, :resource_id
   alias_attribute :version, :snapshot_number
 
   delegate :md5sum, :sha1sum, to: :content_blob
 
+  validate :resource_creators_present?, on: :create
   validates :snapshot_number, uniqueness: { scope: %i[resource_type resource_id] }
 
   acts_as_doi_mintable(proxy: :resource, general_type: 'Collection')
@@ -31,22 +32,6 @@ class Snapshot < ApplicationRecord
 
   def metadata
     @ro_metadata ||= parse_metadata
-  end
-
-  def title
-    if content_blob.present?
-      metadata['title']
-    else
-      'incomplete snapshot'
-    end
-  end
-
-  def description
-    if content_blob.present?
-      metadata['description']
-    else
-      'The snapshot currently has no content, and could still be being generated.'
-    end
   end
 
   def contributor
@@ -97,10 +82,21 @@ class Snapshot < ApplicationRecord
       (resource.created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) <= Time.now
   end
 
+  def zenodo_metadata
+    super.tap do |zm|
+      zm[:title] = metadata['title']
+      zm[:description] = metadata['description']
+    end
+  end
+
+  def potential_snapshot_number
+    (resource.snapshots.maximum(:snapshot_number) || 0) + 1
+  end
+
   private
 
   def set_snapshot_number
-    self.snapshot_number ||= (resource.snapshots.maximum(:snapshot_number) || 0) + 1
+    self.snapshot_number ||= potential_snapshot_number
   end
 
   def doi_target_url
@@ -114,5 +110,11 @@ class Snapshot < ApplicationRecord
   # Need to re-index the parent model to update its' "doi" field
   def reindex_parent_resource
     ReindexingQueue.enqueue(resource) if saved_change_to_doi?
+  end
+
+  def resource_creators_present?
+    if resource.creators.empty?
+      errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{resource.class.model_name.human}.")
+    end
   end
 end

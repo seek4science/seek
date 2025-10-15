@@ -5,8 +5,8 @@ module PublicationsHelper
     projects = Project.includes(:people)
     grouped = projects.map do |p|
       [
-          p.title,
-          p.people.map {|m| ["#{m.name}#{' (suggested)' if !selected_id && suggestion == m}", m.id]}
+        p.title,
+        p.people.map {|m| ["#{m.name}#{' (suggested)' if !selected_id && suggestion == m}", m.id]}
       ]
     end
 
@@ -42,6 +42,30 @@ module PublicationsHelper
       return html.html_safe
     end
   end
+
+  def publication_authors_form_field(element_name, publication, allow_new: true, limit: nil)
+    existing_objects = publication.publication_authors.map do |pa|
+      full_name = [pa.first_name, pa.last_name].compact.join(" ")
+      Struct.new(:id, :title).new(full_name, full_name)
+    end
+
+    typeahead = {
+      handlebars_template: 'typeahead/publication_author',
+      query_url: typeahead_publication_authors_publications_path
+    }
+
+    options = {
+      typeahead: typeahead,
+      limit: limit,
+      allow_new: allow_new,
+      token_separators: [','],
+      class: 'form-control',
+      'data-role': 'seek-objectsinput'
+    }
+
+    objects_input(element_name, existing_objects, options)
+  end
+
 end
 
 

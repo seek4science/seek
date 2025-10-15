@@ -133,7 +133,7 @@ class ContentBlobsController < ApplicationController
 
   def get_file_from_jerm
     project = @asset_version.projects.first
-    downloader = Jerm::DownloaderFactory.create project.title
+    downloader = JERM::DownloaderFactory.create project.title
     resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
     begin
       data_hash = downloader.get_remote_data @content_blob.url, project.site_username, project.site_password, resource_type
@@ -230,7 +230,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def get_request_payload
-    if request.content_type == 'multipart/form-data'
+    if request.media_type == 'multipart/form-data'
       # "Unwrap" multipart requests to get at the content.
       params.values.detect { |v| v.is_a?(ActionDispatch::Http::UploadedFile) }
     else

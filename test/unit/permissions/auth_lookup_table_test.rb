@@ -194,9 +194,11 @@ class AuthLookupTableTest < ActiveSupport::TestCase
   end
 
   test 'queues delete job when assets removed' do
-    Person.destroy_all
-    User.destroy_all
-    Sop.destroy_all
+    disable_authorization_checks do
+      Person.destroy_all
+      User.destroy_all
+      Sop.destroy_all
+    end
 
     person = FactoryBot.create(:person)
     FactoryBot.create(:person)

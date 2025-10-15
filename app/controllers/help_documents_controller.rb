@@ -9,8 +9,8 @@ class HelpDocumentsController < ApplicationController
   before_action :is_user_admin_auth, :except => [:show, :index]
   
   def internal_help_enabled
-    if (!Seek::Config.internal_help_enabled)
-      redirect_to(Seek::Config.external_help_url)
+    unless Seek::Config.internal_help_enabled
+      redirect_to(Seek::Config.external_help_url, allow_other_host: true)
     end
   end
 

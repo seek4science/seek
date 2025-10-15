@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'sessions_controller'
 
 # Re-raise errors caught by the controller.
 class SessionsController; def rescue_action(e)

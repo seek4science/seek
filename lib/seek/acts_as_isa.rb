@@ -19,9 +19,7 @@ module Seek
         has_extended_metadata
         has_external_identifier
 
-        title_trimmer
-
-        
+        auto_strip_attributes :title
 
         validates :title, presence: true
         validates :title, length: { maximum: 255 }

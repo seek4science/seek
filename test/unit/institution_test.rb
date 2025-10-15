@@ -1,7 +1,14 @@
 require 'test_helper'
 
 class InstitutionTest < ActiveSupport::TestCase
+
+  include MockHelper
+
   fixtures :institutions, :projects, :work_groups, :users, :group_memberships, :people
+
+  def setup
+    ror_mock
+  end
   # Replace this with your real tests.
 
   def test_delete_inst_deletes_workgroup
@@ -45,6 +52,15 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal('an institution', i.title)
   end
 
+  test 'title combines title and department correctly' do
+
+    assert_equal 'Science, University', FactoryBot.create(:institution, title: 'University', department: 'Science').title
+    assert_equal 'University', FactoryBot.create(:institution, title: 'University', department: '').title
+    assert_equal 'University', FactoryBot.create(:institution, title: 'University', department: nil).title
+    assert_equal 'A Minimal Institution', FactoryBot.create(:min_institution).title
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', FactoryBot.create(:max_institution).title
+  end
+
   def test_update_first_letter
     i = FactoryBot.create(:institution, title: 'an institution', country: 'NL')
     assert_equal 'A', i.first_letter
@@ -70,6 +86,7 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   test 'validation' do
+
     i = FactoryBot.create(:institution)
     assert i.valid?
 
@@ -110,6 +127,23 @@ class InstitutionTest < ActiveSupport::TestCase
 
     i.web_page = 'http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110'
     assert i.valid?
+
+    i.ror_id='027m9bs27'
+    assert i.valid?
+
+    i.ror_id = ''
+    assert i.valid?
+
+    i.ror_id = '1121'
+    assert !i.valid?
+
+    i.ror_id = '1121-1121-1121'
+    assert !i.valid?
+
+    #duplicate ror_id
+    existing_institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
+    new_institution = FactoryBot.build(:institution, ror_id: existing_institution.ror_id)
+    assert_not new_institution.valid?
   end
 
   test 'test uuid generated' do
@@ -235,4 +269,38 @@ class InstitutionTest < ActiveSupport::TestCase
     institution.reload
     assert_equal 'DE',institution.country
   end
+
+  test 'fetch_ror_details is called before validation' do
+    institution = Institution.new(ror_id: '027m9bs27')
+    institution.valid?
+    assert_equal 'University of Manchester', institution.title
+    assert_equal 'Manchester', institution.city
+    assert_equal 'GB', institution.country
+    assert_equal 'http://www.manchester.ac.uk/', institution.web_page
+  end
+
+  test 'fetch_ror_details adds error if ROR ID is invalid' do
+    institution = Institution.new( title: 'test', ror_id: 'invalid_id')
+    institution.valid?
+    assert_equal "Ror 'invalid_id' is not a valid ROR ID", institution.errors.full_messages.join(', ')
+  end
+
+
+  test 'validate raw title presence' do
+    institution = FactoryBot.build(:institution, title: nil)
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution.title = ''
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution = FactoryBot.build(:institution, title: nil, department: 'Department of Science')
+    assert_not institution.valid?
+    assert_includes institution.errors[:title], "can't be blank"
+
+    institution.title = 'Valid Title'
+    assert institution.valid?
+  end
+
 end

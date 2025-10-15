@@ -41,7 +41,7 @@ module Seek
         acts_as_favouritable
         acts_as_discussable
         grouped_pagination
-        title_trimmer
+        auto_strip_attributes :title
         has_extended_metadata
         has_external_identifier
 

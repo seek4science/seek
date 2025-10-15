@@ -17,6 +17,10 @@ class SampleDataPersistJob < TaskJob
     Rails.logger.info("Benchmark for persist: #{time}")
   end
 
+  def timelimit
+    60.minutes
+  end
+
   def task
     arguments[0].sample_persistence_task
   end

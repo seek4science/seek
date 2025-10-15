@@ -1,0 +1,36 @@
+<%# TODO: add dictionary entry for title %>
+<h1>New NeLS dataset
+<% if (@projects.length==1) %>
+  for project <%=@projects[0]['name'] %>
+<% end %>
+</h1>
+
+
+<%= form_tag(action: :create_dataset) do -%>
+
+   <div class="form-group">
+    <label>Project <span class="required">*</span></label>
+    <%= select_tag :project, options_for_select(@projects.collect{ |p| [p['name'], p['id']] }), class: 'form-control', readonly: @projects.length==1 %>
+  </div>
+   
+  <div class="form-group">
+    <label>Dataset type <span class="required">*</span></label>
+    <%= select_tag :datasettype, options_for_select(@datasettypes), class: 'form-control' %>
+  </div>
+
+  <%# Based on projects/_form.html.erb %>
+  <div class="form-group">
+    <label>Name <span class="required">*</span></label>
+    <%= text_field_tag :title, nil, class: "form-control"-%>
+  </div>
+
+  <div class="form-group">
+    <label>Description <span class="required">*</span></label>
+    <%= text_field_tag :description, nil, class: "form-control"-%>
+  </div>
+
+  <%= submit_tag "Create dataset", data: {disable_with: 'Creating...'}, class: 'btn btn-primary' -%>
+  or
+  <%= cancel_button(nels_path) %>
+
+<% end %>

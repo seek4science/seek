@@ -45,10 +45,12 @@ class InvestigationTest < ActiveSupport::TestCase
     object = FactoryBot.create(:investigation, description: 'Big investigation')
     FactoryBot.create_list(:study, 2, contributor: object.contributor, investigation: object)
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), graph.statements.first.subject
+
   end
 
   test 'to_isatab' do
@@ -65,7 +67,7 @@ class InvestigationTest < ActiveSupport::TestCase
       assay.save!
     end
 
-    the_hash = IsaTabConverter.convert_investigation(object)
+    the_hash = ISATabConverter.convert_investigation(object)
     json = JSON.pretty_generate(the_hash)
 
     # write out to a temporary file
@@ -78,8 +80,7 @@ class InvestigationTest < ActiveSupport::TestCase
     assert result.blank?, "check-isa.py result was not blank, returned: #{result}"
   end
 
-# the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
-  test 'title trimmed' do
+  test 'title stripped' do
     inv = FactoryBot.create(:investigation, title: ' Test')
     assert_equal 'Test', inv.title
   end
@@ -155,7 +156,7 @@ class InvestigationTest < ActiveSupport::TestCase
     end
 
     assert_equal 1, investigation.snapshots.count
-    assert_equal investigation.title, snapshot.title
+    assert_equal investigation.title, snapshot.metadata['title']
   end
 
   test 'clone with associations' do

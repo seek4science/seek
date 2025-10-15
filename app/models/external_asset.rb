@@ -4,7 +4,7 @@ class ExternalAsset < ApplicationRecord
   self.inheritance_column = 'class_type'
   attr_accessor :sync_options, :content_changed
 
-  enum sync_state: %i[synchronized refresh failed fatal]
+  enum :sync_state, %i[synchronized refresh failed fatal]
 
   belongs_to :seek_entity, polymorphic: true
   belongs_to :seek_service, polymorphic: true

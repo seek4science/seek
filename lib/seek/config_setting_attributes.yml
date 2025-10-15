@@ -57,6 +57,7 @@ jerm_enabled:
 email_enabled:
 jws_enabled:
 copasi_enabled:
+morpheus_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
 piwik_analytics_tracking_notice:
@@ -274,3 +275,5 @@ fair_data_station_enabled:
 sandbox_instance_url:
 sandbox_instance_name:
 scraper_config:
+max_filters:
+  convert: :to_i

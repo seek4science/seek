@@ -3,6 +3,7 @@ class Investigation < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
+  has_filter :is_isa_json_compliant
   has_many :studies
   has_many :study_publications, through: :studies, source: :publications
   has_many :assays, through: :studies
@@ -10,7 +11,6 @@ class Investigation < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
-  enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
 
   has_many :study_sops, through: :studies, source: :sops
@@ -22,6 +22,8 @@ class Investigation < ApplicationRecord
   has_many :observation_units, through: :studies
   has_many :observations_unit_data_files, -> { distinct }, through: :observation_units, source: :data_files
   has_many :observations_unit_samples, -> { distinct }, through: :observation_units, source: :samples
+
+  has_many :fair_data_station_uploads, dependent: :destroy
   def state_allows_delete?(*args)
     studies.empty? && super
   end

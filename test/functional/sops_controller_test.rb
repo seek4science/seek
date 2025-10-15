@@ -1047,7 +1047,7 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: sop }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'should display license for current version' do
@@ -1058,11 +1058,11 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: sop, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
 
     get :show, params: { id: sop, version: sopv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal (CC0-1.0)'
   end
 
   test 'should update license' do
@@ -1075,7 +1075,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: sop }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
     assert_equal 'CC-BY-SA-4.0', assigns(:sop).license
   end
 
@@ -2138,6 +2138,88 @@ class SopsControllerTest < ActionController::TestCase
     policy = sop.policy
     assert_equal Policy::VISIBLE, policy.access_type
     assert_equal 0, policy.permissions.count
+  end
+
+  test 'dynamic table typeahead should return sops only linked to studies or assays' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    study_sops = (1..10).collect.each { |i| FactoryBot.create(:sop, contributor: person, projects: [project], title: "My study level protocol nr. #{i}") }
+
+    # 5 sops unrelated to study
+    (11..15).collect.each { |i| FactoryBot.create(:sop, contributor: person, projects: [project], title: "My protocol nr. #{i}") }
+
+    # Project has a total of 15 sops
+    assert_equal project.sops.count, 15
+
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: [project])
+    study = FactoryBot.create(:study, contributor: person, investigation: investigation, sops: study_sops)
+    login_as(person)
+
+    # No query
+    # Should only return 10 sops linked to study
+    get :dynamic_table_typeahead, params: { study_id: study.id }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 10
+
+    # Query '1'
+    # Should return 2 sops linked to study: nr. 1 and 10
+    get :dynamic_table_typeahead, params: { study_id: study.id, query: '1' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 2
+
+    assay_sops = (16..20).collect.each { |i| FactoryBot.create(:sop, contributor: person, projects: [project], title: "My assay level protocol nr. #{i}") }
+    assay = FactoryBot.create(:assay, contributor: person, study: study, sops: assay_sops)
+
+    # Project has now a total of 20 sops
+    assert_equal project.sops.count, 20
+
+    # Query 'assay'
+    # Should return 5 sops linked to assay: nr. 16 to 20
+    get :dynamic_table_typeahead, params: { assay_id: assay.id, query: 'assay' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 5
+
+    # Query '12'
+    # Should return 0 sops linked to assay
+    get :dynamic_table_typeahead, params: { assay_id: assay.id, query: '12' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 0
+
+    # Query 'assay'
+    # study_id is 'undefined'
+    # Should return 5 sops linked to assay: nr. 16 to 20 like before
+    get :dynamic_table_typeahead, params: { study_id: 'undefined', assay_id: assay.id, query: 'assay' }, format: :json
+    results = JSON.parse(response.body)['results']
+    assert_equal results.count, 5
+
+
+    # Query ''
+    # assay_id and study_id are 'null'
+    # Should return an error
+    get :dynamic_table_typeahead, params: { study_id: 'null', assay_id: 'null', query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "Invalid parameters! Either study id 'null' or assay id 'null' must be a valid id."
+
+    # Query ''
+    # study_id is unexisting id and assay_id is 'undefined'
+    # Should return an error
+    random_study_id = (Study.last.id + 15653).to_s
+    get :dynamic_table_typeahead, params: { study_id: random_study_id, assay_id: 'undefined', query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for study ID '#{random_study_id}'."
+
+    # Query ''
+    # study_id is 'undefined' id and assay_id is not permitted to be viewed
+    # Should return an error
+    random_person = FactoryBot.create(:person)
+    login_as(random_person)
+    get :dynamic_table_typeahead, params: { study_id: 'undefined', assay_id: assay.id, query: '' }, format: :json
+    assert_response :unprocessable_entity
+    results = JSON.parse(response.body)['error']
+    assert_equal results, "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for assay ID '#{assay.id}'."
+
   end
 
   private

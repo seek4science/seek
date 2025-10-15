@@ -13,5 +13,5 @@ class SpecialAuthCode < ApplicationRecord
 
   validates_presence_of :code, :expiration_date
 
-  validate ->(code) { errors.add(:special_auth_code, 'asset must be manageable') unless code.asset && code.asset.can_manage? }
+  validate ->(code) { errors.add(:special_auth_code, 'asset must be manageable') unless ((code.asset && code.asset.can_manage?) || !authorization_checks_enabled) }
 end

@@ -49,6 +49,12 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     result = @repository.select(q)
     assert_equal 1, result.count
     assert_equal 'Test for RDF storage', result[0][:o].value
+    assert_equal 'http://www.w3.org/2001/XMLSchema#string', result[0][:o].datatype
+
+    q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/created'), :o]).from(@private_graph)
+    result = @repository.select(q)
+    assert_equal 1, result.count
+    assert_equal 'http://www.w3.org/2001/XMLSchema#dateTime', result[0][:o].datatype
   end
 
   test 'remove public from store' do
@@ -328,6 +334,6 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   # variables making the tests fragile
   def triple_count(object)
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf).statements.count
+    RDF::Reader.for(:ttl).new(rdf).statements.count
   end
 end

@@ -27,13 +27,10 @@ module Seek #:nodoc:
       end
 
       module InstanceMethods
-        def create_snapshot
-          if self.creators.empty?
-            errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{self.class.model_name.human}.")
-            return nil
-          end
+        def create_snapshot(snapshot_metadata = {})
           Rails.logger.debug("Creating snapshot for: #{self.class.name} #{id}")
-          snapshot = snapshots.create
+          snapshot = snapshots.build(snapshot_metadata)
+          return snapshot unless snapshot.save
           filename = "#{self.class.name.underscore}-#{id}-#{snapshot.snapshot_number}.ro.zip"
           blob = snapshot.build_content_blob(content_type: Mime::Type.lookup_by_extension('ro').to_s,
                                              original_filename: filename)

@@ -1,4 +1,4 @@
-class AddExternalIdentifierToIsaAndAssets < ActiveRecord::Migration[6.1]
+class AddExternalIdentifierToISAAndAssets < ActiveRecord::Migration[6.1]
   def change
     add_column :investigations, :external_identifier, :string, limit: 2048
     add_column :studies, :external_identifier, :string, limit: 2048

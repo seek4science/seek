@@ -24,6 +24,7 @@ class Programme < ApplicationRecord
   has_many :investigations, -> { distinct }, through: :projects
   has_many :studies, -> { distinct }, through: :investigations
   has_many :assays, -> { distinct }, through: :studies
+  has_many :observation_units, -> { distinct }, through: :studies
   %i[data_files documents models sops presentations events publications samples workflows collections].each do |type|
     has_many type, -> { distinct }, through: :projects
   end

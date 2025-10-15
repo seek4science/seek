@@ -244,18 +244,36 @@ end
   test 'additional permissions and privilege text for preview permission' do
     # no additional text
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::NO_ACCESS }, resource_name: 'assay' }
+    assert_response :success
+    assert_select 'p.private', text: "This #{I18n.t('assay')} is hidden from public view."
 
     # with additional text for permissions
     project = FactoryBot.create(:project)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [project.id], Policy::ACCESSIBLE), resource_name: 'data_file', project_ids: project.id }
+    assert_response :success
+    assert_select 'h3', text: "Public Visibility"
+    assert_select 'p.public', text: "All visitors can view summary only."
+    assert_select 'h3', text: "Additionally..."
+    assert_select 'p', text: "The following can view summary and get contents"
 
     # with additional text for privileged people
     asset_manager = FactoryBot.create(:asset_housekeeper)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::NO_ACCESS, [asset_manager.projects.first], Policy::ACCESSIBLE), resource_name: 'data_file', project_ids: asset_manager.projects.first.id }
+    assert_response :success
+    assert_select 'h3', text: "Public Visibility"
+    assert_select 'p.private', text: "This #{I18n.t('data_file')} is hidden from public view."
+    assert_select 'h3', text: "Additionally..."
+    assert_select 'p', text: "The following can view summary and get contents"
 
     # with additional text for both permissions and privileged people
     asset_manager = FactoryBot.create(:asset_housekeeper)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [asset_manager.projects.first], Policy::ACCESSIBLE), resource_name: 'data_file', project_ids: asset_manager.projects.first.id }
+    assert_response :success
+    assert_select 'h3', text: "Public Visibility"
+    assert_select 'p.public', text: "All visitors can view summary only."
+    assert_select 'h3', text: "Additionally..."
+    assert_select 'p', text: "The following can view summary and get contents"
+
   end
 
   test 'should display download permissions as view for non-downloadable resource in permission preview' do

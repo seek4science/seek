@@ -1,6 +1,5 @@
 class Study < ApplicationRecord
 
-  enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
 
   searchable(:auto_index => false) do
@@ -9,7 +8,7 @@ class Study < ApplicationRecord
 
   belongs_to :investigation
   has_many :projects, through: :investigation
-  has_filter :project
+  has_filter :project, :isa_json_compliance
 
   #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   acts_as_isa

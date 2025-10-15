@@ -66,6 +66,13 @@
         }
       ],
       "creators": [
+        {
+          "profile": "/people/<%= res.assets_creators.first.creator_id %>",
+          "family_name": "<%= res.assets_creators.first.family_name %>",
+          "given_name": "<%= res.assets_creators.first.given_name %>",
+          "affiliation": "<%= res.assets_creators.first.affiliation %>",
+          "orcid": null
+        }
       ],
       "other_creators": null,
       "journal": "Journal of Molecular Biology",
@@ -88,6 +95,10 @@
     "relationships": {
       "creators": {
         "data": [
+          {
+            "id": "<%= res.assets_creators.first.creator_id %>",
+            "type": "people"
+          }
         ]
       },
       "submitter": {
@@ -102,6 +113,10 @@
         "data": [
           {
             "id": "<%= current_person.id %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= res.assets_creators.first.creator_id %>",
             "type": "people"
           }
         ]

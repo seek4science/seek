@@ -73,7 +73,7 @@ end
 
   attr_writer :refresh_policy
   before_update :refresh_policy
-  after_update :update_creators_from_publication_authors
+  after_save :update_creators_from_publication_authors
 
   accepts_nested_attributes_for :publication_authors
 

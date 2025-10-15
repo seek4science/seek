@@ -12,7 +12,6 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::UniquelyIdentifiable
   include Seek::ActsAsYellowPages
   include Seek::GroupedPagination
-  include Seek::TitleTrimmer
   include Seek::ActsAsAsset
   include Seek::ActsAsISA
   include HasExtendedMetadata

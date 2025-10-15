@@ -33,6 +33,165 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_redirected_to institution_path(assigns(:institution))
   end
 
+  def test_should_create_institution_with_ror_id
+    VCR.use_cassette("ror/fetch_by_id") do
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { ror_id:'03vek6s52' } }
+      end
+    end
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Harvard University', assigns(:institution).title
+    assert_equal 'US', assigns(:institution).country
+    assert_equal '03vek6s52', assigns(:institution).ror_id
+  end
+
+  def test_should_create_institution_with_title
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'test' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'test', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'test', count: 1
+
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'University of Manchester', department: 'Manchester Institute of Biotechnology'} }
+    end
+
+    institution = assigns(:institution)
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Manchester Institute of Biotechnology, University of Manchester', institution.title
+
+    get :show, params: { id: institution }
+    assert_select 'h1', text: 'Manchester Institute of Biotechnology, University of Manchester', count: 1
+
+    get :edit, params: { id: institution }
+    assert_response :success
+    assert_select 'input#institution_title[value=?]', 'University of Manchester'
+
+  end
+
+
+  def test_should_create_institution_with_or_without_title_department_
+
+    # If creating a new institution with a title first,
+    # it should still be possible to create another institution with the same title but a different department.
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1', department: 'Division 1' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Division 1', assigns(:institution).department
+    assert_equal 'Division 1, Institution 1', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Division 1, Institution 1', count: 1
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1' }}
+    end
+
+    assert_equal 'Institution 1', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Institution 1', count: 1
+
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 1',department: 'Division 2' }}
+    end
+
+    assert_equal 'Division 2, Institution 1', assigns(:institution).title
+
+    # If creating a new institution with a title and a department first,
+    # it should still be possible to create another institution with the title but without a different department.
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 2' }}
+    end
+
+    assert_equal 'Institution 2', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Institution 2', count: 1
+
+    assert_difference('Institution.count') do
+      post :create, params: { institution: { title: 'Institution 2', department: 'Division 2' } }
+    end
+
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'Division 2', assigns(:institution).department
+    assert_equal 'Division 2, Institution 2', assigns(:institution).title
+
+    get :show, params: { id: assigns(:institution) }
+    assert_select 'h1', text: 'Division 2, Institution 2', count: 1
+
+  end
+
+  def test_should_not_create_institution_without_title
+    assert_no_difference('Institution.count') do
+      post :create, params: { institution: { department: 'Some Department' } }
+    end
+    assert_includes assigns(:institution).errors[:title], "can't be blank"
+
+  end
+
+
+
+  def test_can_not_create_institution_with_invalid_ror_id
+    VCR.use_cassette("ror/fetch_invalid_id") do
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { title: 'test', ror_id: 'invalid_id' } }
+      end
+    end
+    assert_equal assigns(:institution).errors[:ror_id].first, "'invalid_id' is not a valid ROR ID"
+  end
+
+
+  def test_can_not_create_institution_with_the_title_or_ror_id_that_already_exists
+    VCR.use_cassette("ror/existing_institution") do
+      FactoryBot.create(:institution, title: 'Harvard University', ror_id: '03vek6s52')
+
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { title: 'Harvard University' } }
+      end
+      assert_equal assigns(:institution).errors[:title].first, 'has already been taken'
+
+      assert_no_difference('Institution.count') do
+        post :create, params: { institution: { ror_id: '03vek6s52' } }
+      end
+      assert_equal assigns(:institution).errors[:ror_id].first, 'has already been taken'
+    end
+  end
+
+  def test_can_create_institution_with_the_title_or_ror_id_that_already_exists_but_different_department
+    VCR.use_cassette("ror/existing_institution") do
+      FactoryBot.create(:institution, title: 'Harvard University', ror_id: '03vek6s52')
+
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { title: 'Harvard University', department: "Applied Mathematics"} }
+      end
+
+      assert_redirected_to institution_path(assigns(:institution))
+      assert_equal 'Applied Mathematics, Harvard University', assigns(:institution).title
+      assert_equal 'Applied Mathematics', assigns(:institution).department
+
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { ror_id: '03vek6s52', department: "Computer Science"} }
+      end
+
+      assert_redirected_to institution_path(assigns(:institution))
+      assert_equal 'Computer Science, Harvard University', assigns(:institution).title
+      assert_equal 'Computer Science', assigns(:institution).department
+      assert_equal '03vek6s52', assigns(:institution).ror_id
+
+    end
+  end
+
   def test_should_show_institution
     get :show, params: { id: institutions(:one).id }
     assert_response :success
@@ -245,7 +404,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', institution.discussion_links.first.url
   end
 
-  test 'should destroy related assetlink when the discussion link is removed ' do
+  test 'should destroy related assetlink when the discussion link is removed' do
     person = FactoryBot.create(:admin)
     login_as(person)
     asset_link = FactoryBot.create(:discussion_link)
@@ -267,5 +426,59 @@ class InstitutionsControllerTest < ActionController::TestCase
     actual = JSON.parse(response.body)['institution_list']
     assert_equal expected, actual
   end
+
+
+  test 'should query institution name via ror' do
+    VCR.use_cassette("ror/query_harvard_by_name") do
+      get :ror_search, params: { query: 'Harvard' }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert res.key?('items'), 'Response should contain items key'
+      assert res['items'].is_a?(Array), 'Items should be an array'
+      assert res['items'].any?, 'Items array should not be empty'
+    end
+  end
+
+
+  test 'should fetch institution metadata with ror id' do
+    VCR.use_cassette("ror/fetch_by_id") do
+      get :ror_search, params: { ror_id: '03vek6s52' }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_equal '03vek6s52', res["id"]
+      assert_equal 'Harvard University', res["name"]
+      assert_equal 'education', res["type"]
+      assert_equal 'Universidad de Harvard', res["altNames"]
+      assert_equal 'United States', res["country"]
+      assert_equal 'US', res["countrycode"]
+      assert_equal 'Cambridge', res["city"]
+      assert_equal 'https://www.harvard.edu', res["webpage"]
+    end
+  end
+
+
+  test 'should return an empty result when querying a nonexistent institution' do
+    VCR.use_cassette("ror/ror_nonexistent_institution") do
+      get :ror_search, params: { query: 'nonexistentuniversity123' }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_empty res["items"]
+    end
+  end
+
+  test 'should return an error when ror id is invalid' do
+    VCR.use_cassette("ror/fetch_invalid_id") do
+      get :ror_search, params: { ror_id: 'invalid_id' }
+      assert_response :internal_server_error
+      assert_includes response.body, "'invalid_id' is not a valid ROR ID"
+    end
+  end
+
+  test 'should return an error when ror id is missing' do
+    get :ror_search
+    assert_response :bad_request
+    assert_equal({ error: 'Missing ROR ID' }.to_json, response.body)
+  end
+
 
 end

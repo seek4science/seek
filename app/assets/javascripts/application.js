@@ -29,26 +29,12 @@
 //= require bootstrap_tab_memory
 //= require associations
 //= require people
+//= require publications
 //= require search
 //= require tooltips
 //= require sample_types
 //= require controlled_vocabs
 //= require wizard_step
-//= require DataTables-1.11.3/jquery.dataTables
-//= require DataTables-1.11.3/colReorder.bootstrap
-//= require DataTables-1.11.3/dataTables.autoFill
-//= require DataTables-1.11.3/dataTables.bootstrap
-//= require DataTables-1.11.3/dataTables.buttons
-//= require DataTables-1.11.3/dataTables.colReorder
-//= require DataTables-1.11.3/dataTables.fixedColumns
-//= require DataTables-1.11.3/dataTables.fixedHeader
-//= require DataTables-1.11.3/dataTables.select
-//= require DataTables-1.11.3/fixedColumns.bootstrap
-//= require DataTables-1.11.3/fixedHeader.bootstrap
-//= require DataTables-1.11.3/select.bootstrap
-//= require DataTables-1.11.3/buttons.bootstrap
-//= require DataTables-1.11.3/buttons.html5
-//= require DataTables-1.11.3/autoFill.bootstrap
 //= require samples
 //= require datafiles
 //= require jstree
@@ -83,4 +69,6 @@
 //= require copasi/copasi_simulation
 //= require plotly-2.27.0.min
 //= require extended_metadata_type
-
+//= require institution-ror-typeahead
+//= require fair_data_station
+//= require DataTables-2.3.1/datatables.min

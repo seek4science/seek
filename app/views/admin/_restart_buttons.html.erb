@@ -26,18 +26,24 @@
         </p>
 
         <p>
-          Some background tasks are running in different processes to the main server process,
+          Some background tasks are running in different processes to the main server process to process queued jobs,
           for example to handle solr reindexing or send subscription emails.
           When certain settings such as <strong>'search enabled'</strong>, or changing code,
           you will need to restart these processes.
-          <%= button_to('Restart background tasks', restart_delayed_job_admin_path,
+          <%= button_to('Restart background job workers', restart_delayed_job_admin_path,
                         class: 'btn btn-danger', id: 'restart_delayed_job',
-                        data: { confirm: 'Are you sure you want to restart the background tasks?', disable_with: 'Restarting...' }) %>
+                        data: { confirm: 'Are you sure you want to restart the background job workers?', disable_with: 'Restarting...' }) %>
         </p>
       </div>
 
       <div class="col-sm-4">
-        <h4>Background processes</h4>
+        <h4>
+          Background processes
+          <div class="subtle">
+            <%= Seek::Workers.active_queues.count %> expected
+          </div>
+        </h4>
+
         <% begin %>
             <% pids = Seek::Util.delayed_job_pids %>
             <% if pids.any? %>
@@ -56,7 +62,7 @@
             <% else %>
                 <span class="none_text">No background processes running</span>
             <% end %>
-        <% rescue Exception => e %>
+        <% rescue StandardError => e %>
             <span class="text-danger">Unable to determine current status - <%= e.message %></span>
         <% end %>
       </div>

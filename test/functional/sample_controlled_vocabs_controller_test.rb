@@ -348,6 +348,8 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
+    #needs to be complete with wrapped in table/ for the html parser
+    response.body = "<table>#{response.body}</table>"
     assert_select 'tr.sample-cv-term', count: 4
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
 'http://purl.obolibrary.org/obo/GO_0090395'
@@ -412,6 +414,8 @@ cv.ols_root_term_uris
     end
 
     assert_response :success
+    #needs to be complete with wrapped in table/ for the html parser
+    response.body = "<table>#{response.body}</table>"
     assert_select 'tr.sample-cv-term', count: 6
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
 'http://purl.obolibrary.org/obo/GO_0090395'
@@ -463,6 +467,8 @@ cv.ols_root_term_uris
     end
 
     assert_response :success
+    #needs to be complete with wrapped in table/ for the html parser
+    response.body = "<table>#{response.body}</table>"
     assert_select 'tr.sample-cv-term', count: 4
 
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
@@ -505,6 +511,8 @@ cv.ols_root_term_uris
     end
 
     assert_response :success
+    #needs to be complete with wrapped in table/ for the html parser
+    response.body = "<table>#{response.body}</table>"
     assert_select 'tr.sample-cv-term', count: 4
   end
 
@@ -517,6 +525,8 @@ cv.ols_root_term_uris
                                            root_uris: 'http://purl.obolibrary.org/obo/GO_0090395' }
     end
     assert_response :success
+    #needs to be complete with wrapped in table/ for the html parser
+    response.body = "<table>#{response.body}</table>"
     assert_select 'tr.sample-cv-term', count: 3
     assert_select 'input[type=hidden]#sample_controlled_vocab_sample_controlled_vocab_terms_attributes_0_iri[value=?]',
 'http://purl.obolibrary.org/obo/GO_0090397'

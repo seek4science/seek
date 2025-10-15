@@ -2,7 +2,6 @@ FactoryBot.define do
   factory(:observation_unit) do
     title { 'Observation Unit' }
     description { 'very simple obs unit'}
-    policy { FactoryBot.create(:public_policy) }
     association :contributor, factory: :person, strategy: :create
     after(:build) do |a|
       a.study ||= FactoryBot.create(:study, contributor: a.contributor)
@@ -11,6 +10,7 @@ FactoryBot.define do
 
   factory(:min_observation_unit, parent: :observation_unit) do
     title { 'A Minimal Observation Unit' }
+    policy { FactoryBot.create(:public_policy) }
     association :study, factory: :study, strategy: :create
     description { nil }
   end

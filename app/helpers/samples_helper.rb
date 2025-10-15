@@ -49,8 +49,6 @@ module SamplesHelper
   def linked_extended_metadata_form_field(attribute, value, element_name, element_class,depth)
     html = ''
 
-    Rails.logger.info ActiveSupport::LogSubscriber.new.send(:color, attribute.inspect, :blue, bold = true)
-
     attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
       attr_element_name = "#{element_name}[#{attr.title}]"
       html += '<div class="form-group"><label>'+attr.label+'</label>'

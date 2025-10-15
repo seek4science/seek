@@ -20,29 +20,35 @@
 
 <% end %>
 
-<%= form_tag submit_fairdata_station_project_path(@project), multipart: true do %>
+<%= render partial: 'fair_data_station_import_statuses', locals: {project: @project, contributor: current_person} %>
 
-  <%= panel('FAIR Data Station turtle (ttl) metadata file') do %>
+<%= panel('New import') do %>
 
-    <%= file_field_tag "datastation_data", accept: '.ttl' -%>
+  <%= form_tag submit_fairdata_station_project_path(@project), multipart: true do %>
 
-  <% end %>
+    <%= panel(t('fair_data_station.upload_file_label')) do %>
 
-  <%= panel('Sharing permissions') do %>
-    <div class="alert alert-info">
-      <p>
-        The following sharing permissions will be applied to all the items created. It is possible to change them individually after they have been created.
-      </p>
-      <p>
-        Note that <strong>Download</strong> is shown but only applicable to some types. Where not applicable, then <strong>View</strong> will be applied.
-      </p>
+      <%= file_field_tag "datastation_data", accept: '.ttl' -%>
+
+    <% end %>
+
+    <%= panel('Sharing permissions') do %>
+      <div class="alert alert-info">
+        <p>
+          The following sharing permissions will be applied to all the items created. It is possible to change them individually after they have been created.
+        </p>
+        <p>
+          Note that <strong>Download</strong> is shown but only applicable to some types. Where not applicable, then <strong>View</strong> will be applied.
+        </p>
+      </div>
+
+      <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: (@project.default_policy || Policy.default), projects: [@project], downloadable: true } %>
+
+    <% end %>
+    <div>
+      <%= submit_tag("Submit", class: 'btn btn-primary') %>
+      or <%= cancel_button(project_path(@project)) %>
     </div>
-
-    <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: (@project.default_policy || Policy.default), projects: [@project], downloadable: true } %>
-
   <% end %>
-  <div>
-    <%= submit_tag("Submit", class: 'btn btn-primary') %>
-  </div>
-<% end %>
 
+<% end %>

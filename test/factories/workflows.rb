@@ -55,7 +55,7 @@ FactoryBot.define do
   
   factory(:user_added_workflow_class_with_logo, class: WorkflowClass) do
     sequence(:title) { |n| "User-added Type with Logo #{n}" }
-    avatar
+    with_avatar
     contributor { FactoryBot.create(:person) }
   end
   

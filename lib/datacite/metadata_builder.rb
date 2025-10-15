@@ -1,6 +1,6 @@
 require 'nokogiri'
 
-module DataCite
+module Datacite
   class MetadataBuilder
     def initialize(hash)
       @hash = hash

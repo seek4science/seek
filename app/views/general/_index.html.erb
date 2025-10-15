@@ -3,7 +3,7 @@
   show_new_button = true unless local_assigns.has_key?(:show_new_button)
   if show_new_button
     new_item_label ||= "New #{t(controller_name.singularize)}"
-    new_item_path = polymorphic_path([:new, controller_name.singularize.to_sym])
+    new_item_path = controller_name == 'projects' ? guided_create_projects_path : polymorphic_path([:new, controller_name.singularize.to_sym])
   end
 
   show_samples_query_button = false unless local_assigns.has_key?(:show_samples_query_button)
@@ -33,8 +33,20 @@
 <%= index_and_new_help_icon controller_name %>
 
 <div class="index-container">
-  <%= render partial: 'assets/resource_filtering' if Seek::Config.filtering_enabled %>
+  <% if Seek::Config.filtering_enabled && !max_filters_met? %>
+    <%= render partial: 'assets/resource_filtering' %>
+  <% end %>
   <div class="index-content">
+    <% if Seek::Config.filtering_enabled && max_filters_met? %>
+      <div class='alert alert-warning'>
+        <p>
+          The maximum of <%= Seek::Config.max_filters %> filters has been reached.
+        </p>
+        <p>
+          You will need to remove a filter to be able to apply a different one. If logged in with a registered account the filter limit is removed.
+        </p>
+      </div>
+    <% end %>
     <div class="row">
       <div class="col-sm-6">
         <%= render partial: 'assets/resource_counts' %>

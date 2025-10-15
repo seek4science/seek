@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   tests:
     name: Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       RAILS_ENV: test
       TERM: dumb-color
@@ -29,7 +29,7 @@ jobs:
           - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       virtuoso:
-        image: tenforce/virtuoso
+        image: openlink/virtuoso-opensource-7
         env:
           DBA_PASSWORD: tester
           SPARQL_UPDATE: true
@@ -61,7 +61,7 @@ jobs:
           sudo apt install -y software-properties-common
           sudo add-apt-repository ppa:deadsnakes/ppa
           sudo apt update
-          sudo apt install -y graphicsmagick graphviz libcurl4-gnutls-dev libreoffice poppler-utils build-essential \
+          sudo apt install -y libmagick++-dev graphviz libcurl4-gnutls-dev libreoffice poppler-utils build-essential \
             git imagemagick libgmp-dev python3.9-dev python3.9-distutils python3-pip
       - name: Checkout code
         uses: actions/checkout@v4

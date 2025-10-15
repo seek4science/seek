@@ -1,0 +1,40 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://test-fe.cbu.uib.no/nels-api/v2/sbi/projects/91123122
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.1.4p223
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 05 Nov 2024 11:20:27 GMT
+      Server:
+      - Apache/2.4.37 (AlmaLinux) OpenSSL/1.1.1k
+      Content-Length:
+      - '7032'
+    body:
+      encoding: UTF-8
+      string: '{"id":91123122,"name":"seek_pilot1","description":"Seek pilot project
+        1","creationtime":1495087464000,"sizeused":578212721,"contactperson":"Kidane
+        M. Tekle","contactemail":"kidane.tekle@gmail.com","contactaffiliation":"NeLS","quotaid":2062,"institution_id":-1,"quota_sizeallocated":1073741824000,"quota_sizeused":52801118697,"quota_name":"NeLS_Test","issensitive":false,"quota_utilization":0.04917487380746752,"disk_stats":[{"id":53663,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1563951297796},{"id":54005,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1563951318462},{"id":54192,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1563951376351},{"id":54854,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1564387501560},{"id":55636,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1564657603827},{"id":56859,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565167121311},{"id":57205,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565168505167},{"id":57551,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565168624344},{"id":57742,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565168962449},{"id":58411,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565179413777},{"id":58761,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565179532032},{"id":59111,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565179677736},{"id":59447,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565215202693},{"id":59892,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565301601941},{"id":60332,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565388002403},{"id":60814,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565474402746},{"id":61202,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565560802395},{"id":61650,"statscontextid":300,"targetid":1123122,"value":6.96587024E8,"statstime":1565647202559},{"id":62098,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1565733602598},{"id":62512,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1565820002611},{"id":62985,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1565906401993},{"id":63429,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1565992802624},{"id":63816,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566079202401},{"id":64276,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566165602104},{"id":64796,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566252002349},{"id":65210,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566338401872},{"id":65629,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566424802453},{"id":66057,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566511202011},{"id":66538,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566597602246},{"id":66998,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566684002384},{"id":67413,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566770402679},{"id":67872,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566856801774},{"id":68254,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1566943201830},{"id":68760,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1567029602244},{"id":69201,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1567116002431},{"id":172035,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597653433378},{"id":172261,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597653845318},{"id":172656,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597662046427},{"id":172882,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597663852448},{"id":173308,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597666369939},{"id":173723,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597667635073},{"id":174170,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597667941779},{"id":174510,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597667967123},{"id":174857,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597670589477},{"id":175252,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671038387},{"id":175648,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671050680},{"id":176044,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671084900},{"id":176440,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671119859},{"id":176892,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671130469},{"id":177232,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671300632},{"id":177882,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671480469},{"id":178265,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597671489642},{"id":178911,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1597734321353},{"id":181735,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598430737044},{"id":182144,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598431285302},{"id":182530,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598431298683},{"id":182929,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598431313756},{"id":184914,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598870533054},{"id":185398,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598870545264},{"id":185688,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598870551721},{"id":186263,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1598870830680},{"id":188720,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1599468066524},{"id":188979,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1599475782569},{"id":189553,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1599475840443},{"id":189956,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1599475896429},{"id":190264,"statscontextid":300,"targetid":1123122,"value":5.782127E8,"statstime":1599475959452}],"seek_enabled":true,"ena_enabled":false,"enaCount":0,"membership_type":3}'
+    http_version: 
+  recorded_at: Tue, 05 Nov 2024 11:20:28 GMT
+recorded_with: VCR 2.9.3

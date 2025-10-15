@@ -1,0 +1,5 @@
+services:
+  seek:
+    build: .
+  seek_workers:
+    build: .

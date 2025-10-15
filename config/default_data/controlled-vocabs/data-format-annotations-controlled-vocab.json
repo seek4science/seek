@@ -1,0 +1,3113 @@
+{
+  "title": "Data Formats",
+  "description": "Data formats, used for annotating. Describes a defined way or layout of representing and structuring data in a computer file, blob, string, message, or elsewhere. Initially seeded from the EDAM ontology.",
+  "ols_root_term_uris": "http://edamontology.org/format_1915",
+  "source_ontology": "edam",
+  "sample_controlled_vocab_terms_attributes": [
+    {
+      "label": "Format",
+      "iri": "http://edamontology.org/format_1915",
+      "parent_iri": ""
+    },
+    {
+      "label": "JSON",
+      "iri": "http://edamontology.org/format_3464",
+      "parent_iri": "http://edamontology.org/format_1915"
+    },
+    {
+      "label": "maDMP",
+      "iri": "http://edamontology.org/format_4041",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "BioSimulators format for the specifications of biosimulation tools",
+      "iri": "http://edamontology.org/format_4025",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "Vega-lite",
+      "iri": "http://edamontology.org/format_3970",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "Vega",
+      "iri": "http://edamontology.org/format_3969",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "PubAnnotation format",
+      "iri": "http://edamontology.org/format_3781",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "BioJSON (Jalview)",
+      "iri": "http://edamontology.org/format_3774",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "BioJSON (BioXSD)",
+      "iri": "http://edamontology.org/format_3772",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "JSON-LD",
+      "iri": "http://edamontology.org/format_3749",
+      "parent_iri": "http://edamontology.org/format_3464"
+    },
+    {
+      "label": "Open Annotation format",
+      "iri": "http://edamontology.org/format_3784",
+      "parent_iri": "http://edamontology.org/format_3749"
+    },
+    {
+      "label": "RDF format",
+      "iri": "http://edamontology.org/format_2376",
+      "parent_iri": "http://edamontology.org/format_1915"
+    },
+    {
+      "label": "RDF/XML",
+      "iri": "http://edamontology.org/format_3261",
+      "parent_iri": "http://edamontology.org/format_2376"
+    },
+    {
+      "label": "Notation3",
+      "iri": "http://edamontology.org/format_3257",
+      "parent_iri": "http://edamontology.org/format_2376"
+    },
+    {
+      "label": "N-Triples",
+      "iri": "http://edamontology.org/format_3256",
+      "parent_iri": "http://edamontology.org/format_2376"
+    },
+    {
+      "label": "OWL format",
+      "iri": "http://edamontology.org/format_2197",
+      "parent_iri": "http://edamontology.org/format_2376"
+    },
+    {
+      "label": "OWL/XML",
+      "iri": "http://edamontology.org/format_3262",
+      "parent_iri": "http://edamontology.org/format_2197"
+    },
+    {
+      "label": "Manchester OWL Syntax",
+      "iri": "http://edamontology.org/format_3253",
+      "parent_iri": "http://edamontology.org/format_2197"
+    },
+    {
+      "label": "OWL Functional Syntax",
+      "iri": "http://edamontology.org/format_3252",
+      "parent_iri": "http://edamontology.org/format_2197"
+    },
+    {
+      "label": "UniProtKB RDF",
+      "iri": "http://edamontology.org/format_3771",
+      "parent_iri": "http://edamontology.org/format_2376"
+    },
+    {
+      "label": "Turtle",
+      "iri": "http://edamontology.org/format_3255",
+      "parent_iri": "http://edamontology.org/format_2376"
+    },
+    {
+      "label": "N-Quads",
+      "iri": "http://edamontology.org/format_3956",
+      "parent_iri": "http://edamontology.org/format_2376"
+    },
+    {
+      "label": "Format (by type of data)",
+      "iri": "http://edamontology.org/format_2350",
+      "parent_iri": "http://edamontology.org/format_1915"
+    },
+    {
+      "label": "Graph format",
+      "iri": "http://edamontology.org/format_3617",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "K-mer countgraph",
+      "iri": "http://edamontology.org/format_3665",
+      "parent_iri": "http://edamontology.org/format_3617"
+    },
+    {
+      "label": "xgmml",
+      "iri": "http://edamontology.org/format_3618",
+      "parent_iri": "http://edamontology.org/format_3617"
+    },
+    {
+      "label": "Sequence quality report format (text)",
+      "iri": "http://edamontology.org/format_3606",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "qual",
+      "iri": "http://edamontology.org/format_3607",
+      "parent_iri": "http://edamontology.org/format_3606"
+    },
+    {
+      "label": "qual454",
+      "iri": "http://edamontology.org/format_3611",
+      "parent_iri": "http://edamontology.org/format_3607"
+    },
+    {
+      "label": "qualsolid",
+      "iri": "http://edamontology.org/format_3610",
+      "parent_iri": "http://edamontology.org/format_3607"
+    },
+    {
+      "label": "qualillumina",
+      "iri": "http://edamontology.org/format_3609",
+      "parent_iri": "http://edamontology.org/format_3607"
+    },
+    {
+      "label": "qualsolexa",
+      "iri": "http://edamontology.org/format_3608",
+      "parent_iri": "http://edamontology.org/format_3607"
+    },
+    {
+      "label": "Image format",
+      "iri": "http://edamontology.org/format_3547",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "tabix",
+      "iri": "http://edamontology.org/format_3616",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "bgzip",
+      "iri": "http://edamontology.org/format_3615",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "rast",
+      "iri": "http://edamontology.org/format_3605",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "SVG",
+      "iri": "http://edamontology.org/format_3604",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "PNG",
+      "iri": "http://edamontology.org/format_3603",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "pgm",
+      "iri": "http://edamontology.org/format_3602",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "pbm",
+      "iri": "http://edamontology.org/format_3601",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "rgb",
+      "iri": "http://edamontology.org/format_3600",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "xpm",
+      "iri": "http://edamontology.org/format_3599",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "xbm",
+      "iri": "http://edamontology.org/format_3598",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "psd",
+      "iri": "http://edamontology.org/format_3597",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "ppm",
+      "iri": "http://edamontology.org/format_3596",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "pcx",
+      "iri": "http://edamontology.org/format_3595",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "pcd",
+      "iri": "http://edamontology.org/format_3594",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "im",
+      "iri": "http://edamontology.org/format_3593",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "BMP",
+      "iri": "http://edamontology.org/format_3592",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "TIFF",
+      "iri": "http://edamontology.org/format_3591",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "JPG",
+      "iri": "http://edamontology.org/format_3579",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "nrrd",
+      "iri": "http://edamontology.org/format_3551",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "mhd",
+      "iri": "http://edamontology.org/format_3550",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "nii",
+      "iri": "http://edamontology.org/format_3549",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "DICOM format",
+      "iri": "http://edamontology.org/format_3548",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "MPEG-4",
+      "iri": "http://edamontology.org/format_3997",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "Texture file format",
+      "iri": "http://edamontology.org/format_3995",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "U3D",
+      "iri": "http://edamontology.org/format_3994",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "Stereolithography format",
+      "iri": "http://edamontology.org/format_3993",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "AVI",
+      "iri": "http://edamontology.org/format_3990",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "LSM",
+      "iri": "http://edamontology.org/format_3988",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "WMV",
+      "iri": "http://edamontology.org/format_3986",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "pptx",
+      "iri": "http://edamontology.org/format_3838",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "OME-TIFF",
+      "iri": "http://edamontology.org/format_3727",
+      "parent_iri": "http://edamontology.org/format_3547"
+    },
+    {
+      "label": "Document format",
+      "iri": "http://edamontology.org/format_3507",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "PDF",
+      "iri": "http://edamontology.org/format_3508",
+      "parent_iri": "http://edamontology.org/format_3507"
+    },
+    {
+      "label": "docx",
+      "iri": "http://edamontology.org/format_3506",
+      "parent_iri": "http://edamontology.org/format_3507"
+    },
+    {
+      "label": "xls",
+      "iri": "http://edamontology.org/format_3468",
+      "parent_iri": "http://edamontology.org/format_3507"
+    },
+    {
+      "label": "latex",
+      "iri": "http://edamontology.org/format_3817",
+      "parent_iri": "http://edamontology.org/format_3507"
+    },
+    {
+      "label": "xlsx",
+      "iri": "http://edamontology.org/format_3620",
+      "parent_iri": "http://edamontology.org/format_3507"
+    },
+    {
+      "label": "ObjTables",
+      "iri": "http://edamontology.org/format_3977",
+      "parent_iri": "http://edamontology.org/format_3620"
+    },
+    {
+      "label": "Sequence variation annotation format",
+      "iri": "http://edamontology.org/format_2921",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Ensembl variation file format",
+      "iri": "http://edamontology.org/format_3499",
+      "parent_iri": "http://edamontology.org/format_2921"
+    },
+    {
+      "label": "Gemini SQLite format",
+      "iri": "http://edamontology.org/format_3622",
+      "parent_iri": "http://edamontology.org/format_2921"
+    },
+    {
+      "label": "BCF",
+      "iri": "http://edamontology.org/format_3020",
+      "parent_iri": "http://edamontology.org/format_2921"
+    },
+    {
+      "label": "GVF",
+      "iri": "http://edamontology.org/format_3019",
+      "parent_iri": "http://edamontology.org/format_2921"
+    },
+    {
+      "label": "VCF",
+      "iri": "http://edamontology.org/format_3016",
+      "parent_iri": "http://edamontology.org/format_2921"
+    },
+    {
+      "label": "gVCF",
+      "iri": "http://edamontology.org/format_4018",
+      "parent_iri": "http://edamontology.org/format_3016"
+    },
+    {
+      "label": "Bibliographic reference format",
+      "iri": "http://edamontology.org/format_2848",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "PubMed XML",
+      "iri": "http://edamontology.org/format_3848",
+      "parent_iri": "http://edamontology.org/format_2848"
+    },
+    {
+      "label": "CiteXplore-all",
+      "iri": "http://edamontology.org/format_1737",
+      "parent_iri": "http://edamontology.org/format_2848"
+    },
+    {
+      "label": "CiteXplore-core",
+      "iri": "http://edamontology.org/format_1736",
+      "parent_iri": "http://edamontology.org/format_2848"
+    },
+    {
+      "label": "Medline Display Format",
+      "iri": "http://edamontology.org/format_1735",
+      "parent_iri": "http://edamontology.org/format_2848"
+    },
+    {
+      "label": "PubMed citation",
+      "iri": "http://edamontology.org/format_1734",
+      "parent_iri": "http://edamontology.org/format_2848"
+    },
+    {
+      "label": "Data index format",
+      "iri": "http://edamontology.org/format_3326",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "ebwtl",
+      "iri": "http://edamontology.org/format_3491",
+      "parent_iri": "http://edamontology.org/format_3326"
+    },
+    {
+      "label": "ebwt",
+      "iri": "http://edamontology.org/format_3484",
+      "parent_iri": "http://edamontology.org/format_3326"
+    },
+    {
+      "label": "BAI",
+      "iri": "http://edamontology.org/format_3327",
+      "parent_iri": "http://edamontology.org/format_3326"
+    },
+    {
+      "label": "Tabix index file format",
+      "iri": "http://edamontology.org/format_3700",
+      "parent_iri": "http://edamontology.org/format_3326"
+    },
+    {
+      "label": "snpeffdb",
+      "iri": "http://edamontology.org/format_3624",
+      "parent_iri": "http://edamontology.org/format_3326"
+    },
+    {
+      "label": "Individual genetic data format",
+      "iri": "http://edamontology.org/format_3287",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "PED/MAP",
+      "iri": "http://edamontology.org/format_3288",
+      "parent_iri": "http://edamontology.org/format_3287"
+    },
+    {
+      "label": "PED",
+      "iri": "http://edamontology.org/format_3286",
+      "parent_iri": "http://edamontology.org/format_3288"
+    },
+    {
+      "label": "MAP",
+      "iri": "http://edamontology.org/format_3285",
+      "parent_iri": "http://edamontology.org/format_3288"
+    },
+    {
+      "label": "Trajectory format",
+      "iri": "http://edamontology.org/format_3866",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Trajectory format (text)",
+      "iri": "http://edamontology.org/format_3868",
+      "parent_iri": "http://edamontology.org/format_3866"
+    },
+    {
+      "label": "trr",
+      "iri": "http://edamontology.org/format_3910",
+      "parent_iri": "http://edamontology.org/format_3868"
+    },
+    {
+      "label": "RST",
+      "iri": "http://edamontology.org/format_3886",
+      "parent_iri": "http://edamontology.org/format_3868"
+    },
+    {
+      "label": "mdcrd",
+      "iri": "http://edamontology.org/format_3878",
+      "parent_iri": "http://edamontology.org/format_3868"
+    },
+    {
+      "label": "XYZ",
+      "iri": "http://edamontology.org/format_3877",
+      "parent_iri": "http://edamontology.org/format_3868"
+    },
+    {
+      "label": "Trajectory format (binary)",
+      "iri": "http://edamontology.org/format_3867",
+      "parent_iri": "http://edamontology.org/format_3866"
+    },
+    {
+      "label": "HDF5",
+      "iri": "http://edamontology.org/format_3590",
+      "parent_iri": "http://edamontology.org/format_3867"
+    },
+    {
+      "label": "Loom",
+      "iri": "http://edamontology.org/format_3913",
+      "parent_iri": "http://edamontology.org/format_3590"
+    },
+    {
+      "label": "TNG",
+      "iri": "http://edamontology.org/format_3876",
+      "parent_iri": "http://edamontology.org/format_3867"
+    },
+    {
+      "label": "XTC",
+      "iri": "http://edamontology.org/format_3875",
+      "parent_iri": "http://edamontology.org/format_3867"
+    },
+    {
+      "label": "PCAzip",
+      "iri": "http://edamontology.org/format_3874",
+      "parent_iri": "http://edamontology.org/format_3867"
+    },
+    {
+      "label": "HDF",
+      "iri": "http://edamontology.org/format_3873",
+      "parent_iri": "http://edamontology.org/format_3867"
+    },
+    {
+      "label": "NetCDF",
+      "iri": "http://edamontology.org/format_3650",
+      "parent_iri": "http://edamontology.org/format_3867"
+    },
+    {
+      "label": "BinPos",
+      "iri": "http://edamontology.org/format_3885",
+      "parent_iri": "http://edamontology.org/format_3867"
+    },
+    {
+      "label": "RNA annotation format",
+      "iri": "http://edamontology.org/format_3865",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "mirGFF3",
+      "iri": "http://edamontology.org/format_3864",
+      "parent_iri": "http://edamontology.org/format_3865"
+    },
+    {
+      "label": "Raw sequence format",
+      "iri": "http://edamontology.org/format_2571",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "completely unambiguous",
+      "iri": "http://edamontology.org/format_2566",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "completely unambiguous pure",
+      "iri": "http://edamontology.org/format_2567",
+      "parent_iri": "http://edamontology.org/format_2566"
+    },
+    {
+      "label": "completely unambiguous pure protein",
+      "iri": "http://edamontology.org/format_2607",
+      "parent_iri": "http://edamontology.org/format_2567"
+    },
+    {
+      "label": "completely unambiguous pure rna sequence",
+      "iri": "http://edamontology.org/format_2570",
+      "parent_iri": "http://edamontology.org/format_2567"
+    },
+    {
+      "label": "completely unambiguous pure dna",
+      "iri": "http://edamontology.org/format_2569",
+      "parent_iri": "http://edamontology.org/format_2567"
+    },
+    {
+      "label": "completely unambiguous pure nucleotide",
+      "iri": "http://edamontology.org/format_2568",
+      "parent_iri": "http://edamontology.org/format_2567"
+    },
+    {
+      "label": "BioXSD (XML)",
+      "iri": "http://edamontology.org/format_2352",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "BioYAML",
+      "iri": "http://edamontology.org/format_3773",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "raw",
+      "iri": "http://edamontology.org/format_1957",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "ambiguous",
+      "iri": "http://edamontology.org/format_2097",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "consensus",
+      "iri": "http://edamontology.org/format_1209",
+      "parent_iri": "http://edamontology.org/format_2097"
+    },
+    {
+      "label": "unambiguous sequence",
+      "iri": "http://edamontology.org/format_2096",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "unambiguous pure",
+      "iri": "http://edamontology.org/format_1206",
+      "parent_iri": "http://edamontology.org/format_2096"
+    },
+    {
+      "label": "unambiguous pure protein",
+      "iri": "http://edamontology.org/format_1218",
+      "parent_iri": "http://edamontology.org/format_1206"
+    },
+    {
+      "label": "unambiguous pure rna sequence",
+      "iri": "http://edamontology.org/format_1216",
+      "parent_iri": "http://edamontology.org/format_1206"
+    },
+    {
+      "label": "unambiguous pure dna",
+      "iri": "http://edamontology.org/format_1214",
+      "parent_iri": "http://edamontology.org/format_1206"
+    },
+    {
+      "label": "unambiguous pure nucleotide",
+      "iri": "http://edamontology.org/format_1211",
+      "parent_iri": "http://edamontology.org/format_1206"
+    },
+    {
+      "label": "unpure",
+      "iri": "http://edamontology.org/format_2095",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "pure",
+      "iri": "http://edamontology.org/format_2094",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "pure protein",
+      "iri": "http://edamontology.org/format_1219",
+      "parent_iri": "http://edamontology.org/format_2094"
+    },
+    {
+      "label": "pure nucleotide",
+      "iri": "http://edamontology.org/format_1210",
+      "parent_iri": "http://edamontology.org/format_2094"
+    },
+    {
+      "label": "pure rna",
+      "iri": "http://edamontology.org/format_1217",
+      "parent_iri": "http://edamontology.org/format_1210"
+    },
+    {
+      "label": "pure dna",
+      "iri": "http://edamontology.org/format_1215",
+      "parent_iri": "http://edamontology.org/format_1210"
+    },
+    {
+      "label": "protein",
+      "iri": "http://edamontology.org/format_1208",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "nucleotide",
+      "iri": "http://edamontology.org/format_1207",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "rna",
+      "iri": "http://edamontology.org/format_1213",
+      "parent_iri": "http://edamontology.org/format_1207"
+    },
+    {
+      "label": "dna",
+      "iri": "http://edamontology.org/format_1212",
+      "parent_iri": "http://edamontology.org/format_1207"
+    },
+    {
+      "label": ".nib",
+      "iri": "http://edamontology.org/format_3010",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "2bit",
+      "iri": "http://edamontology.org/format_3009",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "msh",
+      "iri": "http://edamontology.org/format_3911",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "BpForms",
+      "iri": "http://edamontology.org/format_3909",
+      "parent_iri": "http://edamontology.org/format_2571"
+    },
+    {
+      "label": "NLP format",
+      "iri": "http://edamontology.org/format_3841",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "NLP annotation format",
+      "iri": "http://edamontology.org/format_3862",
+      "parent_iri": "http://edamontology.org/format_3841"
+    },
+    {
+      "label": "NLP corpus format",
+      "iri": "http://edamontology.org/format_3863",
+      "parent_iri": "http://edamontology.org/format_3862"
+    },
+    {
+      "label": "Raw microarray data format",
+      "iri": "http://edamontology.org/format_3828",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "GPR",
+      "iri": "http://edamontology.org/format_3829",
+      "parent_iri": "http://edamontology.org/format_3828"
+    },
+    {
+      "label": "Ontology format",
+      "iri": "http://edamontology.org/format_2195",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "OBO format",
+      "iri": "http://edamontology.org/format_2196",
+      "parent_iri": "http://edamontology.org/format_2195"
+    },
+    {
+      "label": "OBO-XML",
+      "iri": "http://edamontology.org/format_2550",
+      "parent_iri": "http://edamontology.org/format_2196"
+    },
+    {
+      "label": "OBO",
+      "iri": "http://edamontology.org/format_2549",
+      "parent_iri": "http://edamontology.org/format_2196"
+    },
+    {
+      "label": "KRSS2 Syntax",
+      "iri": "http://edamontology.org/format_3254",
+      "parent_iri": "http://edamontology.org/format_2195"
+    },
+    {
+      "label": "NMR data format",
+      "iri": "http://edamontology.org/format_3824",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "nmrML",
+      "iri": "http://edamontology.org/format_3825",
+      "parent_iri": "http://edamontology.org/format_3824"
+    },
+    {
+      "label": "NMReDATA",
+      "iri": "http://edamontology.org/format_3906",
+      "parent_iri": "http://edamontology.org/format_3824"
+    },
+    {
+      "label": "Query language",
+      "iri": "http://edamontology.org/format_3787",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Annotated text format",
+      "iri": "http://edamontology.org/format_3780",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "BioNLP Shared Task format",
+      "iri": "http://edamontology.org/format_3785",
+      "parent_iri": "http://edamontology.org/format_3780"
+    },
+    {
+      "label": "PubTator format",
+      "iri": "http://edamontology.org/format_3783",
+      "parent_iri": "http://edamontology.org/format_3780"
+    },
+    {
+      "label": "BioC",
+      "iri": "http://edamontology.org/format_3782",
+      "parent_iri": "http://edamontology.org/format_3780"
+    },
+    {
+      "label": "OSCAR format",
+      "iri": "http://edamontology.org/format_1741",
+      "parent_iri": "http://edamontology.org/format_3780"
+    },
+    {
+      "label": "Linked data format",
+      "iri": "http://edamontology.org/format_3748",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Biodiversity data format",
+      "iri": "http://edamontology.org/format_3706",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "MCPD",
+      "iri": "http://edamontology.org/format_3777",
+      "parent_iri": "http://edamontology.org/format_3706"
+    },
+    {
+      "label": "BIOM format",
+      "iri": "http://edamontology.org/format_3746",
+      "parent_iri": "http://edamontology.org/format_3706"
+    },
+    {
+      "label": "ABCD format",
+      "iri": "http://edamontology.org/format_3708",
+      "parent_iri": "http://edamontology.org/format_3706"
+    },
+    {
+      "label": "Mass spectrometry data format",
+      "iri": "http://edamontology.org/format_3245",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "MSP",
+      "iri": "http://edamontology.org/format_4039",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "JCAMP-DX",
+      "iri": "http://edamontology.org/format_3859",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "Waters RAW",
+      "iri": "http://edamontology.org/format_3858",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "ibd",
+      "iri": "http://edamontology.org/format_3839",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "TIDE TXT",
+      "iri": "http://edamontology.org/format_3835",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "mzData",
+      "iri": "http://edamontology.org/format_3834",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "featureXML",
+      "iri": "http://edamontology.org/format_3833",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "consensusXML",
+      "iri": "http://edamontology.org/format_3832",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "idXML",
+      "iri": "http://edamontology.org/format_3764",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "SEQUEST .out file",
+      "iri": "http://edamontology.org/format_3758",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "protXML",
+      "iri": "http://edamontology.org/format_3747",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "MaxQuant APL peaklist format",
+      "iri": "http://edamontology.org/format_3714",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "Mascot .dat file",
+      "iri": "http://edamontology.org/format_3713",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "Thermo RAW",
+      "iri": "http://edamontology.org/format_3712",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "X!Tandem XML",
+      "iri": "http://edamontology.org/format_3711",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "WIFF format",
+      "iri": "http://edamontology.org/format_3710",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "MSF",
+      "iri": "http://edamontology.org/format_3702",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "mzQuantML",
+      "iri": "http://edamontology.org/format_3248",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "mzIdentML",
+      "iri": "http://edamontology.org/format_3247",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "TraML",
+      "iri": "http://edamontology.org/format_3246",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "mzML",
+      "iri": "http://edamontology.org/format_3244",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "PRIDE XML",
+      "iri": "http://edamontology.org/format_3684",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "qcML",
+      "iri": "http://edamontology.org/format_3683",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "imzML metadata file",
+      "iri": "http://edamontology.org/format_3682",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "mzTab",
+      "iri": "http://edamontology.org/format_3681",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "pepXML",
+      "iri": "http://edamontology.org/format_3655",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "mzXML",
+      "iri": "http://edamontology.org/format_3654",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "pkl",
+      "iri": "http://edamontology.org/format_3653",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "dta",
+      "iri": "http://edamontology.org/format_3652",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "MGF",
+      "iri": "http://edamontology.org/format_3651",
+      "parent_iri": "http://edamontology.org/format_3245"
+    },
+    {
+      "label": "Experiment annotation format",
+      "iri": "http://edamontology.org/format_3167",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "spML",
+      "iri": "http://edamontology.org/format_3250",
+      "parent_iri": "http://edamontology.org/format_3167"
+    },
+    {
+      "label": "GelML",
+      "iri": "http://edamontology.org/format_3249",
+      "parent_iri": "http://edamontology.org/format_3167"
+    },
+    {
+      "label": "GCDML",
+      "iri": "http://edamontology.org/format_3163",
+      "parent_iri": "http://edamontology.org/format_3167"
+    },
+    {
+      "label": "Microarray experiment data format",
+      "iri": "http://edamontology.org/format_2056",
+      "parent_iri": "http://edamontology.org/format_3167"
+    },
+    {
+      "label": "affymetrix-exp",
+      "iri": "http://edamontology.org/format_1641",
+      "parent_iri": "http://edamontology.org/format_2056"
+    },
+    {
+      "label": "ISA-TAB",
+      "iri": "http://edamontology.org/format_3687",
+      "parent_iri": "http://edamontology.org/format_3167"
+    },
+    {
+      "label": "COMBINE OMEX",
+      "iri": "http://edamontology.org/format_3686",
+      "parent_iri": "http://edamontology.org/format_3167"
+    },
+    {
+      "label": "SED-ML",
+      "iri": "http://edamontology.org/format_3685",
+      "parent_iri": "http://edamontology.org/format_3167"
+    },
+    {
+      "label": "Biological pathway or network report format",
+      "iri": "http://edamontology.org/format_3166",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "CopasiML",
+      "iri": "http://edamontology.org/format_3239",
+      "parent_iri": "http://edamontology.org/format_3166"
+    },
+    {
+      "label": "SBRML",
+      "iri": "http://edamontology.org/format_3155",
+      "parent_iri": "http://edamontology.org/format_3166"
+    },
+    {
+      "label": "Protein domain classification format",
+      "iri": "http://edamontology.org/format_3097",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "InterProScan XML",
+      "iri": "http://edamontology.org/format_3846",
+      "parent_iri": "http://edamontology.org/format_3097"
+    },
+    {
+      "label": "CATH domain report format",
+      "iri": "http://edamontology.org/format_3100",
+      "parent_iri": "http://edamontology.org/format_3097"
+    },
+    {
+      "label": "Raw CATH domain classification format",
+      "iri": "http://edamontology.org/format_3099",
+      "parent_iri": "http://edamontology.org/format_3097"
+    },
+    {
+      "label": "Raw SCOP domain classification format",
+      "iri": "http://edamontology.org/format_3098",
+      "parent_iri": "http://edamontology.org/format_3097"
+    },
+    {
+      "label": "Alignment format",
+      "iri": "http://edamontology.org/format_1921",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Alignment format (pair only)",
+      "iri": "http://edamontology.org/format_2920",
+      "parent_iri": "http://edamontology.org/format_1921"
+    },
+    {
+      "label": "CIGAR format",
+      "iri": "http://edamontology.org/format_3992",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "CHAIN",
+      "iri": "http://edamontology.org/format_3982",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "CRAM",
+      "iri": "http://edamontology.org/format_3462",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "SAM",
+      "iri": "http://edamontology.org/format_2573",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "BAM",
+      "iri": "http://edamontology.org/format_2572",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "proBAM",
+      "iri": "http://edamontology.org/format_3826",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "EBI Application Result XML",
+      "iri": "http://edamontology.org/format_3157",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "srspair",
+      "iri": "http://edamontology.org/format_2003",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "Pileup",
+      "iri": "http://edamontology.org/format_3015",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "LAV",
+      "iri": "http://edamontology.org/format_3014",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "axt",
+      "iri": "http://edamontology.org/format_3013",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "PSL",
+      "iri": "http://edamontology.org/format_3007",
+      "parent_iri": "http://edamontology.org/format_2920"
+    },
+    {
+      "label": "RNAML",
+      "iri": "http://edamontology.org/format_3311",
+      "parent_iri": "http://edamontology.org/format_1921"
+    },
+    {
+      "label": "Alignment format (XML)",
+      "iri": "http://edamontology.org/format_2555",
+      "parent_iri": "http://edamontology.org/format_1921"
+    },
+    {
+      "label": "HSAML",
+      "iri": "http://edamontology.org/format_3845",
+      "parent_iri": "http://edamontology.org/format_2555"
+    },
+    {
+      "label": "Alignment format (text)",
+      "iri": "http://edamontology.org/format_2554",
+      "parent_iri": "http://edamontology.org/format_1921"
+    },
+    {
+      "label": "csfasta",
+      "iri": "http://edamontology.org/format_3589",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "Phylip format variant",
+      "iri": "http://edamontology.org/format_2924",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "Relaxed PHYLIP Sequential",
+      "iri": "http://edamontology.org/format_3820",
+      "parent_iri": "http://edamontology.org/format_2924"
+    },
+    {
+      "label": "Relaxed PHYLIP Interleaved",
+      "iri": "http://edamontology.org/format_3819",
+      "parent_iri": "http://edamontology.org/format_2924"
+    },
+    {
+      "label": "PHYLIP sequential",
+      "iri": "http://edamontology.org/format_1998",
+      "parent_iri": "http://edamontology.org/format_2924"
+    },
+    {
+      "label": "PHYLIP format",
+      "iri": "http://edamontology.org/format_1997",
+      "parent_iri": "http://edamontology.org/format_2924"
+    },
+    {
+      "label": "mega variant",
+      "iri": "http://edamontology.org/format_2923",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "meganon",
+      "iri": "http://edamontology.org/format_1992",
+      "parent_iri": "http://edamontology.org/format_2923"
+    },
+    {
+      "label": "mega",
+      "iri": "http://edamontology.org/format_1991",
+      "parent_iri": "http://edamontology.org/format_2923"
+    },
+    {
+      "label": "markx0 variant",
+      "iri": "http://edamontology.org/format_2922",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "markx3",
+      "iri": "http://edamontology.org/format_1989",
+      "parent_iri": "http://edamontology.org/format_2922"
+    },
+    {
+      "label": "markx2",
+      "iri": "http://edamontology.org/format_1988",
+      "parent_iri": "http://edamontology.org/format_2922"
+    },
+    {
+      "label": "markx10",
+      "iri": "http://edamontology.org/format_1987",
+      "parent_iri": "http://edamontology.org/format_2922"
+    },
+    {
+      "label": "markx1",
+      "iri": "http://edamontology.org/format_1986",
+      "parent_iri": "http://edamontology.org/format_2922"
+    },
+    {
+      "label": "markx0",
+      "iri": "http://edamontology.org/format_1985",
+      "parent_iri": "http://edamontology.org/format_2922"
+    },
+    {
+      "label": "GCG format variant",
+      "iri": "http://edamontology.org/format_3486",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "RSF",
+      "iri": "http://edamontology.org/format_3485",
+      "parent_iri": "http://edamontology.org/format_3486"
+    },
+    {
+      "label": "GCG MSF",
+      "iri": "http://edamontology.org/format_1947",
+      "parent_iri": "http://edamontology.org/format_3486"
+    },
+    {
+      "label": "GCG",
+      "iri": "http://edamontology.org/format_1935",
+      "parent_iri": "http://edamontology.org/format_3486"
+    },
+    {
+      "label": "PO",
+      "iri": "http://edamontology.org/format_3330",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "BLC",
+      "iri": "http://edamontology.org/format_3313",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "A2M",
+      "iri": "http://edamontology.org/format_3281",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "FASTA-aln",
+      "iri": "http://edamontology.org/format_1984",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "debug",
+      "iri": "http://edamontology.org/format_1983",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "ClustalW format",
+      "iri": "http://edamontology.org/format_1982",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "nexusnon",
+      "iri": "http://edamontology.org/format_1973",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "XMFA",
+      "iri": "http://edamontology.org/format_3811",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "Stockholm format",
+      "iri": "http://edamontology.org/format_1961",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "nexus-seq",
+      "iri": "http://edamontology.org/format_1949",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "FASTA",
+      "iri": "http://edamontology.org/format_1929",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "daf",
+      "iri": "http://edamontology.org/format_1393",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "DIALIGN format",
+      "iri": "http://edamontology.org/format_1392",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "HMMER-aln",
+      "iri": "http://edamontology.org/format_1391",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "TreeCon-seq",
+      "iri": "http://edamontology.org/format_2005",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "T-Coffee format",
+      "iri": "http://edamontology.org/format_2004",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "srs format",
+      "iri": "http://edamontology.org/format_2002",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "EMBOSS simple format",
+      "iri": "http://edamontology.org/format_2001",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "selex",
+      "iri": "http://edamontology.org/format_2000",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "scores format",
+      "iri": "http://edamontology.org/format_1999",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "pair",
+      "iri": "http://edamontology.org/format_1996",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "match",
+      "iri": "http://edamontology.org/format_1990",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "MAF",
+      "iri": "http://edamontology.org/format_3008",
+      "parent_iri": "http://edamontology.org/format_2554"
+    },
+    {
+      "label": "MSAML",
+      "iri": "http://edamontology.org/format_3849",
+      "parent_iri": "http://edamontology.org/format_1921"
+    },
+    {
+      "label": "ARB",
+      "iri": "http://edamontology.org/format_3830",
+      "parent_iri": "http://edamontology.org/format_1921"
+    },
+    {
+      "label": "Sequence feature annotation format",
+      "iri": "http://edamontology.org/format_1920",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Sequence annotation track format",
+      "iri": "http://edamontology.org/format_2919",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "customtrack",
+      "iri": "http://edamontology.org/format_3588",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "bedgraph",
+      "iri": "http://edamontology.org/format_3583",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "bigBed",
+      "iri": "http://edamontology.org/format_3004",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "BED",
+      "iri": "http://edamontology.org/format_3003",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "chrominfo",
+      "iri": "http://edamontology.org/format_3587",
+      "parent_iri": "http://edamontology.org/format_3003"
+    },
+    {
+      "label": "bedstrict",
+      "iri": "http://edamontology.org/format_3584",
+      "parent_iri": "http://edamontology.org/format_3003"
+    },
+    {
+      "label": "bed12",
+      "iri": "http://edamontology.org/format_3586",
+      "parent_iri": "http://edamontology.org/format_3584"
+    },
+    {
+      "label": "bed6",
+      "iri": "http://edamontology.org/format_3585",
+      "parent_iri": "http://edamontology.org/format_3584"
+    },
+    {
+      "label": "ENCODE peak format",
+      "iri": "http://edamontology.org/format_3612",
+      "parent_iri": "http://edamontology.org/format_3585"
+    },
+    {
+      "label": "ENCODE broad peak format",
+      "iri": "http://edamontology.org/format_3614",
+      "parent_iri": "http://edamontology.org/format_3612"
+    },
+    {
+      "label": "ENCODE narrow peak format",
+      "iri": "http://edamontology.org/format_3613",
+      "parent_iri": "http://edamontology.org/format_3612"
+    },
+    {
+      "label": "TrackDB",
+      "iri": "http://edamontology.org/format_3991",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "proBED",
+      "iri": "http://edamontology.org/format_3827",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "GEN",
+      "iri": "http://edamontology.org/format_3812",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "BTrack",
+      "iri": "http://edamontology.org/format_3776",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "GTrack",
+      "iri": "http://edamontology.org/format_3164",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "pgSnp",
+      "iri": "http://edamontology.org/format_3012",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "genePred",
+      "iri": "http://edamontology.org/format_3011",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "bigWig",
+      "iri": "http://edamontology.org/format_3006",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "WIG",
+      "iri": "http://edamontology.org/format_3005",
+      "parent_iri": "http://edamontology.org/format_2919"
+    },
+    {
+      "label": "QMAP",
+      "iri": "http://edamontology.org/format_3984",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "NET",
+      "iri": "http://edamontology.org/format_3983",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "Sequence feature table format",
+      "iri": "http://edamontology.org/format_2548",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "Sequence feature table format (XML)",
+      "iri": "http://edamontology.org/format_2553",
+      "parent_iri": "http://edamontology.org/format_2548"
+    },
+    {
+      "label": "DASGFF",
+      "iri": "http://edamontology.org/format_1978",
+      "parent_iri": "http://edamontology.org/format_2553"
+    },
+    {
+      "label": "uniprotkb-like format",
+      "iri": "http://edamontology.org/format_2547",
+      "parent_iri": "http://edamontology.org/format_2548"
+    },
+    {
+      "label": "UniProt-like (text)",
+      "iri": "http://edamontology.org/format_2187",
+      "parent_iri": "http://edamontology.org/format_2547"
+    },
+    {
+      "label": "UniProtKB format",
+      "iri": "http://edamontology.org/format_1963",
+      "parent_iri": "http://edamontology.org/format_2187"
+    },
+    {
+      "label": "UniProtKB XML",
+      "iri": "http://edamontology.org/format_3770",
+      "parent_iri": "http://edamontology.org/format_2547"
+    },
+    {
+      "label": "Sequence feature table format (text)",
+      "iri": "http://edamontology.org/format_2206",
+      "parent_iri": "http://edamontology.org/format_2548"
+    },
+    {
+      "label": "GFF",
+      "iri": "http://edamontology.org/format_2305",
+      "parent_iri": "http://edamontology.org/format_2206"
+    },
+    {
+      "label": "GFF3",
+      "iri": "http://edamontology.org/format_1975",
+      "parent_iri": "http://edamontology.org/format_2305"
+    },
+    {
+      "label": "GFF3-seq",
+      "iri": "http://edamontology.org/format_1939",
+      "parent_iri": "http://edamontology.org/format_1975"
+    },
+    {
+      "label": "GFF2",
+      "iri": "http://edamontology.org/format_1974",
+      "parent_iri": "http://edamontology.org/format_2305"
+    },
+    {
+      "label": "GFF2-seq",
+      "iri": "http://edamontology.org/format_1938",
+      "parent_iri": "http://edamontology.org/format_1974"
+    },
+    {
+      "label": "GTF",
+      "iri": "http://edamontology.org/format_2306",
+      "parent_iri": "http://edamontology.org/format_2305"
+    },
+    {
+      "label": "GenBank format",
+      "iri": "http://edamontology.org/format_1936",
+      "parent_iri": "http://edamontology.org/format_2206"
+    },
+    {
+      "label": "Sequin format",
+      "iri": "http://edamontology.org/format_3701",
+      "parent_iri": "http://edamontology.org/format_2206"
+    },
+    {
+      "label": "EMBL format",
+      "iri": "http://edamontology.org/format_1927",
+      "parent_iri": "http://edamontology.org/format_2206"
+    },
+    {
+      "label": "debug-feat",
+      "iri": "http://edamontology.org/format_1979",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "UniRef XML",
+      "iri": "http://edamontology.org/format_3854",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "UniParc XML",
+      "iri": "http://edamontology.org/format_3853",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "PSDML",
+      "iri": "http://edamontology.org/format_3851",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "GSuite",
+      "iri": "http://edamontology.org/format_3775",
+      "parent_iri": "http://edamontology.org/format_1920"
+    },
+    {
+      "label": "Sequence record format",
+      "iri": "http://edamontology.org/format_1919",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "GenBank-like format",
+      "iri": "http://edamontology.org/format_2559",
+      "parent_iri": "http://edamontology.org/format_1919"
+    },
+    {
+      "label": "GenBank-HTML",
+      "iri": "http://edamontology.org/format_2532",
+      "parent_iri": "http://edamontology.org/format_2559"
+    },
+    {
+      "label": "GenBank-like format (text)",
+      "iri": "http://edamontology.org/format_2205",
+      "parent_iri": "http://edamontology.org/format_2559"
+    },
+    {
+      "label": "genpept",
+      "iri": "http://edamontology.org/format_1937",
+      "parent_iri": "http://edamontology.org/format_2205"
+    },
+    {
+      "label": "Sequence record format (XML)",
+      "iri": "http://edamontology.org/format_2552",
+      "parent_iri": "http://edamontology.org/format_1919"
+    },
+    {
+      "label": "BSML",
+      "iri": "http://edamontology.org/format_3487",
+      "parent_iri": "http://edamontology.org/format_2552"
+    },
+    {
+      "label": "SeqXML",
+      "iri": "http://edamontology.org/format_3852",
+      "parent_iri": "http://edamontology.org/format_2552"
+    },
+    {
+      "label": "OrthoXML",
+      "iri": "http://edamontology.org/format_3850",
+      "parent_iri": "http://edamontology.org/format_2552"
+    },
+    {
+      "label": "Chado-XML",
+      "iri": "http://edamontology.org/format_3844",
+      "parent_iri": "http://edamontology.org/format_2552"
+    },
+    {
+      "label": "BEAST",
+      "iri": "http://edamontology.org/format_3843",
+      "parent_iri": "http://edamontology.org/format_2552"
+    },
+    {
+      "label": "dasdna",
+      "iri": "http://edamontology.org/format_1968",
+      "parent_iri": "http://edamontology.org/format_2552"
+    },
+    {
+      "label": "DAS format",
+      "iri": "http://edamontology.org/format_1967",
+      "parent_iri": "http://edamontology.org/format_2552"
+    },
+    {
+      "label": "Sequence record format (text)",
+      "iri": "http://edamontology.org/format_2551",
+      "parent_iri": "http://edamontology.org/format_1919"
+    },
+    {
+      "label": "CONTIG",
+      "iri": "http://edamontology.org/format_3978",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "GDE",
+      "iri": "http://edamontology.org/format_3312",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "jackknifernon",
+      "iri": "http://edamontology.org/format_1970",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "debug-seq",
+      "iri": "http://edamontology.org/format_1969",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "ASN.1 sequence format",
+      "iri": "http://edamontology.org/format_1966",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "strider format",
+      "iri": "http://edamontology.org/format_1962",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "Staden format",
+      "iri": "http://edamontology.org/format_1960",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "refseqp",
+      "iri": "http://edamontology.org/format_1958",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "pdbseqres",
+      "iri": "http://edamontology.org/format_1953",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "pdbseqresnuc",
+      "iri": "http://edamontology.org/format_1952",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "pdbatomnuc",
+      "iri": "http://edamontology.org/format_1951",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "pdbatom",
+      "iri": "http://edamontology.org/format_1950",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "mega-seq",
+      "iri": "http://edamontology.org/format_1946",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "mase format",
+      "iri": "http://edamontology.org/format_1945",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "jackknifer",
+      "iri": "http://edamontology.org/format_1944",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "igstrict",
+      "iri": "http://edamontology.org/format_1943",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "ig",
+      "iri": "http://edamontology.org/format_1942",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "hennig86",
+      "iri": "http://edamontology.org/format_1941",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "fitch program",
+      "iri": "http://edamontology.org/format_1934",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "Staden experiment format",
+      "iri": "http://edamontology.org/format_1928",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "codata",
+      "iri": "http://edamontology.org/format_1925",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "acedb",
+      "iri": "http://edamontology.org/format_1923",
+      "parent_iri": "http://edamontology.org/format_2551"
+    },
+    {
+      "label": "FASTA-like",
+      "iri": "http://edamontology.org/format_2546",
+      "parent_iri": "http://edamontology.org/format_1919"
+    },
+    {
+      "label": "FASTA-HTML",
+      "iri": "http://edamontology.org/format_2310",
+      "parent_iri": "http://edamontology.org/format_2546"
+    },
+    {
+      "label": "FASTA-like (text)",
+      "iri": "http://edamontology.org/format_2200",
+      "parent_iri": "http://edamontology.org/format_2546"
+    },
+    {
+      "label": "NCBI format",
+      "iri": "http://edamontology.org/format_1972",
+      "parent_iri": "http://edamontology.org/format_2200"
+    },
+    {
+      "label": "Pearson format",
+      "iri": "http://edamontology.org/format_1954",
+      "parent_iri": "http://edamontology.org/format_2200"
+    },
+    {
+      "label": "giFASTA format",
+      "iri": "http://edamontology.org/format_1940",
+      "parent_iri": "http://edamontology.org/format_2200"
+    },
+    {
+      "label": "dbid",
+      "iri": "http://edamontology.org/format_1926",
+      "parent_iri": "http://edamontology.org/format_2200"
+    },
+    {
+      "label": "EMBL-like format",
+      "iri": "http://edamontology.org/format_2543",
+      "parent_iri": "http://edamontology.org/format_1919"
+    },
+    {
+      "label": "EMBL-like (XML)",
+      "iri": "http://edamontology.org/format_2558",
+      "parent_iri": "http://edamontology.org/format_2543"
+    },
+    {
+      "label": "EMBL format (XML)",
+      "iri": "http://edamontology.org/format_2204",
+      "parent_iri": "http://edamontology.org/format_2558"
+    },
+    {
+      "label": "INSDSeq",
+      "iri": "http://edamontology.org/format_2185",
+      "parent_iri": "http://edamontology.org/format_2204"
+    },
+    {
+      "label": "cdsxml",
+      "iri": "http://edamontology.org/format_2184",
+      "parent_iri": "http://edamontology.org/format_2204"
+    },
+    {
+      "label": "EMBLXML",
+      "iri": "http://edamontology.org/format_2183",
+      "parent_iri": "http://edamontology.org/format_2204"
+    },
+    {
+      "label": "EMBL-HTML",
+      "iri": "http://edamontology.org/format_2311",
+      "parent_iri": "http://edamontology.org/format_2543"
+    },
+    {
+      "label": "EMBL-like (text)",
+      "iri": "http://edamontology.org/format_2181",
+      "parent_iri": "http://edamontology.org/format_2543"
+    },
+    {
+      "label": "geneseq",
+      "iri": "http://edamontology.org/format_2186",
+      "parent_iri": "http://edamontology.org/format_2181"
+    },
+    {
+      "label": "Sequence trace format",
+      "iri": "http://edamontology.org/format_2057",
+      "parent_iri": "http://edamontology.org/format_1919"
+    },
+    {
+      "label": "AB1",
+      "iri": "http://edamontology.org/format_3000",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "SFF",
+      "iri": "http://edamontology.org/format_3284",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "FASTQ-like format",
+      "iri": "http://edamontology.org/format_2545",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "FASTQ-like format (text)",
+      "iri": "http://edamontology.org/format_2182",
+      "parent_iri": "http://edamontology.org/format_2545"
+    },
+    {
+      "label": "FASTQ-solexa",
+      "iri": "http://edamontology.org/format_1933",
+      "parent_iri": "http://edamontology.org/format_2182"
+    },
+    {
+      "label": "FASTQ-sanger",
+      "iri": "http://edamontology.org/format_1932",
+      "parent_iri": "http://edamontology.org/format_2182"
+    },
+    {
+      "label": "FASTQ-illumina",
+      "iri": "http://edamontology.org/format_1931",
+      "parent_iri": "http://edamontology.org/format_2182"
+    },
+    {
+      "label": "FASTQ",
+      "iri": "http://edamontology.org/format_1930",
+      "parent_iri": "http://edamontology.org/format_2182"
+    },
+    {
+      "label": "PHD",
+      "iri": "http://edamontology.org/format_1633",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "SCF",
+      "iri": "http://edamontology.org/format_1632",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "mira",
+      "iri": "http://edamontology.org/format_1629",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "ABI",
+      "iri": "http://edamontology.org/format_1628",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "ZTR",
+      "iri": "http://edamontology.org/format_3018",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "SRF",
+      "iri": "http://edamontology.org/format_3017",
+      "parent_iri": "http://edamontology.org/format_2057"
+    },
+    {
+      "label": "Sequence cluster format",
+      "iri": "http://edamontology.org/format_2170",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Sequence cluster format (nucleic acid)",
+      "iri": "http://edamontology.org/format_2172",
+      "parent_iri": "http://edamontology.org/format_2170"
+    },
+    {
+      "label": "affymetrix",
+      "iri": "http://edamontology.org/format_1639",
+      "parent_iri": "http://edamontology.org/format_2172"
+    },
+    {
+      "label": "Sequence cluster format (protein)",
+      "iri": "http://edamontology.org/format_2171",
+      "parent_iri": "http://edamontology.org/format_2170"
+    },
+    {
+      "label": "Nucleic acid features (restriction sites) format",
+      "iri": "http://edamontology.org/format_2158",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "REBASE restriction sites",
+      "iri": "http://edamontology.org/format_1320",
+      "parent_iri": "http://edamontology.org/format_2158"
+    },
+    {
+      "label": "restover format",
+      "iri": "http://edamontology.org/format_1319",
+      "parent_iri": "http://edamontology.org/format_2158"
+    },
+    {
+      "label": "restrict format",
+      "iri": "http://edamontology.org/format_1318",
+      "parent_iri": "http://edamontology.org/format_2158"
+    },
+    {
+      "label": "Sequence features (repeats) format",
+      "iri": "http://edamontology.org/format_2155",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "EMBOSS repeat",
+      "iri": "http://edamontology.org/format_1297",
+      "parent_iri": "http://edamontology.org/format_2155"
+    },
+    {
+      "label": "Sanger inverted repeats",
+      "iri": "http://edamontology.org/format_1296",
+      "parent_iri": "http://edamontology.org/format_2155"
+    },
+    {
+      "label": "quicktandem",
+      "iri": "http://edamontology.org/format_1295",
+      "parent_iri": "http://edamontology.org/format_2155"
+    },
+    {
+      "label": "Sequence range format",
+      "iri": "http://edamontology.org/format_2078",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Cytoband format",
+      "iri": "http://edamontology.org/format_3235",
+      "parent_iri": "http://edamontology.org/format_2078"
+    },
+    {
+      "label": "EMBL feature location",
+      "iri": "http://edamontology.org/format_1248",
+      "parent_iri": "http://edamontology.org/format_2078"
+    },
+    {
+      "label": "Protein secondary structure format",
+      "iri": "http://edamontology.org/format_2077",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "hssp",
+      "iri": "http://edamontology.org/format_1455",
+      "parent_iri": "http://edamontology.org/format_2077"
+    },
+    {
+      "label": "dssp",
+      "iri": "http://edamontology.org/format_1454",
+      "parent_iri": "http://edamontology.org/format_2077"
+    },
+    {
+      "label": "RNA secondary structure format",
+      "iri": "http://edamontology.org/format_2076",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "SS",
+      "iri": "http://edamontology.org/format_3310",
+      "parent_iri": "http://edamontology.org/format_2076"
+    },
+    {
+      "label": "CT",
+      "iri": "http://edamontology.org/format_3309",
+      "parent_iri": "http://edamontology.org/format_2076"
+    },
+    {
+      "label": "Dot-bracket format",
+      "iri": "http://edamontology.org/format_1457",
+      "parent_iri": "http://edamontology.org/format_2076"
+    },
+    {
+      "label": "Vienna local RNA secondary structure format",
+      "iri": "http://edamontology.org/format_1458",
+      "parent_iri": "http://edamontology.org/format_1457"
+    },
+    {
+      "label": "HMM emission and transition counts format",
+      "iri": "http://edamontology.org/format_2075",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "HMMER emission and transition",
+      "iri": "http://edamontology.org/format_1351",
+      "parent_iri": "http://edamontology.org/format_2075"
+    },
+    {
+      "label": "Dirichlet distribution format",
+      "iri": "http://edamontology.org/format_2074",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "MEME Dirichlet prior",
+      "iri": "http://edamontology.org/format_1350",
+      "parent_iri": "http://edamontology.org/format_2074"
+    },
+    {
+      "label": "HMMER Dirichlet prior",
+      "iri": "http://edamontology.org/format_1349",
+      "parent_iri": "http://edamontology.org/format_2074"
+    },
+    {
+      "label": "Sequence profile format",
+      "iri": "http://edamontology.org/format_2069",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Hidden Markov model format",
+      "iri": "http://edamontology.org/format_2072",
+      "parent_iri": "http://edamontology.org/format_2069"
+    },
+    {
+      "label": "HMMER format",
+      "iri": "http://edamontology.org/format_1370",
+      "parent_iri": "http://edamontology.org/format_2072"
+    },
+    {
+      "label": "HMMER3",
+      "iri": "http://edamontology.org/format_3329",
+      "parent_iri": "http://edamontology.org/format_1370"
+    },
+    {
+      "label": "HMMER2",
+      "iri": "http://edamontology.org/format_3328",
+      "parent_iri": "http://edamontology.org/format_1370"
+    },
+    {
+      "label": "MEME background Markov model",
+      "iri": "http://edamontology.org/format_1369",
+      "parent_iri": "http://edamontology.org/format_2072"
+    },
+    {
+      "label": "JASPAR format",
+      "iri": "http://edamontology.org/format_1367",
+      "parent_iri": "http://edamontology.org/format_2069"
+    },
+    {
+      "label": "prosite-profile",
+      "iri": "http://edamontology.org/format_1366",
+      "parent_iri": "http://edamontology.org/format_2069"
+    },
+    {
+      "label": "Sequence motif format",
+      "iri": "http://edamontology.org/format_2068",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "meme-motif",
+      "iri": "http://edamontology.org/format_1360",
+      "parent_iri": "http://edamontology.org/format_2068"
+    },
+    {
+      "label": "EMBOSS sequence pattern",
+      "iri": "http://edamontology.org/format_1357",
+      "parent_iri": "http://edamontology.org/format_2068"
+    },
+    {
+      "label": "prosite-pattern",
+      "iri": "http://edamontology.org/format_1356",
+      "parent_iri": "http://edamontology.org/format_2068"
+    },
+    {
+      "label": "Sequence distance matrix format",
+      "iri": "http://edamontology.org/format_2067",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Phylip distance matrix",
+      "iri": "http://edamontology.org/format_1423",
+      "parent_iri": "http://edamontology.org/format_2067"
+    },
+    {
+      "label": "Database hits (sequence) format",
+      "iri": "http://edamontology.org/format_2066",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "InterPro hits format",
+      "iri": "http://edamontology.org/format_1341",
+      "parent_iri": "http://edamontology.org/format_2066"
+    },
+    {
+      "label": "InterPro match table format",
+      "iri": "http://edamontology.org/format_1343",
+      "parent_iri": "http://edamontology.org/format_1341"
+    },
+    {
+      "label": "InterPro protein view report format",
+      "iri": "http://edamontology.org/format_1342",
+      "parent_iri": "http://edamontology.org/format_1341"
+    },
+    {
+      "label": "lhf",
+      "iri": "http://edamontology.org/format_1337",
+      "parent_iri": "http://edamontology.org/format_2066"
+    },
+    {
+      "label": "dhf",
+      "iri": "http://edamontology.org/format_1336",
+      "parent_iri": "http://edamontology.org/format_2066"
+    },
+    {
+      "label": "Smith-Waterman format",
+      "iri": "http://edamontology.org/format_1335",
+      "parent_iri": "http://edamontology.org/format_2066"
+    },
+    {
+      "label": "mspcrunch",
+      "iri": "http://edamontology.org/format_1334",
+      "parent_iri": "http://edamontology.org/format_2066"
+    },
+    {
+      "label": "BLAST results",
+      "iri": "http://edamontology.org/format_1333",
+      "parent_iri": "http://edamontology.org/format_2066"
+    },
+    {
+      "label": "BLAST XML results format",
+      "iri": "http://edamontology.org/format_3331",
+      "parent_iri": "http://edamontology.org/format_1333"
+    },
+    {
+      "label": "BLAST XML v2 results format",
+      "iri": "http://edamontology.org/format_3836",
+      "parent_iri": "http://edamontology.org/format_1333"
+    },
+    {
+      "label": "FASTA search results format",
+      "iri": "http://edamontology.org/format_1332",
+      "parent_iri": "http://edamontology.org/format_2066"
+    },
+    {
+      "label": "Protein structure report (quality evaluation) format",
+      "iri": "http://edamontology.org/format_2065",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "ProQ report format",
+      "iri": "http://edamontology.org/format_1552",
+      "parent_iri": "http://edamontology.org/format_2065"
+    },
+    {
+      "label": "Pcons report format",
+      "iri": "http://edamontology.org/format_1551",
+      "parent_iri": "http://edamontology.org/format_2065"
+    },
+    {
+      "label": "Protein report format",
+      "iri": "http://edamontology.org/format_2062",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "BcForms",
+      "iri": "http://edamontology.org/format_3951",
+      "parent_iri": "http://edamontology.org/format_2062"
+    },
+    {
+      "label": "Nucleic acid features (primers) format",
+      "iri": "http://edamontology.org/format_2061",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Primer3 primer",
+      "iri": "http://edamontology.org/format_1627",
+      "parent_iri": "http://edamontology.org/format_2061"
+    },
+    {
+      "label": "Map format",
+      "iri": "http://edamontology.org/format_2060",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "PlasMapper TextMap",
+      "iri": "http://edamontology.org/format_1861",
+      "parent_iri": "http://edamontology.org/format_2060"
+    },
+    {
+      "label": "Gene expression report format",
+      "iri": "http://edamontology.org/format_2058",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "rcc",
+      "iri": "http://edamontology.org/format_3580",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "IDAT",
+      "iri": "http://edamontology.org/format_3578",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "RPKM",
+      "iri": "http://edamontology.org/format_3980",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "Cytoscape input file format",
+      "iri": "http://edamontology.org/format_3477",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "GCT/Res format",
+      "iri": "http://edamontology.org/format_3709",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "MAGE-TAB",
+      "iri": "http://edamontology.org/format_3162",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "MAGE-ML",
+      "iri": "http://edamontology.org/format_3161",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "CHP",
+      "iri": "http://edamontology.org/format_1644",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "cel",
+      "iri": "http://edamontology.org/format_1638",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "dat",
+      "iri": "http://edamontology.org/format_1637",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "MTX",
+      "iri": "http://edamontology.org/format_3916",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "Zarr",
+      "iri": "http://edamontology.org/format_3915",
+      "parent_iri": "http://edamontology.org/format_2058"
+    },
+    {
+      "label": "Sequence assembly format",
+      "iri": "http://edamontology.org/format_2055",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "ACE",
+      "iri": "http://edamontology.org/format_3001",
+      "parent_iri": "http://edamontology.org/format_2055"
+    },
+    {
+      "label": "Sequence assembly format (text)",
+      "iri": "http://edamontology.org/format_2561",
+      "parent_iri": "http://edamontology.org/format_2055"
+    },
+    {
+      "label": "afg",
+      "iri": "http://edamontology.org/format_3582",
+      "parent_iri": "http://edamontology.org/format_2561"
+    },
+    {
+      "label": "GFA 2",
+      "iri": "http://edamontology.org/format_3976",
+      "parent_iri": "http://edamontology.org/format_2561"
+    },
+    {
+      "label": "GFA 1",
+      "iri": "http://edamontology.org/format_3975",
+      "parent_iri": "http://edamontology.org/format_2561"
+    },
+    {
+      "label": "FASTG",
+      "iri": "http://edamontology.org/format_3823",
+      "parent_iri": "http://edamontology.org/format_2561"
+    },
+    {
+      "label": "ELAND format",
+      "iri": "http://edamontology.org/format_3818",
+      "parent_iri": "http://edamontology.org/format_2561"
+    },
+    {
+      "label": "EXP",
+      "iri": "http://edamontology.org/format_1631",
+      "parent_iri": "http://edamontology.org/format_2561"
+    },
+    {
+      "label": "CAF",
+      "iri": "http://edamontology.org/format_1630",
+      "parent_iri": "http://edamontology.org/format_2561"
+    },
+    {
+      "label": "AGP",
+      "iri": "http://edamontology.org/format_3693",
+      "parent_iri": "http://edamontology.org/format_2055"
+    },
+    {
+      "label": "Protein interaction format",
+      "iri": "http://edamontology.org/format_2054",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "STRING entry format (XML)",
+      "iri": "http://edamontology.org/format_2304",
+      "parent_iri": "http://edamontology.org/format_2054"
+    },
+    {
+      "label": "PSI MI TAB (MITAB)",
+      "iri": "http://edamontology.org/format_3242",
+      "parent_iri": "http://edamontology.org/format_2054"
+    },
+    {
+      "label": "PSI MI XML (MIF)",
+      "iri": "http://edamontology.org/format_3158",
+      "parent_iri": "http://edamontology.org/format_2054"
+    },
+    {
+      "label": "PSI-PAR",
+      "iri": "http://edamontology.org/format_3243",
+      "parent_iri": "http://edamontology.org/format_3158"
+    },
+    {
+      "label": "Protein family report format",
+      "iri": "http://edamontology.org/format_2052",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Phylogenetic tree report (tree distances) format",
+      "iri": "http://edamontology.org/format_2049",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Phylip tree distance format",
+      "iri": "http://edamontology.org/format_1445",
+      "parent_iri": "http://edamontology.org/format_2049"
+    },
+    {
+      "label": "Phylogenetic character data format",
+      "iri": "http://edamontology.org/format_2036",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Phylogenetic tree report (invariants) format",
+      "iri": "http://edamontology.org/format_2040",
+      "parent_iri": "http://edamontology.org/format_2036"
+    },
+    {
+      "label": "Phylogenetic tree report (cliques) format",
+      "iri": "http://edamontology.org/format_2039",
+      "parent_iri": "http://edamontology.org/format_2036"
+    },
+    {
+      "label": "Phylip cliques format",
+      "iri": "http://edamontology.org/format_1434",
+      "parent_iri": "http://edamontology.org/format_2039"
+    },
+    {
+      "label": "Phylogenetic discrete states format",
+      "iri": "http://edamontology.org/format_2038",
+      "parent_iri": "http://edamontology.org/format_2036"
+    },
+    {
+      "label": "Phylip discrete states format",
+      "iri": "http://edamontology.org/format_1433",
+      "parent_iri": "http://edamontology.org/format_2038"
+    },
+    {
+      "label": "Phylogenetic continuous quantitative character format",
+      "iri": "http://edamontology.org/format_2037",
+      "parent_iri": "http://edamontology.org/format_2036"
+    },
+    {
+      "label": "Phylip character frequencies format",
+      "iri": "http://edamontology.org/format_1432",
+      "parent_iri": "http://edamontology.org/format_2037"
+    },
+    {
+      "label": "Phylip continuous quantitative characters",
+      "iri": "http://edamontology.org/format_1430",
+      "parent_iri": "http://edamontology.org/format_2037"
+    },
+    {
+      "label": "Chemical formula format",
+      "iri": "http://edamontology.org/format_2035",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "InChIKey",
+      "iri": "http://edamontology.org/format_1199",
+      "parent_iri": "http://edamontology.org/format_2035"
+    },
+    {
+      "label": "mf",
+      "iri": "http://edamontology.org/format_1198",
+      "parent_iri": "http://edamontology.org/format_2035"
+    },
+    {
+      "label": "InChI",
+      "iri": "http://edamontology.org/format_1197",
+      "parent_iri": "http://edamontology.org/format_2035"
+    },
+    {
+      "label": "SMILES",
+      "iri": "http://edamontology.org/format_1196",
+      "parent_iri": "http://edamontology.org/format_2035"
+    },
+    {
+      "label": "smarts",
+      "iri": "http://edamontology.org/format_1200",
+      "parent_iri": "http://edamontology.org/format_1196"
+    },
+    {
+      "label": "Tertiary structure format",
+      "iri": "http://edamontology.org/format_2033",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "PDB database entry format",
+      "iri": "http://edamontology.org/format_1475",
+      "parent_iri": "http://edamontology.org/format_2033"
+    },
+    {
+      "label": "PDBQT",
+      "iri": "http://edamontology.org/format_4036",
+      "parent_iri": "http://edamontology.org/format_1475"
+    },
+    {
+      "label": "PQR",
+      "iri": "http://edamontology.org/format_4035",
+      "parent_iri": "http://edamontology.org/format_1475"
+    },
+    {
+      "label": "PDBML",
+      "iri": "http://edamontology.org/format_1478",
+      "parent_iri": "http://edamontology.org/format_1475"
+    },
+    {
+      "label": "mmCIF",
+      "iri": "http://edamontology.org/format_1477",
+      "parent_iri": "http://edamontology.org/format_1475"
+    },
+    {
+      "label": "PDB",
+      "iri": "http://edamontology.org/format_1476",
+      "parent_iri": "http://edamontology.org/format_1475"
+    },
+    {
+      "label": "CHARMM rtf",
+      "iri": "http://edamontology.org/format_3887",
+      "parent_iri": "http://edamontology.org/format_2033"
+    },
+    {
+      "label": "GROMACS itp",
+      "iri": "http://edamontology.org/format_3883",
+      "parent_iri": "http://edamontology.org/format_2033"
+    },
+    {
+      "label": "PSF",
+      "iri": "http://edamontology.org/format_3882",
+      "parent_iri": "http://edamontology.org/format_2033"
+    },
+    {
+      "label": "AMBER top",
+      "iri": "http://edamontology.org/format_3881",
+      "parent_iri": "http://edamontology.org/format_2033"
+    },
+    {
+      "label": "GROMACS top",
+      "iri": "http://edamontology.org/format_3880",
+      "parent_iri": "http://edamontology.org/format_2033"
+    },
+    {
+      "label": "Workflow format",
+      "iri": "http://edamontology.org/format_2032",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "MATLAB script",
+      "iri": "http://edamontology.org/format_4007",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "R markdown",
+      "iri": "http://edamontology.org/format_4000",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "R script",
+      "iri": "http://edamontology.org/format_3999",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "Perl script",
+      "iri": "http://edamontology.org/format_3998",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "Python script",
+      "iri": "http://edamontology.org/format_3996",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "gxformat2",
+      "iri": "http://edamontology.org/format_3985",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "CWL",
+      "iri": "http://edamontology.org/format_3857",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "KNIME datatable format",
+      "iri": "http://edamontology.org/format_3765",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "Taverna workflow format",
+      "iri": "http://edamontology.org/format_1665",
+      "parent_iri": "http://edamontology.org/format_2032"
+    },
+    {
+      "label": "Gene annotation format",
+      "iri": "http://edamontology.org/format_2031",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "WEGO",
+      "iri": "http://edamontology.org/format_3979",
+      "parent_iri": "http://edamontology.org/format_2031"
+    },
+    {
+      "label": "est2genome format",
+      "iri": "http://edamontology.org/format_1316",
+      "parent_iri": "http://edamontology.org/format_2031"
+    },
+    {
+      "label": "Chemical data format",
+      "iri": "http://edamontology.org/format_2030",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "cif",
+      "iri": "http://edamontology.org/format_4024",
+      "parent_iri": "http://edamontology.org/format_2030"
+    },
+    {
+      "label": "cml",
+      "iri": "http://edamontology.org/format_4023",
+      "parent_iri": "http://edamontology.org/format_2030"
+    },
+    {
+      "label": "Mol2",
+      "iri": "http://edamontology.org/format_3816",
+      "parent_iri": "http://edamontology.org/format_2030"
+    },
+    {
+      "label": "Molfile",
+      "iri": "http://edamontology.org/format_3815",
+      "parent_iri": "http://edamontology.org/format_2030"
+    },
+    {
+      "label": "SDF",
+      "iri": "http://edamontology.org/format_3814",
+      "parent_iri": "http://edamontology.org/format_2030"
+    },
+    {
+      "label": "HET group dictionary entry format",
+      "iri": "http://edamontology.org/format_1705",
+      "parent_iri": "http://edamontology.org/format_2030"
+    },
+    {
+      "label": "Enzyme kinetics report format",
+      "iri": "http://edamontology.org/format_2027",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "findkm",
+      "iri": "http://edamontology.org/format_1582",
+      "parent_iri": "http://edamontology.org/format_2027"
+    },
+    {
+      "label": "Text mining report format",
+      "iri": "http://edamontology.org/format_2021",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "iHOP format",
+      "iri": "http://edamontology.org/format_1740",
+      "parent_iri": "http://edamontology.org/format_2021"
+    },
+    {
+      "label": "Article format",
+      "iri": "http://edamontology.org/format_2020",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "medline",
+      "iri": "http://edamontology.org/format_2194",
+      "parent_iri": "http://edamontology.org/format_2020"
+    },
+    {
+      "label": "pmc",
+      "iri": "http://edamontology.org/format_1739",
+      "parent_iri": "http://edamontology.org/format_2020"
+    },
+    {
+      "label": "Sequence-profile alignment format",
+      "iri": "http://edamontology.org/format_2014",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "HMMER profile alignment (HMM versus sequences)",
+      "iri": "http://edamontology.org/format_1422",
+      "parent_iri": "http://edamontology.org/format_2014"
+    },
+    {
+      "label": "HMMER profile alignment (sequences versus HMMs)",
+      "iri": "http://edamontology.org/format_1421",
+      "parent_iri": "http://edamontology.org/format_2014"
+    },
+    {
+      "label": "Sequence-MEME profile alignment",
+      "iri": "http://edamontology.org/format_1419",
+      "parent_iri": "http://edamontology.org/format_2014"
+    },
+    {
+      "label": "Biological pathway or network format",
+      "iri": "http://edamontology.org/format_2013",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "BNGL",
+      "iri": "http://edamontology.org/format_3972",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "NeuroML",
+      "iri": "http://edamontology.org/format_3971",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "SBML",
+      "iri": "http://edamontology.org/format_2585",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "KGML",
+      "iri": "http://edamontology.org/format_3847",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "GML",
+      "iri": "http://edamontology.org/format_3822",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "VisML",
+      "iri": "http://edamontology.org/format_3821",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "CellML",
+      "iri": "http://edamontology.org/format_3240",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "BioPAX",
+      "iri": "http://edamontology.org/format_3156",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "SBGN-ML",
+      "iri": "http://edamontology.org/format_3692",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "BCML",
+      "iri": "http://edamontology.org/format_3689",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "SBtab",
+      "iri": "http://edamontology.org/format_3688",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "GPML",
+      "iri": "http://edamontology.org/format_3657",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "sif",
+      "iri": "http://edamontology.org/format_3619",
+      "parent_iri": "http://edamontology.org/format_2013"
+    },
+    {
+      "label": "Phylogenetic tree format",
+      "iri": "http://edamontology.org/format_2006",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Phylogenetic tree format (XML)",
+      "iri": "http://edamontology.org/format_2557",
+      "parent_iri": "http://edamontology.org/format_2006"
+    },
+    {
+      "label": "NeXML",
+      "iri": "http://edamontology.org/format_3160",
+      "parent_iri": "http://edamontology.org/format_2557"
+    },
+    {
+      "label": "phyloXML",
+      "iri": "http://edamontology.org/format_3159",
+      "parent_iri": "http://edamontology.org/format_2557"
+    },
+    {
+      "label": "Phylogenetic tree format (text)",
+      "iri": "http://edamontology.org/format_2556",
+      "parent_iri": "http://edamontology.org/format_2006"
+    },
+    {
+      "label": "Nexus format",
+      "iri": "http://edamontology.org/format_1912",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "TreeCon format",
+      "iri": "http://edamontology.org/format_1911",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "newick",
+      "iri": "http://edamontology.org/format_1910",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "TreeFam format",
+      "iri": "http://edamontology.org/format_1437",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "TreeBASE format",
+      "iri": "http://edamontology.org/format_1436",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "Phylip tree format",
+      "iri": "http://edamontology.org/format_1435",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "Phylip tree raw",
+      "iri": "http://edamontology.org/format_1425",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "ClustalW dendrogram",
+      "iri": "http://edamontology.org/format_1424",
+      "parent_iri": "http://edamontology.org/format_2556"
+    },
+    {
+      "label": "Matrix format",
+      "iri": "http://edamontology.org/format_3033",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "3D-1D scoring matrix format",
+      "iri": "http://edamontology.org/format_2064",
+      "parent_iri": "http://edamontology.org/format_3033"
+    },
+    {
+      "label": "MAT",
+      "iri": "http://edamontology.org/format_3626",
+      "parent_iri": "http://edamontology.org/format_3033"
+    },
+    {
+      "label": "Amino acid index format",
+      "iri": "http://edamontology.org/format_2017",
+      "parent_iri": "http://edamontology.org/format_3033"
+    },
+    {
+      "label": "aaindex",
+      "iri": "http://edamontology.org/format_1504",
+      "parent_iri": "http://edamontology.org/format_2017"
+    },
+    {
+      "label": "FF parameter format",
+      "iri": "http://edamontology.org/format_3884",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "AMBER off",
+      "iri": "http://edamontology.org/format_3889",
+      "parent_iri": "http://edamontology.org/format_3884"
+    },
+    {
+      "label": "AMBER frcmod",
+      "iri": "http://edamontology.org/format_3888",
+      "parent_iri": "http://edamontology.org/format_3884"
+    },
+    {
+      "label": "Topology format",
+      "iri": "http://edamontology.org/format_3879",
+      "parent_iri": "http://edamontology.org/format_2350"
+    },
+    {
+      "label": "Binary format",
+      "iri": "http://edamontology.org/format_2333",
+      "parent_iri": "http://edamontology.org/format_1915"
+    },
+    {
+      "label": "Zstandard format",
+      "iri": "http://edamontology.org/format_4006",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "SimTools repertoire file format",
+      "iri": "http://edamontology.org/format_4004",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "NumPy format",
+      "iri": "http://edamontology.org/format_4003",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "pickle",
+      "iri": "http://edamontology.org/format_4002",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "GZIP format",
+      "iri": "http://edamontology.org/format_3989",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "ZIP format",
+      "iri": "http://edamontology.org/format_3987",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "TAR format",
+      "iri": "http://edamontology.org/format_3981",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "Docker image",
+      "iri": "http://edamontology.org/format_3973",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "GIF",
+      "iri": "http://edamontology.org/format_3467",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "VDB",
+      "iri": "http://edamontology.org/format_3699",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "SRA format",
+      "iri": "http://edamontology.org/format_3698",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "SQLite format",
+      "iri": "http://edamontology.org/format_3621",
+      "parent_iri": "http://edamontology.org/format_2333"
+    },
+    {
+      "label": "XML",
+      "iri": "http://edamontology.org/format_2332",
+      "parent_iri": "http://edamontology.org/format_1915"
+    },
+    {
+      "label": "xsd",
+      "iri": "http://edamontology.org/format_3804",
+      "parent_iri": "http://edamontology.org/format_2332"
+    },
+    {
+      "label": "PMML",
+      "iri": "http://edamontology.org/format_3726",
+      "parent_iri": "http://edamontology.org/format_2332"
+    },
+    {
+      "label": "SBOL",
+      "iri": "http://edamontology.org/format_3725",
+      "parent_iri": "http://edamontology.org/format_2332"
+    },
+    {
+      "label": "BDML",
+      "iri": "http://edamontology.org/format_3690",
+      "parent_iri": "http://edamontology.org/format_2332"
+    },
+    {
+      "label": "HTML",
+      "iri": "http://edamontology.org/format_2331",
+      "parent_iri": "http://edamontology.org/format_1915"
+    },
+    {
+      "label": "MHTML",
+      "iri": "http://edamontology.org/format_3556",
+      "parent_iri": "http://edamontology.org/format_2331"
+    },
+    {
+      "label": "Textual format",
+      "iri": "http://edamontology.org/format_2330",
+      "parent_iri": "http://edamontology.org/format_1915"
+    },
+    {
+      "label": "BioSimulators standard for command-line interfaces for biosimulation tools",
+      "iri": "http://edamontology.org/format_4026",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "Configuration file format",
+      "iri": "http://edamontology.org/format_4005",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "arff",
+      "iri": "http://edamontology.org/format_3581",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "SPSS",
+      "iri": "http://edamontology.org/format_3555",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "R file format",
+      "iri": "http://edamontology.org/format_3554",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "SAMPLE file format",
+      "iri": "http://edamontology.org/format_3813",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "SPARQL",
+      "iri": "http://edamontology.org/format_3790",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "XQuery",
+      "iri": "http://edamontology.org/format_3789",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "SQL",
+      "iri": "http://edamontology.org/format_3788",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "plain text format (unformatted)",
+      "iri": "http://edamontology.org/format_1964",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "nbrf/pir",
+      "iri": "http://edamontology.org/format_1948",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "DSV",
+      "iri": "http://edamontology.org/format_3751",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "TSV",
+      "iri": "http://edamontology.org/format_3475",
+      "parent_iri": "http://edamontology.org/format_3751"
+    },
+    {
+      "label": "PEtab",
+      "iri": "http://edamontology.org/format_4015",
+      "parent_iri": "http://edamontology.org/format_3475"
+    },
+    {
+      "label": "CSV",
+      "iri": "http://edamontology.org/format_3752",
+      "parent_iri": "http://edamontology.org/format_3751"
+    },
+    {
+      "label": "dbGaP format",
+      "iri": "http://edamontology.org/format_3729",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "LocARNA PP",
+      "iri": "http://edamontology.org/format_3728",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "PS",
+      "iri": "http://edamontology.org/format_3696",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "EPS",
+      "iri": "http://edamontology.org/format_3466",
+      "parent_iri": "http://edamontology.org/format_3696"
+    },
+    {
+      "label": "BEL",
+      "iri": "http://edamontology.org/format_3691",
+      "parent_iri": "http://edamontology.org/format_2330"
+    },
+    {
+      "label": "YAML",
+      "iri": "http://edamontology.org/format_3750",
+      "parent_iri": "http://edamontology.org/format_1915"
+    }
+  ]
+}

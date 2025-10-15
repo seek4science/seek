@@ -21,7 +21,6 @@ module AdminHelper
     words.join(', ').html_safe
   end
 
-  
 
   def action_buttons(user_or_person, action)
     case action
@@ -101,4 +100,5 @@ module AdminHelper
       concat yield
     end
   end
+
 end

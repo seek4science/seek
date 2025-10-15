@@ -72,6 +72,36 @@ class SampleControlledVocab < ApplicationRecord
     self.ols_root_term_uris = uris.join(', ')
   end
 
+  # updates the vocab and terms from a json file created with rake seek_dev:dump_controlled_vocab
+  def update_from_json_dump(json, delete_removed)
+    # find and attach the ids for those that exist
+    presented_iris = []
+    json[:sample_controlled_vocab_terms_attributes].each do |term_json|
+      iri = term_json[:iri]
+      presented_iris << iri
+      term = sample_controlled_vocab_terms.where(iri: iri).first
+      if term
+        term_json[:id] = term.id
+      end
+    end
+
+    existing_iris = sample_controlled_vocab_terms.select(:iri).collect(&:iri)
+    removed_iris = existing_iris - presented_iris
+    removed_iris.each do |iri|
+      term = sample_controlled_vocab_terms.where(iri: iri).first
+
+      # see if the label exists, and if so set id to update existing or otherwise mark for deletion. (deleting original and adding new will give duplicate label validation error)
+      json_term = json[:sample_controlled_vocab_terms_attributes].detect{|json_term| json_term[:label] == term.label}
+      if json_term
+        json_term[:id] = term.id
+      elsif delete_removed
+        json[:sample_controlled_vocab_terms_attributes] << {id: term.id, _destroy:true }
+      end
+
+    end
+    update(json)
+  end
+
   private
 
   def update_sample_type_templates(_term)
@@ -86,7 +116,8 @@ class SampleControlledVocab < ApplicationRecord
       topics: 'topic_annotations',
       operations: 'operation_annotations',
       data_formats: 'data_format_annotations',
-      data_types: 'data_type_annotations'
+      data_types: 'data_type_annotations',
+      disciplines: 'discipline_annotations',
     }
 
     def self.vocab_for_property(property)

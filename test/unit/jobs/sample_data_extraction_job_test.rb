@@ -50,6 +50,7 @@ class SampleDataExtractionJobTest < ActiveSupport::TestCase
 
     task = @data_file.sample_extraction_task
     assert task.failed?
+    assert_equal 'RuntimeError: critical error', task.error_message
     refute_nil task.exception
 
     # contains message and backtrace

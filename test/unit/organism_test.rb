@@ -103,12 +103,13 @@ class OrganismTest < ActiveSupport::TestCase
     object.bioportal_concept = FactoryBot.create(:bioportal_concept)
     object.save
     rdf = object.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count >= 1
-      assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), reader.statements.first.subject
-      assert reader.has_triple? ["http://localhost:3000/organisms/#{object.id}", Seek::Rdf::JERMVocab.NCBI_ID, RDF::Literal::AnyURI.new('http://purl.bioontology.org/ontology/NCBITAXON/2287')]
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count >= 1
+    assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), graph.statements.first.subject
+    assert graph.has_triple? ["http://localhost:3000/organisms/#{object.id}", Seek::Rdf::JERMVocab.NCBI_ID, RDF::Literal::AnyURI.new('http://purl.bioontology.org/ontology/NCBITAXON/2287')]
+
   end
 
   test 'can create' do

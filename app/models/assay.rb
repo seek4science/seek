@@ -1,7 +1,6 @@
 class Assay < ApplicationRecord
   include Seek::Ontologies::AssayOntologyTypes
 
-  enum status: %i[planned running completed cancelled failed]
   belongs_to :assignee, class_name: 'Person'
 
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
@@ -67,7 +66,7 @@ class Assay < ApplicationRecord
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
 
-  has_filter :assay_class, :assay_type, :technology_type
+  has_filter :assay_class, :assay_type, :technology_type, :isa_json_compliance
 
   enforce_authorization_on_association :study, :view
 

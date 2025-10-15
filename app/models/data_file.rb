@@ -3,6 +3,7 @@ require_dependency 'seek/util'
 class DataFile < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
+  include Seek::DataFiles::Unzip
 
   acts_as_asset
 
@@ -119,7 +120,7 @@ class DataFile < ApplicationRecord
   
   def zipped_folder?
     return false if external_asset.is_a? OpenbisExternalAsset
-    content_blob.is_unzippable_datafile?
+    content_blob&.is_unzippable_datafile?
   end
 
   def matching_sample_type?
@@ -141,29 +142,6 @@ class DataFile < ApplicationRecord
   
   def related_data_files
     zip_origin.nil? ? unzipped_files : [zip_origin] + unzipped_files
-  end
-
-  def unzip(tmp_dir)
-    unzip_folder = Zip::File.open(content_blob.filepath)
-    FileUtils.rm_r(tmp_dir) if File.exist?(tmp_dir)
-    Dir.mkdir(tmp_dir)
-    unzipped =[]
-    unzip_folder.entries.each do |file|
-      if file.ftype == :file
-        file_name = File.basename(file.name)
-        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
-        data_file_params = {
-          title: file_name,
-            license: license,
-            projects: projects,
-            description: '',
-            contributor_id: contributor.id,
-            zip_origin_id: self.id
-        }
-        unzipped << DataFile.new(data_file_params)
-      end
-    end
-    unzipped
   end
 
   # Extracts samples using the given sample_type
@@ -239,15 +217,27 @@ class DataFile < ApplicationRecord
   end
 
   # Copy the AssayAsset associations to each of the given resources (usually Samples).
-  # If an array of `assays` is specified (can be Assay objects or IDs), only copy associations to these assays.
+  # If an array of `assays` is specified (must be assay instances or IDs), only copy associations to these assays.
   def copy_assay_associations(resources, assays = nil)
-    resources.map do |resource|
-      aa = assay_assets
-      aa = assay_assets.where(assay: assays) if assays
-      aa.map do |aa|
-        AssayAsset.create(assay: aa.assay, direction: aa.direction, asset: resource)
+    aa = assay_assets
+    if assays
+      assay_ids = assays.map { |a| a.is_a?(Assay) ? a.id : a }
+      assays = Assay.where(id: assay_ids).authorized_for(:edit)
+      aa = assay_assets.where(assay: assays)
+    end
+
+    AssayAsset.transaction do
+      resources.in_groups_of(500).each do |group|
+        inserts = group.compact.map do |resource|
+          aa.map do |aa|
+            {assay_id: aa.assay.id, direction: aa.direction, asset_id: resource.id, asset_type: resource.class.name}
+          end
+        end.flatten
+        AssayAsset.insert_all(inserts)
       end
-    end.flatten
+    end
+
+    queue_rdf_generation(true, true)
   end
 
   def populate_metadata_from_template

@@ -43,10 +43,15 @@ module Seek
             return false
           end
 
+          if creators.empty?
+            errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{self.class.model_name.human}.")
+            return false
+          end
+
           username = Seek::Config.datacite_username
           password = Seek::Config.datacite_password
           url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
-          endpoint = DataCite::Client.new(username, password, url)
+          endpoint = Datacite::Client.new(username, password, url)
 
           endpoint.upload_metadata(datacite_metadata.to_s)
           endpoint.mint(suggested_doi, doi_target_url)
@@ -62,7 +67,7 @@ module Seek
         end
 
         def datacite_metadata
-          DataCite::Metadata.new(
+          Datacite::Metadata.new(
               identifier: suggested_doi,
               title: title,
               description: description,
