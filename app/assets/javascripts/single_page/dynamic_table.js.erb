@@ -308,6 +308,11 @@ const handleSelect = (e) => {
     },
     initHeader: function (columns) {
       const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
+      const colsWithUnits = columns.map((c, i) => {
+        if (c.unit && c.unit.id && c.unit.symbol) {
+          return {colNr: i, symbol: c.unit.symbol};
+        }
+      }).filter(c => c);
       if (this.options.readonly) {
         const sampleTypes = this.getSampleTypes();
         $j.each(sampleTypes, (i, s) => {
@@ -324,9 +329,13 @@ const handleSelect = (e) => {
         .columns()
         .header()
         .each((x, i) => {
+          const unit = colsWithUnits.find(c => c.colNr === i);
           if (i == 0 && !this.options.readonly) $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`);
-          else if (requiredCols.includes(i)) {
+          if (requiredCols.includes(i)) {
             $j(x).append("<span class='required-attribute'>*</span>");
+          }
+          if (unit) {
+            $j(x).append(`<span>( ${unit.symbol} )</span>`);
           }
           $j(x)
             .attr("title", columns[i].description)

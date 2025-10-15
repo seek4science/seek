@@ -633,8 +633,7 @@ SEEK::Application.routes.draw do
 
   resources :publications, concerns: [:asset, :has_content_blobs] do
     collection do
-      get :query_authors
-      get :query_authors_typeahead
+      get :typeahead_publication_authors
       get :export
       post :fetch_preview
       post :update_metadata

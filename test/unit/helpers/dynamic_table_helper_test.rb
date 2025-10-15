@@ -18,7 +18,7 @@ class DynamicTableHelperTest < ActionView::TestCase
   test 'should return default dynamic table columns' do
     User.with_current_user(@person) do
       dt_def_col_name = @source_sample_type.id.to_s
-      assert_equal dt_default_cols(dt_def_col_name), [{ title: 'status', name: dt_def_col_name, status: true }, { title: 'id', name: dt_def_col_name }, { title: 'uuid', name: dt_def_col_name }]
+      assert_equal dt_default_cols(dt_def_col_name), [{ title: 'status', name: dt_def_col_name, status: true, unit: {} }, { title: 'id', name: dt_def_col_name, unit: {} }, { title: 'uuid', name: dt_def_col_name, unit: {} }]
     end
   end
 
@@ -304,6 +304,26 @@ class DynamicTableHelperTest < ActionView::TestCase
       hidden_df_row = rows.select { |row| row[strain_attribute.title]['title'] == '#HIDDEN' }
       assert_equal hidden_df_row.length, 1
       assert_equal hidden_df_row.first[strain_attribute.title]['id'], other_person_strain.id
+    end
+  end
+
+  test 'Should return the unit if attribute has a unit' do
+    ml_unit = Unit.find_by(symbol: 'mL')
+    refute_nil ml_unit
+
+    assert_difference '@material_assay_sample_type.sample_attributes.count', 1 do
+      @material_assay_sample_type.sample_attributes <<  FactoryBot.create(:sample_attribute, title: 'Buffer Added', unit: ml_unit, sample_type: @source_sample_type, sample_attribute_type: FactoryBot.create(:float_sample_attribute_type))
+    end
+    User.with_current_user(@person.user) do
+      # Test the dynamic table
+      cols = dt_cols(@material_assay_sample_type)
+      columns_with_unit = cols.select { |col| col[:unit][:symbol] == ml_unit&.symbol }
+      assert_equal columns_with_unit.count, 1
+
+      # Test the cumulative (Read-Only) table
+      ro_cols = dt_cumulative_cols([@material_assay_sample_type])
+      ro_cols_with_unit = ro_cols.select { |col| col[:unit][:symbol] == ml_unit&.symbol }
+      assert_equal ro_cols_with_unit.count, 1
     end
   end
 end

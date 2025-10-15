@@ -848,7 +848,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :show, params: { id: p.id }, format: :json
     assert_response :success
     json = JSON.parse(@response.body)
-    authors = json["data"]["attributes"]["authors"]
+    authors = json['data']['attributes']['authors']
     matching_count = authors.count { |a| a.include? min_person.name }
     assert_equal 0, matching_count
   end
@@ -1045,59 +1045,34 @@ class PublicationsControllerTest < ActionController::TestCase
 
   end
 
-  test 'query single authors for typeahead' do
+  test 'query authors with the same last name' do
     FactoryBot.create_list(:publication_with_author, 6)
     query = 'Last'
-    get :query_authors_typeahead, params: { format: :json, full_name: query }
+    get :typeahead_publication_authors, params: { format: :json, q: query }
+
     assert_response :success
-    authors = JSON.parse(@response.body)
-    assert_equal 6, authors.length, authors
-    assert authors[0].key?('person_id'), 'missing author person_id'
-    assert authors[0].key?('first_name'), 'missing author first name'
-    assert authors[0].key?('last_name'), 'missing author last name'
-    assert authors[0].key?('count'), 'missing author publication count'
-    assert authors[0]['first_name'].start_with?('Author')
-    assert_equal 'Last', authors[0]['last_name']
-    assert_nil authors[0]['person_id']
-    assert_equal 1, authors[0]['count']
+    authors = JSON.parse(@response.body)['results']
+
+    # 6 are from PublicationAuthors + 3 from People
+    assert_equal 9, authors.size
+    # Ensure all authors have "Last" as last_name
+    assert authors.all? { |a| a['last_name'].include?('Last') }
+
+
+    # Ensure ids are full names
+    authors.each do |a|
+      expected_full_name = "#{a['first_name']} #{a['last_name']}"
+      assert_equal expected_full_name, a['id']
+      assert_equal expected_full_name, a['text']
+    end
   end
 
-  test 'query single author for typeahead that is unknown' do
+  test 'query a single unknown author' do
     query = 'Nobody knows this person'
-    get :query_authors_typeahead, params: { format: :json, full_name: query }
+    get :typeahead_publication_authors, params: { format: :json, q: query }
     assert_response :success
-    authors = JSON.parse(@response.body)
-    assert_equal 0, authors.length
-  end
-
-  test 'query authors for initialization' do
-    FactoryBot.create_list(:publication_with_author, 5)
-    FactoryBot.create(:publication_with_author, publication_authors:[FactoryBot.create(:publication_author, first_name:'Existing', last_name:'Author')])
-    query_authors = {
-      '0' => { full_name: 'Existing Author' }, # Existing author-> should return 1
-      '1' => { full_name: 'NewAuthor ShouldBeCreated' } # New author (i.e. not found)
-    }
-    get :query_authors, format: :json, as: :json, params: { authors: query_authors }
-    assert_response :success
-    authors = JSON.parse(@response.body)
-    assert_equal 2, authors.length, authors
-    assert authors[0].key?('person_id'), 'missing author person_id'
-    assert authors[0].key?('first_name'), 'missing author first name'
-    assert authors[0].key?('last_name'), 'missing author last name'
-    assert authors[0].key?('count'), 'missing author publication count'
-    assert_equal 'Existing', authors[0]['first_name']
-    assert_equal 'Author', authors[0]['last_name']
-    assert_nil authors[0]['person_id']
-    assert_equal 1, authors[0]['count']
-
-    assert authors[1].key?('person_id'), 'missing author person_id'
-    assert authors[1].key?('first_name'), 'missing author first name'
-    assert authors[1].key?('last_name'), 'missing author last name'
-    assert authors[1].key?('count'), 'missing author publication count'
-    assert_equal 'NewAuthor', authors[1]['first_name']
-    assert_equal 'ShouldBeCreated', authors[1]['last_name']
-    assert_nil authors[1]['person_id']
-    assert_equal 0, authors[1]['count']
+    authors = JSON.parse(@response.body)['results']
+    assert_equal 0, authors.size
   end
 
   test 'automatically extracts DOI from full DOI url' do
@@ -1248,9 +1223,9 @@ class PublicationsControllerTest < ActionController::TestCase
     get :show, params: { id: publication }
     assert_response :success
 
-    assert_select "p#authors" do
-      assert_select "a[href=?]", person_path(person), text: person.name, count:0
-      assert_select "a[href=?]", person_path(person), text: original_full_name
+    assert_select 'p#authors' do
+      assert_select 'a[href=?]', person_path(person), text: person.name, count:0
+      assert_select 'a[href=?]', person_path(person), text: original_full_name
     end
   end
 
@@ -1287,7 +1262,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :manage, params: { id: publication, newly_created: true}
     assert_response :success
 
-    assert_select "a", { count: 1, text: "Cancel and delete" }, "This page must contain a Cancel and delete button"
+    assert_select 'a', { count: 1, text: 'Cancel and delete' }, 'This page must contain a Cancel and delete button'
   end
 
   test 'manage from menu should not give a delete button' do
@@ -1298,7 +1273,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :manage, params: { id: publication}
     assert_response :success
 
-    assert_select "a", { count: 0, text: "Cancel and delete" }, "This page must not contain a Cancel and delete button"
+    assert_select 'a', { count: 0, text: 'Cancel and delete' }, 'This page must not contain a Cancel and delete button'
   end
 
 
@@ -1542,7 +1517,7 @@ class PublicationsControllerTest < ActionController::TestCase
                                                journal: 'Public Library of Science (PLoS)',
                                                published_date: Date.new(2011, 3),
                                                publication_type_id: FactoryBot.create(:journal).id,
-                                               misc_links_attributes: { '0' => { url: "http://www.slack.com/",
+                                               misc_links_attributes: { '0' => { url: 'http://www.slack.com/',
                                                 label:'the slack about this publication' } })
 
     assert_difference('AssetLink.misc_link.count') do
@@ -1571,7 +1546,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_nil publication.misc_links.first
     assert_difference('AssetLink.misc_link.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ url: "http://www.slack.com/" }] }  }
+        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ url: 'http://www.slack.com/' }] }  }
       end
     end
     assert_redirected_to publication_path(publication = assigns(:publication))
@@ -1585,7 +1560,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 1,publication.misc_links.count
     assert_no_difference('AssetLink.misc_link.count') do
       assert_difference('ActivityLog.count') do
-        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ id:publication.misc_links.first.id, url: "http://www.wibble.com/" }] } }
+        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ id:publication.misc_links.first.id, url: 'http://www.wibble.com/' }] } }
       end
     end
     publication = assigns(:publication)
@@ -1614,6 +1589,71 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
+
+
+  test 'should return authors matching the query' do
+    FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe')
+    FactoryBot.create(:publication_author, first_name: 'Jane', last_name: 'Smith')
+    FactoryBot.create(:publication_author, first_name: 'Alice', last_name: 'Johnson')
+
+    get :typeahead_publication_authors, params: { q: 'John' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 2, results.size
+    assert_equal 'John Doe', results.first['text']
+    assert_equal 'Alice Johnson', results.last['text']
+  end
+
+  test 'should return people matching the query' do
+    FactoryBot.create(:person, first_name: 'John', last_name: 'Doe')
+    FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith')
+    FactoryBot.create(:person, first_name: 'Alice', last_name: 'Johnson')
+
+    get :typeahead_publication_authors, params: { q: 'Jane' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 1, results.size
+    assert_equal 'Jane Smith', results.first['text']
+  end
+
+  test 'should not return duplicate authors and people' do
+    FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe', person_id: 1)
+    FactoryBot.create(:person, first_name: 'John', last_name: 'Doe', id: 1)
+
+    get :typeahead_publication_authors, params: { q: 'John' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 1, results.size
+    assert_equal 'John Doe', results.first['text']
+  end
+
+  test 'should return empty results for unmatched query' do
+    FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe')
+    FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith')
+
+    get :typeahead_publication_authors, params: { q: 'Nonexistent' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 0, results.size
+  end
+
+
+  test 'should return unique author with correct count for duplicate names' do
+    25.times { FactoryBot.create(:publication_author, first_name: 'John', last_name: 'Doe') }
+    FactoryBot.create(:person, first_name: 'John', last_name: 'Doe', id: 1)
+    get :typeahead_publication_authors, params: { q: 'John' }, format: :json
+
+    assert_response :success
+    results = JSON.parse(@response.body)['results']
+    assert_equal 1, results.size
+    assert_equal 'John Doe', results.first['text']
+    assert_equal 25, results.first['count']
+  end
+
   private
 
   def publication_for_export_tests
@@ -1635,4 +1675,7 @@ class PublicationsControllerTest < ActionController::TestCase
             publication_type: FactoryBot.create(:journal)
     )
   end
+
+
+
 end
