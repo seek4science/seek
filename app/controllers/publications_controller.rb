@@ -195,36 +195,55 @@ class PublicationsController < ApplicationController
   end
 
   def typeahead_publication_authors
-    q = params[:q].to_s.strip
+    q = params[:q].to_s.strip.downcase
+    return render json: { results: [] } if q.blank?
 
-    # Fetch all matching authors and remove empty names
-    results = PublicationAuthor
-                .where("CONCAT_WS(' ', first_name, last_name) LIKE ?", "%#{q}%")
-                .select(:id, :first_name, :last_name, :person_id)
-                .reject { |a| a.first_name.blank? || a.last_name.blank? }
+    # --- Fetch authors ---
+    authors_results = PublicationAuthor
+                        .where.not("(first_name IS NULL OR first_name = '') AND (last_name IS NULL OR last_name = '')")
+                        .where("LOWER(CONCAT_WS(' ', first_name, last_name)) LIKE ?", "%#{q}%")
+                        .select(:first_name, :last_name, :person_id)
 
+    # Group authors by full name
+    authors_group = authors_results.group_by { |a| [a.first_name, a.last_name] }
 
-    # Group by full name (ignore person_id when grouping)
-    grouped = results.group_by { |a| [a.first_name, a.last_name] }
-
-    items = grouped.map do |(first_name, last_name), group|
-      full_name = [first_name, last_name].compact.join(" ")
-
-      person_id = group.map(&:person_id).compact.first
-
-      {
+    # Build author items hash, keyed by full_name
+    authors_items_hash = {}
+    authors_group.each do |(first_name, last_name), group|
+      full_name = "#{first_name} #{last_name}"
+      authors_items_hash[full_name] = {
         id: full_name,
         text: full_name,
         first_name: first_name,
         last_name: last_name,
-        person_id: person_id,
+        person_id: group.map(&:person_id).compact.first,
         count: group.size
       }
     end
 
-    render json: { results: items }
-  end
+    # --- Fetch people ---
+    people_results = Person
+                       .where("LOWER(CONCAT_WS(' ', first_name, last_name)) LIKE ?", "%#{q}%")
+                       .select(:first_name, :last_name, :id)
 
+    # Add people only if they are not already in authors
+    people_results.each do |person|
+      full_name = "#{person.first_name} #{person.last_name}"
+      next if authors_items_hash.key?(full_name) # skip duplicates
+
+      authors_items_hash[full_name] = {
+        id: full_name,
+        text: full_name,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        person_id: person.id,
+        count: 0
+      }
+    end
+
+    # Return all unique items
+    render json: { results: authors_items_hash.values }
+  end
 
 
 
