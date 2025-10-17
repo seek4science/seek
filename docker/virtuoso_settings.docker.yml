@@ -5,7 +5,7 @@ production:
   username: dba
   password: <%= ENV["DBA_PASSWORD"] %>
 
-  private_graph: seek:private
-  public_graph: seek:public
+  private_graph: ENV["RDF_PRIVATE_GRAPH"]
+  public_graph: ENV["RDF_PUBLIC_GRAPH"]
 
   disabled: <%= !ENV["VIRTUOSO"].present? %>
