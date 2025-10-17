@@ -6,6 +6,7 @@ services:
     restart: always
     env_file:
       - docker/db.env
+      #- docker/virtuoso.env
     volumes:
       - seek-mysql-db:/var/lib/mysql
 
@@ -20,12 +21,9 @@ services:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       NO_ENTRYPOINT_WORKERS: 1
-      DBA_PASSWORD: wibble
-      RDF_PUBLIC_GRAPH: 'seek:public'
-      #RDF_PRIVATE_GRAPH: 'seek:private'
-      VIRTUOSO: 'true'
     env_file:
       - docker/db.env
+      - docker/virtuoso.env
     volumes:
       - seek-filestore:/seek/filestore
       - seek-cache:/seek/tmp/cache
@@ -50,12 +48,9 @@ services:
       RAILS_ENV: production
       SOLR_PORT: 8983
       SOLR_HOST: solr
-      DBA_PASSWORD: wibble
-      RDF_PUBLIC_GRAPH: 'seek:public'
-      #RDF_PRIVATE_GRAPH: 'seek:private'
-      VIRTUOSO: 'true'
     env_file:
       - docker/db.env
+      - docker/virtuoso.env
     volumes:
       - seek-filestore:/seek/filestore
       - seek-cache:/seek/tmp/cache
