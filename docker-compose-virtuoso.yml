@@ -20,6 +20,10 @@ services:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       NO_ENTRYPOINT_WORKERS: 1
+      DBA_PASSWORD: wibble
+      RDF_PUBLIC_GRAPH: 'seek:public'
+      #RDF_PRIVATE_GRAPH: 'seek:private'
+      VIRTUOSO: 'true'
     env_file:
       - docker/db.env
     volumes:
@@ -79,7 +83,7 @@ services:
       - /opt/solr/server/solr/configsets/seek_config 
 
   virtuoso:
-    image: openlink/virtuoso-opensource-7
+    image: openlink/virtuoso-opensource-7:7.2.15
     container_name: seek-virtuoso
     restart: always
     ports:
