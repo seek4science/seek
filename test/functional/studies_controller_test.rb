@@ -2124,4 +2124,249 @@ class StudiesControllerTest < ActionController::TestCase
     get :edit, params: { id: study.id }
     assert_response :success
   end
+
+  # MIAPPE Batch Upload Tests
+  test 'should get batch_uploader page' do
+    get :batch_uploader
+    assert_response :success
+  end
+
+  test 'should show error if no file provided to preview_content' do
+    post :preview_content, params: { content_blobs: [{ data: nil }] }
+    assert_response :success
+    assert flash[:error].present?
+    assert_match /Please select a file/i, flash[:error]
+  end
+
+  test 'should preview content from valid zip file' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    
+    # Use the test fixture zip file
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    
+    assert_response :success
+    assert_not_nil assigns(:studies)
+    assert_not_nil assigns(:study)
+    assert_equal 3, assigns(:studies).count
+    assert_not_nil assigns(:studies_datafiles)
+    assert_not_nil assigns(:license)
+  end
+
+  test 'batch preview should extract license from file' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    
+    assert_response :success
+    assert_not_nil assigns(:license)
+    assert_equal 'CC-BY-SA-4.0', assigns(:license)
+  end
+
+  test 'batch preview should identify existing studies' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: person.projects)
+    
+    # Create an existing study with MIAPPE metadata
+    metadata_type = ExtendedMetadataType.where(title: ExtendedMetadataType::MIAPPE_TITLE, supported_type: 'Study').last
+    existing_study = FactoryBot.create(:study,
+      investigation: investigation,
+      contributor: person,
+      extended_metadata: ExtendedMetadata.new(
+        extended_metadata_type: metadata_type,
+        data: { id: 'POPYOMICS-POP2-F' }
+      )
+    )
+    
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    
+    assert_response :success
+    assert_not_nil assigns(:existing_studies)
+    existing_studies_array = JSON.parse(assigns(:existing_studies))
+    assert_equal 1, existing_studies_array.length
+    assert_equal existing_study.id, existing_studies_array.first['id']
+  end
+
+  test 'batch preview should extract study data files information' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    
+    assert_response :success
+    assert_not_nil assigns(:studies_datafiles)
+    # Verify that data files are extracted for each study
+    assigns(:studies_datafiles).each do |study_id, datafiles|
+      assert datafiles.key?(:data_file), "Data files should have :data_file key"
+      assert datafiles.key?(:data_file_description), "Data files should have :data_file_description key"
+      assert datafiles[:data_file].is_a?(Array), "Data files should be an array"
+    end
+  end
+
+  test 'batch preview should extract correct study metadata' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    
+    assert_response :success
+    studies = assigns(:studies)
+    assert_equal 3, studies.count
+    
+    # Verify first study has correct data
+    first_study = studies.first
+    assert_equal 'Clonal test of mapping pedigree 0504B in nursery', first_study.title
+    assert first_study.extended_metadata.present?
+    assert_equal 'POPYOMICS-POP2-F', first_study.extended_metadata.data[:id]
+    
+    # Verify all studies have extended metadata
+    studies.each do |study|
+      assert study.extended_metadata.present?, "Study should have extended metadata"
+      assert study.extended_metadata.data[:id].present?, "Study should have MIAPPE ID"
+    end
+  end
+
+  test 'should require login for batch_uploader' do
+    logout
+    get :batch_uploader
+    assert_redirected_to :root
+  end
+
+  test 'should require login for preview_content' do
+    logout
+    post :preview_content, params: { content_blobs: [{ data: nil }] }
+    assert_redirected_to :root
+  end
+
+  test 'should require login for batch_create' do
+    logout
+    post :batch_create, params: { study: {}, studies: {} }
+    assert_redirected_to :root
+  end
+
+  test 'batch create should validate required MIAPPE fields' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: person.projects)
+    FactoryBot.create(:project, title: 'Default Project')
+    
+    # First preview to get temp files setup
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    
+    # Try to create with missing required MIAPPE fields
+    assert_no_difference('Study.count') do
+      post :batch_create, params: {
+        study: { investigation_id: investigation.id },
+        studies: {
+          title: ['Test Study'],
+          description: ['Test Description'],
+          id: [''], # Empty ID - required field
+          startDate: [''],
+          endDate: [''],
+          contactInstitution: [''], # Required field
+          geographicLocationCountry: [''], # Required field
+          experimentalSiteName: [''], # Required field
+          latitude: [''],
+          longitude: [''],
+          altitude: [''],
+          descriptionOfTheExperimentalDesign: [''], # Required field
+          typeOfExperimentalDesign: [''],
+          observationUnitLevelHierarchy: [''],
+          observationUnitDescription: [''], # Required field
+          descriptionOfGrowthFacility: [''], # Required field
+          typeOfGrowthFacility: [''],
+          culturalPractices: [''],
+          data_files: ['datafile1.txt'],
+          data_file_description: ['Description'],
+          license: 'CC-BY-4.0'
+        }
+      }
+    end
+    
+    # Should render the preview page with error
+    assert_response :unprocessable_entity
+  end
+
+  test 'batch create full workflow with valid data' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person, projects: person.projects)
+    FactoryBot.create(:project, title: 'Default Project')
+    
+    # First upload and preview
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    assert_response :success
+    
+    studies_data = assigns(:studies)
+    assert_equal 3, studies_data.count
+    datafiles_info = assigns(:studies_datafiles)
+    
+    # Now create the studies with proper data
+    assert_difference('Study.count', 3) do
+      assert_difference('ExtendedMetadata.count', 3) do
+        post :batch_create, params: {
+          study: { investigation_id: investigation.id },
+          studies: {
+            title: studies_data.map(&:title),
+            description: studies_data.map(&:description),
+            id: studies_data.map { |s| s.extended_metadata.data[:id] },
+            startDate: studies_data.map { |s| s.extended_metadata.data[:study_start_date] || '' },
+            endDate: studies_data.map { |s| s.extended_metadata.data[:study_end_date] || '' },
+            contactInstitution: studies_data.map { |s| s.extended_metadata.data[:contact_institution] || '' },
+            geographicLocationCountry: studies_data.map { |s| s.extended_metadata.data[:geographic_location_country] || '' },
+            experimentalSiteName: studies_data.map { |s| s.extended_metadata.data[:experimental_site_name] || '' },
+            latitude: studies_data.map { |s| s.extended_metadata.data[:latitude] || '' },
+            longitude: studies_data.map { |s| s.extended_metadata.data[:longitude] || '' },
+            altitude: studies_data.map { |s| s.extended_metadata.data[:altitude] || '' },
+            descriptionOfTheExperimentalDesign: studies_data.map { |s| s.extended_metadata.data[:description_of_the_experimental_design] || '' },
+            typeOfExperimentalDesign: studies_data.map { |s| s.extended_metadata.data[:type_of_experimental_design] || '' },
+            observationUnitLevelHierarchy: studies_data.map { |s| s.extended_metadata.data[:observation_unit_level_hierarchy] || '' },
+            observationUnitDescription: studies_data.map { |s| s.extended_metadata.data[:observation_unit_description] || '' },
+            descriptionOfGrowthFacility: studies_data.map { |s| s.extended_metadata.data[:description_of_growth_facility] || '' },
+            typeOfGrowthFacility: studies_data.map { |s| s.extended_metadata.data[:type_of_growth_facility] || '' },
+            culturalPractices: studies_data.map { |s| s.extended_metadata.data[:cultural_practices] || '' },
+            data_files: studies_data.map { |s| 
+              study_id = s.extended_metadata.data[:id]
+              datafiles_info[study_id][:data_file].join(', ')
+            },
+            data_file_description: studies_data.map { |s| 
+              study_id = s.extended_metadata.data[:id]
+              datafiles_info[study_id][:data_file_description].join(', ')
+            },
+            license: 'CC-BY-4.0'
+          }
+        }
+      end
+    end
+    
+    assert_redirected_to studies_path
+    assert_match /successfully created/i, flash[:notice]
+    
+    # Verify created studies have correct metadata
+    created_studies = Study.last(3)
+    created_studies.each do |study|
+      assert study.extended_metadata.present?
+      assert study.extended_metadata.extended_metadata_type.title == ExtendedMetadataType::MIAPPE_TITLE
+    end
+  end
 end
