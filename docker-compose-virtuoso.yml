@@ -6,7 +6,6 @@ services:
     restart: always
     env_file:
       - docker/db.env
-      #- docker/virtuoso.env
     volumes:
       - seek-mysql-db:/var/lib/mysql
 
@@ -85,7 +84,7 @@ services:
       - "8890:8890"
       - "1111:1111"
     environment:
-      DBA_PASSWORD: wibble
+      DBA_PASSWORD: CHANGE_ME
     volumes:
       - seek-virtuoso-data:/database
 
