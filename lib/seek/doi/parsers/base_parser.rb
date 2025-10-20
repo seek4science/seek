@@ -1,19 +1,19 @@
 module Seek
   module Doi
     module Parsers
-        class BaseParser
+      class BaseParser
         def parse(_doi)
           raise NotImplementedError, "#{self.class.name} must implement #parse"
         end
 
-        protected
+      protected
 
         def normalize_metadata(raw)
           {
             title: raw[:title],
-            publication_authors: raw[:authors],
+            authors: raw[:authors],
             journal: raw[:journal],
-            published_date: raw[:date_published],
+            date_published: raw[:date_published],
             doi: raw[:doi],
             abstract: raw[:abstract],
             citation: raw[:citation],
@@ -24,7 +24,7 @@ module Seek
           }.compact
         end
 
-      end
+    end
     end
   end
 end

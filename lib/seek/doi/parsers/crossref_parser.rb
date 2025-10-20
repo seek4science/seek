@@ -6,39 +6,35 @@ module Seek
 
         def parse(doi)
           data = fetch_csl_json(doi)
-
-          # log data
           Rails.logger.info("CSL JSON data for DOI #{doi}: #{data.inspect}")
 
+          title = [Array(data['title']).first, Array(data['subtitle']).first].compact.join(':')
+          abstract = clean_abstract(data['abstract'])
+          date_published = extract_date(data)
+          #todo remove special &amp; e.g. Astronomy &amp; Astrophysics
+          journal = data['container-title']
+          doi_value = data['DOI']
+          citation = data['citation'] || build_citation(data)
+          publisher = data['publisher']
+          booktitle = data['collection-title'] || data['book-title']
+          editors = extract_editors(data['editor']).join(' and ')
+          authors = extract_authors_as_objects(data['author'])
+          url = data['URL']
 
-          doi_record = OpenStruct.new(
-            title: [Array(data['title']).first, Array(data['subtitle']).first].compact.join(':'),
-            abstract: clean_abstract(data['abstract']),
-            date_published: extract_date(data),
-            journal: data['container-title'],
-            doi: data['DOI'],
-            citation: data['citation'] || build_citation(data),
-            publisher: data['publisher'],
-            booktitle: data['collection-title'] || data['book-title'],
-            editors: extract_editors(data['editor']),
-            authors: extract_authors_as_objects(data['author']),
-            url: data['URL']
-          )
-
-          normalize_metadata(
-            title: doi_record.title,
-            abstract: doi_record.abstract,
-            date_published: doi_record.date_published.to_s,
-            journal: doi_record.journal,
-            doi: doi_record.doi,
-            citation: doi_record.citation,
-            publisher: doi_record.publisher,
-            booktitle: doi_record.booktitle,
-            editors: doi_record.editors.join(' and '),
-            authors: doi_record.authors,
-            url: data['URL']
-          )
-        end
+          OpenStruct.new(normalize_metadata(
+            title: title,
+            abstract: abstract,
+            date_published: date_published.to_s,
+            journal: journal,
+            doi: doi_value,
+            citation: citation,
+            publisher: publisher,
+            booktitle: booktitle,
+            editors: editors,
+            authors: authors,
+            url: url
+          ))
+                 end
 
         private
 

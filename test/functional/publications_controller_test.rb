@@ -85,14 +85,22 @@ class PublicationsControllerTest < ActionController::TestCase
 
 
   test 'should create an inproceedings with booktitle' do
-    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1117/12.2275959', content_file: 'cross_ref6.xml')
-    assert_difference('Publication.count') do
-      post :create, params: { publication: { doi: '10.1117/12.2275959', project_ids: [projects(:sysmo_project).id],publication_type_id: FactoryBot.create(:inproceedings).id } }
+    doi = '10.1117/12.2275959'
+
+    VCR.use_cassette('doi/doi_crossref_proceedings_article_response') do
+      assert_difference('Publication.count') do
+        post :create, params: {
+          publication: {
+            doi: doi,
+            project_ids: [projects(:sysmo_project).id],
+            publication_type_id: FactoryBot.create(:inproceedings).id
+          }
+        }
+      end
     end
 
     assert_not_nil assigns(:publication)
     assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
-
   end
 
   test 'should create doi publication with various doi prefixes' do

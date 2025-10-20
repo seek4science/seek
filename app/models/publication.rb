@@ -48,7 +48,7 @@ class Publication < ApplicationRecord
   has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, as: :asset, foreign_key: :asset_id
 
   explicit_versioning(:version_column => "version", sync_ignore_columns: ['license','other_creators']) do
-    acts_as_versioned_resource
+  acts_as_versioned_resource
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :publication_id,:foreign_key => :asset_id
 
@@ -188,11 +188,11 @@ end
     end
 
     if reference.respond_to?(:pubmed)
-      result = extract_pubmed_metadata(reference)
+      extract_pubmed_metadata(reference)
     else
-      result = extract_doi_metadata(reference)
+      extract_doi_metadata(reference)
     end
-
+    
     reference.authors.each_with_index do |author, index|
       publication_authors.build(first_name: author.first_name,
                                 last_name: author.last_name,
@@ -230,7 +230,7 @@ end
     self.citation = doi_record.citation
     self.publisher = doi_record.publisher
     self.booktitle = doi_record.booktitle
-    self.editor = doi_record.editors.map(&:name).join(" and ")
+    self.editor = doi_record.editors
   end
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
@@ -433,7 +433,7 @@ end
     end
 
     if self.doi.blank? && self.citation.blank?
-     self.citation += url.blank? ? '': url
+      self.citation += url.blank? ? '': url
     end
     self.citation =  self.citation.try(:to_s).strip.gsub(/^,/,'').strip
   end
@@ -453,8 +453,14 @@ end
       end
     elsif !doi.blank?
       begin
-        query = DOI::Query.new(Seek::Config.crossref_api_email)
-        result = query.fetch(doi)
+        # query = DOI::Query.new(Seek::Config.crossref_api_email)
+        # result = query.fetch(doi)
+        result = Seek::Doi::Parser.parse(doi)
+        # add logs to output result
+        # logging the file and function name
+        Rails.logger.info("*******************File: publication.rb, Function: fetch_pubmed_or_doi_result *****************************")
+        Rails.logger.info("DOI query result for #{doi}: #{result.inspect}")
+
 
         @error = 'Unable to get result' if result.blank?
         @error = 'Unable to get DOI' if result.title.blank?
@@ -620,7 +626,7 @@ end
     end
 
     if (%w[InCollection InProceedings].include? self.publication_type.title) && (bibtex_record[:booktitle].blank?)
-        errors.add(:base, "An #{self.publication_type.title} needs to have a booktitle.")
+      errors.add(:base, "An #{self.publication_type.title} needs to have a booktitle.")
         return false
     end
 
