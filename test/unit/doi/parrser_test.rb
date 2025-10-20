@@ -29,7 +29,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
 
   # Journal article
   test 'returns parsed Journal article DOI (crossref)' do
-    VCR.use_cassette('doi/doi_crossref_response') do
+    VCR.use_cassette('doi/doi_crossref_journal_article_response') do
       doi = '10.1038/s41586-020-2649-2'
       result = Seek::Doi::Parser.parse(doi)
       # puts result.inspect
@@ -47,9 +47,9 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     end
   end
 
-  # Journal article with editors and subtitle
+  # Book
   test 'returns parsed Journal article DOI with editors and subtitle (crossref)' do
-    VCR.use_cassette('doi/doi_crossref_with_editor_subtitle_response') do
+    VCR.use_cassette('doi/doi_crossref_book_with_editor_subtitle_response') do
       doi = '10.2307/j.ctvn5txvs'
       result = Seek::Doi::Parser.parse(doi)
 

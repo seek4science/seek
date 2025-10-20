@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 20 Oct 2025 11:45:50 GMT
+      - Mon, 20 Oct 2025 15:32:58 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Duzp8t0PWTEp8vHj4tnXGhF6UMohjRnTCAhVC04RoLEJlnVqc8GcqB%2FrR4Qw7qzbm2LoRalbTlY1tE94ycqZb6K55o3LI7bj3sgxdkIc4W887g%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=70szkxSdgZN4ev%2FQBWDYCjlUZcT6zy7cLStWQv69UtTYdINkabE1MGGh%2FsWrzSJWypWLZOsvXIDAaEFi0vpz3XyQMbQ0VA%3D%3D"}]}'
       Cf-Ray:
-      - 991845758b26d34d-FRA
+      - 9919922acfe78f39-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Mon, 20 Oct 2025 11:45:51 GMT
+  recorded_at: Mon, 20 Oct 2025 15:32:58 GMT
 - request:
     method: get
     uri: https://doi.org/10.1038/s41586-020-2649-2
@@ -74,7 +74,7 @@ http_interactions:
       message: Found
     headers:
       Date:
-      - Mon, 20 Oct 2025 11:45:51 GMT
+      - Mon, 20 Oct 2025 15:32:58 GMT
       Content-Type:
       - text/html;charset=utf-8
       Transfer-Encoding:
@@ -89,7 +89,7 @@ http_interactions:
       - Accept
       - Origin
       Expires:
-      - Mon, 20 Oct 2025 11:52:33 GMT
+      - Mon, 20 Oct 2025 15:49:21 GMT
       Permissions-Policy:
       - interest-cohort=(),browsing-topics=()
       Cf-Cache-Status:
@@ -99,9 +99,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=IqVorYyXFtbAf1Gbah9zd6Gp9LpULyNhmInMRgs4nt4YJBNbq%2FkxPYUub7gncC73aTQuiyiHlB2qCbNBh2vFIV8pWQc3A8j84lsIg%2BR20aAveg%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=C7hyK%2FMVyN82Z5pwqKz1xZzvRSfw01ZpsbxcIIm0bwkGmlrtai2wWgqlKx%2BXuKj56z%2F5o90lhc3anIwTgletOcDgHERTDA%3D%3D"}]}'
       Cf-Ray:
-      - 991845763c582bdc-FRA
+      - 9919922b79ba9729-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -109,7 +109,7 @@ http_interactions:
       string: |-
         <html><head><title>Handle Redirect</title></head>
         <body><a href="https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform">https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform</a></body></html>
-  recorded_at: Mon, 20 Oct 2025 11:45:51 GMT
+  recorded_at: Mon, 20 Oct 2025 15:32:58 GMT
 - request:
     method: get
     uri: https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform
@@ -129,7 +129,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 20 Oct 2025 11:45:51 GMT
+      - Mon, 20 Oct 2025 15:32:59 GMT
       Content-Type:
       - application/vnd.citationstyles.csl+json
       Content-Length:
@@ -357,5 +357,5 @@ http_interactions:
         Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"The
         authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
         interests"}}]}'
-  recorded_at: Mon, 20 Oct 2025 11:45:51 GMT
+  recorded_at: Mon, 20 Oct 2025 15:32:59 GMT
 recorded_with: VCR 6.3.1
