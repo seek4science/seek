@@ -1,0 +1,361 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1038
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 20 Oct 2025 11:45:50 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Duzp8t0PWTEp8vHj4tnXGhF6UMohjRnTCAhVC04RoLEJlnVqc8GcqB%2FrR4Qw7qzbm2LoRalbTlY1tE94ycqZb6K55o3LI7bj3sgxdkIc4W887g%3D%3D"}]}'
+      Cf-Ray:
+      - 991845758b26d34d-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1038",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Mon, 20 Oct 2025 11:45:51 GMT
+- request:
+    method: get
+    uri: https://doi.org/10.1038/s41586-020-2649-2
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.citationstyles.csl+json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 302
+      message: Found
+    headers:
+      Date:
+      - Mon, 20 Oct 2025 11:45:51 GMT
+      Content-Type:
+      - text/html;charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Location:
+      - https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform
+      Server:
+      - cloudflare
+      Vary:
+      - Accept
+      - Origin
+      Expires:
+      - Mon, 20 Oct 2025 11:52:33 GMT
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=IqVorYyXFtbAf1Gbah9zd6Gp9LpULyNhmInMRgs4nt4YJBNbq%2FkxPYUub7gncC73aTQuiyiHlB2qCbNBh2vFIV8pWQc3A8j84lsIg%2BR20aAveg%3D%3D"}]}'
+      Cf-Ray:
+      - 991845763c582bdc-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: |-
+        <html><head><title>Handle Redirect</title></head>
+        <body><a href="https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform">https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform</a></body></html>
+  recorded_at: Mon, 20 Oct 2025 11:45:51 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.citationstyles.csl+json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 20 Oct 2025 11:45:51 GMT
+      Content-Type:
+      - application/vnd.citationstyles.csl+json
+      Content-Length:
+      - '24456'
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept, Accept-Encoding
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"indexed":{"date-parts":[[2025,10,20]],"date-time":"2025-10-20T10:27:39Z","timestamp":1760956059626,"version":"3.41.0"},"reference-count":57,"publisher":"Springer
+        Science and Business Media LLC","issue":"7825","license":[{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"published-print":{"date-parts":[[2020,9,17]]},"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Array
+        programming provides a powerful, compact and expressive syntax for accessing,
+        manipulating and operating on data in vectors, matrices and higher-dimensional
+        arrays. NumPy is the primary array programming library for the Python language.
+        It has an essential role in research analysis pipelines in fields as diverse
+        as physics, chemistry, astronomy, geoscience, biology, psychology, materials
+        science, engineering, finance and economics. For example, in astronomy, NumPy
+        was an important part of the software stack used in the discovery of gravitational
+        waves<jats:sup>1<\/jats:sup>and in the first imaging of a black hole<jats:sup>2<\/jats:sup>.
+        Here we review how a few fundamental array concepts lead to a simple and powerful
+        programming paradigm for organizing, exploring and analysing scientific data.
+        NumPy is the foundation upon which the scientific Python ecosystem is constructed.
+        It is so pervasive that several projects, targeting audiences with specialized
+        needs, have developed their own NumPy-like interfaces and array objects. Owing
+        to its central position in the ecosystem, NumPy increasingly acts as an interoperability
+        layer between such array computation libraries and, together with its application
+        programming interface (API), provides a flexible framework to support the
+        next decade of scientific and industrial analysis.<\/jats:p>","DOI":"10.1038\/s41586-020-2649-2","type":"journal-article","created":{"date-parts":[[2020,9,17]],"date-time":"2020-09-17T20:48:17Z","timestamp":1600375697000},"page":"357-362","update-policy":"https:\/\/doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":17946,"title":"Array
+        programming with NumPy","prefix":"10.1038","volume":"585","author":[{"given":"Charles
+        R.","family":"Harris","sequence":"first","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-5263-5070","authenticated-orcid":false,"given":"K.
+        Jarrod","family":"Millman","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0001-9276-1891","authenticated-orcid":false,"given":"St\u00e9fan
+        J.","family":"van der Walt","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-0300-3333","authenticated-orcid":false,"given":"Ralf","family":"Gommers","sequence":"additional","affiliation":[]},{"given":"Pauli","family":"Virtanen","sequence":"additional","affiliation":[]},{"given":"David","family":"Cournapeau","sequence":"additional","affiliation":[]},{"given":"Eric","family":"Wieser","sequence":"additional","affiliation":[]},{"given":"Julian","family":"Taylor","sequence":"additional","affiliation":[]},{"given":"Sebastian","family":"Berg","sequence":"additional","affiliation":[]},{"given":"Nathaniel
+        J.","family":"Smith","sequence":"additional","affiliation":[]},{"given":"Robert","family":"Kern","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-1771-9949","authenticated-orcid":false,"given":"Matti","family":"Picus","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-5207-0380","authenticated-orcid":false,"given":"Stephan","family":"Hoyer","sequence":"additional","affiliation":[]},{"given":"Marten
+        H.","family":"van Kerkwijk","sequence":"additional","affiliation":[]},{"given":"Matthew","family":"Brett","sequence":"additional","affiliation":[]},{"given":"Allan","family":"Haldane","sequence":"additional","affiliation":[]},{"given":"Jaime
+        Fern\u00e1ndez","family":"del R\u00edo","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0003-3603-8038","authenticated-orcid":false,"given":"Mark","family":"Wiebe","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0001-7328-4305","authenticated-orcid":false,"given":"Pearu","family":"Peterson","sequence":"additional","affiliation":[]},{"given":"Pierre","family":"G\u00e9rard-Marchant","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0001-8700-2292","authenticated-orcid":false,"given":"Kevin","family":"Sheppard","sequence":"additional","affiliation":[]},{"given":"Tyler","family":"Reddy","sequence":"additional","affiliation":[]},{"given":"Warren","family":"Weckesser","sequence":"additional","affiliation":[]},{"given":"Hameer","family":"Abbasi","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0001-8108-7707","authenticated-orcid":false,"given":"Christoph","family":"Gohlke","sequence":"additional","affiliation":[]},{"given":"Travis
+        E.","family":"Oliphant","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2020,9,16]]},"reference":[{"key":"2649_CR1","doi-asserted-by":"publisher","first-page":"061102","DOI":"10.1103\/PhysRevLett.116.061102","volume":"116","author":"BP
+        Abbott","year":"2016","unstructured":"Abbott, B. P. et al. Observation of
+        gravitational waves from a binary black hole merger. Phys. Rev. Lett. 116,
+        061102 (2016).","journal-title":"Phys. Rev. Lett."},{"key":"2649_CR2","doi-asserted-by":"publisher","first-page":"11","DOI":"10.3847\/0004-637X\/829\/1\/11","volume":"286","author":"A
+        Chael","year":"2016","unstructured":"Chael, A. et al. High-resolution linear
+        polarimetric imaging for the Event Horizon Telescope. Astrophys. J. 286, 11
+        (2016).","journal-title":"Astrophys. J."},{"key":"2649_CR3","doi-asserted-by":"publisher","first-page":"262","DOI":"10.1063\/1.4822400","volume":"10","author":"PF
+        Dubois","year":"1996","unstructured":"Dubois, P. F., Hinsen, K. & Hugunin,
+        J. Numerical Python. Comput. Phys. 10, 262\u2013267 (1996).","journal-title":"Comput.
+        Phys."},{"key":"2649_CR4","unstructured":"Ascher, D., Dubois, P. F., Hinsen,
+        K., Hugunin, J. & Oliphant, T. E. An Open Source Project: Numerical Python
+        (Lawrence Livermore National Laboratory, 2001)."},{"key":"2649_CR5","unstructured":"Yang,
+        T.-Y., Furnish, G. & Dubois, P. F. Steering object-oriented scientific computations.
+        In Proc. TOOLS USA 97. Intl Conf. Technology of Object Oriented Systems and
+        Languages (eds Ege,\u00a0R., Singh,\u00a0M.\u00a0& Meyer,\u00a0B.) 112\u2013119
+        (IEEE, 1997)."},{"key":"2649_CR6","unstructured":"Greenfield, P., Miller,
+        J. T., Hsu, J. & White, R. L. numarray: a new scientific array package for
+        Python. In PyCon DC 2003 http:\/\/citeseerx.ist.psu.edu\/viewdoc\/download?doi=10.1.1.112.9899
+        (2003)."},{"key":"2649_CR7","unstructured":"Oliphant, T. E. Guide to NumPy
+        1st edn (Trelgol Publishing, 2006)."},{"key":"2649_CR8","doi-asserted-by":"publisher","first-page":"7","DOI":"10.1109\/MCSE.2007.51","volume":"9","author":"PF
+        Dubois","year":"2007","unstructured":"Dubois, P. F. Python: batteries included.
+        Comput. Sci. Eng. 9, 7\u20139 (2007).","journal-title":"Comput. Sci. Eng."},{"key":"2649_CR9","doi-asserted-by":"publisher","first-page":"10","DOI":"10.1109\/MCSE.2007.58","volume":"9","author":"TE
+        Oliphant","year":"2007","unstructured":"Oliphant, T. E. Python for scientific
+        computing. Comput. Sci. Eng. 9, 10\u201320 (2007).","journal-title":"Comput.
+        Sci. Eng."},{"key":"2649_CR10","doi-asserted-by":"publisher","first-page":"9","DOI":"10.1109\/MCSE.2011.36","volume":"13","author":"KJ
+        Millman","year":"2011","unstructured":"Millman, K. J. & Aivazis, M. Python
+        for scientists and engineers. Comput. Sci. Eng. 13, 9\u201312 (2011).","journal-title":"Comput.
+        Sci. Eng."},{"key":"2649_CR11","doi-asserted-by":"publisher","first-page":"13","DOI":"10.1109\/MCSE.2010.119","volume":"13","author":"F
+        P\u00e9rez","year":"2011","unstructured":"P\u00e9rez, F., Granger, B. E. &
+        Hunter, J. D. Python: an ecosystem for scientific computing. Comput. Sci.
+        Eng. 13, 13\u201321 (2011). Explains why the scientific Python ecosystem is
+        a highly productive environment for research.","journal-title":"Comput. Sci.
+        Eng."},{"key":"2649_CR12","doi-asserted-by":"publisher","first-page":"261","DOI":"10.1038\/s41592-019-0686-2","volume":"17","author":"P
+        Virtanen","year":"2020","unstructured":"Virtanen, P. et al. SciPy 1.0\u2014fundamental
+        algorithms for scientific computing in Python. Nat. Methods 17, 261\u2013272
+        (2020); correction 17, 352 (2020). Introduces the SciPy library and includes
+        a more detailed history of NumPy and SciPy.","journal-title":"Nat. Methods"},{"key":"2649_CR13","doi-asserted-by":"publisher","first-page":"90","DOI":"10.1109\/MCSE.2007.55","volume":"9","author":"JD
+        Hunter","year":"2007","unstructured":"Hunter, J. D. Matplotlib: a 2D graphics
+        environment. Comput. Sci. Eng. 9, 90\u201395 (2007).","journal-title":"Comput.
+        Sci. Eng."},{"key":"2649_CR14","doi-asserted-by":"crossref","unstructured":"McKinney,
+        W. Data structures for statistical computing in Python. In Proc. 9th Python
+        in Science Conf. (eds van der\u00a0Walt,\u00a0S.\u00a0& Millman,\u00a0K.\u00a0J.)
+        56\u201361 (2010).","DOI":"10.25080\/Majora-92bf1922-00a"},{"key":"2649_CR15","first-page":"2825","volume":"12","author":"F
+        Pedregosa","year":"2011","unstructured":"Pedregosa, F. et al. Scikit-learn:
+        machine learning in Python. J. Mach. Learn. Res. 12, 2825\u20132830 (2011).","journal-title":"J.
+        Mach. Learn. Res."},{"key":"2649_CR16","doi-asserted-by":"publisher","first-page":"e453","DOI":"10.7717\/peerj.453","volume":"2","author":"S
+        van der Walt","year":"2014","unstructured":"van der Walt, S. et al. scikit-image:
+        image processing in Python. PeerJ 2, e453 (2014).","journal-title":"PeerJ"},{"key":"2649_CR17","doi-asserted-by":"crossref","unstructured":"van
+        der Walt, S., Colbert, S. C. & Varoquaux, G. The NumPy array: a structure
+        for efficient numerical computation. Comput. Sci. Eng. 13, 22\u201330 (2011).
+        Discusses the NumPy array data structure with a focus on how it enables efficient
+        computation.","DOI":"10.1109\/MCSE.2011.37"},{"key":"2649_CR18","doi-asserted-by":"crossref","unstructured":"Wang,
+        Q., Zhang, X., Zhang, Y. & Yi, Q. AUGEM: automatically generate high performance
+        dense linear algebra kernels on x86 CPUs. In SC\u201913: Proc. Intl Conf.
+        High Performance Computing, Networking, Storage and Analysis 25 (IEEE, 2013).","DOI":"10.1145\/2503210.2503219"},{"key":"2649_CR19","doi-asserted-by":"crossref","unstructured":"Xianyi,
+        Z., Qian, W. & Yunquan, Z. Model-driven level 3 BLAS performance optimization
+        on Loongson 3A processor. In 2012 IEEE 18th Intl Conf. Parallel and Distributed
+        Systems 684\u2013691 (IEEE, 2012).","DOI":"10.1109\/ICPADS.2012.97"},{"key":"2649_CR20","doi-asserted-by":"publisher","first-page":"21","DOI":"10.1109\/MCSE.2007.53","volume":"9","author":"F
+        P\u00e9rez","year":"2007","unstructured":"P\u00e9rez, F. & Granger, B. E.
+        IPython: a system for interactive scientific computing. Comput. Sci. Eng.
+        9, 21\u201329 (2007).","journal-title":"Comput. Sci. Eng."},{"key":"2649_CR21","unstructured":"Kluyver,
+        T. et al. Jupyter Notebooks\u2014a publishing format for reproducible computational
+        workflows. In Positioning and Power in Academic Publishing: Players, Agents
+        and Agendas (eds Loizides,\u00a0F.\u00a0& Schmidt,\u00a0B.) 87\u201390 (IOS
+        Press, 2016)."},{"key":"2649_CR22","unstructured":"Hagberg, A. A., Schult,
+        D. A. & Swart, P. J. Exploring network structure, dynamics, and function using
+        NetworkX. In Proc. 7th Python in Science Conf. (eds Varoquaux,\u00a0G., Vaught,\u00a0T.\u00a0&
+        Millman,\u00a0K.\u00a0J.) 11\u201315 (2008)."},{"key":"2649_CR23","doi-asserted-by":"publisher","first-page":"A33","DOI":"10.1051\/0004-6361\/201322068","volume":"558","author":"Astropy
+        Collaboration","year":"2013","unstructured":"Astropy Collaboration et al.
+        Astropy: a community Python package for astronomy. Astron. Astrophys. 558,
+        A33 (2013).","journal-title":"Astron. Astrophys."},{"key":"2649_CR24","doi-asserted-by":"publisher","first-page":"123","DOI":"10.3847\/1538-3881\/aac387","volume":"156","author":"AM
+        Price-Whelan","year":"2018","unstructured":"Price-Whelan, A. M. et al. The
+        Astropy Project: building an open-science project and status of the v2.0 core
+        package. Astron. J. 156, 123 (2018).","journal-title":"Astron. J."},{"key":"2649_CR25","doi-asserted-by":"publisher","first-page":"1422","DOI":"10.1093\/bioinformatics\/btp163","volume":"25","author":"PJ
+        Cock","year":"2009","unstructured":"Cock, P. J. et al. Biopython: freely available
+        Python tools for computational molecular biology and bioinformatics. Bioinformatics
+        25, 1422\u20131423 (2009).","journal-title":"Bioinformatics"},{"key":"2649_CR26","doi-asserted-by":"publisher","first-page":"52","DOI":"10.1109\/MCSE.2007.46","volume":"9","author":"KJ
+        Millman","year":"2007","unstructured":"Millman, K. J. & Brett, M. Analysis
+        of functional magnetic resonance imaging in Python. Comput. Sci. Eng. 9, 52\u201355
+        (2007).","journal-title":"Comput. Sci. Eng."},{"key":"2649_CR27","doi-asserted-by":"publisher","first-page":"014009","DOI":"10.1088\/1749-4699\/8\/1\/014009","volume":"8","author":"The
+        SunPy Community et al.","year":"2015","unstructured":"The SunPy Community
+        et al. SunPy\u2014Python for solar physics. Comput. Sci. Discov. 8, 014009
+        (2015).","journal-title":"Comput. Sci. Discov."},{"key":"2649_CR28","unstructured":"Hamman,
+        J., Rocklin, M. & Abernathy, R. Pangeo: a big-data ecosystem for scalable
+        Earth system science. In EGU General Assembly Conf. Abstracts 12146 (2018)."},{"key":"2649_CR29","unstructured":"Chael,
+        A. A. et al. ehtim: imaging, analysis, and simulation software for radio interferometry.
+        Astrophysics Source Code Library https:\/\/ascl.net\/1904.004 (2019)."},{"key":"2649_CR30","doi-asserted-by":"crossref","unstructured":"Millman,
+        K. J. & P\u00e9rez, F. Developing open source scientific practice. In Implementing
+        Reproducible Research (eds Stodden,\u00a0V., Leisch,\u00a0F.\u00a0& Peng,\u00a0R.\u00a0D.)
+        149\u2013183 (CRC Press, 2014). Describes the software engineering practices
+        embraced by the NumPy and SciPy communities with a focus on how these practices
+        improve research.","DOI":"10.1201\/9781315373461-6"},{"key":"2649_CR31","unstructured":"van
+        der Walt, S. The SciPy Documentation Project (technical overview). In Proc.
+        7th Python in Science Conf. (SciPy 2008) (eds Varoquaux,\u00a0G., Vaught,\u00a0T.\u00a0&
+        Millman,\u00a0K.\u00a0J.) 27\u201328 (2008)."},{"key":"2649_CR32","unstructured":"Harrington,
+        J. The SciPy Documentation Project. In Proc. 7th Python in Science Conference
+        (SciPy 2008) (eds Varoquaux,\u00a0G., Vaught,\u00a0T.\u00a0& Millman, K.\u00a0J.)
+        33\u201335 (2008)."},{"key":"2649_CR33","unstructured":"Harrington, J. & Goldsmith,
+        D. Progress report: NumPy and SciPy documentation in 2009. In Proc. 8th Python
+        in Science Conf. (SciPy 2009) (eds Varoquaux,\u00a0G., van der\u00a0Walt,\u00a0S.\u00a0&
+        Millman,\u00a0K.\u00a0J.) 84\u201387 (2009)."},{"key":"2649_CR34","unstructured":"Royal
+        Astronomical Society Report of the RAS \u2018A\u2019 Awards Committee 2020:
+        Astropy Project: 2020 Group Achievement Award (A) https:\/\/ras.ac.uk\/sites\/default\/files\/2020-01\/Group%20Award%20-%20Astropy.pdf
+        (2020)."},{"key":"2649_CR35","doi-asserted-by":"publisher","first-page":"66","DOI":"10.1109\/MCSE.2006.122","volume":"8","author":"G
+        Wilson","year":"2006","unstructured":"Wilson, G. Software carpentry: getting
+        scientists to write better code by making them more productive. Comput. Sci.
+        Eng. 8, 66\u201369 (2006).","journal-title":"Comput. Sci. Eng."},{"key":"2649_CR36","doi-asserted-by":"crossref","unstructured":"Hannay,
+        J. E. et al. How do scientists develop and use scientific software? In Proc.
+        2009 ICSE Workshop on Software Engineering for Computational Science and Engineering
+        1\u20138 (IEEE, 2009).","DOI":"10.1109\/SECSE.2009.5069155"},{"key":"2649_CR37","doi-asserted-by":"publisher","first-page":"727","DOI":"10.3389\/fnins.2018.00727","volume":"12","author":"KJ
+        Millman","year":"2018","unstructured":"Millman, K. J., Brett, M., Barnowski,
+        R. & Poline, J.-B. Teaching computational reproducibility for neuroimaging.
+        Front. Neurosci. 12, 727 (2018).","journal-title":"Front. Neurosci."},{"key":"2649_CR38","unstructured":"Paszke,
+        A. et al. Pytorch: an imperative style, high-performance deep learning library.
+        In Advances in Neural Information Processing Systems 32 (eds Wallach,\u00a0H.\u00a0et
+        al.) 8024\u20138035 (Neural Information Processing Systems, 2019)."},{"key":"2649_CR39","unstructured":"Abadi,
+        M. et al. TensorFlow: a system for large-scale machine learning. In OSDI\u201916:
+        Proc. 12th USENIX Conf. Operating Systems Design and Implementation (chairs
+        Keeton, K. & Roscoe, T.) 265\u2013283 (USENIX Association, 2016)."},{"key":"2649_CR40","unstructured":"Chen,
+        T. et al. MXNet: a flexible and efficient machine learning library for heterogeneous
+        distributed systems. Preprint at http:\/\/www.arxiv.org\/abs\/1512.01274 (2015)."},{"key":"2649_CR41","doi-asserted-by":"publisher","first-page":"10","DOI":"10.5334\/jors.148","volume":"5","author":"S
+        Hoyer","year":"2017","unstructured":"Hoyer, S. & Hamman, J. xarray: N\u2013D
+        labeled arrays and datasets in Python. J. Open Res. Softw. 5, 10 (2017).","journal-title":"J.
+        Open Res. Softw."},{"key":"2649_CR42","unstructured":"Entschev, P. Distributed
+        multi-GPU computing with Dask, CuPy and RAPIDS. In EuroPython 2019 https:\/\/ep2019.europython.eu\/media\/conference\/slides\/fX8dJsD-distributed-multi-gpu-computing-with-dask-cupy-and-rapids.pdf
+        (2019)."},{"key":"2649_CR43","doi-asserted-by":"publisher","first-page":"31","DOI":"10.1109\/MCSE.2010.118","volume":"13","author":"S
+        Behnel","year":"2011","unstructured":"Behnel, S. et al. Cython: the best of
+        both worlds. Comput. Sci. Eng. 13, 31\u201339 (2011).","journal-title":"Comput.
+        Sci. Eng."},{"key":"2649_CR44","doi-asserted-by":"crossref","unstructured":"Lam,
+        S. K., Pitrou, A. & Seibert, S. Numba: a LLVM-based Python JIT compiler. In
+        Proc. Second Workshop on the LLVM Compiler Infrastructure in HPC, LLVM \u201915
+        7:1\u20137:6 (ACM, 2015).","DOI":"10.1145\/2833157.2833162"},{"key":"2649_CR45","doi-asserted-by":"publisher","first-page":"014001","DOI":"10.1088\/1749-4680\/8\/1\/014001","volume":"8","author":"S
+        Guelton","year":"2015","unstructured":"Guelton, S. et al. Pythran: enabling
+        static optimization of scientific Python programs. Comput. Sci. Discov. 8,
+        014001 (2015).","journal-title":"Comput. Sci. Discov."},{"key":"2649_CR46","doi-asserted-by":"publisher","first-page":"30","DOI":"10.1109\/MAHC.2008.29","volume":"30","author":"J
+        Dongarra","year":"2008","unstructured":"Dongarra, J., Golub, G. H., Grosse,
+        E., Moler, C. & Moore, K. Netlib and NA-Net: building a scientific computing
+        community. IEEE Ann. Hist. Comput. 30, 30\u201341 (2008).","journal-title":"IEEE
+        Ann. Hist. Comput."},{"key":"2649_CR47","unstructured":"Barrett, K. A., Chiu,
+        Y. H., Painter, J. F., Motteler, Z. C. & Dubois, P. F. Basis System, Part
+        I: Running a Basis Program\u2014A Tutorial for Beginners UCRL-MA-118543, Vol.\u00a01
+        (Lawrence Livermore National Laboratory 1995)."},{"key":"2649_CR48","unstructured":"Dubois,
+        P. F. & Motteler, Z. Basis System, Part II: Basis Language Reference Manual
+        UCRL-MA-118543, Vol.\u00a02 (Lawrence Livermore National Laboratory, 1995)."},{"key":"2649_CR49","unstructured":"Chiu,
+        Y. H. & Dubois, P. F. Basis System, Part III: EZN User Manual UCRL-MA-118543,
+        Vol.\u00a03 (Lawrence Livermore National Laboratory, 1995)."},{"key":"2649_CR50","unstructured":"Chiu,
+        Y. H. & Dubois, P. F. Basis System, Part IV: EZD User Manual UCRL-MA-118543,
+        Vol.\u00a04 (Lawrence Livermore National Laboratory, 1995)."},{"key":"2649_CR51","doi-asserted-by":"publisher","first-page":"609","DOI":"10.1063\/1.4823451","volume":"9","author":"DH
+        Munro","year":"1995","unstructured":"Munro, D. H. & Dubois, P. F. Using the
+        Yorick interpreted language. Comput. Phys. 9, 609\u2013615 (1995).","journal-title":"Comput.
+        Phys."},{"key":"2649_CR52","doi-asserted-by":"crossref","first-page":"299","DOI":"10.1080\/10618600.1996.10474713","volume":"5","author":"R
+        Ihaka","year":"1996","unstructured":"Ihaka, R. & Gentleman, R. R: a language
+        for data analysis and graphics. J. Comput. Graph. Stat. 5, 299\u2013314 (1996).","journal-title":"J.
+        Comput. Graph. Stat."},{"key":"2649_CR53","doi-asserted-by":"crossref","unstructured":"Iverson,
+        K. E. A programming language. In Proc. 1962 Spring Joint Computer Conf. 345\u2013351
+        (1962).","DOI":"10.1145\/1460833.1460872"},{"key":"2649_CR54","doi-asserted-by":"crossref","unstructured":"Jenness,
+        T. et al. LSST data management software development practices and tools. In
+        Proc. SPIE 10707, Software and Cyberinfrastructure for Astronomy V 1070709
+        (SPIE and International Society for Optics and Photonics, 2018).","DOI":"10.1117\/12.2312157"},{"key":"2649_CR55","doi-asserted-by":"publisher","first-page":"103","DOI":"10.1145\/2692956.2663188","volume":"34","author":"ND
+        Matsakis","year":"2014","unstructured":"Matsakis, N. D. & Klock, F. S. The
+        Rust language. Ada Letters 34, 103\u2013104 (2014).","journal-title":"Ada
+        Letters"},{"key":"2649_CR56","doi-asserted-by":"publisher","first-page":"65","DOI":"10.1137\/141000671","volume":"59","author":"J
+        Bezanson","year":"2017","unstructured":"Bezanson, J., Edelman, A., Karpinski,
+        S. & Shah, V. B. Julia: a fresh approach to numerical computing. SIAM Rev.
+        59, 65\u201398 (2017).","journal-title":"SIAM Rev."},{"key":"2649_CR57","unstructured":"Lattner,
+        C. & Adve, V. LLVM: a compilation framework for lifelong program analysis
+        and transformation. In Proc. 2004 Intl Symp. Code Generation and Optimization
+        (CGO\u201904) 75\u201388 (IEEE, 2004)."}],"container-title":"Nature","original-title":[],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,8,14]],"date-time":"2024-08-14T02:15:12Z","timestamp":1723601712000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2020,9,16]]},"references-count":57,"journal-issue":{"issue":"7825","published-print":{"date-parts":[[2020,9,17]]}},"alternative-id":["2649"],"URL":"http:\/\/dx.doi.org\/10.1038\/s41586-020-2649-2","relation":{"has-part":[{"id-type":"doi","id":"10.5194\/os-17-997-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/acp-21-18557-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/bg-18-6329-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/amt-17-4891-2024","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/se-14-859-2023","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/amt-18-2481-2025","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/jsss-12-163-2023","asserted-by":"object"}],"has-review":[{"id-type":"doi","id":"10.14293\/S2199-1006.1.SOR-UNCAT.A7759461.v1.RAUGFI","asserted-by":"object"},{"id-type":"doi","id":"10.3410\/f.738677898.793581450","asserted-by":"object"}]},"ISSN":["0028-0836","1476-4687"],"subject":[],"container-title-short":"Nature","published":{"date-parts":[[2020,9,16]]},"assertion":[{"value":"21
+        February 2020","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
+        History"}},{"value":"17 June 2020","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
+        History"}},{"value":"16 September 2020","order":3,"name":"first_online","label":"First
+        Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"The
+        authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
+        interests"}}]}'
+  recorded_at: Mon, 20 Oct 2025 11:45:51 GMT
+recorded_with: VCR 6.3.1

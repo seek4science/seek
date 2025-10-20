@@ -11,19 +11,19 @@ module Seek
         def normalize_metadata(raw)
           {
             title: raw[:title],
-            publication_authors: raw[:publication_authors],
+            publication_authors: raw[:authors],
             journal: raw[:journal],
-            published_date: raw[:published_date],
+            published_date: raw[:date_published],
             doi: raw[:doi],
-            pubmed_id: raw[:pubmed_id],
             abstract: raw[:abstract],
             citation: raw[:citation],
-            editor: raw[:editor],
+            editors: raw[:editors],
             booktitle: raw[:booktitle],
             publisher: raw[:publisher],
             url: raw[:url]
           }.compact
         end
+
       end
     end
   end
