@@ -2240,6 +2240,32 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'batch preview should render preview form with study data' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    
+    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    post :preview_content, params: { 
+      content_blobs: [{ data: zip_file }]
+    }
+    
+    assert_response :success
+    assert_template 'studies/batch_preview'
+    
+    # Verify form elements are present
+    assert_select 'form[action=?]', batch_create_studies_path
+    assert_select 'table.table' do
+      # Check for required field headers with asterisks
+      assert_select 'th', text: /Study ID.*\*/, count: 1
+      assert_select 'th', text: /Study Title.*\*/, count: 1
+      assert_select 'th', text: /Start date.*\*/, count: 1
+      assert_select 'th', text: /Contact institution.*\*/, count: 1
+      
+      # Check that study data is populated in form fields
+      assert_select 'input[name="studies[id][]"][value=?]', 'POPYOMICS-POP2-F'
+      assert_select 'textarea[name="studies[title][]"]', text: /Clonal test of mapping pedigree/
+    end
+  end
+
   test 'should require login for batch_uploader' do
     logout
     get :batch_uploader
