@@ -4,7 +4,7 @@ require 'json'
 module Seek
   module Doi
     module Parsers
-      class DataCiteParser < BaseParser
+      class DataciteParser < BaseParser
         API_BASE = 'https://api.datacite.org/dois/'.freeze
 
         def parse(doi)

@@ -12,7 +12,7 @@ module Seek
         agency = get_doi_ra(doi)
         case agency
         when 'DataCite'
-          Seek::Doi::Parsers::DataCiteParser.new.parse(doi)
+          Seek::Doi::Parsers::DataciteParser.new.parse(doi)
         when 'Crossref'
           Seek::Doi::Parsers::CrossrefParser.new.parse(doi)
         else
