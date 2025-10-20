@@ -7,10 +7,14 @@ module Seek
         def parse(doi)
           data = fetch_csl_json(doi)
 
+          # log data
+          Rails.logger.info("CSL JSON data for DOI #{doi}: #{data.inspect}")
+
+
           doi_record = OpenStruct.new(
-            title: Array(data['title']).first,
-            abstract: data['abstract'],
-            date_published: extract_date(data['issued']),
+            title: [Array(data['title']).first, Array(data['subtitle']).first].compact.join(':'),
+            abstract: clean_abstract(data['abstract']),
+            date_published: extract_date(data),
             journal: data['container-title'],
             doi: data['DOI'],
             citation: data['citation'] || build_citation(data),
@@ -46,11 +50,31 @@ module Seek
           {}
         end
 
-        def extract_date(issued)
-          return nil unless issued && issued['date-parts'].is_a?(Array)
+        def clean_abstract(abstract)
+          return nil if abstract.nil?
 
-          date_parts = issued['date-parts'].first
-          Date.new(*date_parts) rescue nil
+          # Remove all <jats:*> tags and their closing tags
+          cleaned = abstract.gsub(/<\/?jats:[^>]+>/, '')
+
+          # Optional: remove leading/trailing whitespace
+          cleaned.strip
+        end
+
+        def extract_date(data)
+          # Helper to extract date-parts from a key
+          get_date_parts = ->(key) {
+            if data[key] && data[key]['date-parts'].is_a?(Array)
+              data[key]['date-parts'].first
+            end
+          }
+
+          # Try issued first, then published, then published-print
+          date_parts = get_date_parts.call('issued') ||
+            get_date_parts.call('published') ||
+            get_date_parts.call('published-print')
+
+          # Return Date object or nil if invalid
+          date_parts ? (Date.new(*date_parts) rescue nil) : nil
         end
 
         def extract_editors(editor_list)
@@ -71,7 +95,7 @@ module Seek
         def build_citation(data)
           #todo improve citation formatting
           journal = data['container-title']
-          year = extract_date(data['issued'])&.year
+          year = extract_date(data)&.year
           "#{journal}. #{year}."
         end
 

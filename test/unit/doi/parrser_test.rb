@@ -27,25 +27,44 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     end
   end
 
-  test 'returns parsed data for a Crossref DOI' do
+  # Journal article
+  test 'returns parsed Journal article DOI (crossref)' do
     VCR.use_cassette('doi/doi_crossref_response') do
       doi = '10.1038/s41586-020-2649-2'
       result = Seek::Doi::Parser.parse(doi)
-
+      # puts result.inspect
       assert_equal result[:title],'Array programming with NumPy'
       assert_equal result[:doi], doi
-      assert_includes result[:abstract],"Array programming provides a powerful"
-      assert_equal result[:journal], "Nature"
-      assert_equal result[:publisher], "Springer Science and Business Media LLC"
+      assert_equal result[:abstract],'AbstractArray programming provides a powerful, compact and expressive syntax for accessing, manipulating and operating on data in vectors, matrices and higher-dimensional arrays. NumPy is the primary array programming library for the Python language. It has an essential role in research analysis pipelines in fields as diverse as physics, chemistry, astronomy, geoscience, biology, psychology, materials science, engineering, finance and economics. For example, in astronomy, NumPy was an important part of the software stack used in the discovery of gravitational waves1and in the first imaging of a black hole2. Here we review how a few fundamental array concepts lead to a simple and powerful programming paradigm for organizing, exploring and analysing scientific data. NumPy is the foundation upon which the scientific Python ecosystem is constructed. It is so pervasive that several projects, targeting audiences with specialized needs, have developed their own NumPy-like interfaces and array objects. Owing to its central position in the ecosystem, NumPy increasingly acts as an interoperability layer between such array computation libraries and, together with its application programming interface (API), provides a flexible framework to support the next decade of scientific and industrial analysis.'
+      assert_equal result[:journal], 'Nature'
+      assert_equal result[:publisher], 'Springer Science and Business Media LLC'
       assert_equal result[:published_date], '2020-09-16'
       assert_equal result[:publication_authors].first.full_name, 'Charles R. Harris'
       #assert_equal result[:citation], 'Nature. 585(7825). 2020.'
-      #assert_equal result[:editors], nil
-      assert_equal result[:booktitle], nil
       assert_equal result[:url], 'http://dx.doi.org/10.1038/s41586-020-2649-2'
 
 
     end
   end
+
+  # Journal article with editors and subtitle
+  test 'returns parsed Journal article DOI with editors and subtitle (crossref)' do
+    VCR.use_cassette('doi/doi_crossref_with_editor_subtitle_response') do
+      doi = '10.2307/j.ctvn5txvs'
+      result = Seek::Doi::Parser.parse(doi)
+
+      assert_equal result[:title],'Troy Book:Selections'
+      assert_equal result[:doi], doi
+      assert_nil result[:abstract]
+      assert_empty result[:journal]
+      assert_equal result[:publication_authors].first.full_name, 'John Lydgate'
+      assert_equal result[:editors], 'Robert R. Edwards'
+      assert_equal result[:publisher], 'Medieval Institute Publications'
+      assert_equal result[:url], 'http://dx.doi.org/10.2307/j.ctvn5txvs'
+      assert_equal result[:published_date], '1998-03-01'
+      #assert_equal result[:citation], ''
+    end
+  end
+
 
 end
