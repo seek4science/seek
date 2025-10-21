@@ -43,8 +43,14 @@ markov_decision_process:
 metabolic_network:
   title: Metabolic network
 
-neural_network:
-  title: Neural network (deep learning, feedforward, recurrent, etc.)
+deep_learning_neural_network:
+  title: Deep learning Neural network
+
+feedforward_neural_network:
+  title: Feedforward Neural network
+
+recurrent_neural_network:
+  title: Recurrent Neural network
 
 ODE:
   title: Ordinary differential equations (ODE)
