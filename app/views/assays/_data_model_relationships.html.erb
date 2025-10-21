@@ -21,9 +21,9 @@
       <% @assay.data_files.each do |d| %>
         <li>
           <% if d.can_view? %>
-            <%= link_to truncate(h(d.title), :length => 110), show_resource_path(d) %>
+            <%= link_to truncate(h(d.title), :length => 110), show_resource_path(d) %><%= d.relationship_type(@assay) ? (" <span class='relationship_type'>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
           <% else %>
-            <span class="none_text">Hidden <%= t('data_file') %></span><%= d.relationship_type(@assay) ? (" <span class='relationship_type'>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
+            <span class="none_text">Hidden <%= t('data_file') %></span>
           <% end %>
         </li>
       <% end %>
