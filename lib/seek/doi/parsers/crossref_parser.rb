@@ -1,3 +1,4 @@
+#todo error handling/logging
 module Seek
   module Doi
     module Parsers
@@ -21,7 +22,7 @@ module Seek
           authors = extract_authors_as_objects(data['author'])
           url = data['URL']
 
-          OpenStruct.new(normalize_metadata(
+          build_struct(
             title: title,
             abstract: abstract,
             date_published: date_published.to_s,
@@ -33,8 +34,8 @@ module Seek
             editors: editors,
             authors: authors,
             url: url
-          ))
-                 end
+          )
+        end
 
         private
 

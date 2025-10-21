@@ -12,7 +12,7 @@ module Seek
           response = Net::HTTP.get(URI("#{API_BASE}#{id}"))
           data = JSON.parse(response)['data']['attributes'] rescue {}
 
-          normalize_metadata(
+          build_struct(
             title: data.dig('titles', 0, 'title'),
             authors: data['creators']&.map { |c| c['name'] },
             journal: data['container-title'],

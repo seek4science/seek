@@ -6,7 +6,11 @@ module Seek
           raise NotImplementedError, "#{self.class.name} must implement #parse"
         end
 
-      protected
+        protected
+
+        def build_struct(raw)
+          OpenStruct.new(normalize_metadata(raw))
+        end
 
         def normalize_metadata(raw)
           {
@@ -23,8 +27,7 @@ module Seek
             url: raw[:url]
           }.compact
         end
-
-    end
+      end
     end
   end
 end
