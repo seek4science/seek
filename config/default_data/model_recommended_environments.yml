@@ -10,9 +10,6 @@ CellNetAnalyzer:
 CellSys:
   title: CellSys
 
-Conda:
-  title: Conda
-
 copasi:
   title: Copasi
 
