@@ -85,9 +85,16 @@ module Seek
           return [] unless author_list.is_a?(Array)
 
           author_list.map do |a|
-            Seek::Doi::Author.new(first_name: a['given'], last_name: a['family'])
-          end
+            if a['given'] && a['family']
+              Seek::Doi::Author.new(first_name: a['given'], last_name: a['family'])
+            elsif a['name']
+              Seek::Doi::Author.new(first_name: a['name'], last_name: '')
+            else
+              nil
+            end
+          end.compact
         end
+
 
         def build_citation(data)
           #todo improve citation formatting

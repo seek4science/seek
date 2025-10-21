@@ -263,13 +263,14 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'editor should not be author' do
-    mock_crossref(email: 'fred@email.com', doi: '10.1371/journal.pcbi.1002352', content_file: 'cross_ref2.xml')
-    query = DOI::Query.new('fred@email.com')
-    result = query.fetch('10.1371/journal.pcbi.1002352')
-    assert result.error.nil?, 'There should not be an error'
-    assert !result.authors.collect(&:last_name).include?('Papin')
-    assert_equal 5, result.authors.size
-    assert_nil result.error
+    VCR.use_cassette('doi/cross_ref7') do
+      result = Seek::Doi::Parser.parse('10.1371/journal.pcbi.1002352')
+      assert result.error.nil?, 'There should not be an error'
+      assert !result.authors.collect(&:last_name).include?('Papin')
+      assert_equal 6, result.authors.size
+      puts result.authors.inspect
+      assert_nil result.error
+    end
   end
 
   test 'model and datafile association' do
