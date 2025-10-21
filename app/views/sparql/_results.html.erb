@@ -1,0 +1,5 @@
+<% if results.present? %>
+    <%= render partial: "results_table", locals: { results: results } %>
+<% else %>
+  <p class="text-muted">No results found.</p>
+<% end %>
