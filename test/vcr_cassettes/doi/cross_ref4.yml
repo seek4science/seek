@@ -1,0 +1,227 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1371
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 21 Oct 2025 07:53:38 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=bvcUYsal6BT4OvUClExwq1Ek9yanOZrfvImmZLZG4FxGCtfONM3iTia9hq1FqF3jn09NRr0NulVaAqbR7O1SjFHgevFoFw%3D%3D"}]}'
+      Cf-Ray:
+      - 991f2eafbec12bb7-STR
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1371",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Tue, 21 Oct 2025 07:53:38 GMT
+- request:
+    method: get
+    uri: https://doi.org/10.1371/journal.pone.0004803
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.citationstyles.csl+json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 302
+      message: Found
+    headers:
+      Date:
+      - Tue, 21 Oct 2025 07:53:38 GMT
+      Content-Type:
+      - text/html;charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Location:
+      - https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform
+      Server:
+      - cloudflare
+      Vary:
+      - Accept
+      - Origin
+      Expires:
+      - Tue, 21 Oct 2025 08:49:22 GMT
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Sr4fiwehvxSLeUhKGqPrj2geOHkrl09xtLlCSWCBtgyq%2FT6T%2BM12N3L5V%2FleeOF2O0EBovCVN3sOYm5rlgBfRXu6gs8rbg%3D%3D"}]}'
+      Cf-Ray:
+      - 991f2eb02f4f2bb7-STR
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: |-
+        <html><head><title>Handle Redirect</title></head>
+        <body><a href="https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform">https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform</a></body></html>
+  recorded_at: Tue, 21 Oct 2025 07:53:38 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.citationstyles.csl+json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 21 Oct 2025 07:53:39 GMT
+      Content-Type:
+      - application/vnd.citationstyles.csl+json
+      Content-Length:
+      - '9973'
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept, Accept-Encoding
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"indexed":{"date-parts":[[2025,10,8]],"date-time":"2025-10-08T22:47:24Z","timestamp":1759963644547},"reference-count":31,"publisher":"Public
+        Library of Science (PLoS)","issue":"3","license":[{"start":{"date-parts":[[2009,3,11]],"date-time":"2009-03-11T00:00:00Z","timestamp":1236729600000},"content-version":"unspecified","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/publicdomain\/zero\/1.0\/"}],"content-domain":{"domain":["www.plosone.org"],"crossmark-restriction":false},"DOI":"10.1371\/journal.pone.0004803","type":"journal-article","created":{"date-parts":[[2009,3,10]],"date-time":"2009-03-10T12:23:18Z","timestamp":1236687798000},"page":"e4803","update-policy":"http:\/\/dx.doi.org\/10.1371\/journal.pone.corrections_policy","source":"Crossref","is-referenced-by-count":135,"title":"Clickstream
+        Data Yields High-Resolution Maps of Science","prefix":"10.1371","volume":"4","author":[{"given":"Johan","family":"Bollen","sequence":"first","affiliation":[]},{"given":"Herbert","family":"Van
+        de Sompel","sequence":"additional","affiliation":[]},{"given":"Aric","family":"Hagberg","sequence":"additional","affiliation":[]},{"given":"Luis","family":"Bettencourt","sequence":"additional","affiliation":[]},{"given":"Ryan","family":"Chute","sequence":"additional","affiliation":[]},{"given":"Marko
+        A.","family":"Rodriguez","sequence":"additional","affiliation":[]},{"given":"Lyudmila","family":"Balakireva","sequence":"additional","affiliation":[]}],"member":"340","published-online":{"date-parts":[[2009,3,11]]},"reference":[{"key":"ref1","doi-asserted-by":"crossref","first-page":"669","DOI":"10.1038\/227669a0","article-title":"Citation
+        indexing for studying science.","volume":"227","author":"E Garfield","year":"1970","journal-title":"Nature"},{"key":"ref2","doi-asserted-by":"crossref","first-page":"764","DOI":"10.1002\/asi.10066","article-title":"Domain
+        visualization using VxInsight for science and technology management.","volume":"53","author":"KW
+        Boyack","year":"2002","journal-title":"J Am Soc Inf Sci Technol"},{"key":"ref3","doi-asserted-by":"crossref","first-page":"351","DOI":"10.1007\/s11192-005-0255-6","article-title":"Mapping
+        the backbone of science.","volume":"64","author":"KW Boyack","year":"2005","journal-title":"Scientometrics"},{"key":"ref4","doi-asserted-by":"crossref","DOI":"10.1007\/BF02018102","article-title":"The
+        generation of aggregated journal-journal citation maps on the basis of the
+        cd-rom version of the science citation index.","volume":"31","author":"L Leydesdorff","year":"1994","journal-title":"Scientometrics"},{"key":"ref5","article-title":"Visualizing
+        the marrow of science.","volume":"58","author":"F de Moya-Aneg\u00f3n","year":"2007","journal-title":"Journal
+        of the American Society for Information Science and Technology"},{"key":"ref6","first-page":"19","article-title":"Delineating
+        the citation impact of scientific discoveries.","author":"C Chen","year":"2007"},{"key":"ref7","doi-asserted-by":"crossref","first-page":"1118","DOI":"10.1073\/pnas.0706851105","article-title":"Maps
+        of random walks on complex networks reveal community structure.","volume":"105","author":"M
+        Rosvall","year":"2008","journal-title":"Proceedings of the National Academy
+        of Sciences USA"},{"key":"ref8","doi-asserted-by":"crossref","first-page":"36","DOI":"10.1002\/asi.20095","article-title":"Worldwide
+        use and impact of the NASA Astrophysics Data System digital library.","volume":"56","author":"MJ
+        Kurtz","year":"2004","journal-title":"Journal of the American Society for
+        information science"},{"key":"ref9","doi-asserted-by":"crossref","first-page":"1060","DOI":"10.1002\/asi.20373","article-title":"Earlier
+        web usage statistics as predictors of later citation impact.","volume":"57","author":"T
+        Brody","year":"2006","journal-title":"Journal of the American Society for
+        Information Science and Technology"},{"key":"ref10","doi-asserted-by":"crossref","first-page":"a568-","DOI":"10.1136\/bmj.a568","article-title":"Open
+        access publishing, article downloads, and citations: randomised controlled
+        trial.","volume":"337","author":"PM Davis","year":"2008","journal-title":"British
+        Medical Journal"},{"key":"ref11","doi-asserted-by":"crossref","first-page":"29","DOI":"10.1007\/BF02457964","article-title":"Publication
+        delays in the science field and their relationship to the ageing of scientific
+        literature.","volume":"41","author":"M Luwel","year":"1998","journal-title":"Scientometrics"},{"key":"ref12","doi-asserted-by":"crossref","first-page":"158","DOI":"10.1002\/(SICI)1097-4571(2000)51:2<158::AID-ASI7>3.0.CO;2-X","article-title":"The
+        influence of publication delays on the observed aging distribution of scientific
+        literature.","volume":"51","author":"L Egghe","year":"2000","journal-title":"Journal
+        of the American Society for information science"},{"key":"ref13","doi-asserted-by":"crossref","DOI":"10.1145\/1378889.1378928","article-title":"Towards
+        usage-based impact metrics: first results from the MESUR project.","author":"J
+        Bollen","year":"2008"},{"key":"ref14","article-title":"Art and Architecture
+        Thesaurus."},{"key":"ref15","doi-asserted-by":"crossref","DOI":"10.7551\/mitpress\/4150.001.0001","article-title":"The
+        laws of the Web: patterns in the ecology of information","author":"BA Huberman","year":"2001"},{"key":"ref16","doi-asserted-by":"crossref","first-page":"5254","DOI":"10.1073\/pnas.0307539100","article-title":"Traffic-based
+        feedback on the web.","volume":"101","author":"J Aizen","year":"2004","journal-title":"Proceedings
+        of the National Academy of Sciences of the United States of America"},{"key":"ref17","article-title":"Temporal
+        dynamics of on-line information streams.","author":"J Kleinberg","year":"2008"},{"key":"ref18","doi-asserted-by":"crossref","first-page":"95","DOI":"10.1126\/science.280.5360.95","article-title":"Strong
+        regularities in world wide web surfing.","volume":"280","author":"BA Huberman","year":"1998","journal-title":"Science"},{"key":"ref19","first-page":"203","article-title":"The
+        economics of surfing.","volume":"1","author":"E Adar","year":"2000","journal-title":"Quarterly
+        Journal of Electronic Commerce"},{"key":"ref20","article-title":"Mining large
+        itemsets for association rules.","volume":"21","author":"CC Aggarwal","year":"1998","journal-title":"IEEE
+        Data Engineering Bulletin"},{"key":"ref21","doi-asserted-by":"crossref","first-page":"29","DOI":"10.1023\/A:1019288403823","article-title":"Distributions
+        of surfers&apos; paths through the world wide web: Empirical characterization.","volume":"2","author":"P
+        Pirolli","year":"1999","journal-title":"World Wide Web"},{"key":"ref22","doi-asserted-by":"crossref","first-page":"1129","DOI":"10.1002\/spe.4380211102","article-title":"Graph
+        drawing by force-directed placement.","volume":"21","author":"TMJ Fruchterman","year":"1991","journal-title":"Software
+        -Practice and Experience"},{"key":"ref23","doi-asserted-by":"crossref","DOI":"10.1017\/CBO9780511815478","article-title":"Social
+        Network Analysis","author":"S Wasserman","year":"1994"},{"key":"ref24","doi-asserted-by":"crossref","first-page":"985","DOI":"10.1038\/444985a","article-title":"Nature
+        news - 2006 gallery: \u201cbrilliant display\u201d, map of science.","volume":"444","author":"E
+        Harris","year":"2006","journal-title":"Nature"},{"key":"ref25","doi-asserted-by":"crossref","first-page":"163","DOI":"10.1080\/0022250X.2001.9990249","article-title":"A
+        faster algorithm for betweenness centrality.","volume":"25","author":"U Brandes","year":"2001","journal-title":"Journal
+        of Mathematical Sociology"},{"key":"ref26","doi-asserted-by":"crossref","first-page":"107","DOI":"10.1016\/S0169-7552(98)00110-X","article-title":"The
+        anatomy of a large-scale hypertextual web search engine.","volume":"30","author":"S
+        Brin","year":"1998","journal-title":"Computer Networks and ISDN Systems"},{"key":"ref27","doi-asserted-by":"crossref","first-page":"92","DOI":"10.1145\/1052934.1052938","article-title":"Inside
+        pagerank.","volume":"5","author":"M Bianchini","year":"2005","journal-title":"ACM
+        Trans Inter Tech"},{"key":"ref28","doi-asserted-by":"crossref","first-page":"227","DOI":"10.1007\/s11192-006-0151-8","article-title":"Mapping
+        the structure of science through usage.","volume":"69","author":"J Bollen","year":"2006","journal-title":"Scientometrics"},{"key":"ref29","doi-asserted-by":"crossref","first-page":"1243","DOI":"10.1002\/asi.20405","article-title":"eJournal
+        interface can influence usage statistics: implications for libraries, publishers,
+        and project COUNTER.","volume":"57","author":"PM Davis","year":"2006","journal-title":"Journal
+        of the American Society for Information Science and Technology"},{"key":"ref30","article-title":"Population
+        modeling of the emergence and development of scientific fields.","author":"LMA
+        Bettencourt","year":"2008","journal-title":"Scientometrics"},{"key":"ref31","doi-asserted-by":"crossref","first-page":"263","DOI":"10.1002\/ejsp.2420150303","article-title":"Methods
+        of coping with social desirability bias - A review.","volume":"15","author":"AJ
+        Nederhof","year":"1985","journal-title":"European Journal of Social Psychology"}],"container-title":"PLoS
+        ONE","original-title":[],"language":"en","link":[{"URL":"http:\/\/dx.plos.org\/10.1371\/journal.pone.0004803","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2019,5,18]],"date-time":"2019-05-18T11:34:18Z","timestamp":1558179258000},"score":1,"resource":{"primary":{"URL":"https:\/\/dx.plos.org\/10.1371\/journal.pone.0004803"}},"subtitle":[],"editor":[{"given":"Alan","family":"Ruttenberg","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2009,3,11]]},"references-count":31,"journal-issue":{"issue":"3","published-online":{"date-parts":[[2009,3,11]]}},"URL":"http:\/\/dx.doi.org\/10.1371\/journal.pone.0004803","relation":{},"ISSN":["1932-6203"],"subject":[],"container-title-short":"PLoS
+        ONE","published":{"date-parts":[[2009,3,11]]}}'
+  recorded_at: Tue, 21 Oct 2025 07:53:39 GMT
+recorded_with: VCR 6.3.1
