@@ -4,20 +4,47 @@ agent based modelling:
 algebraic equations:
   title: Algebraic equations
 
+ai_ml:
+  title: AI/ML
+
+autoencoder:
+  title: Autoencoder / Variational Autoencoder (VAE)
+
 bayesian:
   title: Bayesian network
+
+bayesian_deep_learning:
+  title: Bayesian deep learning
 
 boolean:
   title: Boolean network
 
+decision_tree:
+  title: Decision tree / Random forest
+
+fuzzy_logic:
+  title: Fuzzy logic model
+
+gan:
+  title: Generative Adversarial Network (GAN)
+
 graphical:
   title: Graphical model
+
+hybrid:
+  title: Hybrid model
 
 linear equations:
   title: Linear equations
 
+markov_decision_process:
+  title: Markov Decision Process (MDP)
+
 metabolic_network:
   title: Metabolic network
+
+neural_network:
+  title: Neural network (deep learning, feedforward, recurrent, etc.)
 
 ODE:
   title: Ordinary differential equations (ODE)
@@ -28,8 +55,23 @@ PDE:
 Petri:
   title: Petri net
 
+probabilistic_graphical:
+  title: Probabilistic graphical model
+
+reinforcement_learning:
+  title: Reinforcement learning model
+
+rule_based:
+  title: Rule-based system
+
 stoichiometric:
   title: Stoichiometric model
+
+support_vector_machine:
+  title: Support Vector Machine (SVM)
+
+transformer:
+  title: Transformer model
 
 
 
