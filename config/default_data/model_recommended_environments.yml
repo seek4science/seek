@@ -40,6 +40,9 @@ Julia:
 Jupyter Notebook:
   title: Jupyter Notebook
 
+Keras:
+  title: Keras
+
 Jarnac:
   title: Jarnac (Systems Biology Workbench)
 
@@ -81,6 +84,9 @@ PySCeS:
 
 R:
   title: R
+
+RStudio:
+  title: RStudio
 
 roadrunner:
   title: roadrunner (Systems Biology Workbench)
