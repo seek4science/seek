@@ -126,7 +126,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: assay, assay: { data_file_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title } }
+      put :update, params: { id: assay, assay: { data_files_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -1007,8 +1007,14 @@ class AssaysControllerTest < ActionController::TestCase
     model2 = FactoryBot.create(:model, title: 'public model', policy: FactoryBot.create(:public_policy),contributor: person)
     assay = FactoryBot.create(:modelling_assay, policy: FactoryBot.create(:public_policy),contributor: person)
 
-    assay.data_files << df
-    assay.data_files << df2
+    simulation_data = RelationshipType.find_by_title('Simulation Data')
+    test_data = RelationshipType.find_by_title('Test data')
+    refute_nil simulation_data, 'check fixtures for relationship types match title'
+    refute_nil test_data, 'check fixtures for relationship types match title'
+    assay.update(data_files_attributes:[
+      {asset_id: df.id, relationship_type_id: simulation_data.id},
+      {asset_id: df2.id, relationship_type_id: test_data.id},
+    ])
     assay.models << model
     assay.models << model2
 
@@ -1028,6 +1034,69 @@ class AssaysControllerTest < ActionController::TestCase
         assert_select 'li a[href=?]', data_file_path(df2), text: /#{df2.title}/, count: 1
         assert_select 'li a[href=?]', data_file_path(df), text: /#{df.title}/, count: 0
         assert_select 'li', text: /Hidden/, count: 1
+        assert_select 'span.relationship_type', count: 1
+        assert_select 'span.relationship_type', text:/Simulation Data/, count: 0
+        assert_select 'span.relationship_type', text:/Test data/
+      end
+    end
+  end
+
+  test 'should show model if no data for modelling analysis' do
+    person = User.current_user.person
+    model = FactoryBot.create(:model, title: 'public model', policy: FactoryBot.create(:public_policy),contributor: person)
+    model2 = FactoryBot.create(:model, title: 'public model2', policy: FactoryBot.create(:public_policy),contributor: person)
+    assay = FactoryBot.create(:modelling_assay, policy: FactoryBot.create(:public_policy),contributor: person)
+
+    assay.models << model
+    assay.models << model2
+
+    assay.save!
+
+    login_as FactoryBot.create(:person)
+
+    get :show, params: { id: assay.id }
+    assert_response :success
+    assert_select 'div.data_model_relationship' do
+      assert_select 'ul.related_models' do
+        assert_select 'li a[href=?]', model_path(model), text: /#{model.title}/, count: 1
+        assert_select 'li a[href=?]', model_path(model2), text: /#{model2.title}/, count: 1
+      end
+      assert_select 'ul.related_data_files', count: 0
+    end
+  end
+
+  test 'should show data if no model for modelling analysis' do
+    person = User.current_user.person
+    df = FactoryBot.create(:data_file, title: 'public data file', policy: FactoryBot.create(:public_policy),contributor: person)
+    df2 = FactoryBot.create(:data_file, title: 'public data file 2', policy: FactoryBot.create(:public_policy),contributor: person)
+    df3 = FactoryBot.create(:data_file, title: 'public data file 2', policy: FactoryBot.create(:public_policy),contributor: person)
+    assay = FactoryBot.create(:modelling_assay, policy: FactoryBot.create(:public_policy),contributor: person)
+
+    simulation_data = RelationshipType.find_by_title('Simulation Data')
+    test_data = RelationshipType.find_by_title('Test data')
+    refute_nil simulation_data, 'check fixtures for relationship types match title'
+    refute_nil test_data, 'check fixtures for relationship types match title'
+    assay.update(data_files_attributes:[
+      {asset_id: df.id, relationship_type_id: simulation_data.id},
+      {asset_id: df2.id, relationship_type_id: test_data.id},
+      {asset_id: df3.id, relationship_type_id: nil}
+    ])
+
+    assay.save!
+
+    login_as FactoryBot.create(:person)
+
+    get :show, params: { id: assay.id }
+    assert_response :success
+    assert_select 'div.data_model_relationship' do
+      assert_select 'ul.related_models', count: 0
+      assert_select 'ul.related_data_files' do
+        assert_select 'li a[href=?]', data_file_path(df), text: /#{df.title}/, count: 1
+        assert_select 'li a[href=?]', data_file_path(df2), text: /#{df2.title}/, count: 1
+        assert_select 'li a[href=?]', data_file_path(df3), text: /#{df3.title}/, count: 1
+        assert_select 'span.relationship_type', count: 2
+        assert_select 'span.relationship_type', text:/Simulation Data/
+        assert_select 'span.relationship_type', text:/Test data/
       end
     end
   end
