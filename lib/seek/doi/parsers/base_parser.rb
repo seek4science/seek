@@ -14,6 +14,7 @@ module Seek
 
         def normalize_metadata(raw)
           {
+            type: raw[:type],
             title: raw[:title],
             authors: raw[:authors],
             journal: raw[:journal],
@@ -24,7 +25,8 @@ module Seek
             editors: raw[:editors],
             booktitle: raw[:booktitle],
             publisher: raw[:publisher],
-            url: raw[:url]
+            url: raw[:url],
+            page:raw[:page]
           }.compact
         end
       end

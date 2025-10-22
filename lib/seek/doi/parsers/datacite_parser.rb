@@ -13,6 +13,7 @@ module Seek
           data = JSON.parse(response)['data']['attributes'] rescue {}
 
           build_struct(
+            type: data['type'],
             title: data.dig('titles', 0, 'title'),
             authors: data['creators']&.map { |c| c['name'] },
             journal: data['container-title'],

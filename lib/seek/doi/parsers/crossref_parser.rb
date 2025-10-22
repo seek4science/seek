@@ -4,47 +4,53 @@ module Seek
     module Parsers
       class CrossrefParser < BaseParser
         CSL_JSON_HEADERS = { 'Accept' => 'application/vnd.citationstyles.csl+json' }.freeze
+        DOI_API_ENDPOINT = 'https://api.crossref.org/works'.freeze
 
         def parse(doi)
-          data = fetch_csl_json(doi)
-          Rails.logger.info("CSL JSON data for DOI #{doi}: #{data.inspect}")
+          url = "#{DOI_API_ENDPOINT}/#{doi}"
+          puts "================== Fetching Crossref JSON from URL: =================="
+          puts url
 
-          title = [Array(data['title']).first, Array(data['subtitle']).first].compact.join(':')
-          abstract = clean_abstract(data['abstract'])
-          date_published = extract_date(data)
-          #todo remove special &amp; e.g. Astronomy &amp; Astrophysics
-          journal = data['container-title']
-          doi_value = data['DOI']
-          citation = data['citation'] || build_citation(data)
-          publisher = data['publisher']
-          booktitle = data['collection-title'] || data['book-title']
-          editors = extract_editors(data['editor']).join(' and ')
-          authors = extract_authors_as_objects(data['author'])
-          url = data['URL']
+          data = JSON.parse(URI.open(url).read)["message"]
 
-          build_struct(
-            title: title,
-            abstract: abstract,
-            date_published: date_published.to_s,
-            journal: journal,
-            doi: doi_value,
-            citation: citation,
-            publisher: publisher,
-            booktitle: booktitle,
-            editors: editors,
-            authors: authors,
-            url: url
-          )
+          Rails.logger.info("Crossref JSON data for DOI #{doi}: #{data.inspect}")
+
+          metadata = extract_metadata(data)
+          metadata[:citation] = build_citation(metadata)
+
+          build_struct(metadata)
         end
+
 
         private
 
         def fetch_csl_json(doi)
           url = "#{Seek::Doi::Parser::DOI_ENDPOINT}/#{doi}"
+          puts "================== Fetching CSL JSON from URL: #{url} =================="
           JSON.parse(URI.open(url, CSL_JSON_HEADERS).read)
         rescue StandardError => e
           Rails.logger.warn("Failed to fetch CSL JSON for DOI #{doi}: #{e.message}")
           {}
+        end
+
+        def extract_metadata(data)
+          {
+            type: data['type'] || 'unspecified',
+            title: [Array(data['title']).first, Array(data['subtitle']).first].compact.join(':'),
+            abstract: clean_abstract(data['abstract']),
+            date_published: extract_date(data)&.to_s,
+            journal: Array(data['container-title']).last,
+            doi: data['DOI'],
+            publisher: data['publisher'],
+            booktitle: data['container-title'].last,
+            editors: extract_editors(data['editor']).join(' and '),
+            authors: extract_authors_as_objects(data['author']),
+            url: data['URL'],
+            volume: data['volume'],
+            issue: data['issue'],
+            page: data['page'],
+            publisher_location: data['publisher-location']
+          }
         end
 
         def clean_abstract(abstract)
@@ -97,11 +103,48 @@ module Seek
 
 
         def build_citation(data)
-          #todo improve citation formatting
-          journal = data['container-title']
-          year = extract_date(data)&.year
-          "#{journal}. #{year}."
+          case data[:type]
+          when 'book-chapter'
+            format_crossref_book_chapter_citation(data)
+          when 'journal-article'
+            format_crossref_journal_article_citation(data)
+          when 'proceedings-article'
+            format_crossref_proceedings_article_citation(data)
+          else
+            default_citation(data)
+          end
         end
+
+        def format_crossref_book_chapter_citation(data)
+
+          editors        = data[:editors]
+          book_title     = data[:booktitle]
+          publisher      = data[:publisher]
+          publisher_location = data[:publisher_location] || ''
+          pages = data[:page]
+          editor_str = editors.blank? ? '' : "#{editors} (eds)"
+          pages_str  = pages.blank? ?  '' : ", pp #{pages}"
+          "In: #{editor_str} #{book_title}. #{publisher}, #{publisher_location}#{pages_str}".squish
+
+        end
+
+
+
+        def format_crossref_journal_article_citation(m)
+          authors = m[:authors].map(&:to_s).join(', ')
+          year = m[:date_published]&.slice(0, 4)
+          "#{authors} (#{year}) #{m[:title]}. #{m[:journal]}. #{m[:publisher]}."
+        end
+
+        def format_crossref_proceedings_article_citation(metadata)
+
+        end
+
+        def default_citation(m)
+          year = m[:date_published]&.slice(0, 4)
+          "#{m[:journal]}. #{year}."
+        end
+
 
       end
     end
