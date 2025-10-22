@@ -1,0 +1,110 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1353
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 18:45:51 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=4hWD%2FrSSvkTPCsEz4NEuye%2FUsiFzrObQQCaZdiDywO9kAK9MoRJYJ4Eh8EYc828krO2RfXimtq4QjAIAy%2B03lQICsRjADNR%2FCX7JodNoNaT74Q%3D%3D"}]}'
+      Cf-Ray:
+      - 992b2774a98cdc4b-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1353",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Wed, 22 Oct 2025 18:45:51 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.1353/book.112605
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 18:45:51 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '1497'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,1]],"date-time":"2025-10-01T16:23:54Z","timestamp":1759335834916},"reference-count":0,"publisher":"Duke
+        University Press","isbn-type":[{"value":"9781478027102","type":"electronic"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2023]]},"DOI":"10.1353\/book.112605","type":"monograph","created":{"date-parts":[[2023,7,10]],"date-time":"2023-07-10T09:07:56Z","timestamp":1688980076000},"source":"Crossref","is-referenced-by-count":1,"title":["Radical
+        Play"],"prefix":"10.1353","author":[{"given":"Rob","family":"Goldberg","sequence":"first","affiliation":[]}],"member":"147","container-title":[],"original-title":[],"deposited":{"date-parts":[[2023,7,10]],"date-time":"2023-07-10T09:08:13Z","timestamp":1688980093000},"score":1,"resource":{"primary":{"URL":"https:\/\/muse.jhu.edu\/book\/112605"}},"subtitle":["Revolutionizing
+        Children\u2019s Toys in 1960s and 1970s America"],"short-title":[],"issued":{"date-parts":[[2023]]},"ISBN":["9781478027102"],"references-count":0,"URL":"https:\/\/doi.org\/10.1353\/book.112605","relation":{"is-identical-to":[{"id-type":"doi","id":"10.1215\/9781478027102","asserted-by":"subject"},{"id-type":"doi","id":"10.1515\/9781478027102","asserted-by":"object"},{"id-type":"doi","id":"10.2307\/jj.3985464","asserted-by":"object"}]},"subject":[],"published":{"date-parts":[[2023]]}}}'
+  recorded_at: Wed, 22 Oct 2025 18:45:51 GMT
+recorded_with: VCR 6.3.1

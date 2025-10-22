@@ -1,0 +1,124 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.23943
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 18:30:32 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=OTczZwnW3NtU45s8rHn9GXfu8FYijJ%2BZVllxvAV6qSsIE0I%2BU8kvRJl3WgHq92iDmQjDsbqDx6HIA7wQB8%2Bc6q4k9BIGpuxJ7lg%2FWAlWcTU9ww%3D%3D"}]}'
+      Cf-Ray:
+      - 992b110369e69874-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.23943",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Wed, 22 Oct 2025 18:30:32 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.23943/princeton/9780691161914.003.0002
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 18:30:32 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2360'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2022,7,29]],"date-time":"2022-07-29T04:19:31Z","timestamp":1659068371433},"reference-count":0,"publisher":"Princeton
+        University Press","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2017,10,19]]},"abstract":"<p>This
+        chapter shows how book 1 of <italic>Paradise Lost<\/italic> metaphorically
+        depicts the role of the devil in raising the rebel angels out of their \u201cbottomless
+        perdition,\u201d an act of poetic creation analogous to the divine creation
+        of the universe described in the invocation\u2014\u201chow the heavens and
+        earth\/Rose out of chaos.\u201d The chief devils described in the catalog
+        that occupies the center of book 1 and organizes its poetic figures and symbolic
+        geography\u2014Carthage, Sodom, Egypt, Babel-Babylon, Rome\u2014are precisely
+        those who will come to inhabit the pagan shrines that human idolatry will
+        build next to or even inside the Jerusalem temple, profaning God''s house.
+        This catalog\u2014whose traditional epic function is to size up military force\u2014instead
+        suggests the force of spiritual falsehood, and it corresponds to the defeated
+        devils'' own reluctance to pursue another direct war against God; they would
+        rather resort to satanic fraud.<\/p>","DOI":"10.23943\/princeton\/9780691161914.003.0002","type":"book","created":{"date-parts":[[2017,11,21]],"date-time":"2017-11-21T13:37:09Z","timestamp":1511271429000},"source":"Crossref","is-referenced-by-count":0,"title":["Milton\u2019s
+        Book of Numbers: Book 1 and Its Catalog"],"prefix":"10.23943","author":[{"given":"David","family":"Quint","sequence":"first","affiliation":[]}],"member":"10341","container-title":["Princeton
+        University Press"],"original-title":["Milton\u2019s Book of Numbers: Book
+        1 and Its Catalog"],"deposited":{"date-parts":[[2022,7,28]],"date-time":"2022-07-28T14:40:42Z","timestamp":1659019242000},"score":1,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/princeton-scholarship-online\/book\/16275\/chapter\/171374633"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2017,10,19]]},"references-count":0,"URL":"https:\/\/doi.org\/10.23943\/princeton\/9780691161914.003.0002","relation":{},"subject":[],"published":{"date-parts":[[2017,10,19]]}}}'
+  recorded_at: Wed, 22 Oct 2025 18:30:32 GMT
+recorded_with: VCR 6.3.1

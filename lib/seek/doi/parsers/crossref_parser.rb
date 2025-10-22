@@ -102,12 +102,15 @@ module Seek
         end
 
 
+        # https://api.crossref.org/types for type list
         def build_citation(data)
           case data[:type]
           when 'book-chapter'
             format_crossref_book_chapter_citation(data)
+          when 'book'
+            format_crossref_book_citation(data)
           when 'journal-article'
-            format_crossref_journal_article_citation(data)
+            format_crossref_journal_citation(data)
           when 'proceedings-article'
             format_crossref_proceedings_article_citation(data)
           else
@@ -130,14 +133,32 @@ module Seek
 
 
 
-        def format_crossref_journal_article_citation(m)
-          authors = m[:authors].map(&:to_s).join(', ')
-          year = m[:date_published]&.slice(0, 4)
-          "#{authors} (#{year}) #{m[:title]}. #{m[:journal]}. #{m[:publisher]}."
+        def format_crossref_journal_citation(data)
+          journal = data[:journal]
+          volume = data[:volume]
+          issue = data[:issue]
+          pages = data[:page]
+
+          # Build the journal/volume/issue/pages string like "Nature 585(7825):357-362"
+          journal_part = [journal.presence, volume.presence].compact.join(' ')
+          journal_part += "(#{issue})" if issue.present?
+          journal_part += ":#{pages}" if pages.present?
+
+          parts = []
+
+          parts << journal_part if journal_part.present?
+
+          parts.compact.join(' ').squish
         end
 
         def format_crossref_proceedings_article_citation(metadata)
 
+        end
+
+        def format_crossref_book_citation(data)
+          publisher      = data[:publisher]
+          publisher_location = data[:publisher_location] || ''
+          "#{[publisher, publisher_location.presence].compact.join(', ')}".squish
         end
 
         def default_citation(m)

@@ -32,7 +32,6 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     VCR.use_cassette('doi/doi_crossref_journal_article_response') do
       doi = '10.1038/s41586-020-2649-2'
       result = Seek::Doi::Parser.parse(doi)
-      #puts result.type.inspect
       assert_equal result.title,'Array programming with NumPy'
       assert_equal result.type,'journal-article'
       assert_equal result.doi, doi
@@ -41,12 +40,13 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal result.publisher, 'Springer Science and Business Media LLC'
       assert_equal result.date_published, '2020-09-16'
       assert_equal result.authors.first.full_name, 'Charles R. Harris'
-      #assert_equal result[:citation], 'Nature. 585(7825). 2020.'
+      assert_equal result[:citation], 'Nature 585(7825):357-362'
       assert_equal result.url, 'https://doi.org/10.1038/s41586-020-2649-2'
     end
   end
 
-  # === BOOK ===
+
+  # === MONOGRAPH ===
   test 'returns parsed Journal article DOI with editors and subtitle (crossref)' do
     VCR.use_cassette('doi/doi_crossref_book_with_editor_subtitle_response') do
       doi = '10.2307/j.ctvn5txvs'
@@ -85,7 +85,6 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     end
   end
 
-  #todo revisit!!!
   # === BOOK CHAPTER ===
   test 'parses Book Chapter DOI (Crossref)_1' do
     VCR.use_cassette('doi/doi_crossref_book_chapter_response_1') do
@@ -151,5 +150,43 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
   end
 
 
+  # === BOOK ===
+  test 'parses Book DOI (Crossref)_1' do
+    VCR.use_cassette('doi/doi_crossref_book_response_1') do
+      doi = '10.23943/princeton/9780691161914.003.0002'
+      result = Seek::Doi::Parser.parse(doi)
+      assert_equal 'book', result.type
+      assert_equal "Milton’s Book of Numbers: Book 1 and Its Catalog", result.title
+      assert_equal doi, result.doi
+      assert_match(/Paradise Lost/, result.abstract)
+      assert_equal 'David Quint', result.authors.first.full_name
+      assert_equal 1, result.authors.size
+      assert_empty result.editors
+      assert_equal 'Princeton University Press', result.publisher
+      assert_equal '2017-10-19', result.date_published
+      assert_equal 'Princeton University Press', result.booktitle
+      assert_equal 'Princeton University Press', result.journal
+      assert_equal 'https://doi.org/10.23943/princeton/9780691161914.003.0002', result.url
+      assert_equal 'Princeton University Press', result.citation
+    end
+  end
 
+  test 'parses Book DOI (Crossref)_2' do
+    VCR.use_cassette('doi/doi_crossref_book_response_2') do
+      doi = '10.1007/978-3-540-70504-8'
+      result = Seek::Doi::Parser.parse(doi)
+      assert_equal 'book', result.type
+      assert_equal 'Sharing Data, Information and Knowledge:25th British National Conference on Databases, BNCOD 25, Cardiff, UK, July 7-10, 2008. Proceedings', result.title
+      assert_equal doi, result.doi
+      assert_nil result.abstract
+      assert_empty result.authors
+      assert_equal 'Alex Gray and Keith Jeffery and Jianhua Shao', result.editors
+      assert_equal 'Springer Berlin Heidelberg', result.publisher
+      assert_equal '2008-01-01', result.date_published
+      assert_equal 'Lecture Notes in Computer Science', result.booktitle
+      assert_equal 'Lecture Notes in Computer Science', result.journal
+      assert_equal 'https://doi.org/10.1007/978-3-540-70504-8', result.url
+      assert_equal 'Springer Berlin Heidelberg, Berlin, Heidelberg', result.citation
+    end
+  end
 end
