@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 21 Oct 2025 08:42:28 GMT
+      - Wed, 22 Oct 2025 17:49:20 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=viSS%2BRJ4NhUHspKdJE44FpX0aC%2B591EL2iAoSL%2FC9aDbD5bIlCdAxW351xCKXLbZ5ZP%2B9iWq7POY6Rq4DDOy2398Bd27cw%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=p9V4g5NSZtp9bYizNXuIF0szJ8vu%2Fb3Kk7xgqegByaGp9s8sj8TsvaDfo68YZhpmUv8C04RNR2HkWDNXOpsMbeUK8cCdvCf%2BGoHLi2S6dRkxAA%3D%3D"}]}'
       Cf-Ray:
-      - 991f7638cd9a6e96-STR
+      - 992ad4ad297337ef-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,75 +54,18 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Tue, 21 Oct 2025 08:42:28 GMT
+  recorded_at: Wed, 22 Oct 2025 17:49:20 GMT
 - request:
     method: get
-    uri: https://doi.org/10.1016/j.future.2011.08.004
+    uri: https://api.crossref.org/works/10.1016/j.future.2011.08.004
     body:
       encoding: US-ASCII
       string: ''
     headers:
-      Accept:
-      - application/vnd.citationstyles.csl+json
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      User-Agent:
-      - Ruby
-  response:
-    status:
-      code: 302
-      message: Found
-    headers:
-      Date:
-      - Tue, 21 Oct 2025 08:42:28 GMT
-      Content-Type:
-      - text/html;charset=utf-8
-      Transfer-Encoding:
-      - chunked
-      Connection:
-      - keep-alive
-      Location:
-      - https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform
-      Server:
-      - cloudflare
-      Vary:
-      - Accept
-      - Origin
-      Expires:
-      - Tue, 21 Oct 2025 08:52:34 GMT
-      Link:
-      - "<https://dul.usage.elsevier.com/doi/>; rel=dul"
-      Permissions-Policy:
-      - interest-cohort=(),browsing-topics=()
-      Cf-Cache-Status:
-      - DYNAMIC
-      Nel:
-      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
-      Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=oSK82KoBnd0ZJcmPONT4CtRr8A1462Og9nkH0DHAudFNOr3al8g%2FH7XBvMgKbax3P7HwOK%2B3ofZyH7VsGbLU5pTWHeTW4Q%3D%3D"}]}'
-      Cf-Ray:
-      - 991f76393d23e859-STR
-      Alt-Svc:
-      - h3=":443"; ma=86400
-    body:
-      encoding: UTF-8
-      string: |-
-        <html><head><title>Handle Redirect</title></head>
-        <body><a href="https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform">https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform</a></body></html>
-  recorded_at: Tue, 21 Oct 2025 08:42:28 GMT
-- request:
-    method: get
-    uri: https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
       Accept:
-      - application/vnd.citationstyles.csl+json
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      - "*/*"
       User-Agent:
       - Ruby
   response:
@@ -131,15 +74,13 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 21 Oct 2025 08:42:29 GMT
+      - Wed, 22 Oct 2025 17:49:21 GMT
       Content-Type:
-      - application/vnd.citationstyles.csl+json
+      - application/json
       Content-Length:
-      - '15312'
+      - '15441'
       Connection:
       - keep-alive
-      Vary:
-      - Accept, Accept-Encoding
       Access-Control-Expose-Headers:
       - Link
       Access-Control-Allow-Headers:
@@ -147,6 +88,8 @@ http_interactions:
         Accept-Ranges, Cache-Control
       Access-Control-Allow-Origin:
       - "*"
+      Vary:
+      - Accept-Encoding
       Server:
       - Jetty(9.4.40.v20210413)
       X-Rate-Limit-Limit:
@@ -159,9 +102,10 @@ http_interactions:
       - interest-cohort=()
     body:
       encoding: ASCII-8BIT
-      string: '{"indexed":{"date-parts":[[2025,10,20]],"date-time":"2025-10-20T18:14:05Z","timestamp":1760984045180},"reference-count":45,"publisher":"Elsevier
-        BV","issue":"2","license":[{"start":{"date-parts":[[2013,2,1]],"date-time":"2013-02-01T00:00:00Z","timestamp":1359676800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2013,2]]},"DOI":"10.1016\/j.future.2011.08.004","type":"journal-article","created":{"date-parts":[[2011,8,21]],"date-time":"2011-08-21T13:33:57Z","timestamp":1313933637000},"page":"599-611","source":"Crossref","is-referenced-by-count":210,"title":"Why
-        linked data is not enough for scientists","prefix":"10.1016","volume":"29","author":[{"given":"Sean","family":"Bechhofer","sequence":"first","affiliation":[]},{"given":"Iain","family":"Buchan","sequence":"additional","affiliation":[]},{"given":"David","family":"De
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,20]],"date-time":"2025-10-20T18:14:05Z","timestamp":1760984045180},"reference-count":45,"publisher":"Elsevier
+        BV","issue":"2","license":[{"start":{"date-parts":[[2013,2,1]],"date-time":"2013-02-01T00:00:00Z","timestamp":1359676800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Future
+        Generation Computer Systems"],"published-print":{"date-parts":[[2013,2]]},"DOI":"10.1016\/j.future.2011.08.004","type":"journal-article","created":{"date-parts":[[2011,8,21]],"date-time":"2011-08-21T13:33:57Z","timestamp":1313933637000},"page":"599-611","source":"Crossref","is-referenced-by-count":210,"title":["Why
+        linked data is not enough for scientists"],"prefix":"10.1016","volume":"29","author":[{"given":"Sean","family":"Bechhofer","sequence":"first","affiliation":[]},{"given":"Iain","family":"Buchan","sequence":"additional","affiliation":[]},{"given":"David","family":"De
         Roure","sequence":"additional","affiliation":[]},{"given":"Paolo","family":"Missier","sequence":"additional","affiliation":[]},{"given":"John","family":"Ainsworth","sequence":"additional","affiliation":[]},{"given":"Jiten","family":"Bhagat","sequence":"additional","affiliation":[]},{"given":"Philip","family":"Couch","sequence":"additional","affiliation":[]},{"given":"Don","family":"Cruickshank","sequence":"additional","affiliation":[]},{"given":"Mark","family":"Delderfield","sequence":"additional","affiliation":[]},{"given":"Ian","family":"Dunlop","sequence":"additional","affiliation":[]},{"given":"Matthew","family":"Gamble","sequence":"additional","affiliation":[]},{"given":"Danius","family":"Michaelides","sequence":"additional","affiliation":[]},{"given":"Stuart","family":"Owen","sequence":"additional","affiliation":[]},{"given":"David","family":"Newman","sequence":"additional","affiliation":[]},{"given":"Shoaib","family":"Sufi","sequence":"additional","affiliation":[]},{"given":"Carole","family":"Goble","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/j.future.2011.08.004_br000005","doi-asserted-by":"crossref","unstructured":"J.
         Ainsworth, I. Buchan, e-Labs and work objects: towards digital health economies,
         in: Comms. Infrastructure. Systems and Applications in Europe, vol. 16, 2009,
@@ -258,8 +202,7 @@ http_interactions:
         First Int. Semantic Web Conf.","first-page":"162","article-title":"Trusting
         information sources one citizen at a time","author":"Gil","year":"2002"},{"key":"10.1016\/j.future.2011.08.004_br000225","unstructured":"O.
         Hartig, J. Zhao, Using web data provenance for quality assessment, in: Int.
-        W\/Shop on Semantic Web and Provenance Management, Washington, DC, USA, 2009."}],"container-title":"Future
-        Generation Computer Systems","original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0167739X11001439?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0167739X11001439?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2019,6,14]],"date-time":"2019-06-14T06:40:50Z","timestamp":1560494450000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0167739X11001439"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2013,2]]},"references-count":45,"journal-issue":{"issue":"2","published-print":{"date-parts":[[2013,2]]}},"alternative-id":["S0167739X11001439"],"URL":"http:\/\/dx.doi.org\/10.1016\/j.future.2011.08.004","relation":{},"ISSN":["0167-739X"],"subject":[],"container-title-short":"Future
-        Generation Computer Systems","published":{"date-parts":[[2013,2]]}}'
-  recorded_at: Tue, 21 Oct 2025 08:42:29 GMT
+        W\/Shop on Semantic Web and Provenance Management, Washington, DC, USA, 2009."}],"container-title":["Future
+        Generation Computer Systems"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0167739X11001439?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0167739X11001439?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2019,6,14]],"date-time":"2019-06-14T06:40:50Z","timestamp":1560494450000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0167739X11001439"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2013,2]]},"references-count":45,"journal-issue":{"issue":"2","published-print":{"date-parts":[[2013,2]]}},"alternative-id":["S0167739X11001439"],"URL":"https:\/\/doi.org\/10.1016\/j.future.2011.08.004","relation":{},"ISSN":["0167-739X"],"issn-type":[{"value":"0167-739X","type":"print"}],"subject":[],"published":{"date-parts":[[2013,2]]}}}'
+  recorded_at: Wed, 22 Oct 2025 17:49:21 GMT
 recorded_with: VCR 6.3.1

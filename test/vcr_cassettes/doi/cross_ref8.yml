@@ -1,0 +1,207 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1371
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 17:53:35 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=51Z%2FMtdKC2cTSr%2FX5v3nuDirD4T9gwbAcsU9URRsJS2yVLAOEIErOqaOt2dtjc4X03Di0liaF%2BdRJO1xwMx18n1b0NeCh6mK4bYEk5wE6EhaUw%3D%3D"}]}'
+      Cf-Ray:
+      - 992adae28f9535f3-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1371",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Wed, 22 Oct 2025 17:53:35 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.1371/journal.pcbi.1002352
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 17:53:35 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '13543'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,17]],"date-time":"2025-10-17T13:39:37Z","timestamp":1760708377167},"reference-count":41,"publisher":"Public
+        Library of Science (PLoS)","issue":"1","license":[{"start":{"date-parts":[[2012,1,19]],"date-time":"2012-01-19T00:00:00Z","timestamp":1326931200000},"content-version":"unspecified","delay-in-days":0,"URL":"http:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"content-domain":{"domain":["www.ploscompbiol.org"],"crossmark-restriction":false},"short-container-title":["PLoS
+        Comput Biol"],"DOI":"10.1371\/journal.pcbi.1002352","type":"journal-article","created":{"date-parts":[[2012,1,19]],"date-time":"2012-01-19T16:55:02Z","timestamp":1326992102000},"page":"e1002352","update-policy":"http:\/\/dx.doi.org\/10.1371\/journal.pcbi.corrections_policy","source":"Crossref","is-referenced-by-count":29,"title":["Dynamic
+        Modelling under Uncertainty: The Case of Trypanosoma brucei Energy Metabolism"],"prefix":"10.1371","volume":"8","author":[{"given":"Fiona","family":"Achcar","sequence":"first","affiliation":[]},{"given":"Eduard
+        J.","family":"Kerkhoven","sequence":"additional","affiliation":[]},{"name":"The
+        SilicoTryp Consortium","sequence":"additional","affiliation":[]},{"given":"Barbara
+        M.","family":"Bakker","sequence":"additional","affiliation":[]},{"given":"Michael
+        P.","family":"Barrett","sequence":"additional","affiliation":[]},{"given":"Rainer","family":"Breitling","sequence":"additional","affiliation":[]}],"member":"340","published-online":{"date-parts":[[2012,1,19]]},"reference":[{"key":"ref1","first-page":"80","article-title":"Prediction
+        of enzyme kinetic parameters based on statistical learning.","volume":"17","author":"S
+        Borger","year":"2006","journal-title":"Genome Inform Ser"},{"key":"ref2","doi-asserted-by":"crossref","first-page":"3750","DOI":"10.1529\/biophysj.104.048090","article-title":"Metabolic
+        control analysis under uncertainty: Framework development and case studies.","volume":"87","author":"L
+        Wang","year":"2004","journal-title":"Biophys J"},{"key":"ref3","doi-asserted-by":"crossref","first-page":"5606","DOI":"10.1529\/biophysj.108.135442","article-title":"Ensemble
+        modeling of metabolic networks.","volume":"95","author":"LM Tran","year":"2008","journal-title":"Biophys
+        J"},{"key":"ref4","doi-asserted-by":"crossref","first-page":"595","DOI":"10.1016\/j.jtice.2009.05.003","article-title":"Ensemble
+        modeling and related mathematical modeling of metabolic networks.","volume":"40","author":"ML
+        Rizk","year":"2009","journal-title":"J Taiwan Inst Chem E"},{"key":"ref5","doi-asserted-by":"crossref","first-page":"413","DOI":"10.1002\/bit.22932","article-title":"Modeling
+        of uncertainties in biochemical reactions.","volume":"108","author":"L Mi\u0161kovi\u0107","year":"2011","journal-title":"Biotechnol
+        Bioeng"},{"key":"ref6","doi-asserted-by":"crossref","first-page":"880","DOI":"10.1098\/rsif.2010.0540","article-title":"A
+        probabilistic approach to identify putative drug targets in biochemical networks.","volume":"8","author":"E
+        Murabito","year":"2011","journal-title":"J Roy Soc Interface"},{"key":"ref7","doi-asserted-by":"crossref","first-page":"3207","DOI":"10.1074\/jbc.272.6.3207","article-title":"Glycolysis
+        in bloodstream form <italic>Trypanosoma brucei<\/italic> can be understood
+        in terms of the kinetics of the glycolytic enzymes.","volume":"272","author":"BM
+        Bakker","year":"1997","journal-title":"J Biol Chem"},{"key":"ref8","doi-asserted-by":"crossref","first-page":"14551","DOI":"10.1074\/jbc.274.21.14551","article-title":"What
+        controls glycolysis in bloodstream form <italic>Trypanosoma brucei<\/italic>?","volume":"274","author":"BM
+        Bakker","year":"1999","journal-title":"J Biol Chem"},{"key":"ref9","doi-asserted-by":"crossref","first-page":"117","DOI":"10.1042\/bj3570117","article-title":"Roles
+        of triosephosphate isomerase and aerobic metabolism in Trypanosoma brucei.","volume":"357","author":"S
+        Helfert","year":"2001","journal-title":"Biochem J"},{"key":"ref10","doi-asserted-by":"crossref","first-page":"28306","DOI":"10.1074\/jbc.M502403200","article-title":"Experimental
+        and in silico analyses of glycolytic ux control in bloodstream form Trypanosoma
+        brucei.","volume":"280","author":"M Albert","year":"2005","journal-title":"J
+        Biol Chem"},{"key":"ref11","doi-asserted-by":"crossref","first-page":"17718","DOI":"10.1073\/pnas.0806664105","article-title":"Compartmentation
+        prevents a lethal turbo-explosion of glycolysis in trypanosomes.","volume":"105","author":"JR
+        Haanstra","year":"2008","journal-title":"Proc Natl Acad Sci USA"},{"key":"ref12","doi-asserted-by":"crossref","first-page":"215","DOI":"10.1042\/bj0620215","article-title":"Studies
+        on the metabolism of the protozoa. 7. comparative carbohydrate metabolism
+        of eleven species of trypanosome.","volume":"62","author":"JF Ryley","year":"1956","journal-title":"Biochem
+        J"},{"key":"ref13","doi-asserted-by":"crossref","first-page":"63","DOI":"10.1016\/0166-6851(80)90032-8","article-title":"<italic>Trypanosoma
+        brucei<\/italic>: the effect of glycerol on the anaerobic metabolism of glucose.","volume":"2","author":"DJ
+        Hammond","year":"1980","journal-title":"Mol Biochem Parasit"},{"article-title":"The
+        power of network-based drug design and the interplay between metabolism and
+        gene expression in <italic>Trypanosoma brucei<\/italic>.","year":"2009","author":"J
+        Haanstra","key":"ref14"},{"key":"ref15","doi-asserted-by":"crossref","first-page":"23","DOI":"10.1016\/0014-5793(85)81106-6","article-title":"The
+        aerobic\/anaerobic transition of glucose metabolism in <italic>Try-panosoma
+        brucei<\/italic>.","volume":"181","author":"R Eisenthal","year":"1985","journal-title":"FEBS
+        Lett"},{"issue":"Pt 2","key":"ref16","doi-asserted-by":"crossref","first-page":"479","DOI":"10.1042\/bj3120479","article-title":"The
+        inhibition of pyruvate transport across the plasma membrane of the bloodstream
+        form of <italic>Trypanosoma brucei<\/italic> and its metabolic implications.","volume":"312","author":"EA
+        Wiemer","year":"1995","journal-title":"Biochem J"},{"key":"ref17","doi-asserted-by":"crossref","first-page":"53","DOI":"10.1042\/bj3460053","article-title":"A
+        pyruvate-proton symport and an H+-ATPase regulate the intracellular pH of
+        <italic>Trypanosoma brucei<\/italic> at different stages of its life cycle.","volume":"346
+        Pt 1","author":"N Vanderheyden","year":"2000","journal-title":"Biochem J"},{"key":"ref18","doi-asserted-by":"crossref","first-page":"7187","DOI":"10.1111\/j.1742-4658.2009.07432.x","article-title":"Alanine
+        aminotransferase of <italic>Trypanosoma brucei<\/italic>\u2013a key role in
+        proline metabolism in procyclic life forms.","volume":"276","author":"D Spitznagel","year":"2009","journal-title":"FEBS
+        J"},{"key":"ref19","doi-asserted-by":"crossref","first-page":"15","DOI":"10.2307\/3280098","article-title":"Alteration
+        of free serum amino acids in voles infected with trypanosoma brucei gambiense.","volume":"63","author":"GR
+        Newport","year":"1977","journal-title":"J Parasitol"},{"key":"ref20","doi-asserted-by":"crossref","first-page":"657","DOI":"10.1111\/j.1432-1033.1982.tb05836.x","article-title":"Carbon-13
+        Nuclear-Magnetic-Resonance studies of glucose catabolism by trypanosoma brucei
+        gambiense.","volume":"121","author":"NE Mackenzie","year":"1982","journal-title":"Eur
+        J Biochem"},{"key":"ref21","doi-asserted-by":"crossref","first-page":"242","DOI":"10.1042\/bj0660242","article-title":"The
+        catabolism of glucose by strains of trypanosoma rhodesiense.","volume":"66","author":"PT
+        Grant","year":"1957","journal-title":"Biochem J"},{"key":"ref22","first-page":"65","article-title":"The
+        control of ux.","volume":"27","author":"H Kacser","year":"1973","journal-title":"Sym
+        Soc Exp Biol"},{"key":"ref23","doi-asserted-by":"crossref","first-page":"10098","DOI":"10.1073\/pnas.96.18.10098","article-title":"Contribution
+        of glucose transport to the control of the glycolytic ux in <italic>Trypanosoma
+        brucei<\/italic>.","volume":"96","author":"BM Bakker","year":"1999","journal-title":"Proc
+        Natl Acad Sci USA"},{"key":"ref24","first-page":"136","article-title":"Control
+        of the glycolytic flux in <italic>Trypanosoma brucei<\/italic>: why control
+        can shift suddenly.","author":"BM Bakker","year":"1996"},{"key":"ref25","doi-asserted-by":"crossref","first-page":"441","DOI":"10.1111\/j.1432-1033.1986.tb09687.x","article-title":"Glycolytic
+        enzymes of <italic>Trypanosoma brucei<\/italic>.","volume":"157","author":"O
+        Misset","year":"1986","journal-title":"Eur J Biochem"},{"key":"ref26","doi-asserted-by":"crossref","first-page":"50","DOI":"10.1016\/j.molbiopara.2009.09.001","article-title":"Genetic
+        validation of aldolase and glyceraldehyde-3-phosphate dehydrogenase as drug
+        targets in <italic>Trypanosoma brucei<\/italic>.","volume":"169","author":"AJ
+        C\u00e1ceres","year":"2010","journal-title":"Mol Biochem Parasit"},{"key":"ref27","doi-asserted-by":"crossref","first-page":"1464","DOI":"10.1046\/j.1432-1327.2000.01145.x","article-title":"<italic>Trypanosoma
+        brucei<\/italic> contains a 2,3-bisphosphoglycerate independent phosphoglycerate
+        mutase.","volume":"267","author":"N Chevalier","year":"2000","journal-title":"Eur
+        J Biochem"},{"key":"ref28","doi-asserted-by":"crossref","first-page":"4273","DOI":"10.1073\/pnas.96.8.4273","article-title":"Structure-based
+        design of submicromolar, biologically active inhibitors of trypanosomatid
+        glyceraldehyde-3-phosphate dehydrogenase.","volume":"96","author":"AM Aronov","year":"1999","journal-title":"Proc
+        Natl Acad Sci USA"},{"key":"ref29","first-page":"ra20","article-title":"Inferring
+        signaling pathway topologies from multiple perturbation measurements of specific
+        biochemical species.","volume":"3","author":"T Xu","year":"2010","journal-title":"Sci
+        Signal"},{"article-title":"Enzymes.","year":"1930","author":"JBS Haldane","key":"ref30"},{"key":"ref31","doi-asserted-by":"crossref","first-page":"524","DOI":"10.1093\/bioinformatics\/btg015","article-title":"The
+        systems biology markup language (SBML): a medium for representation and exchange
+        of biochemical network models.","volume":"19","author":"A Cornish-Bowden","year":"2003","journal-title":"Bioinformatics"},{"key":"ref32","doi-asserted-by":"crossref","first-page":"D670","DOI":"10.1093\/nar\/gkq1089","article-title":"BRENDA,
+        the enzyme information system in 2011.","volume":"39","author":"M Scheer","year":"2011","journal-title":"Nucleic
+        Acids Res"},{"key":"ref33","doi-asserted-by":"crossref","first-page":"1310","DOI":"10.1039\/c1mt00119a","article-title":"Phosphoglycerate
+        mutase from trypanosoma brucei is hyperactivated by cobalt in vitro, but not
+        in vivo.","volume":"3","author":"FAA Fuad","year":"2011","journal-title":"Metallomics"},{"key":"ref34","doi-asserted-by":"crossref","first-page":"191","DOI":"10.1111\/j.1432-1033.1991.tb16362.x","article-title":"Specificity
+        of glucose transport in <italic>Trypanosoma brucei<\/italic>.","volume":"202","author":"A
+        Seyfang","year":"1991","journal-title":"Eur J Biochem"},{"key":"ref35","doi-asserted-by":"crossref","first-page":"81","DOI":"10.1016\/0005-2736(89)90107-7","article-title":"Specificity
+        and kinetics of hexose transport in <italic>Try-panosoma brucei<\/italic>.","volume":"985","author":"R
+        Eisenthal","year":"1989","journal-title":"Biochim Biophys Acta"},{"article-title":"Transport
+        and diffusion across cell membranes","year":"1986","author":"WD Stein","key":"ref36"},{"key":"ref37","doi-asserted-by":"crossref","first-page":"3","DOI":"10.1145\/272991.272995","article-title":"Mersenne
+        Twister: A 623-dimensionally equidistributed uniform pseudorandom number generator.","volume":"8","author":"M
+        Matsumoto","year":"1998","journal-title":"ACM T Model Comput S"},{"article-title":"GNU
+        scientific library reference manual: (v. 1.12)","year":"2009","author":"M
+        Galassi","key":"ref38"},{"key":"ref39","doi-asserted-by":"crossref","first-page":"1406","DOI":"10.1093\/bioinformatics\/btl086","article-title":"The
+        SBML ODE solver library: a native API for symbolic and fast numerical analysis
+        of reaction networks.","volume":"22","author":"R Machn\u00e9","year":"2006","journal-title":"Bioinformatics"},{"key":"ref40","doi-asserted-by":"crossref","first-page":"3067","DOI":"10.1093\/bioinformatics\/btl485","article-title":"COPASI\u2013a
+        COmplex PAthway SImulator.","volume":"22","author":"S Hoops","year":"2006","journal-title":"Bioinformatics"},{"key":"ref41","doi-asserted-by":"crossref","first-page":"560","DOI":"10.1093\/bioinformatics\/bti046","article-title":"Modelling
+        cellular systems with PySCeS.","volume":"21","author":"BG Olivier","year":"2005","journal-title":"Bioinformatics"}],"container-title":["PLoS
+        Computational Biology"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/dx.plos.org\/10.1371\/journal.pcbi.1002352","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2021,12,26]],"date-time":"2021-12-26T07:50:12Z","timestamp":1640505012000},"score":1,"resource":{"primary":{"URL":"https:\/\/dx.plos.org\/10.1371\/journal.pcbi.1002352"}},"subtitle":[],"editor":[{"given":"Jason
+        A.","family":"Papin","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2012,1,19]]},"references-count":41,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2012,1,19]]}},"URL":"https:\/\/doi.org\/10.1371\/journal.pcbi.1002352","relation":{},"ISSN":["1553-7358"],"issn-type":[{"type":"electronic","value":"1553-7358"}],"subject":[],"published":{"date-parts":[[2012,1,19]]}}}'
+  recorded_at: Wed, 22 Oct 2025 17:53:35 GMT
+recorded_with: VCR 6.3.1

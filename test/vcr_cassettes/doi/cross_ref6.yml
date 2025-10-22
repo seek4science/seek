@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 21 Oct 2025 08:55:34 GMT
+      - Wed, 22 Oct 2025 17:49:31 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=MwBH68ICOsU8mDojitM%2FzFdEhm6wZJuVCSerZ2pXD%2BUnni7bfp%2FoUj80b0luPeTH%2FtkKLDl972JX3RaI%2BELAlqARC960LQ%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=9yofYeqxGBLOIrpgpe%2BW5zAe%2FG2OdqFwb57QorxhPzgWEmeb6PDHFikV1r7SwCmTKRuEn5oW5rusy0CCzh6CjPUGt%2FgC8NbbU6yo12PhuGureg%3D%3D"}]}'
       Cf-Ray:
-      - 991f8969ca58b570-STR
+      - 992ad4f1dccbd26a-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "DataCite"
           }
         ]
-  recorded_at: Tue, 21 Oct 2025 08:55:34 GMT
+  recorded_at: Wed, 22 Oct 2025 17:49:31 GMT
 - request:
     method: get
     uri: https://api.datacite.org/dois/10.11588/heidok.00021513
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 21 Oct 2025 08:55:35 GMT
+      - Wed, 22 Oct 2025 17:49:32 GMT
       Content-Type:
       - application/json; charset=utf-8
       Transfer-Encoding:
@@ -98,13 +98,13 @@ http_interactions:
       X-Xss-Protection:
       - '0'
       X-Request-Id:
-      - e5517749-1612-49a0-88f5-bd43a88c6eef
+      - d21dfa6b-f7e9-4786-bd22-ec8c476e3193
       Etag:
-      - W/"ba8edb751714b0f4a2280490556c995b"
+      - W/"557724a9fd207e91d1870841a1a69e03"
       X-Frame-Options:
       - SAMEORIGIN
       X-Runtime:
-      - '0.034384'
+      - '0.023589'
       X-Content-Type-Options:
       - nosniff
       X-Powered-By:
@@ -126,5 +126,5 @@ http_interactions:
         of the Common Envelope Phase in Binary Stellar Evolution"}],"publisher":"Heidelberg
         University Library","container":{},"publicationYear":2016,"subjects":[{"subject":"520
         Astronomy and allied sciences"},{"subject":"530 Physics"}],"contributors":[],"dates":[{"date":"2016","dateType":"Issued"}],"language":null,"types":{"ris":"GEN","bibtex":"misc","citeproc":"article","schemaOrg":"CreativeWork"},"relatedIdentifiers":[],"relatedItems":[],"sizes":[],"formats":[],"version":null,"rightsList":[],"descriptions":[],"geoLocations":[],"fundingReferences":[],"xml":"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHJlc291cmNlIHhtbG5zPSJodHRwOi8vZGF0YWNpdGUub3JnL3NjaGVtYS9rZXJuZWwtMi4yIiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIiB4c2k6c2NoZW1hTG9jYXRpb249Imh0dHA6Ly9kYXRhY2l0ZS5vcmcvc2NoZW1hL2tlcm5lbC0yLjIgaHR0cDovL3NjaGVtYS5kYXRhY2l0ZS5vcmcvbWV0YS9rZXJuZWwtMi4yL21ldGFkYXRhLnhzZCI+PGlkZW50aWZpZXIgaWRlbnRpZmllclR5cGU9IkRPSSI+MTAuMTE1ODgvaGVpZG9rLjAwMDIxNTEzPC9pZGVudGlmaWVyPjxjcmVhdG9ycz48Y3JlYXRvcj48Y3JlYXRvck5hbWU+T2hsbWFubiwgU2ViYXN0aWFuIFRob21hczwvY3JlYXRvck5hbWU+PC9jcmVhdG9yPjwvY3JlYXRvcnM+PHRpdGxlcz48dGl0bGU+SHlkcm9keW5hbWljcyBvZiB0aGUgQ29tbW9uIEVudmVsb3BlIFBoYXNlIGluIEJpbmFyeSBTdGVsbGFyIEV2b2x1dGlvbjwvdGl0bGU+PC90aXRsZXM+PHB1Ymxpc2hlcj5IZWlkZWxiZXJnIFVuaXZlcnNpdHkgTGlicmFyeTwvcHVibGlzaGVyPjxwdWJsaWNhdGlvblllYXI+MjAxNjwvcHVibGljYXRpb25ZZWFyPjxzdWJqZWN0cz48c3ViamVjdD41MjAgQXN0cm9ub215IGFuZCBhbGxpZWQgc2NpZW5jZXM8L3N1YmplY3Q+PHN1YmplY3Q+NTMwIFBoeXNpY3M8L3N1YmplY3Q+PC9zdWJqZWN0cz48YWx0ZXJuYXRlSWRlbnRpZmllcnM+PGFsdGVybmF0ZUlkZW50aWZpZXIgYWx0ZXJuYXRlSWRlbnRpZmllclR5cGU9IlVSTCI+aHR0cDovL2FyY2hpdi51Yi51bmktaGVpZGVsYmVyZy5kZS92b2xsdGV4dHNlcnZlci8yMTUxMy88L2FsdGVybmF0ZUlkZW50aWZpZXI+PC9hbHRlcm5hdGVJZGVudGlmaWVycz48L3Jlc291cmNlPg==","url":"http://archiv.ub.uni-heidelberg.de/volltextserver/id/eprint/21513","contentUrl":null,"metadataVersion":0,"schemaVersion":"http://datacite.org/schema/kernel-2.2","source":"api","isActive":true,"state":"findable","reason":null,"viewCount":0,"viewsOverTime":[],"downloadCount":0,"downloadsOverTime":[],"referenceCount":0,"citationCount":0,"citationsOverTime":[],"partCount":0,"partOfCount":0,"versionCount":0,"versionOfCount":0,"created":"2016-07-15T12:19:26.000Z","registered":"2016-07-15T12:19:27.000Z","published":"2016","updated":"2020-12-10T16:34:30.000Z"},"relationships":{"client":{"data":{"id":"gesis.ubhd","type":"clients"}},"provider":{"data":{"id":"vgzm","type":"providers"}},"media":{"data":{"id":"10.11588/heidok.00021513","type":"media"}},"references":{"data":[]},"citations":{"data":[]},"parts":{"data":[]},"partOf":{"data":[]},"versions":{"data":[]},"versionOf":{"data":[]}}}}'
-  recorded_at: Tue, 21 Oct 2025 08:55:35 GMT
+  recorded_at: Wed, 22 Oct 2025 17:49:32 GMT
 recorded_with: VCR 6.3.1

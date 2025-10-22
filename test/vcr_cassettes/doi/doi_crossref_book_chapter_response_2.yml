@@ -1,0 +1,151 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1007
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 17:48:50 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=iRR9U0CAA%2BaOvg%2F3Pc%2Fd474FBL3O07QjUANZV7mJzIbFAyzmSOYn6tsKtExO%2FlIxZTHZ2Ddz6Z5HIe9BtFyVPI6TyVz21BcgAtJyqI%2BHLqQqvA%3D%3D"}]}'
+      Cf-Ray:
+      - 992ad3f0ba8271b8-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1007",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Wed, 22 Oct 2025 17:48:50 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.1007/978-3-540-70504-8_9
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 17:48:51 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '6149'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,9,5]],"date-time":"2024-09-05T06:09:47Z","timestamp":1725516587929},"publisher-location":"Berlin,
+        Heidelberg","reference-count":14,"publisher":"Springer Berlin Heidelberg","isbn-type":[{"type":"print","value":"9783540705031"},{"type":"electronic","value":"9783540705048"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"DOI":"10.1007\/978-3-540-70504-8_9","type":"book-chapter","created":{"date-parts":[[2008,8,12]],"date-time":"2008-08-12T16:07:43Z","timestamp":1218557263000},"page":"87-99","source":"Crossref","is-referenced-by-count":15,"title":["A
+        Semantics for a Query Language over Sensors, Streams and Relations"],"prefix":"10.1007","author":[{"given":"Christian
+        Y. A.","family":"Brenninkmeijer","sequence":"first","affiliation":[]},{"given":"Ixent","family":"Galpin","sequence":"additional","affiliation":[]},{"given":"Alvaro
+        A. A.","family":"Fernandes","sequence":"additional","affiliation":[]},{"given":"Norman
+        W.","family":"Paton","sequence":"additional","affiliation":[]}],"member":"297","reference":[{"issue":"2","key":"9_CR1","doi-asserted-by":"publisher","first-page":"120","DOI":"10.1007\/s00778-003-0095-z","volume":"12","author":"D.J.
+        Abadi","year":"2003","unstructured":"Abadi, D.J., Carney, D., \u00c7etintemel,
+        U., Cherniack, M., et al.: Aurora: A new Model and Architecture for Data Stream
+        Management. VLDB J.\u00a012(2), 120\u2013139 (2003)","journal-title":"VLDB
+        J."},{"issue":"2","key":"9_CR2","doi-asserted-by":"publisher","first-page":"121","DOI":"10.1007\/s00778-004-0147-z","volume":"15","author":"A.
+        Arasu","year":"2006","unstructured":"Arasu, A., Babu, S., Widom, J.: The CQL
+        continuous query language: semantic foundations and query execution. VLDB
+        J\u00a015(2), 121\u2013142 (2006)","journal-title":"VLDB J"},{"issue":"3","key":"9_CR3","doi-asserted-by":"publisher","first-page":"6","DOI":"10.1145\/1031570.1031572","volume":"33","author":"A.
+        Arasu","year":"2004","unstructured":"Arasu, A., Widom, J.: A Denotational
+        Semantics for Continuous Queries over Streams and Relations. SIGMOD Record\u00a033(3),
+        6\u201312 (2004)","journal-title":"SIGMOD Record"},{"key":"9_CR4","doi-asserted-by":"crossref","unstructured":"Babcock,
+        B., Babu, S., Datar, M., Motwani, R., Widom, J.: Models and Issues in Data
+        Stream Systems. In: PODS, pp. 1\u201316 (2002)","DOI":"10.1145\/543613.543615"},{"key":"9_CR5","doi-asserted-by":"crossref","unstructured":"Chandrasekaran,
+        S., Cooper, O., Deshpande, A., Franklin, M.J., et al.: TelegraphCQ: Continuous
+        Dataflow Processing for an Uncertain World. In: CIDR (2003)","DOI":"10.1145\/872757.872857"},{"key":"9_CR6","doi-asserted-by":"crossref","unstructured":"Chen,
+        J., DeWitt, D.J., Tian, F., Wang, Y.: NiagaraCQ: A Scalable Continuous Query
+        System for Internet Databases. In: SIGMOD, pp. 379\u2013390 (2000)","DOI":"10.1145\/342009.335432"},{"key":"9_CR7","doi-asserted-by":"crossref","unstructured":"Cranor,
+        C.D., Johnson, T., Spatscheck, O., Shkapenyuk, V.: Gigascope: A Stream Database
+        for Network Applications. In: SIGMOD, pp. 647\u2013651 (2003)","DOI":"10.1145\/872757.872838"},{"key":"9_CR8","doi-asserted-by":"crossref","unstructured":"Galpin,
+        I., Brenninkmeijer, C.Y.A., Jabeen, F., Fernandes, A.A.A., Paton, N.W.: An
+        Architecture for Query Optimization in Sensor Networks. In: Proc. ICDE (2008)","DOI":"10.1109\/ICDE.2008.4497582"},{"issue":"2","key":"9_CR9","doi-asserted-by":"publisher","first-page":"5","DOI":"10.1145\/776985.776986","volume":"32","author":"L.
+        Golab","year":"2003","unstructured":"Golab, L., \u00d6zsu, M.T.: Issues in
+        data stream management. SIGMOD Record\u00a032(2), 5\u201314 (2003)","journal-title":"SIGMOD
+        Record"},{"issue":"1","key":"9_CR10","doi-asserted-by":"publisher","first-page":"122","DOI":"10.1145\/1061318.1061322","volume":"30","author":"S.
+        Madden","year":"2005","unstructured":"Madden, S., Franklin, M.J., Hellerstein,
+        J.M., Hong, W.: TinyDB: An Acquisitional Query Processing System for Sensor
+        Networks. ACM Trans. Database Syst.\u00a030(1), 122\u2013173 (2005)","journal-title":"ACM
+        Trans. Database Syst."},{"key":"9_CR11","series-title":"Lecture Notes in Computer
+        Science","doi-asserted-by":"crossref","first-page":"37","DOI":"10.1007\/978-3-540-30570-5_3","volume-title":"Database
+        Theory - ICDT 2005","author":"D. Maier","year":"2004","unstructured":"Maier,
+        D., Li, J., Tucker, P.A., Tufte, K., Papadimos, V.: Semantics of Data Streams
+        and Operators. In: Eiter, T., Libkin, L. (eds.) ICDT 2005. LNCS, vol.\u00a03363,
+        pp. 37\u201352. Springer, Heidelberg (2004)"},{"key":"9_CR12","volume-title":"StreamDataManagement,
+        ch. 3","author":"D. Maier","year":"2005","unstructured":"Maier, D., Tucker,
+        P.A., Garofalakis, M.: Filtering, Punctuation, Windows and Synopses. In: Chaudhury,
+        N.A., et al. (eds.) StreamDataManagement, ch. 3, Springer, Heidelberg (2005)"},{"key":"9_CR13","doi-asserted-by":"crossref","unstructured":"Rundensteiner,
+        E.A., Ding, L., Sutherland, T.M., Zhu, Y., et al.: CAPE: Continuous Query
+        Engine with Heterogeneous-Grained Adaptivity. In: VLDB (2004)","DOI":"10.1016\/B978-012088469-8\/50145-5"},{"key":"9_CR14","unstructured":"Yao,
+        Y., Gehrke, J.: Query Processing in Sensor Networks. In: CIDR (2003)"}],"container-title":["Lecture
+        Notes in Computer Science","Sharing Data, Information and Knowledge"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1007\/978-3-540-70504-8_9.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2020,11,19]],"date-time":"2020-11-19T05:06:52Z","timestamp":1605762412000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1007\/978-3-540-70504-8_9"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[null]]},"ISBN":["9783540705031","9783540705048"],"references-count":14,"URL":"https:\/\/doi.org\/10.1007\/978-3-540-70504-8_9","relation":{},"ISSN":["0302-9743","1611-3349"],"issn-type":[{"type":"print","value":"0302-9743"},{"type":"electronic","value":"1611-3349"}],"subject":[]}}'
+  recorded_at: Wed, 22 Oct 2025 17:48:51 GMT
+recorded_with: VCR 6.3.1

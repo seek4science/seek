@@ -2,79 +2,26 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.1371
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-      User-Agent:
-      - Ruby
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Date:
-      - Tue, 21 Oct 2025 09:58:26 GMT
-      Content-Type:
-      - application/json;charset=UTF-8
-      Transfer-Encoding:
-      - chunked
-      Connection:
-      - keep-alive
-      Server:
-      - cloudflare
-      Vary:
-      - Origin
-      - accept-encoding
-      Permissions-Policy:
-      - interest-cohort=(),browsing-topics=()
-      Cf-Cache-Status:
-      - DYNAMIC
-      Nel:
-      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
-      Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=vTqy6B7fytWOQbhZHvCf6D1aZ8POo%2FgFRGpiJN68lmfv4uOEdxq9VrmycjPRBDrR3YhgEpEgvpMY7dnH1iw7m2W%2B1%2Fmn%2Bw%3D%3D"}]}'
-      Cf-Ray:
-      - 991fe57db8ae6e96-STR
-      Alt-Svc:
-      - h3=":443"; ma=86400
-    body:
-      encoding: ASCII-8BIT
-      string: |-
-        [
-          {
-            "DOI": "10.1371",
-            "RA": "Crossref"
-          }
-        ]
-  recorded_at: Tue, 21 Oct 2025 09:58:26 GMT
-- request:
-    method: get
-    uri: https://doi.org/10.1371/journal.pcbi.1002352
+    uri: https://doi.org/10.1016/j.future.2011.08.004
     body:
       encoding: US-ASCII
       string: ''
     headers:
       Accept:
       - application/vnd.citationstyles.csl+json
+      User-Agent:
+      - rest-client/2.1.0 (darwin24 arm64) ruby/3.3.9p170
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      User-Agent:
-      - Ruby
+      Host:
+      - doi.org
   response:
     status:
       code: 302
       message: Found
     headers:
       Date:
-      - Tue, 21 Oct 2025 09:58:26 GMT
+      - Wed, 22 Oct 2025 17:49:21 GMT
       Content-Type:
       - text/html;charset=utf-8
       Transfer-Encoding:
@@ -82,14 +29,16 @@ http_interactions:
       Connection:
       - keep-alive
       Location:
-      - https://api.crossref.org/v1/works/10.1371%2Fjournal.pcbi.1002352/transform
+      - https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform
       Server:
       - cloudflare
       Vary:
       - Accept
       - Origin
       Expires:
-      - Tue, 21 Oct 2025 10:52:33 GMT
+      - Wed, 22 Oct 2025 17:52:36 GMT
+      Link:
+      - "<https://dul.usage.elsevier.com/doi/>; rel=dul"
       Permissions-Policy:
       - interest-cohort=(),browsing-topics=()
       Cf-Cache-Status:
@@ -99,41 +48,43 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=odBzn9IVoJQSQLVoFGv1iRJOd24WR3AbBycJ1fs7uFuBXoJOVjCEbvLJrKqpduUcEw%2BS1QFCl2%2BMUrPQWfchwIERqJ2O4Q%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=DtFe6EDrd2ilhrrU%2B1EUHt85ptPKRRc%2F9K6VqvO1a31N56wr04uCI73JNud6BbxU9zBlrtzMDoLCMXbghJrNp61hdF4DzA%2FqkYlF20rC4u8%3D"}]}'
       Cf-Ray:
-      - 991fe57e2bdb2c0a-STR
+      - 992ad4b2cd0f996e-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
       encoding: UTF-8
       string: |-
         <html><head><title>Handle Redirect</title></head>
-        <body><a href="https://api.crossref.org/v1/works/10.1371%2Fjournal.pcbi.1002352/transform">https://api.crossref.org/v1/works/10.1371%2Fjournal.pcbi.1002352/transform</a></body></html>
-  recorded_at: Tue, 21 Oct 2025 09:58:26 GMT
+        <body><a href="https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform">https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform</a></body></html>
+  recorded_at: Wed, 22 Oct 2025 17:49:21 GMT
 - request:
     method: get
-    uri: https://api.crossref.org/v1/works/10.1371%2Fjournal.pcbi.1002352/transform
+    uri: https://api.crossref.org/v1/works/10.1016%2Fj.future.2011.08.004/transform
     body:
       encoding: US-ASCII
       string: ''
     headers:
       Accept:
       - application/vnd.citationstyles.csl+json
+      User-Agent:
+      - rest-client/2.1.0 (darwin24 arm64) ruby/3.3.9p170
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      User-Agent:
-      - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Tue, 21 Oct 2025 09:58:26 GMT
+      - Wed, 22 Oct 2025 17:49:22 GMT
       Content-Type:
       - application/vnd.citationstyles.csl+json
       Content-Length:
-      - '13409'
+      - '15312'
       Connection:
       - keep-alive
       Vary:
@@ -157,106 +108,107 @@ http_interactions:
       - interest-cohort=()
     body:
       encoding: ASCII-8BIT
-      string: '{"indexed":{"date-parts":[[2025,10,17]],"date-time":"2025-10-17T13:39:37Z","timestamp":1760708377167},"reference-count":41,"publisher":"Public
-        Library of Science (PLoS)","issue":"1","license":[{"start":{"date-parts":[[2012,1,19]],"date-time":"2012-01-19T00:00:00Z","timestamp":1326931200000},"content-version":"unspecified","delay-in-days":0,"URL":"http:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"content-domain":{"domain":["www.ploscompbiol.org"],"crossmark-restriction":false},"DOI":"10.1371\/journal.pcbi.1002352","type":"journal-article","created":{"date-parts":[[2012,1,19]],"date-time":"2012-01-19T16:55:02Z","timestamp":1326992102000},"page":"e1002352","update-policy":"http:\/\/dx.doi.org\/10.1371\/journal.pcbi.corrections_policy","source":"Crossref","is-referenced-by-count":29,"title":"Dynamic
-        Modelling under Uncertainty: The Case of Trypanosoma brucei Energy Metabolism","prefix":"10.1371","volume":"8","author":[{"given":"Fiona","family":"Achcar","sequence":"first","affiliation":[]},{"given":"Eduard
-        J.","family":"Kerkhoven","sequence":"additional","affiliation":[]},{"name":"The
-        SilicoTryp Consortium","sequence":"additional","affiliation":[]},{"given":"Barbara
-        M.","family":"Bakker","sequence":"additional","affiliation":[]},{"given":"Michael
-        P.","family":"Barrett","sequence":"additional","affiliation":[]},{"given":"Rainer","family":"Breitling","sequence":"additional","affiliation":[]}],"member":"340","published-online":{"date-parts":[[2012,1,19]]},"reference":[{"key":"ref1","first-page":"80","article-title":"Prediction
-        of enzyme kinetic parameters based on statistical learning.","volume":"17","author":"S
-        Borger","year":"2006","journal-title":"Genome Inform Ser"},{"key":"ref2","doi-asserted-by":"crossref","first-page":"3750","DOI":"10.1529\/biophysj.104.048090","article-title":"Metabolic
-        control analysis under uncertainty: Framework development and case studies.","volume":"87","author":"L
-        Wang","year":"2004","journal-title":"Biophys J"},{"key":"ref3","doi-asserted-by":"crossref","first-page":"5606","DOI":"10.1529\/biophysj.108.135442","article-title":"Ensemble
-        modeling of metabolic networks.","volume":"95","author":"LM Tran","year":"2008","journal-title":"Biophys
-        J"},{"key":"ref4","doi-asserted-by":"crossref","first-page":"595","DOI":"10.1016\/j.jtice.2009.05.003","article-title":"Ensemble
-        modeling and related mathematical modeling of metabolic networks.","volume":"40","author":"ML
-        Rizk","year":"2009","journal-title":"J Taiwan Inst Chem E"},{"key":"ref5","doi-asserted-by":"crossref","first-page":"413","DOI":"10.1002\/bit.22932","article-title":"Modeling
-        of uncertainties in biochemical reactions.","volume":"108","author":"L Mi\u0161kovi\u0107","year":"2011","journal-title":"Biotechnol
-        Bioeng"},{"key":"ref6","doi-asserted-by":"crossref","first-page":"880","DOI":"10.1098\/rsif.2010.0540","article-title":"A
-        probabilistic approach to identify putative drug targets in biochemical networks.","volume":"8","author":"E
-        Murabito","year":"2011","journal-title":"J Roy Soc Interface"},{"key":"ref7","doi-asserted-by":"crossref","first-page":"3207","DOI":"10.1074\/jbc.272.6.3207","article-title":"Glycolysis
-        in bloodstream form <italic>Trypanosoma brucei<\/italic> can be understood
-        in terms of the kinetics of the glycolytic enzymes.","volume":"272","author":"BM
-        Bakker","year":"1997","journal-title":"J Biol Chem"},{"key":"ref8","doi-asserted-by":"crossref","first-page":"14551","DOI":"10.1074\/jbc.274.21.14551","article-title":"What
-        controls glycolysis in bloodstream form <italic>Trypanosoma brucei<\/italic>?","volume":"274","author":"BM
-        Bakker","year":"1999","journal-title":"J Biol Chem"},{"key":"ref9","doi-asserted-by":"crossref","first-page":"117","DOI":"10.1042\/bj3570117","article-title":"Roles
-        of triosephosphate isomerase and aerobic metabolism in Trypanosoma brucei.","volume":"357","author":"S
-        Helfert","year":"2001","journal-title":"Biochem J"},{"key":"ref10","doi-asserted-by":"crossref","first-page":"28306","DOI":"10.1074\/jbc.M502403200","article-title":"Experimental
-        and in silico analyses of glycolytic ux control in bloodstream form Trypanosoma
-        brucei.","volume":"280","author":"M Albert","year":"2005","journal-title":"J
-        Biol Chem"},{"key":"ref11","doi-asserted-by":"crossref","first-page":"17718","DOI":"10.1073\/pnas.0806664105","article-title":"Compartmentation
-        prevents a lethal turbo-explosion of glycolysis in trypanosomes.","volume":"105","author":"JR
-        Haanstra","year":"2008","journal-title":"Proc Natl Acad Sci USA"},{"key":"ref12","doi-asserted-by":"crossref","first-page":"215","DOI":"10.1042\/bj0620215","article-title":"Studies
-        on the metabolism of the protozoa. 7. comparative carbohydrate metabolism
-        of eleven species of trypanosome.","volume":"62","author":"JF Ryley","year":"1956","journal-title":"Biochem
-        J"},{"key":"ref13","doi-asserted-by":"crossref","first-page":"63","DOI":"10.1016\/0166-6851(80)90032-8","article-title":"<italic>Trypanosoma
-        brucei<\/italic>: the effect of glycerol on the anaerobic metabolism of glucose.","volume":"2","author":"DJ
-        Hammond","year":"1980","journal-title":"Mol Biochem Parasit"},{"article-title":"The
-        power of network-based drug design and the interplay between metabolism and
-        gene expression in <italic>Trypanosoma brucei<\/italic>.","year":"2009","author":"J
-        Haanstra","key":"ref14"},{"key":"ref15","doi-asserted-by":"crossref","first-page":"23","DOI":"10.1016\/0014-5793(85)81106-6","article-title":"The
-        aerobic\/anaerobic transition of glucose metabolism in <italic>Try-panosoma
-        brucei<\/italic>.","volume":"181","author":"R Eisenthal","year":"1985","journal-title":"FEBS
-        Lett"},{"issue":"Pt 2","key":"ref16","doi-asserted-by":"crossref","first-page":"479","DOI":"10.1042\/bj3120479","article-title":"The
-        inhibition of pyruvate transport across the plasma membrane of the bloodstream
-        form of <italic>Trypanosoma brucei<\/italic> and its metabolic implications.","volume":"312","author":"EA
-        Wiemer","year":"1995","journal-title":"Biochem J"},{"key":"ref17","doi-asserted-by":"crossref","first-page":"53","DOI":"10.1042\/bj3460053","article-title":"A
-        pyruvate-proton symport and an H+-ATPase regulate the intracellular pH of
-        <italic>Trypanosoma brucei<\/italic> at different stages of its life cycle.","volume":"346
-        Pt 1","author":"N Vanderheyden","year":"2000","journal-title":"Biochem J"},{"key":"ref18","doi-asserted-by":"crossref","first-page":"7187","DOI":"10.1111\/j.1742-4658.2009.07432.x","article-title":"Alanine
-        aminotransferase of <italic>Trypanosoma brucei<\/italic>\u2013a key role in
-        proline metabolism in procyclic life forms.","volume":"276","author":"D Spitznagel","year":"2009","journal-title":"FEBS
-        J"},{"key":"ref19","doi-asserted-by":"crossref","first-page":"15","DOI":"10.2307\/3280098","article-title":"Alteration
-        of free serum amino acids in voles infected with trypanosoma brucei gambiense.","volume":"63","author":"GR
-        Newport","year":"1977","journal-title":"J Parasitol"},{"key":"ref20","doi-asserted-by":"crossref","first-page":"657","DOI":"10.1111\/j.1432-1033.1982.tb05836.x","article-title":"Carbon-13
-        Nuclear-Magnetic-Resonance studies of glucose catabolism by trypanosoma brucei
-        gambiense.","volume":"121","author":"NE Mackenzie","year":"1982","journal-title":"Eur
-        J Biochem"},{"key":"ref21","doi-asserted-by":"crossref","first-page":"242","DOI":"10.1042\/bj0660242","article-title":"The
-        catabolism of glucose by strains of trypanosoma rhodesiense.","volume":"66","author":"PT
-        Grant","year":"1957","journal-title":"Biochem J"},{"key":"ref22","first-page":"65","article-title":"The
-        control of ux.","volume":"27","author":"H Kacser","year":"1973","journal-title":"Sym
-        Soc Exp Biol"},{"key":"ref23","doi-asserted-by":"crossref","first-page":"10098","DOI":"10.1073\/pnas.96.18.10098","article-title":"Contribution
-        of glucose transport to the control of the glycolytic ux in <italic>Trypanosoma
-        brucei<\/italic>.","volume":"96","author":"BM Bakker","year":"1999","journal-title":"Proc
-        Natl Acad Sci USA"},{"key":"ref24","first-page":"136","article-title":"Control
-        of the glycolytic flux in <italic>Trypanosoma brucei<\/italic>: why control
-        can shift suddenly.","author":"BM Bakker","year":"1996"},{"key":"ref25","doi-asserted-by":"crossref","first-page":"441","DOI":"10.1111\/j.1432-1033.1986.tb09687.x","article-title":"Glycolytic
-        enzymes of <italic>Trypanosoma brucei<\/italic>.","volume":"157","author":"O
-        Misset","year":"1986","journal-title":"Eur J Biochem"},{"key":"ref26","doi-asserted-by":"crossref","first-page":"50","DOI":"10.1016\/j.molbiopara.2009.09.001","article-title":"Genetic
-        validation of aldolase and glyceraldehyde-3-phosphate dehydrogenase as drug
-        targets in <italic>Trypanosoma brucei<\/italic>.","volume":"169","author":"AJ
-        C\u00e1ceres","year":"2010","journal-title":"Mol Biochem Parasit"},{"key":"ref27","doi-asserted-by":"crossref","first-page":"1464","DOI":"10.1046\/j.1432-1327.2000.01145.x","article-title":"<italic>Trypanosoma
-        brucei<\/italic> contains a 2,3-bisphosphoglycerate independent phosphoglycerate
-        mutase.","volume":"267","author":"N Chevalier","year":"2000","journal-title":"Eur
-        J Biochem"},{"key":"ref28","doi-asserted-by":"crossref","first-page":"4273","DOI":"10.1073\/pnas.96.8.4273","article-title":"Structure-based
-        design of submicromolar, biologically active inhibitors of trypanosomatid
-        glyceraldehyde-3-phosphate dehydrogenase.","volume":"96","author":"AM Aronov","year":"1999","journal-title":"Proc
-        Natl Acad Sci USA"},{"key":"ref29","first-page":"ra20","article-title":"Inferring
-        signaling pathway topologies from multiple perturbation measurements of specific
-        biochemical species.","volume":"3","author":"T Xu","year":"2010","journal-title":"Sci
-        Signal"},{"article-title":"Enzymes.","year":"1930","author":"JBS Haldane","key":"ref30"},{"key":"ref31","doi-asserted-by":"crossref","first-page":"524","DOI":"10.1093\/bioinformatics\/btg015","article-title":"The
-        systems biology markup language (SBML): a medium for representation and exchange
-        of biochemical network models.","volume":"19","author":"A Cornish-Bowden","year":"2003","journal-title":"Bioinformatics"},{"key":"ref32","doi-asserted-by":"crossref","first-page":"D670","DOI":"10.1093\/nar\/gkq1089","article-title":"BRENDA,
-        the enzyme information system in 2011.","volume":"39","author":"M Scheer","year":"2011","journal-title":"Nucleic
-        Acids Res"},{"key":"ref33","doi-asserted-by":"crossref","first-page":"1310","DOI":"10.1039\/c1mt00119a","article-title":"Phosphoglycerate
-        mutase from trypanosoma brucei is hyperactivated by cobalt in vitro, but not
-        in vivo.","volume":"3","author":"FAA Fuad","year":"2011","journal-title":"Metallomics"},{"key":"ref34","doi-asserted-by":"crossref","first-page":"191","DOI":"10.1111\/j.1432-1033.1991.tb16362.x","article-title":"Specificity
-        of glucose transport in <italic>Trypanosoma brucei<\/italic>.","volume":"202","author":"A
-        Seyfang","year":"1991","journal-title":"Eur J Biochem"},{"key":"ref35","doi-asserted-by":"crossref","first-page":"81","DOI":"10.1016\/0005-2736(89)90107-7","article-title":"Specificity
-        and kinetics of hexose transport in <italic>Try-panosoma brucei<\/italic>.","volume":"985","author":"R
-        Eisenthal","year":"1989","journal-title":"Biochim Biophys Acta"},{"article-title":"Transport
-        and diffusion across cell membranes","year":"1986","author":"WD Stein","key":"ref36"},{"key":"ref37","doi-asserted-by":"crossref","first-page":"3","DOI":"10.1145\/272991.272995","article-title":"Mersenne
-        Twister: A 623-dimensionally equidistributed uniform pseudorandom number generator.","volume":"8","author":"M
-        Matsumoto","year":"1998","journal-title":"ACM T Model Comput S"},{"article-title":"GNU
-        scientific library reference manual: (v. 1.12)","year":"2009","author":"M
-        Galassi","key":"ref38"},{"key":"ref39","doi-asserted-by":"crossref","first-page":"1406","DOI":"10.1093\/bioinformatics\/btl086","article-title":"The
-        SBML ODE solver library: a native API for symbolic and fast numerical analysis
-        of reaction networks.","volume":"22","author":"R Machn\u00e9","year":"2006","journal-title":"Bioinformatics"},{"key":"ref40","doi-asserted-by":"crossref","first-page":"3067","DOI":"10.1093\/bioinformatics\/btl485","article-title":"COPASI\u2013a
-        COmplex PAthway SImulator.","volume":"22","author":"S Hoops","year":"2006","journal-title":"Bioinformatics"},{"key":"ref41","doi-asserted-by":"crossref","first-page":"560","DOI":"10.1093\/bioinformatics\/bti046","article-title":"Modelling
-        cellular systems with PySCeS.","volume":"21","author":"BG Olivier","year":"2005","journal-title":"Bioinformatics"}],"container-title":"PLoS
-        Computational Biology","original-title":[],"language":"en","link":[{"URL":"http:\/\/dx.plos.org\/10.1371\/journal.pcbi.1002352","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2021,12,26]],"date-time":"2021-12-26T07:50:12Z","timestamp":1640505012000},"score":1,"resource":{"primary":{"URL":"https:\/\/dx.plos.org\/10.1371\/journal.pcbi.1002352"}},"subtitle":[],"editor":[{"given":"Jason
-        A.","family":"Papin","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2012,1,19]]},"references-count":41,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2012,1,19]]}},"URL":"http:\/\/dx.doi.org\/10.1371\/journal.pcbi.1002352","relation":{},"ISSN":["1553-7358"],"subject":[],"container-title-short":"PLoS
-        Comput Biol","published":{"date-parts":[[2012,1,19]]}}'
-  recorded_at: Tue, 21 Oct 2025 09:58:26 GMT
+      string: '{"indexed":{"date-parts":[[2025,10,20]],"date-time":"2025-10-20T18:14:05Z","timestamp":1760984045180},"reference-count":45,"publisher":"Elsevier
+        BV","issue":"2","license":[{"start":{"date-parts":[[2013,2,1]],"date-time":"2013-02-01T00:00:00Z","timestamp":1359676800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2013,2]]},"DOI":"10.1016\/j.future.2011.08.004","type":"journal-article","created":{"date-parts":[[2011,8,21]],"date-time":"2011-08-21T13:33:57Z","timestamp":1313933637000},"page":"599-611","source":"Crossref","is-referenced-by-count":210,"title":"Why
+        linked data is not enough for scientists","prefix":"10.1016","volume":"29","author":[{"given":"Sean","family":"Bechhofer","sequence":"first","affiliation":[]},{"given":"Iain","family":"Buchan","sequence":"additional","affiliation":[]},{"given":"David","family":"De
+        Roure","sequence":"additional","affiliation":[]},{"given":"Paolo","family":"Missier","sequence":"additional","affiliation":[]},{"given":"John","family":"Ainsworth","sequence":"additional","affiliation":[]},{"given":"Jiten","family":"Bhagat","sequence":"additional","affiliation":[]},{"given":"Philip","family":"Couch","sequence":"additional","affiliation":[]},{"given":"Don","family":"Cruickshank","sequence":"additional","affiliation":[]},{"given":"Mark","family":"Delderfield","sequence":"additional","affiliation":[]},{"given":"Ian","family":"Dunlop","sequence":"additional","affiliation":[]},{"given":"Matthew","family":"Gamble","sequence":"additional","affiliation":[]},{"given":"Danius","family":"Michaelides","sequence":"additional","affiliation":[]},{"given":"Stuart","family":"Owen","sequence":"additional","affiliation":[]},{"given":"David","family":"Newman","sequence":"additional","affiliation":[]},{"given":"Shoaib","family":"Sufi","sequence":"additional","affiliation":[]},{"given":"Carole","family":"Goble","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/j.future.2011.08.004_br000005","doi-asserted-by":"crossref","unstructured":"J.
+        Ainsworth, I. Buchan, e-Labs and work objects: towards digital health economies,
+        in: Comms. Infrastructure. Systems and Applications in Europe, vol. 16, 2009,
+        pp. 206\u2013216.","DOI":"10.1007\/978-3-642-11284-3_22"},{"key":"10.1016\/j.future.2011.08.004_br000010","series-title":"Scientific
+        Collaboration on the Internet","author":"Olson","year":"2008"},{"issue":"3","key":"10.1016\/j.future.2011.08.004_br000015","doi-asserted-by":"crossref","first-page":"1","DOI":"10.4018\/jswis.2009081901","article-title":"Linked
+        data\u2014the story so far","volume":"5","author":"Bizer","year":"2009","journal-title":"International
+        Journal on Semantic Web and Information Systems"},{"issue":"5964","key":"10.1016\/j.future.2011.08.004_br000020","doi-asserted-by":"crossref","first-page":"415","DOI":"10.1126\/science.1179653","article-title":"Accessible
+        reproducible research","volume":"327","author":"Mesirov","year":"2010","journal-title":"Science"},{"key":"10.1016\/j.future.2011.08.004_br000025","unstructured":"D.
+        De Roure, C. Goble, Anchors in shifting sand: the primacy of method in the
+        web of data, in: Web Science Conference 2010, Raleigh, NC, 2010."},{"key":"10.1016\/j.future.2011.08.004_br000030","doi-asserted-by":"crossref","first-page":"142","DOI":"10.1186\/1471-2105-6-142","article-title":"Which
+        gene did you mean?","volume":"6","author":"Mons","year":"2005","journal-title":"BMC
+        Bioinformatics"},{"issue":"5","key":"10.1016\/j.future.2011.08.004_br000035","doi-asserted-by":"crossref","first-page":"8","DOI":"10.1109\/MCSE.2010.113","article-title":"Reproducible
+        research: addressing the need for data and code sharing in computational science","volume":"12","author":"Yale
+        Roundtable Participants","year":"2010","journal-title":"Journal of Computing
+        Science and Engineering"},{"key":"10.1016\/j.future.2011.08.004_br000040","unstructured":"F.
+        Giunchiglia, R. ChenuAbente, Scientific knowledge objects V.1, Technical Report
+        DISI-09-006, University of Trento, January 2009."},{"issue":"1","key":"10.1016\/j.future.2011.08.004_br000045","doi-asserted-by":"crossref","first-page":"51","DOI":"10.3233\/ISU-2010-0613","article-title":"The
+        anatomy of a nano-publication","volume":"30","author":"Groth","year":"2010","journal-title":"Information
+        Services and Use"},{"key":"10.1016\/j.future.2011.08.004_br000050","unstructured":"G.
+        Klyne, J.J. Carroll, Resource description framework (RDF): concepts and abstract
+        syntax, W3C Recommendation, World Wide Web Consortium, 2004. URL: http:\/\/www.w3.org\/TR\/owl-guide\/."},{"key":"10.1016\/j.future.2011.08.004_br000055","doi-asserted-by":"crossref","first-page":"608","DOI":"10.1016\/j.procs.2011.04.064","article-title":"The
+        collage authoring environment","volume":"4","author":"Nowakowski","year":"2011","journal-title":"Procedia
+        Computer Science"},{"key":"10.1016\/j.future.2011.08.004_br000060","doi-asserted-by":"crossref","first-page":"589","DOI":"10.1016\/j.procs.2011.04.062","article-title":"Share:
+        a web portal for creating and sharing executable research papers","volume":"4","author":"Gorp","year":"2011","journal-title":"Procedia
+        Computer Science"},{"key":"10.1016\/j.future.2011.08.004_br000065","doi-asserted-by":"crossref","first-page":"637","DOI":"10.1016\/j.procs.2011.04.067","article-title":"A
+        universal identifier for computational results","volume":"4","author":"Gavish","year":"2011","journal-title":"Procedia
+        Computer Science"},{"key":"10.1016\/j.future.2011.08.004_br000070","unstructured":"Consultative
+        Committee for Space Data Systems, Reference model for an open archival information
+        system (OAIS), Blue Book CCDS 650.0-B-1, Open Archives Initiative, 2002."},{"issue":"1","key":"10.1016\/j.future.2011.08.004_br000075","doi-asserted-by":"crossref","DOI":"10.2218\/ijdc.v1i1.4","article-title":"Scientific
+        publication packages\u2014a selective approach to the communication and archival
+        of scientific output","volume":"1","author":"Hunter","year":"2006","journal-title":"International
+        Journal of Digital Curation"},{"issue":"2","key":"10.1016\/j.future.2011.08.004_br000080","article-title":"The
+        ABC ontology and model","volume":"2","author":"Lagoze","year":"2002","journal-title":"Journal
+        of Digital Information"},{"key":"10.1016\/j.future.2011.08.004_br000085","unstructured":"T.
+        Clark, J.S. Luciano, M.S. Marshall, E. Prud\u2019hommeaux, S. Stephens (Eds.),
+        Semantic Web Applications in Scientific Discourse 2009, vol. 523, in: CUER
+        Workshop Proceedings, 2009."},{"issue":"11","key":"10.1016\/j.future.2011.08.004_br000090","doi-asserted-by":"crossref","first-page":"795","DOI":"10.1098\/rsif.2006.0134","article-title":"An
+        ontology of scientific experiments","volume":"3","author":"Soldatova","year":"2006","journal-title":"Journal
+        of the Royal Society Interface"},{"key":"10.1016\/j.future.2011.08.004_br000095","unstructured":"M.
+        Courtot, W. Bug, F. Gibson, A.L. Lister, J. Malone, D. Schober, R. Brinkman,
+        A. Ruttenberg, The OWL of biomedical investigations, in: OWLED 2008, 2008."},{"issue":"7","key":"10.1016\/j.future.2011.08.004_br000100","doi-asserted-by":"crossref","first-page":"866","DOI":"10.1093\/bioinformatics\/btl005","article-title":"The
+        MGED ontology: a resource for semantics-based description of microarray experiments","volume":"22","author":"Whetzel","year":"2006","journal-title":"Bioinformatics"},{"key":"10.1016\/j.future.2011.08.004_br000105","unstructured":"H.V.
+        de Sompel, C. Lagoze, M. Nelson, S. Warner, R. Sanderson, P. Johnston, Adding
+        eScience assets to the data web, in: C. Bizer, T. Heath, T. Berners-Lee, K.
+        Idehen, Linked Data on the Web, LDOW2009, 2009."},{"issue":"suppl. 1","key":"10.1016\/j.future.2011.08.004_br000110","doi-asserted-by":"crossref","first-page":"S6","DOI":"10.1186\/2041-1480-1-S1-S6","article-title":"Cito,
+        the citation typing ontology","volume":"1","author":"Shotton","year":"2010","journal-title":"Journal
+        of Biomedical Semantics"},{"key":"10.1016\/j.future.2011.08.004_br000115","doi-asserted-by":"crossref","unstructured":"P.
+        Missier, S.S. Sahoo, J. Zhao, A. Sheth, C. Goble, Janus: from workflows to
+        semantic provenance and linked open data, in: Procs IPAW 2010, 2010.","DOI":"10.1007\/978-3-642-17819-1_16"},{"key":"10.1016\/j.future.2011.08.004_br000120","unstructured":"P.
+        Jain, P. Hitzler, P. Yeh, K. Verma, A. Sheth, Linked data is merely more dbata,
+        in: Linked AI: AAAI Spring Symposium \u201cLinked Data Meets Artificial Intelligence\u201d,
+        2010."},{"key":"10.1016\/j.future.2011.08.004_br000125","unstructured":"W3C
+        OWL Working Group, OWL 2 web ontology language document overview, W3C Recommendation,
+        World Wide Web Consortium, 2009. URL: http:\/\/www.w3.org\/TR\/owl2-overview\/."},{"key":"10.1016\/j.future.2011.08.004_br000130","unstructured":"D.
+        Brickley, R. Guha, RDF vocabulary description language 1.0: RDF schema, W3C
+        Recommendation, World Wide Web Consortium, 2004. URL: http:\/\/www.w3.org\/TR\/owl-guide\/."},{"issue":"17","key":"10.1016\/j.future.2011.08.004_br000135","doi-asserted-by":"crossref","first-page":"2335","DOI":"10.1002\/cpe.1601","article-title":"Towards
+        open science: the myExperiment approach","volume":"27","author":"De Roure","year":"2010","journal-title":"Concurrency
+        and Computation: Practice and Experience"},{"key":"10.1016\/j.future.2011.08.004_br000140","unstructured":"D.
+        De Roure, C. Goble, Lessons from myExperiment: research objects for data intensive
+        research, in: Microsoft e-Science Workshop, Pittsburgh, US, 2009."},{"issue":"18","key":"10.1016\/j.future.2011.08.004_br000145","doi-asserted-by":"crossref","first-page":"2354","DOI":"10.1093\/bioinformatics\/btq415","article-title":"ISA
+        software suite: supporting standards-compliant experimental annotation and
+        enabling curation at the community level","volume":"26","author":"Rocca-Serra","year":"2010","journal-title":"Bioinformatics"},{"issue":"7","key":"10.1016\/j.future.2011.08.004_br000150","doi-asserted-by":"crossref","first-page":"932","DOI":"10.1093\/bioinformatics\/btq069","article-title":"SBRML:
+        a markup language for associating systems biology data with models","volume":"26","author":"Dada","year":"2010","journal-title":"Bioinformatics"},{"key":"10.1016\/j.future.2011.08.004_br000155","unstructured":"I.
+        Buchan, S. Sufi, S. Thew, I. Dunlop, U. Hiroeh, D. Canoy, G. Moulton, J. Ainsworth,
+        A. Dale, S. Bechhofer, C. Goble, Obesity e-Lab: connecting social science
+        via research objects, in: 2009 Int. Conf. on e-Social Science, Cologne, Germany,
+        2009."},{"key":"10.1016\/j.future.2011.08.004_br000160","series-title":"Design
+        Patterns: Elements of Reusable Object-Oriented Software","author":"Gamma","year":"1995"},{"key":"10.1016\/j.future.2011.08.004_br000165","unstructured":"H.V.
+        de Sompel, R. Sanderson, M.L. Nelson, L. Balakireva, H. Shankar, S. Ainsworth,
+        An http-based versioning mechanism for linked data, CoRR abs\/1003.3661."},{"key":"10.1016\/j.future.2011.08.004_br000170","unstructured":"E.
+        Prud\u2019hommeaux, A. Seabore, SPARQL Query Language for RDF, W3C recommendation,
+        World Wide Web Consortium, 2008. URL: http:\/\/www.w3.org\/TR\/rdf-sparql-query\/."},{"issue":"5","key":"10.1016\/j.future.2011.08.004_br000175","doi-asserted-by":"crossref","first-page":"706","DOI":"10.1016\/j.jbi.2008.03.004","article-title":"Bio2rdf:
+        towards a mashup to build bioinformatics knowledge systems","volume":"41","author":"Belleau","year":"2008","journal-title":"Journal
+        of Biomedical Informatics"},{"key":"10.1016\/j.future.2011.08.004_br000180","unstructured":"L.
+        Sauermann, R. Cyganiak, Cool URIs for the semantic web, W3C interest group
+        note, World Wide Web Consortium, 2008. URL: http:\/\/www.w3.org\/TR\/cooluris\/."},{"key":"10.1016\/j.future.2011.08.004_br000185","unstructured":"C.
+        Lagoze, H.V. de Sompel, P. Johnston, M. Nelson, R. Sanderson, S. Warner, ORE
+        specification\u2014abstract data model, Tech. Rep., Open Archives Initiative,
+        2008. URL: http:\/\/www.openarchives.org\/ore\/datamodel."},{"key":"10.1016\/j.future.2011.08.004_br000190","unstructured":"C.
+        Lagoze, H.V. de Sompel, ORE user guide\u2014resource map implementation in
+        RDF\/XML, Tech. Rep., Open Archives Initiative, 2008. URL: http:\/\/www.openarchives.org\/ore\/rdfxml."},{"key":"10.1016\/j.future.2011.08.004_br000195","unstructured":"D.
+        Newman, S. Bechhofer, D. De Roure, myExperiment: an ontology for e-research,
+        in: Sem Web Apps in Scientific Discourse, W\/Shop at ISWC 2009, 2009."},{"issue":"6","key":"10.1016\/j.future.2011.08.004_br000200","doi-asserted-by":"crossref","first-page":"743","DOI":"10.1016\/j.future.2010.07.005","article-title":"The
+        open provenance model core specification (v1.1)","volume":"27","author":"Moreau","year":"2011","journal-title":"Future
+        Generation Computer Systems"},{"issue":"2","key":"10.1016\/j.future.2011.08.004_br000205","doi-asserted-by":"crossref","DOI":"10.2218\/ijdc.v3i2.55","article-title":"SCOPE:
+        a scientific compound object publishing and editing system","volume":"3","author":"Cheung","year":"2008","journal-title":"International
+        Journal of Digital Curation"},{"key":"10.1016\/j.future.2011.08.004_br000210","unstructured":"M.
+        Gamble, C. Goble, Standing on the shoulders of the trusted web: trust, scholarship
+        and linked data, in: Proceedings of the Web Science Conference 2010 WebSci10
+        Extending the Frontiers of Society, 2010. URL: http:\/\/journal.webscience.org\/312\/2\/websci10_submission_72.pdf."},{"key":"10.1016\/j.future.2011.08.004_br000215","unstructured":"J.
+        Golbeck, A. Mannes, Using trust and provenance for content filtering on the
+        semantic web, in: T. Finin, L. Kagal, D. Olmedilla (Eds.), WWW\u201906 W\/Shop
+        on Models of Trust for the Web, vol. 190, 2006. CEUR-WS.org."},{"key":"10.1016\/j.future.2011.08.004_br000220","series-title":"ISWC\u201902:
+        First Int. Semantic Web Conf.","first-page":"162","article-title":"Trusting
+        information sources one citizen at a time","author":"Gil","year":"2002"},{"key":"10.1016\/j.future.2011.08.004_br000225","unstructured":"O.
+        Hartig, J. Zhao, Using web data provenance for quality assessment, in: Int.
+        W\/Shop on Semantic Web and Provenance Management, Washington, DC, USA, 2009."}],"container-title":"Future
+        Generation Computer Systems","original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0167739X11001439?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0167739X11001439?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2019,6,14]],"date-time":"2019-06-14T06:40:50Z","timestamp":1560494450000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0167739X11001439"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2013,2]]},"references-count":45,"journal-issue":{"issue":"2","published-print":{"date-parts":[[2013,2]]}},"alternative-id":["S0167739X11001439"],"URL":"http:\/\/dx.doi.org\/10.1016\/j.future.2011.08.004","relation":{},"ISSN":["0167-739X"],"subject":[],"container-title-short":"Future
+        Generation Computer Systems","published":{"date-parts":[[2013,2]]}}'
+  recorded_at: Wed, 22 Oct 2025 17:49:22 GMT
 recorded_with: VCR 6.3.1

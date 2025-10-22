@@ -220,22 +220,25 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'book chapter doi' do
-    mock_crossref(email: 'fred@email.com', doi: '10.1007/978-3-642-16239-8_8', content_file: 'cross_ref1.xml')
-    query = DOI::Query.new('fred@email.com')
-    result = query.fetch('10.1007/978-3-642-16239-8_8')
-    assert_equal :book_chapter, result.publication_type
-    assert_equal 'Prediction with Confidence Based on a Random Forest Classifier', result.title
-    assert_equal 2, result.authors.size
-    assert_equal 'Artificial Intelligence Applications and Innovations 339:37-44,Springer Berlin Heidelberg', result.citation
-    last_names = %w(Devetyarov Nouretdinov)
-    result.authors.each do |auth|
-      assert last_names.include? auth.last_name
+    VCR.use_cassette('doi/doi_crossref_book_chapter_response_3') do
+      result = Seek::Doi::Parser.parse('10.1007/978-3-642-16239-8_8')
+      puts result.inspect
+      assert_equal 'book-chapter', result.type
+      assert_equal 'Prediction with Confidence Based on a Random Forest Classifier', result.title
+      assert_equal 2, result.authors.size
+      assert_equal 'In: Artificial Intelligence Applications and Innovations. Springer Berlin Heidelberg, Berlin, Heidelberg, pp 37-44', result.citation
+      last_names = %w(Devetyarov Nouretdinov)
+      result.authors.each do |auth|
+        assert last_names.include? auth.last_name
+      end
+
+      assert_equal 'Artificial Intelligence Applications and Innovations', result.journal
+      assert_equal '2010-01-01', result.date_published
+      assert_equal '10.1007/978-3-642-16239-8_8', result.doi
+      assert_nil result.error
+
     end
 
-    assert_equal 'Artificial Intelligence Applications and Innovations', result.journal
-    assert_equal Date.parse('1 Jan 2010'), result.date_published
-    assert_equal '10.1007/978-3-642-16239-8_8', result.doi
-    assert_nil result.error
   end
 
   test 'doi with not resolvable error' do
@@ -263,12 +266,11 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'editor should not be author' do
-    VCR.use_cassette('doi/cross_ref7') do
+    VCR.use_cassette('doi/cross_ref8') do
       result = Seek::Doi::Parser.parse('10.1371/journal.pcbi.1002352')
       assert result.error.nil?, 'There should not be an error'
       assert !result.authors.collect(&:last_name).include?('Papin')
       assert_equal 6, result.authors.size
-      puts result.authors.inspect
       assert_nil result.error
     end
   end

@@ -1003,7 +1003,8 @@ class PublicationsControllerTest < ActionController::TestCase
     end
     publication.reload
     joined_original_authors = original_authors.join(', ')
-    VCR.use_cassette('doi/cross_ref5') do
+
+    VCR.use_cassette('doi/cross_ref7') do
       get :show, params: { id: publication.id }
     end
     assert @response.body.include?(joined_original_authors)

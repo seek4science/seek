@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 20 Oct 2025 15:32:58 GMT
+      - Wed, 22 Oct 2025 17:48:52 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=70szkxSdgZN4ev%2FQBWDYCjlUZcT6zy7cLStWQv69UtTYdINkabE1MGGh%2FsWrzSJWypWLZOsvXIDAaEFi0vpz3XyQMbQ0VA%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=MmBqzFFblEmnNYNSyNv0z%2BYfyzSfUBKs2UpHhfN2D1hi8LvNenAixxukVrMRYdrT4239xITE435%2B%2FAjF0YRZdGLlDUyZrHTOUsZihKFbWtAC2Q%3D%3D"}]}'
       Cf-Ray:
-      - 9919922acfe78f39-FRA
+      - 992ad3f96d2c89d8-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,73 +54,18 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Mon, 20 Oct 2025 15:32:58 GMT
+  recorded_at: Wed, 22 Oct 2025 17:48:52 GMT
 - request:
     method: get
-    uri: https://doi.org/10.1038/s41586-020-2649-2
+    uri: https://api.crossref.org/works/10.1038/s41586-020-2649-2
     body:
       encoding: US-ASCII
       string: ''
     headers:
-      Accept:
-      - application/vnd.citationstyles.csl+json
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      User-Agent:
-      - Ruby
-  response:
-    status:
-      code: 302
-      message: Found
-    headers:
-      Date:
-      - Mon, 20 Oct 2025 15:32:58 GMT
-      Content-Type:
-      - text/html;charset=utf-8
-      Transfer-Encoding:
-      - chunked
-      Connection:
-      - keep-alive
-      Location:
-      - https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform
-      Server:
-      - cloudflare
-      Vary:
-      - Accept
-      - Origin
-      Expires:
-      - Mon, 20 Oct 2025 15:49:21 GMT
-      Permissions-Policy:
-      - interest-cohort=(),browsing-topics=()
-      Cf-Cache-Status:
-      - DYNAMIC
-      Nel:
-      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
-      Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=C7hyK%2FMVyN82Z5pwqKz1xZzvRSfw01ZpsbxcIIm0bwkGmlrtai2wWgqlKx%2BXuKj56z%2F5o90lhc3anIwTgletOcDgHERTDA%3D%3D"}]}'
-      Cf-Ray:
-      - 9919922b79ba9729-FRA
-      Alt-Svc:
-      - h3=":443"; ma=86400
-    body:
-      encoding: UTF-8
-      string: |-
-        <html><head><title>Handle Redirect</title></head>
-        <body><a href="https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform">https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform</a></body></html>
-  recorded_at: Mon, 20 Oct 2025 15:32:58 GMT
-- request:
-    method: get
-    uri: https://api.crossref.org/v1/works/10.1038%2Fs41586-020-2649-2/transform
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
       Accept:
-      - application/vnd.citationstyles.csl+json
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      - "*/*"
       User-Agent:
       - Ruby
   response:
@@ -129,15 +74,13 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 20 Oct 2025 15:32:59 GMT
+      - Wed, 22 Oct 2025 17:48:52 GMT
       Content-Type:
-      - application/vnd.citationstyles.csl+json
+      - application/json
       Content-Length:
-      - '24456'
+      - '24627'
       Connection:
       - keep-alive
-      Vary:
-      - Accept, Accept-Encoding
       Access-Control-Expose-Headers:
       - Link
       Access-Control-Allow-Headers:
@@ -145,6 +88,8 @@ http_interactions:
         Accept-Ranges, Cache-Control
       Access-Control-Allow-Origin:
       - "*"
+      Vary:
+      - Accept-Encoding
       Server:
       - Jetty(9.4.40.v20210413)
       X-Rate-Limit-Limit:
@@ -157,8 +102,8 @@ http_interactions:
       - interest-cohort=()
     body:
       encoding: ASCII-8BIT
-      string: '{"indexed":{"date-parts":[[2025,10,20]],"date-time":"2025-10-20T10:27:39Z","timestamp":1760956059626,"version":"3.41.0"},"reference-count":57,"publisher":"Springer
-        Science and Business Media LLC","issue":"7825","license":[{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"published-print":{"date-parts":[[2020,9,17]]},"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Array
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,22]],"date-time":"2025-10-22T17:25:40Z","timestamp":1761153940800,"version":"3.41.0"},"reference-count":57,"publisher":"Springer
+        Science and Business Media LLC","issue":"7825","license":[{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nature"],"published-print":{"date-parts":[[2020,9,17]]},"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Array
         programming provides a powerful, compact and expressive syntax for accessing,
         manipulating and operating on data in vectors, matrices and higher-dimensional
         arrays. NumPy is the primary array programming library for the Python language.
@@ -175,8 +120,8 @@ http_interactions:
         to its central position in the ecosystem, NumPy increasingly acts as an interoperability
         layer between such array computation libraries and, together with its application
         programming interface (API), provides a flexible framework to support the
-        next decade of scientific and industrial analysis.<\/jats:p>","DOI":"10.1038\/s41586-020-2649-2","type":"journal-article","created":{"date-parts":[[2020,9,17]],"date-time":"2020-09-17T20:48:17Z","timestamp":1600375697000},"page":"357-362","update-policy":"https:\/\/doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":17946,"title":"Array
-        programming with NumPy","prefix":"10.1038","volume":"585","author":[{"given":"Charles
+        next decade of scientific and industrial analysis.<\/jats:p>","DOI":"10.1038\/s41586-020-2649-2","type":"journal-article","created":{"date-parts":[[2020,9,17]],"date-time":"2020-09-17T20:48:17Z","timestamp":1600375697000},"page":"357-362","update-policy":"https:\/\/doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":17989,"title":["Array
+        programming with NumPy"],"prefix":"10.1038","volume":"585","author":[{"given":"Charles
         R.","family":"Harris","sequence":"first","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-5263-5070","authenticated-orcid":false,"given":"K.
         Jarrod","family":"Millman","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0001-9276-1891","authenticated-orcid":false,"given":"St\u00e9fan
         J.","family":"van der Walt","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-0300-3333","authenticated-orcid":false,"given":"Ralf","family":"Gommers","sequence":"additional","affiliation":[]},{"given":"Pauli","family":"Virtanen","sequence":"additional","affiliation":[]},{"given":"David","family":"Cournapeau","sequence":"additional","affiliation":[]},{"given":"Eric","family":"Wieser","sequence":"additional","affiliation":[]},{"given":"Julian","family":"Taylor","sequence":"additional","affiliation":[]},{"given":"Sebastian","family":"Berg","sequence":"additional","affiliation":[]},{"given":"Nathaniel
@@ -350,12 +295,12 @@ http_interactions:
         59, 65\u201398 (2017).","journal-title":"SIAM Rev."},{"key":"2649_CR57","unstructured":"Lattner,
         C. & Adve, V. LLVM: a compilation framework for lifelong program analysis
         and transformation. In Proc. 2004 Intl Symp. Code Generation and Optimization
-        (CGO\u201904) 75\u201388 (IEEE, 2004)."}],"container-title":"Nature","original-title":[],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,8,14]],"date-time":"2024-08-14T02:15:12Z","timestamp":1723601712000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2020,9,16]]},"references-count":57,"journal-issue":{"issue":"7825","published-print":{"date-parts":[[2020,9,17]]}},"alternative-id":["2649"],"URL":"http:\/\/dx.doi.org\/10.1038\/s41586-020-2649-2","relation":{"has-part":[{"id-type":"doi","id":"10.5194\/os-17-997-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/acp-21-18557-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/bg-18-6329-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/amt-17-4891-2024","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/se-14-859-2023","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/amt-18-2481-2025","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/jsss-12-163-2023","asserted-by":"object"}],"has-review":[{"id-type":"doi","id":"10.14293\/S2199-1006.1.SOR-UNCAT.A7759461.v1.RAUGFI","asserted-by":"object"},{"id-type":"doi","id":"10.3410\/f.738677898.793581450","asserted-by":"object"}]},"ISSN":["0028-0836","1476-4687"],"subject":[],"container-title-short":"Nature","published":{"date-parts":[[2020,9,16]]},"assertion":[{"value":"21
+        (CGO\u201904) 75\u201388 (IEEE, 2004)."}],"container-title":["Nature"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,8,14]],"date-time":"2024-08-14T02:15:12Z","timestamp":1723601712000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s41586-020-2649-2"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2020,9,16]]},"references-count":57,"journal-issue":{"issue":"7825","published-print":{"date-parts":[[2020,9,17]]}},"alternative-id":["2649"],"URL":"https:\/\/doi.org\/10.1038\/s41586-020-2649-2","relation":{"has-part":[{"id-type":"doi","id":"10.5194\/os-17-997-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/acp-21-18557-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/bg-18-6329-2021","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/amt-17-4891-2024","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/se-14-859-2023","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/amt-18-2481-2025","asserted-by":"object"},{"id-type":"doi","id":"10.5194\/jsss-12-163-2023","asserted-by":"object"}],"has-review":[{"id-type":"doi","id":"10.14293\/S2199-1006.1.SOR-UNCAT.A7759461.v1.RAUGFI","asserted-by":"object"},{"id-type":"doi","id":"10.3410\/f.738677898.793581450","asserted-by":"object"}]},"ISSN":["0028-0836","1476-4687"],"issn-type":[{"type":"print","value":"0028-0836"},{"type":"electronic","value":"1476-4687"}],"subject":[],"published":{"date-parts":[[2020,9,16]]},"assertion":[{"value":"21
         February 2020","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
         History"}},{"value":"17 June 2020","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
         History"}},{"value":"16 September 2020","order":3,"name":"first_online","label":"First
         Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"The
         authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
-        interests"}}]}'
-  recorded_at: Mon, 20 Oct 2025 15:32:59 GMT
+        interests"}}]}}'
+  recorded_at: Wed, 22 Oct 2025 17:48:52 GMT
 recorded_with: VCR 6.3.1

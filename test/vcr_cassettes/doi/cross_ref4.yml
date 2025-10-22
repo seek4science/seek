@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 21 Oct 2025 07:53:38 GMT
+      - Wed, 22 Oct 2025 17:49:17 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=bvcUYsal6BT4OvUClExwq1Ek9yanOZrfvImmZLZG4FxGCtfONM3iTia9hq1FqF3jn09NRr0NulVaAqbR7O1SjFHgevFoFw%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=YcIhYLTVrjZ8lAirpV1BI5WHWHpfKhekQIwPPvO8pmcPofA7DNQpMA4djma1LPZtRR4vNI0E7VOGZnc6aLeknGgxz3%2Fbpug8cM7JESOlcEyrTg%3D%3D"}]}'
       Cf-Ray:
-      - 991f2eafbec12bb7-STR
+      - 992ad496bde39f4c-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,73 +54,18 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Tue, 21 Oct 2025 07:53:38 GMT
+  recorded_at: Wed, 22 Oct 2025 17:49:17 GMT
 - request:
     method: get
-    uri: https://doi.org/10.1371/journal.pone.0004803
+    uri: https://api.crossref.org/works/10.1371/journal.pone.0004803
     body:
       encoding: US-ASCII
       string: ''
     headers:
-      Accept:
-      - application/vnd.citationstyles.csl+json
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      User-Agent:
-      - Ruby
-  response:
-    status:
-      code: 302
-      message: Found
-    headers:
-      Date:
-      - Tue, 21 Oct 2025 07:53:38 GMT
-      Content-Type:
-      - text/html;charset=utf-8
-      Transfer-Encoding:
-      - chunked
-      Connection:
-      - keep-alive
-      Location:
-      - https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform
-      Server:
-      - cloudflare
-      Vary:
-      - Accept
-      - Origin
-      Expires:
-      - Tue, 21 Oct 2025 08:49:22 GMT
-      Permissions-Policy:
-      - interest-cohort=(),browsing-topics=()
-      Cf-Cache-Status:
-      - DYNAMIC
-      Nel:
-      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
-      Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Sr4fiwehvxSLeUhKGqPrj2geOHkrl09xtLlCSWCBtgyq%2FT6T%2BM12N3L5V%2FleeOF2O0EBovCVN3sOYm5rlgBfRXu6gs8rbg%3D%3D"}]}'
-      Cf-Ray:
-      - 991f2eb02f4f2bb7-STR
-      Alt-Svc:
-      - h3=":443"; ma=86400
-    body:
-      encoding: UTF-8
-      string: |-
-        <html><head><title>Handle Redirect</title></head>
-        <body><a href="https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform">https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform</a></body></html>
-  recorded_at: Tue, 21 Oct 2025 07:53:38 GMT
-- request:
-    method: get
-    uri: https://api.crossref.org/v1/works/10.1371%2Fjournal.pone.0004803/transform
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
       Accept:
-      - application/vnd.citationstyles.csl+json
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      - "*/*"
       User-Agent:
       - Ruby
   response:
@@ -129,15 +74,13 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 21 Oct 2025 07:53:39 GMT
+      - Wed, 22 Oct 2025 17:49:17 GMT
       Content-Type:
-      - application/vnd.citationstyles.csl+json
+      - application/json
       Content-Length:
-      - '9973'
+      - '10107'
       Connection:
       - keep-alive
-      Vary:
-      - Accept, Accept-Encoding
       Access-Control-Expose-Headers:
       - Link
       Access-Control-Allow-Headers:
@@ -145,6 +88,8 @@ http_interactions:
         Accept-Ranges, Cache-Control
       Access-Control-Allow-Origin:
       - "*"
+      Vary:
+      - Accept-Encoding
       Server:
       - Jetty(9.4.40.v20210413)
       X-Rate-Limit-Limit:
@@ -157,9 +102,10 @@ http_interactions:
       - interest-cohort=()
     body:
       encoding: ASCII-8BIT
-      string: '{"indexed":{"date-parts":[[2025,10,8]],"date-time":"2025-10-08T22:47:24Z","timestamp":1759963644547},"reference-count":31,"publisher":"Public
-        Library of Science (PLoS)","issue":"3","license":[{"start":{"date-parts":[[2009,3,11]],"date-time":"2009-03-11T00:00:00Z","timestamp":1236729600000},"content-version":"unspecified","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/publicdomain\/zero\/1.0\/"}],"content-domain":{"domain":["www.plosone.org"],"crossmark-restriction":false},"DOI":"10.1371\/journal.pone.0004803","type":"journal-article","created":{"date-parts":[[2009,3,10]],"date-time":"2009-03-10T12:23:18Z","timestamp":1236687798000},"page":"e4803","update-policy":"http:\/\/dx.doi.org\/10.1371\/journal.pone.corrections_policy","source":"Crossref","is-referenced-by-count":135,"title":"Clickstream
-        Data Yields High-Resolution Maps of Science","prefix":"10.1371","volume":"4","author":[{"given":"Johan","family":"Bollen","sequence":"first","affiliation":[]},{"given":"Herbert","family":"Van
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,8]],"date-time":"2025-10-08T22:47:24Z","timestamp":1759963644547},"reference-count":31,"publisher":"Public
+        Library of Science (PLoS)","issue":"3","license":[{"start":{"date-parts":[[2009,3,11]],"date-time":"2009-03-11T00:00:00Z","timestamp":1236729600000},"content-version":"unspecified","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/publicdomain\/zero\/1.0\/"}],"content-domain":{"domain":["www.plosone.org"],"crossmark-restriction":false},"short-container-title":["PLoS
+        ONE"],"DOI":"10.1371\/journal.pone.0004803","type":"journal-article","created":{"date-parts":[[2009,3,10]],"date-time":"2009-03-10T12:23:18Z","timestamp":1236687798000},"page":"e4803","update-policy":"http:\/\/dx.doi.org\/10.1371\/journal.pone.corrections_policy","source":"Crossref","is-referenced-by-count":135,"title":["Clickstream
+        Data Yields High-Resolution Maps of Science"],"prefix":"10.1371","volume":"4","author":[{"given":"Johan","family":"Bollen","sequence":"first","affiliation":[]},{"given":"Herbert","family":"Van
         de Sompel","sequence":"additional","affiliation":[]},{"given":"Aric","family":"Hagberg","sequence":"additional","affiliation":[]},{"given":"Luis","family":"Bettencourt","sequence":"additional","affiliation":[]},{"given":"Ryan","family":"Chute","sequence":"additional","affiliation":[]},{"given":"Marko
         A.","family":"Rodriguez","sequence":"additional","affiliation":[]},{"given":"Lyudmila","family":"Balakireva","sequence":"additional","affiliation":[]}],"member":"340","published-online":{"date-parts":[[2009,3,11]]},"reference":[{"key":"ref1","doi-asserted-by":"crossref","first-page":"669","DOI":"10.1038\/227669a0","article-title":"Citation
         indexing for studying science.","volume":"227","author":"E Garfield","year":"1970","journal-title":"Nature"},{"key":"ref2","doi-asserted-by":"crossref","first-page":"764","DOI":"10.1002\/asi.10066","article-title":"Domain
@@ -220,8 +166,7 @@ http_interactions:
         modeling of the emergence and development of scientific fields.","author":"LMA
         Bettencourt","year":"2008","journal-title":"Scientometrics"},{"key":"ref31","doi-asserted-by":"crossref","first-page":"263","DOI":"10.1002\/ejsp.2420150303","article-title":"Methods
         of coping with social desirability bias - A review.","volume":"15","author":"AJ
-        Nederhof","year":"1985","journal-title":"European Journal of Social Psychology"}],"container-title":"PLoS
-        ONE","original-title":[],"language":"en","link":[{"URL":"http:\/\/dx.plos.org\/10.1371\/journal.pone.0004803","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2019,5,18]],"date-time":"2019-05-18T11:34:18Z","timestamp":1558179258000},"score":1,"resource":{"primary":{"URL":"https:\/\/dx.plos.org\/10.1371\/journal.pone.0004803"}},"subtitle":[],"editor":[{"given":"Alan","family":"Ruttenberg","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2009,3,11]]},"references-count":31,"journal-issue":{"issue":"3","published-online":{"date-parts":[[2009,3,11]]}},"URL":"http:\/\/dx.doi.org\/10.1371\/journal.pone.0004803","relation":{},"ISSN":["1932-6203"],"subject":[],"container-title-short":"PLoS
-        ONE","published":{"date-parts":[[2009,3,11]]}}'
-  recorded_at: Tue, 21 Oct 2025 07:53:39 GMT
+        Nederhof","year":"1985","journal-title":"European Journal of Social Psychology"}],"container-title":["PLoS
+        ONE"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/dx.plos.org\/10.1371\/journal.pone.0004803","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2019,5,18]],"date-time":"2019-05-18T11:34:18Z","timestamp":1558179258000},"score":1,"resource":{"primary":{"URL":"https:\/\/dx.plos.org\/10.1371\/journal.pone.0004803"}},"subtitle":[],"editor":[{"given":"Alan","family":"Ruttenberg","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2009,3,11]]},"references-count":31,"journal-issue":{"issue":"3","published-online":{"date-parts":[[2009,3,11]]}},"URL":"https:\/\/doi.org\/10.1371\/journal.pone.0004803","relation":{},"ISSN":["1932-6203"],"issn-type":[{"value":"1932-6203","type":"electronic"}],"subject":[],"published":{"date-parts":[[2009,3,11]]}}}'
+  recorded_at: Wed, 22 Oct 2025 17:49:17 GMT
 recorded_with: VCR 6.3.1
