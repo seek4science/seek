@@ -26,7 +26,7 @@ module Seek
             booktitle: raw[:booktitle],
             publisher: raw[:publisher],
             url: raw[:url],
-            page:raw[:page]
+            page: raw[:page]
           }.compact
         end
       end

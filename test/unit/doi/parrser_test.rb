@@ -28,8 +28,8 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
   end
 
   # === JOURNAL ===
-  test 'returns parsed Journal article DOI (crossref)' do
-    VCR.use_cassette('doi/doi_crossref_journal_article_response') do
+  test 'returns parsed Journal article DOI (crossref)_1' do
+    VCR.use_cassette('doi/doi_crossref_journal_article_response_1') do
       doi = '10.1038/s41586-020-2649-2'
       result = Seek::Doi::Parser.parse(doi)
       assert_equal result.title,'Array programming with NumPy'
@@ -42,6 +42,29 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal result.authors.first.full_name, 'Charles R. Harris'
       assert_equal result[:citation], 'Nature 585(7825):357-362'
       assert_equal result.url, 'https://doi.org/10.1038/s41586-020-2649-2'
+    end
+  end
+
+  test 'returns parsed Journal article DOI (crossref)_2' do
+    VCR.use_cassette('doi/doi_crossref_journal_article_response_2') do
+      doi = '10.1021/acs.jcim.5c01488'
+      result = Seek::Doi::Parser.parse(doi)
+
+      assert_equal 'journal-article', result.type
+      assert_equal 'A Multiscale Simulation Approach to Compute Protein–Ligand Association Rate Constants by Combining Brownian Dynamics and Molecular Dynamics', result.title
+      assert_equal doi, result.doi
+      assert_nil result.abstract
+      assert_equal 'Abraham Muñiz-Chicharro', result.authors[0].full_name
+      assert_equal 'Gaurav K. Ganotra', result.authors[1].full_name
+      assert_equal 'Rebecca C. Wade', result.authors[2].full_name
+      assert_empty result.editors
+      assert_equal 'American Chemical Society (ACS)', result.publisher
+      assert_equal '2025-10-04', result.date_published
+      assert_equal 'Journal of Chemical Information and Modeling', result.booktitle
+      assert_equal 'Journal of Chemical Information and Modeling', result.journal
+      assert_equal 'https://doi.org/10.1021/acs.jcim.5c01488', result.url
+      assert_equal 'J. Chem. Inf. Model.:acs.jcim.5c01488', result.citation
+
     end
   end
 

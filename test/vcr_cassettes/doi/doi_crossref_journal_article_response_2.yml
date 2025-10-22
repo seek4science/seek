@@ -1,0 +1,131 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1021
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 19:43:17 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Fx9%2BFeZsjRSQiaMZWq6egymYz8X%2FWQbDFlSl6Y96ZtPuO8fofjPTOTrZP6ApaBcpswCBRuSMbnHibCjRPP0UhiAYnBpZ4PzpIPfATa1QSTaylw%3D%3D"}]}'
+      Cf-Ray:
+      - 992b7b94e95fd9d6-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1021",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Wed, 22 Oct 2025 19:43:17 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.1021/acs.jcim.5c01488
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 22 Oct 2025 19:43:17 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '8594'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,5]],"date-time":"2025-10-05T00:39:41Z","timestamp":1759624781901,"version":"build-2065373602"},"reference-count":54,"publisher":"American
+        Chemical Society (ACS)","license":[{"start":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T00:00:00Z","timestamp":1759536000000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by-nc-nd\/4.0\/"}],"funder":[{"DOI":"10.13039\/501100001659","name":"Deutsche
+        Forschungsgemeinschaft","doi-asserted-by":"publisher","award":["INST 35\/1597-
+        1 FUGG"],"id":[{"id":"10.13039\/501100001659","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/501100007316","name":"Klaus
+        Tschira Stiftung","doi-asserted-by":"publisher","id":[{"id":"10.13039\/501100007316","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["J.
+        Chem. Inf. Model."],"DOI":"10.1021\/acs.jcim.5c01488","type":"journal-article","created":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T13:01:23Z","timestamp":1759582883000},"source":"Crossref","is-referenced-by-count":0,"title":["A
+        Multiscale Simulation Approach to Compute Protein\u2013Ligand Association
+        Rate Constants by Combining Brownian Dynamics and Molecular Dynamics"],"prefix":"10.1021","author":[{"ORCID":"https:\/\/orcid.org\/0000-0002-2598-7687","authenticated-orcid":true,"given":"Abraham","family":"Mu\u00f1iz-Chicharro","sequence":"first","affiliation":[{"name":"Molecular
+        and Cellular Modeling Group","place":["Heidelberg, Germany"]},{"name":"Heidelberg
+        Institute for Theoretical Studies (HITS)","place":["Heidelberg, Germany"]}]},{"given":"Gaurav
+        K.","family":"Ganotra","sequence":"additional","affiliation":[{"name":"Molecular
+        and Cellular Modeling Group","place":["Heidelberg, Germany"]},{"name":"Heidelberg
+        Institute for Theoretical Studies (HITS)","place":["Heidelberg, Germany"]}]},{"ORCID":"https:\/\/orcid.org\/0000-0001-5951-8670","authenticated-orcid":true,"given":"Rebecca
+        C.","family":"Wade","sequence":"additional","affiliation":[{"name":"Molecular
+        and Cellular Modeling Group","place":["Heidelberg, Germany"]},{"name":"Heidelberg
+        Institute for Theoretical Studies (HITS)","place":["Heidelberg, Germany"]},{"name":"Faculties
+        of Engineering Sciences and Biosciences, Center for Molecular Biology of Heidelberg
+        University (ZMBH), DKFZ-ZMBH Alliance, and Interdisciplinary Center for Scientific
+        Computing (IWR)","place":["Heidelberg, Germany"]},{"name":"Heidelberg University","place":["Heidelberg,
+        Germany"]}]}],"member":"316","published-online":{"date-parts":[[2025,10,4]]},"reference":[{"key":"ref1\/cit1","doi-asserted-by":"publisher","DOI":"10.1038\/nrd2082"},{"key":"ref2\/cit2","doi-asserted-by":"publisher","DOI":"10.1021\/acs.jmedchem.5b01684"},{"key":"ref3\/cit3","doi-asserted-by":"publisher","DOI":"10.1039\/C6MD00581K"},{"key":"ref4\/cit4","doi-asserted-by":"publisher","DOI":"10.1063\/1.446900"},{"key":"ref5\/cit5","doi-asserted-by":"publisher","DOI":"10.1002\/wcms.1649"},{"key":"ref6\/cit6","doi-asserted-by":"publisher","DOI":"10.1016\/j.bbagen.2024.130740"},{"key":"ref7\/cit7","doi-asserted-by":"publisher","DOI":"10.1038\/358347a0"},{"key":"ref8\/cit8","doi-asserted-by":"publisher","DOI":"10.1042\/bst0240254"},{"key":"ref9\/cit9","doi-asserted-by":"publisher","DOI":"10.1038\/nsb0194-65"},{"key":"ref10\/cit10","doi-asserted-by":"publisher","DOI":"10.1002\/(SICI)1097-0134(19980601)31:4<406::AID-PROT7>3.0.CO;2-F"},{"key":"ref11\/cit11","doi-asserted-by":"publisher","DOI":"10.1021\/acs.jpcb.6b02236"},{"key":"ref12\/cit12","doi-asserted-by":"publisher","DOI":"10.1006\/meth.1998.0588"},{"key":"ref13\/cit13","doi-asserted-by":"publisher","DOI":"10.1006\/jmbi.1999.2919"},{"key":"ref14\/cit14","doi-asserted-by":"publisher","DOI":"10.1006\/jmbi.2000.4404"},{"key":"ref15\/cit15","doi-asserted-by":"publisher","DOI":"10.1529\/biophysj.105.074575"},{"key":"ref16\/cit16","doi-asserted-by":"publisher","DOI":"10.1021\/acs.jctc.1c00673"},{"key":"ref17\/cit17","doi-asserted-by":"publisher","DOI":"10.1021\/ja00078a027"},{"key":"ref18\/cit18","doi-asserted-by":"publisher","DOI":"10.1021\/acs.jpcb.6b09388"},{"key":"ref19\/cit19","doi-asserted-by":"publisher","DOI":"10.1021\/ja00721a051"},{"key":"ref20\/cit20","doi-asserted-by":"publisher","DOI":"10.1021\/acs.jctc.7b00631"},{"key":"ref21\/cit21","doi-asserted-by":"publisher","DOI":"10.1038\/nature06956"},{"key":"ref22\/cit22","doi-asserted-by":"publisher","DOI":"10.1063\/1.5020294"},{"key":"ref23\/cit23","doi-asserted-by":"publisher","DOI":"10.1093\/nar\/28.1.235"},{"key":"ref24\/cit24","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-018-05769-2"},{"key":"ref25\/cit25","doi-asserted-by":"publisher","DOI":"10.1107\/S0907444913009050"},{"key":"ref26\/cit26","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0908485106"},{"key":"ref27\/cit27","doi-asserted-by":"publisher","DOI":"10.1002\/anie.201801666"},{"key":"ref28\/cit28","doi-asserted-by":"publisher","DOI":"10.1006\/jmbi.1993.1441"},{"key":"ref29\/cit29","doi-asserted-by":"publisher","DOI":"10.1021\/jm070245n"},{"key":"ref30\/cit30","doi-asserted-by":"publisher","DOI":"10.1160\/TH14-10-0877"},{"key":"ref31\/cit31","doi-asserted-by":"publisher","DOI":"10.1021\/jm050101d"},{"key":"ref32\/cit32","doi-asserted-by":"publisher","DOI":"10.1038\/nature05114"},{"key":"ref33\/cit33","doi-asserted-by":"publisher","DOI":"10.1007\/s10822-013-9644-8"},{"key":"ref34\/cit34","doi-asserted-by":"publisher","DOI":"10.1002\/pro.3280"},{"key":"ref35\/cit35","doi-asserted-by":"publisher","DOI":"10.1016\/S0065-3233(03)66002-X"},{"key":"ref36\/cit36","doi-asserted-by":"publisher","DOI":"10.1021\/acs.jctc.1c00302"},{"key":"ref37\/cit37","unstructured":"Ganotra,
+        G. K. Computational studies of drug-binding kinetics. 2020."},{"key":"ref38\/cit38","doi-asserted-by":"publisher","DOI":"10.1063\/5.0005188"},{"key":"ref39\/cit39","doi-asserted-by":"publisher","DOI":"10.1002\/jcc.20290"},{"key":"ref40\/cit40","doi-asserted-by":"publisher","DOI":"10.1002\/jcc.23971"},{"key":"ref41\/cit41","doi-asserted-by":"publisher","DOI":"10.1021\/jp953109f"},{"key":"ref42\/cit42","doi-asserted-by":"publisher","DOI":"10.1016\/S0006-3495(00)76630-6"},{"key":"ref43\/cit43","doi-asserted-by":"publisher","DOI":"10.1016\/j.isci.2022.105088"},{"key":"ref44\/cit44","doi-asserted-by":"publisher","DOI":"10.1021\/acs.jctc.9b00591"},{"key":"ref45\/cit45","doi-asserted-by":"publisher","DOI":"10.1016\/j.jmgm.2005.12.005"},{"key":"ref46\/cit46","doi-asserted-by":"publisher","DOI":"10.1063\/1.445869"},{"key":"ref47\/cit47","doi-asserted-by":"publisher","DOI":"10.1016\/0021-9991(77)90098-5"},{"key":"ref48\/cit48","unstructured":"Mu\u00f1iz-Chicharro,
+        A.; Chernova, E.; Ganotra, G. K.; Wade, R. C. SDAMD: a multiscale workflow
+        to compute protein-ligand binding association rate constants using Brownian
+        dynamics and molecular dynamics simulations. Manuscript submitted."},{"key":"ref49\/cit49","doi-asserted-by":"publisher","DOI":"10.1371\/journal.pcbi.1000939"},{"key":"ref50\/cit50","doi-asserted-by":"publisher","DOI":"10.1002\/jcc.21836"},{"key":"ref51\/cit51","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.1103547108"},{"key":"ref52\/cit52","doi-asserted-by":"publisher","DOI":"10.3389\/fmolb.2022.922361"},{"key":"ref53\/cit53","doi-asserted-by":"publisher","DOI":"10.1007\/s11239-013-0991-z"},{"key":"ref54\/cit54","doi-asserted-by":"publisher","DOI":"10.32607\/20758251-2009-1-2-26-32"}],"container-title":["Journal
+        of Chemical Information and Modeling"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"application\/pdf","content-version":"vor","intended-application":"unspecified"},{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T13:24:27Z","timestamp":1759584267000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.acs.org\/doi\/10.1021\/acs.jcim.5c01488"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2025,10,4]]},"references-count":54,"alternative-id":["10.1021\/acs.jcim.5c01488"],"URL":"https:\/\/doi.org\/10.1021\/acs.jcim.5c01488","relation":{},"ISSN":["1549-9596","1549-960X"],"issn-type":[{"value":"1549-9596","type":"print"},{"value":"1549-960X","type":"electronic"}],"subject":[],"published":{"date-parts":[[2025,10,4]]},"article-number":"acs.jcim.5c01488"}}'
+  recorded_at: Wed, 22 Oct 2025 19:43:17 GMT
+recorded_with: VCR 6.3.1

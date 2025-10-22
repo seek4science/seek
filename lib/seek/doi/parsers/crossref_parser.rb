@@ -40,6 +40,7 @@ module Seek
             abstract: clean_abstract(data['abstract']),
             date_published: extract_date(data)&.to_s,
             journal: Array(data['container-title']).last,
+            short_journal_title: Array(data['short-container-title']).last,
             doi: data['DOI'],
             publisher: data['publisher'],
             booktitle: data['container-title'].last,
@@ -49,7 +50,8 @@ module Seek
             volume: data['volume'],
             issue: data['issue'],
             page: data['page'],
-            publisher_location: data['publisher-location']
+            publisher_location: data['publisher-location'],
+            article_number: data['article-number']
           }
         end
 
@@ -134,22 +136,20 @@ module Seek
 
 
         def format_crossref_journal_citation(data)
-          journal = data[:journal]
-          volume = data[:volume]
-          issue = data[:issue]
-          pages = data[:page]
+          journal = data[:short_journal_title].presence || data[:journal]
+          volume  = data[:volume].presence
+          issue   = data[:issue].presence
+          pages   = data[:page].presence
+          article = data[:article_number].presence
 
-          # Build the journal/volume/issue/pages string like "Nature 585(7825):357-362"
-          journal_part = [journal.presence, volume.presence].compact.join(' ')
-          journal_part += "(#{issue})" if issue.present?
-          journal_part += ":#{pages}" if pages.present?
+          # Build the core part: "Journal 585(7825):357–362" or "J Chem Inf Model:acs.jcim.5c01488"
+          parts = [journal, volume].compact.join(' ')
+          parts += "(#{issue})" if issue
+          parts += ":#{pages || article}" if pages || article
 
-          parts = []
-
-          parts << journal_part if journal_part.present?
-
-          parts.compact.join(' ').squish
+          parts.squish
         end
+
 
         def format_crossref_proceedings_article_citation(metadata)
 
