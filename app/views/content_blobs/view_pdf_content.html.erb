@@ -18,7 +18,8 @@ limitations under the License.
 <!--
  This file has been modified
 -->
-
+<%= stylesheet_link_tag 'pdfjs/viewer'%>
+<%= javascript_include_tag 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.149/pdf.min.mjs', type: :module %>' %>
 
 
 <html dir="ltr">
@@ -27,9 +28,6 @@ limitations under the License.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <style id="PDFJS_FONT_STYLE_TAG"></style>
-
-  <%= stylesheet_link_tag 'pdfjs/viewer'%>
-  <%= javascript_include_tag 'pdfjs/compatibility', 'pdfjs/debugger', 'pdfjs/l10n', 'pdfjs/pdf', 'pdfjs/viewer' %>
 
   <script type="text/javascript">
       DEFAULT_URL = '<%= @pdf_url.html_safe %>'

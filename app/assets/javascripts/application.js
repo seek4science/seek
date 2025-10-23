@@ -1,4 +1,5 @@
 // ...
+
 //= require jquery
 //= require jquery_ujs
 //= require jquery.remotipart
@@ -47,7 +48,7 @@
 //= require cytoscape.js-2.5.0/cytoscape
 //= require cytoscape_isa_graph
 //= require bives
-//= require asset_report
+//= require asset_reprt
 //= require uri
 //= require chartjs
 //= require lightbox2
