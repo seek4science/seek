@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 17:54:44 GMT
+      - Thu, 23 Oct 2025 08:42:51 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=oZ%2BFeR9KAlEEnUME4lrk68q4Xi%2FJL%2BiemwCJq%2BmsmiU0I94Jsfqqd%2FA7V5wKZtfK9%2FQlSxsrgkO%2BYm%2BZLVkRuwBl9LVpxuDN%2F2Qm06ATJ4aIYw%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=d2oVppMh9ZyPTsia9s9yVMLxOIp9zjhtUXoLlDO%2FP8%2BGNkxNVYqblEzJsfXwB2XkD%2FAYkWBv%2Fai7DNtA6W4YdTYGR3sSGA%3D%3D"}]}'
       Cf-Ray:
-      - 992adc929b91d26e-FRA
+      - 992ff1874b792bb7-STR
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 22 Oct 2025 17:54:44 GMT
+  recorded_at: Thu, 23 Oct 2025 08:42:51 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1117/12.2275959
@@ -74,7 +74,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 17:54:44 GMT
+      - Thu, 23 Oct 2025 08:42:51 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -148,5 +148,5 @@ http_interactions:
         Science"}],"event":{"name":"Developments in X-Ray Tomography XI","start":{"date-parts":[[2017,8,6]]},"location":"San
         Diego, United States","end":{"date-parts":[[2017,8,10]]}},"container-title":["Developments
         in X-Ray Tomography XI"],"original-title":[],"deposited":{"date-parts":[[2024,6,27]],"date-time":"2024-06-27T02:25:34Z","timestamp":1719455134000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.spiedigitallibrary.org\/conference-proceedings-of-spie\/10391\/2275959\/The-NOVA-project--maximizing-beam-time-efficiency-through-synergistic\/10.1117\/12.2275959.full"}},"subtitle":[],"editor":[{"given":"Bert","family":"M\u00fcller","sequence":"first","affiliation":[]},{"given":"Ge","family":"Wang","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2017,9,26]]},"references-count":54,"URL":"https:\/\/doi.org\/10.1117\/12.2275959","relation":{},"subject":[],"published":{"date-parts":[[2017,9,26]]}}}'
-  recorded_at: Wed, 22 Oct 2025 17:54:44 GMT
+  recorded_at: Thu, 23 Oct 2025 08:42:51 GMT
 recorded_with: VCR 6.3.1

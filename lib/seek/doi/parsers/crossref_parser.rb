@@ -1,9 +1,10 @@
 #todo error handling/logging
+require 'cgi'
+
 module Seek
   module Doi
     module Parsers
       class CrossrefParser < BaseParser
-        CSL_JSON_HEADERS = { 'Accept' => 'application/vnd.citationstyles.csl+json' }.freeze
         DOI_API_ENDPOINT = 'https://api.crossref.org/works'.freeze
 
         def parse(doi)
@@ -11,8 +12,7 @@ module Seek
           puts "================== Fetching Crossref JSON from URL: =================="
           puts url
 
-          data = JSON.parse(URI.open(url).read)["message"]
-
+          data = decode_html_entities_in_hash(JSON.parse(URI.open(url).read)["message"])
           Rails.logger.info("Crossref JSON data for DOI #{doi}: #{data.inspect}")
 
           metadata = extract_metadata(data)
@@ -23,15 +23,6 @@ module Seek
 
 
         private
-
-        def fetch_csl_json(doi)
-          url = "#{Seek::Doi::Parser::DOI_ENDPOINT}/#{doi}"
-          puts "================== Fetching CSL JSON from URL: #{url} =================="
-          JSON.parse(URI.open(url, CSL_JSON_HEADERS).read)
-        rescue StandardError => e
-          Rails.logger.warn("Failed to fetch CSL JSON for DOI #{doi}: #{e.message}")
-          {}
-        end
 
         def extract_metadata(data)
           {
@@ -50,7 +41,7 @@ module Seek
             volume: data['volume'],
             issue: data['issue'],
             page: data['page'],
-            publisher_location: data['publisher-location'],
+            location: data['publisher-location'] || data['event']&.[]('location'),
             article_number: data['article-number']
           }
         end
@@ -108,31 +99,17 @@ module Seek
         def build_citation(data)
           case data[:type]
           when 'book-chapter'
-            format_crossref_book_chapter_citation(data)
+            format_crossref_in_collection_citation(data)
           when 'book'
             format_crossref_book_citation(data)
           when 'journal-article'
             format_crossref_journal_citation(data)
           when 'proceedings-article'
-            format_crossref_proceedings_article_citation(data)
+            format_crossref_in_collection_citation(data)
           else
             default_citation(data)
           end
         end
-
-        def format_crossref_book_chapter_citation(data)
-
-          editors        = data[:editors]
-          book_title     = data[:booktitle]
-          publisher      = data[:publisher]
-          publisher_location = data[:publisher_location] || ''
-          pages = data[:page]
-          editor_str = editors.blank? ? '' : "#{editors} (eds)"
-          pages_str  = pages.blank? ?  '' : ", pp #{pages}"
-          "In: #{editor_str} #{book_title}. #{publisher}, #{publisher_location}#{pages_str}".squish
-
-        end
-
 
 
         def format_crossref_journal_citation(data)
@@ -151,14 +128,28 @@ module Seek
         end
 
 
-        def format_crossref_proceedings_article_citation(metadata)
+        #book-chapter + proceedings-article
+        def format_crossref_in_collection_citation(data)
+          editors            = data[:editors]
+          book_title         = data[:booktitle]
+          publisher          = data[:publisher]
+          location = data[:location].to_s.strip
+          pages              = data[:page]
+          pages_str =
+            if pages.present?
+              pages.to_s.include?('-') || pages.to_s.include?('–') ? ", pp #{pages}" : ", p #{pages}"
+            else
+              ''
+            end
 
+          "In: #{book_title}. #{publisher}#{", #{location}" if location.present?}#{pages_str}".squish
         end
+
 
         def format_crossref_book_citation(data)
           publisher      = data[:publisher]
-          publisher_location = data[:publisher_location] || ''
-          "#{[publisher, publisher_location.presence].compact.join(', ')}".squish
+          location = data[:location] || ''
+          "#{[publisher, location.presence].compact.join(', ')}".squish
         end
 
         def default_citation(m)
@@ -166,6 +157,20 @@ module Seek
           "#{m[:journal]}. #{year}."
         end
 
+        def decode_html_entities_in_hash(hash)
+          hash.transform_values do |value|
+            case value
+            when String
+              CGI.unescapeHTML(value)
+            when Array
+              value.map { |v| v.is_a?(String) ? CGI.unescapeHTML(v) : v }
+            when Hash
+              decode_html_entities_in_hash(value)
+            else
+              value
+            end
+          end
+        end
 
       end
     end

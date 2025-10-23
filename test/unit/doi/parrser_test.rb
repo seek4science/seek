@@ -28,7 +28,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
   end
 
   # === JOURNAL ===
-  test 'returns parsed Journal article DOI (crossref)_1' do
+  test 'returns parsed journal article DOI (crossref)_1' do
     VCR.use_cassette('doi/doi_crossref_journal_article_response_1') do
       doi = '10.1038/s41586-020-2649-2'
       result = Seek::Doi::Parser.parse(doi)
@@ -45,7 +45,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     end
   end
 
-  test 'returns parsed Journal article DOI (crossref)_2' do
+  test 'returns parsed journal article DOI (crossref)_2' do
     VCR.use_cassette('doi/doi_crossref_journal_article_response_2') do
       doi = '10.1021/acs.jcim.5c01488'
       result = Seek::Doi::Parser.parse(doi)
@@ -70,7 +70,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
 
 
   # === MONOGRAPH ===
-  test 'returns parsed Journal article DOI with editors and subtitle (crossref)' do
+  test 'returns parsed journal article DOI with editors and subtitle (crossref)' do
     VCR.use_cassette('doi/doi_crossref_book_with_editor_subtitle_response') do
       doi = '10.2307/j.ctvn5txvs'
       result = Seek::Doi::Parser.parse(doi)
@@ -90,8 +90,8 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
   end
 
   # === PROCEEDINGS ARTICLE ===
-  test 'returns parsed Proceedings Article DOI (crossref)' do
-    VCR.use_cassette('doi/doi_crossref_proceedings_article_response') do
+  test 'returns parsed proceedings article DOI (crossref)_1' do
+    VCR.use_cassette('doi/doi_crossref_proceedings_article_response_1') do
       doi = '10.1117/12.2275959'
       result = Seek::Doi::Parser.parse(doi)
       assert_equal result.type, 'proceedings-article'
@@ -104,12 +104,58 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal result.publisher, 'SPIE'
       assert_equal result.url, 'https://doi.org/10.1117/12.2275959'
       assert_equal result.date_published, '2017-09-26'
-      #assert_equal result.citation, ''
+      assert_equal result.citation, 'In: Developments in X-Ray Tomography XI. SPIE, San Diego, United States, p 24'
     end
   end
 
+
+  test 'returns parsed proceedings article DOI (crossref)_2' do
+    VCR.use_cassette('doi/doi_crossref_proceedings_article_response_2') do
+      doi = '10.1145/3292500.3330675'
+      result = Seek::Doi::Parser.parse(doi)
+      assert_equal 'proceedings-article', result.type
+      assert_equal 'Whole Page Optimization with Global Constraints', result.title
+      assert_equal doi, result.doi
+      assert_nil result.abstract
+      assert_equal 'Weicong Ding', result.authors[0].full_name
+      assert_equal 3, result.authors.size
+      assert_empty result.editors
+      assert_equal 'ACM', result.publisher
+      assert_equal '2019-07-25', result.date_published
+      assert_equal 'Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining', result.booktitle
+      assert_equal 'Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining', result.journal
+      assert_equal '3153-3161', result.page
+      assert_equal 'https://doi.org/10.1145/3292500.3330675', result.url
+      assert_equal 'In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining. ACM, New York, NY, USA, pp 3153-3161', result.citation
+
+    end
+  end
+
+  test 'returns parsed proceedings article DOI (crossref)_3' do
+    VCR.use_cassette('doi/doi_crossref_proceedings_article_response_3') do
+      doi = '10.1063/1.2128263'
+      result = Seek::Doi::Parser.parse(doi)
+      puts result.inspect
+      assert_equal 'proceedings-article', result.type
+      assert_equal 'Conference Recommendations', result.title
+      assert_equal doi, result.doi
+      assert_nil result.abstract
+      assert_equal 'Conference organizers ', result.authors.first.full_name
+      assert_empty result.editors
+      assert_equal 'AIP', result.publisher
+      assert_equal '2005-01-01', result.date_published
+      assert_equal 'AIP Conference Proceedings', result.booktitle
+      assert_equal 'AIP Conference Proceedings', result.journal
+      assert_equal '29-34', result.page
+      assert_equal 'https://doi.org/10.1063/1.2128263', result.url
+      assert_equal 'In: AIP Conference Proceedings. AIP, Rio de Janeiro (Brazil), pp 29-34', result.citation
+    end
+  end
+
+  #In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining. ACM, Anchorage AK USA, pp 3153–3161
+
   # === BOOK CHAPTER ===
-  test 'parses Book Chapter DOI (Crossref)_1' do
+  test 'parses book chapter DOI (Crossref)_1' do
     VCR.use_cassette('doi/doi_crossref_book_chapter_response_1') do
       doi = '10.1007/978-3-642-16239-8_8'
       result = Seek::Doi::Parser.parse(doi)
@@ -124,11 +170,10 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal '2010-01-01', result.date_published
       assert_equal 'https://doi.org/10.1007/978-3-642-16239-8_8', result.url
       assert_equal "In: Artificial Intelligence Applications and Innovations. Springer Berlin Heidelberg, Berlin, Heidelberg, pp 37-44", result.citation
-
     end
-    end
+  end
 
-  test 'parses Book Chapter DOI (Crossref)_2' do
+  test 'parses book chapter DOI (Crossref)_2' do
     VCR.use_cassette('doi/doi_crossref_book_chapter_response_2') do
       doi = '10.1007/978-3-540-70504-8_9'
       result = Seek::Doi::Parser.parse(doi)
@@ -146,11 +191,10 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal '87-99', result.page
       assert_equal 'https://doi.org/10.1007/978-3-540-70504-8_9', result.url
       assert_equal 'In: Sharing Data, Information and Knowledge. Springer Berlin Heidelberg, Berlin, Heidelberg, pp 87-99', result.citation
-
     end
   end
 
-  test 'parses Book Chapter DOI (Crossref)_3' do
+  test 'parses book chapter DOI (Crossref)_3' do
     VCR.use_cassette('doi/doi_crossref_book_chapter_response_3') do
       doi = '10.1007/978-3-642-16239-8_8'
       result = Seek::Doi::Parser.parse(doi)
@@ -174,7 +218,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
 
 
   # === BOOK ===
-  test 'parses Book DOI (Crossref)_1' do
+  test 'parses book DOI (Crossref)_1' do
     VCR.use_cassette('doi/doi_crossref_book_response_1') do
       doi = '10.23943/princeton/9780691161914.003.0002'
       result = Seek::Doi::Parser.parse(doi)
@@ -194,7 +238,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     end
   end
 
-  test 'parses Book DOI (Crossref)_2' do
+  test 'parses book DOI (Crossref)_2' do
     VCR.use_cassette('doi/doi_crossref_book_response_2') do
       doi = '10.1007/978-3-540-70504-8'
       result = Seek::Doi::Parser.parse(doi)
