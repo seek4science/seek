@@ -1065,7 +1065,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     login_as @person
     assert sample_type_with_blob.can_view?
-    assert !sample_type_with_blob.content_blob.blank?
+    refute sample_type_with_blob.content_blob.blank?
 
     get :download, params: { id: sample_type_with_blob }
     assert_redirected_to download_sample_type_content_blob_path(sample_type_with_blob, sample_type_with_blob.content_blob)
