@@ -108,6 +108,8 @@ module Seek
             format_crossref_in_collection_citation(data)
           when 'proceedings'
             format_crossref_proceedings_citation(data)
+          when 'posted-content'
+            format_crossref_preprint_citation(data)
           else
             default_citation(data)
           end
@@ -169,9 +171,20 @@ module Seek
           citation_parts.compact.join(' ').squish
         end
 
-        def default_citation(m)
-          year = m[:date_published]&.slice(0, 4)
-          "#{m[:journal]}. #{year}."
+        def format_crossref_preprint_citation(data)
+
+          repo = data[:journal]
+          url = data[:url]
+
+          citation_parts = []
+          citation_parts << "Preprint."
+          citation_parts << "#{repo}." if repo.present?
+          citation_parts << "#{url}" if url.present?
+          citation_parts.compact.join(' ').squish
+        end
+
+        def default_citation(data)
+
         end
 
         def decode_html_entities_in_hash(hash)

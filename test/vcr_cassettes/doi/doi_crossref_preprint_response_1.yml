@@ -1,0 +1,139 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.20944
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 23 Oct 2025 14:55:13 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=owZEd4gsOlZX9OHEq%2FIjy7UTaVA3erJ8FwlGFH2BUFQpu0ufhBVWPg5M2M%2FfDFG1yRSos%2Fge%2BFJmbVsTqnt4I7JINF5DdA%3D%3D"}]}'
+      Cf-Ray:
+      - 993212fe9ce22c09-STR
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.20944",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Thu, 23 Oct 2025 14:55:13 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.20944/preprints201909.0043.v1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 23 Oct 2025 14:55:18 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5014'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,2,21]],"date-time":"2025-02-21T00:23:27Z","timestamp":1740097407763,"version":"3.37.3"},"posted":{"date-parts":[[2019,9,4]]},"group-title":"LIFE
+        SCIENCES","reference-count":0,"publisher":"MDPI AG","license":[{"start":{"date-parts":[[2019,9,4]],"date-time":"2019-09-04T00:00:00Z","timestamp":1567555200000},"content-version":"unspecified","delay-in-days":0,"URL":"http:\/\/creativecommons.org\/licenses\/by\/4.0"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"accepted":{"date-parts":[[2019,9,3]]},"abstract":"<jats:p>Myalgic
+        Encephalomyelitis\/Chronic Fatigue Syndrome (ME\/CFS) is an enigmatic condition
+        characterized by fatigue that is unaided by rest and by exacerbation of symptoms
+        after exertion (post-exertional malaise or &amp;ldquo;PEM&amp;rdquo;). There
+        is no definitive molecular marker or known underlying pathological mechanism
+        for the condition. Increasing evidence for aberrant energy metabolism suggests
+        a role for mitochondrial dysfunction in ME\/CFS. Our objective was therefore
+        to measure mitochondrial function and cellular stress sensing in actively
+        metabolising patient blood cells. We immortalized lymphoblasts isolated from
+        51 ME\/CFS patients diagnosed according to the Canadian Consensus Criteria
+        and an age- and gender-matched control group. Parameters of mitochondrial
+        function and energy stress sensing were assessed by Seahorse extracellular
+        flux analysis, proteomics, and an array of additional biochemical assays.
+        As a proportion of the basal oxygen consumption rate (OCR), the rate of ATP
+        synthesis by Complex V was significantly reduced in ME\/CFS lymphoblasts,
+        while significant elevations were observed in Complex I OCR, maximum OCR,
+        spare respiratory capacity, nonmitochondrial OCR and &amp;ldquo;proton leak&amp;rdquo;
+        as a proportion of the basal OCR. This was accompanied by an elevation of
+        mitochondrial membrane potential, chronically hyperactivated TOR Complex I
+        stress signalling and upregulated expression of mitochondrial respiratory
+        complexes, fatty acid transporters and enzymes of the &amp;beta;-oxidation
+        and TCA cycles. By contrast, mitochondrial mass and genome copy number, as
+        well as glycolytic rates and steady state ATP levels were unchanged. Our results
+        suggest a model in which ME\/CFS lymphoblasts have a Complex V defect accompanied
+        by compensatory upregulation of their respiratory capacity that includes the
+        mitochondrial respiratory complexes, membrane transporters and enzymes involved
+        in fatty acid &amp;beta;-oxidation. This homeostatically returns ATP synthesis
+        and steady state levels to &amp;ldquo;normal&amp;rdquo; in resting cells,
+        but may leave them unable to adequately respond to acute increases in energy
+        demand as the relevant homeostatic pathways are already activated.<\/jats:p>","DOI":"10.20944\/preprints201909.0043.v1","type":"posted-content","created":{"date-parts":[[2019,9,5]],"date-time":"2019-09-05T04:28:52Z","timestamp":1567657732000},"source":"Crossref","is-referenced-by-count":2,"title":["An
+        Isolated Complex V Inefficiency and Dysregulated Mitochondrial Function in
+        Immortalized Lymphocytes from ME\/CFS Patients"],"prefix":"10.20944","author":[{"given":"Daniel","family":"Missailidis","sequence":"first","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-7604-3985","authenticated-orcid":false,"given":"Sarah","family":"Annesley","sequence":"additional","affiliation":[]},{"given":"Claire","family":"Allan","sequence":"additional","affiliation":[]},{"given":"Oana","family":"Sanislav","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0003-2211-989X","authenticated-orcid":false,"given":"Brett","family":"Lidbury","sequence":"additional","affiliation":[]},{"given":"Don","family":"Lewis","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0003-1884-6306","authenticated-orcid":false,"given":"Paul","family":"Fisher","sequence":"additional","affiliation":[]}],"member":"1968","container-title":[],"original-title":[],"deposited":{"date-parts":[[2020,3,10]],"date-time":"2020-03-10T06:22:28Z","timestamp":1583821348000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.preprints.org\/manuscript\/201909.0043\/v1"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2019,9,4]]},"references-count":0,"URL":"https:\/\/doi.org\/10.20944\/preprints201909.0043.v1","relation":{"is-version-of":[{"id-type":"doi","id":"10.20944\/preprints201909.0043.v2","asserted-by":"subject"},{"id-type":"doi","id":"10.20944\/preprints201909.0043.v3","asserted-by":"subject"}],"is-preprint-of":[{"id-type":"doi","id":"10.3390\/ijms21031074","asserted-by":"subject"}],"has-version":[{"id-type":"doi","id":"10.20944\/preprints201909.0043.v2","asserted-by":"object"},{"id-type":"doi","id":"10.20944\/preprints201909.0043.v3","asserted-by":"object"}]},"subject":[],"published":{"date-parts":[[2019,9,4]]},"subtype":"preprint"}}'
+  recorded_at: Thu, 23 Oct 2025 14:55:18 GMT
+recorded_with: VCR 6.3.1

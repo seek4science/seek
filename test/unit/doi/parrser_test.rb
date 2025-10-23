@@ -273,4 +273,28 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
   end
 
 
+  # === PREPRINT ===
+
+  test 'parses preprint DOI (Crossref)_1' do
+    VCR.use_cassette('doi/doi_crossref_preprint_response_1') do
+      doi = '10.20944/preprints201909.0043.v1'
+      result = Seek::Doi::Parser.parse(doi)
+      assert_equal 'posted-content', result.type
+      assert_equal 'An Isolated Complex V Inefficiency and Dysregulated Mitochondrial Function in Immortalized Lymphocytes from ME/CFS Patients', result.title
+      assert_equal doi, result.doi
+      assert_equal 'https://doi.org/10.20944/preprints201909.0043.v1', result.url
+      assert_equal '2019-09-04', result.date_published
+      assert_equal  'Preprint. https://doi.org/10.20944/preprints201909.0043.v1', result.citation
+    end
+  end
+
 end
+
+# datacite dois
+# 10.48550/arXiv.2404.12345
+
+# resource not found
+#10.31234/osf.io/8s4xq
+
+# phd thesis can not be resolved
+#10.5445/IR/1000055628
