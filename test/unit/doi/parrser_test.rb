@@ -126,7 +126,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal 'Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining', result.journal
       assert_equal '3153-3161', result.page
       assert_equal 'https://doi.org/10.1145/3292500.3330675', result.url
-      assert_equal 'In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining. ACM, New York, NY, USA, pp 3153-3161', result.citation
+      assert_equal 'In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining. ACM, Anchorage AK USA, pp 3153-3161', result.citation
 
     end
   end
@@ -135,7 +135,6 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     VCR.use_cassette('doi/doi_crossref_proceedings_article_response_3') do
       doi = '10.1063/1.2128263'
       result = Seek::Doi::Parser.parse(doi)
-      puts result.inspect
       assert_equal 'proceedings-article', result.type
       assert_equal 'Conference Recommendations', result.title
       assert_equal doi, result.doi
@@ -152,7 +151,22 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     end
   end
 
-  #In: Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining. ACM, Anchorage AK USA, pp 3153–3161
+  # === PROCEEDINGS ===
+  test 'returns parsed proceedings DOI (crossref)_1' do
+    VCR.use_cassette('doi/doi_crossref_proceedings_response_1') do
+      doi = '10.18653/v1/w18-08'
+      result = Seek::Doi::Parser.parse(doi)
+      assert_equal result.type, 'proceedings'
+      assert_equal 'Proceedings of the Second ACL Workshop on Ethics in Natural Language Processing', result.title
+      assert_equal doi, result.doi
+      assert_equal 'Association for Computational Linguistics', result.publisher
+      assert_equal '2018-01-01', result.date_published
+      assert_equal 'https://doi.org/10.18653/v1/w18-08', result.url
+      assert_equal 'Proceedings of the Second ACL Workshop on Ethics in Natural Language Processing. Association for Computational Linguistics, New Orleans, Louisiana, USA', result.citation
+    end
+  end
+
+
 
   # === BOOK CHAPTER ===
   test 'parses book chapter DOI (Crossref)_1' do
@@ -218,6 +232,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
 
 
   # === BOOK ===
+  # more book doi: 10.1007/978-3-662-49096-9
   test 'parses book DOI (Crossref)_1' do
     VCR.use_cassette('doi/doi_crossref_book_response_1') do
       doi = '10.23943/princeton/9780691161914.003.0002'
@@ -256,4 +271,6 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal 'Springer Berlin Heidelberg, Berlin, Heidelberg', result.citation
     end
   end
+
+
 end

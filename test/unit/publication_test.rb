@@ -222,7 +222,6 @@ class PublicationTest < ActiveSupport::TestCase
   test 'book chapter doi' do
     VCR.use_cassette('doi/doi_crossref_book_chapter_response_3') do
       result = Seek::Doi::Parser.parse('10.1007/978-3-642-16239-8_8')
-      puts result.inspect
       assert_equal 'book-chapter', result.type
       assert_equal 'Prediction with Confidence Based on a Random Forest Classifier', result.title
       assert_equal 2, result.authors.size

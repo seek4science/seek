@@ -1,0 +1,111 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.18653
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 23 Oct 2025 13:38:43 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=wd8zILCYowCk2FtDtP%2BQudl2ST1mcMtHj6TeYP8f1H8m7ulac539LTx0dx1PQA%2FeFNoW7KMnw5tBz1hqtefVBGW5thKptQ%3D%3D"}]}'
+      Cf-Ray:
+      - 9931a2ebff8831bc-STR
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.18653",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Thu, 23 Oct 2025 13:38:43 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.18653/v1/w18-08
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 23 Oct 2025 13:38:43 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '1376'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2022,4,3]],"date-time":"2022-04-03T09:15:56Z","timestamp":1648977356913},"publisher-location":"Stroudsburg,
+        PA, USA","reference-count":0,"publisher":"Association for Computational Linguistics","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2018]]},"DOI":"10.18653\/v1\/w18-08","type":"proceedings","created":{"date-parts":[[2018,5,30]],"date-time":"2018-05-30T00:48:35Z","timestamp":1527641315000},"source":"Crossref","is-referenced-by-count":0,"title":["Proceedings
+        of the Second ACL Workshop on Ethics in Natural Language Processing"],"prefix":"10.18653","member":"1643","event":{"name":"Proceedings
+        of the Second ACL Workshop on Ethics in Natural Language Processing","location":"New
+        Orleans, Louisiana, USA","start":{"date-parts":[[2018,6]]},"end":{"date-parts":[[2018,6]]}},"container-title":[],"original-title":[],"deposited":{"date-parts":[[2018,5,30]],"date-time":"2018-05-30T00:48:36Z","timestamp":1527641316000},"score":1,"resource":{"primary":{"URL":"http:\/\/aclweb.org\/anthology\/W18-08"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2018]]},"references-count":0,"URL":"https:\/\/doi.org\/10.18653\/v1\/w18-08","relation":{},"subject":[],"published":{"date-parts":[[2018]]}}}'
+  recorded_at: Thu, 23 Oct 2025 13:38:43 GMT
+recorded_with: VCR 6.3.1
