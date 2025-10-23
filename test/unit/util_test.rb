@@ -34,7 +34,7 @@ Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain
   test 'rdf capable types' do
     types = Seek::Util.rdf_capable_types
     expected = %w[Assay DataFile Investigation Model ObservationUnit Organism Person Programme Project Publication 
-Sample Sop Strain Study]
+Sample Sop Strain Study Institution]
     assert_equal expected, types.collect(&:name).sort
   end
 

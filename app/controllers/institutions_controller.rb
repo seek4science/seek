@@ -24,6 +24,7 @@ class InstitutionsController < ApplicationController
       # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
       #format.json { render json: @institution } #normal json
       format.json {render json: @institution, include: [params[:include]]}
+      format.rdf { render template: 'rdf/show' }
     end
   end
 
