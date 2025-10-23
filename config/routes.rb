@@ -721,7 +721,7 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE TYPES ###
   #
-  resources :sample_types, concerns: %i[asset has_content_blobs] do
+  resources :sample_types, concerns: %i[asset] do
     collection do
       post :create_from_template
       post :create_from_fair_ds_ttl
@@ -732,6 +732,11 @@ SEEK::Application.routes.draw do
       get :template_details
       get :batch_upload
       post :update_annotations_ajax
+    end
+    resources :content_blobs do
+      member do
+        get :download
+      end
     end
     resources :samples
     resources :investigations, :people, :collections, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
