@@ -1060,6 +1060,37 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
   end
 
+  test 'redirect download to content blob download' do
+    sample_type_with_blob = FactoryBot.create(:strain_sample_type, contributor: @person)
+
+    login_as @person
+    assert sample_type_with_blob.can_view?
+    assert !sample_type_with_blob.content_blob.blank?
+
+    get :download, params: { id: sample_type_with_blob }
+    assert_redirected_to download_sample_type_content_blob_path(sample_type_with_blob, sample_type_with_blob.content_blob)
+
+    get :download, params: { id: sample_type_with_blob }, as: :json
+    assert_response :see_other
+
+    get :download, params: { id: @sample_type }
+    assert_redirected_to sample_type_path(@sample_type)
+    assert_equal flash[:error], "No downloadable content found for this Sample type."
+
+    get :download, params: { id: @sample_type }, as: :json
+    assert_response :not_found
+    assert_equal response.body, { error: "No downloadable content found for this Sample type." }.to_json
+
+    unauthorized_person = FactoryBot.create(:person)
+    login_as unauthorized_person
+    get :download, params: { id: sample_type_with_blob }
+    assert_equal flash[:error], "You are not authorized to download this Sample type."
+    assert_redirected_to sample_type_path(sample_type_with_blob)
+
+    get :download, params: { id: sample_type_with_blob }, as: :json
+    assert_response :forbidden
+  end
+
   private
 
   def template_for_upload

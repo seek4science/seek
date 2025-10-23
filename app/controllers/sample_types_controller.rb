@@ -152,6 +152,31 @@ class SampleTypesController < ApplicationController
 
   def batch_upload; end
 
+  def download
+    content_blob = @sample_type.content_blob
+
+    if content_blob
+      respond_to do |format|
+        format.html do
+          redirect_to download_sample_type_content_blob_path(@sample_type, content_blob)
+        end
+        format.json do
+          render json: { redirect_to: download_sample_type_content_blob_path(@sample_type, content_blob) }, status: :see_other
+        end
+      end
+    else
+      respond_to do |format|
+        format.html do
+          flash[:error] = "No downloadable content found for this Sample type."
+          redirect_to sample_type_path(@sample_type)
+        end
+        format.json do
+          render json: { error: "No downloadable content found for this Sample type." }, status: :not_found
+        end
+      end
+    end
+  end
+
   private
 
   def build_sample_type

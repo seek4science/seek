@@ -731,6 +731,7 @@ SEEK::Application.routes.draw do
     member do
       get :template_details
       get :batch_upload
+      get :download
       post :update_annotations_ajax
     end
     resources :content_blobs do
