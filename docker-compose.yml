@@ -1,5 +1,6 @@
 services:
-  db: # Database implementation, in this case MySQL
+  db:
+    # Database implementation, in this case MySQL
     image: mysql:8.0
     container_name: seek-mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-error-verbosity=1
@@ -9,8 +10,14 @@ services:
       - docker/db.env
     volumes:
       - seek-mysql-db:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  seek: # The SEEK application
+  seek:
+    # The SEEK application
     #build: .
 
     image: fairdom/seek:1.17
@@ -32,39 +39,45 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - db
-      - solr
+      db:
+        condition: service_healthy
+      solr:
+        condition: service_healthy
     links:
       - db
       - solr
 
-  seek_workers: # The SEEK delayed job workers
-      #build: .
+  seek_workers:
+    # The SEEK delayed job workers
+    #build: .
 
-      image: fairdom/seek:1.17
-      container_name: seek-workers
-      command: docker/start_workers.sh
-      restart: always
-      environment:
-        RAILS_ENV: production
-        SOLR_PORT: 8983
-        SOLR_HOST: solr
-        RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-        QUIET_SUPERCRONIC: 1 # remove to show supercronic activity logs
-      env_file:
-        - docker/db.env
-      volumes:
-        - seek-filestore:/seek/filestore
-        - seek-cache:/seek/tmp/cache
-      depends_on:
-        - db
-        - solr
-      links:
-        - db
-        - solr
+    image: fairdom/seek:1.17
+    container_name: seek-workers
+    command: docker/start_workers.sh
+    restart: always
+    environment:
+      RAILS_ENV: production
+      SOLR_PORT: 8983
+      SOLR_HOST: solr
+      RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
+      QUIET_SUPERCRONIC: 1 # remove to show supercronic activity logs
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-filestore:/seek/filestore
+      - seek-cache:/seek/tmp/cache
+    depends_on:
+      db:
+        condition: service_healthy
+      solr:
+        condition: service_healthy
+    links:
+      - db
+      - solr
 
   solr:
     image: fairdom/seek-solr:8.11
+    shm_size: 1gb
     container_name: seek-solr
     restart: always
     environment:
@@ -75,8 +88,7 @@ services:
       - docker-entrypoint.sh
       - solr-precreate
       - seek
-      - /opt/solr/server/solr/configsets/seek_config      
-
+      - /opt/solr/server/solr/configsets/seek_config
 
 volumes:
   seek-filestore:

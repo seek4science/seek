@@ -7,7 +7,7 @@ on:
       - workflowhub
       - rails-7-hacking-rebased
       - full-test-suite
-      - seek-1.16
+      - seek-1.17
 
   pull_request:
 
