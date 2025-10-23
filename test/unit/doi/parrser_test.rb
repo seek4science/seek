@@ -74,7 +74,6 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     VCR.use_cassette('doi/doi_crossref_book_with_editor_subtitle_response') do
       doi = '10.2307/j.ctvn5txvs'
       result = Seek::Doi::Parser.parse(doi)
-      #puts result.type.inspect
       assert_equal result.type, 'monograph'
       assert_equal result.title, 'Troy Book:Selections'
       assert_equal result.doi, doi
@@ -85,7 +84,7 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
       assert_equal result.publisher, 'Medieval Institute Publications'
       assert_equal result.url, 'https://doi.org/10.2307/j.ctvn5txvs'
       assert_equal result.date_published, '1998-03-01'
-      #assert_equal result[:citation], ''
+      assert_equal result[:citation], 'Medieval Institute Publications'
     end
   end
 

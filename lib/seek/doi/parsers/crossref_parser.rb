@@ -100,7 +100,7 @@ module Seek
           case data[:type]
           when 'book-chapter'
             format_crossref_in_collection_citation(data)
-          when 'book'
+          when 'book', 'monograph'
             format_crossref_book_citation(data)
           when 'journal-article'
             format_crossref_journal_citation(data)
@@ -164,7 +164,7 @@ module Seek
           editor_str = editors.present? ? "#{editors} (eds)" : ''
 
           citation_parts = []
-          citation_parts << "#{editor_str}," if editor_str.present?
+          citation_parts << "#{editor_str}," if editors.present?
           citation_parts << "#{title}. #{publisher},"
           citation_parts << location if location.present?
 
