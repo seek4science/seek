@@ -48,7 +48,7 @@
 //= require cytoscape.js-2.5.0/cytoscape
 //= require cytoscape_isa_graph
 //= require bives
-//= require asset_reprt
+//= require asset_report
 //= require uri
 //= require chartjs
 //= require lightbox2
