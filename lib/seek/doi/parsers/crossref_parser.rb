@@ -5,10 +5,10 @@ module Seek
   module Doi
     module Parsers
       class CrossrefParser < BaseParser
-        DOI_API_ENDPOINT = 'https://api.crossref.org/works'.freeze
+        CROSSREF_API_ENDPOINT = 'https://api.crossref.org/works'.freeze
 
         def parse(doi)
-          url = "#{DOI_API_ENDPOINT}/#{doi}"
+          url = "#{CROSSREF_API_ENDPOINT}/#{doi}"
           puts "================== Fetching Crossref JSON from URL: =================="
           puts url
 
@@ -184,7 +184,14 @@ module Seek
         end
 
         def default_citation(data)
-
+          parts = []
+          if data[:publisher]
+            parts << data[:publisher]
+          end
+          if data[:url]
+            parts << data[:url]
+          end
+          parts.join('. ') + (parts.empty? ? '' : '.')
         end
 
         def decode_html_entities_in_hash(hash)

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class Seek::Doi::ParserTest < ActiveSupport::TestCase
+class Seek::Doi::CrossrefParserTest < ActiveSupport::TestCase
 
   test 'returns nil if DOI is blank' do
     result = Seek::Doi::Parser.parse('')
@@ -10,13 +10,6 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
     assert_nil result
   end
 
-  test 'get_doi_ra returns DataCite for a known DOI' do
-    VCR.use_cassette('doi/datacite_ra') do
-      doi = '10.5281/zenodo.16736322'
-      ra = Seek::Doi::Parser.send(:get_doi_ra, doi)
-      assert_equal 'DataCite', ra
-    end
-  end
 
   test 'get_doi_ra returns Crossref for a known DOI' do
     VCR.use_cassette('doi/crossref_ra') do
@@ -288,9 +281,6 @@ class Seek::Doi::ParserTest < ActiveSupport::TestCase
   end
 
 end
-
-# datacite dois
-# 10.48550/arXiv.2404.12345
 
 # resource not found
 #10.31234/osf.io/8s4xq

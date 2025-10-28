@@ -1,0 +1,163 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.5061
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 28 Oct 2025 17:22:22 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=dCTCB%2FKa4OemtV7eIS0g%2FDmIKkBVLzYQcP4atlp0edtUzGKvLYY7NI6lTUdKLKr1ekOi5rewoD6cCRcn12Z9N%2Fxx3Sdchw%3D%3D"}]}'
+      Cf-Ray:
+      - 995c1d675c722c09-STR
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.5061",
+            "RA": "DataCite"
+          }
+        ]
+  recorded_at: Tue, 28 Oct 2025 17:22:22 GMT
+- request:
+    method: get
+    uri: https://api.datacite.org/dois/10.5061/dryad.m62gj
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - application/vnd.api+json
+      User-Agent:
+      - Ruby
+      Host:
+      - api.datacite.org
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 28 Oct 2025 17:22:22 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Status:
+      - 200 OK
+      X-Anonymous-Consumer:
+      - 'true'
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Vary:
+      - Accept,Accept-Encoding
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - '0'
+      X-Request-Id:
+      - 51a0f032-fdf3-45c9-a40f-337b8fbb0cb3
+      Etag:
+      - W/"8f11ee061826de2d31221bd9e7fc0a27"
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Runtime:
+      - '0.022704'
+      X-Content-Type-Options:
+      - nosniff
+      X-Powered-By:
+      - Phusion Passenger(R) 6.1.0
+      Server:
+      - nginx/1.24.0 + Phusion Passenger(R) 6.1.0
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, PATCH, DELETE, OPTIONS
+      Access-Control-Allow-Headers:
+      - Accept,Access-Control-Allow-Origin,Access-Control-Expose-Headers,Access-Control-Allow-Methods,Access-Control-Allow-Headers,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Mx-ReqToken,X-Requested-With
+      Access-Control-Expose-Headers:
+      - Authorization
+    body:
+      encoding: ASCII-8BIT
+      string: '{"data":{"id":"10.5061/dryad.m62gj","type":"dois","attributes":{"doi":"10.5061/dryad.m62gj","prefix":"10.5061","suffix":"dryad.m62gj","identifiers":[],"alternateIdentifiers":[],"creators":[{"name":"Woodward,
+        Craig A.","nameType":"Personal","givenName":"Craig A.","familyName":"Woodward","affiliation":["The
+        University of Queensland"],"nameIdentifiers":[]},{"name":"Shulmeister, James","nameType":"Personal","givenName":"James","familyName":"Shulmeister","affiliation":["The
+        University of Queensland"],"nameIdentifiers":[]},{"name":"Larsen, Joshua","nameType":"Personal","givenName":"Joshua","familyName":"Larsen","affiliation":["The
+        University of Queensland"],"nameIdentifiers":[]},{"name":"Jacobsen, Geraldine
+        E.","nameType":"Personal","givenName":"Geraldine E.","familyName":"Jacobsen","affiliation":["Australian
+        Nuclear Science and Technology Organisation"],"nameIdentifiers":[]},{"name":"Zawadzki,
+        Atun","nameType":"Personal","givenName":"Atun","familyName":"Zawadzki","affiliation":["Australian
+        Nuclear Science and Technology Organisation"],"nameIdentifiers":[]}],"titles":[{"title":"Data
+        from: The hydrological legacy of deforestation on global wetlands"}],"publisher":"Dryad","container":{},"publicationYear":2015,"subjects":[{"subject":"Deforestation","schemeUri":"https://github.com/PLOS/plos-thesaurus","subjectScheme":"PLOS
+        Subject Area Thesaurus"},{"subject":"human"},{"subject":"Anthropogenic"},{"subject":"Holocene"}],"contributors":[],"dates":[{"date":"2014-10-30T02:21:19Z","dateType":"Submitted"},{"date":"2015-10-30T00:00:00Z","dateType":"Issued"},{"date":"2015-10-30T00:00:00Z","dateType":"Available"}],"language":"en","types":{"ris":"DATA","bibtex":"misc","citeproc":"dataset","schemaOrg":"Dataset","resourceType":"dataset","resourceTypeGeneral":"Dataset"},"relatedIdentifiers":[{"relationType":"IsCitedBy","relatedIdentifier":"10.1126/science.1260510","relatedIdentifierType":"DOI"}],"relatedItems":[],"sizes":["653124
+        bytes"],"formats":[],"version":"1","rightsList":[{"rights":"Creative Commons
+        Zero v1.0 Universal","rightsUri":"https://creativecommons.org/publicdomain/zero/1.0/legalcode","schemeUri":"https://spdx.org/licenses/","rightsIdentifier":"cc0-1.0","rightsIdentifierScheme":"SPDX"}],"descriptions":[{"description":"Increased
+        catchment erosion and nutrient loading are commonly recognized\n impacts of
+        deforestation on global wetlands. In contrast, an increase in\n water availability
+        in deforested catchments is well known in modern\n studies but is rarely considered
+        when evaluating past human impacts. We\n used a Budyko water balance approach,
+        a meta-analysis of global wetland\n response to deforestation, and paleoecological
+        studies from Australasia to\n explore this issue. After complete deforestation,
+        we demonstrated that\n water available to wetlands increases by up to 15%
+        of annual\n precipitation. This can convert ephemeral swamps to permanent
+        lakes or\n even create new wetlands. This effect is globally significant,
+        with 9 to\n 12% of wetlands affected, including 20 to 40% of Ramsar wetlands,
+        but is\n widely unrecognized because human impact studies rarely test for
+        it.","descriptionType":"Abstract"},{"description":"Database S1Database S1
+        is an Excel spreadsheet that contains data from all\n studies of deforestation
+        in wetland catchments during the Holocene. These\n are the papers used in
+        the meta-analysis. All sites examined by each paper\n are listed. This information
+        was extracted from published, peer-reviewed\n journal articlesDatabase S2Database
+        S2 contains information on specific\n sites where hydrological changes have
+        occurred after deforestation.This\n information was extracted from published,
+        peer-reviewed journal articles\n listed in Database S1Database S3This information
+        was extracted from\n published, peer-reviewed journal articles. Database S3
+        contains\n information relating to the meta-analysis. Database S3 contains\n
+        information from each site where deforestation and wetland change data is\n
+        available. Post-deforestation wetland changes are identified including; a\n
+        change in sedimentation rate, eutrophication or change in hydrology.","descriptionType":"Other"}],"geoLocations":[{"geoLocationPlace":"Global
+        coverage"}],"fundingReferences":[],"xml":"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHJlc291cmNlIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiIHhtbG5zPSJodHRwOi8vZGF0YWNpdGUub3JnL3NjaGVtYS9rZXJuZWwtNCIgeHNpOnNjaGVtYUxvY2F0aW9uPSJodHRwOi8vZGF0YWNpdGUub3JnL3NjaGVtYS9rZXJuZWwtNCBodHRwOi8vc2NoZW1hLmRhdGFjaXRlLm9yZy9tZXRhL2tlcm5lbC00L21ldGFkYXRhLnhzZCI+CiAgPGlkZW50aWZpZXIgaWRlbnRpZmllclR5cGU9IkRPSSI+MTAuNTA2MS9EUllBRC5NNjJHSjwvaWRlbnRpZmllcj4KICA8Y3JlYXRvcnM+CiAgICA8Y3JlYXRvcj4KICAgICAgPGNyZWF0b3JOYW1lIG5hbWVUeXBlPSJQZXJzb25hbCI+V29vZHdhcmQsIENyYWlnIEEuPC9jcmVhdG9yTmFtZT4KICAgICAgPGFmZmlsaWF0aW9uIGFmZmlsaWF0aW9uSWRlbnRpZmllcj0iaHR0cHM6Ly9yb3Iub3JnLzAwcnF5OTQyMiIgYWZmaWxpYXRpb25JZGVudGlmaWVyU2NoZW1lPSJST1IiIHNjaGVtZVVSST0iaHR0cHM6Ly9yb3Iub3JnIj5UaGUgVW5pdmVyc2l0eSBvZiBRdWVlbnNsYW5kPC9hZmZpbGlhdGlvbj4KICAgIDwvY3JlYXRvcj4KICAgIDxjcmVhdG9yPgogICAgICA8Y3JlYXRvck5hbWUgbmFtZVR5cGU9IlBlcnNvbmFsIj5TaHVsbWVpc3RlciwgSmFtZXM8L2NyZWF0b3JOYW1lPgogICAgICA8YWZmaWxpYXRpb24gYWZmaWxpYXRpb25JZGVudGlmaWVyPSJodHRwczovL3Jvci5vcmcvMDBycXk5NDIyIiBhZmZpbGlhdGlvbklkZW50aWZpZXJTY2hlbWU9IlJPUiIgc2NoZW1lVVJJPSJodHRwczovL3Jvci5vcmciPlRoZSBVbml2ZXJzaXR5IG9mIFF1ZWVuc2xhbmQ8L2FmZmlsaWF0aW9uPgogICAgPC9jcmVhdG9yPgogICAgPGNyZWF0b3I+CiAgICAgIDxjcmVhdG9yTmFtZSBuYW1lVHlwZT0iUGVyc29uYWwiPkxhcnNlbiwgSm9zaHVhPC9jcmVhdG9yTmFtZT4KICAgICAgPGFmZmlsaWF0aW9uIGFmZmlsaWF0aW9uSWRlbnRpZmllcj0iaHR0cHM6Ly9yb3Iub3JnLzAwcnF5OTQyMiIgYWZmaWxpYXRpb25JZGVudGlmaWVyU2NoZW1lPSJST1IiIHNjaGVtZVVSST0iaHR0cHM6Ly9yb3Iub3JnIj5UaGUgVW5pdmVyc2l0eSBvZiBRdWVlbnNsYW5kPC9hZmZpbGlhdGlvbj4KICAgIDwvY3JlYXRvcj4KICAgIDxjcmVhdG9yPgogICAgICA8Y3JlYXRvck5hbWUgbmFtZVR5cGU9IlBlcnNvbmFsIj5KYWNvYnNlbiwgR2VyYWxkaW5lIEUuPC9jcmVhdG9yTmFtZT4KICAgICAgPGFmZmlsaWF0aW9uIGFmZmlsaWF0aW9uSWRlbnRpZmllcj0iaHR0cHM6Ly9yb3Iub3JnLzA1ajdmZXAyOCIgYWZmaWxpYXRpb25JZGVudGlmaWVyU2NoZW1lPSJST1IiIHNjaGVtZVVSST0iaHR0cHM6Ly9yb3Iub3JnIj5BdXN0cmFsaWFuIE51Y2xlYXIgU2NpZW5jZSBhbmQgVGVjaG5vbG9neSBPcmdhbmlzYXRpb248L2FmZmlsaWF0aW9uPgogICAgPC9jcmVhdG9yPgogICAgPGNyZWF0b3I+CiAgICAgIDxjcmVhdG9yTmFtZSBuYW1lVHlwZT0iUGVyc29uYWwiPlphd2FkemtpLCBBdHVuPC9jcmVhdG9yTmFtZT4KICAgICAgPGFmZmlsaWF0aW9uIGFmZmlsaWF0aW9uSWRlbnRpZmllcj0iaHR0cHM6Ly9yb3Iub3JnLzA1ajdmZXAyOCIgYWZmaWxpYXRpb25JZGVudGlmaWVyU2NoZW1lPSJST1IiIHNjaGVtZVVSST0iaHR0cHM6Ly9yb3Iub3JnIj5BdXN0cmFsaWFuIE51Y2xlYXIgU2NpZW5jZSBhbmQgVGVjaG5vbG9neSBPcmdhbmlzYXRpb248L2FmZmlsaWF0aW9uPgogICAgPC9jcmVhdG9yPgogIDwvY3JlYXRvcnM+CiAgPHRpdGxlcz4KICAgIDx0aXRsZT5EYXRhIGZyb206IFRoZSBoeWRyb2xvZ2ljYWwgbGVnYWN5IG9mIGRlZm9yZXN0YXRpb24gb24gZ2xvYmFsIHdldGxhbmRzPC90aXRsZT4KICA8L3RpdGxlcz4KICA8cHVibGlzaGVyIHB1Ymxpc2hlcklkZW50aWZpZXI9Imh0dHBzOi8vcm9yLm9yZy8wMHg2aDVuOTUiIHB1Ymxpc2hlcklkZW50aWZpZXJTY2hlbWU9IlJPUiIgc2NoZW1lVVJJPSJodHRwczovL3Jvci5vcmcvIj5EcnlhZDwvcHVibGlzaGVyPgogIDxyZXNvdXJjZVR5cGUgcmVzb3VyY2VUeXBlR2VuZXJhbD0iRGF0YXNldCI+ZGF0YXNldDwvcmVzb3VyY2VUeXBlPgogIDxwdWJsaWNhdGlvblllYXI+MjAxNTwvcHVibGljYXRpb25ZZWFyPgogIDxzdWJqZWN0cz4KICAgIDxzdWJqZWN0IHN1YmplY3RTY2hlbWU9IlBMT1MgU3ViamVjdCBBcmVhIFRoZXNhdXJ1cyIgc2NoZW1lVVJJPSJodHRwczovL2dpdGh1Yi5jb20vUExPUy9wbG9zLXRoZXNhdXJ1cyI+RGVmb3Jlc3RhdGlvbjwvc3ViamVjdD4KICAgIDxzdWJqZWN0Pmh1bWFuPC9zdWJqZWN0PgogICAgPHN1YmplY3Q+QW50aHJvcG9nZW5pYzwvc3ViamVjdD4KICAgIDxzdWJqZWN0PkhvbG9jZW5lPC9zdWJqZWN0PgogIDwvc3ViamVjdHM+CiAgPGRhdGVzPgogICAgPGRhdGUgZGF0ZVR5cGU9IlN1Ym1pdHRlZCI+MjAxNC0xMC0zMFQwMjoyMToxOVo8L2RhdGU+CiAgICA8ZGF0ZSBkYXRlVHlwZT0iSXNzdWVkIj4yMDE1LTEwLTMwVDAwOjAwOjAwWjwvZGF0ZT4KICAgIDxkYXRlIGRhdGVUeXBlPSJBdmFpbGFibGUiPjIwMTUtMTAtMzBUMDA6MDA6MDBaPC9kYXRlPgogIDwvZGF0ZXM+CiAgPGxhbmd1YWdlPmVuPC9sYW5ndWFnZT4KICA8cmVsYXRlZElkZW50aWZpZXJzPgogICAgPHJlbGF0ZWRJZGVudGlmaWVyIHJlbGF0aW9uVHlwZT0iSXNDaXRlZEJ5IiByZWxhdGVkSWRlbnRpZmllclR5cGU9IkRPSSI+aHR0cHM6Ly9kb2kub3JnLzEwLjExMjYvc2NpZW5jZS4xMjYwNTEwPC9yZWxhdGVkSWRlbnRpZmllcj4KICA8L3JlbGF0ZWRJZGVudGlmaWVycz4KICA8c2l6ZXM+CiAgICA8c2l6ZT42NTMxMjQgYnl0ZXM8L3NpemU+CiAgPC9zaXplcz4KICA8dmVyc2lvbj4xPC92ZXJzaW9uPgogIDxyaWdodHNMaXN0PgogICAgPHJpZ2h0cyByaWdodHNVUkk9Imh0dHBzOi8vc3BkeC5vcmcvbGljZW5zZXMvQ0MwLTEuMC5odG1sIj5DcmVhdGl2ZSBDb21tb25zIFplcm8gdjEuMCBVbml2ZXJzYWw8L3JpZ2h0cz4KICA8L3JpZ2h0c0xpc3Q+CiAgPGRlc2NyaXB0aW9ucz4KICAgIDxkZXNjcmlwdGlvbiBkZXNjcmlwdGlvblR5cGU9IkFic3RyYWN0Ij4KICAgICAgSW5jcmVhc2VkIGNhdGNobWVudCBlcm9zaW9uIGFuZCBudXRyaWVudCBsb2FkaW5nIGFyZSBjb21tb25seSByZWNvZ25pemVkCiAgICAgIGltcGFjdHMgb2YgZGVmb3Jlc3RhdGlvbiBvbiBnbG9iYWwgd2V0bGFuZHMuIEluIGNvbnRyYXN0LCBhbiBpbmNyZWFzZSBpbgogICAgICB3YXRlciBhdmFpbGFiaWxpdHkgaW4gZGVmb3Jlc3RlZCBjYXRjaG1lbnRzIGlzIHdlbGwga25vd24gaW4gbW9kZXJuCiAgICAgIHN0dWRpZXMgYnV0IGlzIHJhcmVseSBjb25zaWRlcmVkIHdoZW4gZXZhbHVhdGluZyBwYXN0IGh1bWFuIGltcGFjdHMuIFdlCiAgICAgIHVzZWQgYSBCdWR5a28gd2F0ZXIgYmFsYW5jZSBhcHByb2FjaCwgYSBtZXRhLWFuYWx5c2lzIG9mIGdsb2JhbCB3ZXRsYW5kCiAgICAgIHJlc3BvbnNlIHRvIGRlZm9yZXN0YXRpb24sIGFuZCBwYWxlb2Vjb2xvZ2ljYWwgc3R1ZGllcyBmcm9tIEF1c3RyYWxhc2lhIHRvCiAgICAgIGV4cGxvcmUgdGhpcyBpc3N1ZS4gQWZ0ZXIgY29tcGxldGUgZGVmb3Jlc3RhdGlvbiwgd2UgZGVtb25zdHJhdGVkIHRoYXQKICAgICAgd2F0ZXIgYXZhaWxhYmxlIHRvIHdldGxhbmRzIGluY3JlYXNlcyBieSB1cCB0byAxNSUgb2YgYW5udWFsCiAgICAgIHByZWNpcGl0YXRpb24uIFRoaXMgY2FuIGNvbnZlcnQgZXBoZW1lcmFsIHN3YW1wcyB0byBwZXJtYW5lbnQgbGFrZXMgb3IKICAgICAgZXZlbiBjcmVhdGUgbmV3IHdldGxhbmRzLiBUaGlzIGVmZmVjdCBpcyBnbG9iYWxseSBzaWduaWZpY2FudCwgd2l0aCA5IHRvCiAgICAgIDEyJSBvZiB3ZXRsYW5kcyBhZmZlY3RlZCwgaW5jbHVkaW5nIDIwIHRvIDQwJSBvZiBSYW1zYXIgd2V0bGFuZHMsIGJ1dCBpcwogICAgICB3aWRlbHkgdW5yZWNvZ25pemVkIGJlY2F1c2UgaHVtYW4gaW1wYWN0IHN0dWRpZXMgcmFyZWx5IHRlc3QgZm9yIGl0LgogICAgPC9kZXNjcmlwdGlvbj4KICAgIDxkZXNjcmlwdGlvbiBkZXNjcmlwdGlvblR5cGU9Ik90aGVyIj4KICAgICAgRGF0YWJhc2UgUzFEYXRhYmFzZSBTMSBpcyBhbiBFeGNlbCBzcHJlYWRzaGVldCB0aGF0IGNvbnRhaW5zIGRhdGEgZnJvbSBhbGwKICAgICAgc3R1ZGllcyBvZiBkZWZvcmVzdGF0aW9uIGluIHdldGxhbmQgY2F0Y2htZW50cyBkdXJpbmcgdGhlIEhvbG9jZW5lLiBUaGVzZQogICAgICBhcmUgdGhlIHBhcGVycyB1c2VkIGluIHRoZSBtZXRhLWFuYWx5c2lzLiBBbGwgc2l0ZXMgZXhhbWluZWQgYnkgZWFjaCBwYXBlcgogICAgICBhcmUgbGlzdGVkLiBUaGlzIGluZm9ybWF0aW9uIHdhcyBleHRyYWN0ZWQgZnJvbSBwdWJsaXNoZWQsIHBlZXItcmV2aWV3ZWQKICAgICAgam91cm5hbCBhcnRpY2xlc0RhdGFiYXNlIFMyRGF0YWJhc2UgUzIgY29udGFpbnMgaW5mb3JtYXRpb24gb24gc3BlY2lmaWMKICAgICAgc2l0ZXMgd2hlcmUgaHlkcm9sb2dpY2FsIGNoYW5nZXMgaGF2ZSBvY2N1cnJlZCBhZnRlciBkZWZvcmVzdGF0aW9uLlRoaXMKICAgICAgaW5mb3JtYXRpb24gd2FzIGV4dHJhY3RlZCBmcm9tIHB1Ymxpc2hlZCwgcGVlci1yZXZpZXdlZCBqb3VybmFsIGFydGljbGVzCiAgICAgIGxpc3RlZCBpbiBEYXRhYmFzZSBTMURhdGFiYXNlIFMzVGhpcyBpbmZvcm1hdGlvbiB3YXMgZXh0cmFjdGVkIGZyb20KICAgICAgcHVibGlzaGVkLCBwZWVyLXJldmlld2VkIGpvdXJuYWwgYXJ0aWNsZXMuIERhdGFiYXNlIFMzIGNvbnRhaW5zCiAgICAgIGluZm9ybWF0aW9uIHJlbGF0aW5nIHRvIHRoZSBtZXRhLWFuYWx5c2lzLiBEYXRhYmFzZSBTMyBjb250YWlucwogICAgICBpbmZvcm1hdGlvbiBmcm9tIGVhY2ggc2l0ZSB3aGVyZSBkZWZvcmVzdGF0aW9uIGFuZCB3ZXRsYW5kIGNoYW5nZSBkYXRhIGlzCiAgICAgIGF2YWlsYWJsZS4gUG9zdC1kZWZvcmVzdGF0aW9uIHdldGxhbmQgY2hhbmdlcyBhcmUgaWRlbnRpZmllZCBpbmNsdWRpbmc7IGEKICAgICAgY2hhbmdlIGluIHNlZGltZW50YXRpb24gcmF0ZSwgZXV0cm9waGljYXRpb24gb3IgY2hhbmdlIGluIGh5ZHJvbG9neS4KICAgIDwvZGVzY3JpcHRpb24+CiAgPC9kZXNjcmlwdGlvbnM+CiAgPGdlb0xvY2F0aW9ucz4KICAgIDxnZW9Mb2NhdGlvbj4KICAgICAgPGdlb0xvY2F0aW9uUGxhY2U+R2xvYmFsIGNvdmVyYWdlPC9nZW9Mb2NhdGlvblBsYWNlPgogICAgPC9nZW9Mb2NhdGlvbj4KICA8L2dlb0xvY2F0aW9ucz4KPC9yZXNvdXJjZT4=","url":"https://datadryad.org/dataset/doi:10.5061/dryad.m62gj","contentUrl":null,"metadataVersion":19,"schemaVersion":"http://datacite.org/schema/kernel-4","source":"mds","isActive":true,"state":"findable","reason":null,"viewCount":506,"viewsOverTime":[{"yearMonth":"2014-11","total":36},{"yearMonth":"2015-02","total":5},{"yearMonth":"2015-03","total":1},{"yearMonth":"2015-04","total":4},{"yearMonth":"2015-05","total":3},{"yearMonth":"2015-08","total":3},{"yearMonth":"2015-09","total":14},{"yearMonth":"2015-11","total":24},{"yearMonth":"2016-01","total":26},{"yearMonth":"2016-03","total":2},{"yearMonth":"2016-04","total":3},{"yearMonth":"2016-07","total":1},{"yearMonth":"2016-08","total":1},{"yearMonth":"2017-01","total":10},{"yearMonth":"2017-02","total":4},{"yearMonth":"2017-03","total":9},{"yearMonth":"2017-04","total":2},{"yearMonth":"2017-05","total":6},{"yearMonth":"2017-06","total":3},{"yearMonth":"2017-08","total":1},{"yearMonth":"2017-09","total":2},{"yearMonth":"2018-01","total":3},{"yearMonth":"2018-02","total":1},{"yearMonth":"2018-04","total":1},{"yearMonth":"2018-10","total":6},{"yearMonth":"2018-11","total":6},{"yearMonth":"2018-12","total":1},{"yearMonth":"2019-01","total":2},{"yearMonth":"2019-02","total":6},{"yearMonth":"2019-04","total":2},{"yearMonth":"2019-07","total":1},{"yearMonth":"2019-08","total":2},{"yearMonth":"2019-09","total":1},{"yearMonth":"2019-10","total":3},{"yearMonth":"2019-12","total":2},{"yearMonth":"2020-02","total":2},{"yearMonth":"2020-04","total":1},{"yearMonth":"2020-05","total":1},{"yearMonth":"2020-07","total":2},{"yearMonth":"2020-08","total":1},{"yearMonth":"2020-09","total":2},{"yearMonth":"2020-10","total":2},{"yearMonth":"2020-12","total":7},{"yearMonth":"2021-01","total":3},{"yearMonth":"2021-02","total":2},{"yearMonth":"2021-03","total":4},{"yearMonth":"2021-04","total":1},{"yearMonth":"2021-05","total":13},{"yearMonth":"2021-06","total":14},{"yearMonth":"2021-07","total":4},{"yearMonth":"2021-08","total":1},{"yearMonth":"2021-09","total":3},{"yearMonth":"2021-10","total":2},{"yearMonth":"2021-11","total":8},{"yearMonth":"2021-12","total":7},{"yearMonth":"2022-02","total":4},{"yearMonth":"2022-03","total":5},{"yearMonth":"2022-04","total":21},{"yearMonth":"2022-05","total":5},{"yearMonth":"2022-06","total":1},{"yearMonth":"2022-07","total":1},{"yearMonth":"2022-09","total":1},{"yearMonth":"2022-10","total":1},{"yearMonth":"2022-11","total":3},{"yearMonth":"2022-12","total":6},{"yearMonth":"2023-01","total":10},{"yearMonth":"2023-02","total":2},{"yearMonth":"2023-03","total":4},{"yearMonth":"2023-04","total":3},{"yearMonth":"2023-05","total":4},{"yearMonth":"2023-06","total":1},{"yearMonth":"2023-07","total":1},{"yearMonth":"2023-08","total":71},{"yearMonth":"2023-09","total":58},{"yearMonth":"2023-10","total":4},{"yearMonth":"2023-11","total":5},{"yearMonth":"2023-12","total":1},{"yearMonth":"2024-03","total":1},{"yearMonth":"2024-04","total":2},{"yearMonth":"2024-09","total":2},{"yearMonth":"2024-10","total":2},{"yearMonth":"2024-11","total":2},{"yearMonth":"2025-01","total":1},{"yearMonth":"2025-02","total":2},{"yearMonth":"2025-08","total":4},{"yearMonth":"2025-09","total":1}],"downloadCount":120,"downloadsOverTime":[{"yearMonth":"2014-11","total":3},{"yearMonth":"2015-02","total":1},{"yearMonth":"2015-04","total":1},{"yearMonth":"2015-05","total":1},{"yearMonth":"2015-08","total":2},{"yearMonth":"2015-09","total":14},{"yearMonth":"2015-11","total":22},{"yearMonth":"2016-01","total":21},{"yearMonth":"2016-03","total":1},{"yearMonth":"2016-04","total":2},{"yearMonth":"2016-07","total":1},{"yearMonth":"2017-01","total":7},{"yearMonth":"2017-02","total":2},{"yearMonth":"2017-03","total":5},{"yearMonth":"2017-04","total":2},{"yearMonth":"2017-05","total":1},{"yearMonth":"2017-06","total":2},{"yearMonth":"2018-01","total":3},{"yearMonth":"2018-10","total":1},{"yearMonth":"2018-11","total":4},{"yearMonth":"2019-01","total":1},{"yearMonth":"2019-04","total":1},{"yearMonth":"2019-08","total":1},{"yearMonth":"2019-10","total":1},{"yearMonth":"2020-05","total":1},{"yearMonth":"2020-12","total":2},{"yearMonth":"2021-05","total":1},{"yearMonth":"2021-06","total":2},{"yearMonth":"2021-07","total":1},{"yearMonth":"2021-08","total":1},{"yearMonth":"2021-09","total":1},{"yearMonth":"2021-10","total":1},{"yearMonth":"2021-11","total":1},{"yearMonth":"2022-11","total":1},{"yearMonth":"2023-10","total":3},{"yearMonth":"2023-11","total":1},{"yearMonth":"2023-12","total":1},{"yearMonth":"2024-03","total":1},{"yearMonth":"2024-04","total":1},{"yearMonth":"2024-09","total":0},{"yearMonth":"2024-10","total":1},{"yearMonth":"2024-11","total":0},{"yearMonth":"2025-01","total":0},{"yearMonth":"2025-02","total":0},{"yearMonth":"2025-08","total":0},{"yearMonth":"2025-09","total":0}],"referenceCount":1,"citationCount":1,"citationsOverTime":[{"year":"2019","total":1}],"partCount":3,"partOfCount":0,"versionCount":0,"versionOfCount":0,"created":"2014-10-30T15:25:41.000Z","registered":"2014-10-30T15:25:42.000Z","published":"2015","updated":"2025-07-21T14:21:48.000Z"},"relationships":{"client":{"data":{"id":"dryad.dryad","type":"clients"}},"provider":{"data":{"id":"dryad","type":"providers"}},"media":{"data":{"id":"10.5061/dryad.m62gj","type":"media"}},"references":{"data":[{"id":"10.1126/science.1260510","type":"dois"}]},"citations":{"data":[{"id":"10.1126/science.1260510","type":"dois"}]},"parts":{"data":[{"id":"10.5061/dryad.m62gj/1","type":"dois"},{"id":"10.5061/dryad.m62gj/2","type":"dois"},{"id":"10.5061/dryad.m62gj/3","type":"dois"}]},"partOf":{"data":[]},"versions":{"data":[]},"versionOf":{"data":[]}}}}'
+  recorded_at: Tue, 28 Oct 2025 17:22:22 GMT
+recorded_with: VCR 6.3.1
