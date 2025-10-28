@@ -68,7 +68,7 @@ module Seek
             doi: data['doi'],
             publisher: data['publisher'],
             authors: extract_authors_as_objects(data['creators']),
-            editors: extract_editors(data['contributors']),
+            editors: extract_editors(data['contributors']).join(' and '),
             url: data['url'],
             volume: data.dig('container', 'volume'),
             issue: data.dig('container', 'issue'),
