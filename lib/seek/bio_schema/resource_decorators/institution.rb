@@ -4,7 +4,8 @@ module Seek
       # Decorator that provides extensions for an Institution
       class Institution < Thing
         schema_mappings full_address: :address,
-                        image: :logo
+                        image: :logo,
+                        ror_url: :identifier
 
         def schema_type
           'ResearchOrganization'

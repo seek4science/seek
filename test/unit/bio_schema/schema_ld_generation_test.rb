@@ -698,6 +698,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
       "name"=>"Manchester Institute of Biotechnology, University of Manchester",
       'url' => 'http://www.manchester.ac.uk/',
+      'identifier' => 'https://ror.org/027m9bs27',
       "address"=>{"address_country"=>"GB", "address_locality"=>"Manchester", "street_address"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
     }
 
