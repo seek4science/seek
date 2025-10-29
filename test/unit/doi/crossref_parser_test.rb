@@ -33,7 +33,7 @@ class Seek::Doi::CrossrefParserTest < ActiveSupport::TestCase
       assert_equal result.publisher, 'Springer Science and Business Media LLC'
       assert_equal result.date_published, '2020-09-16'
       assert_equal result.authors.first.full_name, 'Charles R. Harris'
-      assert_equal result[:citation], 'Nature 585(7825):357-362'
+      assert_equal result[:citation], 'Nature 585(7825):357-362.'
       assert_equal result.url, 'https://doi.org/10.1038/s41586-020-2649-2'
     end
   end
@@ -56,7 +56,7 @@ class Seek::Doi::CrossrefParserTest < ActiveSupport::TestCase
       assert_equal 'Journal of Chemical Information and Modeling', result.booktitle
       assert_equal 'Journal of Chemical Information and Modeling', result.journal
       assert_equal 'https://doi.org/10.1021/acs.jcim.5c01488', result.url
-      assert_equal 'J. Chem. Inf. Model.:acs.jcim.5c01488', result.citation
+      assert_equal 'J. Chem. Inf. Model. 65(20):11215-11231.', result.citation
 
     end
   end

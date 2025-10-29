@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 19:43:17 GMT
+      - Wed, 29 Oct 2025 16:49:01 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Fx9%2BFeZsjRSQiaMZWq6egymYz8X%2FWQbDFlSl6Y96ZtPuO8fofjPTOTrZP6ApaBcpswCBRuSMbnHibCjRPP0UhiAYnBpZ4PzpIPfATa1QSTaylw%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=5xgtzjxhROwgPNMm0q55%2FQ3gXnHXznNtON%2BvIWUQcA5QluCNT9o9ViFSGLAcfrmzuBodeV1zE6RnB%2Bb7EHuTn32T%2BOdC8MkSzhicvyOAnFEHmw%3D%3D"}]}'
       Cf-Ray:
-      - 992b7b94e95fd9d6-FRA
+      - 996429ee9f7ed2f6-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 22 Oct 2025 19:43:17 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:01 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1021/acs.jcim.5c01488
@@ -65,20 +65,22 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
       - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 19:43:17 GMT
+      - Wed, 29 Oct 2025 16:49:01 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '8594'
+      - '8735'
       Connection:
       - keep-alive
       Access-Control-Expose-Headers:
@@ -102,14 +104,14 @@ http_interactions:
       - interest-cohort=()
     body:
       encoding: ASCII-8BIT
-      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,5]],"date-time":"2025-10-05T00:39:41Z","timestamp":1759624781901,"version":"build-2065373602"},"reference-count":54,"publisher":"American
-        Chemical Society (ACS)","license":[{"start":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T00:00:00Z","timestamp":1759536000000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by-nc-nd\/4.0\/"}],"funder":[{"DOI":"10.13039\/501100001659","name":"Deutsche
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,27]],"date-time":"2025-10-27T08:26:59Z","timestamp":1761553619739,"version":"build-2065373602"},"reference-count":54,"publisher":"American
+        Chemical Society (ACS)","issue":"20","license":[{"start":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T00:00:00Z","timestamp":1759536000000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by-nc-nd\/4.0\/"}],"funder":[{"DOI":"10.13039\/501100001659","name":"Deutsche
         Forschungsgemeinschaft","doi-asserted-by":"publisher","award":["INST 35\/1597-
         1 FUGG"],"id":[{"id":"10.13039\/501100001659","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/501100007316","name":"Klaus
         Tschira Stiftung","doi-asserted-by":"publisher","id":[{"id":"10.13039\/501100007316","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["J.
-        Chem. Inf. Model."],"DOI":"10.1021\/acs.jcim.5c01488","type":"journal-article","created":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T13:01:23Z","timestamp":1759582883000},"source":"Crossref","is-referenced-by-count":0,"title":["A
+        Chem. Inf. Model."],"published-print":{"date-parts":[[2025,10,27]]},"DOI":"10.1021\/acs.jcim.5c01488","type":"journal-article","created":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T13:01:23Z","timestamp":1759582883000},"page":"11215-11231","source":"Crossref","is-referenced-by-count":0,"title":["A
         Multiscale Simulation Approach to Compute Protein\u2013Ligand Association
-        Rate Constants by Combining Brownian Dynamics and Molecular Dynamics"],"prefix":"10.1021","author":[{"ORCID":"https:\/\/orcid.org\/0000-0002-2598-7687","authenticated-orcid":true,"given":"Abraham","family":"Mu\u00f1iz-Chicharro","sequence":"first","affiliation":[{"name":"Molecular
+        Rate Constants by Combining Brownian Dynamics and Molecular Dynamics"],"prefix":"10.1021","volume":"65","author":[{"ORCID":"https:\/\/orcid.org\/0000-0002-2598-7687","authenticated-orcid":true,"given":"Abraham","family":"Mu\u00f1iz-Chicharro","sequence":"first","affiliation":[{"name":"Molecular
         and Cellular Modeling Group","place":["Heidelberg, Germany"]},{"name":"Heidelberg
         Institute for Theoretical Studies (HITS)","place":["Heidelberg, Germany"]}]},{"given":"Gaurav
         K.","family":"Ganotra","sequence":"additional","affiliation":[{"name":"Molecular
@@ -126,6 +128,6 @@ http_interactions:
         A.; Chernova, E.; Ganotra, G. K.; Wade, R. C. SDAMD: a multiscale workflow
         to compute protein-ligand binding association rate constants using Brownian
         dynamics and molecular dynamics simulations. Manuscript submitted."},{"key":"ref49\/cit49","doi-asserted-by":"publisher","DOI":"10.1371\/journal.pcbi.1000939"},{"key":"ref50\/cit50","doi-asserted-by":"publisher","DOI":"10.1002\/jcc.21836"},{"key":"ref51\/cit51","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.1103547108"},{"key":"ref52\/cit52","doi-asserted-by":"publisher","DOI":"10.3389\/fmolb.2022.922361"},{"key":"ref53\/cit53","doi-asserted-by":"publisher","DOI":"10.1007\/s11239-013-0991-z"},{"key":"ref54\/cit54","doi-asserted-by":"publisher","DOI":"10.32607\/20758251-2009-1-2-26-32"}],"container-title":["Journal
-        of Chemical Information and Modeling"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"application\/pdf","content-version":"vor","intended-application":"unspecified"},{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2025,10,4]],"date-time":"2025-10-04T13:24:27Z","timestamp":1759584267000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.acs.org\/doi\/10.1021\/acs.jcim.5c01488"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2025,10,4]]},"references-count":54,"alternative-id":["10.1021\/acs.jcim.5c01488"],"URL":"https:\/\/doi.org\/10.1021\/acs.jcim.5c01488","relation":{},"ISSN":["1549-9596","1549-960X"],"issn-type":[{"value":"1549-9596","type":"print"},{"value":"1549-960X","type":"electronic"}],"subject":[],"published":{"date-parts":[[2025,10,4]]},"article-number":"acs.jcim.5c01488"}}'
-  recorded_at: Wed, 22 Oct 2025 19:43:17 GMT
+        of Chemical Information and Modeling"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"application\/pdf","content-version":"vor","intended-application":"unspecified"},{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2025,10,27]],"date-time":"2025-10-27T08:11:43Z","timestamp":1761552703000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.acs.org\/doi\/10.1021\/acs.jcim.5c01488"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2025,10,4]]},"references-count":54,"journal-issue":{"issue":"20","published-print":{"date-parts":[[2025,10,27]]}},"alternative-id":["10.1021\/acs.jcim.5c01488"],"URL":"https:\/\/doi.org\/10.1021\/acs.jcim.5c01488","relation":{},"ISSN":["1549-9596","1549-960X"],"issn-type":[{"type":"print","value":"1549-9596"},{"type":"electronic","value":"1549-960X"}],"subject":[],"published":{"date-parts":[[2025,10,4]]}}}'
+  recorded_at: Wed, 29 Oct 2025 16:49:01 GMT
 recorded_with: VCR 6.3.1

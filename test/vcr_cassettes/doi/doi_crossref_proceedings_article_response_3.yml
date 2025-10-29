@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 12:37:24 GMT
+      - Wed, 29 Oct 2025 16:49:04 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=JohwK9c68%2FA%2BDC3K2dRJ9pwMDnAjOqDpXXhqwEo160FVHDFsdG1oaKP33WQ5MVBcCXmyYi%2FVm0oCNKyeYuy3duCbiPKV%2BA%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=zfK2LTOAr7u8bMyPfqXRwG%2Btdly4w2xYG79tJguKRiyGZfgi1FvoouDsGVv4gflJXgP%2BIPruVpJJ92tZR9L3JWStHLqIojDQawRwhlVQvwx7%2Fw%3D%3D"}]}'
       Cf-Ray:
-      - 99314919ea5fe859-STR
+      - 99642a054d5639d6-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Thu, 23 Oct 2025 12:37:24 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:04 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1063/1.2128263
@@ -65,16 +65,18 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
       - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 12:37:24 GMT
+      - Wed, 29 Oct 2025 16:49:05 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -107,5 +109,5 @@ http_interactions:
         organizers","sequence":"first","affiliation":[]}],"member":"317","event":{"name":"WOMEN
         IN PHYSICS: 2nd IUPAP International Conference on Women in Physics","location":"Rio
         de Janeiro (Brazil)"},"container-title":["AIP Conference Proceedings"],"original-title":[],"deposited":{"date-parts":[[2023,4,20]],"date-time":"2023-04-20T10:00:04Z","timestamp":1681984804000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/aip\/acp\/article\/795\/1\/29-34\/624381"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2005]]},"references-count":0,"URL":"https:\/\/doi.org\/10.1063\/1.2128263","relation":{},"ISSN":["0094-243X"],"issn-type":[{"type":"print","value":"0094-243X"}],"subject":[],"published":{"date-parts":[[2005]]}}}'
-  recorded_at: Thu, 23 Oct 2025 12:37:24 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:05 GMT
 recorded_with: VCR 6.3.1

@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 17:48:50 GMT
+      - Wed, 29 Oct 2025 16:48:57 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=iRR9U0CAA%2BaOvg%2F3Pc%2Fd474FBL3O07QjUANZV7mJzIbFAyzmSOYn6tsKtExO%2FlIxZTHZ2Ddz6Z5HIe9BtFyVPI6TyVz21BcgAtJyqI%2BHLqQqvA%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=tHp6fzNWQbOLjN6eJkFJ2Dvbw%2F0SYKtRTTprpNuPT0B%2B2R6F1cL7TWiCqb5fzP%2Fpr5NXhqTC7Q05AbagAAC%2FXVEZxKXstB%2BYFSPy3sCw7T4Urw%3D%3D"}]}'
       Cf-Ray:
-      - 992ad3f0ba8271b8-FRA
+      - 996429d62e14e854-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 22 Oct 2025 17:48:50 GMT
+  recorded_at: Wed, 29 Oct 2025 16:48:57 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1007/978-3-540-70504-8_9
@@ -65,16 +65,18 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
       - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 17:48:51 GMT
+      - Wed, 29 Oct 2025 16:48:57 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -147,5 +149,5 @@ http_interactions:
         Engine with Heterogeneous-Grained Adaptivity. In: VLDB (2004)","DOI":"10.1016\/B978-012088469-8\/50145-5"},{"key":"9_CR14","unstructured":"Yao,
         Y., Gehrke, J.: Query Processing in Sensor Networks. In: CIDR (2003)"}],"container-title":["Lecture
         Notes in Computer Science","Sharing Data, Information and Knowledge"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1007\/978-3-540-70504-8_9.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2020,11,19]],"date-time":"2020-11-19T05:06:52Z","timestamp":1605762412000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1007\/978-3-540-70504-8_9"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[null]]},"ISBN":["9783540705031","9783540705048"],"references-count":14,"URL":"https:\/\/doi.org\/10.1007\/978-3-540-70504-8_9","relation":{},"ISSN":["0302-9743","1611-3349"],"issn-type":[{"type":"print","value":"0302-9743"},{"type":"electronic","value":"1611-3349"}],"subject":[]}}'
-  recorded_at: Wed, 22 Oct 2025 17:48:51 GMT
+  recorded_at: Wed, 29 Oct 2025 16:48:57 GMT
 recorded_with: VCR 6.3.1

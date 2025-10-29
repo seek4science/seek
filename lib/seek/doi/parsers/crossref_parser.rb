@@ -1,52 +1,18 @@
-#todo error handling/logging
-require 'cgi'
-
 module Seek
   module Doi
     module Parsers
       class CrossrefParser < BaseParser
         CROSSREF_API_ENDPOINT = 'https://api.crossref.org/works'.freeze
 
-        def parse(doi)
-          url = URI("#{CROSSREF_API_ENDPOINT}/#{doi}")
-          Rails.logger.info("Fetching Crossref metadata for DOI #{doi} from #{url}")
-
-          response = perform_request(url)
-          return nil unless response.is_a?(Net::HTTPSuccess)
-
-          begin
-            json = JSON.parse(response.body)
-            data = json['message']
-            raise "Missing 'message' in Crossref response" unless data
-
-            data = decode_html_entities_in_hash(data)
-            metadata = extract_metadata(data)
-            metadata[:citation] = build_citation(metadata)
-
-            build_struct(metadata)
-          rescue JSON::ParserError => e
-            Rails.logger.error("JSON parse error for Crossref DOI #{doi}: #{e.message}")
-            nil
-          rescue StandardError => e
-            Rails.logger.error("Unexpected error parsing Crossref DOI #{doi}: #{e.message}")
-            nil
-          end
-        end
-
         private
 
+        def build_url(doi)
+          URI("#{CROSSREF_API_ENDPOINT}/#{doi}")
+        end
 
-        def perform_request(uri)
-          Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new(uri)
-            request['Accept'] = 'application/json'
-            response = http.request(request)
-            Rails.logger.debug("HTTP #{response.code} #{response.message} for #{uri}")
-            response
-          end
-        rescue SocketError, Timeout::Error => e
-          Rails.logger.error("Network error fetching #{uri}: #{e.message}")
-          nil
+        def parse_response_body(response)
+          json = JSON.parse(response.body)
+          json['message']
         end
 
         def extract_metadata(data)
@@ -73,54 +39,22 @@ module Seek
 
         def clean_abstract(abstract)
           return nil if abstract.nil?
-
-          # Remove all <jats:*> tags and their closing tags
-          cleaned = abstract.gsub(/<\/?jats:[^>]+>/, '')
-
-          # Optional: remove leading/trailing whitespace
-          cleaned.strip
+          abstract.gsub(/<\/?jats:[^>]+>/, '').strip
         end
 
         def extract_date(data)
-          # Helper to extract date-parts from a key
-          get_date_parts = ->(key) {
+          get_date_parts = ->(key) do
             if data[key] && data[key]['date-parts'].is_a?(Array)
               data[key]['date-parts'].first
             end
-          }
+          end
 
-          # Try issued first, then published, then published-print
           date_parts = get_date_parts.call('issued') ||
             get_date_parts.call('published') ||
             get_date_parts.call('published-print')
-
-          # Return Date object or nil if invalid
           date_parts ? (Date.new(*date_parts) rescue nil) : nil
         end
 
-        def extract_editors(editor_list)
-          #todo improve editor formatting
-          return [] unless editor_list.is_a?(Array)
-          editor_list.map { |e| [e['given'], e['family']].compact.join(' ') }
-        end
-
-        # Returns an array of DOI::Author objects
-        def extract_authors_as_objects(author_list)
-          return [] unless author_list.is_a?(Array)
-
-          author_list.map do |a|
-            if a['given'] && a['family']
-              Seek::Doi::Author.new(first_name: a['given'], last_name: a['family'])
-            elsif a['name']
-              Seek::Doi::Author.new(first_name: a['name'], last_name: '')
-            else
-              nil
-            end
-          end.compact
-        end
-
-
-        # https://api.crossref.org/types for type list
         def build_citation(data)
           case data[:type]
           when 'book-chapter'
@@ -151,7 +85,7 @@ module Seek
           # Build the core part: "Journal 585(7825):357–362" or "J Chem Inf Model:acs.jcim.5c01488"
           parts = [journal, volume].compact.join(' ')
           parts += "(#{issue})" if issue
-          parts += ":#{pages || article}" if pages || article
+          parts += ":#{pages || article}." if pages || article
 
           parts.squish
         end
@@ -217,21 +151,6 @@ module Seek
             parts << data[:url]
           end
           parts.join('. ') + (parts.empty? ? '' : '.')
-        end
-
-        def decode_html_entities_in_hash(hash)
-          hash.transform_values do |value|
-            case value
-            when String
-              CGI.unescapeHTML(value)
-            when Array
-              value.map { |v| v.is_a?(String) ? CGI.unescapeHTML(v) : v }
-            when Hash
-              decode_html_entities_in_hash(value)
-            else
-              value
-            end
-          end
         end
 
       end

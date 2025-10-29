@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 19:43:07 GMT
+      - Wed, 29 Oct 2025 16:49:00 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=9azYzgua0ya8x5tO5rnrPIX1L8s0PZ8BX%2B1zw9tKgCLayZIw70xtp6coemQiEMrNOM7WAHM5tv848LuGAwmLvIj3IvCQQ81pyxuT0R5HC2Ld3Q%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Q2bObUzfS26l8uzU7ZicLt%2BDVLidSG3ajc7dmGCf3wch%2F%2FSsPvh1V2V6UDej7%2B9j685jtCOGreXUxqnTiqStW1BhD3raYGn%2Bj5W5E6IWaFNVLg%3D%3D"}]}'
       Cf-Ray:
-      - 992b7b5a5d2cdc58-FRA
+      - 996429ea5d3e9022-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 22 Oct 2025 19:43:07 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:00 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1038/s41586-020-2649-2
@@ -65,16 +65,18 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
       - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 19:43:08 GMT
+      - Wed, 29 Oct 2025 16:49:01 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -102,7 +104,7 @@ http_interactions:
       - interest-cohort=()
     body:
       encoding: ASCII-8BIT
-      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,22]],"date-time":"2025-10-22T18:16:31Z","timestamp":1761156991849,"version":"3.41.0"},"reference-count":57,"publisher":"Springer
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,10,29]],"date-time":"2025-10-29T13:41:47Z","timestamp":1761745307551,"version":"3.41.0"},"reference-count":57,"publisher":"Springer
         Science and Business Media LLC","issue":"7825","license":[{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2020,9,16]],"date-time":"2020-09-16T00:00:00Z","timestamp":1600214400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nature"],"published-print":{"date-parts":[[2020,9,17]]},"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Array
         programming provides a powerful, compact and expressive syntax for accessing,
         manipulating and operating on data in vectors, matrices and higher-dimensional
@@ -120,7 +122,7 @@ http_interactions:
         to its central position in the ecosystem, NumPy increasingly acts as an interoperability
         layer between such array computation libraries and, together with its application
         programming interface (API), provides a flexible framework to support the
-        next decade of scientific and industrial analysis.<\/jats:p>","DOI":"10.1038\/s41586-020-2649-2","type":"journal-article","created":{"date-parts":[[2020,9,17]],"date-time":"2020-09-17T20:48:17Z","timestamp":1600375697000},"page":"357-362","update-policy":"https:\/\/doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":17998,"title":["Array
+        next decade of scientific and industrial analysis.<\/jats:p>","DOI":"10.1038\/s41586-020-2649-2","type":"journal-article","created":{"date-parts":[[2020,9,17]],"date-time":"2020-09-17T20:48:17Z","timestamp":1600375697000},"page":"357-362","update-policy":"https:\/\/doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":18118,"title":["Array
         programming with NumPy"],"prefix":"10.1038","volume":"585","author":[{"given":"Charles
         R.","family":"Harris","sequence":"first","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-5263-5070","authenticated-orcid":false,"given":"K.
         Jarrod","family":"Millman","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0001-9276-1891","authenticated-orcid":false,"given":"St\u00e9fan
@@ -302,5 +304,5 @@ http_interactions:
         Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"The
         authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
         interests"}}]}}'
-  recorded_at: Wed, 22 Oct 2025 19:43:08 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:00 GMT
 recorded_with: VCR 6.3.1

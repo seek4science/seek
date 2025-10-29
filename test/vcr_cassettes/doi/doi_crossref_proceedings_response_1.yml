@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 13:38:43 GMT
+      - Wed, 29 Oct 2025 16:49:02 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=wd8zILCYowCk2FtDtP%2BQudl2ST1mcMtHj6TeYP8f1H8m7ulac539LTx0dx1PQA%2FeFNoW7KMnw5tBz1hqtefVBGW5thKptQ%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=JTplHAASPrzKsv3713m%2FMRscQP0yQ7gNxYry7xcp2%2B%2FEOjj1RAk5FiTcw%2BMXoXZTg0K2h9lUE8SxSfF%2F4t2WDzU48aXV3PTFHoFn2N2Lmnba%2BQ%3D%3D"}]}'
       Cf-Ray:
-      - 9931a2ebff8831bc-STR
+      - 996429f7ab2a814d-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Thu, 23 Oct 2025 13:38:43 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:02 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.18653/v1/w18-08
@@ -65,16 +65,18 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
       - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 13:38:43 GMT
+      - Wed, 29 Oct 2025 16:49:03 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -107,5 +109,5 @@ http_interactions:
         of the Second ACL Workshop on Ethics in Natural Language Processing"],"prefix":"10.18653","member":"1643","event":{"name":"Proceedings
         of the Second ACL Workshop on Ethics in Natural Language Processing","location":"New
         Orleans, Louisiana, USA","start":{"date-parts":[[2018,6]]},"end":{"date-parts":[[2018,6]]}},"container-title":[],"original-title":[],"deposited":{"date-parts":[[2018,5,30]],"date-time":"2018-05-30T00:48:36Z","timestamp":1527641316000},"score":1,"resource":{"primary":{"URL":"http:\/\/aclweb.org\/anthology\/W18-08"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2018]]},"references-count":0,"URL":"https:\/\/doi.org\/10.18653\/v1\/w18-08","relation":{},"subject":[],"published":{"date-parts":[[2018]]}}}'
-  recorded_at: Thu, 23 Oct 2025 13:38:43 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:03 GMT
 recorded_with: VCR 6.3.1

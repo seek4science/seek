@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 14:55:13 GMT
+      - Wed, 29 Oct 2025 16:48:58 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=owZEd4gsOlZX9OHEq%2FIjy7UTaVA3erJ8FwlGFH2BUFQpu0ufhBVWPg5M2M%2FfDFG1yRSos%2Fge%2BFJmbVsTqnt4I7JINF5DdA%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=LWebD6G2Suo%2Bwg0AkgLRd2HUbKfyAdlKQtvq3BJyZ9F1UI5GBsQeWPWueCEH3V%2FOOaVtyPSSXwj0VgOrZfxWiJovdq0EyZ4dvYXunZc7p07UjA%3D%3D"}]}'
       Cf-Ray:
-      - 993212fe9ce22c09-STR
+      - 996429df1bb63a6d-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Thu, 23 Oct 2025 14:55:13 GMT
+  recorded_at: Wed, 29 Oct 2025 16:48:58 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.20944/preprints201909.0043.v1
@@ -65,16 +65,18 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
       - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 14:55:18 GMT
+      - Wed, 29 Oct 2025 16:49:00 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -135,5 +137,5 @@ http_interactions:
         demand as the relevant homeostatic pathways are already activated.<\/jats:p>","DOI":"10.20944\/preprints201909.0043.v1","type":"posted-content","created":{"date-parts":[[2019,9,5]],"date-time":"2019-09-05T04:28:52Z","timestamp":1567657732000},"source":"Crossref","is-referenced-by-count":2,"title":["An
         Isolated Complex V Inefficiency and Dysregulated Mitochondrial Function in
         Immortalized Lymphocytes from ME\/CFS Patients"],"prefix":"10.20944","author":[{"given":"Daniel","family":"Missailidis","sequence":"first","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-7604-3985","authenticated-orcid":false,"given":"Sarah","family":"Annesley","sequence":"additional","affiliation":[]},{"given":"Claire","family":"Allan","sequence":"additional","affiliation":[]},{"given":"Oana","family":"Sanislav","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0003-2211-989X","authenticated-orcid":false,"given":"Brett","family":"Lidbury","sequence":"additional","affiliation":[]},{"given":"Don","family":"Lewis","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0003-1884-6306","authenticated-orcid":false,"given":"Paul","family":"Fisher","sequence":"additional","affiliation":[]}],"member":"1968","container-title":[],"original-title":[],"deposited":{"date-parts":[[2020,3,10]],"date-time":"2020-03-10T06:22:28Z","timestamp":1583821348000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.preprints.org\/manuscript\/201909.0043\/v1"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2019,9,4]]},"references-count":0,"URL":"https:\/\/doi.org\/10.20944\/preprints201909.0043.v1","relation":{"is-version-of":[{"id-type":"doi","id":"10.20944\/preprints201909.0043.v2","asserted-by":"subject"},{"id-type":"doi","id":"10.20944\/preprints201909.0043.v3","asserted-by":"subject"}],"is-preprint-of":[{"id-type":"doi","id":"10.3390\/ijms21031074","asserted-by":"subject"}],"has-version":[{"id-type":"doi","id":"10.20944\/preprints201909.0043.v2","asserted-by":"object"},{"id-type":"doi","id":"10.20944\/preprints201909.0043.v3","asserted-by":"object"}]},"subject":[],"published":{"date-parts":[[2019,9,4]]},"subtype":"preprint"}}'
-  recorded_at: Thu, 23 Oct 2025 14:55:18 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:00 GMT
 recorded_with: VCR 6.3.1

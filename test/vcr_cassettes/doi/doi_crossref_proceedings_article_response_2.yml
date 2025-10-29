@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 08:56:34 GMT
+      - Wed, 29 Oct 2025 16:49:04 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=pDJSFdKCvaigYLDIBpDLZX89Exs13Bl%2FcylPFrLpaqLjNw7bnnFK8nsZPaH70wULFpJx2hDOx%2FFdMT9RT1rFI%2BlJOqubWQ%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=bzhXU1EURAk%2BT2gzzAnkfdVlBrbuWz%2BIeLKxi%2FNiis9uTsgwzY8Zq0XYZXt8G64r%2F%2FEN%2FKsF%2BDxXsP5h7Pgaerr%2BRa88B7eg9Da72whQDa7SAw%3D%3D"}]}'
       Cf-Ray:
-      - 993005a198412c0d-STR
+      - 99642a00faa4d280-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -54,7 +54,7 @@ http_interactions:
             "RA": "Crossref"
           }
         ]
-  recorded_at: Thu, 23 Oct 2025 08:56:34 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:04 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1145/3292500.3330675
@@ -65,16 +65,18 @@ http_interactions:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
       - Ruby
+      Host:
+      - api.crossref.org
   response:
     status:
       code: 200
       message: OK
     headers:
       Date:
-      - Thu, 23 Oct 2025 08:56:35 GMT
+      - Wed, 29 Oct 2025 16:49:04 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -141,5 +143,5 @@ http_interactions:
         AK USA"},"container-title":["Proceedings of the 25th ACM SIGKDD International
         Conference on Knowledge Discovery &amp; Data Mining"],"original-title":[],"link":[{"URL":"https:\/\/dl.acm.org\/doi\/10.1145\/3292500.3330675","content-type":"unspecified","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/dl.acm.org\/doi\/pdf\/10.1145\/3292500.3330675","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2025,6,18]],"date-time":"2025-06-18T01:02:09Z","timestamp":1750208529000},"score":1,"resource":{"primary":{"URL":"https:\/\/dl.acm.org\/doi\/10.1145\/3292500.3330675"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2019,7,25]]},"references-count":29,"alternative-id":["10.1145\/3292500.3330675","10.1145\/3292500"],"URL":"https:\/\/doi.org\/10.1145\/3292500.3330675","relation":{},"subject":[],"published":{"date-parts":[[2019,7,25]]},"assertion":[{"value":"2019-07-25","order":2,"name":"published","label":"Published","group":{"name":"publication_history","label":"Publication
         History"}}]}}'
-  recorded_at: Thu, 23 Oct 2025 08:56:35 GMT
+  recorded_at: Wed, 29 Oct 2025 16:49:04 GMT
 recorded_with: VCR 6.3.1
