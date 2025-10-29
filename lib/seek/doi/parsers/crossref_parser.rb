@@ -8,21 +8,46 @@ module Seek
         CROSSREF_API_ENDPOINT = 'https://api.crossref.org/works'.freeze
 
         def parse(doi)
-          url = "#{CROSSREF_API_ENDPOINT}/#{doi}"
-          puts "================== Fetching Crossref JSON from URL: =================="
-          puts url
+          url = URI("#{CROSSREF_API_ENDPOINT}/#{doi}")
+          Rails.logger.info("Fetching Crossref metadata for DOI #{doi} from #{url}")
 
-          data = decode_html_entities_in_hash(JSON.parse(URI.open(url).read)["message"])
-          Rails.logger.info("Crossref JSON data for DOI #{doi}: #{data.inspect}")
+          response = perform_request(url)
+          return nil unless response.is_a?(Net::HTTPSuccess)
 
-          metadata = extract_metadata(data)
-          metadata[:citation] = build_citation(metadata)
+          begin
+            json = JSON.parse(response.body)
+            data = json['message']
+            raise "Missing 'message' in Crossref response" unless data
 
-          build_struct(metadata)
+            data = decode_html_entities_in_hash(data)
+            metadata = extract_metadata(data)
+            metadata[:citation] = build_citation(metadata)
+
+            build_struct(metadata)
+          rescue JSON::ParserError => e
+            Rails.logger.error("JSON parse error for Crossref DOI #{doi}: #{e.message}")
+            nil
+          rescue StandardError => e
+            Rails.logger.error("Unexpected error parsing Crossref DOI #{doi}: #{e.message}")
+            nil
+          end
         end
 
-
         private
+
+
+        def perform_request(uri)
+          Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+            request = Net::HTTP::Get.new(uri)
+            request['Accept'] = 'application/json'
+            response = http.request(request)
+            Rails.logger.debug("HTTP #{response.code} #{response.message} for #{uri}")
+            response
+          end
+        rescue SocketError, Timeout::Error => e
+          Rails.logger.error("Network error fetching #{uri}: #{e.message}")
+          nil
+        end
 
         def extract_metadata(data)
           {
