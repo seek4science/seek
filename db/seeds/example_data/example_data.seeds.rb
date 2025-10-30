@@ -1,8 +1,3 @@
-# Load modular seed files in order
-require_relative 'example_projects_and_basic_setup_seeds'
-require_relative 'example_users_seeds'
-require_relative 'example_isa_structure_seeds'
-require_relative 'example_samples_seeds'
-require_relative 'example_data_files_and_models_seeds'
-require_relative 'example_publications_and_presentations_seeds'
-require_relative 'example_config_seeds'
+# Use the new centralized ExampleDataSeeder class
+seeder = Seek::ExampleDataSeeder.new
+seeder.seed_all
