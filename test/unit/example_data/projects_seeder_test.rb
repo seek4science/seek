@@ -48,7 +48,7 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     # Verify institution attributes
     institution = result[:institution]
     assert_equal 'Default Institution', institution.title
-    assert_equal 'United Kingdom', institution.country
+    assert_equal 'GB', institution.country
     
     # Verify strain attributes
     strain = result[:strain]
