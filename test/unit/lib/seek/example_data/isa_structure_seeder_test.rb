@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class IsaStructureSeederTest < ActiveSupport::TestCase
+class ISAStructureSeederTest < ActiveSupport::TestCase
   def setup
     User.current_user = nil
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
@@ -23,7 +23,7 @@ class IsaStructureSeederTest < ActiveSupport::TestCase
     initial_study_count = Study.count
     initial_assay_count = Assay.count
     
-    seeder = Seek::ExampleData::IsaStructureSeeder.new(
+    seeder = Seek::ExampleData::ISAStructureSeeder.new(
       @base_data[:project],
       @user_data[:guest_person],
       @base_data[:organism]

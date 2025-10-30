@@ -1,7 +1,7 @@
 # Seeds ISA structure - Investigation, Study, Assays, Observation Units
 module Seek
   module ExampleData
-    class IsaStructureSeeder
+    class ISAStructureSeeder
       def initialize(project, guest_person, organism)
         @project = project
         @guest_person = guest_person

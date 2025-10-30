@@ -53,7 +53,7 @@ module Seek
     end
 
     def seed_isa_structure
-      seeder = Seek::ExampleData::IsaStructureSeeder.new(@project, @guest_person, @organism)
+      seeder = Seek::ExampleData::ISAStructureSeeder.new(@project, @guest_person, @organism)
       result = seeder.seed
       
       @investigation = result[:investigation]
