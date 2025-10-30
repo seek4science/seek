@@ -5,10 +5,20 @@ module Seek
       class Institution < Thing
         schema_mappings full_address: :address,
                         image: :logo,
-                        ror_url: :identifier
+                        ror_url: :identifier,
+                        base_title: :name,
+                        department_organization: :department
 
         def schema_type
           'ResearchOrganization'
+        end
+
+        def department_organization
+          return nil if department.blank?
+          {
+            '@type': 'Organization',
+            name: department
+          }
         end
 
         def url
@@ -21,9 +31,10 @@ module Seek
 
         def full_address
           full = {}
-          full[:address_country] = country
-          full[:address_locality] = city unless city.blank?
-          full[:street_address] = address unless address.blank?
+          full[:@type]='PostalAddress'
+          full[:addressCountry] = country
+          full[:addressLocality] = city unless city.blank?
+          full[:streetAddress] = address unless address.blank?
           full
         end
       end
