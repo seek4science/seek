@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.1007
+    uri: https://doi.org/ra/10.1007/978-3-540-70504-8
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:48:55 GMT
+      - Thu, 30 Oct 2025 20:16:25 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=LVQ%2BdRxJAkM0oLVoLjqfeEGaqC55NEixPNMsFf80uyhYLq6A79ZW8c2OaiISvaFnFEFklg4IKZZyAdnQIPotrnfMAUzpued0oyBQlHiEYOg%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=uNE3vHfW0siUn706bEUp7CRkjJtHHEDCaIz60jW%2FrOs5M98rWFBiaiAkN6DInSHztjDxCoWCJMwvON5R41MVv37kW5LUrHv%2FDAX8DxkpKjpzOg%3D%3D"}]}'
       Cf-Ray:
-      - 996429cd0bef993f-FRA
+      - 996d9720ddaa4d2b-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,11 +50,11 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.1007",
+            "DOI": "10.1007/978-3-540-70504-8",
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 29 Oct 2025 16:48:55 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:25 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1007/978-3-540-70504-8
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:48:56 GMT
+      - Thu, 30 Oct 2025 20:16:26 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -110,5 +110,5 @@ http_interactions:
         Notes in Computer Science"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1007\/978-3-540-70504-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1007\/978-3-540-70504-8","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2019,5,19]],"date-time":"2019-05-19T11:45:50Z","timestamp":1558266350000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1007\/978-3-540-70504-8"}},"subtitle":["25th
         British National Conference on Databases, BNCOD 25, Cardiff, UK, July 7-10,
         2008. Proceedings"],"editor":[{"given":"Alex","family":"Gray","sequence":"first","affiliation":[]},{"given":"Keith","family":"Jeffery","sequence":"additional","affiliation":[]},{"given":"Jianhua","family":"Shao","sequence":"additional","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2008]]},"ISBN":["9783540705031","9783540705048"],"references-count":0,"URL":"https:\/\/doi.org\/10.1007\/978-3-540-70504-8","relation":{},"ISSN":["0302-9743","1611-3349"],"issn-type":[{"type":"print","value":"0302-9743"},{"type":"electronic","value":"1611-3349"}],"subject":[],"published":{"date-parts":[[2008]]}}}'
-  recorded_at: Wed, 29 Oct 2025 16:48:56 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:26 GMT
 recorded_with: VCR 6.3.1

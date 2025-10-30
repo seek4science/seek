@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.23943
+    uri: https://doi.org/ra/10.23943/princeton/9780691161914.003.0002
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:48:55 GMT
+      - Thu, 30 Oct 2025 20:16:25 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=S0YC%2FCJRhw%2FhUK31UBl78Xtkb27WEgRLE38P3GF2QPhfJgQ41pjYqRlBCEVsCZTSDWUJIjQNxa3QxKFDzhzasnSU7GiE9oYQ6foXZkM%2BKmtYxQ%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=F7CyQqkbQqak0LnO055XEAuHaYsxTFr%2FQsJlrknsDov%2BP3345aT1mN63ilC%2FkzPuc9mZLMI7X1ZaNNf662EkxHmalYMgbBhmtgKXDWbEs%2Brjsw%3D%3D"}]}'
       Cf-Ray:
-      - 996429c799c62bbe-FRA
+      - 996d971c4f6595b3-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,11 +50,11 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.23943",
+            "DOI": "10.23943/princeton/9780691161914.003.0002",
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 29 Oct 2025 16:48:55 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:25 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.23943/princeton/9780691161914.003.0002
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:48:55 GMT
+      - Thu, 30 Oct 2025 20:16:25 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -122,5 +122,5 @@ http_interactions:
         Book of Numbers: Book 1 and Its Catalog"],"prefix":"10.23943","author":[{"given":"David","family":"Quint","sequence":"first","affiliation":[]}],"member":"10341","container-title":["Princeton
         University Press"],"original-title":["Milton\u2019s Book of Numbers: Book
         1 and Its Catalog"],"deposited":{"date-parts":[[2022,7,28]],"date-time":"2022-07-28T14:40:42Z","timestamp":1659019242000},"score":1,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/princeton-scholarship-online\/book\/16275\/chapter\/171374633"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2017,10,19]]},"references-count":0,"URL":"https:\/\/doi.org\/10.23943\/princeton\/9780691161914.003.0002","relation":{},"subject":[],"published":{"date-parts":[[2017,10,19]]}}}'
-  recorded_at: Wed, 29 Oct 2025 16:48:55 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:25 GMT
 recorded_with: VCR 6.3.1

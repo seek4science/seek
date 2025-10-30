@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.1063
+    uri: https://doi.org/ra/10.1063/1.2128263
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:04 GMT
+      - Thu, 30 Oct 2025 20:16:42 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=zfK2LTOAr7u8bMyPfqXRwG%2Btdly4w2xYG79tJguKRiyGZfgi1FvoouDsGVv4gflJXgP%2BIPruVpJJ92tZR9L3JWStHLqIojDQawRwhlVQvwx7%2Fw%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=ysotTDZX%2FAnrHuavrlc4C9GsV0ddwEMgpNxE6OI%2BYGdAYqmSw40EQupOgJsWW95erEimu3fagu4pNul4sn8kzWiyOFiXipIxBODr46vbEYk%3D"}]}'
       Cf-Ray:
-      - 99642a054d5639d6-FRA
+      - 996d978b3b2d695e-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,11 +50,11 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.1063",
+            "DOI": "10.1063/1.2128263",
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 29 Oct 2025 16:49:04 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:42 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1063/1.2128263
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:05 GMT
+      - Thu, 30 Oct 2025 20:16:43 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -109,5 +109,5 @@ http_interactions:
         organizers","sequence":"first","affiliation":[]}],"member":"317","event":{"name":"WOMEN
         IN PHYSICS: 2nd IUPAP International Conference on Women in Physics","location":"Rio
         de Janeiro (Brazil)"},"container-title":["AIP Conference Proceedings"],"original-title":[],"deposited":{"date-parts":[[2023,4,20]],"date-time":"2023-04-20T10:00:04Z","timestamp":1681984804000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/aip\/acp\/article\/795\/1\/29-34\/624381"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2005]]},"references-count":0,"URL":"https:\/\/doi.org\/10.1063\/1.2128263","relation":{},"ISSN":["0094-243X"],"issn-type":[{"type":"print","value":"0094-243X"}],"subject":[],"published":{"date-parts":[[2005]]}}}'
-  recorded_at: Wed, 29 Oct 2025 16:49:05 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:43 GMT
 recorded_with: VCR 6.3.1

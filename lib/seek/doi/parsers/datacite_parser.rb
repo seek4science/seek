@@ -43,7 +43,11 @@ module Seek
           if data['publicationYear']
             Date.new(data['publicationYear'].to_i)
           elsif (issued = Array(data['dates']).find { |d| d['dateType'] == 'Issued' })
-            Date.parse(issued['date']) rescue nil
+            begin
+              Date.parse(issued['date'])
+            rescue
+              nil
+            end
           end
         end
 

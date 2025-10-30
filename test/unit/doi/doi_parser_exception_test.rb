@@ -41,6 +41,18 @@ class DoiParserExceptionTest < ActiveSupport::TestCase
     end
   end
 
+
+  test 'raises ParseException when Crossref returns invalid JSON' do
+    doi = '10.1016/j.patter.2025.101345'
+
+    VCR.use_cassette('doi/invalid_json_response') do
+      error = assert_raises(Seek::Doi::ParseException) do
+        Seek::Doi::Parser.parse(doi)
+      end
+      assert_match /Error parsing JSON for DOI/, error.message
+    end
+  end
+
 end
 
 

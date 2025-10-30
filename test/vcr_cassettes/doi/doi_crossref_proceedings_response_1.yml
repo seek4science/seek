@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.18653
+    uri: https://doi.org/ra/10.18653/v1/w18-08
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:02 GMT
+      - Thu, 30 Oct 2025 20:16:40 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=JTplHAASPrzKsv3713m%2FMRscQP0yQ7gNxYry7xcp2%2B%2FEOjj1RAk5FiTcw%2BMXoXZTg0K2h9lUE8SxSfF%2F4t2WDzU48aXV3PTFHoFn2N2Lmnba%2BQ%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=ZAExPgMIw4IdS44UXgq%2Fo6pc3zyGBcHqTVnszaLS5vM9lis7y8V1RAuyU769jpa9Iezdal4%2FP%2BUWuvCZuG7TQ8bB954Zrj9OWKZeHxGZ6WTO3A%3D%3D"}]}'
       Cf-Ray:
-      - 996429f7ab2a814d-FRA
+      - 996d977d6c953a7c-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,11 +50,11 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.18653",
+            "DOI": "10.18653/v1/w18-08",
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 29 Oct 2025 16:49:02 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:40 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.18653/v1/w18-08
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:03 GMT
+      - Thu, 30 Oct 2025 20:16:41 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -109,5 +109,5 @@ http_interactions:
         of the Second ACL Workshop on Ethics in Natural Language Processing"],"prefix":"10.18653","member":"1643","event":{"name":"Proceedings
         of the Second ACL Workshop on Ethics in Natural Language Processing","location":"New
         Orleans, Louisiana, USA","start":{"date-parts":[[2018,6]]},"end":{"date-parts":[[2018,6]]}},"container-title":[],"original-title":[],"deposited":{"date-parts":[[2018,5,30]],"date-time":"2018-05-30T00:48:36Z","timestamp":1527641316000},"score":1,"resource":{"primary":{"URL":"http:\/\/aclweb.org\/anthology\/W18-08"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2018]]},"references-count":0,"URL":"https:\/\/doi.org\/10.18653\/v1\/w18-08","relation":{},"subject":[],"published":{"date-parts":[[2018]]}}}'
-  recorded_at: Wed, 29 Oct 2025 16:49:03 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:41 GMT
 recorded_with: VCR 6.3.1

@@ -50,8 +50,8 @@ module Seek
           end
 
           date_parts = get_date_parts.call('issued') ||
-            get_date_parts.call('published') ||
-            get_date_parts.call('published-print')
+                       get_date_parts.call('published') ||
+                       get_date_parts.call('published-print')
           date_parts ? (Date.new(*date_parts) rescue nil) : nil
         end
 

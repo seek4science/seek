@@ -1,0 +1,58 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1038/s41586-020-2649-2
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 30 Oct 2025 12:20:09 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=HcUhfJCHAFWq7S0iCcwb0XOFpgEvKgcFzJT9ddCKgkPUEoNKnaIfxaMnTBuBhbjCVu2DY%2BbNOSbkpXskYjWvGecslyyjNXJ%2BdnNsDxgvWD%2F00Q%3D%3D"}]}'
+      Cf-Ray:
+      - 996add769a50d37a-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1038/s41586-020-2649-2",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Thu, 30 Oct 2025 12:20:09 GMT
+recorded_with: VCR 6.3.1

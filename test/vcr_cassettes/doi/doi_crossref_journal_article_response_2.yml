@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.1021
+    uri: https://doi.org/ra/10.1021/acs.jcim.5c01488
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:01 GMT
+      - Thu, 30 Oct 2025 20:16:30 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=5xgtzjxhROwgPNMm0q55%2FQ3gXnHXznNtON%2BvIWUQcA5QluCNT9o9ViFSGLAcfrmzuBodeV1zE6RnB%2Bb7EHuTn32T%2BOdC8MkSzhicvyOAnFEHmw%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=14jSLSfXCV9Z%2FwxqIxO6drIlbUA5DzDzytZKaRseX55XHLtclWO1SdT%2BZKcKzW0LIZPv6ZTVoM1Rs3MuJaRglADD8vDSlYxwf2lU%2BOqN6HrimA%3D%3D"}]}'
       Cf-Ray:
-      - 996429ee9f7ed2f6-FRA
+      - 996d973c5e5a976a-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,11 +50,11 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.1021",
+            "DOI": "10.1021/acs.jcim.5c01488",
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 29 Oct 2025 16:49:01 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:30 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1021/acs.jcim.5c01488
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:01 GMT
+      - Thu, 30 Oct 2025 20:16:38 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -129,5 +129,5 @@ http_interactions:
         to compute protein-ligand binding association rate constants using Brownian
         dynamics and molecular dynamics simulations. Manuscript submitted."},{"key":"ref49\/cit49","doi-asserted-by":"publisher","DOI":"10.1371\/journal.pcbi.1000939"},{"key":"ref50\/cit50","doi-asserted-by":"publisher","DOI":"10.1002\/jcc.21836"},{"key":"ref51\/cit51","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.1103547108"},{"key":"ref52\/cit52","doi-asserted-by":"publisher","DOI":"10.3389\/fmolb.2022.922361"},{"key":"ref53\/cit53","doi-asserted-by":"publisher","DOI":"10.1007\/s11239-013-0991-z"},{"key":"ref54\/cit54","doi-asserted-by":"publisher","DOI":"10.32607\/20758251-2009-1-2-26-32"}],"container-title":["Journal
         of Chemical Information and Modeling"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"application\/pdf","content-version":"vor","intended-application":"unspecified"},{"URL":"https:\/\/pubs.acs.org\/doi\/pdf\/10.1021\/acs.jcim.5c01488","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2025,10,27]],"date-time":"2025-10-27T08:11:43Z","timestamp":1761552703000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.acs.org\/doi\/10.1021\/acs.jcim.5c01488"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2025,10,4]]},"references-count":54,"journal-issue":{"issue":"20","published-print":{"date-parts":[[2025,10,27]]}},"alternative-id":["10.1021\/acs.jcim.5c01488"],"URL":"https:\/\/doi.org\/10.1021\/acs.jcim.5c01488","relation":{},"ISSN":["1549-9596","1549-960X"],"issn-type":[{"type":"print","value":"1549-9596"},{"type":"electronic","value":"1549-960X"}],"subject":[],"published":{"date-parts":[[2025,10,4]]}}}'
-  recorded_at: Wed, 29 Oct 2025 16:49:01 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:38 GMT
 recorded_with: VCR 6.3.1

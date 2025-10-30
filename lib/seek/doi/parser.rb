@@ -7,6 +7,7 @@ module Seek
       DOI_ENDPOINT = 'https://doi.org'.freeze
 
       def self.parse(doi)
+
         agency = get_doi_ra(doi)
 
         case agency

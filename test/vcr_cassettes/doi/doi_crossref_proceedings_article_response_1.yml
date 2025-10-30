@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.1117
+    uri: https://doi.org/ra/10.1117/12.2275959
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:03 GMT
+      - Thu, 30 Oct 2025 20:16:41 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=bydy8wa6aq%2Beh8abmkU7ivqKUCjRgesiPUSA2ugRAVJznwTrELhRrxQRVvVGR534%2F%2FqDBkupk%2FE%2F7%2F1lRCRH4BOuxJHTS498AS%2BjpBkDRVI%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=WDzVS9YehTcd4S5xKc5vaueniUW9dNMperq4xB3%2BrAcOaDM5z1Kp%2FP7NcCiOvoveotb3lPdCdS5hxHFGST5h9kKY%2BmmOn2XNDa81cTxugGLyyw%3D%3D"}]}'
       Cf-Ray:
-      - 996429fc1d699a0b-FRA
+      - 996d97823b4cd289-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,11 +50,11 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.1117",
+            "DOI": "10.1117/12.2275959",
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 29 Oct 2025 16:49:03 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:41 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1117/12.2275959
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:49:03 GMT
+      - Thu, 30 Oct 2025 20:16:41 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -150,5 +150,5 @@ http_interactions:
         Science"}],"event":{"name":"Developments in X-Ray Tomography XI","start":{"date-parts":[[2017,8,6]]},"location":"San
         Diego, United States","end":{"date-parts":[[2017,8,10]]}},"container-title":["Developments
         in X-Ray Tomography XI"],"original-title":[],"deposited":{"date-parts":[[2024,6,27]],"date-time":"2024-06-27T02:25:34Z","timestamp":1719455134000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.spiedigitallibrary.org\/conference-proceedings-of-spie\/10391\/2275959\/The-NOVA-project--maximizing-beam-time-efficiency-through-synergistic\/10.1117\/12.2275959.full"}},"subtitle":[],"editor":[{"given":"Bert","family":"M\u00fcller","sequence":"first","affiliation":[]},{"given":"Ge","family":"Wang","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2017,9,26]]},"references-count":54,"URL":"https:\/\/doi.org\/10.1117\/12.2275959","relation":{},"subject":[],"published":{"date-parts":[[2017,9,26]]}}}'
-  recorded_at: Wed, 29 Oct 2025 16:49:03 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:41 GMT
 recorded_with: VCR 6.3.1

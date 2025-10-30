@@ -12,25 +12,23 @@ module Seek
           Rails.logger.info("Fetching metadata for DOI #{doi} from #{url}")
 
           response = perform_request(url)
-          return nil unless response.is_a?(Net::HTTPSuccess)
+          data = parse_response_body(response)
 
-          begin
-            data = parse_response_body(response)
-            raise "Missing metadata in response" unless data
+          raise Seek::Doi::ParseException, "Empty metadata response for DOI #{doi}" if data.blank?
 
-            data = decode_html_entities_in_hash(data)
-            metadata = extract_metadata(data)
-            metadata[:citation] ||= build_citation(metadata)
+          metadata = decode_html_entities_in_hash(extract_metadata(data))
+          metadata[:citation] ||= build_citation(metadata)
 
-            build_struct(metadata)
-          rescue JSON::ParserError => e
-            Rails.logger.error("JSON parse error for DOI #{doi}: #{e.message}")
-            nil
-          rescue StandardError => e
-            Rails.logger.error("Unexpected error parsing DOI #{doi}: #{e.message}")
-            nil
-          end
+          build_struct(metadata)
+
+        rescue JSON::ParserError => e
+          raise Seek::Doi::ParseException, "Error parsing JSON for DOI #{doi}: #{e.message}"
+        rescue Seek::Doi::BaseException
+          raise
+        rescue StandardError => e
+          raise Seek::Doi::ParseException, "Unexpected error while parsing DOI #{doi}: #{e.message}"
         end
+
 
         protected
 
@@ -79,12 +77,22 @@ module Seek
             request = Net::HTTP::Get.new(uri)
             request['Accept'] = accept_header
             response = http.request(request)
-            Rails.logger.debug("HTTP #{response.code} #{response.message} for #{uri}")
-            response
+
+            case response.code.to_i
+            when 200
+              response
+            when 204
+              raise Seek::Doi::FetchException, "No metadata available for DOI #{uri}"
+            when 404
+              raise Seek::Doi::NotFoundException, "DOI not found: #{uri}"
+            else
+              raise Seek::Doi::FetchException, "Unexpected HTTP #{response.code} #{response.message} for #{uri}"
+            end
           end
-        rescue SocketError, Timeout::Error, StandardError => e
-          Rails.logger.error("Network error fetching #{uri}: #{e.message}")
-          nil
+        rescue SocketError, Timeout::Error => e
+          raise Seek::Doi::FetchException, "Network error fetching DOI metadata: #{e.message}"
+        rescue URI::InvalidURIError => e
+          raise Seek::Doi::MalformedDOIException, "Invalid DOI or malformed URI: #{e.message}"
         end
 
 

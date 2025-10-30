@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.1007
+    uri: https://doi.org/ra/10.1007/978-3-540-70504-8_9
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:48:57 GMT
+      - Thu, 30 Oct 2025 20:16:27 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=tHp6fzNWQbOLjN6eJkFJ2Dvbw%2F0SYKtRTTprpNuPT0B%2B2R6F1cL7TWiCqb5fzP%2Fpr5NXhqTC7Q05AbagAAC%2FXVEZxKXstB%2BYFSPy3sCw7T4Urw%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=njUCrBNcSXVSCRSIkxPDpu3qGyMX6%2FvyBhuNGPhBndYOfQ0Zol64Z3XKiuCsBSPNF0qv8Vgpe4rHPxOhRIiwT5%2BeXTx9qs4uic%2FKEXh3dItJYg%3D%3D"}]}'
       Cf-Ray:
-      - 996429d62e14e854-FRA
+      - 996d972ac9279f1d-FRA
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,11 +50,11 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.1007",
+            "DOI": "10.1007/978-3-540-70504-8_9",
             "RA": "Crossref"
           }
         ]
-  recorded_at: Wed, 29 Oct 2025 16:48:57 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:27 GMT
 - request:
     method: get
     uri: https://api.crossref.org/works/10.1007/978-3-540-70504-8_9
@@ -76,7 +76,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 29 Oct 2025 16:48:57 GMT
+      - Thu, 30 Oct 2025 20:16:27 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -149,5 +149,5 @@ http_interactions:
         Engine with Heterogeneous-Grained Adaptivity. In: VLDB (2004)","DOI":"10.1016\/B978-012088469-8\/50145-5"},{"key":"9_CR14","unstructured":"Yao,
         Y., Gehrke, J.: Query Processing in Sensor Networks. In: CIDR (2003)"}],"container-title":["Lecture
         Notes in Computer Science","Sharing Data, Information and Knowledge"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1007\/978-3-540-70504-8_9.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2020,11,19]],"date-time":"2020-11-19T05:06:52Z","timestamp":1605762412000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1007\/978-3-540-70504-8_9"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[null]]},"ISBN":["9783540705031","9783540705048"],"references-count":14,"URL":"https:\/\/doi.org\/10.1007\/978-3-540-70504-8_9","relation":{},"ISSN":["0302-9743","1611-3349"],"issn-type":[{"type":"print","value":"0302-9743"},{"type":"electronic","value":"1611-3349"}],"subject":[]}}'
-  recorded_at: Wed, 29 Oct 2025 16:48:57 GMT
+  recorded_at: Thu, 30 Oct 2025 20:16:27 GMT
 recorded_with: VCR 6.3.1
