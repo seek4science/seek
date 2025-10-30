@@ -56,7 +56,7 @@ class UsersSeederTest < ActiveSupport::TestCase
     
     # Verify institution was updated
     institution = @base_data[:institution].reload
-    assert_equal 'United Kingdom', institution.country
+    assert_equal 'GB', institution.country
     assert_equal 'Manchester', institution.city
   end
 end
