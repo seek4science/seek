@@ -15,7 +15,7 @@ class SamplesSeederTest < ActiveSupport::TestCase
     )
     @user_data = @users_seeder.seed
     
-    @isa_seeder = Seek::ExampleData::IsaStructureSeeder.new(
+    @isa_seeder = Seek::ExampleData::ISAStructureSeeder.new(
       @base_data[:project],
       @user_data[:guest_person],
       @base_data[:organism]
