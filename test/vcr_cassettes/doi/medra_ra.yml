@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://doi.org/ra/10.1038
+    uri: https://doi.org/ra/10.19232/uv4pb.2018.2.00
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 22 Oct 2025 17:48:49 GMT
+      - Thu, 30 Oct 2025 15:22:32 GMT
       Content-Type:
       - application/json;charset=UTF-8
       Transfer-Encoding:
@@ -40,9 +40,9 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=JA6cTizFxpP9A81i%2Bq6IxytDG7MDEACEXIRtL4gLAFic8Bh1Qse5ibwqSzoqAEd5tIZQS%2FoA75LI2n14cC5nWAmj%2FEJCJO3srldqhsvo8%2BiOJQ%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=qbybHuHwC0H7O8VYvmAGDk5p5d7DJdw%2Bc3DiYfN3awLV41nr%2FYrcwR7TI6O13ObGGaVH96QOuzqHX3X%2B%2BBdJxLVBQgLUdA%3D%3D"}]}'
       Cf-Ray:
-      - 992ad3ea5ea1353c-FRA
+      - 996be89c9c436e96-STR
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
@@ -50,9 +50,9 @@ http_interactions:
       string: |-
         [
           {
-            "DOI": "10.1038",
-            "RA": "Crossref"
+            "DOI": "10.19232/uv4pb.2018.2.00",
+            "RA": "mEDRA"
           }
         ]
-  recorded_at: Wed, 22 Oct 2025 17:48:49 GMT
+  recorded_at: Thu, 30 Oct 2025 15:22:31 GMT
 recorded_with: VCR 6.3.1
