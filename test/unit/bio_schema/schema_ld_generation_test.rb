@@ -696,13 +696,21 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@type' => 'ResearchOrganization',
       'dct:conformsTo' => 'https://schema.org/ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
-      "name"=>"Manchester Institute of Biotechnology, University of Manchester",
+      "name"=>"University of Manchester",
+      "department"=>{"@type"=>"Organization", "name"=>"Manchester Institute of Biotechnology"},
       'url' => 'http://www.manchester.ac.uk/',
       'identifier' => 'https://ror.org/027m9bs27',
-      "address"=>{"address_country"=>"GB", "address_locality"=>"Manchester", "street_address"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
+      "address"=>{"@type"=>"PostalAddress","addressCountry"=>"GB", "addressLocality"=>"Manchester", "streetAddress"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
     }
 
     json = JSON.parse(institution.to_schema_ld)
+    assert_equal expected, json
+
+    # check without ror_id and department
+    institution.update_columns(department:'', ror_id:nil)
+    json = JSON.parse(institution.to_schema_ld)
+    expected.delete('department')
+    expected.delete('identifier')
     assert_equal expected, json
   end
 
