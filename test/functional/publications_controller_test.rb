@@ -95,7 +95,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should create an inproceedings with booktitle' do
     doi = '10.1117/12.2275959'
 
-    VCR.use_cassette('doi/doi_crossref_proceedings_article_response') do
+    VCR.use_cassette('doi/doi_crossref_proceedings_article_response_1') do
       assert_difference('Publication.count') do
         post :create, params: {
           publication: {
