@@ -1,5 +1,3 @@
-#require 'doi/record'
-
 module PublicationsHelper
   def author_to_person_options(selected_id, suggestion)
     projects = Project.includes(:people)
