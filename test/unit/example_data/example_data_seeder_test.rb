@@ -2,25 +2,22 @@ require 'test_helper'
 
 class ExampleDataSeederTest < ActiveSupport::TestCase
   def setup
-    User.current_user = nil
-  end
-
-  def teardown
-    User.current_user = nil
+    User.delete_all
+    Person.delete_all
   end
 
   test 'can create ExampleDataSeeder instance' do
-    seeder = Seek::ExampleDataSeeder.new
+    seeder = Seek::ExampleData::ExampleDataSeeder.new
     assert_not_nil seeder
   end
 
   test 'responds to seed_all method' do
-    seeder = Seek::ExampleDataSeeder.new
+    seeder = Seek::ExampleData::ExampleDataSeeder.new
     assert_respond_to seeder, :seed_all
   end
   
   test 'has attr_readers for all seeded data' do
-    seeder = Seek::ExampleDataSeeder.new
+    seeder = Seek::ExampleData::ExampleDataSeeder.new
     
     # Check project-related attributes
     assert_respond_to seeder, :project

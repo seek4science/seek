@@ -23,7 +23,9 @@ module Seek
         admin_user.save!
         admin_user.person.work_groups << @workgroup unless admin_user.person.work_groups.include?(@workgroup)
         admin_person = admin_user.person
-        admin_person.save
+        #admin_person.is_admin = true
+        disable_authorization_checks{ admin_person.save! }
+
         puts 'Seeded 1 admin.'
         
         # Guest user
@@ -38,7 +40,8 @@ module Seek
         guest_user.save!
         guest_user.person.work_groups << @workgroup unless guest_user.person.work_groups.include?(@workgroup)
         guest_person = guest_user.person
-        guest_person.save
+        #guest_person.is_admin = false
+        disable_authorization_checks { guest_person.save! }
         puts 'Seeded 1 guest.'
         
         # Update project
