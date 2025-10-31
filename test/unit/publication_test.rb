@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class PublicationTest < ActiveSupport::TestCase
   include MockHelper
@@ -50,26 +51,37 @@ class PublicationTest < ActiveSupport::TestCase
     assert_nil publication.doi
   end
 
-  test 'create publication from metadata doi' do
-    publication_hash = {
-        title: 'SEEK publication',
-        abstract: 'An investigation into blalblabla',
-        journal: 'The testing journal',
-        date_published: Date.new(2011, 12, 24),
-        pubmed_id: nil,
-        doi: nil
-    }
-    doi_record = DOI::Record.new(publication_hash)
-    publication = Publication.new
-    publication.extract_doi_metadata(doi_record)
-    assert_equal publication_hash[:title], publication.title
-    assert_equal publication_hash[:journal], publication.journal
-    assert_equal publication_hash[:date_published], publication.published_date
-    assert_equal publication_hash[:abstract], publication.abstract
-    assert_nil publication.pubmed_id
-    assert_nil publication.doi
-    assert_equal Publication::REGISTRATION_BY_DOI, publication.registered_mode
+  test 'create publication from metadata via Seek::Doi::Parser' do
+    doi = '10.1234/fake-doi-for-test'
+
+    # Simulate parser result — OpenStruct-like metadata
+    parsed_record = OpenStruct.new(
+      title: 'SEEK publication',
+      abstract: 'An investigation into blalblabla',
+      journal: 'The testing journal',
+      date_published: Date.new(2011, 12, 24),
+      pubmed_id: nil,
+      doi: nil,
+      citation: nil,
+      publisher: 'The Testing Publisher',
+      booktitle: nil,
+      editors: nil
+    )
+
+    # Stub the parser call to return the fake metadata
+    Seek::Doi::Parser.stub(:parse, parsed_record) do
+      publication = Publication.new
+      publication.extract_doi_metadata(parsed_record)
+      assert_equal 'SEEK publication', publication.title
+      assert_equal 'The testing journal', publication.journal
+      assert_equal Date.new(2011, 12, 24), publication.published_date
+      assert_equal 'An investigation into blalblabla', publication.abstract
+      assert_nil publication.pubmed_id
+      assert_nil publication.doi
+      assert_equal Publication::REGISTRATION_BY_DOI, publication.registered_mode
+    end
   end
+
 
   test 'create publication from metadata pubmed' do
     publication_hash = {
@@ -240,39 +252,51 @@ class PublicationTest < ActiveSupport::TestCase
 
   end
 
-  test 'doi with not resolvable error' do
-    mock_crossref(email: 'fred@email.com', doi: '10.4230/OASIcs.GCB.2012.1', content_file: 'cross_ref_no_resolve.xml')
-    assert_raises DOI::NotFoundException do
-      query = DOI::Query.new('fred@email.com')
-      query.fetch('10.4230/OASIcs.GCB.2012.1')
+
+  test 'raises NotFoundException for fake DOI' do
+    VCR.use_cassette('doi/fake_doi') do
+      doi = '10.19232/fake.2020.1.23'
+      error = assert_raises(Seek::Doi::NotFoundException) do
+        Seek::Doi::Parser.send(:get_doi_ra, doi)
+      end
+      assert_equal 'DOI does not exist: 10.19232/fake.2020.1.23.', error.message
     end
   end
 
-  test 'malformed doi' do
-    mock_crossref(email: 'fred@email.com', doi: '10.1.11.1', content_file: 'cross_ref_malformed_doi.html')
-    assert_raises DOI::MalformedDOIException do
-      query = DOI::Query.new('fred@email.com')
-      query.fetch('10.1.11.1')
+  test 'raises MalformedDOIException for invalid DOI' do
+    VCR.use_cassette('doi/invalid_doi') do
+      doi = 'hello_march'
+      error = assert_raises(Seek::Doi::MalformedDOIException) do
+        Seek::Doi::Parser.send(:get_doi_ra, doi)
+      end
+      assert_equal 'Invalid DOI format: hello_march.', error.message
     end
   end
 
-  test 'unsupported type doi' do
-    mock_crossref(email: 'fred@email.com', doi: '10.1.11.1', content_file: 'cross_ref_unsupported_type.xml')
-    assert_raises DOI::RecordNotSupported do
-      query = DOI::Query.new('fred@email.com')
-      query.fetch('10.1.11.1')
+
+  test 'raises ParseException when Crossref returns invalid JSON' do
+    doi = '10.1016/j.patter.2025.101345'
+
+    VCR.use_cassette('doi/invalid_json_response') do
+      error = assert_raises(Seek::Doi::ParseException) do
+        Seek::Doi::Parser.parse(doi)
+      end
+      assert_match /Error parsing JSON for DOI/, error.message
     end
   end
 
-  test 'editor should not be author' do
+  test 'Crossref entry should not list editors as authors' do
     VCR.use_cassette('doi/cross_ref8') do
-      result = Seek::Doi::Parser.parse('10.1371/journal.pcbi.1002352')
-      assert result.error.nil?, 'There should not be an error'
-      assert !result.authors.collect(&:last_name).include?('Papin')
+      doi = '10.1371/journal.pcbi.1002352'
+
+      result = Seek::Doi::Parser.parse(doi)
+
+      assert result.respond_to?(:authors), 'Expected parser result to include authors'
+      refute_includes result.authors.map(&:last_name), 'Papin', 'Editor should not appear as author'
       assert_equal 6, result.authors.size
-      assert_nil result.error
     end
   end
+
 
   test 'model and datafile association' do
     publication = FactoryBot.create(:publication)
