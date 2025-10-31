@@ -2,13 +2,10 @@ require 'test_helper'
 
 class UsersSeederTest < ActiveSupport::TestCase
   def setup
-    User.current_user = nil
+    User.delete_all
+    Person.delete_all
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
     @base_data = @projects_seeder.seed
-  end
-
-  def teardown
-    User.current_user = nil
   end
 
   test 'seeds users and people' do
@@ -38,6 +35,7 @@ class UsersSeederTest < ActiveSupport::TestCase
     assert admin_user.active?
     assert_not_nil admin_user.person
     assert_equal 'Admin', admin_user.person.first_name
+    assert admin_user.is_admin?
     
     # Verify guest user
     guest_user = result[:guest_user]
@@ -45,6 +43,7 @@ class UsersSeederTest < ActiveSupport::TestCase
     assert guest_user.active?
     assert_not_nil guest_user.person
     assert_equal 'Guest', guest_user.person.first_name
+    refute guest_user.is_admin?
     
     # Verify people are in workgroup
     assert_includes result[:admin_person].work_groups, @base_data[:workgroup]

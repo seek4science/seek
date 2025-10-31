@@ -2,7 +2,8 @@ require 'test_helper'
 
 class SamplesSeederTest < ActiveSupport::TestCase
   def setup
-    User.current_user = nil
+    FactoryBot.create(:experimental_assay_class)
+    FactoryBot.create(:modelling_assay_class)
     
     # Set up base data
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
@@ -23,9 +24,6 @@ class SamplesSeederTest < ActiveSupport::TestCase
     @isa_data = @isa_seeder.seed
   end
 
-  def teardown
-    User.current_user = nil
-  end
 
   test 'seeds sample types and samples' do
     initial_sample_type_count = SampleType.count

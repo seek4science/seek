@@ -2,7 +2,8 @@ require 'test_helper'
 
 class ISAStructureSeederTest < ActiveSupport::TestCase
   def setup
-    User.current_user = nil
+    FactoryBot.create(:experimental_assay_class)
+    FactoryBot.create(:modelling_assay_class)
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
     @base_data = @projects_seeder.seed
     
@@ -14,9 +15,6 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     @user_data = @users_seeder.seed
   end
 
-  def teardown
-    User.current_user = nil
-  end
 
   test 'seeds ISA structure' do
     initial_investigation_count = Investigation.count
