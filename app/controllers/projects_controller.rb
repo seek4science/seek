@@ -529,7 +529,7 @@ class ProjectsController < ApplicationController
       format.html { render(params[:only_content] ? { layout: false } : {})} # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.json { render json: @project, include: [params[:include]] }
-      format.jsonld { render json: Seek::BioSchema::Serializer.new(@project).json_ld, adapter: :attributes }
+      format.jsonld { render json: @project.to_schema_ld, adapter: :attributes }
     end
   end
 
