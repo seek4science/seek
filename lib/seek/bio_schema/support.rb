@@ -10,7 +10,7 @@ module Seek
 
       # returns the JSON-LD formatted as a pretty String for easier reading
       def to_pretty_schema_ld
-        JSON.pretty_generate(Seek::BioSchema::Serializer.new(self).json_representation)
+        Seek::BioSchema::Serializer.new(self).pretty_json_ld
       end
 
       class_methods do
