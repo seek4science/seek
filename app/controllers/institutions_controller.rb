@@ -22,7 +22,7 @@ class InstitutionsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.json {render json: @institution, include: [params[:include]]}
-      format.jsonld { render json: Seek::BioSchema::Serializer.new(@institution).json_representation, adapter: :attributes }
+      format.jsonld { render json: @institution.to_schema_ld, adapter: :attributes }
     end
   end
 

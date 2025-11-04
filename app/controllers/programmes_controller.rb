@@ -91,7 +91,7 @@ class ProgrammesController < ApplicationController
       format.html
       format.json {render json: @programme, include: [params[:include]]}
       format.rdf { render template: 'rdf/show' }
-      format.jsonld { render json: Seek::BioSchema::Serializer.new(@programme).json_representation, adapter: :attributes }
+      format.jsonld { render json: @programme.to_schema_ld, adapter: :attributes }
     end
   end
 

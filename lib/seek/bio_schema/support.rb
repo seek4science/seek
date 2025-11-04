@@ -3,9 +3,14 @@ module Seek
     # The mixin for an ActiveRecord model to provide the ability to get the Schema.org (Bioschema.org) JSON-LD
     module Support
       extend ActiveSupport::Concern
-
+      # returns the JSON-LD as a String
       def to_schema_ld
         Seek::BioSchema::Serializer.new(self).json_ld
+      end
+
+      # returns the JSON-LD formatted as a pretty String for easier reading
+      def to_pretty_schema_ld
+        JSON.pretty_generate(Seek::BioSchema::Serializer.new(self).json_representation)
       end
 
       class_methods do
