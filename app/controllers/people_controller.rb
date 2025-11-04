@@ -32,6 +32,7 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @person, include: [params[:include]]}
+      format.jsonld { render json: Seek::BioSchema::Serializer.new(@person).json_representation, adapter: :attributes }
     end
   end
 

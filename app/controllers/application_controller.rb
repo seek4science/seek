@@ -247,6 +247,9 @@ class ApplicationController < ActionController::Base
         format.json { render json: { errors: [{ title: 'Forbidden',
                                                 details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
                              status: :forbidden }
+        format.jsonld { render json: { errors: [{ title: 'Forbidden',
+                                                details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
+                             status: :forbidden }
       end
       return false
     end
