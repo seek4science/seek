@@ -56,13 +56,18 @@ module Seek
             Rails.logger.debug("Performing transformation: #{transformation}")
             item = eval(transformation)
           end
-          o = if uri_or_literal.casecmp('u').zero?
-                handle_uri_for_item(item)
-              else
-                handle_literal_for_item(item)
-              end
+          if uri_or_literal.casecmp('s').zero?
+            rdf_graph << item
+          else
+            o = if uri_or_literal.casecmp('u').zero?
+                  handle_uri_for_item(item)
+                else
+                  handle_literal_for_item(item)
+                end
 
-          rdf_graph << [resource, property_uri, o] unless o.nil?
+            rdf_graph << [resource, property_uri, o] unless o.nil?
+          end
+
         end
         rdf_graph
       end

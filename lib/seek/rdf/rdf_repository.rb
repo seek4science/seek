@@ -162,7 +162,7 @@ module Seek
       end
 
       def with_statements(item)
-        RDF::Reader.for(:jsonld).new(item.to_schema_ld) do |reader|
+        RDF::Reader.for(:ttl).new(item.to_rdf) do |reader|
           reader.each_statement do |statement|
             yield(statement)
           end

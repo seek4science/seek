@@ -64,8 +64,12 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     @project.reload
     # @repository.send_rdf(@project)
     # @repository.send_rdf(df)
+    person = FactoryBot.create(:max_person, first_name: 'RDF', last_name: 'Tester')
+    pp person.to_rdf
+    @repository.send_rdf(person)
     ror_mock
     inst = FactoryBot.create(:max_institution, title: 'RDF test institution', projects: [@project])
+    pp inst.to_rdf_graph
     @repository.send_rdf(inst)
   end
 

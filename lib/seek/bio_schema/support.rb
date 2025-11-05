@@ -13,6 +13,10 @@ module Seek
         Seek::BioSchema::Serializer.new(self).pretty_json_ld
       end
 
+      def schema_ld_statements
+        RDF::Reader.for(:jsonld).new(to_schema_ld).statements
+      end
+
       class_methods do
         def public_schema_ld_dump
           Seek::BioSchema::DataDump.new(self)
