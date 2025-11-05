@@ -529,6 +529,7 @@ class ProjectsController < ApplicationController
       format.html { render(params[:only_content] ? { layout: false } : {})} # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.json { render json: @project, include: [params[:include]] }
+      format.jsonld { render json: @project.to_schema_ld }
     end
   end
 

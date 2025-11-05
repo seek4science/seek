@@ -21,9 +21,8 @@ class InstitutionsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
-      #format.json { render json: @institution } #normal json
       format.json {render json: @institution, include: [params[:include]]}
+      format.jsonld { render json: @institution.to_schema_ld }
     end
   end
 

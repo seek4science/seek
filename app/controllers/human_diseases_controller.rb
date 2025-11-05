@@ -23,6 +23,7 @@ class HumanDiseasesController < ApplicationController
       format.html
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @human_disease}
+      format.jsonld { render json: @human_disease.to_schema_ld }
     end
   end
 
