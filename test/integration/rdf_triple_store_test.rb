@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class RdfTripleStoreTest < ActionDispatch::IntegrationTest
+
+  include MockHelper
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
     @project = FactoryBot.create(:max_project, title: 'Test for RDF storage')
@@ -60,8 +62,11 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   test 'send schema to store' do
     df = FactoryBot.create(:data_file, projects: [@project], title: 'RDF test data file')
     @project.reload
-    @repository.send_rdf(@project)
-    @repository.send_rdf(df)
+    # @repository.send_rdf(@project)
+    # @repository.send_rdf(df)
+    ror_mock
+    inst = FactoryBot.create(:max_institution, title: 'RDF test institution', projects: [@project])
+    @repository.send_rdf(inst)
   end
 
   test 'remove public from store' do

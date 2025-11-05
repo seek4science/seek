@@ -1,10 +1,10 @@
 .sparql-interface {
   .sparql-textarea {
     font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-    font-size: 12px;
+    //font-size: 14px;
     line-height: 1.4;
-    background-color: #f8f9fa;
-    border: 2px solid #dee2e6;
+    //background-color: #fafafa;
+    //border: 2px solid #dee2e6;
 
     &:focus {
       border-color: #007bff;

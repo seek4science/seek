@@ -17,7 +17,7 @@
         <div class="form-group">
           <%= form.label :sparql_query, "SPARQL Query:", class: "control-label" %>
           <%= form.text_area :sparql_query, value: @sparql_query,
-                             class: "form-control sparql-textarea",
+                             class: "form-control",
                              rows: 12,
                              placeholder: "Enter your SPARQL query here...\n\nExample:\nSELECT ?subject ?predicate ?object\nWHERE {\n  ?subject ?predicate ?object .\n}\nLIMIT 10" %>
         </div>

@@ -40,7 +40,7 @@ module Seek
 
       # send the rdf related to item to the repository, and update the rdf file
       def send_rdf(item, graphs = rdf_graph_uris(item), save_file = true)
-        if configured? && item.rdf_supported?
+        if configured? && item.schema_org_supported?
           connect_to_repository
           Rails.logger.debug("RDF about to be sent for item: #{item.to_rdf}")
           with_statements(item) do |statement|
