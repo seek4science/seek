@@ -44,6 +44,7 @@ module Seek
           connect_to_repository
           Rails.logger.debug("RDF about to be sent for item: #{item.to_rdf}")
           with_statements(item) do |statement|
+            pp statement
             if statement.valid?
               graphs.each do |graph_uri|
                 send_statement_to_repository statement, graph_uri
@@ -161,7 +162,7 @@ module Seek
       end
 
       def with_statements(item)
-        RDF::Reader.for(:ttl).new(item.to_rdf) do |reader|
+        RDF::Reader.for(:jsonld).new(item.to_schema_ld) do |reader|
           reader.each_statement do |statement|
             yield(statement)
           end

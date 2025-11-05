@@ -3,7 +3,7 @@ require 'test_helper'
 class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
-    @project = FactoryBot.create(:project, title: 'Test for RDF storage')
+    @project = FactoryBot.create(:max_project, title: 'Test for RDF storage')
     skip('these tests need a configured triple store setup') unless @repository.configured?
     
     @private_graph = RDF::URI.new @repository.get_configuration.private_graph
@@ -55,6 +55,13 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     result = @repository.select(q)
     assert_equal 1, result.count
     assert_equal 'http://www.w3.org/2001/XMLSchema#dateTime', result[0][:o].datatype
+  end
+
+  test 'send schema to store' do
+    df = FactoryBot.create(:data_file, projects: [@project], title: 'RDF test data file')
+    @project.reload
+    @repository.send_rdf(@project)
+    @repository.send_rdf(df)
   end
 
   test 'remove public from store' do
