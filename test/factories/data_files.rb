@@ -25,6 +25,10 @@ FactoryBot.define do
   factory(:public_data_file, parent: :data_file) do
     policy { FactoryBot.create(:downloadable_public_policy) }
   end
+
+  factory(:private_data_file, parent: :data_file) do
+    policy { FactoryBot.create(:private_policy) }
+  end
   
   factory(:min_data_file, class: DataFile) do
     with_project_contributor
