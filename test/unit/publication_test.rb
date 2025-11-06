@@ -52,7 +52,6 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'create publication from metadata via Seek::Doi::Parser' do
-    doi = '10.1234/fake-doi-for-test'
 
     # Simulate parser result — OpenStruct-like metadata
     parsed_record = OpenStruct.new(

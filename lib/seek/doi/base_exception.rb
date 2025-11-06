@@ -8,10 +8,6 @@ module Seek
       def backtrace
         cause ? cause.backtrace : super
       end
-
-      def message
-        cause ? "#{super} (#{cause.class.name}: #{cause.message})" : super
-      end
     end
 
     class UnrecognizedTypeException < BaseException; end

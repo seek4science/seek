@@ -467,7 +467,7 @@ end
         @error =  e.message
       rescue Seek::Doi::NotFoundException => e
         @error = e.message
-      rescue Seek::Doi::RecordNotSupported => e
+      rescue Seek::Doi::RecordNotSupported
         @error = 'The DOI resolved to an unsupported resource type.'
       rescue RuntimeError => e
         @error = 'There was a problem contacting the DOI query service. Please add the publication manually instead.'
