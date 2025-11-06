@@ -195,6 +195,18 @@ class Workflow < ApplicationRecord
     end
   end
 
+  def ro_crate_metadata
+    metadata = latest_version.ro_crate.metadata
+    json = metadata.generate
+    json = JSON.parse(json)
+    json["@context"] = ['https://w3id.org/ro/crate/1.1/context', { "@base": "#{rdf_seek_id}/" } ]
+    JSON.generate json
+  end
+
+  # def to_schema_ld
+  #   { }
+  # end
+
   def defines_own_avatar?
     workflow_class ? workflow_class.defines_own_avatar? : super
   end

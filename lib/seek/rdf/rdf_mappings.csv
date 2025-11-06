@@ -1,3 +1,4 @@
 class,method,property,uri literal or statements,transformation,collection transformation
 *,to_schema_ld,nil,j,,
+Workflow,ro_crate_metadata,nil,j,,
 Person,mbox_sha1sum,RDF::Vocab::FOAF.mbox_sha1sum,l,,

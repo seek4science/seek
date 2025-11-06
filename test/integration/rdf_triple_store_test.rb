@@ -60,14 +60,20 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   end
 
   test 'send schema to store' do
+    ror_mock
+    wf = FactoryBot.create(:max_workflow, projects: [@project], title: 'RDF test workflow')
     df = FactoryBot.create(:data_file, projects: [@project], title: 'RDF test data file')
     @project.reload
+    VCR.use_cassette('workflow/ro_crate_context') do
+      @repository.send_rdf(wf)
+    end
+
     # @repository.send_rdf(@project)
     @repository.send_rdf(df)
     person = FactoryBot.create(:max_person, first_name: 'RDF', last_name: 'Tester')
     pp person.to_rdf
     @repository.send_rdf(person)
-    ror_mock
+
     inst = FactoryBot.create(:max_institution, title: 'RDF test institution', projects: [@project])
     pp inst.to_rdf_graph
     @repository.send_rdf(inst)
