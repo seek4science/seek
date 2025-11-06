@@ -63,7 +63,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     df = FactoryBot.create(:data_file, projects: [@project], title: 'RDF test data file')
     @project.reload
     # @repository.send_rdf(@project)
-    # @repository.send_rdf(df)
+    @repository.send_rdf(df)
     person = FactoryBot.create(:max_person, first_name: 'RDF', last_name: 'Tester')
     pp person.to_rdf
     @repository.send_rdf(person)

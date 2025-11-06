@@ -56,8 +56,9 @@ module Seek
             Rails.logger.debug("Performing transformation: #{transformation}")
             item = eval(transformation)
           end
-          if uri_or_literal.casecmp('s').zero?
-            rdf_graph << item
+          if uri_or_literal.casecmp('j').zero?
+            statements = RDF::Reader.for(:jsonld).new(item).statements
+            rdf_graph << statements
           else
             o = if uri_or_literal.casecmp('u').zero?
                   handle_uri_for_item(item)
