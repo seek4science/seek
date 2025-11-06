@@ -131,7 +131,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'ResearchOrganization', '@id' => "http://localhost:3000/institutions/#{institution.id}",
           'name' => institution.title }
       ],
-      'orcid' => 'https://orcid.org/0000-0001-9842-9718'
+      'orcid' => { '@id' => 'https://orcid.org/0000-0001-9842-9718' }
     }
 
     json = JSON.parse(@person.to_schema_ld)
@@ -173,7 +173,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
-      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'identifier' => { '@id' => 'https://doi.org/10.10.10.10/test.1' },
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
@@ -230,7 +230,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
-      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'identifier' => { '@id' => 'https://doi.org/10.10.10.10/test.1' },
       'isPartOf' => [],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -279,7 +279,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'text/html',
-      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'identifier' => { '@id' => 'https://doi.org/10.10.10.10/test.1' },
       'isPartOf' => [],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -433,7 +433,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}",
           'name' => document.projects.first.title }
       ],
-      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'identifier' => { '@id' => 'https://doi.org/10.10.10.10/test.1' },
       'isPartOf' => [],
       'subjectOf' => []
     }
@@ -511,7 +511,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/workflows/#{workflow.id}",
       'keywords' => 'wibble',
       'license' => Seek::License.find('APSL-2.0')&.url,
-      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'identifier' => { '@id' => 'https://doi.org/10.10.10.10/test.1' },
       'creator' => [
         { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
         { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{creator2.id}", 'name' => creator2.name },
@@ -699,7 +699,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       "name"=>"University of Manchester",
       "department"=>{"@type"=>"Organization", "name"=>"Manchester Institute of Biotechnology"},
       'url' => 'http://www.manchester.ac.uk/',
-      'identifier' => 'https://ror.org/027m9bs27',
+      'identifier' => { '@id' => 'https://ror.org/027m9bs27' },
       "address"=>{"@type"=>"PostalAddress","addressCountry"=>"GB", "addressLocality"=>"Manchester", "streetAddress"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
     }
 
@@ -837,7 +837,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'image/png',
       'version' => 2,
       'isPartOf' => [],
-      'identifier' => 'https://doi.org/10.10.10.10/test.2', # This DOI was added to the version itself
+      'identifier' => { '@id' => 'https://doi.org/10.10.10.10/test.2' }, # This DOI was added to the version itself
       'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",

@@ -5,12 +5,18 @@ module Seek
       class Institution < Thing
         schema_mappings full_address: :address,
                         image: :logo,
-                        ror_url: :identifier,
+                        ror_identifier: :identifier,
                         base_title: :name,
                         department_organization: :department
 
         def schema_type
           'ResearchOrganization'
+        end
+
+        def ror_identifier
+          return unless ror_url.present?
+
+          { '@id' => ror_url }
         end
 
         def department_organization
