@@ -344,27 +344,28 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'sample' do
-    sample = FactoryBot.create(:patient_sample, contributor: @person)
+    sample = Sample.new(contributor: @person, projects: @person.projects, sample_type: FactoryBot.create(:schema_org_sample_type))
     sample.add_annotations('keyword', 'tag', User.first)
-    sample.set_attribute_value('postcode', 'M13 4PP')
+    sample.set_attribute_value('title', 'The Title')
+    sample.set_attribute_value('description', 'The Description')
+    sample.set_attribute_value('enzyme', 'EC 4.1.2.13')
     sample.set_attribute_value('weight', '88700.2')
     disable_authorization_checks { sample.save! }
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-      '@type' => %w[Thing Sample],
-      '@id' => "http://localhost:3000/samples/#{sample.id}",
+      '@type' => %w[Sample],
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/',
-      'name' => 'Fred Bloggs',
+      '@id' => "http://localhost:3000/samples/#{sample.id}",
+      'name' => 'The Title',
       'url' => "http://localhost:3000/samples/#{sample.id}",
       'keywords' => 'keyword',
       'additionalProperty' => [
-        { '@type' => 'PropertyValue', 'name' => 'full name', 'value' => 'Fred Bloggs' },
-        { '@type' => 'PropertyValue', 'name' => 'age', 'value' => '44' },
+        { '@type' => 'PropertyValue', 'name' => 'title', 'propertyId' => 'dc:title', 'value' => 'The Title' },
+        { '@type' => 'PropertyValue', 'name' => 'description', 'propertyId' => 'dc:description', 'value' => 'The Description' },
+        { '@type' => 'PropertyValue', 'name' => 'enzyme', 'propertyId' => 'http://purl.uniprot.org/core/enzyme', 'value' => 'EC 4.1.2.13' },
         { '@type' => 'PropertyValue', 'name' => 'weight', 'value' => '88700.2', 'unitCode' => 'g',
           'unitText' => 'gram' },
-        { '@type' => 'PropertyValue', 'name' => 'address', 'value' => '' },
-        { '@type' => 'PropertyValue', 'name' => 'postcode', 'value' => 'M13 4PP' }
       ]
     }
 
