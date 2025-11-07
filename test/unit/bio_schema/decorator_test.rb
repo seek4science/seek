@@ -29,8 +29,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal %w[lorry yellow], decorator.keywords.split(',').collect(&:strip).sort
     assert_equal 'https://spdx.org/licenses/CC-BY-4.0', decorator.license
     assert_equal 'application/pdf', decorator.content_type
-    doi_expected = { '@id' => 'https://doi.org/10.10.10.10/test.1' }
-    assert_equal doi_expected, decorator.doi
+    assert_equal 'https://doi.org/10.10.10.10/test.1', decorator.doi
     project = document.projects.first
     person = document.creators.first
     assert_equal [{ :@type => 'Event', :@id => "http://localhost:3000/events/#{event.id}", :name => event.title }], decorator.subject_of

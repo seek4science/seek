@@ -17,12 +17,10 @@ module Seek
                         subject_of: :subjectOf,
                         part_of: :isPartOf,
                         doi: :identifier,
-                        previous_version_url: :isBasedOn
+			 previous_version_url: :isBasedOn
 
         def doi
-          return unless resource.try(:doi).present?
-
-          { '@id' => "https://doi.org/#{resource.doi}" }
+          "https://doi.org/#{resource.doi}" if resource.try(:doi).present?
         end
 
         def content_type

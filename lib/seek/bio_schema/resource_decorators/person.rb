@@ -12,17 +12,11 @@ module Seek
                         last_name: :familyName,
                         image: :image,
                         member_of: :memberOf,
-                        orcid_identifier: :orcid,
+                        orcid: :orcid,
                         works_for: :worksFor
 
         def conformance
           PERSON_PROFILE
-        end
-
-        def orcid_identifier
-          return unless orcid.present?
-
-          { '@id' => orcid }
         end
 
         def url
