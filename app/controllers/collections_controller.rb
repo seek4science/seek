@@ -17,7 +17,7 @@ class CollectionsController < ApplicationController
       format.html
       format.rdf { render template: 'rdf/show' }
       format.json { render json: @collection, include: json_api_include_param }
-      format.jsonld { render json: @collection.to_schema_ld }
+      format.jsonld { render body: @collection.to_schema_ld }
     end
   end
 

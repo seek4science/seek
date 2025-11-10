@@ -11,7 +11,7 @@ class HomesController < ApplicationController
       format.html
       format.jsonld do
         resource = determine_resource_for_schema_ld
-        render json: Seek::BioSchema::Serializer.new(resource).json_ld
+        render body: Seek::BioSchema::Serializer.new(resource).json_ld
       end
     end
   end

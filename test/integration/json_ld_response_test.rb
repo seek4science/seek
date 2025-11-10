@@ -33,6 +33,7 @@ class JsonLdResponseTest < ActionDispatch::IntegrationTest
                  'description' => "You may not view data_file:#{data_file.id}",
                  'statusCode' => 403 }
     assert_equal expected, JSON.parse(response.body)
+    assert_equal 'application/ld+json; charset=utf-8', response.headers['Content-Type']
   end
 
   private
