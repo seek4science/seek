@@ -1,0 +1,113 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1063/1.2128263
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 30 Oct 2025 20:16:42 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=ysotTDZX%2FAnrHuavrlc4C9GsV0ddwEMgpNxE6OI%2BYGdAYqmSw40EQupOgJsWW95erEimu3fagu4pNul4sn8kzWiyOFiXipIxBODr46vbEYk%3D"}]}'
+      Cf-Ray:
+      - 996d978b3b2d695e-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1063/1.2128263",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Thu, 30 Oct 2025 20:16:42 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.1063/1.2128263
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - application/json
+      User-Agent:
+      - Ruby
+      Host:
+      - api.crossref.org
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 30 Oct 2025 20:16:43 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '1402'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,8,6]],"date-time":"2024-08-06T00:01:12Z","timestamp":1722902472549},"reference-count":0,"publisher":"AIP","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2005]]},"DOI":"10.1063\/1.2128263","type":"proceedings-article","created":{"date-parts":[[2005,11,1]],"date-time":"2005-11-01T14:06:18Z","timestamp":1130853978000},"page":"29-34","source":"Crossref","is-referenced-by-count":4,"title":["Conference
+        Recommendations"],"prefix":"10.1063","volume":"795","author":[{"name":"Conference
+        organizers","sequence":"first","affiliation":[]}],"member":"317","event":{"name":"WOMEN
+        IN PHYSICS: 2nd IUPAP International Conference on Women in Physics","location":"Rio
+        de Janeiro (Brazil)"},"container-title":["AIP Conference Proceedings"],"original-title":[],"deposited":{"date-parts":[[2023,4,20]],"date-time":"2023-04-20T10:00:04Z","timestamp":1681984804000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/aip\/acp\/article\/795\/1\/29-34\/624381"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2005]]},"references-count":0,"URL":"https:\/\/doi.org\/10.1063\/1.2128263","relation":{},"ISSN":["0094-243X"],"issn-type":[{"type":"print","value":"0094-243X"}],"subject":[],"published":{"date-parts":[[2005]]}}}'
+  recorded_at: Thu, 30 Oct 2025 20:16:43 GMT
+recorded_with: VCR 6.3.1

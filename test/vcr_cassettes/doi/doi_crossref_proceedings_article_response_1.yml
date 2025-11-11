@@ -1,0 +1,154 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1117/12.2275959
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 30 Oct 2025 20:16:41 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=WDzVS9YehTcd4S5xKc5vaueniUW9dNMperq4xB3%2BrAcOaDM5z1Kp%2FP7NcCiOvoveotb3lPdCdS5hxHFGST5h9kKY%2BmmOn2XNDa81cTxugGLyyw%3D%3D"}]}'
+      Cf-Ray:
+      - 996d97823b4cd289-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1117/12.2275959",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Thu, 30 Oct 2025 20:16:41 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.1117/12.2275959
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - application/json
+      User-Agent:
+      - Ruby
+      Host:
+      - api.crossref.org
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 30 Oct 2025 20:16:41 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '9924'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,10,23]],"date-time":"2024-10-23T09:55:38Z","timestamp":1729677338309,"version":"3.28.0"},"reference-count":54,"publisher":"SPIE","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2017,9,26]]},"DOI":"10.1117\/12.2275959","type":"proceedings-article","created":{"date-parts":[[2017,9,19]],"date-time":"2017-09-19T19:58:22Z","timestamp":1505851102000},"page":"24","source":"Crossref","is-referenced-by-count":4,"title":["The
+        NOVA project: maximizing beam time efficiency through synergistic analyses
+        of SR\u03bcCT data"],"prefix":"10.1117","author":[{"given":"Sebastian","family":"Schmelzle","sequence":"first","affiliation":[]},{"given":"Thomas","family":"van
+        de Kamp","sequence":"first","affiliation":[]},{"given":"Michael","family":"Heethoff","sequence":"first","affiliation":[]},{"given":"Vincent","family":"Heuveline","sequence":"first","affiliation":[]},{"given":"Philipp","family":"L\u00f6sel","sequence":"first","affiliation":[]},{"given":"J\u00fcrgen","family":"Becker","sequence":"first","affiliation":[]},{"given":"Felix","family":"Beckmann","sequence":"first","affiliation":[]},{"given":"Frank","family":"Schluenzen","sequence":"first","affiliation":[]},{"given":"J\u00f6rg
+        U.","family":"Hammel","sequence":"first","affiliation":[]},{"given":"Andreas","family":"Kopmann","sequence":"first","affiliation":[]},{"given":"Wolfgang","family":"Mexner","sequence":"first","affiliation":[]},{"given":"Matthias","family":"Vogelgesang","sequence":"first","affiliation":[]},{"given":"Nicholas
+        T.","family":"Jerome","sequence":"first","affiliation":[]},{"given":"Oliver","family":"Betz","sequence":"first","affiliation":[]},{"given":"Rolf","family":"Beutel","sequence":"first","affiliation":[]},{"given":"Benjamin","family":"Wipfler","sequence":"first","affiliation":[]},{"given":"Alexander","family":"Blanke","sequence":"first","affiliation":[]},{"given":"Steffen","family":"Harzsch","sequence":"first","affiliation":[]},{"given":"Marie","family":"H\u00f6rnig","sequence":"first","affiliation":[]},{"given":"Tilo","family":"Baumbach","sequence":"first","affiliation":[]}],"member":"189","reference":[{"doi-asserted-by":"publisher","key":"c1","DOI":"10.1111\/jmi.2007.227.issue-1"},{"key":"c2","first-page":"70781U-1","article-title":"Micro-computer
+        tomography and a renaissance of insect morphology","volume":"7078","author":"Friedrich","year":"2008"},{"doi-asserted-by":"publisher","key":"c3","DOI":"10.1016\/j.asd.2009.07.001"},{"doi-asserted-by":"publisher","key":"c4","DOI":"10.1016\/j.jcz.2014.09.002"},{"doi-asserted-by":"publisher","key":"c5","DOI":"10.1002\/jmor.v272.9"},{"key":"c6","first-page":"147","article-title":"Insect
+        imaging at the ANKA Synchrotron Radiation Facility","volume":"25","author":"van
+        de Kamp","year":"2013","journal-title":"Entomologie heute"},{"doi-asserted-by":"publisher","key":"c7","DOI":"10.1002\/jmor.v277.4"},{"key":"c8","first-page":"1","article-title":"Morphological
+        and molecular evidence converging upon a robust phylogeny of the megadiverse
+        Holometabola","volume":"26","author":"Beutel","year":"2011","journal-title":"Cladistics"},{"year":"2017","author":"Mexner","article-title":"OpenGL\u00ae
+        API based analysis of large datasets in a cloud environment","key":"c9"},{"key":"c10","article-title":"Enhancing
+        a diffusion algorithm for 4D image segmentation using local information","volume":"9784","author":"L\u00f6sel","year":"2016"},{"doi-asserted-by":"publisher","key":"c11","DOI":"10.1007\/978-3-319-52280-7"},{"doi-asserted-by":"publisher","key":"c12","DOI":"10.1111\/cla.2012.28.issue-6"},{"doi-asserted-by":"publisher","key":"c13","DOI":"10.1007\/s13127-012-0097-z"},{"doi-asserted-by":"publisher","key":"c14","DOI":"10.1111\/syen.12012"},{"doi-asserted-by":"publisher","key":"c15","DOI":"10.1186\/1742-9994-11-16"},{"doi-asserted-by":"publisher","key":"c16","DOI":"10.1016\/j.asd.2013.10.003"},{"doi-asserted-by":"publisher","key":"c17","DOI":"10.1093\/molbev\/mst199"},{"doi-asserted-by":"publisher","key":"c18","DOI":"10.1111\/syen.2015.40.issue-2"},{"key":"c19","first-page":"20151033","article-title":"Structural
+        mouthpart interaction evolved already in the earliest lineages of insects","volume":"282","author":"Blanke","year":"2015"},{"doi-asserted-by":"publisher","key":"c20","DOI":"10.1093\/sysbio\/sys091"},{"doi-asserted-by":"publisher","key":"c21","DOI":"10.1002\/jmor.v270:12"},{"key":"c22","doi-asserted-by":"crossref","first-page":"910","DOI":"10.1002\/jmor.10841","article-title":"Comparative
+        morphology of the head of selected sporophagous and non-sporophagous aleocharinae
+        (Coleoptera: Staphylinidae): Musculature and hypopharynx-prementum complex","volume":"271","author":"Weide","year":"2010","journal-title":"J.
+        Morph"},{"doi-asserted-by":"publisher","key":"c23","DOI":"10.1111\/azo.2013.95.issue-1"},{"doi-asserted-by":"publisher","key":"c24","DOI":"10.1242\/jeb.092742"},{"doi-asserted-by":"publisher","key":"c25","DOI":"10.1016\/j.asd.2012.09.005"},{"doi-asserted-by":"publisher","key":"c26","DOI":"10.1016\/j.jcz.2012.09.003"},{"key":"c27","first-page":"1","article-title":"Brain
+        architecture of the Pacific White Shrimp Penaeus vannamei Boone, 1931 (Malacostraca,
+        Dendrobranchiata): correspondence of brain structure and sensory input?","author":"Meth","year":"2017","journal-title":"Cell
+        and Tissue Research"},{"doi-asserted-by":"publisher","key":"c28","DOI":"10.1002\/cne.23741"},{"key":"c29","first-page":"1","article-title":"What
+        nymphal morphology can tell us about parental investment \u2013 a group of
+        cockroach hatchlings in Baltic Amber documented by a multi-method approach","author":"H\u00f6rnig","year":"2016","journal-title":"Palaeontologia
+        Electronica 19.1.5A"},{"doi-asserted-by":"publisher","key":"c30","DOI":"10.1038\/s41598-017-01496-8"},{"doi-asserted-by":"publisher","key":"c31","DOI":"10.1038\/srep42345"},{"doi-asserted-by":"publisher","key":"c32","DOI":"10.1073\/pnas.1308650111"},{"key":"c33","first-page":"37","article-title":"X-ray
+        radiography of a spraying stick insect (Phasmatodea)","volume":"27","author":"van
+        de Kamp","year":"2015","journal-title":"Entomologie heute"},{"doi-asserted-by":"publisher","key":"c34","DOI":"10.1111\/zoj.2012.165.issue-4"},{"doi-asserted-by":"publisher","key":"c35","DOI":"10.1371\/journal.pone.0080560"},{"doi-asserted-by":"publisher","key":"c36","DOI":"10.11646\/zootaxa.3860.5"},{"key":"c37","first-page":"151","article-title":"Scanning
+        the past \u2013synchrotron X-ray microtomography of fossil wasps in amber","volume":"26","author":"van
+        de Kamp","year":"2014","journal-title":"Entomologie heute"},{"issue":"e12129","key":"c38","first-page":"1","article-title":"Preservation
+        of three-dimensional anatomy in phosphatized fossil arthropods enriches evolutionary
+        inference","volume":"5","author":"Schwermann","year":"2016","journal-title":"eLife"},{"key":"c39","first-page":"127","article-title":"The
+        fossil insects of the Quercy region: a historical review","volume":"28","author":"Schwermann","year":"2016","journal-title":"Entomologie
+        heute"},{"doi-asserted-by":"publisher","key":"c40","DOI":"10.1038\/srep41413"},{"doi-asserted-by":"publisher","key":"c41","DOI":"10.1126\/science.1204245"},{"doi-asserted-by":"publisher","key":"c42","DOI":"10.1371\/journal.pone.0102355"},{"doi-asserted-by":"publisher","key":"c43","DOI":"10.1016\/j.asd.2015.07.004"},{"key":"c44","article-title":"Adaptive
+        trends in malacostracan brain form and function related to behavior","volume":"3","author":"Sandeman","year":"2014"},{"year":"2008","author":"Beckmann","article-title":"The
+        GKSS Beamlines at PETRA III and DORIS III","key":"c45"},{"doi-asserted-by":"publisher","key":"c46","DOI":"10.1154\/1.3428364"},{"year":"2010","author":"Haibel","article-title":"Micro-
+        and nano-tomography at the GKSS Imaging Beamline at PETRA III","key":"c47"},{"year":"2014","author":"Hipp","article-title":"Grating-Based
+        X-Ray Phase-Contrast Imaging at PETRA III","key":"c48"},{"key":"c49","first-page":"92120O","article-title":"P05
+        imaging beamline at PETRA III: first results","author":"Greving","year":"2014","journal-title":"Developments
+        in X-Ray Tomography IX 9212"},{"key":"c50","article-title":"Single-grating
+        interferometer for high-resolution phase-contrast imaging at synchrotron radiation
+        sources","volume":"9967","author":"Hipp","year":"2016","journal-title":"SPIE
+        Optical Engineering + Applications"},{"year":"2015","author":"Wilde","article-title":"Micro-CT
+        at the Imaging Beamline P05 at PETRA III","key":"c51"},{"key":"c52","first-page":"152","article-title":"WAVE:
+        a 3D online previewing framework for big data archives","author":"Tan Jerome","year":"2017"},{"doi-asserted-by":"publisher","key":"c53","DOI":"10.5220\/0006262903300334"},{"key":"c54","first-page":"1","article-title":"Surface
+        area\u2013volume ratios in insects","author":"K\u00fchsel","year":"2016","journal-title":"Insect
+        Science"}],"event":{"name":"Developments in X-Ray Tomography XI","start":{"date-parts":[[2017,8,6]]},"location":"San
+        Diego, United States","end":{"date-parts":[[2017,8,10]]}},"container-title":["Developments
+        in X-Ray Tomography XI"],"original-title":[],"deposited":{"date-parts":[[2024,6,27]],"date-time":"2024-06-27T02:25:34Z","timestamp":1719455134000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.spiedigitallibrary.org\/conference-proceedings-of-spie\/10391\/2275959\/The-NOVA-project--maximizing-beam-time-efficiency-through-synergistic\/10.1117\/12.2275959.full"}},"subtitle":[],"editor":[{"given":"Bert","family":"M\u00fcller","sequence":"first","affiliation":[]},{"given":"Ge","family":"Wang","sequence":"first","affiliation":[]}],"short-title":[],"issued":{"date-parts":[[2017,9,26]]},"references-count":54,"URL":"https:\/\/doi.org\/10.1117\/12.2275959","relation":{},"subject":[],"published":{"date-parts":[[2017,9,26]]}}}'
+  recorded_at: Thu, 30 Oct 2025 20:16:41 GMT
+recorded_with: VCR 6.3.1
