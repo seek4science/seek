@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DoiParserExceptionTest < ActiveSupport::TestCase
 
-  test 'raises RANotSupported for mEDRA DOI' do
+  test 'mEDRA DOI is detected' do
     VCR.use_cassette('doi/medra_ra') do
       doi = '10.19232/uv4pb.2018.2.00'
       assert_equal 'mEDRA', Seek::Doi::Parser.send(:get_doi_ra, doi)
@@ -10,7 +10,7 @@ class DoiParserExceptionTest < ActiveSupport::TestCase
   end
 
   # Test that a DOI registered under mEDRA raises the correct exception
-  test 'raises RANotSupported for mEDRA DOI11' do
+  test 'parsing mEDRA DOI raises RANotSupported' do
     VCR.use_cassette('doi/medra_ra') do
       doi = '10.19232/uv4pb.2018.2.00'
       error = assert_raises(Seek::Doi::RANotSupported) do
