@@ -1,22 +1,8 @@
-services:
-  db: # Database implementation, in this case MySQL
-    image: mysql:8.0
-    container_name: seek-mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-error-verbosity=1
-    restart: always
-    stop_grace_period: 1m30s
-    env_file:
-      - docker/db.env
-    volumes:
-      - seek-mysql-db:/var/lib/mysql
-
-  seek: # The SEEK application
-    #build: .
-
+x-shared:
+  seek-base: &seek-base
+    # build: .
     image: fairdom/seek:main
 
-    container_name: seek
-    command: docker/entrypoint.sh
     restart: always
     environment:
       RAILS_ENV: production
@@ -29,39 +15,52 @@ services:
     volumes:
       - seek-filestore:/seek/filestore
       - seek-cache:/seek/tmp/cache
+    depends_on:
+      db:
+        condition: service_healthy
+      solr:
+        condition: service_started
+
+
+services:
+  db:
+    # Database implementation, in this case MySQL
+    image: mysql:8.0
+    container_name: seek-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-error-verbosity=1
+    restart: always
+    stop_grace_period: 1m30s
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-mysql-db:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+
+  seek:
+    # The SEEK application
+    <<: *seek-base
+    container_name: seek
+    command: docker/entrypoint.sh
     ports:
       - "3000:3000"
-    depends_on:
-      - db
-      - solr
-    links:
-      - db
-      - solr
+    healthcheck:
+      test: [ "CMD", "ruby", "script/check_deployment.rb" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 1m
 
-  seek_workers: # The SEEK delayed job workers
-      #build: .
-
-      image: fairdom/seek:main
-      container_name: seek-workers
-      command: docker/start_workers.sh
-      restart: always
-      environment:
-        RAILS_ENV: production
-        SOLR_PORT: 8983
-        SOLR_HOST: solr
-        RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-        QUIET_SUPERCRONIC: 1 # remove to show supercronic activity logs
-      env_file:
-        - docker/db.env
-      volumes:
-        - seek-filestore:/seek/filestore
-        - seek-cache:/seek/tmp/cache
-      depends_on:
-        - db
-        - solr
-      links:
-        - db
-        - solr
+  seek_workers:
+    # The SEEK delayed job workers
+    <<: *seek-base
+    container_name: seek-workers
+    command: docker/start_workers.sh
 
   solr:
     image: fairdom/seek-solr:8.11
@@ -75,8 +74,7 @@ services:
       - docker-entrypoint.sh
       - solr-precreate
       - seek
-      - /opt/solr/server/solr/configsets/seek_config      
-
+      - /opt/solr/server/solr/configsets/seek_config
 
 volumes:
   seek-filestore:
