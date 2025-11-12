@@ -20,7 +20,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
       '@id' => 'http://fairyhub.org',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/',
+      'dct:conformsTo' => {'@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
       'name' => 'Sysmo SEEK',
       'url' => 'http://fairyhub.org',
       'dataset' => [
@@ -70,7 +70,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
       '@id' => 'http://fairyhub.org',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
       'name' => 'Sysmo SEEK',
       'url' => 'http://fairyhub.org',
       'dataset' => [
@@ -116,7 +116,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
-      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE,
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE },
       'name' => @person.name,
       'givenName' => @person.first_name,
       'familyName' => @person.last_name,
@@ -154,7 +154,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
       'name' => df.title,
       'description' => df.description.ljust(50, '.'),
       'keywords' => 'keyword',
@@ -212,7 +212,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
@@ -260,7 +260,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      'dct:conformsTo' => { '@id' => 'https://bioschemas.org/profiles/Dataset/1.0-RELEASE' },
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
@@ -292,24 +292,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     check_version(df.latest_version, expected)
   end
 
-  test 'taxon' do
-    organism = FactoryBot.create(:organism, bioportal_concept: FactoryBot.create(:bioportal_concept))
-
-    expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-      '@type' => 'Taxon',
-      '@id' => "http://localhost:3000/organisms/#{organism.id}",
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
-      'name' => 'An Organism',
-      'url' => "http://localhost:3000/organisms/#{organism.id}",
-      'sameAs' => 'http://purl.bioontology.org/ontology/NCBITAXON/2287',
-      'alternateName' => []
-    }
-
-    json = JSON.parse(organism.to_schema_ld)
-    assert_equal expected, json
-  end
-
   test 'project' do
     @project.avatar = FactoryBot.create(:avatar)
     @project.web_page = 'http://testing.com'
@@ -321,7 +303,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
-      'dct:conformsTo' => 'https://schema.org/Project',
       'name' => @project.title,
       'description' => 'a lovely project',
       'logo' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
@@ -354,8 +335,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-      '@type' => %w[Sample],
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/',
+      '@type' => 'Sample',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Sample::SAMPLE_PROFILE },
       '@id' => "http://localhost:3000/samples/#{sample.id}",
       'name' => 'The Title',
       'url' => "http://localhost:3000/samples/#{sample.id}",
@@ -380,7 +361,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/events/#{event.id}",
-      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE,
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE },
       '@type' => 'Event',
       'name' => 'A Maximal Event',
       'description' => 'All you ever wanted to know about headaches',
@@ -422,7 +403,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DigitalDocument',
       '@id' => "http://localhost:3000/documents/#{document.id}",
-      'dct:conformsTo' => 'https://schema.org/DigitalDocument',
       'name' => 'This Document',
       'url' => "http://localhost:3000/documents/#{document.id}",
       'keywords' => 'wibble',
@@ -456,7 +436,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'PresentationDigitalDocument',
       '@id' => "http://localhost:3000/presentations/#{presentation.id}",
-      'dct:conformsTo' => 'https://schema.org/PresentationDigitalDocument',
       'name' => 'This presentation',
       'url' => "http://localhost:3000/presentations/#{presentation.id}",
       'keywords' => 'wibble',
@@ -506,7 +485,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
       '@id' => "http://localhost:3000/workflows/#{workflow.id}",
-      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE },
       'description' => 'This is a test workflow for bioschema generation',
       'name' => 'This workflow',
       'url' => "http://localhost:3000/workflows/#{workflow.id}",
@@ -548,30 +527,30 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-inputs-%23main/max-steps',
           'name' => '#main/max-steps',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE }
         },
         {
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-inputs-%23main/reverse',
           'name' => '#main/reverse',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE }
         },
         {
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-inputs-%23main/rulesfile',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE },
           'name' => '#main/rulesfile'
         },
         {
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-inputs-%23main/sinkfile',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE },
           'name' => '#main/sinkfile'
         },
         {
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-inputs-%23main/sourcefile',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE },
           'name' => '#main/sourcefile'
         }
       ],
@@ -579,19 +558,19 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         {
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-outputs-%23main/compounds',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE },
           'name' => '#main/compounds'
         },
         {
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-outputs-%23main/reactions',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE },
           'name' => '#main/reactions'
         },
         {
           '@type' => 'FormalParameter',
           '@id' => '#this_workflow-outputs-%23main/sinks',
-          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE },
           'name' => '#main/sinks'
         }
       ]
@@ -627,7 +606,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Collection',
-      'dct:conformsTo' => 'https://schema.org/Collection',
       '@id' => "http://localhost:3000/collections/#{collection.id}",
       'description' => 'A collection of very interesting things',
       'name' => 'A Maximal Collection',
@@ -671,7 +649,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Taxon',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::HumanDisease::TAXON_PROFILE },
       '@id' => "http://localhost:3000/human_diseases/#{human_disease.id}",
       'name' => 'A Maximal Human Disease',
       'url' => "http://localhost:3000/human_diseases/#{human_disease.id}",
@@ -695,7 +673,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'ResearchOrganization',
-      'dct:conformsTo' => 'https://schema.org/ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
       "name"=>"University of Manchester",
       "department"=>{"@type"=>"Organization", "name"=>"Manchester Institute of Biotechnology"},
@@ -725,7 +702,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Taxon',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Organism::TAXON_PROFILE },
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
       'name' => 'A Maximal Organism',
       'url' => "http://localhost:3000/organisms/#{organism.id}",
@@ -747,7 +724,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'FundingScheme',
-      'dct:conformsTo' => 'https://schema.org/FundingScheme',
       '@id' => "http://localhost:3000/programmes/#{programme.id}",
       'description' => 'A very exciting programme',
       'name' => 'A Maximal Programme',
@@ -780,7 +756,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      'dct:conformsTo' => {'@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
       'name' => 'version 1 title',
       'description' => 'version 1 description'.ljust(50, '.'),
       'keywords' => 'keyword',
@@ -818,7 +794,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
       'name' => 'version 2 title',
       'description' => 'version 2 description'.ljust(50, '.'),
       'keywords' => 'keyword',
@@ -863,7 +839,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Dataset::DATASET_PROFILE },
       '@id' => 'http://localhost:3000/workflows',
       'description' => 'Workflows in Sysmo SEEK.',
       'name' => 'Workflows',
@@ -897,7 +873,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Dataset::DATASET_PROFILE },
       '@id' => 'http://localhost:3000/workflows',
       'description' => 'Workflows in Sysmo SEEK.',
       'name' => 'Workflows',

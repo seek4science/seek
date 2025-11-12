@@ -3,7 +3,7 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a creator
       class AssetsCreator < Thing
-        PERSON_PROFILE = 'https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/'.freeze
+        PERSON_PROFILE = 'https://bioschemas.org/profiles/Person/0.3-DRAFT'.freeze
 
         schema_mappings given_name: :givenName,
                         family_name: :familyName,
