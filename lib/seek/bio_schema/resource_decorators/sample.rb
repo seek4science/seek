@@ -8,7 +8,7 @@ module Seek
         SAMPLE_PROFILE = 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/'.freeze
 
         def schema_type
-          %w[Sample]
+          'Sample'
         end
 
         def conformance
