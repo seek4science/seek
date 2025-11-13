@@ -674,11 +674,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
-      'name'=>'University of Manchester',
-      'department'=>{'@type'=>'Organization', 'name'=>'Manchester Institute of Biotechnology'},
+      'name' => 'University of Manchester',
+      'department' => {'@type' => 'Organization', 'name' => 'Manchester Institute of Biotechnology'},
       'url' => 'http://www.manchester.ac.uk/',
       'identifier' => 'https://ror.org/027m9bs27',
-      'address'=>{'@type'=>'PostalAddress','addressCountry'=>'GB', 'addressLocality'=>'Manchester', 'streetAddress'=>'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom'}
+      'address' => {'@type' => 'PostalAddress','addressCountry' => 'GB', 'addressLocality' => 'Manchester', 'streetAddress' => 'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom'}
     }
 
     json = JSON.parse(institution.to_schema_ld)
@@ -903,9 +903,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'sop' do
+    collection = nil
     sop = travel_to(@current_time) do
+
       sop = FactoryBot.create(:max_sop)
-      disable_authorization_checks { sop.save! }
+      collection = FactoryBot.create(:public_collection, title: 'A collection',
+                                     items: [FactoryBot.create(:collection_item, asset: sop)])
+      sop.reload
       sop
     end
 
@@ -925,7 +929,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
-      'isPartOf' => [],
+      'isPartOf' => [{ '@type' => 'Collection', '@id' => "http://localhost:3000/collections/#{collection.id}", 'name' => 'A collection'}],
       'computationalTool' => [{ '@type' => %w[SoftwareSourceCode ComputationalWorkflow], '@id' => "http://localhost:3000/workflows/#{sop.workflows.first.id}", 'name' => 'This Workflow' }]
     }
 
