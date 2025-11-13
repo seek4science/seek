@@ -662,7 +662,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   end
 
   test 'institution' do
-    institution = VCR.use_cassette("ror/max_institution") do
+    institution = VCR.use_cassette('ror/max_institution') do
       travel_to(@current_time) do
         institution = FactoryBot.create(:max_institution)
         disable_authorization_checks { institution.save! }
@@ -674,11 +674,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
-      "name"=>"University of Manchester",
-      "department"=>{"@type"=>"Organization", "name"=>"Manchester Institute of Biotechnology"},
+      'name'=>'University of Manchester',
+      'department'=>{'@type'=>'Organization', 'name'=>'Manchester Institute of Biotechnology'},
       'url' => 'http://www.manchester.ac.uk/',
       'identifier' => 'https://ror.org/027m9bs27',
-      "address"=>{"@type"=>"PostalAddress","addressCountry"=>"GB", "addressLocality"=>"Manchester", "streetAddress"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
+      'address'=>{'@type'=>'PostalAddress','addressCountry'=>'GB', 'addressLocality'=>'Manchester', 'streetAddress'=>'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom'}
     }
 
     json = JSON.parse(institution.to_schema_ld)
@@ -900,6 +900,37 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       json = JSON.parse(resource.to_schema_ld)
       assert_equal expected, json
     end
+  end
+
+  test 'sop' do
+    sop = travel_to(@current_time) do
+      sop = FactoryBot.create(:max_sop)
+      disable_authorization_checks { sop.save! }
+      sop
+    end
+
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'LabProtocol',
+      '@id' => "http://localhost:3000/sops/#{sop.id}",
+      'description' => 'How to run a simulation in GROMACS',
+      'name' => 'A Maximal Sop',
+      'url' => "http://localhost:3000/sops/#{sop.id}",
+      'keywords' => 'Sop-tag1, Sop-tag2, Sop-tag3, Sop-tag4, Sop-tag5',
+      'version' => 1,
+      'creator' => [{ '@type' => 'Person', '@id' => "http://localhost:3000/people/#{sop.assets_creators.first.creator_id}", 'name' => 'Some One' },
+                    { '@type' => 'Person', '@id' => '#Blogs', 'name' => 'Blogs' },
+                    { '@type' => 'Person', '@id' => '#Joe', 'name' => 'Joe' }],
+      'producer' => [{ '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{sop.projects.first.id}", 'name' => 'A Maximal Project' }],
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'encodingFormat' => 'application/pdf',
+      'isPartOf' => [],
+      'computationalTool' => [{ '@type' => %w[SoftwareSourceCode ComputationalWorkflow], '@id' => "http://localhost:3000/workflows/#{sop.workflows.first.id}", 'name' => 'This Workflow' }]
+    }
+
+    json = JSON.parse(sop.to_schema_ld)
+    assert_equal expected, json
   end
 
   private
