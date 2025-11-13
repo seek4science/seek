@@ -3,7 +3,6 @@ Dockerfile
 filestore*
 hooks/
 coverage/
-docker/solr/
 db/*.sqlite3
 vendor/bundle/
 public/unused_images
