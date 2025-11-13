@@ -1,4 +1,4 @@
-FROM ruby:3.3-slim-bookworm AS base
+FROM ruby:3.3-slim-trixie AS base
 LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 ARG SOURCE_COMMIT
 
@@ -18,7 +18,10 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
 
 # Install base dependencies
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 postgresql-client default-mysql-client vim-tiny git openjdk-17-jre-headless zip \
+    apt-get install --no-install-recommends -y \
+    curl zip libjemalloc2 libvips \
+    sqlite3 postgresql-client default-mysql-client \
+    vim-tiny git openjdk-21-jre \
     poppler-utils graphviz gettext shared-mime-info
 
 # Prepare app directory
@@ -34,12 +37,13 @@ RUN apt-get update -qq && \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
     libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
     libxslt1-dev libyaml-dev locales nodejs \
-    python3.11-dev python3.11-distutils python3-pip python3.11-venv \
+    python3.13-dev python3-setuptools python3-pip python3.13-venv \
     shared-mime-info links zip && \
+    apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
     locale-gen en_US.UTF-8
 
 # create and use a dedicated python virtualenv
-RUN python3.11 -m venv /opt/venv
+RUN python3.13 -m venv /opt/venv
 RUN chown -R www-data /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
@@ -67,9 +71,9 @@ RUN rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bund
 RUN touch config/using-docker
 
 # Python dependencies from requirements.txt
-RUN python3.11 -m pip install --upgrade pip
-RUN python3.11 -m pip install setuptools==58
-RUN python3.11 -m pip install -r requirements.txt
+RUN python3.13 -m pip install --upgrade pip
+RUN python3.13 -m pip install setuptools==58
+RUN python3.13 -m pip install -r requirements.txt
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
