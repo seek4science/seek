@@ -29,6 +29,9 @@ RUN mkdir -p $APP_DIR
 RUN chown www-data $APP_DIR
 WORKDIR $APP_DIR
 
+# Disable ssl from the mysql client
+RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
+
 FROM base AS builder
 
 # Install build dependencies
