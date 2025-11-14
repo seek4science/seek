@@ -1,7 +1,12 @@
-# Needed as normally the types are Seeded.
-Journal:
-  title: Journal
-  key: article
+# -------------------------------------------------------------------
+#  Mapped Old SEEK Types  →  New DataCite Types
+#  Based on DataCite Metadata Schema Documentation
+#  https://datacite-metadata-schema.readthedocs.io/en/4.6/appendices/appendix-1/resourceTypeGeneral/#
+# -------------------------------------------------------------------
+
+JournalArticle:
+  title: JournalArticle
+  key: journalarticle   # was: article (Journal)
 
 Book:
   title: Book
@@ -11,21 +16,25 @@ Booklet:
   title: Booklet
   key: booklet
 
-InBook:
-  title: InBook
-  key: inbook
+BookChapter:
+  title: BookChapter
+  key: bookchapter       # was: InBook (inbook)
 
-InCollection:
-  title: InCollection
-  key: incollection
+Collection:
+  title: Collection
+  key: collection        # replaces InCollection (incollection)
 
-InProceedings:
-  title: InProceedings
-  key: inproceedings
+ConferencePaper:
+  title: ConferencePaper
+  key: conferencepaper   # was: InProceedings (inproceedings)
 
-Manual:
-  title: Manual
-  key: manual
+ConferenceProceeding:
+  title: ConferenceProceeding
+  key: conferenceproceeding   # was: Proceedings
+
+Text:
+  title: Text
+  key: text              # was: Manual (manual)
 
 BachelorThesis:
   title: Bachelor's Thesis
@@ -39,22 +48,102 @@ DiplomaThesis:
   title: Diplom Thesis
   key: diplomthesis
 
-Misc:
-  title: Misc
-  key: misc
-
 PhdThesis:
   title: Doctoral Thesis
   key: phdthesis
 
-Proceedings:
-  title: Proceedings
-  key: proceedings
+Other:
+  title: Other
+  key: other              # replaces Misc
 
-Techreport:
-  title: Tech report
-  key: techreport
+Preprint:
+  title: Preprint
+  key: preprint           # was: Unpublished
 
-Unpublished:
-  title: Unpublished
-  key: unpublished
+Report:
+  title: Report
+  key: report             # was: Tech report
+
+# -------------------------------------------------------------------
+#  Additional Extended DataCite Types
+# -------------------------------------------------------------------
+
+Audiovisual:
+  title: Audiovisual
+  key: audiovisual
+
+Award:
+  title: Award
+  key: award
+
+ComputationalNotebook:
+  title: ComputationalNotebook
+  key: computationalnotebook
+
+DataPaper:
+  title: DataPaper
+  key: datapaper
+
+Dataset:
+  title: Dataset
+  key: dataset
+
+Event:
+  title: Event
+  key: event
+
+Image:
+  title: Image
+  key: image
+
+Instrument:
+  title: Instrument
+  key: instrument
+
+InteractiveResource:
+  title: InteractiveResource
+  key: interactiveresource
+
+Model:
+  title: Model
+  key: model
+
+OutputManagementPlan:
+  title: OutputManagementPlan
+  key: outputmanagementplan
+
+PeerReview:
+  title: PeerReview
+  key: peerreview
+
+PhysicalObject:
+  title: PhysicalObject
+  key: physicalobject
+
+Project:
+  title: Project
+  key: project
+
+Service:
+  title: Service
+  key: service
+
+Software:
+  title: Software
+  key: software
+
+Sound:
+  title: Sound
+  key: sound
+
+Standard:
+  title: Standard
+  key: standard
+
+StudyRegistration:
+  title: StudyRegistration
+  key: studyregistration
+
+Workflow:
+  title: Workflow
+  key: workflow
