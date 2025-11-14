@@ -21,7 +21,7 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     curl zip libjemalloc2 libvips \
     sqlite3 postgresql-client default-mysql-client \
-    vim-tiny git openjdk-21-jre \
+    vim-tiny git openjdk-21-jre python3.13 \
     poppler-utils graphviz gettext shared-mime-info
 
 # Prepare app directory
@@ -97,6 +97,9 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
     && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
 FROM base AS runtime
+
+# Set PATH to include python virtualenv
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Install nginx
 RUN apt-get update -qq && \
