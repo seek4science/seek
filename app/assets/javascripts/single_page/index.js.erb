@@ -299,7 +299,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectI
     setTimeout(() => {
       const itemType = assayId == null ? 'study' : 'assay';
       const itemId = assayId == null ? studyId : assayId;
-      if (projectId && itemType && itemId) {
+      if (projectId != null && itemType && itemId != null) {
         window.location.href = `/single_pages/${projectId}?item_type=${itemType}&item_id=${itemId}`;
       } else {
         // If one of the variables is missing, just reload the current page.
