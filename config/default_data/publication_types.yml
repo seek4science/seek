@@ -1,11 +1,11 @@
 # -------------------------------------------------------------------
-#  Mapped Old SEEK Types  →  New DataCite Types
+#  Mapped legacy SEEK Types  →  New DataCite Types
 #  Based on DataCite Metadata Schema Documentation
 #  https://datacite-metadata-schema.readthedocs.io/en/4.6/appendices/appendix-1/resourceTypeGeneral/#
 # -------------------------------------------------------------------
 
 JournalArticle:
-  title: JournalArticle
+  title: Journal Article
   key: journalarticle   # was: article (Journal)
 
 Book:
@@ -17,19 +17,19 @@ Booklet:
   key: booklet
 
 BookChapter:
-  title: BookChapter
+  title: Book Chapter
   key: bookchapter       # was: InBook (inbook)
 
 Collection:
   title: Collection
-  key: collection        # replaces InCollection (incollection)
+  key: collection        # was: InCollection (incollection)
 
 ConferencePaper:
-  title: ConferencePaper
+  title: Conference Paper
   key: conferencepaper   # was: InProceedings (inproceedings)
 
 ConferenceProceeding:
-  title: ConferenceProceeding
+  title: Conference Proceeding
   key: conferenceproceeding   # was: Proceedings
 
 Text:
@@ -77,11 +77,11 @@ Award:
   key: award
 
 ComputationalNotebook:
-  title: ComputationalNotebook
+  title: Computational Notebook
   key: computationalnotebook
 
 DataPaper:
-  title: DataPaper
+  title: Data Paper
   key: datapaper
 
 Dataset:
@@ -101,7 +101,7 @@ Instrument:
   key: instrument
 
 InteractiveResource:
-  title: InteractiveResource
+  title: Interactive Resource
   key: interactiveresource
 
 Model:
@@ -109,15 +109,15 @@ Model:
   key: model
 
 OutputManagementPlan:
-  title: OutputManagementPlan
+  title: Output Management Plan
   key: outputmanagementplan
 
 PeerReview:
-  title: PeerReview
+  title: Peer Review
   key: peerreview
 
 PhysicalObject:
-  title: PhysicalObject
+  title: Physical Object
   key: physicalobject
 
 Project:
@@ -141,9 +141,13 @@ Standard:
   key: standard
 
 StudyRegistration:
-  title: StudyRegistration
+  title: Study Registration
   key: studyregistration
 
 Workflow:
   title: Workflow
   key: workflow
+
+ProjectDeliverable:
+  title: Project Deliverable
+  key: projectdeliverable
