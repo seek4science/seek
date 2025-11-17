@@ -1,25 +1,64 @@
-# Load expected publication types from YAML
-yml_file = File.join(Rails.root, 'config/default_data/publication_types.yml')
-pubtypes = YAML.load_file(yml_file)
+puts 'Seeding Publication Types...'
 
-# Extract a normalized list of YAML entries
-expected = pubtypes.values.map { |x| { title: x['title'], key: x['key'] } }
+yml_path = Rails.root.join('config', 'default_data', 'publication_types.yml')
+pubtypes = YAML.load_file(yml_path)
 
-# Extract database records
-actual = PublicationType.all.map { |pt| { title: pt.title, key: pt.key } }
+# Build lookup:
+#   "Journal Article" → { "title" => "Journal Article", "key" => "journalarticle" }
+expected = pubtypes.values.index_by { |data| data["title"] }
 
-# Compute differences
-missing_in_db = expected.reject { |e| actual.include?(e) }
-extra_in_db   = actual.reject   { |a| expected.include?(a) }
+# -------------------------------------------------------------------
+# Legacy SEEK → DataCite mapping
+# -------------------------------------------------------------------
+LEGACY_MAPPING = {
+  'Journal'        => 'Journal Article',
+  'InBook'         => 'Book Chapter',
+  'InCollection'   => 'Collection',
+  'InProceedings'  => 'Conference Paper',
+  'Proceedings'    => 'Conference Proceeding',
+  'Manual'         => 'Text',
+  'Misc'           => 'Other',
+  'Tech report'    => 'Report',
+  'Unpublished'    => 'Preprint'
+}.freeze
 
-puts "=== Missing in DB ==="
-puts missing_in_db.any? ? missing_in_db.inspect : "None"
+# -------------------------------------------------------------------
+# STEP 1 — Migrate legacy types to new DataCite types
+# -------------------------------------------------------------------
+PublicationType.all.each do |pt|
+  legacy_name = pt.title
 
-puts "\n=== Extra in DB (not in YAML) ==="
-puts extra_in_db.any? ? extra_in_db.inspect : "None"
+  if LEGACY_MAPPING.key?(legacy_name)
+    new_name = LEGACY_MAPPING[legacy_name]
+    target = expected[new_name]
 
-if missing_in_db.empty? && extra_in_db.empty?
-  puts "\n✔ All publication types are exactly consistent with YAML."
-else
-  puts "\n⚠ Inconsistencies found."
+    if target
+      puts "Migrating #{legacy_name.inspect} → #{new_name.inspect}"
+      pt.update(title: target["title"], key: target["key"])
+    else
+      puts "WARNING: Missing mapping in YAML for #{new_name.inspect}"
+    end
+  end
 end
+
+# -------------------------------------------------------------------
+# STEP 2 — Ensure all DataCite YAML types exist and match
+# -------------------------------------------------------------------
+expected.values.each do |etype|
+  title = etype["title"]
+  key   = etype["key"]
+
+  existing = PublicationType.find_by(key: key)
+
+  if existing.nil?
+    puts "Creating new type: #{title}"
+    PublicationType.create!(title: title, key: key)
+  else
+    if existing.title != title
+      puts "Updating title for #{key}: #{existing.title.inspect} → #{title.inspect}"
+      existing.update(title: title)
+    end
+  end
+end
+
+puts 'Publication types synced with publication_types.yml'
