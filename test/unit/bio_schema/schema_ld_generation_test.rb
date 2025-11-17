@@ -20,7 +20,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
       '@id' => 'http://fairyhub.org',
-      'dct:conformsTo' => {'@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
       'name' => 'Sysmo SEEK',
       'url' => 'http://fairyhub.org',
       'dataset' => [
@@ -36,6 +36,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/programmes', 'name' => 'Programmes' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/projects', 'name' => 'Projects' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/samples', 'name' => 'Samples' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/sops', 'name' => 'SOPs' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/workflows', 'name' => 'Workflows' }
       ],
       'description' => 'a lovely project',
@@ -100,6 +101,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        presentations_enabled: false,
                        programmes_enabled: false,
                        samples_enabled: false,
+                       sops_enabled: false,
                        instance_description: 'a lovely project',
                        instance_keywords: 'a,  b, ,,c,d',
                        site_base_host: 'http://fairyhub.org') do
@@ -600,8 +602,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     doc1 = sel_assets[0]
-    df1 = sel_assets[1]
-    df2 = sel_assets[2]
+    sop1 = sel_assets[1]
+    df1 = sel_assets[2]
+    df2 = sel_assets[3]
+    
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -630,6 +634,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'hasPart' => [
         { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{doc1.id}",
           'name' => doc1.title.to_s },
+        { '@type' => 'LabProtocol', '@id' => "http://localhost:3000/sops/#{sop1.id}", 'name' => sop1.title.to_s },
         { '@type' => 'Dataset', '@id' => "http://localhost:3000/data_files/#{df1.id}", 'name' => df1.title.to_s },
         { '@type' => 'Dataset', '@id' => "http://localhost:3000/data_files/#{df2.id}", 'name' => df2.title.to_s }
       ]
@@ -675,10 +680,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@type' => 'ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
       'name' => 'University of Manchester',
-      'department' => {'@type' => 'Organization', 'name' => 'Manchester Institute of Biotechnology'},
+      'department' => { '@type' => 'Organization', 'name' => 'Manchester Institute of Biotechnology' },
       'url' => 'http://www.manchester.ac.uk/',
       'identifier' => 'https://ror.org/027m9bs27',
-      'address' => {'@type' => 'PostalAddress','addressCountry' => 'GB', 'addressLocality' => 'Manchester', 'streetAddress' => 'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom'}
+      'address' => { '@type' => 'PostalAddress','addressCountry' => 'GB', 'addressLocality' => 'Manchester', 'streetAddress' => 'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom' }
     }
 
     json = JSON.parse(institution.to_schema_ld)
@@ -756,7 +761,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
-      'dct:conformsTo' => {'@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
+      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
       'name' => 'version 1 title',
       'description' => 'version 1 description'.ljust(50, '.'),
       'keywords' => 'keyword',
@@ -846,11 +851,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => 'http://localhost:3000/workflows',
       'keywords' => [],
       'license' => 'https://spdx.org/licenses/CC0-1.0',
-      'creator' => [{'@type' => 'Organization',
+      'creator' => [{ '@type' => 'Organization',
                      '@id' => 'http://www.sysmo-db.org',
                      'name' => 'SysMO-DB',
-                     'url' => 'http://www.sysmo-db.org'}],
-      'includedInDataCatalog' => {'@id' => 'http://localhost:3000'}
+                     'url' => 'http://www.sysmo-db.org' }],
+      'includedInDataCatalog' => { '@id' => 'http://localhost:3000' }
     }
 
     resource = Seek::BioSchema::Dataset.new(Workflow)
@@ -929,7 +934,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
-      'isPartOf' => [{ '@type' => 'Collection', '@id' => "http://localhost:3000/collections/#{collection.id}", 'name' => 'A collection'}],
+      'isPartOf' => [{ '@type' => 'Collection', '@id' => "http://localhost:3000/collections/#{collection.id}", 'name' => 'A collection' }],
       'computationalTool' => [{ '@type' => %w[SoftwareSourceCode ComputationalWorkflow], '@id' => "http://localhost:3000/workflows/#{sop.workflows.first.id}", 'name' => 'This Workflow' }]
     }
 

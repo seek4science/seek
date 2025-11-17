@@ -78,7 +78,7 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
                 assert_equal 'Organization', provider['@type']
                 assert_equal 'WIBBLE', provider['name']
                 assert_equal 'http://wibble.eu', provider['url']
-                assert_equal 13, json['dataset'].count
+                assert_equal 14, json['dataset'].count
               end
             end
           end
