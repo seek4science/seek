@@ -605,8 +605,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     sop1 = sel_assets[1]
     df1 = sel_assets[2]
     df2 = sel_assets[3]
-    
-
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Collection',
@@ -683,7 +681,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'department' => { '@type' => 'Organization', 'name' => 'Manchester Institute of Biotechnology' },
       'url' => 'http://www.manchester.ac.uk/',
       'identifier' => 'https://ror.org/027m9bs27',
-      'address' => { '@type' => 'PostalAddress','addressCountry' => 'GB', 'addressLocality' => 'Manchester', 'streetAddress' => 'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom' }
+      'address' => { '@type' => 'PostalAddress', 'addressCountry' => 'GB', 'addressLocality' => 'Manchester', 'streetAddress' => 'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom' }
     }
 
     json = JSON.parse(institution.to_schema_ld)
