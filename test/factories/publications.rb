@@ -2,20 +2,20 @@ FactoryBot.define do
   # PublicationType
   # :journal rely on the existence of the PublicationTypes
   factory(:journal, class: PublicationType) do
-    title { 'Journal' }
-    key { 'article' }
+    title { 'Journal Article' }
+    key   { 'journalarticle' }
   end
   
   
   factory(:phdthesis, class: PublicationType) do
-    title { 'Phd Thesis' }
-    key { 'phdthesis' }
+    title { 'Doctoral Thesis' }
+    key   { 'phdthesis' }
   end
   
   
   factory(:inproceedings, class: PublicationType) do
-    title { 'InProceedings' }
-    key { 'inproceedings' }
+    title { 'Conference Paper' }
+    key   { 'conferencepaper' }
   end
   
   # Publication

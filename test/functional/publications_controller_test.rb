@@ -300,14 +300,49 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_difference('Publication.count', 0) do
       post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
       assert_redirected_to publications_path
-      assert_includes flash[:error], 'An InProceedings needs to have a booktitle.'
+      assert_includes flash[:error], 'An Conference Paper needs to have a booktitle.'
       assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
-      assert_includes flash[:error], 'An InCollection needs to have a booktitle.'
-      assert_includes flash[:error], 'A Phd Thesis needs to have a school.'
-      assert_includes flash[:error], 'A Masters Thesis needs to have a school.'
-      assert_includes flash[:error], 'You need at least one author or editor for the Journal.'
+      assert_includes flash[:error], 'An Collection needs to have a booktitle.'
+      assert_includes flash[:error], 'A Doctoral Thesis needs to have a school.'
+      assert_includes flash[:error], "A Master's Thesis needs to have a school."
+      assert_includes flash[:error], 'You need at least one author or editor for the Journal Article.'
     end
   end
+
+  test 'should import publication types and titles from sample bibtex file' do
+    expected_pubs = [
+      { title: 'A Sample Journal Article',       type_title: 'Journal Article' },
+      { title: 'The Example Book',               type_title: 'Book' },
+      { title: 'A Chapter Inside a Book',        type_title: 'Book Chapter' },
+      { title: 'A Conference Paper Example',     type_title: 'Conference Paper' },
+      { title: 'An Example PhD Thesis',          type_title: 'Doctoral Thesis' },
+      { title: 'A Technical Report Example',     type_title: 'Report' },
+      { title: 'Miscellaneous Example',          type_title: 'Other' }
+    ]
+
+    assert_difference('Publication.count', expected_pubs.count) do
+      post :create, params: {
+        subaction: 'ImportMultiple',
+        publication: {
+          bibtex_file: fixture_file_upload('bibtex/sample_publications.bib'),
+          project_ids: [projects(:one).id]
+        }
+      }
+    end
+
+    expected_pubs.each do |entry|
+      title          = entry[:title]
+      expected_title = entry[:type_title]
+
+      publication = Publication.find_by(title: title)
+      assert_not_nil publication, "Publication '#{title}' should have been imported"
+
+      assert_equal expected_title,
+                   publication.publication_type.title
+    end
+  end
+
+
 
 
   test 'should associate authors to users when importing multiple publications from bibtex files' do
