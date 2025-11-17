@@ -297,8 +297,8 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectI
   })
   .always( function(response){
     setTimeout(() => {
-      const itemType = assayId === null ? 'study' : 'assay';
-      const itemId = assayId === null ? studyId : assayId;
+      const itemType = assayId == null ? 'study' : 'assay';
+      const itemId = assayId == null ? studyId : assayId;
       if (projectId && itemType && itemId) {
         window.location.href = `/single_pages/${projectId}?item_type=${itemType}&item_id=${itemId}`;
       } else {
