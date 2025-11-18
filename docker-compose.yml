@@ -4,11 +4,10 @@ x-shared:
     image: fairdom/seek:main
 
     restart: always
-    environment:
+    environment: &seek_base_env
       RAILS_ENV: production
       SOLR_PORT: 8983
       SOLR_HOST: solr
-      NO_ENTRYPOINT_WORKERS: 1
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
     env_file:
       - docker/db.env
@@ -49,6 +48,9 @@ services:
     command: docker/entrypoint.sh
     ports:
       - "3000:3000"
+    environment:
+      <<: *seek_base_env
+      NO_ENTRYPOINT_WORKERS: 1
     healthcheck:
       test: [ "CMD", "ruby", "script/check_deployment.rb" ]
       interval: 30s
@@ -60,6 +62,9 @@ services:
     # The SEEK delayed job workers
     <<: *seek_base
     container_name: seek-workers
+    environment:
+      <<: *seek_base_env
+      QUIET_SUPERCRONIC: 1
     command: docker/start_workers.sh
 
   solr:
