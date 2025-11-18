@@ -6,14 +6,9 @@ module Seek
         include ActionView::Helpers::NumberHelper
 
         
-        schema_mappings doi: :identifier,
-                        distribution: :distribution
+        schema_mappings distribution: :distribution
 
         DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
-
-        def doi
-          "https://doi.org/#{resource.doi}" if resource.doi
-        end
 
         def description
           description = resource.description&.truncate(4999)

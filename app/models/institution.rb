@@ -66,6 +66,12 @@ class Institution < ApplicationRecord
     end
   end
 
+  def ror_url
+    return nil unless ror_id.present?
+
+    "https://ror.org/#{ror_id}"
+  end
+
   private
 
   def validate_base_title_presence

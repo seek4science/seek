@@ -32,6 +32,7 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @person, include: [params[:include]]}
+      format.jsonld { render body: @person.to_schema_ld }
     end
   end
 

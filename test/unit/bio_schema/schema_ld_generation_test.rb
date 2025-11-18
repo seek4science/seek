@@ -411,7 +411,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'document' do
     document = travel_to(@current_time) do
-      document = FactoryBot.create(:document, contributor: @person)
+      document = FactoryBot.create(:document, contributor: @person, doi: '10.10.10.10/test.1')
       document.add_annotations('wibble', 'tag', User.first)
       disable_authorization_checks { document.save! }
       document
@@ -433,6 +433,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}",
           'name' => document.projects.first.title }
       ],
+      'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
       'subjectOf' => []
     }
@@ -482,7 +483,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
                          contributor: @person,
-                         license: 'APSL-2.0')
+                         license: 'APSL-2.0', doi: '10.10.10.10/test.1')
 
       workflow.assets_creators.create!(creator: @person, pos: 1)
       workflow.assets_creators.create!(creator: creator2, pos: 2)
@@ -510,6 +511,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/workflows/#{workflow.id}",
       'keywords' => 'wibble',
       'license' => Seek::License.find('APSL-2.0')&.url,
+      'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'creator' => [
         { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
         { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{creator2.id}", 'name' => creator2.name },
@@ -694,12 +696,21 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@type' => 'ResearchOrganization',
       'dct:conformsTo' => 'https://schema.org/ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
-      "name"=>"Manchester Institute of Biotechnology, University of Manchester",
+      "name"=>"University of Manchester",
+      "department"=>{"@type"=>"Organization", "name"=>"Manchester Institute of Biotechnology"},
       'url' => 'http://www.manchester.ac.uk/',
-      "address"=>{"address_country"=>"GB", "address_locality"=>"Manchester", "street_address"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
+      'identifier' => 'https://ror.org/027m9bs27',
+      "address"=>{"@type"=>"PostalAddress","addressCountry"=>"GB", "addressLocality"=>"Manchester", "streetAddress"=>"Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"}
     }
 
     json = JSON.parse(institution.to_schema_ld)
+    assert_equal expected, json
+
+    # check without ror_id and department
+    institution.update_columns(department:'', ror_id:nil)
+    json = JSON.parse(institution.to_schema_ld)
+    expected.delete('department')
+    expected.delete('identifier')
     assert_equal expected, json
   end
 

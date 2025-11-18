@@ -26,6 +26,11 @@ module Seek
 
       # returns the JSON-LD as a String, for the resource
       def json_ld
+        JSON.generate(json_representation)
+      end
+
+      # returns the JSON-LD as a pretty String, for the resource
+      def pretty_json_ld
         JSON.pretty_generate(json_representation)
       end
 
