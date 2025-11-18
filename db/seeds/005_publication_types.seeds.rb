@@ -44,11 +44,11 @@ end
 # -------------------------------------------------------------------
 # STEP 2 — Ensure all DataCite YAML types exist and match
 # -------------------------------------------------------------------
+existing_by_key = PublicationType.all.index_by(&:key)
 expected.values.each do |etype|
   title = etype["title"]
   key   = etype["key"]
-
-  existing = PublicationType.find_by(key: key)
+  existing = existing_by_key[key]
 
   if existing.nil?
     puts "Creating new type: #{title}"

@@ -594,19 +594,19 @@ end
       return false
     end
 
-    if (['Collection','Conference Paper'].include? self.publication_type.title) && (bibtex_record[:booktitle].blank?)
-      errors.add(:base, "An #{self.publication_type.title} needs to have a booktitle.")
+    if (['Collection', 'Conference Paper'].include? self.publication_type.title) && (bibtex_record[:booktitle].blank?)
+      errors.add(:base, "A #{self.publication_type.title} needs to have a booktitle.")
         return false
     end
 
-    unless ['Booklet','Text','Other','Conference Proceeding'].include? self.publication_type.title
+    unless ['Booklet', 'Text', 'Other', 'Conference Proceeding'].include? self.publication_type.title
       if bibtex_record[:author].nil? && self.editor.nil?
         self.errors.add(:base, "You need at least one author or editor for the #{self.publication_type.title}.")
         return false
       end
     end
 
-    if publication_type.key == 'bachelorsthesis' || publication_type.key == 'mastersthesis' || publication_type.key == 'phdthesis'
+    if ['bachelorsthesis', 'mastersthesis', 'phdthesis', 'diplomthesis'].include?(publication_type.key)
       if bibtex_record[:school].try(:to_s).nil?
         self.errors.add(:base,"A #{self.publication_type.title} needs to have a school.")
         return false

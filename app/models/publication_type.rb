@@ -41,12 +41,18 @@ class PublicationType < ActiveRecord::Base
     publication_key = bibtex_record.to_s[/@(.*?)\{/m, 1].to_s.downcase.strip
     datacite_key = BIBTEX_TO_DATACITE_KEY[publication_key] || 'other'
     pub_type = PublicationType.find_by(key: datacite_key)
-    pub_type.id
+    return pub_type.id if pub_type
+    other_type = PublicationType.find_by(key: 'other')
+    other_type&.id
   end
 
-  type_registry.each_key do |title|
-    define_singleton_method(title.gsub(/\s+/, '')) do
-      find_by(key: type_registry[title]['key'])
+  begin
+    type_registry.each_key do |title|
+      define_singleton_method(title.gsub(/\s+/, '')) do
+        find_by(key: type_registry[title]['key'])
+      end
     end
+  rescue => e
+    Rails.logger.error("Failed to load publication types: #{e.message}")
   end
 end
