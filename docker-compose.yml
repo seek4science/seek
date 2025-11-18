@@ -1,5 +1,5 @@
 x-shared:
-  seek-base: &seek-base
+  seek_base: &seek_base
     # build: .
     image: fairdom/seek:main
 
@@ -44,7 +44,7 @@ services:
 
   seek:
     # The SEEK application
-    <<: *seek-base
+    <<: *seek_base
     container_name: seek
     command: docker/entrypoint.sh
     ports:
@@ -58,7 +58,7 @@ services:
 
   seek_workers:
     # The SEEK delayed job workers
-    <<: *seek-base
+    <<: *seek_base
     container_name: seek-workers
     command: docker/start_workers.sh
 
