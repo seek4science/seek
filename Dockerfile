@@ -19,10 +19,8 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
 # Install base dependencies
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
-    curl zip libjemalloc2 libvips \
-    sqlite3 postgresql-client default-mysql-client \
-    vim-tiny git openjdk-21-jre python3.13 \
-    poppler-utils graphviz gettext shared-mime-info
+    curl default-mysql-client gettext git graphviz libjemalloc2 libvips \
+    openjdk-21-jre poppler-utils postgresql-client python3.13 shared-mime-info sqlite3 vim-tiny zip
 
 # Prepare app directory
 RUN mkdir -p $APP_DIR
@@ -39,9 +37,9 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential cmake \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
     libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-    libxslt1-dev libyaml-dev locales nodejs \
+    libxslt1-dev libyaml-dev links locales nodejs \
     python3.13-dev python3-setuptools python3-pip python3.13-venv \
-    shared-mime-info links zip && \
+    shared-mime-info zip && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
     locale-gen en_US.UTF-8
 
