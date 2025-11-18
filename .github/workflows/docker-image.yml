@@ -8,6 +8,7 @@ on:
       - rails-7-hacking-rebased
       - full-test-suite
       - seek-1.17
+      - update-docker-images
 
   pull_request:
 
