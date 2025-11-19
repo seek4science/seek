@@ -11,6 +11,8 @@ class SparqlController < ApplicationController
     flash.now[:error] = 'SPARQL endpoint is configured, but not currently available.' unless rdf_repository_available?
 
     @example_queries = load_example_queries
+    @sparql_query = params[:sparql_query] || ''
+    @format = params[:output_format] || 'html'
 
     respond_to(&:html)
   end

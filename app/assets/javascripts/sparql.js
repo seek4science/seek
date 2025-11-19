@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearQueryBtn = document.getElementById('clear-query');
     const clearResultsBtn = document.getElementById('clear-results');
     const queryTextarea = document.getElementById('sparql_query');
+    const copyBtn = document.getElementById('copy-query-url');
 
     if (clearQueryBtn && queryTextarea) {
         clearQueryBtn.addEventListener('click', function() {
@@ -17,6 +18,36 @@ document.addEventListener('DOMContentLoaded', function() {
             if (resultsContainer) {
                 resultsContainer.remove();
                 queryTextarea.focus();
+            }
+        });
+    }
+
+    // Copy query URL to clipboard
+    if (copyBtn && queryTextarea) {
+        copyBtn.addEventListener('click', function () {
+            const formatEl = document.querySelector('.sparql-format-select');
+            const query = queryTextarea.value;
+            const format = formatEl ? formatEl.value : '';
+
+            const url = window.location.origin + window.location.pathname;
+            const params = new URLSearchParams();
+            if (query && query.trim() !== '') params.set('sparql_query', query);
+            if (format) params.set('output_format', format);
+            const fullUrl = url + (params.toString() ? '?' + params.toString() : '');
+
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullUrl).then(function () {
+                    const original = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="glyphicon glyphicon-copy"></i> Copied!';
+                    setTimeout(function () {
+                        copyBtn.innerHTML = original;
+                    }, 2000);
+                }).catch(function () {
+                    alert("Sorry, but your browser doesn't support this feature.");
+                });
+            } else {
+                alert("Sorry, but your browser doesn't support this feature.");
             }
         });
     }
