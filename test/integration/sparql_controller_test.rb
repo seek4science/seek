@@ -36,9 +36,24 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
       assert_select 'div#error_flash', count: 0
       assert_select 'div.sparql-interface' do
         assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
-          assert_select 'textarea.sparql-textarea'
+          assert_select 'textarea.sparql-textarea', text: ''
+          assert_select 'select#format option[selected=selected][value=?]', 'html'
         end
         assert_select 'div.sparql-examples div.panel'
+      end
+    end
+  end
+
+  test 'params populate the query and format' do
+    query = 'This is a sparql query'
+    format = 'json'
+    get sparql_index_path, params: { sparql_query: query, output_format: format }
+    assert_response :success
+    assert_select 'div#error_flash', count: 0
+    assert_select 'div.sparql-interface' do
+      assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
+        assert_select 'textarea.sparql-textarea', text: query
+        assert_select 'select#format option[selected=selected][value=?]', format
       end
     end
   end
