@@ -75,6 +75,7 @@ end
   attr_writer :refresh_policy
   before_update :refresh_policy
   after_save :update_creators_from_publication_authors
+  before_save :strip_abstract_whitespace
 
   accepts_nested_attributes_for :publication_authors
 
@@ -566,6 +567,10 @@ end
   end
 
   private
+
+  def strip_abstract_whitespace
+    self.abstract = abstract&.strip
+  end
 
   def populate_policy_from_authors(pol)
     # add managers (authors + contributor)

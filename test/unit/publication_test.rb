@@ -539,4 +539,60 @@ class PublicationTest < ActiveSupport::TestCase
     assert_includes publication.related_models, assay_model
     assert_includes publication.related_models, model
   end
+
+  test 'strips leading and trailing whitespace from abstract on save' do
+    project = FactoryBot.create(:project)
+    publication = Publication.new(
+      title: 'Test Publication',
+      projects: [project],
+      publication_type: FactoryBot.create(:journal),
+      abstract: "  \n  This is an abstract with leading and trailing whitespace  \n  "
+    )
+    
+    User.with_current_user(FactoryBot.create(:person).user) do
+      publication.save!
+    end
+    
+    assert_equal 'This is an abstract with leading and trailing whitespace', publication.abstract
+  end
+
+  test 'handles nil abstract gracefully' do
+    project = FactoryBot.create(:project)
+    publication = Publication.new(
+      title: 'Test Publication',
+      projects: [project],
+      publication_type: FactoryBot.create(:journal),
+      abstract: nil
+    )
+    
+    User.with_current_user(FactoryBot.create(:person).user) do
+      publication.save!
+    end
+    
+    assert_nil publication.abstract
+  end
+
+  test 'strips whitespace from abstract when extracted from pubmed' do
+    publication_hash = {
+      'title' => 'SEEK publication',
+      'abstract' => "  \n  An investigation into blalblabla  \n  ",
+      'journal' => 'The testing journal',
+      'pubmed' => '12345',
+      'doi' => nil
+    }
+    bio_reference = Bio::Reference.new(publication_hash)
+    publication = Publication.new(
+      title: 'Test',
+      projects: [FactoryBot.create(:project)],
+      publication_type: FactoryBot.create(:journal)
+    )
+    
+    publication.extract_pubmed_metadata(bio_reference)
+    
+    User.with_current_user(FactoryBot.create(:person).user) do
+      publication.save!
+    end
+    
+    assert_equal 'An investigation into blalblabla', publication.abstract
+  end
 end
