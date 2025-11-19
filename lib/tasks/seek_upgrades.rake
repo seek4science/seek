@@ -18,6 +18,7 @@ namespace :seek do
     update_rdf
     update_morpheus_model
     db:seed:018_discipline_vocab
+    strip_publication_abstracts
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -95,6 +96,18 @@ namespace :seek do
     unless errors.empty?
       puts "The following errors were encountered during the update:"
       errors.each { |error| puts error }
+    end
+  end
+
+  task(strip_publication_abstracts: [:environment]) do
+    puts 'Stripping publication abstracts...'
+    Publication.select(:id, :abstract).find_each do |publication|
+      if publication.abstract.present?
+        stripped = publication.abstract.strip
+        if stripped.length != publication.abstract.length
+          publication.update_column(:abstract, stripped)
+        end
+      end
     end
   end
 

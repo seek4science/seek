@@ -49,7 +49,7 @@ class Publication < ApplicationRecord
   has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, as: :asset, foreign_key: :asset_id
 
   explicit_versioning(:version_column => "version", sync_ignore_columns: ['license','other_creators']) do
-  acts_as_versioned_resource
+    acts_as_versioned_resource
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :publication_id,:foreign_key => :asset_id
 
@@ -58,7 +58,7 @@ class Publication < ApplicationRecord
     end
 
     alias_method :doi_identifier, :doi_uri
-end
+  end
 
   belongs_to :publication_type
 
@@ -77,6 +77,8 @@ end
   after_save :update_creators_from_publication_authors
 
   accepts_nested_attributes_for :publication_authors
+
+  auto_strip_attributes :abstract
 
   # Types of registration
   REGISTRATION_BY_PUBMED = 1
