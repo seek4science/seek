@@ -60,10 +60,6 @@ uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
             $j(".dataTables_scrollBody").css("min-height", "300px");
         });
 
-        function SourcePasteFromClipboard(){
-            window.sourceDynamicTable.pasteFromClipboard()
-        }
-
         function SourceSave(){
             window.sourceDynamicTable.save()
         }
@@ -77,7 +73,7 @@ uploadExcel: 'sourceUploadExcel()', sample_type_id: sample_type&.id} %>
         }
 
         function sourceExportExcel() {
-            exportToExcel("source-material-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+            exportToExcel("source-material-table", <%=study.id%>, null, <%=sample_type.id%>, <%= project.id %>);
         }
 
         function sourceUploadExcel(){

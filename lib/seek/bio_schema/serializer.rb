@@ -15,13 +15,15 @@ module Seek
       end
 
       def json_representation
-        repr = {
+        representation = {
           '@context' => resource_decorator.context,
           '@type' => resource_decorator.schema_type
         }
-        repr['dct:conformsTo'] = resource_decorator.conformance if resource_decorator.respond_to? 'conformance'
-        repr = repr.merge(attributes_json)
-        repr.deep_stringify_keys
+        if resource_decorator.respond_to? 'conformance'
+          representation['dct:conformsTo'] = { '@id' => resource_decorator.conformance }
+        end
+        representation = representation.merge(attributes_json)
+        representation.deep_stringify_keys
       end
 
       # returns the JSON-LD as a String, for the resource
@@ -58,7 +60,7 @@ module Seek
       private
 
       SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
-                         Seek::BioSchema::DataCatalogMockModel,
+                         Seek::BioSchema::DataCatalogMockModel, Sop,
                          Document, Presentation, Workflow, Collection,
                          Institution, Programme, Sample, AssetsCreator].freeze
 
