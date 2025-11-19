@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (clearResultsBtn) {
+    if (clearResultsBtn && queryTextarea) {
         clearResultsBtn.addEventListener('click', function() {
             const resultsContainer = document.getElementById('sparql-results');
             if (resultsContainer) {
@@ -20,6 +20,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // allow tabs, instead of jumping to next element
+    if (queryTextarea) {
+        queryTextarea.addEventListener('keydown', function(e) {
+            if (e.key == 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+
+                // set textarea value to: text before caret + tab + text after caret
+                this.value = this.value.substring(0, start) +
+                    "\t" + this.value.substring(end);
+
+                // put caret at right position again
+                this.selectionStart =
+                    this.selectionEnd = start + 1;
+            }
+        });
+    }
+
 
     // Use example query buttons
     const useQueryButtons = document.querySelectorAll('.use-query');
