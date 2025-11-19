@@ -101,14 +101,17 @@ namespace :seek do
 
   task(strip_publication_abstracts: [:environment]) do
     puts 'Stripping publication abstracts...'
+    updated_count = 0
     Publication.select(:id, :abstract).find_each do |publication|
       if publication.abstract.present?
         stripped = publication.abstract.strip
         if stripped.length != publication.abstract.length
           publication.update_column(:abstract, stripped)
+          updated_count += 1
         end
       end
     end
+    puts "... updated #{updated_count} publications"
   end
 
   private
