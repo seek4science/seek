@@ -16,6 +16,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   end
   def teardown
     return unless @repository.configured?
+
     q = @repository.query.delete(%i[s p o]).graph(@private_graph).where(%i[s p o])
     @repository.delete(q)
 
@@ -87,7 +88,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'div#query-error', count: 0
 
-    assert_select 'div.sparql-results table' do
+    assert_select 'div#sparql-results table' do
       assert_select 'tbody tr', count: 1
       assert_select 'thead th', count: 2
       assert_select 'td', text: 'public data file', count: 1
@@ -159,7 +160,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
       post path, params: { sparql_query: query }
       assert_response :success
-      assert_select 'div.sparql-results table' do
+      assert_select 'div#sparql-results table' do
         assert_select 'tbody tr', count: 1
         assert_select 'tbody td', text:'true', count: 1
         assert_select 'thead th', count: 1
