@@ -1,15 +1,25 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
-    const clearBtn = document.getElementById('clear-query');
+    const clearQueryBtn = document.getElementById('clear-query');
+    const clearResultsBtn = document.getElementById('clear-results');
     const queryTextarea = document.getElementById('sparql_query');
 
-    if (clearBtn && queryTextarea) {
-        clearBtn.addEventListener('click', function() {
+    if (clearQueryBtn && queryTextarea) {
+        clearQueryBtn.addEventListener('click', function() {
             queryTextarea.value = '';
             queryTextarea.focus();
         });
     }
 
+    if (clearResultsBtn) {
+        clearResultsBtn.addEventListener('click', function() {
+            const resultsContainer = document.getElementById('sparql-results');
+            if (resultsContainer) {
+                resultsContainer.remove();
+                queryTextarea.focus();
+            }
+        });
+    }
 
     // Use example query buttons
     const useQueryButtons = document.querySelectorAll('.use-query');
