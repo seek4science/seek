@@ -103,6 +103,15 @@
     display: inline-block;
   }
 
+  #sparql-buttons {
+    display: flex;
+    align-items: flex-start;
+
+    .form-actions {
+      margin-top: 0; // we align to top via flexbox so remove previously applied top margin
+    }
+  }
+
   .form-actions {
     margin-top: 25px;
     
