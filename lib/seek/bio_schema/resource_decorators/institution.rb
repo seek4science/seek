@@ -25,10 +25,6 @@ module Seek
           web_page.blank? ? identifier : web_page
         end
 
-        def conformance
-          'https://schema.org/ResearchOrganization'
-        end
-
         def full_address
           full = {}
           full[:@type]='PostalAddress'

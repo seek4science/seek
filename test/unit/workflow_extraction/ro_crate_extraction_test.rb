@@ -135,4 +135,22 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
 
     assert_equal 'The Secret Club, University of Manchester', metadata[:assets_creators_attributes]['0'][:affiliation]
   end
+
+  test 'ignores remote author reference' do
+    roc = ROCrate::Crate.new
+    roc.author = roc.add_person('#joe', 'name' => 'Joe')
+    roc['author'] = [roc['author'], { '@id' => 'https://orcid.org/0000-0002-1825-0097' }]
+    tf = Tempfile.new('test.crate.zip')
+    tf.binmode
+    ROCrate::Writer.new(roc).write_zip(tf)
+    tf.close
+
+    extractor = Seek::WorkflowExtractors::ROCrate.new(tf)
+    metadata = extractor.metadata
+
+    assert_equal 1, metadata[:assets_creators_attributes].values.length
+    assert_equal 'Joe', metadata[:assets_creators_attributes]['0'][:given_name]
+  ensure
+    tf.unlink
+  end
 end
