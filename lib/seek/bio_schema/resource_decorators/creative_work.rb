@@ -17,7 +17,7 @@ module Seek
                         subject_of: :subjectOf,
                         part_of: :isPartOf,
                         doi: :identifier,
-			 previous_version_url: :isBasedOn
+                        previous_version_url: :isBasedOn
 
         def doi
           "https://doi.org/#{resource.doi}" if resource.try(:doi).present?
