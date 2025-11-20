@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // allow tabs, instead of jumping to next element
     if (queryTextarea) {
         queryTextarea.addEventListener('keydown', function(e) {
-            if (e.key == 'Tab') {
+            if (e.key === 'Tab') {
                 e.preventDefault();
                 const start = this.selectionStart;
                 const end = this.selectionEnd;
