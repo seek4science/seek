@@ -177,7 +177,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select 'div#sparql-results table' do
         assert_select 'tbody tr', count: 1
-        assert_select 'tbody td', text:'true', count: 1
+        assert_select 'tbody td', text: 'true', count: 1
         assert_select 'thead th', count: 1
         assert_select 'thead th', text:'Result', count: 1
       end
@@ -262,10 +262,10 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   private
 
   def create_some_triples
-    private_df = FactoryBot.create(:max_data_file, title:'private data file')
+    private_df = FactoryBot.create(:max_data_file, title: 'private data file')
     private_df.send_rdf_to_repository
 
-    public_df = FactoryBot.create(:max_data_file, title:'public data file', policy: FactoryBot.create(:public_policy))
+    public_df = FactoryBot.create(:max_data_file, title: 'public data file', policy: FactoryBot.create(:public_policy))
     public_df.send_rdf_to_repository
   end
 
