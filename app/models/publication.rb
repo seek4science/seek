@@ -471,7 +471,7 @@ end
         @error = 'The DOI resolved to an unsupported resource type.'
       rescue RuntimeError => e
         @error = 'There was a problem contacting the DOI query service. Please add the publication manually instead.'
-        Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem fetching DOI #{doi} : #{e.message}"})
+        Seek::Errors::ExceptionForwarder.send_notification(e, data: {message: "Problem fetching DOI #{doi} : #{e.message}"})
       end
     else
       @error = 'Please enter either a DOI or a PubMed ID for the publication.'
