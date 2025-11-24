@@ -345,15 +345,15 @@ end
     publication_type = PublicationType.find(self.publication_type_id)
 
     case publication_type.key
-    when 'journalarticle'
+    when publication_type.journalarticle?
       self.citation += self.journal.nil? ? '':self.journal
       self.citation += volume.blank? ? '': " #{volume}"
       self.citation += number.nil? ? '' : "(#{number})"
       self.citation += pages.blank? ? '' : (":#{pages}")
-    when 'booklet'
+    when publication_type.booklet?
       self.citation += howpublished.blank? ? '': "#{howpublished}"
       self.citation += address.nil? ? '' : (", #{address}")
-    when 'bookchapter'
+    when publication_type.bookchapter?
       self.citation += self.booktitle.nil? ? '' : ("In #{self.booktitle}")
       self.citation += volume.blank? ? '' : (", volume #{volume}")
       self.citation += series.blank? ? '' : (" of #{series}")
@@ -363,7 +363,7 @@ end
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (", #{address}")
       end
-    when 'conferencepaper', 'collection', 'book'
+    when publication_type.conferencepaper?, publication_type.collection?, publication_type.book?
       # InProceedings / InCollection
       self.citation += self.booktitle.nil? ? '' : ("In #{self.booktitle}")
       self.citation += volume.blank? ? '' : (", vol. #{volume}")
@@ -374,7 +374,7 @@ end
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (", #{address}")
       end
-    when 'bachelorsthesis', 'mastersthesis', 'phdthesis'
+    when publication_type.dissertation?
       #PhD/Master Thesis
       self.citation += school.nil? ? '' : (" #{school}")
       self.errors.add(:base,'A thesis need to have a school') if school.nil?
@@ -382,17 +382,17 @@ end
       self.citation += tutor.nil? ? '' : (", #{tutor}(Tutor)")
       self.citation += tutorhits.nil? ? '' : (", #{tutorhits}(HITS Tutor)")
       self.citation += url.nil? ? '' : (", #{url}")
-    when 'conferenceproceeding'
+    when publication_type.conferenceproceeding?
       # Proceedings are conference proceedings, it has no authors but editors
       # Book
       self.journal = self.title
       self.citation += volume.blank? ? '' : ("vol. #{volume}")
       self.citation += series.blank? ? '' : (" of #{series}")
       self.citation += self.publisher.blank? ? '' : (", #{self.publisher}")
-    when 'report'
+    when publication_type.report?
       self.citation += institution.blank? ? ' ': institution
       self.citation += type.blank? ? ' ' : (", #{type}")
-    when 'preprint'
+    when publication_type.preprint?
       self.citation += note.blank? ? ' ': note
     end
 
@@ -594,21 +594,21 @@ end
       return false
     end
 
-    if (['Collection', 'Conference Paper'].include? self.publication_type.title) && (bibtex_record[:booktitle].blank?)
+    if (publication_type.collection? || publication_type.conferencepaper?) && bibtex_record[:booktitle].blank?
       errors.add(:base, "A #{self.publication_type.title} needs to have a booktitle.")
         return false
     end
 
-    unless ['Booklet', 'Text', 'Other', 'Conference Proceeding'].include? self.publication_type.title
+    unless publication_type.booklet? || publication_type.text? || publication_type.other? || publication_type.conferenceproceeding?
       if bibtex_record[:author].nil? && self.editor.nil?
         self.errors.add(:base, "You need at least one author or editor for the #{self.publication_type.title}.")
         return false
       end
     end
 
-    if ['bachelorsthesis', 'mastersthesis', 'phdthesis', 'diplomthesis'].include?(publication_type.key)
+    if publication_type.dissertation?
       if bibtex_record[:school].try(:to_s).nil?
-        self.errors.add(:base,"A #{self.publication_type.title} needs to have a school.")
+        self.errors.add(:base,"A #{publication_type.title} needs to have a school.")
         return false
       end
     end

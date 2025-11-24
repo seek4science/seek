@@ -29,10 +29,12 @@
             <div class="col-sm-3">
               <span id="publication_type_info" style="display:none;"></span>
               <span id="publication_type_selection">
-              <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                                    {:selected => PublicationType.JournalArticle.id},
-                                    {:class => 'form-control'}  -%>
-      </span>
+                <%= collection_select :publication, :publication_type_id,
+                      PublicationType.order(:title),
+                      :id, :title,
+                      { include_blank: "Please select a type ..." },
+                      { class: "form-control" } %>
+              </span>
             </div>
           </div>
         </div>
@@ -78,9 +80,11 @@
           <div class="col-sm-2">
             <span id="publication_type_info" style="display:none;"></span>
             <span id="publication_type_selection">
-        <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                              {:selected => PublicationType.JournalArticle.id},
-                              {:class => 'form-control'} -%>
+            <%= collection_select :publication, :publication_type_id,
+                                  PublicationType.order(:title),
+                                  :id, :title,
+                                  { include_blank: "Please select a type ..." },
+                                  { class: "form-control" } %>
       </span>
           </div>
         </div>

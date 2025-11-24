@@ -19,7 +19,9 @@ LEGACY_MAPPING = {
   'Manual'         => 'Text',
   'Misc'           => 'Other',
   'Tech report'    => 'Report',
-  'Unpublished'    => 'Preprint'
+  'Unpublished'    => 'Preprint',
+  'Doctoral Thesis' => 'PhD Thesis',
+  'Diplom Thesis'  => 'Diploma Thesis'
 }.freeze
 
 # -------------------------------------------------------------------

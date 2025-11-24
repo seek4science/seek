@@ -8,7 +8,7 @@ FactoryBot.define do
   
   
   factory(:phdthesis, class: PublicationType) do
-    title { 'Doctoral Thesis' }
+    title { 'PhD Thesis' }
     key   { 'phdthesis' }
   end
   

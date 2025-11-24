@@ -45,11 +45,11 @@ MastersThesis:
   key: mastersthesis
 
 DiplomaThesis:
-  title: Diplom Thesis
-  key: diplomthesis
+  title: Diploma Thesis
+  key: diplomathesis
 
 PhdThesis:
-  title: Doctoral Thesis
+  title: PhD Thesis
   key: phdthesis
 
 Other:

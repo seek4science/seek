@@ -303,7 +303,7 @@ class PublicationsControllerTest < ActionController::TestCase
       assert_includes flash[:error], 'A Conference Paper needs to have a booktitle.'
       assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
       assert_includes flash[:error], 'A Collection needs to have a booktitle.'
-      assert_includes flash[:error], 'A Doctoral Thesis needs to have a school.'
+      assert_includes flash[:error], 'A PhD Thesis needs to have a school.'
       assert_includes flash[:error], "A Master's Thesis needs to have a school."
       assert_includes flash[:error], 'You need at least one author or editor for the Journal Article.'
     end
@@ -315,7 +315,7 @@ class PublicationsControllerTest < ActionController::TestCase
       { title: 'The Example Book',               type_title: 'Book' },
       { title: 'A Chapter Inside a Book',        type_title: 'Book Chapter' },
       { title: 'A Conference Paper Example',     type_title: 'Conference Paper' },
-      { title: 'An Example PhD Thesis',          type_title: 'Doctoral Thesis' },
+      { title: 'An Example PhD Thesis',          type_title: 'PhD Thesis' },
       { title: 'A Technical Report Example',     type_title: 'Report' },
       { title: 'Miscellaneous Example',          type_title: 'Other' }
     ]
