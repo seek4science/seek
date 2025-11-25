@@ -181,13 +181,4 @@ class PublicationType < ActiveRecord::Base
     other_type&.id
   end
 
-  begin
-    type_registry.each_key do |title|
-      define_singleton_method(title.gsub(/\s+/, '')) do
-        find_by(key: type_registry[title]['key'])
-      end
-    end
-  rescue => e
-    Rails.logger.error("Failed to load publication types: #{e.message}")
-  end
 end
