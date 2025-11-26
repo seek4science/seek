@@ -10,6 +10,16 @@ module SessionsHelper
     User.admin_logged_in?
   end
 
+  def detect_default_login_strategy
+    return 'password' if show_standard_password_login?
+    return 'elixir_aai' if show_elixir_aai_login?
+    return 'ldap' if show_ldap_login?
+    return 'github' if show_github_login?
+    return 'oidc' if show_oidc_login?
+
+    nil
+  end
+
   # returns true if there is somebody logged in and they are an project manager
   def project_administrator_logged_in?
     User.project_administrator_logged_in?
