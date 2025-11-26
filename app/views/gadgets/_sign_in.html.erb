@@ -13,8 +13,10 @@
         <%# tabs if omniauth authentication with providers is enabled %>
         <% if show_omniauth_login? %>
           <ul class="nav nav-tabs" role="tablist">
-            <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
-              <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
+            <% if show_standard_password_login? %>
+              <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
+                <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
+              <% end %>
             <% end %>
             <% if show_elixir_aai_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'elixir_aai' ? 'active' : nil) do %>
@@ -40,32 +42,34 @@
         <% end #omniauth enabled and providers available %>
 
         <div class="tab-content">
-          <%= content_tag(:div, id: 'password_login', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
-            <%= form_tag main_app.session_path do %>
-              <%= hidden_field_tag "called_from[path]", original_path -%>
-              <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
-              <%= hidden_field_tag "called_from[action]", controller.action_name -%>
-              <%= hidden_field_tag "called_from[id]", params[:id] -%>
+          <% if show_standard_password_login? %>
+            <%= content_tag(:div, id: 'password_login', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
+              <%= form_tag main_app.session_path do %>
+                <%= hidden_field_tag "called_from[path]", original_path -%>
+                <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
+                <%= hidden_field_tag "called_from[action]", controller.action_name -%>
+                <%= hidden_field_tag "called_from[id]", params[:id] -%>
 
-              <div class="form-group">
-                <label>Username or Email Address</label>
-                <%= text_field_tag 'login', nil, placeholder: 'Username or Email Address', class: 'form-control', autofocus: true -%>
-              </div>
+                <div class="form-group">
+                  <label>Username or Email Address</label>
+                  <%= text_field_tag 'login', nil, placeholder: 'Username or Email Address', class: 'form-control', autofocus: true -%>
+                </div>
 
-              <div class="form-group">
-                <label>Password</label>
-                <%= password_field_tag 'password', nil, placeholder: 'Password', class: 'form-control' -%>
-              </div>
+                <div class="form-group">
+                  <label>Password</label>
+                  <%= password_field_tag 'password', nil, placeholder: 'Password', class: 'form-control' -%>
+                </div>
 
-              <div class="form-group">
-                <%= check_box_tag 'remember_me',nil,true %>
-                <%= label :remember, :me, "Remember me" %>
-              </div>
+                <div class="form-group">
+                  <%= check_box_tag 'remember_me',nil,true %>
+                  <%= label :remember, :me, "Remember me" %>
+                </div>
 
-              <div class="form-group">
-                <%= submit_tag 'Log in', class: 'btn btn-primary', id: 'login_button' %>
-              </div>
-            <% end #form %>
+                <div class="form-group">
+                  <%= submit_tag 'Log in', class: 'btn btn-primary', id: 'login_button' %>
+                </div>
+              <% end #form %>
+            <% end %>
           <% end %>
 
           <% if show_omniauth_login? %>

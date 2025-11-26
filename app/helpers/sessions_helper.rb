@@ -32,6 +32,11 @@ module SessionsHelper
     User.logged_in_and_member?
   end
 
+  def show_standard_password_login?
+    # always show if omniauth options aren't available
+    Seek::Config.standard_login_enabled || !show_omniauth_login?
+  end
+
   def show_omniauth_login?
     Seek::Config.omniauth_enabled && Seek::Config.omniauth_providers.any?
   end
