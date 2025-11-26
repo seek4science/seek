@@ -564,6 +564,18 @@ class UsersControllerTest < ActionController::TestCase
           end
         end
       end
+
+      # force display with special flag
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new, params: { show_standard_login: '1' }
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]','#password_registration'
+            assert_select 'div.tab-content div#password_registration'
+          end
+        end
+      end
     end
   end
 
