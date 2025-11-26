@@ -43,7 +43,7 @@ module SessionsHelper
   end
 
   def show_standard_password_login?
-    # always show if omniauth options aren't available
+    # always show if omniauth options aren't available, regardless of standard_login_enabled setting
     params[:show_standard_login].present? || Seek::Config.standard_login_enabled || !show_omniauth_login?
   end
 
