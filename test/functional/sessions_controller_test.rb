@@ -239,6 +239,66 @@ class SessionsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should hide standard login if disabled' do
+    with_config_values(standard_login_enabled: true, omniauth_enabled: false,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: false) do
+
+      with_config_value(:omniauth_enabled, false) do
+        with_config_value(:omniauth_ldap_enabled, false) do
+          with_config_value(:standard_login_enabled, true) do
+            get :new
+            assert_response :success
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
+
+      # still shown without omniauth enabled
+      with_config_value(:omniauth_enabled, false) do
+        with_config_value(:omniauth_ldap_enabled, false) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
+      # still shown with omniauth enabled but no auth options setup
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, false) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
+
+      # hidden when disabled and with omniauth options (first check if shown with tab when enabled)
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, true) do
+            get :new
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]', '#password_login'
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]','#password_login', count: 0
+            assert_select 'div.tab-content div#password_login', count: 0
+          end
+        end
+      end
+    end
+  end
+
   protected
 
   def cookie_for(user)
