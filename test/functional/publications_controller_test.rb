@@ -438,6 +438,15 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_select '.panel-heading', text: 'License', count: 0
   end
 
+  test 'should show publication and SEEK ID only once when fulltext enabled' do
+    Seek::Config.allow_publications_fulltext = true
+    publication = FactoryBot.create(:publication, contributor: User.current_user.person)
+    get :show, params: { id: publication.id }
+    assert_response :success
+    assert_select 'strong', text: 'SEEK ID:', count: 1
+  end
+
+
   test 'should export publication as endnote' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
