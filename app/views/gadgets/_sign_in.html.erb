@@ -1,5 +1,5 @@
 <% original_path ||= request.original_fullpath %>
-<% strategy = params[:strategy] || 'password' %>
+<% strategy = params[:strategy] || detect_default_login_strategy %>
 
 <% unless logged_in_and_registered? -%>
     <div class="panel panel-default" id="login-panel">
