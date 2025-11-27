@@ -18,7 +18,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'mint a DOI button' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
       assert asset.find_version(1).can_mint_doi?
 
       get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
@@ -32,7 +32,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'hidden version can not mint a DOI' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
       assert asset.find_version(1).can_mint_doi?
       login_as(asset.contributor.user)
 
@@ -49,7 +49,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'get mint_doi_confirm' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
       assert asset.is_published?
       assert asset.can_manage?
       versioned_asset = asset.latest_version
@@ -69,7 +69,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
     DOIABLE_ASSETS.each do |type|
       login_as(@user)
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+      asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       refute asset.is_published?
       assert asset.can_manage?
       assert asset.find_version(asset.version).can_mint_doi?
@@ -94,7 +94,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'mint_doi' do
     mock_datacite_request
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
 
       post "/#{type.pluralize}/#{asset.id}/mint_doi"
       assert_redirected_to polymorphic_path(asset, version: asset.version)
@@ -104,23 +104,58 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'show error if missing creators' do
+    asset = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+    assert asset.is_published?
+    assert asset.can_manage?
+
+    asset.creators = []
+    asset.save!
+    assert_empty asset.creators
+    assert_empty asset.assets_creators
+
+    post "/workflows/#{asset.id}/mint_doi"
+    assert_redirected_to polymorphic_path(asset, version: asset.version)
+    assert_includes flash[:error], 'creator is required'
+
+    refute AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
+  end
+
+  test 'do not show error if non-SEEK creator present' do
+    mock_datacite_request
+    asset = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+    assert asset.is_published?
+    assert asset.can_manage?
+
+    asset.creators = []
+    asset.assets_creators.create!(given_name: 'Julia', family_name: 'Jones', orcid: 'https://orcid.org/0000-0001-8172-8981')
+    asset.save!
+    assert_empty asset.creators
+    assert_not_empty asset.assets_creators
+
+    post "/workflows/#{asset.id}/mint_doi"
+    assert_redirected_to polymorphic_path(asset, version: asset.version)
+    assert_not_nil flash[:notice]
+    assert AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
+  end
+
   test 'handle error when mint_doi' do
     mock_datacite_request
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
 
       with_config_value :datacite_username, 'invalid' do
         post "/#{type.pluralize}/#{asset.id}/mint_doi"
-        assert_not_nil flash[:error]
+        assert_includes flash[:error], 'Service inaccessible'
 
-        assert !AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
+        refute AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
       end
     end
   end
 
   test 'should show doi attribute for asset which doi is minted' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
       doi = '10.5072/my_test'
       version = asset.latest_version
       version.doi = doi
@@ -135,7 +170,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'should show doi attribute on minted version' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, contributor: User.current_user.person)
+      asset = doiable_asset(type)
 
       asset.save_as_new_version
 
@@ -163,7 +198,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'should log doi after doi is minted' do
     mock_datacite_request
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
 
       post "/#{type.pluralize}/#{asset.id}/mint_doi"
       assert AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
@@ -181,7 +216,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'after DOI is minted, the -Upload new version- button is not disabled' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -196,7 +231,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'after DOI is minted, the -Delete- button is disabled' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, contributor: User.current_user.person, policy: FactoryBot.create(:private_policy))
+      asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -210,7 +245,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'can not delete asset after DOI is minted' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, contributor: User.current_user.person, policy: FactoryBot.create(:private_policy))
+      asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -227,7 +262,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     skip 'This test no longer works with the dynamic permissions form'
 
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, contributor: User.current_user.person, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -241,7 +276,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'can not unpublish asset after DOI is minted' do
     DOIABLE_ASSETS.each do |type|
-      asset = FactoryBot.create(type.to_sym, contributor: User.current_user.person, policy: FactoryBot.create(:public_policy))
+      asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -257,7 +292,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'can update asset with DOI if current version does not have one' do
-    asset = FactoryBot.create(:workflow, contributor: User.current_user.person, policy: FactoryBot.create(:public_policy))
+    asset = doiable_asset(:workflow)
     latest_version = asset.latest_version
     latest_version.doi = '10.5072/my_test'
     assert latest_version.save
@@ -273,7 +308,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot update asset with DOI to be private, even if current version does not have a DOI' do
-    asset = FactoryBot.create(:workflow, contributor: User.current_user.person, policy: FactoryBot.create(:public_policy))
+    asset = doiable_asset(:workflow)
     latest_version = asset.latest_version
     latest_version.doi = '10.5072/my_test'
     assert latest_version.save
@@ -291,7 +326,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'mint doi for git-versioned workflow' do
     mock_datacite_request
 
-    workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:public_policy))
+    workflow = doiable_asset(:remote_git_workflow)
     assert_nil workflow.latest_git_version.doi
     refute workflow.latest_git_version.mutable?
     assert workflow.latest_git_version.can_mint_doi?
@@ -307,7 +342,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'cannot mint doi for git-versioned workflow if it is still mutable' do
     mock_datacite_request
 
-    workflow = FactoryBot.create(:remote_git_workflow, policy: FactoryBot.create(:public_policy))
+    workflow = doiable_asset(:remote_git_workflow)
     workflow.latest_git_version.update_column(:mutable, true)
     assert_nil workflow.latest_git_version.doi
     assert workflow.latest_git_version.mutable?
@@ -336,5 +371,12 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   def login_as(user)
     User.current_user = user
     post '/session', params: { login: user.login, password: generate_user_password }
+  end
+
+  def doiable_asset(type, attributes = {})
+    attributes.reverse_merge!(contributor: User.current_user.person,
+                              policy: FactoryBot.create(:public_policy),
+                              creators: [@user.person])
+    FactoryBot.create(type.to_sym, attributes)
   end
 end

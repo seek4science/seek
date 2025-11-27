@@ -1,6 +1,12 @@
 BioPAX:
   title: BioPAX
 
+C++:
+  title: C++ code
+
+CSharp:
+  title: C# code
+
 CellML:
   title: CellML
 
@@ -10,11 +16,20 @@ Copasi:
 FieldML:
   title: FieldML
 
+Fortran:
+  title: Fortran code
+
 GraphML:
   title: GraphML
 
 Image:
   title: Image
+
+JavaScript:
+  title: JavaScript code
+
+Julia:
+  title: Julia code
 
 KGML:
   title: KGML
@@ -26,7 +41,7 @@ MathML:
   title: MathML
 
 Matlab:
-  title: Matlab package
+  title: Matlab code
 
 Morpheus:
   title: Morpheus
@@ -41,7 +56,7 @@ Python:
   title: Python code
 
 R:
-  title: R package
+  title: R code
 
 SBGN-ML-PD:
   title: SBGN-ML PD

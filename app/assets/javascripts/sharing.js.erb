@@ -27,17 +27,6 @@ var Sharing = {
       }
     }
 
-    // This ensures that if a project permission is added, and that project is associated with the resource, it gains
-    //  the "isMandatory" flag.
-    if (permission.contributor_type === 'Project' && Sharing.projectsSelector) {
-      for (var j = 0; j < Sharing.projectsSelector.selected.length; j++) {
-        if (Sharing.projectsSelector.selected[j].id === permission.contributor_id) {
-          permission.isMandatory = true;
-          break;
-        }
-      }
-    }
-
     Sharing.permissionsTable.permissions.push(permission);
   },
 
@@ -47,20 +36,7 @@ var Sharing = {
         contributor_type: 'Project',
         contributor_id: project.id,
         title: project.title,
-        access_type: Sharing.associatedProjectAccessType,
-        isMandatory: true }, true);
-  },
-
-  removeMandatoryProjectPermissions: function () {
-    if (!Sharing.permissionsTable)
-      return;
-    var indices = [];
-    for (var i = Sharing.permissionsTable.permissions.length - 1; i >= 0; i--) {
-      if (Sharing.permissionsTable.permissions[i].contributor_type === 'Project' &&
-          Sharing.permissionsTable.permissions[i].isMandatory) {
-        Sharing.permissionsTable.permissions.splice(i, 1);
-      }
-    }
+        access_type: Sharing.associatedProjectAccessType }, true);
   },
 
   removePermissionForProject: function (project) {
@@ -72,13 +48,12 @@ var Sharing = {
     }
     if (confirm('Do you want to remove any permissions for ' + project.title + '?')) {
       Sharing.permissionsTable.permissions.splice(i, 1);
-    } else {
-      Sharing.permissionsTable.permissions[i].isMandatory = false;
     }
   },
 
   requestInstitutionsUrl: '<%= request_institutions_projects_path %>',
   requestAllInstitutionsUrl: '<%= request_all_sharing_form_institutions_path %>',
+  requestDefaultDataUrl: '<%= default_data_project_path('_replaceme_') %>',
 
   accessTypes: {
     noAccess: <%= Policy::NO_ACCESS %>,
@@ -120,15 +95,29 @@ var Sharing = {
   },
 
   // Ask if they want to use the default policy (if there is one)
-  defaultPolicyPrompt: function (project, skipPrompt) {
+  defaultPolicyPrompt: function (project, policy, skipPrompt) {
       if (!Sharing.permissionsTable)
           return;
 
-      if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default sharing policy specified, do you want to apply it?'))) {
-          Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
+      if (policy && (skipPrompt || confirm(`${project.title} has a default sharing policy specified, do you want to apply it?\n\nNOTE that this will overwrite any previously defined permissions.`))) {
+          Sharing.applyPolicy(policy);
       } else { // Otherwise just add a permission for the project
           Sharing.addPermissionForProject(project);
       }
+  },
+
+  fetchDefaultData: function (project) {
+      return new Promise((resolve, reject) => {
+        $j.ajax(Sharing.requestDefaultDataUrl.replace('_replaceme_', project.id), {
+                success: function (data) {
+                    resolve(data);
+                },
+                complete: function () {
+                    resolve({});
+                }
+            }
+        );
+      });
   }
 };
 
@@ -171,7 +160,8 @@ Vue.component('permissions-table', {
   computed: {
     sortedPermissions: function () {
       return this.permissions.sort(function (a, b) {
-        return (b.isMandatory || false) - (a.isMandatory || false);
+          return ((b.contributor_type === 'Project') && Sharing.getSelectedProjectIds().includes(b.contributor_id)) -
+                 ((a.contributor_type === 'Project') && Sharing.getSelectedProjectIds().includes(a.contributor_id));
       });
     }
   },
@@ -185,14 +175,14 @@ Vue.component('permissions-table', {
 Vue.component('permission-row', {
   props: ['index', 'permission', 'accessTypes', 'publicAccessType', 'fieldPrefixOrig'],
   template:
-  '<tr class="permission-row" :class="{ mandatory: permission.isMandatory, hidden: permission.contributor_type === \'FavouriteGroup\' }">' +
+  '<tr class="permission-row" :class="{ mandatory: mandatory, hidden: permission.contributor_type === \'FavouriteGroup\' }">' +
   '<td class="name-cell" :title="permission.title"><span class="type-icon-wrapper"><img :src="typeIcon" class="type-icon" :title="permission.contributor_type || \'All visitors\'"/></span> {{ permission.title }}' +
   '<input v-if="permission.contributor_type" type="hidden" :name="fieldPrefix+\'[contributor_type]\'" v-model="permission.contributor_type"/>' +
   '<input v-if="permission.contributor_id" type="hidden" :name="fieldPrefix+\'[contributor_id]\'" v-model="permission.contributor_id"/>' +
   '</td>' +
   '<td is="privilege-cell" v-for="accessType in accessTypes" :fieldPrefix="fieldPrefix" :permission="permission" :access-type="accessType" :public-access-type="publicAccessType"></td>' +
   '<td class="actions-cell">'+
-  '<a v-if="!permission.isMandatory" @click="$emit(\'delete-permission\')" class="clickable remove-button" title="Remove this permission">' +
+  '<a v-if="!mandatory" @click="$emit(\'delete-permission\')" class="clickable remove-button" title="Remove this permission">' +
   '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
   '</a>' +
   '</td>' +
@@ -216,6 +206,15 @@ Vue.component('permission-row', {
       }
 
       return '<%= asset_path icon_filename_for_key('world') %>';
+    },
+    mandatory: function () {
+        if (this.permission.isPublic) {
+            return true;
+        }
+        if (this.permission.contributor_type === 'Project') {
+            return Sharing.getSelectedProjectIds().includes(this.permission.contributor_id);
+        }
+        return false;
     }
   }
 });

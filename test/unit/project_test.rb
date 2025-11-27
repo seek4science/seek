@@ -978,4 +978,37 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal df_blob_size + 2 * repo_size, project.total_asset_size, "total_asset_size includes each workflow and df"
   end
 
+  test 'propagates disciplines to workflows' do
+    FactoryBot.create(:disciplines_controlled_vocab) unless SampleControlledVocab::SystemVocabs.disciplines_controlled_vocab
+
+    project = FactoryBot.create(:project)
+    workflow = FactoryBot.create(:workflow, projects: [project])
+    workflow_with_disciplines = FactoryBot.create(:workflow, projects: [project])
+    User.with_current_user(workflow_with_disciplines.contributor.user) do
+      workflow_with_disciplines.discipline_annotations = ['Physics and Astronomy']
+      workflow_with_disciplines.save!
+    end
+    assert_equal ['Physics and Astronomy'], workflow_with_disciplines.reload.discipline_annotation_labels
+
+    assert_empty workflow.discipline_annotation_labels
+    assert_empty project.discipline_annotation_labels
+
+    User.with_current_user(workflow.contributor.user) do
+      project.discipline_annotations = ['Biochemistry, Genetics and Molecular Biology']
+      project.save!
+    end
+
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], project.discipline_annotation_labels
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], workflow.reload.discipline_annotation_labels
+    assert_equal ['Physics and Astronomy'], workflow_with_disciplines.reload.discipline_annotation_labels
+
+    User.with_current_user(workflow.contributor.user) do
+      workflow.discipline_annotations = ['Chemistry']
+      workflow.save!
+    end
+
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], project.discipline_annotation_labels
+    assert_equal ['Chemistry'], workflow.discipline_annotation_labels
+    assert_equal ['Physics and Astronomy'], workflow_with_disciplines.reload.discipline_annotation_labels
+  end
 end

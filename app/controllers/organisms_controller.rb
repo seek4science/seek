@@ -24,6 +24,7 @@ class OrganismsController < ApplicationController
       format.html
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @organism, include: [params[:include]]}
+      format.jsonld { render body: @organism.to_schema_ld }
     end
   end
 

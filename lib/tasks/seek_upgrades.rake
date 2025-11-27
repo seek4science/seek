@@ -14,8 +14,10 @@ namespace :seek do
     db:seed:014_data_types_controlled_vocab
     db:seed:003_model_formats
     db:seed:004_model_recommended_environments
+    db:seed:004_model_types
     update_rdf
     update_morpheus_model
+    db:seed:018_discipline_vocab
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

@@ -1,0 +1,46 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://doi.org/ra/10.1016/j.patter.2025.101345
+      body:
+        encoding: US-ASCII
+        string: ''
+      headers:
+        Accept:
+          - "*/*"
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        encoding: UTF-8
+        string: '[{"DOI": "10.1016/j.patter.2025.101345", "RA": "Crossref"}]'
+      http_version:
+    recorded_at: Wed, 29 Oct 2025 00:00:00 GMT
+
+  - request:
+      method: get
+      uri: https://api.crossref.org/works/10.1016/j.patter.2025.101345
+      body:
+        encoding: US-ASCII
+        string: ''
+      headers:
+        Accept:
+          - application/json
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        encoding: UTF-8
+        string: "This is not valid JSON!"
+      http_version:
+    recorded_at: Wed, 29 Oct 2025 00:00:00 GMT
+recorded_with: VCR 6.2.0

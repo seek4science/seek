@@ -22,7 +22,7 @@ module Seek
           if @asset_version.mint_doi
             flash[:notice] = 'DOI successfully minted'
           else
-            flash[:error] = @asset_version.errors.full_messages
+            flash[:error] = @asset_version.errors.full_messages.join(', ')
           end
 
           redirect_to version_path

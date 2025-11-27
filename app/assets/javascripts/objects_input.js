@@ -35,6 +35,10 @@ var ObjectsInput = {
                 opts.data = $j(this).data('typeahead-local-values');
             }
 
+            if ($j(this).data('token-separators')) {
+                opts.tokenSeparators = $j(this).data('token-separators');
+            }
+
             const template = $j(this).data('typeahead-template') || 'typeahead/hint';
             opts.templateResult = HandlebarsTemplates[template];
             opts.escapeMarkup = ObjectsInput.doNothing;

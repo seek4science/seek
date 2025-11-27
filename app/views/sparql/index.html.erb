@@ -1,0 +1,93 @@
+<% content_for :title, "SPARQL Query Interface" %>
+
+<div class="sparql-interface">
+  <div class="page-header">
+    <h1>SPARQL Query Interface</h1>
+    <p class="lead">Query the SEEK knowledge graph using SPARQL</p>
+    <div class="text-right">
+      <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#schemaModal">
+        <i class="glyphicon glyphicon-picture"></i> View Schema
+      </button>
+    </div>
+  </div>
+
+  <%= form_with url: query_sparql_index_path, method: :post, local: true, class: "sparql-form" do |form| %>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <%= form.label :sparql_query, "SPARQL Query:", class: "control-label" %>
+          <%= form.text_area :sparql_query, value: @sparql_query,
+                             class: "form-control sparql-textarea",
+                             rows: 12,
+                             placeholder: "Enter your SPARQL query here...\n\nExample:\nSELECT ?subject ?predicate ?object\nWHERE {\n  ?subject ?predicate ?object .\n}\nLIMIT 10" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <%= form.label :format, "Output Format:", class: "control-label" %>
+          <%= form.select :format,
+                          [['Table', 'html'], ['JSON', 'json'], ['XML', 'xml']],
+                          { selected: @format },
+                          { class: "form-control sparql-format-select" } %>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-actions">
+          <%= form.submit "Execute Query", class: "btn btn-primary" %>
+          <button type="button" class="btn btn-default" id="clear-query">Clear</button>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @error %>
+    <div id="query-error" class="alert alert-danger">
+      <h4><i class="glyphicon glyphicon-exclamation-sign"></i> Query Error:</h4>
+      <pre><%= @error %></pre>
+    </div>
+  <% end %>
+
+  <% if @results && @results.any? %>
+    <div class="sparql-results">
+
+      <%= panel(sparql_results_panel_title, class:'panel-success') do %>
+        <%= render partial: "results", locals: { results: @results, format: @format } %>
+      <% end %>
+    </div>
+  <% elsif @results && @results.empty? && @error.nil? %>
+    <div class="alert alert-info">
+      <i class="glyphicon glyphicon-info-sign"></i>
+      No results found for your query.
+    </div>
+  <% end %>
+
+  <%= render partial: 'sparql_examples' %>
+</div>
+
+<!-- Schema Modal -->
+<div class="modal fade" id="schemaModal" tabindex="-1" role="dialog" aria-labelledby="schemaModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="schemaModalLabel">
+          <i class="glyphicon glyphicon-picture"></i> SEEK Data Schema
+        </h4>
+      </div>
+      <div class="modal-body text-center">
+        <%= image_tag('sparql/schema.png', alt: 'SEEK Data Schema', class: 'img-responsive', style: 'max-width: 100%; height: auto;') %>
+      </div>
+      <div class="modal-footer">
+        <a href="<%= asset_path('sparql/schema.png') %>" download="seek-data-schema.png" class="btn btn-success">
+          <i class="glyphicon glyphicon-download-alt"></i> Download Schema
+        </a>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

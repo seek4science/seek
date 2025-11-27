@@ -43,6 +43,11 @@ module Seek
             return false
           end
 
+          if (respond_to?(:assets_creators) ? assets_creators : creators).empty?
+            errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{self.class.model_name.human}.")
+            return false
+          end
+
           username = Seek::Config.datacite_username
           password = Seek::Config.datacite_password
           url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url

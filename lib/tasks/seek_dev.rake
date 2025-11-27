@@ -449,4 +449,19 @@ namespace :seek_dev do
     end
 
   end
+
+  task fetch_openalex_fields: :environment do
+    url = 'https://api.openalex.org/domains'
+    puts "Fetching from: #{url}"
+    res = URI.open(url)
+    json = res.read
+    doc = JSON.parse(json)
+    domains = doc['results'].map do |dom|
+      dom.slice('id', 'display_name', 'fields')
+    end
+
+    filename = Rails.root.join('config', 'default_data', 'controlled-vocabs', 'openalex_fields.json')
+    File.write(filename, JSON.pretty_generate(domains))
+    puts "Written to: #{filename}"
+  end
 end

@@ -5590,6 +5590,53 @@ class ProjectsControllerTest < ActionController::TestCase
     assert upload.show_status?
   end
 
+  test 'get default data if project member' do
+    FactoryBot.create(:disciplines_controlled_vocab) unless SampleControlledVocab::SystemVocabs.disciplines_controlled_vocab
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    disable_authorization_checks do
+      project.default_license = 'CC0-1.0'
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.use_default_policy = true
+      project.discipline_annotations = ['Biochemistry, Genetics and Molecular Biology']
+      project.save!
+    end
+    login_as(person)
+
+    get :default_data, params: { id: project, format: :json }
+
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert_equal 0, data.dig('policy', 'access_type')
+    assert_equal ['Biochemistry, Genetics and Molecular Biology'], data['disciplines']
+    assert_equal 'CC0-1.0', data['license']
+  end
+
+  test 'cannot get default data if not project member' do
+    person = FactoryBot.create(:person)
+    project = FactoryBot.create(:project)
+    refute project.has_member?(person)
+    login_as(person)
+
+    get :default_data, params: { id: project, format: :json }
+
+    assert_response :forbidden
+  end
+
+  test 'default data excludes blank values' do
+    FactoryBot.create(:disciplines_controlled_vocab) unless SampleControlledVocab::SystemVocabs.disciplines_controlled_vocab
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+
+    get :default_data, params: { id: project, format: :json }
+
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert_equal 'CC-BY-4.0', data['license']
+    assert ['license'], data.keys
+  end
+
   private
 
   def check_project(project)

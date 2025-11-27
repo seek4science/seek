@@ -2,6 +2,7 @@ require 'digest/sha1'
 
 class User < ApplicationRecord
   MIN_PASSWORD_LENGTH = 10
+  RANDOM_PASSWORD_LENGTH = 24
   MAX_LOGIN_LENGTH = 120
   MIN_LOGIN_LENGTH = 3
 
@@ -356,6 +357,6 @@ class User < ApplicationRecord
   end
 
   def self.random_password
-    SecureRandom.urlsafe_base64(MIN_PASSWORD_LENGTH).first(MIN_PASSWORD_LENGTH)
+    SecureRandom.urlsafe_base64(RANDOM_PASSWORD_LENGTH).first(RANDOM_PASSWORD_LENGTH)
   end
 end
