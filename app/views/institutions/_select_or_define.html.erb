@@ -30,7 +30,7 @@
 <div class="form-group">
   <label class="control-label">ROR ID</label>    <%= link_to(image('ror_id', title: 'ROR', width: '30'), 'https://ror.org/', target: '_blank') %>
   <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
-   To find out more and get your ORCID ID please visit https://ror.org/') -%>
+   To find out more and get your ROR ID please visit https://ror.org/') -%>
   <%= text_field_tag 'institution[ror_id]', @institution.ror_id, class: "form-control" %>
   <%= render partial: 'institutions/ror_fetch_button' %>
 </div>
