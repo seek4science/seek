@@ -43,7 +43,7 @@
   <%= render partial: 'assets/manage_specific_attributes', locals: {f: f, sharing_link: sharing_link} %>
 
   <%
-    if @isa_json_compliant
+    if @isa_json_compliant && !resource.projects.blank?
       item_type = resource.is_a?(Assay) ? 'assay' : 'study'
       options = { validate:false, cancel_path: single_page_path(id: resource.projects.first.id, item_type: item_type, item_id: resource.id) }
     else

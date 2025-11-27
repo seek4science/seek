@@ -187,7 +187,7 @@ class AssaysController < ApplicationController
       # Clone the policy from the parent assay
       assay_policy = @assay.policy.deep_copy
       assay.update(policy: assay_policy)
-      assay.sample_type.update(policy: assay_policy)
+      assay.sample_type.update(policy: assay_policy) unless assay.sample_type.nil?
       current_assay_policy.destroy if current_assay_policy
       update_sharing_policies assay
     end
