@@ -52,11 +52,11 @@ services:
       <<: *seek_base_env
       NO_ENTRYPOINT_WORKERS: 1
     healthcheck:
-      test: [ "CMD", "ruby", "script/check_deployment.rb" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 1m
+      start_period: 20s
 
   seek_workers:
     # The SEEK delayed job workers
