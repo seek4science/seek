@@ -81,7 +81,7 @@ COPY --chown=www-data:www-data docker/database.docker.sqlite3.yml config/databas
 RUN mkdir -p /var/www
 
 # Fix permissions
-RUN chown www-data:www-data config/initializers public sqlite3-db
+RUN chown www-data:www-data config/initializers public sqlite3-db /var/www
 RUN chown -R www-data:www-data public/api
 RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh
 
