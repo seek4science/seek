@@ -19,6 +19,9 @@ class AssaysController < ApplicationController
   # => Rearrange positions
   after_action :rearrange_assay_positions_at_destroy, only: :destroy
 
+  # sets @set_isa_json_compliance if is isa-json compliant
+  # Needed to be able to set the correct study. Otherwise, they are filtered out.
+  before_action :set_isa_json_compliance, only: :manage
   after_action :propagate_permissions_to_children, only: :manage_update
 
   include Seek::Publishing::PublishingCommon
@@ -210,6 +213,10 @@ class AssaysController < ApplicationController
 
   def rearrange_assay_positions_at_destroy
     rearrange_assay_positions(@assay.assay_stream)
+  end
+
+  def set_isa_json_compliance
+    @isa_json_compliant = @assay.is_isa_json_compliant? || false
   end
 
   def assay_params
