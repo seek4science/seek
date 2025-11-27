@@ -128,10 +128,10 @@
         <div class="row">
           <div class="col-md-12 col-sm-10">
             <% if Seek::Config.allow_publications_fulltext %>
-                <%= render :partial => 'assets/fileinfo', :object => @publication.content_blob -%>
-                <% if @publication.content_blob %>
-                  <%= rendered_asset_view(@publication) %>
-                <% end %>
+              <%= render :partial => 'assets/fileinfo', :object => @publication.content_blob -%>
+              <% if @publication.content_blob %>
+                <%= rendered_asset_view(@publication) %>
+              <% end %>
             <% end %>
           </div>
         </div>
