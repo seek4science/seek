@@ -19,8 +19,8 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
 # Install base dependencies
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
-    curl default-mysql-client gettext git graphviz libjemalloc2 libvips \
-    openjdk-21-jre poppler-utils postgresql-client python3.13 shared-mime-info sqlite3 vim-tiny zip
+    curl default-mysql-client gettext git graphviz libjemalloc2 libvips links locales \
+    openjdk-21-jre poppler-utils postgresql-client python3.13 shared-mime-info sqlite3 telnet vim-tiny zip
 
 # Prepare app directory
 RUN mkdir -p $APP_DIR
@@ -37,9 +37,8 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential cmake \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
     libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-    libxslt1-dev libyaml-dev links locales nodejs \
-    python3.13-dev python3-setuptools python3-pip python3.13-venv \
-    shared-mime-info zip && \
+    libxslt1-dev libyaml-dev nodejs \
+    python3.13-dev python3-setuptools python3-pip python3.13-venv && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
     locale-gen en_US.UTF-8
 
@@ -49,16 +48,13 @@ RUN chown -R www-data /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy over App code from local filesystem
-COPY --chown=www-data:www-data . .
-
-USER www-data
-
-# Create log and tmp directories
-RUN mkdir log tmp
-
+COPY . .
 
 # Export the commit hash if provided at build time
 RUN if [ -n "$SOURCE_COMMIT" ] ; then echo $SOURCE_COMMIT > config/.git-revision ; fi
+
+# Ensure correct ownership of files that need to be writeable
+RUN chown -R www-data solr config docker public db/schema.rb
 
 # Install Ruby gems
 RUN bundle config --local frozen 1 && \
@@ -68,13 +64,23 @@ RUN bundle config --local frozen 1 && \
 
 RUN rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
+# Install supercronic - a cron alternative
+RUN curl -fsSLO "$SUPERCRONIC_URL" \
+    && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
+    && chmod +x "$SUPERCRONIC" \
+    && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
+    && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
+
+# Copy over virtuoso config
+COPY docker/virtuoso_settings.docker.yml config/virtuoso_settings.yml
+
+USER www-data
+
+# Create log and tmp directories
+RUN mkdir log tmp
+
 # Allows us to see within SEEK we are running in a container
 RUN touch config/using-docker
-
-# Python dependencies from requirements.txt
-RUN python3.13 -m pip install --upgrade pip
-RUN python3.13 -m pip install setuptools==58
-RUN python3.13 -m pip install -r requirements.txt
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
@@ -82,17 +88,13 @@ RUN mkdir sqlite3-db && \
     chmod +x docker/upgrade.sh docker/start_workers.sh && \
     bundle exec rake db:setup
 
+# Python dependencies from requirements.txt
+RUN python3.13 -m pip install --upgrade pip
+RUN python3.13 -m pip install setuptools==58
+RUN python3.13 -m pip install -r requirements.txt
+
 RUN bundle exec rake assets:precompile && \
     rm -rf tmp/cache/*
-
-USER root
-
-# Install supercronic - a cron alternative
-RUN curl -fsSLO "$SUPERCRONIC_URL" \
-    && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
-    && chmod +x "$SUPERCRONIC" \
-    && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
-    && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
 FROM base AS runtime
 
@@ -105,10 +107,10 @@ RUN apt-get update -qq && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Bring over build time dependencies
-COPY --from=builder --chown=www-data:www-data "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=builder --chown=www-data:www-data $APP_DIR $APP_DIR
-COPY --from=builder --chown=www-data:www-data /opt/venv /opt/venv
-COPY --from=builder --chown=www-data:www-data /usr/local/bin/supercronic /usr/local/bin/supercronic
+COPY --from=builder "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --from=builder $APP_DIR $APP_DIR
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /usr/local/bin/supercronic /usr/local/bin/supercronic
 
 # Cleanup and remove default nginx index page
 RUN rm -rf /tmp/* /var/tmp/* /usr/share/nginx/html/index.html
