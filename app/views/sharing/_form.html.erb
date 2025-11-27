@@ -53,7 +53,7 @@
     <% end %>
 
     <%= render partial: 'sharing/permissions_table', locals: { object: object, policy: policy, projects: projects } %>
-  <% if is_assay_stream %>
+  <% if is_assay_stream && !object.new_record? %>
     <div>
       <%= check_box_tag 'propagate_permissions' %>
       <label>
