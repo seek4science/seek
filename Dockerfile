@@ -119,9 +119,6 @@ COPY --from=builder /usr/local/bin/supercronic /usr/local/bin/supercronic
 # Cleanup and remove default nginx index page
 RUN rm -rf /tmp/* /var/tmp/* /usr/share/nginx/html/index.html
 
-# Bundler uses /var/www as path
-RUN chown -R www-data /var/www
-
 USER www-data
 
 # Network
