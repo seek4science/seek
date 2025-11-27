@@ -24,7 +24,7 @@ RUN apt-get update -qq && \
 
 # Prepare app directory
 RUN mkdir -p $APP_DIR
-RUN chown www-data $APP_DIR
+RUN chown www-data:www-data $APP_DIR
 WORKDIR $APP_DIR
 
 # Disable ssl from the mysql client
@@ -44,7 +44,6 @@ RUN apt-get update -qq && \
 
 # create and use a dedicated python virtualenv
 RUN python3.13 -m venv /opt/venv
-RUN chown -R www-data /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy over App code from local filesystem
@@ -52,9 +51,6 @@ COPY . .
 
 # Export the commit hash if provided at build time
 RUN if [ -n "$SOURCE_COMMIT" ] ; then echo $SOURCE_COMMIT > config/.git-revision ; fi
-
-# Ensure correct ownership of files that need to be writeable
-RUN chown -R www-data solr config docker public db/schema.rb
 
 # Install Ruby gems
 RUN bundle config --local frozen 1 && \
@@ -74,24 +70,32 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
 # Copy over virtuoso config
 COPY docker/virtuoso_settings.docker.yml config/virtuoso_settings.yml
 
-USER www-data
-
-# Create log and tmp directories
-RUN mkdir log tmp
-
 # Allows us to see within SEEK we are running in a container
 RUN touch config/using-docker
 
 # SQLite Database (for asset compilation)
-RUN mkdir sqlite3-db && \
-    cp docker/database.docker.sqlite3.yml config/database.yml && \
-    chmod +x docker/upgrade.sh docker/start_workers.sh && \
-    bundle exec rake db:setup
+RUN mkdir sqlite3-db
+COPY --chown=www-data:www-data docker/database.docker.sqlite3.yml config/database.yml
+
+# Create /var/www folder for bundler to compile dependencies into
+RUN mkdir -p /var/www
+
+# Fix permissions
+RUN chown www-data:www-data config/initializers public sqlite3-db /var/www
+RUN chown -R www-data:www-data public/api public/javascripts
+RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh
 
 # Python dependencies from requirements.txt
 RUN python3.13 -m pip install --upgrade pip
 RUN python3.13 -m pip install setuptools==58
 RUN python3.13 -m pip install -r requirements.txt
+
+USER www-data
+
+RUN bundle exec rake db:setup
+
+# Create log and tmp directories
+RUN mkdir -p log tmp
 
 RUN bundle exec rake assets:precompile && \
     rm -rf tmp/cache/*
