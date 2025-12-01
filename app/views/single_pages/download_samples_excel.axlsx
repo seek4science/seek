@@ -8,7 +8,9 @@ else
   secret_pwd = UUID.new.generate
 end
 
+xlsx_package = Axlsx::Package.new
 workbook = xlsx_package.workbook
+
 # Prevents formula injections
 Axlsx.escape_formulas = true
 
@@ -26,33 +28,39 @@ header_bg_color = 'F2b035'
 # Cell Styles
 unlocked = workbook.styles.add_style locked: false
 locked = workbook.styles.add_style locked: true
-title_style = workbook.styles.add_style(bg_color: header_bg_color,
+header_one_style = workbook.styles.add_style(bg_color: header_bg_color,
                                         fg_color: header_fg_color,
                                         b: true,
                                         u: true,
                                         sz: 18)
 
+header_two_style = workbook.styles.add_style(b:true, u: true)
+
 ########################################################################################################################
 # Adding the Sample Type metadata sheet
 ########################################################################################################################
 
-workbook.add_worksheet(name: 'Metadata') do |sheet|
-  sheet.add_row ['Study:'], style: title_style
-  sheet.add_row ['Fairdom ID:', @study.id]
-  sheet.add_row ['UUID:', @study.uuid]
+workbook.add_worksheet(name: 'Sample Type Metadata') do |sheet|
+  sheet.add_row ['Sample Type:'], style: header_one_style
+  sheet.add_row ['Fairdom ID:', @sample_type.id], style: [header_two_style, nil]
+  sheet.add_row ['Title:', @sample_type.title], style: [header_two_style, nil]
+  sheet.add_row ['UUID:', @sample_type.uuid], style: [header_two_style, nil]
 
-  sheet.add_row ['Sample Type:'], style: title_style
-  sheet.add_row ['Fairdom ID:', @sample_type.id]
-  sheet.add_row ['UUID:', @sample_type.uuid]
-
-  sheet.add_row ['Template:'], style: title_style
-  sheet.add_row ['Fairdom ID:', @template.id]
-  sheet.add_row ['UUID:', @template.uuid]
+  sheet.add_row ['Template:'], style: header_one_style
+  sheet.add_row ['Fairdom ID:', @template.id], style: [header_two_style, nil]
+  sheet.add_row ['Title:', @template.title], style: [header_two_style, nil]
+  sheet.add_row ['UUID:', @template.uuid], style: [header_two_style, nil]
 
   if @assay
-    sheet.add_row ['Assay:'], style: title_style
-    sheet.add_row ['Fairdom ID:', @assay.id]
-    sheet.add_row ['UUID:', @assay.uuid]
+    sheet.add_row ['Assay:'], style: header_one_style
+    sheet.add_row ['Fairdom ID:', @assay&.id], style: [header_two_style, nil]
+    sheet.add_row ['Title:', @assay&.title], style: [header_two_style, nil]
+    sheet.add_row ['UUID:', @assay&.uuid], style: [header_two_style, nil]
+  else
+    sheet.add_row ['Study:'], style: header_one_style
+    sheet.add_row ['Fairdom ID:', @study.id], style: [header_two_style, nil]
+    sheet.add_row ['Title:', @study.title], style: [header_two_style, nil]
+    sheet.add_row ['UUID:', @study.uuid], style: [header_two_style, nil]
   end
 
   sheet.sheet_protection.password = secret_pwd
