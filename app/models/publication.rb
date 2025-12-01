@@ -244,7 +244,7 @@ class Publication < ApplicationRecord
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
     self.title         += ( ":#{(bibtex_record[:subtitle].try(:to_s).gsub /{|}/, '')}") unless bibtex_record[:subtitle].nil?
 
-    if check_bibtex_file (bibtex_record)
+    return false unless check_bibtex_file (bibtex_record)
       self.abstract = bibtex_record[:abstract].try(:to_s)
       self.journal = bibtex_record.journal.try(:to_s)
       month = bibtex_record[:month].try(:to_s)
@@ -318,9 +318,9 @@ class Publication < ApplicationRecord
         self.generate_citation(bibtex_record)
       end
       return true
-    else
-      return false
-    end
+    
+      
+    
   end
 
   # generating the citations for different types of publications by using the data from Bibtex file when no doi/pubmed_id
@@ -416,12 +416,11 @@ class Publication < ApplicationRecord
     @error = nil
     if !pubmed_id.blank?
       begin
-        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+        result = Bio::MEDLINE.new(pubmed_entry(pubmed_id)).reference
         @error = result.error
       rescue => exception
-        raise exception unless Rails.env.production?
         result ||= Bio::Reference.new({})
-        @error = 'There was a problem contacting the PubMed query service. Please try again later'
+        @error = 'There was a problem contacting the PubMed query service, or the PubMed id was invalid. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing ncbi using pubmed id #{pubmed_id}"})
       end
     elsif !doi.blank?
@@ -551,13 +550,14 @@ class Publication < ApplicationRecord
     pol.permissions
   end
 
-  def pubmed_entry
-    if pubmed_id
-      Rails.cache.fetch("bio-reference-#{pubmed_id}") do
-        entry = Bio::PubMed.efetch(pubmed_id).first
-        raise 'PubMed entry was nil' if entry.nil?
-        entry
-      end
+  def pubmed_entry(pm_id = pubmed_id)
+    return unless pm_id
+
+    Rails.cache.fetch("bio-reference-#{pm_id}") do
+      entry = Bio::PubMed.efetch(pm_id).first
+      raise 'PubMed entry was nil' if entry.nil?
+
+      entry
     end
   end
 

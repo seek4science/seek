@@ -81,7 +81,6 @@ class PublicationTest < ActiveSupport::TestCase
     end
   end
 
-
   test 'create publication from metadata pubmed' do
     publication_hash = {
         'title'   => 'SEEK publication\\r', # test required? chomp
@@ -211,23 +210,28 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'publication date from pubmed' do
     mock_pubmed(content_file: 'pubmed_21533085.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(21533085).first).reference
-    assert_equal '2011-04-20', result.published_date.to_s
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(21533085).first).reference
 
-    mock_pubmed(content_file: 'pubmed_1.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1).first).reference
-    assert_equal '1975-06-01', result.published_date.to_s
+      assert_equal '2011-04-20', result.published_date.to_s
 
-    mock_pubmed(content_file: 'pubmed_20533085.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(20533085).first).reference
-    assert_equal '2010-06-10', result.published_date.to_s
-    assert_nil result.error
+      mock_pubmed(content_file: 'pubmed_1.txt')
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(1).first).reference
+      assert_equal '1975-06-01', result.published_date.to_s
+
+      mock_pubmed(content_file: 'pubmed_20533085.txt')
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(20533085).first).reference
+      assert_equal '2010-06-10', result.published_date.to_s
+      assert_nil result.error
+    end
   end
 
   test 'unknown pubmed_id' do
     mock_pubmed(content_file: 'pubmed_not_found.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1111111111111).first).reference
-    assert_equal 'No publication could be found on PubMed with that ID', result.error
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(1111111111111).first).reference
+      assert_equal 'No publication could be found on PubMed with that ID', result.error
+    end
   end
 
   test 'book chapter doi' do

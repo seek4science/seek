@@ -140,7 +140,8 @@ module Seek
     end
 
     def pubmed_api_email_propagate
-      Bio::NCBI.default_email = "(#{pubmed_api_email})"
+      Bio::NCBI.default_email = pubmed_api_email
+      Bio::NCBI.default_tool = 'SEEK'
     end
 
     def propagate_all
