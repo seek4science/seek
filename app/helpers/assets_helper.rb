@@ -10,7 +10,7 @@ module AssetsHelper
       options[:preview_permissions] = show_form_manage_specific_attributes?
     end
     options[:button_text] ||= submit_button_text(item)
-    options[:cancel_path] = params[:single_page] ? single_page_path(id: params[:single_page]) : polymorphic_path(item)
+    options[:cancel_path] ||= params[:single_page] ? single_page_path(id: params[:single_page]) : polymorphic_path(item)
     options[:resource_name] = item.class.name.underscore
     options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
 
