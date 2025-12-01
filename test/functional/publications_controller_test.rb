@@ -55,7 +55,6 @@ class PublicationsControllerTest < ActionController::TestCase
       end
     end
 
-
     assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     p = assigns(:publication)
     assert_equal 1, p.assays.count
