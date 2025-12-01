@@ -88,9 +88,11 @@ class SinglePagesController < ApplicationController
       end
     end
 
+    spreadsheet_name = @sample_type.title&.concat(".xlsx")
+
     notice_message << '</ul>'
     flash[:notice] = notice_message.html_safe
-    render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline'
+    render xlsx: 'download_samples_excel', filename: spreadsheet_name, disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|

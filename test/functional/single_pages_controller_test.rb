@@ -66,7 +66,9 @@ class SinglePagesControllerTest < ActionController::TestCase
     cache_uuid = response_body['uuid']
 
     get :download_samples_excel, params: { uuid: cache_uuid }
-    assert_response :ok, msg = 'Unable to generate the excel'
+    response_cd = response.headers["Content-Disposition"]
+    assert_response :ok
+    assert response_cd.include?("filename=\"#{source_sample_type.title}.xlsx\"")
   end
 
   test 'generates a valid export of source samples in single page' do
@@ -93,7 +95,10 @@ class SinglePagesControllerTest < ActionController::TestCase
     cache_uuid = response_body['uuid']
 
     get :download_samples_excel, params: { uuid: cache_uuid }
-    assert_response :ok, msg = 'Unable to generate the excel'
+    response_cd = response.headers["Content-Disposition"]
+    assert_response :ok
+    assert response_cd.include?("filename=\"#{sample_collection_sample_type.title}.xlsx\"")
+  end
   end
 
   test 'invalid file extension should raise exception' do
