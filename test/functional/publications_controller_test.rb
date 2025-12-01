@@ -1728,6 +1728,42 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 25, results.first['count']
   end
 
+  test 'pubmed option disabled if no email configured' do
+    with_config_value(:pubmed_api_email, '') do
+      get :new
+      assert_response :success
+      assert_select 'select#protocol' do
+        assert_select 'option[value="doi"]', count: 1
+        assert_select 'option[value="pubmed"]' do |option|
+          assert option.attr('disabled').present?
+          assert_equal 'PubMed ID (email needs configuring by an Admin)', option.text
+        end
+      end
+      assert_select 'div.tab-pane#Create' do
+        assert_select 'input#publication_pubmed_id', count: 0
+        assert_select 'button#retrieve_from_pubmed', count: 0
+        assert_select 'div.alert-warning', text: /To use the PubMed ID lookup feature, an administrator must first configure an email address for the PubMed API/
+      end
+    end
+
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      get :new
+      assert_response :success
+      assert_select 'select#protocol' do
+        assert_select 'option[value="doi"]', count: 1
+        assert_select 'option[value="pubmed"]' do |option|
+          refute option.attr('disabled').present?
+          assert_equal 'PubMed ID', option.text
+        end
+      end
+      assert_select 'div.tab-pane#Create' do
+        assert_select 'input#publication_pubmed_id', count: 1
+        assert_select 'button#retrieve_from_pubmed', count: 1
+        assert_select 'div.alert-warning', count: 0
+      end
+    end
+  end
+
   private
 
   def publication_for_export_tests
