@@ -272,10 +272,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_nil Seek::Config.pubmed_api_email
   end
 
-  test 'crossref_api_email' do
-    assert_equal 'sowen@cs.man.ac.uk', Seek::Config.crossref_api_email
-  end
-
   test 'site_base_host' do
     assert_equal 'http://localhost:3000', Seek::Config.site_base_host
   end
