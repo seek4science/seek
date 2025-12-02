@@ -4,37 +4,51 @@
 <% asset = content_blob.asset %>
 <% asset_version = content_blob.asset_version %>
 
+
 <% if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
-  <% if content_blob.is_content_viewable? && !content_blob.is_supported_spreadsheet_format? %>
-    <%# Use fancy lightbox thing for displaying images in page %>
+
+  <%# ---------- Case 1: Image or PDF / Inline viewable ---------- %>
+  <% if content_blob.is_content_remotely_viewable? && !content_blob.is_supported_spreadsheet_format? %>
     <% if content_blob.is_image? %>
       <% zoom_width = content_blob.width.to_i.clamp(Seek::ActsAsFleximageExtension::STANDARD_SIZE,
                                                     Seek::ActsAsFleximageExtension::MAX_SIZE) %>
-      <%#param code is used for temporary link %>
-      <% url = polymorphic_path([asset, content_blob], action: 'download', disposition: 'inline', code: params[:code], image_size: zoom_width) %>
-      <%# lightbox ID needs to be unique %>
-      <% options = { 'data-lightbox' => "view_content_blob_#{content_blob.id}_#{Time.now.to_i}_#{rand(10000000)}", title: 'Preview'} %>
-    <% else %>
-      <% url = polymorphic_path([asset, content_blob], action: 'view_content', code: params[:code]) %>
-      <% options = { title: 'View contents of this file' } %>
+
+      <% url = polymorphic_path([asset, content_blob],
+                                action: 'download',
+                                disposition: 'inline',
+                                code: params[:code],
+                                image_size: zoom_width) %>
+
+      <% options = { 'data-lightbox' => "view_content_blob_#{content_blob.id}", title: 'Preview' } %>
+
+    <% else %> <%# PDF or other browser-viewable types %>
+      <% url = polymorphic_path([asset, content_blob],
+                                action: 'download',
+                                disposition: 'inline',
+                                code: params[:code]) %>
+      <% options = { title: 'View content' } %>
     <% end %>
+
+    <%# ---------- Case 2: Spreadsheet viewer ---------- %>
   <% elsif asset.supports_spreadsheet_explore? && content_blob.is_supported_spreadsheet_format? %>
     <% if content_blob.is_extractable_spreadsheet? %>
-      <% url = polymorphic_path([asset], action: 'explore', code: params[:code], version: asset_version) %>
-      <% options = { title: 'Explore the contents of this file' } %>
+      <% url = polymorphic_path([asset],
+                                action: 'explore',
+                                code: params[:code],
+                                version: asset_version) %>
+      <% options = { title: 'Explore spreadsheet contents' } %>
     <% else %>
-      <% options = { disabled_reason: "This spreadsheet is too big to be explored (larger than #{Seek::Config.max_extractable_spreadsheet_size} MB), or the file does not exist." } %>
+      <% options[:disabled_reason] = "Spreadsheet too large or unavailable for preview." %>
     <% end %>
+
+    <%# ---------- Case 3: Downloadable but not inline ---------- %>
   <% elsif !asset.is_a?(Model) && asset.is_downloadable_asset? %>
-    <% if content_blob.file_exists? %>
-      <% options[:disabled_reason] = "This #{text_for_resource(asset).downcase} is unable to be viewed in-browser. " +
-          "Supported file formats are: " + Seek::ContentTypeDetection.viewable_formats.join(', ') %>
-    <% else %>
-      <% options[:disabled_reason] = 'This content is stored externally and cannot be previewed.' %>
-    <% end %>
+    <% options[:disabled_reason] = "Format not viewable inline. " \
+      "Supported formats: #{Seek::ContentTypeDetection.viewable_formats.join(', ')}" %>
   <% end %>
 
-  <% if url || !options.empty? %>
+  <% if url || options[:disabled_reason] %>
     <%= icon_view ? icon_link_to('', 'show', url, options) : button_link_to('View content', 'show', url, options) %>
   <% end %>
+
 <% end %>

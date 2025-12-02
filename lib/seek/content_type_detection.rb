@@ -189,6 +189,24 @@ module Seek
       blob.asset.is_downloadable_asset? && blob.is_viewable_format? && blob.file_exists?
     end
 
+    def is_content_remotely_viewable?(blob = self)
+      return false unless blob
+
+      # Shrine / S3 remote storage support
+      return false unless blob.file_exists? || blob.is_stored_remotely?
+
+      # only certain formats are viewable
+      return false unless blob.is_viewable_format?
+
+      true
+    end
+
+
+    def is_stored_remotely?
+      respond_to?(:file_attacher) && file_attacher&.attached?
+    end
+
+
     def update_content_mime_type
       if url
         set_content_type_according_to_url

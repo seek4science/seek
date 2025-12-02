@@ -1,6 +1,5 @@
 # lib/shrine/file_uploader.rb
 require "shrine"
-require "image_processing/mini_magick"
 
 class Shrine
   class FileUploader < Shrine
