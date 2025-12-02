@@ -24,6 +24,22 @@ module SinglePagesHelper
     ATTRIBUTES_WITH_DATA_VALIDATION.include?(sample_attribute.sample_attribute_type.base_type)
   end
 
+  def get_values_for_attribute(attribute)
+    case attribute.sample_attribute_type
+    when controlled_vocab?
+      get_values_for_cv(attribute)
+    when seek_sample? || seek_sample_multi?
+      get_values_for_registered_samples(attribute)
+    when seek_data_file?
+      get_values_for_datafiles(attribute)
+    when seek_strain?
+      get_values_for_strains(attribute)
+    when seek_sop?
+      get_values_for_sops(attribute)
+    else
+      []
+    end
+  end
   def get_values_for_cv(sample_attribute)
     sample_attribute.sample_controlled_vocab.labels
   end
