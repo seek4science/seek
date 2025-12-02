@@ -4,10 +4,12 @@ require 'open-uri'
 require 'tmpdir'
 require 'docsplit'
 require 'rest-client'
+require "shrine/attachment"
 
 class ContentBlob < ApplicationRecord
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
+  include Shrine::FileUploader::Attachment(:file)
   extend Seek::UrlValidation
   prepend Seek::Openbis::Blob
   prepend Nels::Blob
@@ -168,8 +170,15 @@ class ContentBlob < ApplicationRecord
   end
 
   def file
-    @file ||= File.open(filepath)
+    if respond_to?(:file_attacher) && file_attacher&.attached?
+      return file_attacher.file
+    end
+
+    return @tmp_io_object unless @tmp_io_object.nil?
+    raise Exception, 'No valid file found' if filepath.blank?
+    File.open(filepath, 'rb')
   end
+
 
   def retrieve
     self.tmp_io_object = remote_content_handler.fetch

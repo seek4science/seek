@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_27_161227) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -352,6 +352,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
     t.datetime "updated_at"
     t.boolean "deleted", default: false
     t.boolean "make_local_copy", default: false
+    t.text "file_data"
     t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
   end
 
@@ -839,7 +840,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
     t.text "root_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "resource_attributes", limit: 16777215
+    t.text "resource_attributes", size: :medium
     t.bigint "git_repository_id"
     t.integer "visibility"
     t.string "doi"
@@ -1251,8 +1252,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
     t.string "identifier"
     t.bigint "organism_id"
     t.bigint "extended_metadata_type_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "contributor_id"
     t.string "uuid"
     t.string "deleted_contributor"
@@ -1752,8 +1753,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
     t.bigint "role_type_id"
     t.string "scope_type"
     t.bigint "scope_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
     t.index ["person_id"], name: "index_roles_on_person_id"
     t.index ["role_type_id"], name: "index_roles_on_role_type_id"
@@ -1844,8 +1845,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
     t.boolean "can_edit", default: false
     t.boolean "can_download", default: false
     t.boolean "can_delete", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_sample_type_user_id_asset_id_can_view"
     t.index ["user_id", "can_view"], name: "index_sample_type_auth_lookup_on_user_id_and_can_view"
   end
@@ -1901,7 +1902,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
 
   create_table "sessions", id: :integer, force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data", limit: 16777215
+    t.text "data", size: :medium
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -2242,7 +2243,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
   create_table "text_values", id: :integer, force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", limit: 16777215, null: false
+    t.text "text", size: :medium, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

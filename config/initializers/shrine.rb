@@ -2,8 +2,8 @@ require "shrine"
 require "shrine/storage/s3"
 
 s3_options = {
-  access_key_id:     "minioadmin", # "AccessKey" value
-  secret_access_key: "minioadmin", # "SecretKey" value
+  access_key_id:     "seek", # "AccessKey" value
+  secret_access_key: "seek1234", # "SecretKey" value
   endpoint:          "http://localhost:9000",   # "Endpoint"  value
   bucket:            "example",     # name of the bucket you created
   region:            "us-east-1",

@@ -83,14 +83,16 @@ module Seek
       end
 
       def build_attributes_hash_for_content_blob(item_params, version)
-        { tmp_io_object: item_params[:tmp_io_object],
+        {
+          file: item_params[:file],
           url: item_params[:data_url],
           external_link: !item_params[:make_local_copy] == '1',
           original_filename: item_params[:original_filename],
           content_type: item_params[:content_type],
           make_local_copy: item_params[:make_local_copy] == '1',
           file_size: item_params[:file_size],
-          asset_version: version }
+          asset_version: version
+        }
       end
 
       def retain_previous_content_blobs(asset, new_version)
@@ -115,11 +117,17 @@ module Seek
       def process_upload(blob_params)
         data = blob_params[:data]
         blob_params.delete(:data_url)
-        blob_params.delete(:original_filename)
+
+        # Shrine-style metadata
+        blob_params[:file] = data
         blob_params[:original_filename] = data.original_filename
-        blob_params[:tmp_io_object] = data
-        blob_params[:content_type] = data.content_type || content_type_from_filename(blob_params[:original_filename])
+        blob_params[:content_type] = data.content_type || content_type_from_filename(data.original_filename)
+        blob_params[:file_size] = data.size
+
+        blob_params.delete(:data)
+        true
       end
+
 
       def process_from_base64(blob_params)
         base64_data = blob_params[:base64_data]
