@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const query = queryTextarea.value;
             const format = formatEl ? formatEl.value : '';
 
-            const url = window.location.origin + window.location.pathname;
+            const url = window.location.origin + '/sparql';
             const params = new URLSearchParams();
             if (query && query.trim() !== '') params.set('sparql_query', query);
             if (format) params.set('output_format', format);
