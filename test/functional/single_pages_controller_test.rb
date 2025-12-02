@@ -103,27 +103,6 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert response_cd.include?("filename=\"#{source_sample_type.title}.xlsx\"")
   end
 
-  test 'should not be able to download spreadsheet if not authorized' do
-    id_label, person, _project, study, source_sample_type, sources = setup_file_upload.values_at(
-      :id_label, :person, :project, :study, :source_sample_type, :sources
-    )
-
-    source_ids = sources.map { |s| { id_label => s.id } }
-    sample_type_id = source_sample_type.id
-    study_id = study.id
-    assay_id = nil
-
-    login_as(person)
-
-    post_params = { sample_ids: source_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
-
-    post :export_to_excel, params: post_params, xhr: true
-
-  end
-
   test 'generates a valid export of study samples in single page' do
     id_label, person, study, sample_collection_sample_type, study_samples = setup_file_upload.values_at(
       :id_label, :person, :study, :sample_collection_sample_type, :study_samples
