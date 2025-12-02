@@ -10,6 +10,16 @@ module SessionsHelper
     User.admin_logged_in?
   end
 
+  def detect_default_login_strategy
+    return 'password' if show_standard_password_login?
+    return 'elixir_aai' if show_elixir_aai_login?
+    return 'ldap' if show_ldap_login?
+    return 'github' if show_github_login?
+    return 'oidc' if show_oidc_login?
+
+    nil
+  end
+
   # returns true if there is somebody logged in and they are an project manager
   def project_administrator_logged_in?
     User.project_administrator_logged_in?
@@ -30,6 +40,11 @@ module SessionsHelper
   # returns true if there is somebody logged in and they are member of a project
   def logged_in_and_member?
     User.logged_in_and_member?
+  end
+
+  def show_standard_password_login?
+    # always show if omniauth options aren't available, regardless of standard_login_enabled setting
+    params[:show_standard_login].present? || Seek::Config.standard_login_enabled || !show_omniauth_login?
   end
 
   def show_omniauth_login?

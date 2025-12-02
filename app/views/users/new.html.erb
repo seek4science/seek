@@ -1,7 +1,7 @@
 
 <%
   term_and_conditions_required = User.any? && Seek::Config.terms_enabled
-  strategy = params[:strategy] || 'password'
+  strategy = params[:strategy] || detect_default_login_strategy
 %>
 
 <% if User.count == 0 -%>
@@ -29,8 +29,10 @@
     <div class="panel-body">
       <% if show_omniauth_login? %>
         <ul class="nav nav-tabs" role="tablist">
-          <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
-            <a href="#password_registration" aria-controls="password_registration" role="tab" data-toggle="tab">SEEK login</a>
+          <% if show_standard_password_login? %>
+            <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
+              <a href="#password_registration" aria-controls="password_registration" role="tab" data-toggle="tab">SEEK login</a>
+            <% end %>
           <% end %>
           <% if show_elixir_aai_login? %>
             <%= content_tag(:li, role: 'presentation', class: strategy == 'elixir_aai' ? 'active' : nil) do %>
@@ -56,34 +58,36 @@
       <% end #omniauth enabled and providers available %>
 
       <div class="tab-content">
-        <%= content_tag(:div, id: 'password_registration', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
-          <%= form_for @user do |f| -%>
+        <% if show_standard_password_login? %>
+          <%= content_tag(:div, id: 'password_registration', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
+            <%= form_for @user do |f| -%>
 
 
-            <div class="form-group">
-              <label>Username</label>
-              <%= f.text_field :login, placeholder: 'Username', class: 'form-control' %>
-              <p class="help-block">The username should contain a minimum of 3 characters.</p>
-            </div>
+              <div class="form-group">
+                <label>Username</label>
+                <%= f.text_field :login, placeholder: 'Username', class: 'form-control' %>
+                <p class="help-block">The username should contain a minimum of 3 characters.</p>
+              </div>
 
-            <div class="form-group">
-              <label>Email address</label>
-              <%= f.text_field :email, placeholder:'Email address',class: 'form-control' %>
-            </div>
+              <div class="form-group">
+                <label>Email address</label>
+                <%= f.text_field :email, placeholder:'Email address',class: 'form-control' %>
+              </div>
 
-            <div class="form-group">
-              <label>Password</label>
-              <%= f.password_field :password, placeholder: 'Password', class: 'form-control' %>
-              <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
-            </div>
+              <div class="form-group">
+                <label>Password</label>
+                <%= f.password_field :password, placeholder: 'Password', class: 'form-control' %>
+                <p class="help-block">Password should contain a minimum of <%= User::MIN_PASSWORD_LENGTH %> characters.</p>
+              </div>
 
-            <div class="form-group">
-              <label>Confirm Password</label>
-              <%= f.password_field :password_confirmation, placeholder: 'Password', class: 'form-control' %>
-            </div>
+              <div class="form-group">
+                <label>Confirm Password</label>
+                <%= f.password_field :password_confirmation, placeholder: 'Password', class: 'form-control' %>
+              </div>
 
-            <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, class: 'btn btn-primary', disabled: term_and_conditions_required %>
-          <% end -%>
+              <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, class: 'btn btn-primary', disabled: term_and_conditions_required %>
+            <% end -%>
+          <% end %>
         <% end %>
 
         <% if show_omniauth_login? %>
