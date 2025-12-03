@@ -41,16 +41,17 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal inv_two.title, json['children'][1]['text']
   end
 
-  test 'generates a valid export of sources in single page' do
-    # Generate the excel data
-    id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
+  test 'Should not generate export if not authorized' do
+    id_label, _person, project, study, source_sample_type, sources = setup_file_upload.values_at(
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
-
+    unauthorized_person = FactoryBot.create(:person)
     source_ids = sources.map { |s| { id_label => s.id } }
     sample_type_id = source_sample_type.id
     study_id = study.id
     assay_id = nil
+
+    login_as(unauthorized_person)
 
     post_params = { sample_ids: source_ids.to_json,
                     sample_type_id: sample_type_id.to_json,
@@ -66,18 +67,53 @@ class SinglePagesControllerTest < ActionController::TestCase
     cache_uuid = response_body['uuid']
 
     get :download_samples_excel, params: { uuid: cache_uuid }
-    assert_response :ok, msg = 'Unable to generate the excel'
+    assert_redirected_to single_page_path(id: project.id, item_type: 'study', item_id: study_id)
+    assert_equal flash[:error], 'Could not retrieve Study Sample Type! Do you have at least viewing permissions?'
   end
 
-  test 'generates a valid export of source samples in single page' do
-    id_label, study, assay, sample_collection_sample_type, source_samples = setup_file_upload.values_at(
-      :id_label, :study, :assay, :sample_collection_sample_type, :source_samples
+  test 'generates a valid export of study sources in single page' do
+    # Generate the excel data
+    id_label, person, _project, study, source_sample_type, sources = setup_file_upload.values_at(
+      :id_label, :person, :project, :study, :source_sample_type, :sources
     )
 
-    source_sample_ids = source_samples.map { |ss| { id_label => ss.id } }
+    source_ids = sources.map { |s| { id_label => s.id } }
+    sample_type_id = source_sample_type.id
+    study_id = study.id
+    assay_id = nil
+
+    login_as(person)
+
+    post_params = { sample_ids: source_ids.to_json,
+                    sample_type_id: sample_type_id.to_json,
+                    study_id: study_id.to_json,
+                    assay_id: assay_id.to_json }
+
+    post :export_to_excel, params: post_params, xhr: true
+
+    assert_response :ok, msg = "Couldn't reach the server"
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_samples_excel, params: { uuid: cache_uuid }
+    response_cd = response.headers["Content-Disposition"]
+    assert_response :ok
+    assert response_cd.include?("filename=\"#{source_sample_type.title}.xlsx\"")
+  end
+
+  test 'generates a valid export of study samples in single page' do
+    id_label, person, study, sample_collection_sample_type, study_samples = setup_file_upload.values_at(
+      :id_label, :person, :study, :sample_collection_sample_type, :study_samples
+    )
+
+    source_sample_ids = study_samples.map { |ss| { id_label => ss.id } }
     sample_type_id = sample_collection_sample_type.id
     study_id = study.id
-    assay_id = assay.id
+    assay_id = nil
+
+    login_as(person)
 
     post_params = { sample_ids: source_sample_ids.to_json,
                     sample_type_id: sample_type_id.to_json,
@@ -93,7 +129,40 @@ class SinglePagesControllerTest < ActionController::TestCase
     cache_uuid = response_body['uuid']
 
     get :download_samples_excel, params: { uuid: cache_uuid }
-    assert_response :ok, msg = 'Unable to generate the excel'
+    response_cd = response.headers["Content-Disposition"]
+    assert_response :ok
+    assert response_cd.include?("filename=\"#{sample_collection_sample_type.title}.xlsx\"")
+  end
+
+  test 'generates a valid export of assay samples in single page' do
+    id_label, person, study, assay, assay_sample_type, assay_samples = setup_file_upload.values_at(
+      :id_label, :person, :study, :assay, :assay_sample_type, :assay_samples
+    )
+
+    assay_sample_ids = assay_samples.map { |ss| { id_label => ss.id } }
+    sample_type_id = assay_sample_type.id
+    study_id = study.id
+    assay_id = assay.id
+
+    login_as(person)
+
+    post_params = { sample_ids: assay_sample_ids.to_json,
+                    sample_type_id: sample_type_id.to_json,
+                    study_id: study_id.to_json,
+                    assay_id: assay_id.to_json }
+
+    post :export_to_excel, params: post_params, xhr: true
+
+    assert_response :ok, msg = "Couldn't reach the server"
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_samples_excel, params: { uuid: cache_uuid }
+    response_cd = response.headers["Content-Disposition"]
+    assert_response :ok
+    assert response_cd.include?("filename=\"#{assay_sample_type.title}.xlsx\"")
   end
 
   test 'invalid file extension should raise exception' do
@@ -370,9 +439,12 @@ class SinglePagesControllerTest < ActionController::TestCase
   def setup_file_upload
     id_label = "#{Seek::Config.instance_name} id"
     person = @member.person
+    institution = FactoryBot.create(:institution, title: 'Legion Of Doooooooooom', country: 'AQ')
     project = FactoryBot.create(:project, id: 10_000)
-    study = FactoryBot.create(:study, id: 10_001)
-    assay = FactoryBot.create(:assay, id: 10_002, study:)
+    person.add_to_project_and_institution(project, institution)
+    investigation = FactoryBot.create(:investigation, id: 10_000, is_isa_json_compliant: true, projects: [project], contributor: person)
+    study = FactoryBot.create(:study, id: 10_001, investigation: investigation, contributor: person)
+    assay = FactoryBot.create(:assay, id: 10_002, study:, contributor: person)
 
     source_sample_type_template = FactoryBot.create(:isa_source_template, id: 10_006)
     source_sample_type = FactoryBot.create(:isa_source_sample_type,
@@ -423,7 +495,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       )
     end
 
-    source_samples = (1..4).map do |n|
+    study_samples = (1..4).map do |n|
       FactoryBot.create(
         :sample,
         id: 10_020 + n,
@@ -450,7 +522,7 @@ class SinglePagesControllerTest < ActionController::TestCase
         project_ids: [project.id],
         contributor: person,
         data: {
-          Input: [source_samples[n - 1].id, source_samples[n].id],
+          Input: [study_samples[n - 1].id, study_samples[n].id],
           'Protocol Assay 1': 'How to make concentrated dark matter',
           'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
           'Extract Name': "Extract nr. #{n}",
@@ -459,9 +531,19 @@ class SinglePagesControllerTest < ActionController::TestCase
       )
     end
 
-    { "id_label": id_label, "person": person, "project": project, "study": study, "assay": assay,
-      "source_sample_type": source_sample_type, "sample_collection_sample_type": sample_collection_sample_type,
-      "assay_sample_type": assay_sample_type, "sources": sources, "source_samples": source_samples,
-      "assay_samples": assay_samples }
+    {
+      "id_label": id_label,
+      "person": person,
+      "project": project,
+      "investigation": investigation,
+      "study": study,
+      "assay": assay,
+      "source_sample_type": source_sample_type,
+      "sample_collection_sample_type": sample_collection_sample_type,
+      "assay_sample_type": assay_sample_type,
+      "sources": sources,
+      "study_samples": study_samples,
+      "assay_samples": assay_samples
+    }
   end
 end

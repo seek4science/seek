@@ -21,15 +21,11 @@
 
   <div class="form-group">
     <%= f.label :ror_id, 'ROR ID' -%>
-    <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
+    <%= link_to(image('ror_id', title: 'ROR', width: '30'), 'https://ror.org/', target: '_blank') %>
     <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
-   To find out more and get your ORCID ID please visit https://ror.org/') -%>
+   To find out more and get your ROR ID please visit https://ror.org/') -%>
     <%= f.text_field :ror_id, class:"form-control" -%>
-    <small class="form-text text-muted">
-      <div id="ror-error-message" class="text-danger" style="display: none;"></div>
-      <em>Enter the ID only (e.g., 01f7bcy98), then click on the fetch button.</em>
-    </small>
-    <button type="button" id="fetch-ror-data-with-id" class="btn btn-sm btn-primary">fetch</button>
+    <%= render partial: 'ror_fetch_button' %>
   </div>
   <div class="form-group">
     <%= f.label :department -%>

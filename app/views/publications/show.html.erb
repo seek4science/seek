@@ -9,19 +9,7 @@
         <%= item_description @publication.abstract, :label => "Abstract", :none_text => "No abstract specified" %>
 
         <div class="row">
-          <% if Seek::Config.allow_publications_fulltext %>
 
-            <div class="col-md-6">
-
-              <%= persistent_resource_id(@publication) %>
-
-              <%= render :partial => 'assets/fileinfo', :object => @publication.content_blob -%>
-
-              <% if @publication.content_blob %>
-                <%= rendered_asset_view(@publication) %>
-              <% end %>
-            </div>
-          <% end %>
 
           <div class="col-md-6">
             <%= persistent_resource_id(@publication) %>
@@ -136,6 +124,17 @@
             <% end %>
           </div>
         </div>
+
+        <% if Seek::Config.allow_publications_fulltext %>
+        <div class="row">
+          <div class="col-md-12 col-sm-10">
+              <%= render :partial => 'assets/fileinfo', :object => @publication.content_blob -%>
+              <% if @publication.content_blob %>
+                <%= rendered_asset_view(@publication) %>
+              <% end %>
+          </div>
+        </div>
+        <% end %>
         <%= render :partial => "general/isa_graph", :locals => { :root_item => @publication, :deep => true, :include_parents => true } %>
       </div>
       <div class="col-md-3 col-sm-4">

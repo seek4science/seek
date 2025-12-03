@@ -5,12 +5,12 @@ http_interactions:
     uri: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi
     body:
       encoding: US-ASCII
-      string: tool=bioruby&email=%28fred%40email.com%29&retmode=text&db=pubmed&rettype=medline&id=40404040404
+      string: tool=SEEK&email=fred%40email.com&retmode=text&db=pubmed&rettype=medline&id=40404040404
     headers:
       Content-Type:
       - application/x-www-form-urlencoded
       Content-Length:
-      - '95'
+      - '86'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -23,41 +23,42 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 14 Oct 2019 08:15:25 GMT
+      - Mon, 01 Dec 2025 15:08:15 GMT
       Server:
       - Finatra
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Content-Security-Policy:
       - upgrade-insecure-requests
-      X-Ratelimit-Remaining:
-      - '2'
-      Ncbi-Phid:
-      - D0BDB88C816F70D50000554525045BD4.1.1.m_5
-      Cache-Control:
-      - private
+      Referrer-Policy:
+      - origin-when-cross-origin
       Ncbi-Sid:
-      - CB2AF495308C0544_6EDESID
-      X-Ratelimit-Limit:
-      - '3'
-      Access-Control-Allow-Origin:
-      - "*"
-      Content-Length:
-      - '89'
+      - 3E3A4C1CED926A71_530FSID
+      Ncbi-Phid:
+      - 1D333619A494FFA500004FD80F826FEA.1.1.m_6
       Content-Type:
       - text/plain; charset=UTF-8
+      Cache-Control:
+      - private
+      X-Ratelimit-Limit:
+      - '3'
+      X-Ratelimit-Remaining:
+      - '2'
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - X-RateLimit-Limit,X-RateLimit-Remaining
       Set-Cookie:
-      - ncbi_sid=CB2AF495308C0544_6EDESID; domain=.nih.gov; path=/; expires=Wed, 14
-        Oct 2020 08:15:26 GMT
+      - ncbi_sid=3E3A4C1CED926A71_530FSID; domain=.nih.gov; path=/; expires=Tue, 01
+        Dec 2026 15:08:16 GMT
       X-Ua-Compatible:
       - IE=Edge
       X-Xss-Protection:
       - 1; mode=block
+      Transfer-Encoding:
+      - chunked
     body:
       encoding: ASCII-8BIT
-      string: |2
-
-        id: 40404040404 Error occurred: The following PMID is not available: 40404040404
-    http_version: 
-  recorded_at: Mon, 14 Oct 2019 08:15:26 GMT
-recorded_with: VCR 2.9.3
+      string: ''
+  recorded_at: Mon, 01 Dec 2025 15:08:16 GMT
+recorded_with: VCR 6.3.1

@@ -29,10 +29,12 @@
             <div class="col-sm-3">
               <span id="publication_type_info" style="display:none;"></span>
               <span id="publication_type_selection">
-              <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                                    {:selected => PublicationType.Journal.id},
-                                    {:class => 'form-control'}  -%>
-      </span>
+                <%= collection_select :publication, :publication_type_id,
+                      PublicationType.order(:title),
+                      :id, :title,
+                      { include_blank: "Please select a type ..." },
+                      { class: "form-control" } %>
+              </span>
             </div>
           </div>
         </div>
@@ -40,7 +42,14 @@
         <div class="form-group">
           <div class="row">
             <div class="col-sm-3 col-xs-5">
-              <%= select_tag("protocol", options_for_select([["PubMed ID","pubmed"],["DOI","doi"]]), :class => 'form-control') %>
+              <%=
+                if Seek::Config.pubmed_api_email.blank?
+                  options = [[["DOI","doi"],["PubMed ID (email needs configuring by an Admin)","pubmed"]], disabled: 'pubmed']
+                else
+                  options = [[["DOI","doi"],["PubMed ID","pubmed"]]]
+                end
+                select_tag("protocol", options_for_select(*options), :class => 'form-control')
+              %>
             </div>
             <div class="col-sm-9 col-xs-7">
               <%= text_field_tag("key", '', :class => 'form-control') %>
@@ -78,20 +87,29 @@
           <div class="col-sm-2">
             <span id="publication_type_info" style="display:none;"></span>
             <span id="publication_type_selection">
-        <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                              {:selected => PublicationType.Journal.id},
-                              {:class => 'form-control'} -%>
+            <%= collection_select :publication, :publication_type_id,
+                                  PublicationType.order(:title),
+                                  :id, :title,
+                                  { include_blank: "Please select a type ..." },
+                                  { class: "form-control" } %>
       </span>
           </div>
         </div>
         <div class="form-group">
-          <%= label_tag :pubmed_id, "Pubmed ID", :class => 'control-label col-sm-2' %>
-          <div class="col-sm-6">
-            <%= publication_form.text_field :pubmed_id, :class => 'form-control' %>
-          </div>
-          <div class=" col-sm-4">
-            <button id="retrieve_from_pubmed" class="btn btn-default">PUBMED</button>
-          </div>
+          <%= label_tag :pubmed_id, "PubMed ID", :class => 'control-label col-sm-2' %>
+          <% if Seek::Config.pubmed_api_email.blank?  %>
+            <div class="col-sm-6 alert alert-warning">
+              To use the PubMed ID lookup feature, an administrator must first configure an email address for the PubMed API.
+            </div>
+          <% else %>
+            <div class="col-sm-6">
+              <%= publication_form.text_field :pubmed_id, :class => 'form-control' %>
+            </div>
+            <div class=" col-sm-4">
+              <button id="retrieve_from_pubmed" class="btn btn-default">PUBMED</button>
+            </div>
+          <% end %>
+
         </div>
         <div class="form-group">
           <%= label_tag :doi, "DOI", :class => 'control-label col-sm-2' %>

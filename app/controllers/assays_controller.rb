@@ -19,6 +19,9 @@ class AssaysController < ApplicationController
   # => Rearrange positions
   after_action :rearrange_assay_positions_at_destroy, only: :destroy
 
+  # sets @set_isa_json_compliance if is isa-json compliant
+  # Needed to be able to set the correct study. Otherwise, they are filtered out.
+  before_action :set_isa_json_compliance, only: :manage
   after_action :propagate_permissions_to_children, only: :manage_update
 
   include Seek::Publishing::PublishingCommon
@@ -182,7 +185,9 @@ class AssaysController < ApplicationController
 
       current_assay_policy = assay.policy
       # Clone the policy from the parent assay
-      assay.update(policy: @assay.policy.deep_copy)
+      assay_policy = @assay.policy.deep_copy
+      assay.update(policy: assay_policy)
+      assay.sample_type.update(policy: assay_policy) unless assay.sample_type.nil?
       current_assay_policy.destroy if current_assay_policy
       update_sharing_policies assay
     end
@@ -210,6 +215,10 @@ class AssaysController < ApplicationController
 
   def rearrange_assay_positions_at_destroy
     rearrange_assay_positions(@assay.assay_stream)
+  end
+
+  def set_isa_json_compliance
+    @isa_json_compliant = @assay.is_isa_json_compliant? || false
   end
 
   def assay_params
