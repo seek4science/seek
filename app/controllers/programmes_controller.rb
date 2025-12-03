@@ -87,11 +87,11 @@ class ProgrammesController < ApplicationController
   end
 
   def show
-    respond_with do |format|
+    respond_to do |format|
       format.html
       format.json {render json: @programme, include: [params[:include]]}
       format.rdf { render template: 'rdf/show' }
-      format.jsonld { render json: @programme.to_schema_ld }
+      format.jsonld { render body: @programme.to_schema_ld }
     end
   end
 

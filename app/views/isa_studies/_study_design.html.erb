@@ -1,10 +1,10 @@
-<% study ||= nil %>
-<% valid_study = study&.sample_types.present? %>
 <%
-	source_table_action = displaying_single_page? ? "highlightTreeviewItem('source_table')" : "loadDynamicTableFromDefaultView('source_table')"
-	study_protocol_action = displaying_single_page? ? "highlightTreeviewItem('study_protocol')" : "loadDynamicTableFromDefaultView('study_protocol')"
-	study_samples_table_action = displaying_single_page? ? "highlightTreeviewItem('study_samples_table')" : "loadDynamicTableFromDefaultView('study_samples_table')"
-	study_experiment_overview_action = displaying_single_page? ? "highlightTreeviewItem('study_experiment_overview')" : "loadDynamicTableFromDefaultView('study_experiment_overview')"
+  study ||= nil
+  valid_study = study&.sample_types.present?
+  source_table_action = displaying_single_page? ? "highlightTreeviewItem('source_table')" : "loadDynamicTableFromDefaultView('source_table')"
+  study_protocol_action = displaying_single_page? ? "highlightTreeviewItem('study_protocol')" : "loadDynamicTableFromDefaultView('study_protocol')"
+  study_samples_table_action = displaying_single_page? ? "highlightTreeviewItem('study_samples_table')" : "loadDynamicTableFromDefaultView('study_samples_table')"
+  study_experiment_overview_action = displaying_single_page? ? "highlightTreeviewItem('study_experiment_overview')" : "loadDynamicTableFromDefaultView('study_experiment_overview')"
 %>
 
 <% if valid_study %>

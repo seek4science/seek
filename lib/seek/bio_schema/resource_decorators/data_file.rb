@@ -8,7 +8,7 @@ module Seek
         
         schema_mappings distribution: :distribution
 
-        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
+        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/1.0-RELEASE'.freeze
 
         def description
           description = resource.description&.truncate(4999)
@@ -19,6 +19,7 @@ module Seek
         def distribution
           return unless resource.content_blob
           return if resource.content_blob.show_as_external_link?
+
           blob = resource.content_blob
           data = {
             '@type': 'DataDownload',

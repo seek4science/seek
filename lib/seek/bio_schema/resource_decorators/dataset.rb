@@ -7,7 +7,7 @@ module Seek
         schema_mappings distribution: :distribution,
                         data_catalog: :includedInDataCatalog
 
-        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
+        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/1.0-RELEASE'.freeze
 
         def resource_url(r, opts = {})
           super(r.model, opts) # For some reason delegation doesn't work here, so have to call `model` explicitly.

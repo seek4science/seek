@@ -43,7 +43,7 @@ module Seek
             return false
           end
 
-          if creators.empty?
+          if (respond_to?(:assets_creators) ? assets_creators : creators).empty?
             errors.add(:base, "At least one creator is required. To add, go to Actions -> Manage #{self.class.model_name.human}.")
             return false
           end

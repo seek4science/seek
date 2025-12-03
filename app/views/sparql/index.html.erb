@@ -25,7 +25,7 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group">
           <%= form.label :format, "Output Format:", class: "control-label" %>
           <%= form.select :format,
@@ -34,10 +34,12 @@
                           { class: "form-control sparql-format-select" } %>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-8" id='sparql-buttons'>
         <div class="form-actions">
           <%= form.submit "Execute Query", class: "btn btn-primary" %>
-          <button type="button" class="btn btn-default" id="clear-query">Clear</button>
+          <button type="button" class="btn btn-default" id="clear-query">Clear query</button>
+          <button type="button" class="btn btn-default" id="clear-results">Clear results</button>
+          <button type="button" class="btn btn-default" id="copy-query-url" data-tooltip="Copy a URL that includes the query, to be used again in the future"><i class="glyphicon glyphicon-copy"></i> Copy query URL</button>
         </div>
       </div>
     </div>
@@ -51,7 +53,7 @@
   <% end %>
 
   <% if @results && @results.any? %>
-    <div class="sparql-results">
+    <div id="sparql-results">
 
       <%= panel(sparql_results_panel_title, class:'panel-success') do %>
         <%= render partial: "results", locals: { results: @results, format: @format } %>

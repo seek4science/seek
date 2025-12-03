@@ -16,6 +16,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   end
   def teardown
     return unless @repository.configured?
+
     q = @repository.query.delete(%i[s p o]).graph(@private_graph).where(%i[s p o])
     @repository.delete(q)
 
@@ -35,9 +36,24 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
       assert_select 'div#error_flash', count: 0
       assert_select 'div.sparql-interface' do
         assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
-          assert_select 'textarea.sparql-textarea'
+          assert_select 'textarea.sparql-textarea', text: ''
+          assert_select 'select#format option[selected=selected][value=?]', 'html'
         end
         assert_select 'div.sparql-examples div.panel'
+      end
+    end
+  end
+
+  test 'params populate the query and format' do
+    query = 'This is a sparql query'
+    format = 'json'
+    get sparql_index_path, params: { sparql_query: query, output_format: format }
+    assert_response :success
+    assert_select 'div#error_flash', count: 0
+    assert_select 'div.sparql-interface' do
+      assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
+        assert_select 'textarea.sparql-textarea', text: query
+        assert_select 'select#format option[selected=selected][value=?]', format
       end
     end
   end
@@ -87,7 +103,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'div#query-error', count: 0
 
-    assert_select 'div.sparql-results table' do
+    assert_select 'div#sparql-results table' do
       assert_select 'tbody tr', count: 1
       assert_select 'thead th', count: 2
       assert_select 'td', text: 'public data file', count: 1
@@ -159,9 +175,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
       post path, params: { sparql_query: query }
       assert_response :success
-      assert_select 'div.sparql-results table' do
+      assert_select 'div#sparql-results table' do
         assert_select 'tbody tr', count: 1
-        assert_select 'tbody td', text:'true', count: 1
+        assert_select 'tbody td', text: 'true', count: 1
         assert_select 'thead th', count: 1
         assert_select 'thead th', text:'Result', count: 1
       end
@@ -246,10 +262,10 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   private
 
   def create_some_triples
-    private_df = FactoryBot.create(:max_data_file, title:'private data file')
+    private_df = FactoryBot.create(:max_data_file, title: 'private data file')
     private_df.send_rdf_to_repository
 
-    public_df = FactoryBot.create(:max_data_file, title:'public data file', policy: FactoryBot.create(:public_policy))
+    public_df = FactoryBot.create(:max_data_file, title: 'public data file', policy: FactoryBot.create(:public_policy))
     public_df.send_rdf_to_repository
   end
 

@@ -86,9 +86,11 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 3, links.size
+
+    assert_equal 4, links.size
     assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :datacite_xml)
     assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :rdf)
+    assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :jsonld)
     assert_link(links, download_sop_url(sop, version: 1), rel: 'item', type: :pdf)
   end
 

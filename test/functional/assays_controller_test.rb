@@ -2273,18 +2273,30 @@ class AssaysControllerTest < ActionController::TestCase
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
       assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
 
-      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0)
+      sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, contributor: person)
+      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0, sample_type:)
 
       login_as(person)
       refute authorized_child_assay.can_manage?(other_person)
+      refute sample_type.can_manage?(other_person)
+
+      get :manage, params: { id: assay_stream }
+      # Manage page should show correct study ID
+      assert_select '#assay_study_id', value: study.id
+      # Manage page should show the checkbox
+      assert_select '#propagate_permissions', count: 1
+
       patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [other_person.id]}, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
 
       # assert that the permissions of the authorized assay were propagated
       # other_person should see the assay stream and the authorized assay
       assay_stream.reload
       assert assay_stream.can_manage?(other_person)
+      assert_equal assay_stream.study, study
       authorized_child_assay.reload
       assert authorized_child_assay.can_manage?(other_person)
+      sample_type.reload
+      assert sample_type.can_manage?(other_person)
     end
   end
 
@@ -2297,7 +2309,8 @@ class AssaysControllerTest < ActionController::TestCase
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
       assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
-      unauthorized_child_assay = FactoryBot.create(:assay, contributor: second_person, study:, assay_stream:, position: 0)
+      sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, contributor: second_person)
+      unauthorized_child_assay = FactoryBot.create(:assay, contributor: second_person, study:, assay_stream:, position: 0, sample_type:)
 
       login_as(person)
       patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [third_person.id]}, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: third_person.id, access_type: Policy::MANAGING}}}}
@@ -2312,6 +2325,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert assay_stream.can_manage?(third_person)
       unauthorized_child_assay.reload
       refute unauthorized_child_assay.can_manage?(third_person)
+      refute sample_type.can_manage?(third_person)
     end
   end
   
@@ -2322,8 +2336,9 @@ class AssaysControllerTest < ActionController::TestCase
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
       assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
-      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0)
-      
+      sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, contributor: person)
+      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0, sample_type:)
+
       login_as(person)
       refute authorized_child_assay.can_manage?(other_person)
       patch :manage_update, params: { id: assay_stream, assay: {creator_ids: [other_person.id] }, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
@@ -2334,6 +2349,7 @@ class AssaysControllerTest < ActionController::TestCase
       # other_person should not see the authorized assay
       authorized_child_assay.reload
       refute authorized_child_assay.can_manage?(other_person)
+      refute sample_type.can_manage?(other_person)
 
       patch :manage_update, params: { id: assay_stream, propagate_permissions: '0', assay: {creator_ids: [other_person.id] }, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
 
@@ -2343,8 +2359,20 @@ class AssaysControllerTest < ActionController::TestCase
       # other_person should not see the authorized assay
       authorized_child_assay.reload
       refute authorized_child_assay.can_manage?(other_person)
-
+      refute sample_type.can_manage?(other_person)
     end
+  end
+
+  test 'should not show assay stream permission propagation checkbox if assay stream has no child assays' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
+    assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
+    login_as(person)
+    get :manage, params: {id: assay_stream.id}
+    assert_select '#assay_study_id', value: study.id
+    assert_select '#propagate_permissions', count: 0
   end
 
   test 'can show and edit with deleted contributor' do
