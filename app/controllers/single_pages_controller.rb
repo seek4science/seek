@@ -63,30 +63,8 @@ class SinglePagesController < ApplicationController
 
     @sample_type = SampleType.find(sample_type_id)
     @template = Template.find(@sample_type.template_id)
-
-    sample_attributes = @sample_type.sample_attributes.map do |sa|
-      is_cv_list = sa.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
-      obj = if sa.sample_controlled_vocab_id.nil?
-              { sa_cv_title: sa.title, sa_cv_id: nil }
-            else
-              { sa_cv_title: sa.title, sa_cv_id: sa.sample_controlled_vocab_id, allows_custom_input: sa.allow_cv_free_text }
-            end
-      obj.merge({ required: sa.required, is_cv_list: })
-    end
-
-    @sa_cv_terms = [{ name: 'id', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil },
-                    { name: 'uuid', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil }]
-
-    sample_attributes.map do |sa|
-      if sa[:sa_cv_id].nil?
-        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: false, data: nil,
-                            allows_custom_input: nil, required: sa[:required], is_cv_list: nil })
-      else
-        sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: sa[:sa_cv_id]).map(&:label)
-        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: true, data: sa_terms,
-                            allows_custom_input: sa[:allows_custom_input], required: sa[:required], is_cv_list: sa[:is_cv_list] })
-      end
-    end
+    
+    spreadsheet_name = @sample_type.title&.concat(".xlsx")
 
     notice_message << '</ul>'
     flash[:notice] = notice_message.html_safe
