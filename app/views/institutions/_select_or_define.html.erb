@@ -17,7 +17,7 @@
     <br>
   </div>
   <div class="help-block">
-    Suggested <%= t('institution').pluralize.downcase %> are sourced from the local instance first, followed by the <%= link_to(image('ror_id', title: 'ROR',width: '30'), 'https://ror.org/', target: '_blank') %> service remotely.
+    Suggested <%= t('institution').pluralize.downcase %> are sourced from the local instance first, followed by the <%= link_to("#{image('ror_id', title: 'ROR', width: '30')} service".html_safe, 'https://ror.org/', target: '_blank') %> remotely.
     Whenever possible, select the <%= t('institution').downcase %> from the local list.
     If the desired <%= t('institution').downcase %> is not listed, continue typing its full name and select one from ROR.
   </div>
@@ -28,10 +28,11 @@
 </div>
 
 <div class="form-group">
-  <label class="control-label">ROR ID</label>    <%= link_to(image('ror_id', title: 'ROR'), 'https://ror.org/', target: '_blank') %>
+  <label class="control-label">ROR ID</label>    <%= link_to(image('ror_id', title: 'ROR', width: '30'), 'https://ror.org/', target: '_blank') %>
   <%= help_icon('The ROR ID (Research Organization Registry Identifier) is a unique 9-character alphanumeric code (e.g., 01f7bcy98).
-   To find out more and get your ORCID ID please visit https://ror.org/') -%>
+   To find out more and get your ROR ID please visit https://ror.org/') -%>
   <%= text_field_tag 'institution[ror_id]', @institution.ror_id, class: "form-control" %>
+  <%= render partial: 'institutions/ror_fetch_button' %>
 </div>
 
 <div class="form-group">

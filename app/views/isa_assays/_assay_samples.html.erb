@@ -73,7 +73,7 @@
         }
 
         function sampleExportExcel() {
-            exportToExcel("assay-samples-table", '<%=assay.study_id%>', '<%=assay.id%>', '<%=sample_type.id%>');
+            exportToExcel("assay-samples-table", <%= assay&.study_id %>, <%= assay&.id %>, <%= sample_type.id %>, <%= project&.id %>);
         }
 
         function assaySampleUploadExcel(){

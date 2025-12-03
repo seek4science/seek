@@ -69,6 +69,14 @@ module Seek
       end
     end
 
+    def self.schema_org_supported_types
+      cache('schema_org_supported_types') do
+        persistent_classes.select do |c|
+          c.schema_org_supported?
+        end
+      end.sort_by(&:name)
+    end
+
     def self.asset_types
       cache('asset_types') do
         persistent_classes.select(&:is_asset?).sort_by(&:name)

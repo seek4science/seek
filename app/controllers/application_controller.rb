@@ -247,6 +247,12 @@ class ApplicationController < ActionController::Base
         format.json { render json: { errors: [{ title: 'Forbidden',
                                                 details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
                              status: :forbidden }
+        format.jsonld { render json: { "@context": "https://schema.org",
+                                       "@type": "Error",
+                                       "name": "Forbidden",
+                                       "description": "You may not #{privilege} #{name}:#{params[:id]}",
+                                       "statusCode": 403 },
+                               status: :forbidden }
       end
       return false
     end

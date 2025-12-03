@@ -33,7 +33,6 @@ class RorClientTest < ActiveSupport::TestCase
   def test_fetch_by_id_with_vcr
     VCR.use_cassette('ror/fetch_by_id') do
       response = @client.fetch_by_id('03vek6s52')
-      puts response.inspect
 
       assert_equal '03vek6s52', response[:id]
       assert_equal 'Harvard University', response[:name]
