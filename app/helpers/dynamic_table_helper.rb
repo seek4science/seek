@@ -70,6 +70,7 @@ module DynamicTableHelper
                         registered_sop_attributes,
                         registered_data_file_attributes,
                         strain_attributes)
+
     registered_sample_multi_attributes.map(&:title).each do |rsma|
       json_metadata = transform_non_text_attributes_multi(json_metadata, rsma)
     end
@@ -92,19 +93,23 @@ module DynamicTableHelper
   end
 
   def transform_non_text_attributes_multi(json_metadata, multi_non_text_attribute_title)
-    unless multi_non_text_attribute_title.nil?
-      original_metadata = json_metadata[multi_non_text_attribute_title]
-      json_metadata[multi_non_text_attribute_title] = original_metadata.map do |obj|
-        hide_unauthorized_metadata(obj)
-      end
+    return json_metadata if multi_non_text_attribute_title.nil?
+    return json_metadata if json_metadata[multi_non_text_attribute_title].nil?
+
+    original_metadata = json_metadata[multi_non_text_attribute_title]
+    json_metadata[multi_non_text_attribute_title] = original_metadata.map do |obj|
+      hide_unauthorized_metadata(obj)
     end
+
     json_metadata
   end
 
   def transform_non_text_attributes_single(json_metadata, non_text_attribute_title)
-    unless non_text_attribute_title.nil?
-      json_metadata[non_text_attribute_title] = hide_unauthorized_metadata(json_metadata[non_text_attribute_title])
-    end
+    return json_metadata if non_text_attribute_title.nil?
+    return json_metadata if json_metadata[non_text_attribute_title].nil?
+
+    json_metadata[non_text_attribute_title] = hide_unauthorized_metadata(json_metadata[non_text_attribute_title])
+    
     json_metadata
   end
 
