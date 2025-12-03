@@ -25,6 +25,9 @@
       <%= render :partial => 'layouts/navbar/search_bar' if Seek::Config.solr_enabled %>
 
       <ul class="nav navbar-nav navbar-right">
+        <% if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured? %>
+          <li><%= link_to 'SPARQL', sparql_index_path %></li>
+        <% end %>
         <%= render :partial => "layouts/navbar/about_menu"%>
         <%= render :partial => "layouts/navbar/help_menu" if Seek::Config.documentation_enabled %>
         <% if logged_in_and_registered? %>

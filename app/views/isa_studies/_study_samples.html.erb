@@ -70,7 +70,7 @@
         }
 
         function sampleExportExcel() {
-            exportToExcel("study-samples-table", '<%=study.id%>', null, '<%=sample_type.id%>');
+            exportToExcel("study-samples-table", <%= study&.id %>, null, <%= sample_type.id %>, <%= project&.id %>);
         }
 
         function studySampleUploadExcel(){

@@ -14,9 +14,12 @@ namespace :seek do
     db:seed:014_data_types_controlled_vocab
     db:seed:003_model_formats
     db:seed:004_model_recommended_environments
+    db:seed:004_model_types
+    db:seed:005_publication_types
     update_rdf
     update_morpheus_model
     db:seed:018_discipline_vocab
+    strip_publication_abstracts
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -95,6 +98,21 @@ namespace :seek do
       puts "The following errors were encountered during the update:"
       errors.each { |error| puts error }
     end
+  end
+
+  task(strip_publication_abstracts: [:environment]) do
+    puts 'Stripping publication abstracts...'
+    updated_count = 0
+    Publication.select(:id, :abstract).find_each do |publication|
+      if publication.abstract.present?
+        stripped = publication.abstract.strip
+        if stripped.length != publication.abstract.length
+          publication.update_column(:abstract, stripped)
+          updated_count += 1
+        end
+      end
+    end
+    puts "... updated #{updated_count} publications"
   end
 
   private

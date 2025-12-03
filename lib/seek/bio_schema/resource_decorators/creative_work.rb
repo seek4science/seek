@@ -16,7 +16,12 @@ module Seek
                         content_type: :encodingFormat,
                         subject_of: :subjectOf,
                         part_of: :isPartOf,
-			 previous_version_url: :isBasedOn	
+                        doi: :identifier,
+                        previous_version_url: :isBasedOn
+
+        def doi
+          "https://doi.org/#{resource.doi}" if resource.try(:doi).present?
+        end
 
         def content_type
           return unless resource.respond_to?(:content_blob) && resource.content_blob

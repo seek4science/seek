@@ -9,9 +9,6 @@ module Seek
           'DigitalDocument'
         end
 
-        def conformance
-          'https://schema.org/DigitalDocument'
-        end
       end
     end
   end

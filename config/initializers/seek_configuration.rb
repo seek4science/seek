@@ -77,6 +77,7 @@ def load_seek_config_defaults!
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
   Seek::Config.default :recommended_data_licenses,  ['CC-BY-4.0', 'CC0-1.0', 'CC-BY-NC-4.0', 'CC-BY-SA-4.0', 'ODC-BY-1.0']
   Seek::Config.default :recommended_software_licenses, ['Apache-2.0','GPL-3.0','MIT','BSD-2-Clause','BSD-3-Clause','LGPL-2.1']
+  Seek::Config.default :standard_login_enabled, true
 
   # Types
   Seek::Config.default :documents_enabled,true
@@ -166,8 +167,7 @@ def load_seek_config_defaults!
   Seek::Config.default :type_managers,'admins'
   Seek::Config.default :tag_threshold,1
   Seek::Config.default :max_visible_tags,20
-  Seek::Config.default :pubmed_api_email,nil
-  Seek::Config.default :crossref_api_email,nil
+  Seek::Config.default :pubmed_api_email, nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour

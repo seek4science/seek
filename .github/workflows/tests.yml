@@ -29,7 +29,7 @@ jobs:
           - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       virtuoso:
-        image: openlink/virtuoso-opensource-7
+        image: openlink/virtuoso-opensource-7:7.2.15
         env:
           DBA_PASSWORD: tester
           SPARQL_UPDATE: true
@@ -63,9 +63,9 @@ jobs:
           sudo apt install -y libmagick++-dev graphviz libcurl4-gnutls-dev libreoffice poppler-utils build-essential \
             git imagemagick libgmp-dev python3.9-dev python3.9-distutils python3-pip
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '11' # The JDK version to make available on the path.

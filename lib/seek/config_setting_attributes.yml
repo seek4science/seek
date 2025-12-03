@@ -15,7 +15,6 @@ instance_link:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:
-crossref_api_email:
 site_base_host:
 copyright_addendum_enabled:
 copyright_addendum_content:
@@ -219,6 +218,8 @@ workflows_enabled:
 collections_enabled:
 file_templates_enabled:
 placeholders_enabled:
+# Standard login panel
+standard_login_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:

@@ -75,6 +75,7 @@ class AdminController < ApplicationController
     end
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
+    Seek::Config.standard_login_enabled = string_to_boolean params[:standard_login_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
     Seek::Config.omniauth_ldap_enabled = string_to_boolean params[:omniauth_ldap_enabled]
@@ -315,12 +316,9 @@ class AdminController < ApplicationController
     # check valid email
     pubmed_email = params[:pubmed_api_email]
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
-    crossref_email = params[:crossref_api_email]
-    crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
     Seek::Config.allow_publications_fulltext = string_to_boolean params[:allow_publications_fulltext]
     Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
-    Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
     if params[:session_store_timeout]
       mins = params[:session_store_timeout].to_i
@@ -356,7 +354,7 @@ class AdminController < ApplicationController
     Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
     Seek::Config.sandbox_instance_url = params[:sandbox_instance_url]
     Seek::Config.sandbox_instance_name = params[:sandbox_instance_name]
-    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
+    update_flag = (pubmed_email == '' || pubmed_email_valid)
     update_redirect_to update_flag, 'settings'
   end
 

@@ -1,6 +1,7 @@
 class Sop < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
+  include Seek::BioSchema::Support
 
   has_and_belongs_to_many :direct_studies, class_name: 'Study'
 

@@ -1,5 +1,3 @@
-require 'doi/record'
-
 module PublicationsHelper
   def author_to_person_options(selected_id, suggestion)
     projects = Project.includes(:people)
@@ -14,13 +12,14 @@ module PublicationsHelper
   end
 
   def publication_registered_mode(mode)
-    if mode == Publication::REGISTRATION_BY_PUBMED
+    case mode
+    when Publication::REGISTRATION_BY_PUBMED
       'by PubMed ID'
-    elsif mode == Publication::REGISTRATION_BY_DOI
+    when Publication::REGISTRATION_BY_DOI
       'by DOI'
-    elsif mode == Publication::REGISTRATION_MANUALLY
+    when Publication::REGISTRATION_MANUALLY
       'manually'
-    elsif mode == Publication::REGISTRATION_FROM_BIBTEX
+    when Publication::REGISTRATION_FROM_BIBTEX
       'imported from a bibtex file'
     else
       `unknown`
@@ -58,6 +57,7 @@ module PublicationsHelper
       typeahead: typeahead,
       limit: limit,
       allow_new: allow_new,
+      token_separators: [','],
       class: 'form-control',
       'data-role': 'seek-objectsinput'
     }

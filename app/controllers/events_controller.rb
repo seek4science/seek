@@ -18,6 +18,7 @@ class EventsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.json {render json: @event, include: [params[:include]]}
+      format.jsonld { render body: @event.to_schema_ld }
     end
   end
 
