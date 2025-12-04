@@ -286,6 +286,8 @@ def load_seek_config_defaults!
     }
   ]
 
+  Seek::Config.default :reindex_all_batch_size, 50
+
   load_seek_testing_defaults! if Rails.env.test?
 end
 
