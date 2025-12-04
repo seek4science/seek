@@ -46,17 +46,17 @@ module Seek
 
     # is an Excel file capable of being extacted from
     def is_extractable_excel?(blob = self)
-      blob.file_exists? && is_excel?(blob) && within_excel_extraction_size_limit?(blob)
+      (blob.file_exists? || blob.is_stored_remotely?) && is_excel?(blob) && within_excel_extraction_size_limit?(blob)
     end
 
-    # is any spreadsheet format, including csv and tsv, that can be extracted from
+    # is any extractable spreadsheet format, including remote stored files
     def is_extractable_spreadsheet?(blob = self)
-      blob.file_exists? && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
+      (blob.file_exists? || blob.is_stored_remotely?) && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
     end
     
     # is any zipped format, that can be extracted from
     def is_unzippable_datafile?(blob = self)
-      blob.file_exists? && (is_zip?(blob)|| is_tar?(blob) || is_tgz?(blob) || is_tbz2?(blob) || is_7zip?(blob) || is_txz?(blob))
+      (blob.file_exists? || blob.is_stored_remotely?) && (is_zip?(blob) || is_tar?(blob) || is_tgz?(blob) || is_tbz2?(blob) || is_7zip?(blob) || is_txz?(blob))
     end
 
     def is_in_simulatable_size_limit?(blob = self)
