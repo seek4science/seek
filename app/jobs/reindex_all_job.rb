@@ -14,7 +14,7 @@ class ReindexAllJob < ApplicationJob
   end
 
   def batch_size
-    Seek::Config.reindex_all_batch_size || 50
+    Seek::Config.reindex_all_batch_size
   end
 
 end

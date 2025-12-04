@@ -17,7 +17,7 @@ class ReindexAllJobTest < ActiveSupport::TestCase
       assert_equal 5, job.batch_size
     end
     with_config_value(:reindex_all_batch_size, nil) do
-      assert_equal 50, job.batch_size
+      assert_nil job.batch_size
     end
   end
 
