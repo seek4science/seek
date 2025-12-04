@@ -81,8 +81,15 @@ module Seek
       spreadsheet_to_csv(filepath, sheet, trim, Seek::Config.jvm_memory_allocation)
     end
 
-    def extract_csv()
-      File.read(filepath)
+    def extract_csv
+      # Use Shrine storage if available
+      if respond_to?(:file_attacher) && file_attacher&.attached?
+        return file_attacher.file.open { |io| io.read }
+      end
+
+      # Legacy fallback
+      raise "Content blob file missing" if filepath.blank? || !File.exist?(filepath)
+      File.read(filepath, mode: "rb")
     end
 
     def to_spreadsheet_xml
