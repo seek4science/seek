@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class RecommendedModelEnvironmentTest < ActiveSupport::TestCase
-  fixtures :recommended_model_environments
 
   test 'validation' do
     existing = recommended_model_environments(:jws)

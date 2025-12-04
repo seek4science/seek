@@ -2,8 +2,6 @@ require 'test_helper'
 
 class EmtExtractorTest < ActiveSupport::TestCase
 
-  fixtures :sample_attribute_types
-
   test 'creates extended metadata type with simple attributes from valid json file' do
 
     emt_file = fixture_file_upload('extended_metadata_type/valid_simple_emt.json', 'application/json')

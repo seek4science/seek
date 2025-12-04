@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
-  fixtures :users, :people, :roles
 
   def test_work_groups
     p = FactoryBot.create(:person_in_multiple_projects)

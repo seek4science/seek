@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class TechnologyTypesControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 

@@ -10,7 +10,6 @@ class SessionsControllerTest < ActionController::TestCase
   # Then, you can remove it from this and the units test.
   include AuthenticatedTestHelper
 
-  fixtures :users, :people
 
   test 'sessions#index redirects to session#new' do
     get :index

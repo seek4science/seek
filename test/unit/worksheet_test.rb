@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class WorksheetTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'create worksheet' do
     ws = Worksheet.new(content_blob: content_blobs(:unique_spreadsheet_blob), last_row: 20, last_column: 20)

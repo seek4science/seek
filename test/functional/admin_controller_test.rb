@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class AdminControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 
