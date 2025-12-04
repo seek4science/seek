@@ -81,7 +81,6 @@ class PublicationTest < ActiveSupport::TestCase
     end
   end
 
-
   test 'create publication from metadata pubmed' do
     publication_hash = {
         'title'   => 'SEEK publication\\r', # test required? chomp
@@ -211,23 +210,28 @@ class PublicationTest < ActiveSupport::TestCase
 
   test 'publication date from pubmed' do
     mock_pubmed(content_file: 'pubmed_21533085.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(21533085).first).reference
-    assert_equal '2011-04-20', result.published_date.to_s
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(21533085).first).reference
 
-    mock_pubmed(content_file: 'pubmed_1.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1).first).reference
-    assert_equal '1975-06-01', result.published_date.to_s
+      assert_equal '2011-04-20', result.published_date.to_s
 
-    mock_pubmed(content_file: 'pubmed_20533085.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(20533085).first).reference
-    assert_equal '2010-06-10', result.published_date.to_s
-    assert_nil result.error
+      mock_pubmed(content_file: 'pubmed_1.txt')
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(1).first).reference
+      assert_equal '1975-06-01', result.published_date.to_s
+
+      mock_pubmed(content_file: 'pubmed_20533085.txt')
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(20533085).first).reference
+      assert_equal '2010-06-10', result.published_date.to_s
+      assert_nil result.error
+    end
   end
 
   test 'unknown pubmed_id' do
     mock_pubmed(content_file: 'pubmed_not_found.txt')
-    result = Bio::MEDLINE.new(Bio::PubMed.efetch(1111111111111).first).reference
-    assert_equal 'No publication could be found on PubMed with that ID', result.error
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      result = Bio::MEDLINE.new(Bio::PubMed.efetch(1111111111111).first).reference
+      assert_equal 'No publication could be found on PubMed with that ID', result.error
+    end
   end
 
   test 'book chapter doi' do
@@ -538,5 +542,50 @@ class PublicationTest < ActiveSupport::TestCase
 
     assert_includes publication.related_models, assay_model
     assert_includes publication.related_models, model
+  end
+
+  test 'strips leading and trailing whitespace from abstract on save' do
+    publication = FactoryBot.build(:publication, abstract:
+      "  \n  This is an abstract with leading and trailing whitespace  \n  ")
+
+    User.with_current_user(publication.contributor) do
+      publication.save!
+    end
+
+    assert_equal 'This is an abstract with leading and trailing whitespace', publication.abstract
+  end
+
+  test 'handles nil abstract gracefully' do
+    publication = FactoryBot.build(:publication, abstract: nil)
+
+    User.with_current_user(publication.contributor) do
+      publication.save!
+    end
+
+    assert_nil publication.abstract
+  end
+
+  test 'strips whitespace from abstract when extracted from pubmed' do
+    publication_hash = {
+      'title' => 'SEEK publication',
+      'abstract' => "    An investigation into blalblabla  \n  ",
+      'journal' => 'The testing journal',
+      'pubmed' => '12345',
+      'doi' => nil
+    }
+    bio_reference = Bio::Reference.new(publication_hash)
+    publication = Publication.new(
+      title: 'Test',
+      projects: [FactoryBot.create(:project)],
+      publication_type: FactoryBot.create(:journal)
+    )
+
+    publication.extract_pubmed_metadata(bio_reference)
+
+    User.with_current_user(FactoryBot.create(:person).user) do
+      publication.save!
+    end
+
+    assert_equal 'An investigation into blalblabla', publication.abstract
   end
 end

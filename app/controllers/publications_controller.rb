@@ -156,8 +156,8 @@ class PublicationsController < ApplicationController
       pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
       result = get_data(@publication, pubmed_id, doi)
     end
-    @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
-    if !@error.nil?
+    @error = @publication.errors.full_messages.join('<br>') if @publication.errors.any?
+    if @error.present?
       @error_text = @error
       respond_to do |format|
         format.js { render status: 500 }

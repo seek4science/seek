@@ -25,7 +25,6 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
         assert_equal result.authors.first.full_name, 'Xiaoming Hu'
         assert_equal result.authors.size, 7
         assert_equal result.url, 'https://zenodo.org/doi/10.5281/zenodo.16736322'
-        puts result.citation.inspect
       end
   end
 

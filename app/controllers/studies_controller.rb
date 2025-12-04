@@ -16,6 +16,8 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_for_this_study, only: %i[update]
 
+  before_action :set_isa_json_compliance, only: :manage
+
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
   include Seek::ISAGraphExtensions
@@ -358,6 +360,11 @@ class StudiesController < ApplicationController
   end
 
   private
+
+  def set_isa_json_compliance
+    @isa_json_compliant = @study.is_isa_json_compliant?
+  end
+
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { publication_ids: [] },

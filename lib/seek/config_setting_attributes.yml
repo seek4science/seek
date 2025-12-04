@@ -15,7 +15,6 @@ instance_link:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:
-crossref_api_email:
 site_base_host:
 copyright_addendum_enabled:
 copyright_addendum_content:

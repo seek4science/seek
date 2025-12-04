@@ -62,13 +62,17 @@ class SinglePagesController < ApplicationController
     raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
     @sample_type = SampleType.find(sample_type_id)
+    raise "Could not retrieve #{assay_id.nil? ? 'Study' : 'Assay'} Sample Type! Do you have at least viewing permissions?" unless @sample_type.can_view?
+
     @template = Template.find(@sample_type.template_id)
     
     spreadsheet_name = @sample_type.title&.concat(".xlsx")
 
+    spreadsheet_name = @sample_type.title&.concat(".xlsx")
+
     notice_message << '</ul>'
     flash[:notice] = notice_message.html_safe
-    render xlsx: 'download_samples_excel', filename: 'samples_table.xlsx', disposition: 'inline'
+    render xlsx: 'download_samples_excel', filename: spreadsheet_name, disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
