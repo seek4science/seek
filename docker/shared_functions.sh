@@ -8,7 +8,7 @@ function wait_for_mysql {
 }
 
 function wait_for_database {
-    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null
+    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
     do
             echo "WAITING FOR DATABASE"
             sleep 2
