@@ -610,9 +610,12 @@ class AdminController < ApplicationController
     return array.slice(0,index) + array.slice(index+1,array.length)
   end
 
-  # this destroys any failed Delayed::Jobs
+  # this destroys any failed jobs
   def clear_failed_jobs
-    Delayed::Job.where('failed_at IS NOT NULL').destroy_all
+    # Clear Sidekiq dead jobs
+    require 'sidekiq/api'
+    Sidekiq::DeadSet.new.clear
+    Sidekiq::RetrySet.new.clear
     respond_to do |format|
       format.json { head :ok }
     end

@@ -30,13 +30,13 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'non admin cannot restart the delayed job' do
+  test 'non admin cannot restart the background job workers' do
     login_as(FactoryBot.create(:user))
     post :restart_delayed_job
     refute_nil flash[:error]
   end
 
-  test 'admin can restart the delayed job' do
+  test 'admin can restart the background job workers' do
     post :restart_delayed_job
     assert_nil flash[:error]
   end
