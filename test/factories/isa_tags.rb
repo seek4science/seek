@@ -49,6 +49,10 @@ FactoryBot.define do
     title { "parameter_value" }
   end
 
+  factory(:default_isa_tag, class: ISATag) do
+    title { "input" }
+  end
+
   # default ISA tag
   factory(:default_isa_tag, class: ISATag) do
     title { "default isa-tag" }
