@@ -134,7 +134,11 @@ class ContentBlob < ApplicationRecord
   end
 
   def file_exists?(format = 'dat')
-    File.exist?(filepath(format))
+    if format == 'dat'
+      stored_in_shrine?
+    else
+      File.exist?(filepath(format))
+    end
   end
 
   def storage_filename(format = 'dat', uuid_to_use = nil)
@@ -270,6 +274,10 @@ class ContentBlob < ApplicationRecord
 
   def remote_headers
     @headers ||= (remote_content_handler.info rescue {})
+  end
+
+  def stored_in_shrine?
+    respond_to?(:file_attacher) && file_attacher&.attached?
   end
 
   def dump_data_object_to_file
