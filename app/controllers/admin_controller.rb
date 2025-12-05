@@ -1,5 +1,3 @@
-require 'delayed/command'
-
 class AdminController < ApplicationController
   include CommonSweepers
 
@@ -381,9 +379,8 @@ class AdminController < ApplicationController
   # give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
   def wait_for_delayed_job_to_start
     sleep(0.5)
-    pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids", 'delayed_job.0')
     count = 0
-    while !pid.running? && (count < 10)
+    while !Seek::Workers.running? && (count < 10)
       sleep(0.5)
       count += 1
     end

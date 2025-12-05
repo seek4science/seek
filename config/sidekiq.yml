@@ -1,0 +1,14 @@
+---
+:concurrency: 5
+:max_retries: 0
+:timeout: 86400
+
+:queues:
+  - default
+  - mailers
+  - authlookup
+  - remotecontent
+  - samples
+  - indexing
+  - templates
+  - datafiles
