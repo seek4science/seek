@@ -33,7 +33,6 @@ class ContentBlob < ApplicationRecord
   # an Exception is raised if both are defined
   before_save :dump_data_to_file
   before_save :check_version
-  before_save :calculate_file_size
   after_create :create_retrieval_job
   before_save :clear_sample_type_matches
   after_destroy :delete_converted_files
@@ -308,14 +307,6 @@ class ContentBlob < ApplicationRecord
       end
     end
     @tmp_io_object = nil
-  end
-
-  def calculate_file_size
-    self.file_size = if file_exists?
-                       File.size(filepath)
-                     elsif url
-                       remote_headers[:file_size]
-                     end
   end
 
   def create_retrieval_job
