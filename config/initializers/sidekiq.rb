@@ -23,7 +23,8 @@ Sidekiq.default_job_options = {
 }
 
 # Map queue names to priorities
-# Higher weight = higher priority
+# All queues have equal weight (2) as jobs are prioritized by the queue they're placed in
+# rather than by priority weighting within Sidekiq
 Sidekiq.options[:queues] = [
   ['default', 2],
   ['mailers', 2],

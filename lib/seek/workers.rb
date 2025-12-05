@@ -29,7 +29,7 @@ module Seek
 
     def self.stop
       if File.exist?(SIDEKIQ_PID_FILE)
-        pid = File.read(SIDEKIQ_PID_FILE).to_i
+        pid = read_pid
         begin
           Process.kill('TERM', pid)
           # Wait for graceful shutdown
@@ -62,7 +62,7 @@ module Seek
 
     def self.running?
       if File.exist?(SIDEKIQ_PID_FILE)
-        pid = File.read(SIDEKIQ_PID_FILE).to_i
+        pid = read_pid
         process_running?(pid)
       else
         false
@@ -72,12 +72,18 @@ module Seek
     def self.process_running?(pid)
       Process.kill(0, pid)
       true
-    rescue Errno::ESRCH, Errno::EPERM
+    rescue Errno::ESRCH, Errno::EPERM, Errno::EINVAL
       false
     end
 
     def self.pids
-      running? ? [File.read(SIDEKIQ_PID_FILE).to_i] : []
+      running? ? [read_pid] : []
+    end
+
+    private
+
+    def self.read_pid
+      File.read(SIDEKIQ_PID_FILE).to_i
     end
   end
 end
