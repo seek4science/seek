@@ -23,7 +23,9 @@ class CitationStyleTest < ActionDispatch::IntegrationTest
 
     new_style = 'journal-of-infectious-diseases'
 
+    assert_nil session[:citation_style]
     get citation_path(@doi, style: new_style, format: :js), xhr: true
+    assert_equal new_style, session[:citation_style]
 
     get model_path(@model)
     assert_select '#citation' do
@@ -33,6 +35,12 @@ class CitationStyleTest < ActionDispatch::IntegrationTest
     assert_select '#citation-style-select' do
       assert_select "option[selected='selected'][value=?]", new_style
     end
+  end
+
+  test 'does not remember style if invalid style chosen' do
+    assert_nil session[:citation_style]
+    get citation_path(@doi, style: 'ghdfgkhdfjkghdkj', format: :js), xhr: true
+    assert_nil session[:citation_style]
   end
 
   test 'handles invalid style selection' do

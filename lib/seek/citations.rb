@@ -29,9 +29,7 @@ module Seek
     end
 
     def self.valid_styles
-      Rails.cache.fetch("citation-styles-set") do
-        Set.new(style_pairs.map(&:last))
-      end
+      @valid_styles ||= Set.new(style_pairs.map(&:last))
     end
 
     def self.doi_to_csl(doi)
@@ -56,10 +54,14 @@ module Seek
       Rails.root.join('config/default_data/csl_styles.yml')
     end
 
+    def self.valid_style?(style)
+      valid_styles.include?(style)
+    end
+
     private
 
     def self.validate_style(style)
-      raise Seek::Citations::InvalidStyleException unless valid_styles.include?(style)
+      raise Seek::Citations::InvalidStyleException unless valid_style?(style)
     end
   end
 end
