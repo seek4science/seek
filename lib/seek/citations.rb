@@ -4,14 +4,16 @@ require 'uri'
 
 module Seek
   class Citations
-    DEFAULT = 'apa' # This could be a setting one day
-
     def self.from_doi(doi, style)
-      generate(doi_to_csl(doi), style)
+      validate_style(style)
+      csl = doi_to_csl(doi)
+      generate(csl, style)
     end
 
     def self.from_cff(blob, style)
-      generate(cff_to_csl(blob), style)
+      validate_style(style)
+      csl = cff_to_csl(blob)
+      generate(csl, style)
     end
 
     def self.generate(csl, style)
@@ -23,6 +25,12 @@ module Seek
     def self.style_pairs
       Rails.cache.fetch("citation-style-pairs") do
         YAML.load(File.open(style_dictionary_path))
+      end
+    end
+
+    def self.valid_styles
+      Rails.cache.fetch("citation-styles-set") do
+        Set.new(style_pairs.map(&:last))
       end
     end
 
@@ -46,6 +54,12 @@ module Seek
 
     def self.style_dictionary_path
       Rails.root.join('config/default_data/csl_styles.yml')
+    end
+
+    private
+
+    def self.validate_style(style)
+      raise Seek::Citations::InvalidStyleException unless valid_styles.include?(style)
     end
   end
 end

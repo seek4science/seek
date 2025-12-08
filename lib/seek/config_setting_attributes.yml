@@ -278,3 +278,4 @@ max_filters:
   convert: :to_i
 reindex_all_batch_size:
   convert: :to_i
+default_citation_style:

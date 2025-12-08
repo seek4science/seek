@@ -15,10 +15,10 @@ class CitationStyleTest < ActionDispatch::IntegrationTest
     get model_path(@model)
     # APA by default
     assert_select '#citation' do
-      assert_select 'div[data-citation-style=?]', Seek::Citations::DEFAULT, text: /Bacall, F/, count: 1
+      assert_select 'div[data-citation-style=?]', Seek::Config.default_citation_style, text: /Bacall, F/, count: 1
     end
     assert_select '#citation-style-select' do
-      assert_select "option[selected='selected'][value=?]", Seek::Citations::DEFAULT
+      assert_select "option[selected='selected'][value=?]", Seek::Config.default_citation_style
     end
 
     new_style = 'journal-of-infectious-diseases'
@@ -27,12 +27,30 @@ class CitationStyleTest < ActionDispatch::IntegrationTest
 
     get model_path(@model)
     assert_select '#citation' do
-      assert_select 'div[data-citation-style=?]', Seek::Citations::DEFAULT, count: 0
+      assert_select 'div[data-citation-style=?]', Seek::Config.default_citation_style, count: 0
       assert_select 'div[data-citation-style=?]', new_style, text: /Bacall F/, count: 1
     end
     assert_select '#citation-style-select' do
       assert_select "option[selected='selected'][value=?]", new_style
     end
+  end
+
+  test 'handles invalid style selection' do
+    doi_citation_mock
+
+    get citation_path(@doi, style: 'fjkgdfhgkjdf123', format: :js), xhr: true
+
+    assert_includes response.body, 'Invalid citation style'
+  end
+
+  test 'handles CSL fetch error' do
+    stub_request(:get, /(https?:\/\/)?(dx\.)?doi\.org\/.+/)
+      .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+      .to_return(body: 'Error!', status: 500)
+
+    get citation_path(@doi, style: 'apa', format: :js), xhr: true
+
+    assert_includes response.body, 'An error occurred whilst fetching the citation'
   end
 
   private
