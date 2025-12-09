@@ -1,0 +1,2 @@
+class ISATagsController < ApplicationController
+end
