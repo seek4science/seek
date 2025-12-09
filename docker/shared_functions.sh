@@ -36,7 +36,7 @@ function check_mysql {
 
         wait_for_mysql
 
-        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null
+        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
         then
             echo "SETTING UP MYSQL DB"
             bundle exec rake db:setup
