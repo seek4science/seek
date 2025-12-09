@@ -352,3 +352,7 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   tooltips:
     batch_permission_changes_button: "You can change the sharing policy and permissions for your items as a batch. A preview of selected items will be given before you choose new permissions for them."
     publish_your_items_button: "Publish your owned items as a batch. A preview will be given before publishing"
+  citations:
+    errors:
+      general: An error occurred whilst fetching the citation
+      invalid_style: Invalid citation style
