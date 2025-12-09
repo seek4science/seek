@@ -67,7 +67,7 @@ module Legacy
       login_required
     end
 
-    def legacy_handle_ro_crate_post(new_version = false)
+    def legacy_handle_ro_crate_api_post(new_version = false)
       @workflow = Workflow.new unless new_version
       extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
 
