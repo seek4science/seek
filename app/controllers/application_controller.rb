@@ -431,7 +431,7 @@ class ApplicationController < ActionController::Base
   def object_for_request
     ctl_name = controller_name.singularize
     var = instance_variable_get("@#{ctl_name}")
-    ctl_name.include?('isa') ? var.send(ctl_name.sub('isa_', '')) : var
+    (["isa_assays", "isa_studies"].any? { |isa| ctl_name.include?(isa) }) ? var.send(ctl_name.sub('isa_', '')) : var
   end
 
   def expire_activity_fragment_cache(controller, action)
