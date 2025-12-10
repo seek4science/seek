@@ -8,7 +8,6 @@ on:
       - rails-7-hacking-rebased
       - full-test-suite
       - seek-1.17
-      - small-tweaks-docker
 
   pull_request:
 
