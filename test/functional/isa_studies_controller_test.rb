@@ -4,11 +4,9 @@ class ISAStudiesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include ISATagsTestHelper
 
   def setup
     login_as FactoryBot.create(:admin).user
-    create_all_isa_tags
   end
 
   test 'should get new' do

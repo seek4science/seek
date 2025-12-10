@@ -3,11 +3,11 @@ require 'test_helper'
 
 class ISATagsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
+  fixtures :isa_tags
 
   def setup
     @authenticated_user = FactoryBot.create(:person)
     Seek::Config.isa_json_compliance_enabled = true
-    [:source_isa_tag, :sample_isa_tag].each { |f| FactoryBot.create(f) }
   end
 
   def teardown
@@ -20,7 +20,7 @@ class ISATagsControllerTest < ActionController::TestCase
     get :index, as: :json
     assert_response :success
     response_body = JSON.parse(response.body)
-    assert_equal response_body["data"].count, 2
+    assert_equal response_body["data"].count, 10
   end
 
   test 'should not return ISA tags if not logged in' do

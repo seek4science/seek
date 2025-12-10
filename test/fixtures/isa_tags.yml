@@ -1,0 +1,30 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+source_isa_tag:
+  title: source
+
+sample_isa_tag:
+  title: sample
+
+protocol_isa_tag:
+  title: protocol
+
+source_characteristic_isa_tag:
+  title: source_characteristic
+
+sample_characteristic_isa_tag:
+  title: sample_characteristic
+
+other_material_isa_tag:
+  title: other_material
+
+other_material_characteristic_isa_tag:
+  title: other_material_characteristic
+
+data_file_isa_tag:
+  title: data_file
+
+data_file_comment_isa_tag:
+  title: data_file_comment
+
+parameter_value_isa_tag:
+  title: parameter_value
