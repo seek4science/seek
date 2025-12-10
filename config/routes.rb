@@ -851,6 +851,10 @@ SEEK::Application.routes.draw do
     end
   end
 
+  ### ISA Tags ###
+
+  resources :isa_tags, only: [:index, :show]
+
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search
   get '/search/save' => 'search#save', as: :save_search
