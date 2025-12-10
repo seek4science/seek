@@ -28,7 +28,5 @@ jobs:
       - name: Build and run the Docker containers
         run: docker compose --file docker-compose.yml --file docker-compose.build.yml up --build --detach --wait
         continue-on-error: true
-      - name: Wait for workers to start
-        run: sleep 120
       - name: Check app status
         run: ruby script/check_deployment.rb
