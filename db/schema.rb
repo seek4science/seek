@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_10_090925) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -2001,6 +2001,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "license"
     t.string "deleted_contributor"
     t.string "external_identifier", limit: 2048
+    t.string "sop_type"
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
