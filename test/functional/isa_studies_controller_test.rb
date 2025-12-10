@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class ISAStudiesControllerTest < ActionController::TestCase
-  fixtures :all
-
   include AuthenticatedTestHelper
 
   def setup

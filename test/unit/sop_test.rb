@@ -2,7 +2,6 @@ require 'test_helper'
 
 class SopTest < ActiveSupport::TestCase
 
-  fixtures :all
 
   def setup
     @person = FactoryBot.create(:person)

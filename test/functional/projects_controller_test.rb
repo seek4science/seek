@@ -9,7 +9,6 @@ class ProjectsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include MockHelper
 
-  fixtures :all
 
   def setup
     login_as(FactoryBot.create(:admin))

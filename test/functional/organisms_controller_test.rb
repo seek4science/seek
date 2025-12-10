@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class OrganismsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include RdfTestCases

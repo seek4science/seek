@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class DataciteMetadataTest < ActiveSupport::TestCase
-  fixtures :investigations
 
   setup do
     contributor = FactoryBot.create(:person)
