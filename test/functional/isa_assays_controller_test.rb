@@ -5,9 +5,11 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
+  include ISATagsTestHelper
 
   def setup
     login_as FactoryBot.create :user
+    create_all_isa_tags
   end
 
   test 'should get new' do

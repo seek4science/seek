@@ -5,6 +5,7 @@ require_relative '../config/environment'
 require 'rails/test_help'
 
 require 'sharing_form_test_helper'
+require 'isa_tags_test_helper'
 require 'general_authorization_test_cases'
 require 'ruby-prof'
 require 'factory_bot'
