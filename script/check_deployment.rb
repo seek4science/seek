@@ -1,4 +1,4 @@
-output = `curl --verbose --silent http://seek:3000/statistics/application_status 2>&1`
+output = `curl --verbose --silent http://localhost:3000/statistics/application_status 2>&1`
 if $?.success? && output.include?('FAIRDOM-SEEK is running | search is enabled | 7 delayed jobs running')
   exit 0
 else
