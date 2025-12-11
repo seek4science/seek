@@ -14,7 +14,7 @@ x-shared:
     volumes:
       - seek-filestore:/seek/filestore
       - seek-cache:/seek/tmp/cache
-    depends_on: &seek_base_depends_on
+    depends_on:
       db:
         condition: service_healthy
       solr:
@@ -57,10 +57,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 120s
-    depends_on:
-      <<: *seek_base_depends_on
-      seek_workers:
-        condition: service_healthy
 
   seek_workers:
     # The SEEK delayed job workers
@@ -79,7 +75,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 20s
 
   solr:
     image: fairdom/seek-solr:8.11
