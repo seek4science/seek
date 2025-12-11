@@ -4840,7 +4840,7 @@ extendedMetadataTypeExtendedMetadataAttributeResponse:
       type: boolean
     pos:
       $ref: "#/components/schemas/nullableInteger"
-    allow_free_text:
+    allow_cv_free_text:
       type: boolean
     sample_controlled_vocab_id:
       $ref: "#/components/schemas/nullableNonEmptyString"

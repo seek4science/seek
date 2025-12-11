@@ -25,6 +25,7 @@ module Seek
       def self.valid_emt_json?(json)
 
         raise StandardError, "The schema file is not readable!" unless File.readable?(SCHEMA_PATH)
+        raise StandardError, "The schema file is not readable!" unless File.readable?(SCHEMA_PATH)
 
         schema = JSON.parse(File.read(SCHEMA_PATH))
         errors = JSON::Validator.fully_validate(schema, json)
@@ -62,8 +63,8 @@ module Seek
             sample_attribute_type: sample_attribute_type,
             sample_controlled_vocab: sample_controlled_vocab,
             linked_extended_metadata_type: linked_extended_metadata_type,
-            required: attr['required'].present? ? attr['required'] : false,
-            allow_cv_free_text: attr['allow_free_text'].present? ? attr['allow_free_text'] : false,
+            required: attr.key?('required') ? attr['required'] : false,
+            allow_cv_free_text: attr.key?('allow_cv_free_text') ? attr['allow_cv_free_text'] : false,
             pid: attr['pid'].present? ? attr['pid'] : nil
           )
         end

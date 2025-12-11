@@ -31,7 +31,7 @@
               "description": {
                 "type": ["string", "null"]
               },
-              "allow_free_text": {
+              "allow_cv_free_text": {
                 "type": "boolean"
               },
               "label": {
@@ -67,7 +67,7 @@
               "description": {
                 "type": ["string", "null"]
               },
-              "allow_free_text": {
+              "allow_cv_free_text": {
                 "type": "boolean"
               },
               "label": {
