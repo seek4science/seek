@@ -54,7 +54,7 @@ class EventsController < ApplicationController
 
   def event_params
     params.require(:event).permit(:title, :description, :start_date, :end_date, :url,
-                                  :location_type, :address, :city, :country, :time_zone,
+                                  :location_type, :event_type_id, :address, :city, :country, :time_zone,
                                   { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { data_file_ids: [] },{document_ids: []}, { publication_ids: [] }, { extended_metadata_attributes: determine_extended_metadata_keys } )

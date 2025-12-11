@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_10_163215) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_11_150800) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -566,6 +566,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_10_163215) do
     t.index ["user_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_can_view"
   end
 
+  create_table "event_types", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.index ["title"], name: "index_event_types_on_title", unique: true
+  end
+
   create_table "events", id: :integer, force: :cascade do |t|
     t.datetime "start_date"
     t.datetime "end_date"
@@ -584,6 +590,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_10_163215) do
     t.string "deleted_contributor"
     t.string "time_zone"
     t.integer "location_type"
+    t.bigint "event_type_id"
+    t.index ["event_type_id"], name: "index_events_on_event_type_id"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
@@ -2385,6 +2393,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_10_163215) do
     t.integer "sheet_number"
   end
 
+  add_foreign_key "events", "event_types"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end

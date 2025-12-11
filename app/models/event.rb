@@ -6,6 +6,7 @@ class Event < ApplicationRecord
 
   # no presence validation so value can be nil (Not specified)
   enum :location_type, { in_person: 0, hybrid: 1, online: 2 }
+  belongs_to :event_type, optional: true
 
   before_destroy {documents.clear}
 
