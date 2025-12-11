@@ -67,7 +67,7 @@ services:
       QUIET_SUPERCRONIC: 1
     command: docker/start_workers.sh
     healthcheck:
-      test: [ "CMD", "ruby", "script/check_deployment.rb" ]
+      test: [ "CMD", "ruby", "script/delayed_job", "status", "-i", "1" ]
       interval: 10s
       timeout: 5s
       retries: 5
