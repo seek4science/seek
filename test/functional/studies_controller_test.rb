@@ -337,8 +337,8 @@ class StudiesControllerTest < ActionController::TestCase
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     study = FactoryBot.create(:study, contributor: User.current_user.person,
-                            investigation: FactoryBot.create(:investigation, contributor: User.current_user.person),
-                            policy: FactoryBot.create(:policy,
+                                      investigation: FactoryBot.create(:investigation, contributor: User.current_user.person),
+                                      policy: FactoryBot.create(:policy,
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::EDITING)]))
     get :edit, params: { id: study.id }
@@ -360,7 +360,7 @@ class StudiesControllerTest < ActionController::TestCase
     person = User.current_user.person
     inv = FactoryBot.create :investigation, policy: FactoryBot.create(:public_policy), contributor:person
     study = FactoryBot.create :study, title: 'the study', policy: FactoryBot.create(:public_policy),
-                            investigation: inv, contributor:person
+                                      investigation: inv, contributor:person
     get :new_object_based_on_existing_one, params: { id: study.id }
     assert_response :success
     assert_select '#study_title[value=?]', 'the study'
@@ -698,10 +698,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                   "name":'fred',
-                                                   "age":22}}}
+      cm_attributes = {extended_metadata_attributes: { extended_metadata_type_id: cmt.id,
+                                                       data: {
+                                                   "name": 'fred',
+                                                   "age": 22}}}
 
       post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -718,8 +718,8 @@ class StudiesControllerTest < ActionController::TestCase
     assert_no_difference('Study.count') do
       assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: study.id, study: { title: "new title",
-          extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
-                                        data: {
+                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                      data: {
                                           "name": 'max',
                                           "age": 20 } }
         }
@@ -743,10 +743,10 @@ class StudiesControllerTest < ActionController::TestCase
       assert_no_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'test', investigation_id: investigation.id }
-        cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
-                                                        data:{
-                                                          "name":'fred',
-                                                          "age":22}}}
+        cm_attributes = {extended_metadata_attributes: { extended_metadata_type_id: cmt.id,
+                                                         data: {
+                                                          "name": 'fred',
+                                                          "age": 22}}}
 
         post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
       end
@@ -840,10 +840,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                   "full name":'Paul Jones',
-                                                   "full address":'London, UK'}}}
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                   "full name": 'Paul Jones',
+                                                   "full address": 'London, UK'}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -866,11 +866,11 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                   "full name":'full name',
-                                                   "Full name":'Full name',
-                                                   "full  name":'full  name'}}}
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                   "full name": 'full name',
+                                                   "Full name": 'Full name',
+                                                   "full  name": 'full  name'}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -894,12 +894,12 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                        data:{
-                                            "+name":'+name',
-                                            "-name":'-name',
-                                            "&name":'&name',
-                                            "name(name)":'name(name)'
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                            "+name": '+name',
+                                            "-name": '-name',
+                                            "&name": '&name',
+                                            "name(name)": 'name(name)'
                                         }}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
@@ -924,10 +924,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                     "apple name":"Newton's Apple",
-                                                     "apple list":['Granny Smith','Bramley'],
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                     "apple name": "Newton's Apple",
+                                                     "apple list": ['Granny Smith','Bramley','random apple'],
                                                      "apple controlled vocab": ['Granny Smith']}}}
 
       post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
@@ -940,12 +940,30 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal "Newton's Apple",cm.get_attribute_value('apple name')
     assert_equal 'Granny Smith',cm.get_attribute_value('apple controlled vocab')
-    assert_equal ['Granny Smith','Bramley'],cm.get_attribute_value('apple list')
+    assert_equal ['Granny Smith','Bramley','random apple'],cm.get_attribute_value('apple list')
 
     get :show, params: { id: study }
     assert_response :success
 
     assert_select 'div.extended_metadata',text:/Granny Smith/, count:2
+
+    assert_no_difference('Study.count') do
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                       "apple name": "Newton's Apple",
+                                                       "apple list": ['Granny Smith','Bramley'],
+                                                       "apple controlled vocab": ['random apple']}}}
+
+      post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+
+
+    assert study=assigns(:study)
+    refute study.valid?
+
   end
 
   test 'should create and update study with linked extended metadata type' do
@@ -960,10 +978,10 @@ class StudiesControllerTest < ActionController::TestCase
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id, data: {
-            "role_email":"alice@email.com",
-            "role_phone":"0012345",
+            "role_email": "alice@email.com",
+            "role_phone": "0012345",
             "role_name": {
-                "first_name":"alice",
+                "first_name": "alice",
                 "last_name": "liddell"
               }
           }
@@ -993,9 +1011,9 @@ class StudiesControllerTest < ActionController::TestCase
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
                                                       extended_metadata_attributes: {
                                                         extended_metadata_type_id: cmt.id, id:cm.id, data: {
-                                                          "role_email":"rabbit@email.com",
+                                                          "role_email": "rabbit@email.com",
                                                           "role_name": {
-                                                            "first_name":"rabbit"
+                                                            "first_name": "rabbit"
                                                           }
                                                         }
                                                       }
@@ -1020,9 +1038,9 @@ class StudiesControllerTest < ActionController::TestCase
         study_attributes = { title: 'Family', investigation_id: investigation.id }
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id, data: {
-            "dad":{"first_name":"john", "last_name":"liddell"},
-            "mom":{"first_name":"lily", "last_name":"liddell"},
-            "child":{"0":{"first_name":"alice", "last_name":"liddell"}}
+            "dad": {"first_name":"john", "last_name":"liddell"},
+            "mom": {"first_name":"lily", "last_name":"liddell"},
+            "child": {"0":{"first_name":"alice", "last_name":"liddell"}}
             }
           }
         }
@@ -1050,8 +1068,8 @@ class StudiesControllerTest < ActionController::TestCase
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
                                                       extended_metadata_attributes: {
                                                         extended_metadata_type_id: cmt.id, id:cm.id, data: {
-                                                          "dad":{"first_name":"tom", "last_name":"liddell"},
-                                                          "child":{"0":{"first_name":"rabbit", "last_name":"wonderland"},"1":{"first_name":"mad", "last_name":"hatter"}}
+                                                          "dad": {"first_name":"tom", "last_name":"liddell"},
+                                                          "child": {"0":{"first_name":"rabbit", "last_name":"wonderland"},"1":{"first_name":"mad", "last_name":"hatter"}}
                                                         }
                                                       }
         }
@@ -1113,8 +1131,8 @@ class StudiesControllerTest < ActionController::TestCase
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id, data: {
-            "role_email":"alice@email.com",
-            "role_phone":"0012345",
+            "role_email": "alice@email.com",
+            "role_phone": "0012345",
             "role_name": {"first_name":"alice", "last_name": "liddell"},
             "role_address": {"street":"wonder","city": "land" }
           }
@@ -1145,9 +1163,9 @@ class StudiesControllerTest < ActionController::TestCase
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
                                                       extended_metadata_attributes: {
                                                         extended_metadata_type_id: cmt.id, id:cm.id, data: {
-                                                          "role_email":"rabbit@email.com",
-                                                          "role_name":{
-                                                              "first_name":"rabbit"
+                                                          "role_email": "rabbit@email.com",
+                                                          "role_name": {
+                                                              "first_name": "rabbit"
                                                           }
                                                         }
                                                       }
@@ -1178,38 +1196,38 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "study_title":"happy study",
-            "study_sites":{
-              "0":{
-                  "study_site_name":"site1",
-                  "study_site_location":"fairyland",
-                  "participants":{
-                    "0":{
-                      "participant_name":{
-                        "first_name":"alice",
-                        "last_name":"liddell"
+            "study_title": "happy study",
+            "study_sites": {
+              "0": {
+                  "study_site_name": "site1",
+                  "study_site_location": "fairyland",
+                  "participants": {
+                    "0": {
+                      "participant_name": {
+                        "first_name": "alice",
+                        "last_name": "liddell"
                       },
-                      "participant_age":"7"
+                      "participant_age": "7"
                     },
-                    "1":{
-                      "participant_name":{
-                        "first_name":"pippi",
-                        "last_name":"langstrumpf"
+                    "1": {
+                      "participant_name": {
+                        "first_name": "pippi",
+                        "last_name": "langstrumpf"
                       },
-                      "participant_age":"9"
+                      "participant_age": "9"
                     }
                   }
               },
-              "1":{
-                "study_site_name":"site2",
-                "study_site_location":"space",
-                "participants":{
-                  "0":{
-                    "participant_name":{
-                      "first_name":"arthur",
-                      "last_name":"Dent"
+              "1": {
+                "study_site_name": "site2",
+                "study_site_location": "space",
+                "participants": {
+                  "0": {
+                    "participant_name": {
+                      "first_name": "arthur",
+                      "last_name": "Dent"
                     },
-                    "participant_age":"40"
+                    "participant_age": "40"
                   }
                 }
               }
@@ -1247,28 +1265,28 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
-                "study_title":"happy study new",
-                "study_sites":{
-                  "0":{
-                    "study_site_name":"site1",
-                    "study_site_location":"better fairyland",
-                    "participants":{
-                      "0":{
-                        "participant_name":{
-                          "first_name":"mad",
-                          "last_name":"hatter"
+                "study_title": "happy study new",
+                "study_sites": {
+                  "0": {
+                    "study_site_name": "site1",
+                    "study_site_location": "better fairyland",
+                    "participants": {
+                      "0": {
+                        "participant_name": {
+                          "first_name": "mad",
+                          "last_name": "hatter"
                         },
-                        "participant_age":"unknown"
+                        "participant_age": "unknown"
                       },
-                      "1":{
-                        "participant_name":{
-                          "first_name":"pippi",
-                          "last_name":"langstrumpf"
+                      "1": {
+                        "participant_name": {
+                          "first_name": "pippi",
+                          "last_name": "langstrumpf"
                         },
-                        "participant_age":"9"
+                        "participant_age": "9"
                       }
                     }
                   }
@@ -1305,10 +1323,10 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1347,10 +1365,10 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{ "identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": { "identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1387,7 +1405,7 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1424,7 +1442,7 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1467,7 +1485,7 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1516,10 +1534,10 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1561,10 +1579,10 @@ class StudiesControllerTest < ActionController::TestCase
           cm_attributes = { extended_metadata_attributes: {
             extended_metadata_type_id: cmt.id,
             data: {
-              "role_affiliation_name":"HITS",
-              "role_affiliation_identifiers":{
-                "0":{"identifier":"", "scheme":"ROR"},
-                "1":{"identifier":"grid.424699.4", "scheme":""}
+              "role_affiliation_name": "HITS",
+              "role_affiliation_identifiers": {
+                "0": {"identifier":"", "scheme":"ROR"},
+                "1": {"identifier":"grid.424699.4", "scheme":""}
               }
             }
           }
@@ -1609,10 +1627,10 @@ class StudiesControllerTest < ActionController::TestCase
     cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1634,7 +1652,7 @@ class StudiesControllerTest < ActionController::TestCase
             title: 'my new study title',
             investigation_id: nil,
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1701,10 +1719,10 @@ class StudiesControllerTest < ActionController::TestCase
     cm_attributes = { extended_metadata_attributes: {
       extended_metadata_type_id: cmt.id,
       data: {
-        "role_affiliation_name":"HITS",
-        "role_affiliation_identifiers":{
-          "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-          "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+        "role_affiliation_name": "HITS",
+        "role_affiliation_identifiers": {
+          "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+          "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
         }
       }
     }
@@ -1724,7 +1742,7 @@ class StudiesControllerTest < ActionController::TestCase
             study: {
               title: 'my new study title',
               extended_metadata_attributes: {
-                id:cm.id,
+                id: cm.id,
                 extended_metadata_type_id: cmt.id,
                 data: {
                   "role_affiliation_name": "University of Manchester",
@@ -2050,7 +2068,7 @@ class StudiesControllerTest < ActionController::TestCase
     study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
     study = FactoryBot.create(:study,
                               investigation: investigation ,
-                              policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
+                              policy: FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
                               contributor: person)
 
