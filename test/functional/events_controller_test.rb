@@ -94,7 +94,8 @@ class EventsControllerTest < ActionController::TestCase
     assert_difference('Event.count', 1) do
       post :create, params: { event: valid_event, sharing: valid_sharing }
     end
-    assert_equal 'FR',assigns(:event).country
+    assert_equal 'FR', assigns(:event).country
+    assert_equal 'online', assigns(:event).location_type
   end
 
   test 'should create valid event with country name' do
@@ -121,7 +122,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   def valid_event
-    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, project_ids: [@project.id], country:'FR' }
+    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, location_type: 'online', project_ids: [@project.id], country: 'FR' }
   end
 
   test 'should get edit' do
@@ -169,6 +170,27 @@ class EventsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should show location type' do
+    event = FactoryBot.create(:event, location_type: 'online', policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /Online/
+
+    event.update_column(:location_type, 'in_person')
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /In person/
+
+    event.update_column(:location_type, 'hybrid')
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /Hybrid/
+
+    event.update_column(:location_type, nil)
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /Not specified/
+  end
 
   test 'create, update and show an event with extended metadata' do
     cmt = FactoryBot.create(:simple_event_extended_metadata_type)
@@ -400,4 +422,5 @@ class EventsControllerTest < ActionController::TestCase
       assert flash[:error].include?('disabled')
     end
   end
+
 end

@@ -4,6 +4,9 @@ class Event < ApplicationRecord
   has_and_belongs_to_many :presentations, -> { distinct }
   has_and_belongs_to_many :documents, -> { distinct }
 
+  # no presence validation so value can be nil (Not specified)
+  enum :location_type, { in_person: 0, hybrid: 1, online: 2 }
+
   before_destroy {documents.clear}
 
   before_save :set_timezone
