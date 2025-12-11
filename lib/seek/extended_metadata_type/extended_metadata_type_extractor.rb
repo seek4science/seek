@@ -25,7 +25,6 @@ module Seek
       def self.valid_emt_json?(json)
 
         raise StandardError, "The schema file is not readable!" unless File.readable?(SCHEMA_PATH)
-        raise StandardError, "The schema file is not readable!" unless File.readable?(SCHEMA_PATH)
 
         schema = JSON.parse(File.read(SCHEMA_PATH))
         errors = JSON::Validator.fully_validate(schema, json)
