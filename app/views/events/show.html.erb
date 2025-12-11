@@ -41,6 +41,11 @@
           <%= text_or_not_specified(@event.url, :external_link=>true) -%>
         </p>
 
+        <p class='location_type'>
+          <label>Location type:</label>
+          <%= @event.location_type.present? ? @event.location_type.humanize : 'Not specified' %>
+        </p>
+
         <p class="address">
           <label>Address:</label>
           <%= text_or_not_specified @event.address, :address=>true %>

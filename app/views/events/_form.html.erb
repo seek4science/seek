@@ -47,6 +47,14 @@
       </div>
 
       <div class="form-group">
+        <%= f.label :location_type, "Location type" %>
+        <%= f.select :location_type,
+                     Event.location_types.keys.map { |k| [k.humanize, k] },
+                     { include_blank: 'Not specified' },
+                     { class: 'form-control' } %>
+      </div>
+
+      <div class="form-group">
         <%= f.label :address -%><br/>
         <%= f.text_area :address, :class=>"form-control", :rows => 4 -%>
       </div>
