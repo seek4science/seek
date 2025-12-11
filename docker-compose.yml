@@ -56,7 +56,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 120s
+      start_period: 180s
 
   seek_workers:
     # The SEEK delayed job workers
