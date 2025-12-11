@@ -4,6 +4,11 @@
 
 <div class="tab-content">
   <%= tab_pane('overview') do %>
+    <p class="event_type">
+      <lable>Event type:</lable>
+      <%= @event.event_type&.title || 'Not specified' %>
+    </p>
+
     <%= item_description @event.description -%>
 
     <div class="row">
@@ -12,7 +17,7 @@
 
         <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event} %>
 
-        <% unless @event.contributor.nil? then %>
+        <% if @event.contributor.present? %>
           <p>
             <label>Created by:</label>
             <%= link_to @event.contributor.name, @event.contributor -%>

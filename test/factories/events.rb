@@ -28,4 +28,9 @@ FactoryBot.define do
     publications {[FactoryBot.create(:publication)]}
     presentations {[FactoryBot.create(:presentation, policy: FactoryBot.create(:public_policy))]}
   end
+
+  factory(:event_type, class: EventType) do
+    title { 'An Event Type' }
+    description { 'A description of the EventType' }
+  end
 end

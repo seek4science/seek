@@ -9,6 +9,16 @@
       <%= f.error_messages %>
 
       <div class="form-group">
+        <%= f.label :event_type_id, 'Event type' %>
+        <%= f.collection_select :event_type_id,
+                                EventType.order(:title),
+                                :id,
+                                :title,
+                                { include_blank: 'Not specified' },
+                                class: 'form-control' %>
+      </div>
+
+      <div class="form-group">
         <label class="required">Title</label>
         <%= f.text_field :title, :class=>"form-control" -%>
       </div>

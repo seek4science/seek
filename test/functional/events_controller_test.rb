@@ -423,4 +423,29 @@ class EventsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should create event with event_type' do
+    event_type = FactoryBot.create(:event_type, title: 'Controller Test Type')
+    assert_difference('Event.count', 1) do
+      post :create, params: { event: valid_event.merge(event_type_id: event_type.id), sharing: valid_sharing }
+    end
+
+    created = assigns(:event)
+    assert_not_nil created
+    assert_equal event_type.id, created.event_type_id
+  end
+
+  test 'show displays event_type name' do
+    event_type = FactoryBot.create(:event_type, title: 'Visible Type')
+    event = FactoryBot.create(:event, event_type: event_type, policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.event_type', text: /Visible Type/
+
+    # no event type
+    event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.event_type', text: /Not specified/
+  end
+
 end

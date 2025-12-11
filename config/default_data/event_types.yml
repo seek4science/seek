@@ -1,0 +1,18 @@
+conference:
+  title: 'Conference'
+  description: 'Large formal meeting or series of meetings'
+workshop:
+  title: 'Workshop'
+  description: 'Hands-on session or training'
+seminar:
+  title: 'Seminar'
+  description: 'Educational presentation or lecture'
+webinar:
+  title: 'Webinar'
+  description: 'Online seminar'
+meetup:
+  title: 'Meetup'
+  description: 'Informal gathering'
+hackathon:
+  title: 'Hackathon'
+  description: 'Collaborative programming event'
