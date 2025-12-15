@@ -3,6 +3,7 @@ require 'ro_crate'
 class WorkflowsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
+  extend Seek::UrlValidation
 
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
@@ -325,9 +326,10 @@ class WorkflowsController < ApplicationController
   end
 
   def run
+    instance_url = run_params[:execution_instance_url]
     # Support other execution methods in the future
     respond_to do |format|
-      format.html { redirect_to @display_workflow.run_url, allow_other_host: true }
+      format.html { redirect_to @display_workflow.run_url(instance_url), allow_other_host: true }
     end
   end
 
@@ -404,8 +406,18 @@ class WorkflowsController < ApplicationController
     params.require(:git_version).permit(:main_workflow_path, :abstract_cwl_path, :diagram_path)
   end
 
+  def run_params
+    params.permit(:execution_instance_url)
+  end
+
   def check_can_run
-    return if @workflow.can_run?
-    error('Execution is not supported for this workflow', '')
+    if run_params[:execution_instance_url].present? && !self.class.valid_url?(run_params[:execution_instance_url])
+      error('Invalid execution instance URL', '')
+    else
+      execution_instance_url = run_params[:execution_instance_url]
+      return if @workflow.can_run?(execution_instance_url)
+
+      error('Execution is not supported for this workflow', '')
+    end
   end
 end

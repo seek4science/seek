@@ -48,6 +48,12 @@ en:
       files: 'Upload/Import Files'
       git: 'Import Git Repository'
       ro_crate: 'Upload/Import Workflow RO-Crate'
+    run:
+      on_galaxy: 'Run on Galaxy'
+      on_select: 'Run on...'
+      on_default: 'Run on default instance'
+      select_prompt: 'Please enter the URL of the Galaxy instance to run this workflow on:'
+      select_label: 'Galaxy instance URL'
   publication: &publication "Publication"
 
   presentation: &presentation "Presentation"
@@ -116,6 +122,7 @@ en:
     upload: 'Register'
     create: 'Create'
     update: 'Update'
+    run: 'Run'
 
   access:
     determined_by_group: "Individual access rights for each member"
