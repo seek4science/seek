@@ -591,7 +591,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_11_150800) do
     t.string "time_zone"
     t.integer "location_type"
     t.bigint "event_type_id"
-    t.index ["event_type_id"], name: "index_events_on_event_type_id"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
@@ -2393,7 +2392,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_11_150800) do
     t.integer "sheet_number"
   end
 
-  add_foreign_key "events", "event_types"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end

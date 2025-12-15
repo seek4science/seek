@@ -1,5 +1,5 @@
 class AddEventTypeToEvents < ActiveRecord::Migration[7.2]
   def change
-    add_reference :events, :event_type, foreign_key: true, index: true, null: true
+    add_reference :events, :event_type, foreign_key: false, index: false, null: true
   end
 end
