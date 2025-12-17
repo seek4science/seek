@@ -281,12 +281,7 @@ class GitWorkflowVersioningTest < ActionDispatch::IntegrationTest
   test 'handles errors when creating version metadata' do
     workflow = FactoryBot.create(:local_git_workflow)
     person = workflow.contributor
-    original_version = workflow.latest_git_version
 
-    repo_count = Git::Repository.count
-    workflow_count = Workflow.count
-    version_count = Git::Version.count
-    annotation_count = Git::Annotation.count
 
     login_as(person.user)
 
