@@ -10,6 +10,10 @@ class EventSerializer < BaseSerializer
   has_many :publications
   has_many :presentations
 
+  attribute :event_type do
+    object.event_type&.title
+  end
+
   def country
     if object.country
       if object.country.length == 2 #a code

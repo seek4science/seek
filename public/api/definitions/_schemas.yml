@@ -1687,6 +1687,8 @@ eventPost:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             location_type:
               $ref: "#/components/schemas/eventLocationTypeString"
             address:
@@ -1750,6 +1752,8 @@ eventPatch:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             location_type:
               $ref: "#/components/schemas/eventLocationTypeString"
             address:
@@ -3694,6 +3698,8 @@ eventResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
             location_type:
               $ref: "#/components/schemas/eventLocationTypeString"
             address:
