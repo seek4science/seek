@@ -65,16 +65,13 @@ services:
     environment:
       <<: *seek_base_env
       QUIET_SUPERCRONIC: 1
-      # Set this number of workers for checking the number of workers at deployment.
-      # Default is 1.
-      # Otherwise healthcheck fails.
-      # MIN_WORKERS: 1
     command: docker/start_workers.sh
     healthcheck:
       test: [ "CMD", "bash", "script/check_worker_pids.sh" ]
       interval: 10s
-      timeout: 5s
+      timeout: 30s
       retries: 5
+      start_period: 30s
 
   solr:
     image: fairdom/seek-solr:8.11
