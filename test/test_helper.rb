@@ -115,6 +115,8 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
+  parallelize(workers: :number_of_processors)
+
   include ActiveJob::TestHelper
   include ActionMailer::TestHelper
 
