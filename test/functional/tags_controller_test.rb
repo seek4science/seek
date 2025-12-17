@@ -3,7 +3,6 @@ require 'test_helper'
 class TagsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
-  fixtures :all
 
   def setup
     login_as FactoryBot.create(:user, person: FactoryBot.create(:person))

@@ -2,7 +2,6 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class DataFileTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'associations' do
     datafile_owner = FactoryBot.create :user

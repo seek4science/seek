@@ -118,6 +118,7 @@ class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   include ActionMailer::TestHelper
 
+  fixtures :all
   setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
@@ -182,10 +183,6 @@ class ActiveSupport::TestCase
   self.use_instantiated_fixtures = false
 
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
-  #
-  # Note: You'll currently still have to declare fixtures explicitly in integration tests
-  # -- they do not yet inherit this setting
-  # fixtures :all
 
   set_fixture_class sop_versions: Sop::Version
   set_fixture_class model_versions: Model::Version
