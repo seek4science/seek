@@ -1,5 +1,6 @@
 class EventSerializer < BaseSerializer
   attributes :title, :description, :url,
+             :location_type,
              :address, :city, :country,
              :start_date, :end_date
 

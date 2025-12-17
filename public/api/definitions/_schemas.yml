@@ -249,6 +249,14 @@ versionNumber:
   minLength: 1
   enum:
     - "1.0"
+eventLocationTypeString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/nonEmptyString"
+      enum:
+        - in_person
+        - hybrid
+        - online
 JsonApiVersion:
   type: object
   properties:
@@ -1685,6 +1693,8 @@ eventPost:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -1746,6 +1756,8 @@ eventPatch:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -3706,6 +3718,8 @@ eventResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:

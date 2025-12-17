@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "100",
+    "id": "197",
     "type": "events",
     "attributes": {
       "policy": {
@@ -12,6 +12,7 @@
       "title": "A Maximal Event",
       "description": "All you ever wanted to know about headaches",
       "url": "http://www.headache-center.org",
+      "location_type": "in_person",
       "address": "Sofienstr 2",
       "city": "Heidelberg",
       "country": "Germany",
@@ -22,7 +23,7 @@
       "submitter": {
         "data": [
           {
-            "id": "2142",
+            "id": "704",
             "type": "people"
           }
         ]
@@ -30,7 +31,7 @@
       "projects": {
         "data": [
           {
-            "id": "2028",
+            "id": "704",
             "type": "projects"
           }
         ]
@@ -38,7 +39,7 @@
       "data_files": {
         "data": [
           {
-            "id": "174",
+            "id": "168",
             "type": "data_files"
           }
         ]
@@ -46,7 +47,7 @@
       "publications": {
         "data": [
           {
-            "id": "131",
+            "id": "168",
             "type": "publications"
           }
         ]
@@ -54,21 +55,21 @@
       "presentations": {
         "data": [
           {
-            "id": "59",
+            "id": "168",
             "type": "presentations"
           }
         ]
       }
     },
     "links": {
-      "self": "/events/100"
+      "self": "/events/197"
     },
     "meta": {
-      "created": "2024-11-20T10:15:46.000Z",
-      "modified": "2024-11-20T10:15:46.000Z",
+      "created": "2025-12-17T10:48:26.356Z",
+      "modified": "2025-12-17T10:48:26.356Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "55278770-8956-013d-24a2-0a81884ed284"
+      "uuid": "d70d6f00-bd63-013e-6459-00155d44e13d"
     }
   },
   "jsonapi": {
