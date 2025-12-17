@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "192",
+    "id": "338",
     "type": "events",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "685",
+              "id": "1196",
               "type": "projects"
             },
             "access": "edit"
@@ -23,13 +23,14 @@
       "city": "Heidelberg",
       "country": "Germany",
       "start_date": "2017-01-01T00:20:00.000Z",
-      "end_date": "2017-01-01T00:22:00.000Z"
+      "end_date": "2017-01-01T00:22:00.000Z",
+      "event_type": "Workshop"
     },
     "relationships": {
       "submitter": {
         "data": [
           {
-            "id": "685",
+            "id": "1196",
             "type": "people"
           }
         ]
@@ -37,7 +38,7 @@
       "projects": {
         "data": [
           {
-            "id": "685",
+            "id": "1196",
             "type": "projects"
           }
         ]
@@ -45,7 +46,7 @@
       "data_files": {
         "data": [
           {
-            "id": "164",
+            "id": "286",
             "type": "data_files"
           }
         ]
@@ -53,7 +54,7 @@
       "publications": {
         "data": [
           {
-            "id": "164",
+            "id": "286",
             "type": "publications"
           }
         ]
@@ -61,21 +62,21 @@
       "presentations": {
         "data": [
           {
-            "id": "164",
+            "id": "286",
             "type": "presentations"
           }
         ]
       }
     },
     "links": {
-      "self": "/events/192"
+      "self": "/events/338"
     },
     "meta": {
-      "created": "2025-12-17T10:48:23.640Z",
-      "modified": "2025-12-17T10:48:23.640Z",
+      "created": "2025-12-17T11:37:58.492Z",
+      "modified": "2025-12-17T11:37:58.492Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "d56c4ce0-bd63-013e-6459-00155d44e13d"
+      "uuid": "c2931030-bd6a-013e-6464-00155d44e13d"
     }
   },
   "jsonapi": {
