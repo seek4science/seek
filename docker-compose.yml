@@ -68,11 +68,7 @@ services:
     command: docker/start_workers.sh
     healthcheck:
       test: [ "CMD", "bash", "script/check_worker_pids.sh" ]
-      interval: 30s
-      timeout: 30s
       retries: 5
-      start_period: 30s
-      start_interval: 10s
 
   solr:
     image: fairdom/seek-solr:8.11
