@@ -3,8 +3,6 @@ require 'minitest/mock'
 
 class PublicationsControllerTest < ActionController::TestCase
 
-  fixtures :all
-
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include RdfTestCases

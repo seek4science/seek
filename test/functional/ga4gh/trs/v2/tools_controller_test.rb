@@ -4,7 +4,6 @@ module Ga4gh
     module V2
       class ToolsControllerTest < ActionController::TestCase
         include AuthenticatedTestHelper
-        fixtures :users, :people
 
         test 'should not work if disabled' do
           with_config_value(:ga4gh_trs_api_enabled, false) do

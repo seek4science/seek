@@ -4,7 +4,6 @@ require 'test_helper'
 class PersonalTagsTest < ActionController::TestCase
   tests PeopleController
 
-  fixtures :all
 
   include AuthenticatedTestHelper
 

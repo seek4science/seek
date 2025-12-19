@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class StudyTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'associations' do
     study = studies(:metabolomics_study)

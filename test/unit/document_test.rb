@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class DocumentTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'project' do
     person = FactoryBot.create(:person)
