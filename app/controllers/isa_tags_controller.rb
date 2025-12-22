@@ -9,7 +9,7 @@ class ISATagsController < ApplicationController
     respond_to do |format|
       format.json {
         render json: ISATag.all,
-               each_serializer: ISATagSerializer,
+               each_serializer: ISATagSkeletonSerializer,
                meta: {
                  base_url: Seek::Config.site_base_host,
                  api_version: ActiveModel::Serializer.config.api_version

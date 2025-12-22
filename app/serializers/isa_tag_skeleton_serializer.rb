@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class ISATagSerializer < ActiveModel::Serializer
+class ISATagSkeletonSerializer < SkeletonSerializer
   attributes :title
 end
