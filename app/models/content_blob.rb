@@ -1,10 +1,7 @@
 require 'digest/md5'
-require 'net/http'
-require 'open-uri'
+require 'shrine'
 require 'tmpdir'
 require 'docsplit'
-require 'rest-client'
-require "shrine/attachment"
 
 class ContentBlob < ApplicationRecord
   include Seek::ContentTypeDetection
@@ -16,22 +13,11 @@ class ContentBlob < ApplicationRecord
 
   belongs_to :asset, polymorphic: true, autosave: false
 
-  # the actual data value stored in memory. If this could be large, then using :tmp_io_object is preferred
-  attr_writer :data
-
-  # this is used as an alternative to passing the data contents directly (in memory).
-  # it is not stored in the database, but when the content_blob is saved, the IO object is read and stored in the correct location.
-  # if the file doesn't exist an error occurs
-  attr_writer :tmp_io_object
-
-  # Store HTTP headers to stop SEEK performing multiple requests when getting info
+  # Store HTTP headers to stop multiple requests when retrieving file info
   attr_writer :headers
 
   acts_as_uniquely_identifiable
 
-  # this action saves the contents of @data or the contents contained within the @tmp_io_object to the storage file.
-  # an Exception is raised if both are defined
-  before_save :dump_data_to_file
   before_save :check_version
   after_create :create_retrieval_job
   before_save :clear_sample_type_matches
@@ -41,26 +27,18 @@ class ContentBlob < ApplicationRecord
 
   validate :original_filename_or_url
 
-  delegate :read, :close, :rewind, :path, to: :file
+  delegate :read, :close, :rewind, :download, :open, to: :shrine_file
 
   include Seek::Data::Checksums
 
   CHUNK_SIZE = 2 ** 12
 
-  acts_as_fleximage do
-    image_directory Seek::Config.temporary_filestore_path + '/image_assets'
-    use_creation_date_based_directories false
-    image_storage_format :png
-    require_image false
-    invalid_image_message 'was not a readable image'
-  end
-
-  acts_as_fleximage_extension
-
-  # This overrides the method from acts_as_fleximage so that the original image is read from the default SEEK filestore
-  #  rather than the special `image_directory` specified above. Resized images will still go in there, though.
-  def file_path
-    filepath
+  def shrine_file
+    if respond_to?(:file_attacher) && file_attacher&.attached?
+      file_attacher.file
+    else
+      raise Exception, 'No file attached for this content blob'
+    end
   end
 
   def original_filename_or_url
@@ -76,11 +54,8 @@ class ContentBlob < ApplicationRecord
   # allows you to run something on a temporary copy of the blob file, which is deleted once finished
   # e.g. blob.with_temporary_copy{|copy_path| <some stuff with the copy>}
   def with_temporary_copy
-    copy_path = make_temp_copy
-    begin
-      yield copy_path
-    ensure
-      FileUtils.rm(copy_path)
+    shrine_file.download do |temp_file|
+      yield temp_file.path
     end
   end
 
@@ -93,13 +68,6 @@ class ContentBlob < ApplicationRecord
     split_filename&.last&.downcase
   end
 
-  def make_temp_copy
-    temp_name = Time.now.strftime('%Y%m%d%H%M%S%L') + '-' + original_filename
-    temp_path = File.join(Seek::Config.temporary_filestore_path, temp_name).to_s
-    FileUtils.cp(filepath, temp_path)
-    temp_path
-  end
-
   def check_version
     self.asset_version = asset.version if asset_version.nil? && !asset.nil? && asset.respond_to?(:version)
   end
@@ -107,12 +75,11 @@ class ContentBlob < ApplicationRecord
   def show_as_external_link?
     return false if custom_integration? || url.blank?
     return true if unhandled_url_scheme?
-    no_local_copy = !file_exists?
+    no_local_copy = !stored_in_shrine?
     html_content = is_webpage? || content_type == 'text/html'
     show_as_link = Seek::Config.show_as_external_link_enabled ? no_local_copy : html_content
     show_as_link
   end
-  # include all image types
 
   def cache_key
     base = new_record? ? "#{model_name.cache_key}/new" : "#{model_name.cache_key}/#{id}"
@@ -124,62 +91,13 @@ class ContentBlob < ApplicationRecord
     end
   end
 
-  # returns an IO Object to the data content, or nil if the data file doesn't exist.
-  # In the case that there is a URL defined, but no local copy, the IO Object is still nil.
-  def data_io_object
-    return @tmp_io_object unless @tmp_io_object.nil?
-    return StringIO.new(@data) unless @data.nil?
-    return File.open(filepath, 'rb') if file_exists?
-    nil
-  end
-
-  def file_exists?(format = 'dat')
-    if format == 'dat'
-      stored_in_shrine?
-    else
-      File.exist?(filepath(format))
-    end
-  end
-
-  def storage_filename(format = 'dat', uuid_to_use = nil)
-    uuid_to_use ||= uuid
-    "#{uuid_to_use}.#{format}"
-  end
-
-  def filepath(format = 'dat', uuid_to_use = nil)
-    if format == 'dat'
-      File.join(data_storage_directory, storage_filename(format, uuid_to_use))
-    else
-      File.join(converted_storage_directory, storage_filename(format, uuid_to_use))
-    end
-  end
-
-  def data_storage_directory
-    Seek::Config.asset_filestore_path
-  end
-
-  def converted_storage_directory
-    Seek::Config.converted_filestore_path
-  end
-
-  def dump_data_to_file
-    raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
-    check_uuid
-    if @tmp_io_object.nil?
-      dump_data_object_to_file
-    else
-      dump_tmp_io_object_to_file
-    end
+  def stored_in_shrine?
+    respond_to?(:file_attacher) && file_attacher&.attached?
   end
 
   def file
-    if respond_to?(:file_attacher) && file_attacher&.attached?
-      return file_attacher.file
-    end
-
-    return @tmp_io_object unless @tmp_io_object.nil?
-    raise Exception, 'No valid file found' if filepath.blank?
-    File.open(filepath, 'rb')
+    raise Exception, 'No valid file found' unless stored_in_shrine?
+    shrine_file
   end
 
 
@@ -231,7 +149,7 @@ class ContentBlob < ApplicationRecord
   end
 
   def no_content?
-    (!file_size || file_size == 0) && url.blank?
+    !stored_in_shrine? && url.blank?
   end
 
   def remote_content_handler
@@ -276,49 +194,8 @@ class ContentBlob < ApplicationRecord
     @headers ||= (remote_content_handler.info rescue {})
   end
 
-  def stored_in_shrine?
-    respond_to?(:file_attacher) && file_attacher&.attached?
-  end
-
-  def dump_data_object_to_file
-    data_to_save = @data
-
-    unless data_to_save.nil?
-      File.open(filepath, 'wb+') do |f|
-        f.write(data_to_save)
-      end
-    end
-  end
-
-  def dump_tmp_io_object_to_file
-    raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
-    return unless @tmp_io_object
-
-    if @tmp_io_object.respond_to?(:path)
-      @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
-      if @tmp_io_object.path
-        FileUtils.cp @tmp_io_object.path, filepath
-
-        # only clean up if object is within the temp (/tmp/) directory, otherwise the original file should be kept
-        if @tmp_io_object.path.start_with?("#{Dir.tmpdir}#{File::SEPARATOR}")
-          File.delete(@tmp_io_object.path)
-        end
-
-      end
-
-    else
-      @tmp_io_object.rewind
-      File.open(filepath, 'wb+') do |f|
-        until (chunk = @tmp_io_object.read(CHUNK_SIZE)).nil?
-          f.write(chunk)
-        end
-      end
-    end
-    @tmp_io_object = nil
-  end
-
   def create_retrieval_job
-    if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
+    if Seek::Config.cache_remote_files && !stored_in_shrine? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
       RemoteContentFetchingJob.perform_later(self)
     end
   end

@@ -37,24 +37,24 @@ module Seek
 
       # calculate the checksum for the file, using the digest type, which could be :md5 or :sha1
       def calculate_checksum(digest_type)
-        return unless file_exists?
+        return unless shrine_file_stored?
 
         digest = "Digest::#{digest_type.upcase}".constantize.new
 
-        if respond_to?(:file_attacher) && file_attacher&.attached?
-          file_attacher.file.open do |io|
-            io.binmode if io.respond_to?(:binmode)
-            while (chunk = io.read(CHECKSUM_CHUNK_SIZE))
-              digest.update(chunk)
-            end
+        file_attacher&.file&.open do |io|
+          io.binmode if io.respond_to?(:binmode)
+          while (chunk = io.read(CHECKSUM_CHUNK_SIZE))
+            digest.update(chunk)
           end
-        elsif filepath.present? && File.exist?(filepath)
-          digest.file(filepath)
-        else
-          return
         end
 
         send("#{digest_type}sum=", digest.hexdigest)
+      end
+
+      private
+
+      def shrine_file_stored?
+        respond_to?(:file_attacher) && file_attacher&.attached?
       end
     end
   end

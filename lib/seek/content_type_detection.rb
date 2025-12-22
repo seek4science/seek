@@ -16,6 +16,7 @@ module Seek
       application/sbml+xml application/xml text/xml application/json text/x-python application/matlab
       text/markdown application/x-ipynb+json)
 
+    # Get all viewable formats
     def self.viewable_formats
       supported_file_formats = ['pdf']
       supported_file_formats += Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT if (Seek::Config.pdf_conversion_enabled)
@@ -24,6 +25,7 @@ module Seek
       supported_file_formats
     end
 
+    # MIME Type Detection
     def is_text?(blob = self)
       TEXT_MIME_TYPES.include?(blob.content_type)
     end
@@ -44,21 +46,20 @@ module Seek
       is_excel?(blob) || is_csv?(blob) || is_tsv?(blob)
     end
 
-    # is an Excel file capable of being extacted from
+    # Ensure file is extractable spreadsheet
     def is_extractable_excel?(blob = self)
-      (blob.file_exists? || blob.is_stored_remotely?) && is_excel?(blob) && within_excel_extraction_size_limit?(blob)
+      blob.stored_in_shrine? && is_excel?(blob) && within_excel_extraction_size_limit?(blob)
     end
 
-    # is any extractable spreadsheet format, including remote stored files
     def is_extractable_spreadsheet?(blob = self)
-      (blob.file_exists? || blob.is_stored_remotely?) && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
-    end
-    
-    # is any zipped format, that can be extracted from
-    def is_unzippable_datafile?(blob = self)
-      (blob.file_exists? || blob.is_stored_remotely?) && (is_zip?(blob) || is_tar?(blob) || is_tgz?(blob) || is_tbz2?(blob) || is_7zip?(blob) || is_txz?(blob))
+      blob.stored_in_shrine? && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
     end
 
+    def is_unzippable_datafile?(blob = self)
+      blob.stored_in_shrine? && (is_zip?(blob) || is_tar?(blob) || is_tgz?(blob) || is_tbz2?(blob) || is_7zip?(blob) || is_txz?(blob))
+    end
+
+    # File size validation
     def is_in_simulatable_size_limit?(blob = self)
       !blob.file_size.nil? && blob.file_size < MAX_SIMULATABLE_SIZE
     end
@@ -190,28 +191,18 @@ module Seek
     end
 
     def is_content_remotely_viewable?(blob = self)
-      return false unless blob
+      return false unless blob.stored_in_shrine?
 
-      # Shrine / S3 remote storage support
-      return false unless blob.file_exists? || blob.is_stored_remotely?
-
-      # only certain formats are viewable
-      return false unless blob.is_viewable_format?
-
-      true
+      # Only certain formats are viewable
+      blob.is_viewable_format?
     end
 
-
-    def is_stored_remotely?
-      respond_to?(:file_attacher) && file_attacher&.attached?
-    end
-
-
+    # Set content type for S3 files
     def update_content_mime_type
       if url
         set_content_type_according_to_url
-      elsif file_exists?
-        set_content_type_according_to_file
+      elsif stored_in_shrine?
+        set_content_type_according_to_shrine_metadata
       end
     end
 
@@ -236,47 +227,17 @@ module Seek
       (Seek::Config.max_extractable_spreadsheet_size || 10).to_i * 1024 * 1024
     end
 
-    def check_content(blob, str, max_length = 1500)
-      char_count = 0
-      filepath = blob.filepath
-      begin
-        File.open(filepath, 'r').each_line do |line|
-          char_count += line.length
-          # Rails.logger.info("line=>"+line)
-          return true if line.downcase.include?(str)
-          break if char_count >= max_length
-        end
-      rescue => exception
-        Rails.logger.error("Error reading content_blob contents #{exception.class.name}:#{exception.message}")
+    # Set MIME type using Shrine metadata
+    def set_content_type_according_to_shrine_metadata
+      if respond_to?(:file_attacher) && file_attacher&.attached?
+        self.content_type = file.metadata['mime_type'] || 'application/octet-stream'
       end
-      false
     end
 
-    def find_or_keep_type_with_mime_magic
-      detected_mime_type = mime_types_for_extension(file_extension).first
-
-      if detected_mime_type.nil? && file_exists?
-        detected_mime_type ||= mime_magic_content_type
-      end
-      detected_mime_type || content_type
-    end
-
-    def mime_magic_content_type
-      io = File.open(filepath)
-      type = MimeMagic.by_magic(io).try(:type) if file_exists?
-      io.close
-      type
-    end
-
-    def set_content_type_according_to_file
-      self.content_type = find_or_keep_type_with_mime_magic
-    end
-
+    # Set MIME type using URL headers
     def set_content_type_according_to_url
       type = content_type.blank? ? retrieve_content_type_from_url : content_type
-
-      # strip out the charset, e.g for content-type  "text/html; charset=utf-8"
-      type = type.gsub(/;.*/, '').strip
+      type = type.gsub(/;.*/, '').strip # Remove charset info
       if type == 'text/html'
         self.is_webpage = true
         self.content_type = type
@@ -284,9 +245,10 @@ module Seek
       self.content_type = type if unknown_file_type?
     rescue => exception
       self.is_webpage = false
-      Rails.logger.warn("There was a problem reading the headers for the URL of the content blob: #{url}\n#{exception.class.name}\n\t#{exception.backtrace.join("\n\t")}")
+      Rails.logger.warn("Problem reading headers: #{exception.class.name}: #{exception.message}")
     end
 
+    # Fetch content type from URL via headers
     def retrieve_content_type_from_url
       remote_headers[:content_type] || ''
     end

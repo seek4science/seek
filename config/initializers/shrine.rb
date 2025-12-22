@@ -1,3 +1,6 @@
+# content_blob.rb
+
+# This is ab Shrine file for handling files with S3 exclusively.
 require "shrine"
 require "shrine/storage/s3"
 
@@ -13,11 +16,11 @@ s3_options = {
 
 # both `cache` and `store` storages are needed
 Shrine.storages = {
-  cache: Shrine::Storage::S3.new(prefix: "cache", **s3_options),
-  store: Shrine::Storage::S3.new(**s3_options),
+  cache: Shrine::Storage::S3.new(prefix: "cache", **s3_options), # for temporary storage
+  store: Shrine::Storage::S3.new(prefix: "store", **s3_options)  # for permanent storage
 }
 
 Shrine.plugin :activerecord
-Shrine.plugin :cached_attachment_data # for retaining the cached file across form redisplays
-Shrine.plugin :restore_cached_data # re-extract metadata when attaching a cached file
+Shrine.plugin :cached_attachment_data # for retaining cached file across form redisplays
+Shrine.plugin :restore_cached_data   # re-extract metadata when attaching a cached file
 Shrine.plugin :derivation_endpoint, secret_key: "squirrel", upload: true, upload_redirect: true
