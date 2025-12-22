@@ -8,7 +8,7 @@ class ISATagsController < ApplicationController
   def index
     respond_to do |format|
       format.json {
-        render json: ISATag.all,
+        render json: ISATag.all.sort,
                each_serializer: ISATagSkeletonSerializer,
                meta: {
                  base_url: Seek::Config.site_base_host,
