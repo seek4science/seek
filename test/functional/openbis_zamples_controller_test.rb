@@ -4,7 +4,6 @@ require 'openbis_test_helper'
 #include SharingFormTestHelper
 
 class OpenbisZamplesControllerTest < ActionController::TestCase
-  #fixtures :all
   include AuthenticatedTestHelper
 
   def setup

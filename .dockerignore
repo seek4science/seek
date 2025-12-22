@@ -1,12 +1,41 @@
+# Git and GitHub
 .git/
-Dockerfile
-filestore*
+.gitignore
+.github/
+
+# Docker and Devcontainer
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+.devcontainer/
+devcontainer.json
 hooks/
-coverage/
-docker/solr/
+
+# SEEK
+filestore*
 db/*.sqlite3
 vendor/bundle/
 public/unused_images
+public/api/definitions/openapi-v3-resolved.*
+public/help_images
+public/javascripts/*
+public/stylesheets
+public/system
+public/sitemaps
+public/assets
+public/assets_dev
 log/
 tmp/
 test/
+
+# Environment files
+.env*
+
+# IDEs and editors
+.idea/
+.vscode/
+
+# Ruby
+.bundle
+coverage/
+.codeclimate.yml

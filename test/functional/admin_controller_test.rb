@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class AdminControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 
@@ -167,7 +166,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'invalid email address' do
-    post :update_settings, params: { pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com' }
+    post :update_settings, params: { pubmed_api_email: 'quentin' }
     refute_nil flash[:error]
   end
 

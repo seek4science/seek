@@ -2,7 +2,6 @@ require 'test_helper'
 require 'minitest/mock'
 
 class PublicationsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -33,10 +32,10 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should not relate assays thay are not authorized for edit during create publication' do
     mock_pubmed(content_file: 'pubmed_1.txt')
     assay = assays(:metabolomics_assay)
-    assert_difference('Publication.count') do
-
-      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s],publication_type_id: FactoryBot.create(:journal).id } }
-
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      assert_difference('Publication.count') do
+        post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s],publication_type_id: FactoryBot.create(:journal).id } }
+      end
     end
 
     assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
@@ -48,10 +47,10 @@ class PublicationsControllerTest < ActionController::TestCase
     mock_pubmed(content_file: 'pubmed_1.txt')
     login_as(:model_owner) # can edit assay
     assay = assays(:metabolomics_assay)
-    assert_difference('Publication.count') do
-
-      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s],publication_type_id: FactoryBot.create(:journal).id } }
-
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      assert_difference('Publication.count') do
+        post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], assay_ids: [assay.id.to_s],publication_type_id: FactoryBot.create(:journal).id } }
+      end
     end
 
     assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
@@ -300,14 +299,49 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_difference('Publication.count', 0) do
       post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
       assert_redirected_to publications_path
-      assert_includes flash[:error], 'An InProceedings needs to have a booktitle.'
+      assert_includes flash[:error], 'A Conference Paper needs to have a booktitle.'
       assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
-      assert_includes flash[:error], 'An InCollection needs to have a booktitle.'
-      assert_includes flash[:error], 'A Phd Thesis needs to have a school.'
-      assert_includes flash[:error], 'A Masters Thesis needs to have a school.'
-      assert_includes flash[:error], 'You need at least one author or editor for the Journal.'
+      assert_includes flash[:error], 'A Collection needs to have a booktitle.'
+      assert_includes flash[:error], 'A PhD Thesis needs to have a school.'
+      assert_includes flash[:error], "A Master's Thesis needs to have a school."
+      assert_includes flash[:error], 'You need at least one author or editor for the Journal Article.'
     end
   end
+
+  test 'should import publication types and titles from sample bibtex file' do
+    expected_pubs = [
+      { title: 'A Sample Journal Article',       type_title: 'Journal Article' },
+      { title: 'The Example Book',               type_title: 'Book' },
+      { title: 'A Chapter Inside a Book',        type_title: 'Book Chapter' },
+      { title: 'A Conference Paper Example',     type_title: 'Conference Paper' },
+      { title: 'An Example PhD Thesis',          type_title: 'PhD Thesis' },
+      { title: 'A Technical Report Example',     type_title: 'Report' },
+      { title: 'Miscellaneous Example',          type_title: 'Other' }
+    ]
+
+    assert_difference('Publication.count', expected_pubs.count) do
+      post :create, params: {
+        subaction: 'ImportMultiple',
+        publication: {
+          bibtex_file: fixture_file_upload('bibtex/sample_publications.bib'),
+          project_ids: [projects(:one).id]
+        }
+      }
+    end
+
+    expected_pubs.each do |entry|
+      title          = entry[:title]
+      expected_title = entry[:type_title]
+
+      publication = Publication.find_by(title: title)
+      assert_not_nil publication, "Publication '#{title}' should have been imported"
+
+      assert_equal expected_title,
+                   publication.publication_type.title
+    end
+  end
+
+
 
 
   test 'should associate authors to users when importing multiple publications from bibtex files' do
@@ -403,6 +437,16 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_select '.panel-heading', text: 'License', count: 0
   end
 
+  test 'should show publication and SEEK ID only once when fulltext enabled' do
+    with_config_value(:allow_publications_fulltext, true) do
+      publication = FactoryBot.create(:publication, contributor: User.current_user.person)
+      get :show, params: { id: publication.id }
+      assert_response :success
+      assert_select 'strong', text: 'SEEK ID:', count: 1
+    end
+  end
+
+
   test 'should export publication as endnote' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
@@ -472,10 +516,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should handle bad response from efetch during export' do
     stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
-        .with(body: { 'db' => 'pubmed', 'email' => '(fred@email.com)', 'id' => '404', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'bioruby' },
+        .with(body: { 'db' => 'pubmed', 'email' => '(fred@email.com)', 'id' => '404', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'SEEK' },
               headers: { 'Accept' => '*/*',
                          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-                         'Content-Length' => '87',
                          'Content-Type' => 'application/x-www-form-urlencoded',
                          'User-Agent' => 'Ruby' })
         .to_return(status: 200, body: '')
@@ -496,10 +539,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should handle timeout from efetch during export' do
     stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
-        .with(body: { 'db' => 'pubmed', 'email' => '(fred@email.com)', 'id' => '999', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'bioruby' },
+        .with(body: { 'db' => 'pubmed', 'email' => '(fred@email.com)', 'id' => '999', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'SEEK' },
               headers: { 'Accept' => '*/*',
                          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-                         'Content-Length' => '87',
                          'Content-Type' => 'application/x-www-form-urlencoded',
                          'User-Agent' => 'Ruby' })
         .to_timeout
@@ -535,7 +577,9 @@ class PublicationsControllerTest < ActionController::TestCase
     p = assigns(:publications)
     assert_equal 0, p.length
     # project with publications
-    get :index, params: { filter: { project: [p1.id, p2.id] } }, format: :enw
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      get :index, params: { filter: { project: [p1.id, p2.id] } }, format: :enw
+    end
     assert_response :success
     p = assigns(:publications)
     assert_equal 3, p.length
@@ -547,19 +591,21 @@ class PublicationsControllerTest < ActionController::TestCase
 
     FactoryBot.create_list(:publication_with_date, 6)
 
-    # sort by published_date asc
-    get :index, params: { order: :published_at_asc }, format: :enw
-    assert_response :success
-    p = assigns(:publications)
-    assert_operator p[0].published_date, :<=, p[1].published_date
-    assert_operator p[1].published_date, :<=, p[2].published_date
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      # sort by published_date asc
+      get :index, params: { order: :published_at_asc }, format: :enw
+      assert_response :success
+      p = assigns(:publications)
+      assert_operator p[0].published_date, :<=, p[1].published_date
+      assert_operator p[1].published_date, :<=, p[2].published_date
 
-    # sort by published_date desc
-    get :index, params: { order: :published_at_desc }, format: :enw
-    assert_response :success
-    p = assigns(:publications)
-    assert_operator p[0].published_date, :>=, p[1].published_date
-    assert_operator p[1].published_date, :>=, p[2].published_date
+      # sort by published_date desc
+      get :index, params: { order: :published_at_desc }, format: :enw
+      assert_response :success
+      p = assigns(:publications)
+      assert_operator p[0].published_date, :>=, p[1].published_date
+      assert_operator p[1].published_date, :>=, p[2].published_date
+    end
   end
 
   test 'should filter publications by title contains for export' do
@@ -586,11 +632,14 @@ class PublicationsControllerTest < ActionController::TestCase
     author = pub.publication_authors.where(last_name: 'LastReg').first
     assert author.person
 
-    # Tests e.g. /people/123/publications
-    get :index, params: { person_id: author.person.id }, format: :enw
-    assert_response :success
-    p = assigns(:publications)
-    assert_equal 1, p.count
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      # Tests e.g. /people/123/publications
+      get :index, params: { person_id: author.person.id }, format: :enw
+      assert_response :success
+      p = assigns(:publications)
+      assert_equal 1, p.count
+    end
+
   end
 
   test 'should not limit exported publications to current page' do
@@ -890,11 +939,12 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_equal 2, p.publication_authors.size
     assert_equal 2, p.creators.size
-
-    assert_difference('PublicationAuthor.count', 0) do
-      # seek_authors (AssetsCreators) decrease by 2.
-      assert_difference('AssetsCreator.count', -2) do
-        post :disassociate_authors, params: { id: p.id }
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      assert_difference('PublicationAuthor.count', 0) do
+        # seek_authors (AssetsCreators) decrease by 2.
+        assert_difference('AssetsCreator.count', -2) do
+          post :disassociate_authors, params: { id: p.id }
+        end
       end
     end
   end
@@ -1252,8 +1302,8 @@ class PublicationsControllerTest < ActionController::TestCase
     #investigation should only be listed once even if in multiple matching projects
     person = FactoryBot.create(:person_in_multiple_projects)
     assert person.projects.count > 1
-    investigation = FactoryBot.create(:investigation,projects:person.projects,contributor:person)
-    publication = FactoryBot.create(:publication, contributor:person)
+    investigation = FactoryBot.create(:investigation, projects: person.projects, contributor: person)
+    publication = FactoryBot.create(:publication, contributor: person)
     login_as(person)
 
     get :manage, params: { id: publication }
@@ -1267,10 +1317,12 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'manage from registration should go to manage as newly_created' do
     mock_pubmed(content_file: 'pubmed_1.txt')
     login_as(:model_owner)
-    assert_difference('Publication.count') do
-      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], publication_type_id: FactoryBot.create(:journal).id } }
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      assert_difference('Publication.count') do
+        post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], publication_type_id: FactoryBot.create(:journal).id } }
+      end
+      assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     end
-    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
   end
 
   test 'manage from newly_created should give a delete button' do
@@ -1671,6 +1723,42 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 1, results.size
     assert_equal 'John Doe', results.first['text']
     assert_equal 25, results.first['count']
+  end
+
+  test 'pubmed option disabled if no email configured' do
+    with_config_value(:pubmed_api_email, '') do
+      get :new
+      assert_response :success
+      assert_select 'select#protocol' do
+        assert_select 'option[value="doi"]', count: 1
+        assert_select 'option[value="pubmed"]' do |option|
+          assert option.attr('disabled').present?
+          assert_equal 'PubMed ID (email needs configuring by an Admin)', option.text
+        end
+      end
+      assert_select 'div.tab-pane#Create' do
+        assert_select 'input#publication_pubmed_id', count: 0
+        assert_select 'button#retrieve_from_pubmed', count: 0
+        assert_select 'div.alert-warning', text: /To use the PubMed ID lookup feature, an administrator must first configure an email address for the PubMed API/
+      end
+    end
+
+    with_config_value(:pubmed_api_email, 'fred@email.com') do
+      get :new
+      assert_response :success
+      assert_select 'select#protocol' do
+        assert_select 'option[value="doi"]', count: 1
+        assert_select 'option[value="pubmed"]' do |option|
+          refute option.attr('disabled').present?
+          assert_equal 'PubMed ID', option.text
+        end
+      end
+      assert_select 'div.tab-pane#Create' do
+        assert_select 'input#publication_pubmed_id', count: 1
+        assert_select 'button#retrieve_from_pubmed', count: 1
+        assert_select 'div.alert-warning', count: 0
+      end
+    end
   end
 
   private

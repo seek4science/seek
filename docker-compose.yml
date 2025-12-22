@@ -1,6 +1,30 @@
+x-shared:
+  seek_base: &seek_base
+    # build: .
+    image: fairdom/seek:main
+
+    restart: always
+    environment: &seek_base_env
+      RAILS_ENV: production
+      SOLR_PORT: 8983
+      SOLR_HOST: solr
+      RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-filestore:/seek/filestore
+      - seek-cache:/seek/tmp/cache
+    depends_on:
+      db:
+        condition: service_healthy
+      solr:
+        condition: service_started
+
+
 services:
-  db: # Database implementation, in this case MySQL
-    image: mysql:8.0
+  db:
+    # Database implementation, in this case MySQL
+    image: mysql:8.4
     container_name: seek-mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-error-verbosity=1
     restart: always
@@ -9,59 +33,42 @@ services:
       - docker/db.env
     volumes:
       - seek-mysql-db:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
-  seek: # The SEEK application
-    #build: .
 
-    image: fairdom/seek:main
-
+  seek:
+    # The SEEK application
+    <<: *seek_base
     container_name: seek
     command: docker/entrypoint.sh
-    restart: always
-    environment:
-      RAILS_ENV: production
-      SOLR_PORT: 8983
-      SOLR_HOST: solr
-      NO_ENTRYPOINT_WORKERS: 1
-      RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-    env_file:
-      - docker/db.env
-    volumes:
-      - seek-filestore:/seek/filestore
-      - seek-cache:/seek/tmp/cache
     ports:
       - "3000:3000"
-    depends_on:
-      - db
-      - solr
-    links:
-      - db
-      - solr
+    environment:
+      <<: *seek_base_env
+      NO_ENTRYPOINT_WORKERS: 1
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
-  seek_workers: # The SEEK delayed job workers
-      #build: .
-
-      image: fairdom/seek:main
-      container_name: seek-workers
-      command: docker/start_workers.sh
-      restart: always
-      environment:
-        RAILS_ENV: production
-        SOLR_PORT: 8983
-        SOLR_HOST: solr
-        RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-        QUIET_SUPERCRONIC: 1 # remove to show supercronic activity logs
-      env_file:
-        - docker/db.env
-      volumes:
-        - seek-filestore:/seek/filestore
-        - seek-cache:/seek/tmp/cache
-      depends_on:
-        - db
-        - solr
-      links:
-        - db
-        - solr
+  seek_workers:
+    # The SEEK delayed job workers
+    <<: *seek_base
+    container_name: seek-workers
+    environment:
+      <<: *seek_base_env
+      QUIET_SUPERCRONIC: 1
+    command: docker/start_workers.sh
+    healthcheck:
+      test: [ "CMD", "bash", "script/check_worker_pids.sh" ]
+      retries: 5
 
   solr:
     image: fairdom/seek-solr:8.11
@@ -75,8 +82,7 @@ services:
       - docker-entrypoint.sh
       - solr-precreate
       - seek
-      - /opt/solr/server/solr/configsets/seek_config      
-
+      - /opt/solr/server/solr/configsets/seek_config
 
 volumes:
   seek-filestore:

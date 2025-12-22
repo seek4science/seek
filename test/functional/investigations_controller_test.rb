@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class InvestigationsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper

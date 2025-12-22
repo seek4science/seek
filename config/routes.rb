@@ -894,6 +894,9 @@ SEEK::Application.routes.draw do
   # feedback
   get '/home/feedback' => 'homes#feedback', as: :feedback
 
+  # Healthcheck
+  get "up" => "rails/health#show", as: :rails_health_check
+
   # error rendering
   get '/404' => 'errors#error_404'
   get '/406' => 'errors#error_406'

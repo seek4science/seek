@@ -49,7 +49,7 @@ class Publication < ApplicationRecord
   has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, as: :asset, foreign_key: :asset_id
 
   explicit_versioning(:version_column => "version", sync_ignore_columns: ['license','other_creators']) do
-  acts_as_versioned_resource
+    acts_as_versioned_resource
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :publication_id,:foreign_key => :asset_id
 
@@ -58,7 +58,7 @@ class Publication < ApplicationRecord
     end
 
     alias_method :doi_identifier, :doi_uri
-end
+  end
 
   belongs_to :publication_type
 
@@ -77,6 +77,8 @@ end
   after_save :update_creators_from_publication_authors
 
   accepts_nested_attributes_for :publication_authors
+
+  auto_strip_attributes :abstract
 
   # Types of registration
   REGISTRATION_BY_PUBMED = 1
@@ -242,83 +244,81 @@ end
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
     self.title         += ( ":#{(bibtex_record[:subtitle].try(:to_s).gsub /{|}/, '')}") unless bibtex_record[:subtitle].nil?
 
-    if check_bibtex_file (bibtex_record)
-      self.abstract = bibtex_record[:abstract].try(:to_s)
-      self.journal = bibtex_record.journal.try(:to_s)
-      month = bibtex_record[:month].try(:to_s)
-      year = bibtex_record[:year].try(:to_s)
-      self.published_date = Date.new(bibtex_record.year.try(:to_i) || 1, bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
-      self.published_date = nil if self.published_date.to_s == "0001-01-01"
-      self.doi = bibtex_record[:doi].try(:to_s)
-      self.pubmed_id = bibtex_record[:pubmed_id].try(:to_s)
-      self.booktitle = bibtex_record[:booktitle].try(:to_s)
-      self.publisher = bibtex_record[:publisher].try(:to_s)
-      self.editor = bibtex_record[:editors].try(:to_s)
-      self.url = parse_bibtex_url(bibtex_record).try(:to_s)
+    return false unless check_bibtex_file (bibtex_record)
+    
+    self.abstract = bibtex_record[:abstract].try(:to_s)
+    self.journal = bibtex_record.journal.try(:to_s)
+    month = bibtex_record[:month].try(:to_s)
+    year = bibtex_record[:year].try(:to_s)
+    self.published_date = Date.new(bibtex_record.year.try(:to_i) || 1, bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1)
+    self.published_date = nil if self.published_date.to_s == '0001-01-01'
+    self.doi = bibtex_record[:doi].try(:to_s)
+    self.pubmed_id = bibtex_record[:pubmed_id].try(:to_s)
+    self.booktitle = bibtex_record[:booktitle].try(:to_s)
+    self.publisher = bibtex_record[:publisher].try(:to_s)
+    self.editor = bibtex_record[:editors].try(:to_s)
+    self.url = parse_bibtex_url(bibtex_record).try(:to_s)
 
-      unless bibtex_record[:author].nil?
-        plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
-        plain_authors.each_with_index do |author, index| # multiselect
-          next if author.empty?
-          last_name, first_name = author.split(', ') # by bibtex definition
-          unless first_name.nil?
-            first_name = first_name.try(:to_s).gsub /^{|}$/, ''
-          end
-          unless last_name.nil?
-            last_name = last_name.try(:to_s).gsub /^{|}$/, ''
-          end
-          pa = PublicationAuthor.new(publication: self,
-                                     first_name: first_name,
-                                     last_name: last_name,
-                                     author_index: index)
-          publication_authors << pa
+    unless bibtex_record[:author].nil?
+      plain_authors = bibtex_record[:author].split(' and ') # by bibtex definition
+      plain_authors.each_with_index do |author, index| # multiselect
+        next if author.empty?
+        last_name, first_name = author.split(', ') # by bibtex definition
+        unless first_name.nil?
+          first_name = first_name.try(:to_s).gsub /^{|}$/, ''
         end
+        unless last_name.nil?
+          last_name = last_name.try(:to_s).gsub /^{|}$/, ''
+        end
+        pa = PublicationAuthor.new(publication: self,
+                                   first_name: first_name,
+                                   last_name: last_name,
+                                   author_index: index)
+        publication_authors << pa
       end
+    end
 
-      unless bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
-        self.editor = bibtex_record[:editor].try(:to_s) || bibtex_record[:editors].try(:to_s)
-      end
+    unless bibtex_record[:editor].nil? && bibtex_record[:editors].nil?
+      self.editor = bibtex_record[:editor].try(:to_s) || bibtex_record[:editors].try(:to_s)
+    end
 
       # in some cases, e.g. proceedings, book, there are no authors but only editors
-      if bibtex_record[:author].nil? && !self.editor.nil?
-        plain_editors = self.editor.split(' and ') # by bibtex definition
-        plain_editors.each_with_index do |editor, index| # multiselect
-          next if editor.empty?
-          last_name, first_name = editor.split(', ') # by bibtex definition
-          unless first_name.nil?
-            first_name = first_name.try(:to_s).gsub /^{|}$/, ''
-          end
-          unless last_name.nil?
-            last_name = last_name.try(:to_s).gsub /^{|}$/, ''
-          end
-          pa = PublicationAuthor.new(publication: self,
-                                     first_name: first_name,
-                                     last_name: last_name,
-                                     author_index: index)
-          publication_authors << pa
+    if bibtex_record[:author].nil? && !self.editor.nil?
+      plain_editors = self.editor.split(' and ') # by bibtex definition
+      plain_editors.each_with_index do |editor, index| # multiselect
+        next if editor.empty?
+        last_name, first_name = editor.split(', ') # by bibtex definition
+        unless first_name.nil?
+          first_name = first_name.try(:to_s).gsub /^{|}$/, ''
         end
+        unless last_name.nil?
+          last_name = last_name.try(:to_s).gsub /^{|}$/, ''
+        end
+        pa = PublicationAuthor.new(publication: self,
+                                   first_name: first_name,
+                                   last_name: last_name,
+                                   author_index: index)
+        publication_authors << pa
       end
+    end
 
       #using doi/pubmed_id to fetch the metadata
-      result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi) if self.pubmed_id.present? || self.doi.present?
+    result = fetch_pubmed_or_doi_result(self.pubmed_id, self.doi) if self.pubmed_id.present? || self.doi.present?
 
-      unless result.nil?
-        self.citation = result.citation unless result.citation.nil?
+    unless result.nil?
+      self.citation = result.citation unless result.citation.nil?
 
-        if self.journal.nil? && !result.journal.nil?
-          self.journal = result.journal
-        end
-
-        self.published_date = result.date_published unless result.date_published.nil?
+      if self.journal.nil? && !result.journal.nil?
+        self.journal = result.journal
       end
 
-      if self.citation.nil?
-        self.generate_citation(bibtex_record)
-      end
-      return true
-    else
-      return false
+      self.published_date = result.date_published unless result.date_published.nil?
     end
+
+    if self.citation.nil?
+      self.generate_citation(bibtex_record)
+    end
+    true
   end
 
   # generating the citations for different types of publications by using the data from Bibtex file when no doi/pubmed_id
@@ -326,7 +326,7 @@ end
     self.citation = ''
     month = bibtex_record[:month].try(:to_s)
     year = bibtex_record[:year].try(:to_s)
-    page_or_pages = (bibtex_record[:pages].try(:to_s).match?(/[^0-9]/) ? "pp." : "p." ) unless bibtex_record[:pages].nil?
+    page_or_pages = (bibtex_record[:pages].try(:to_s).match?(/[^0-9]/) ? 'pp.' : 'p.' ) unless bibtex_record[:pages].nil?
     pages = bibtex_record[:pages].try(:to_s)
     volume = bibtex_record[:volume].try(:to_s)
     series = bibtex_record[:series].try(:to_s)
@@ -344,25 +344,16 @@ end
     url = parse_bibtex_url(bibtex_record).try(:to_s)
     publication_type = PublicationType.find(self.publication_type_id)
 
-    if publication_type.is_journal?
+    case publication_type.key
+    when publication_type.journalarticle?
       self.citation += self.journal.nil? ? '':self.journal
       self.citation += volume.blank? ? '': " #{volume}"
       self.citation += number.nil? ? '' : "(#{number})"
       self.citation += pages.blank? ? '' : (":#{pages}")
-=begin
-      unless year.nil?
-        self.citation += year.nil? ? '' : (' '+year)
-      end
-=end
-    elsif publication_type.is_booklet?
+    when publication_type.booklet?
       self.citation += howpublished.blank? ? '': "#{howpublished}"
       self.citation += address.nil? ? '' : (", #{address}")
-=begin
-      unless year.nil?
-        self.citation += year.nil? ? '' : (' '+year)
-      end
-=end
-    elsif publication_type.is_inbook?
+    when publication_type.bookchapter?
       self.citation += self.booktitle.nil? ? '' : ("In #{self.booktitle}")
       self.citation += volume.blank? ? '' : (", volume #{volume}")
       self.citation += series.blank? ? '' : (" of #{series}")
@@ -372,14 +363,7 @@ end
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (", #{address}")
       end
-=begin
-      unless self.booktitle.try(:include?, year)
-        unless year.nil?
-          self.citation += year.nil? ? '' : (' '+year)
-        end
-      end
-=end
-    elsif publication_type.is_inproceedings? || publication_type.is_incollection? || publication_type.is_book?
+    when publication_type.conferencepaper?, publication_type.collection?, publication_type.book?
       # InProceedings / InCollection
       self.citation += self.booktitle.nil? ? '' : ("In #{self.booktitle}")
       self.citation += volume.blank? ? '' : (", vol. #{volume}")
@@ -390,14 +374,7 @@ end
       unless address.nil? || (self.booktitle.try(:include?, address))
         self.citation += address.nil? ? '' : (", #{address}")
       end
-=begin
-      unless self.booktitle.try(:include?, year)
-        unless year.nil?
-          self.citation += year.nil? ? '' : (', '+year)
-        end
-      end
-=end
-    elsif publication_type.is_phd_thesis? || publication_type.is_masters_thesis? || publication_type.is_bachelor_thesis?
+    when publication_type.dissertation?
       #PhD/Master Thesis
       self.citation += school.nil? ? '' : (" #{school}")
       self.errors.add(:base,'A thesis need to have a school') if school.nil?
@@ -405,24 +382,17 @@ end
       self.citation += tutor.nil? ? '' : (", #{tutor}(Tutor)")
       self.citation += tutorhits.nil? ? '' : (", #{tutorhits}(HITS Tutor)")
       self.citation += url.nil? ? '' : (", #{url}")
-    elsif publication_type.is_proceedings?
+    when publication_type.conferenceproceeding?
       # Proceedings are conference proceedings, it has no authors but editors
       # Book
       self.journal = self.title
       self.citation += volume.blank? ? '' : ("vol. #{volume}")
       self.citation += series.blank? ? '' : (" of #{series}")
       self.citation += self.publisher.blank? ? '' : (", #{self.publisher}")
-=begin
-      unless month.nil? && year.nil?
-        self.citation += self.citation.blank? ? '' : ','
-        self.citation += month.nil? ? '' : (' '+ month.capitalize)
-        self.citation += year.nil? ? '' : (' '+year)
-      end
-=end
-    elsif publication_type.is_tech_report?
+    when publication_type.report?
       self.citation += institution.blank? ? ' ': institution
       self.citation += type.blank? ? ' ' : (", #{type}")
-    elsif publication_type.is_unpublished?
+    when publication_type.preprint?
       self.citation += note.blank? ? ' ': note
     end
 
@@ -444,12 +414,11 @@ end
     @error = nil
     if !pubmed_id.blank?
       begin
-        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+        result = Bio::MEDLINE.new(pubmed_entry(pubmed_id)).reference
         @error = result.error
       rescue => exception
-        raise exception unless Rails.env.production?
         result ||= Bio::Reference.new({})
-        @error = 'There was a problem contacting the PubMed query service. Please try again later'
+        @error = 'There was a problem contacting the PubMed query service, or the PubMed id was invalid. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing ncbi using pubmed id #{pubmed_id}"})
       end
     elsif !doi.blank?
@@ -579,13 +548,14 @@ end
     pol.permissions
   end
 
-  def pubmed_entry
-    if pubmed_id
-      Rails.cache.fetch("bio-reference-#{pubmed_id}") do
-        entry = Bio::PubMed.efetch(pubmed_id).first
-        raise "PubMed entry was nil" if entry.nil?
-        entry
-      end
+  def pubmed_entry(pm_id = pubmed_id)
+    return unless pm_id
+
+    Rails.cache.fetch("bio-reference-#{pm_id}") do
+      entry = Bio::PubMed.efetch(pm_id).first
+      raise 'PubMed entry was nil' if entry.nil?
+
+      entry
     end
   end
 
@@ -620,25 +590,25 @@ end
 
 
     if self.title.blank?
-      errors.add(:base, "Please check your bibtex files, each publication should contain a title or a chapter name.")
+      errors.add(:base, 'Please check your bibtex files, each publication should contain a title or a chapter name.')
       return false
     end
 
-    if (%w[InCollection InProceedings].include? self.publication_type.title) && (bibtex_record[:booktitle].blank?)
-      errors.add(:base, "An #{self.publication_type.title} needs to have a booktitle.")
-        return false
+    if (publication_type.collection? || publication_type.conferencepaper?) && bibtex_record[:booktitle].blank?
+      errors.add(:base, "A #{self.publication_type.title} needs to have a booktitle.")
+      return false
     end
 
-    unless %w[Booklet Manual Misc Proceedings].include? self.publication_type.title
+    unless publication_type.booklet? || publication_type.text? || publication_type.other? || publication_type.conferenceproceeding?
       if bibtex_record[:author].nil? && self.editor.nil?
         self.errors.add(:base, "You need at least one author or editor for the #{self.publication_type.title}.")
         return false
       end
     end
 
-    if self.publication_type.is_phd_thesis? || self.publication_type.is_masters_thesis? || self.publication_type.is_bachelor_thesis?
+    if publication_type.dissertation?
       if bibtex_record[:school].try(:to_s).nil?
-        self.errors.add(:base,"A #{self.publication_type.title} needs to have a school.")
+        self.errors.add(:base,"A #{publication_type.title} needs to have a school.")
         return false
       end
     end

@@ -76,10 +76,9 @@ module MockHelper
 
   def publication_formatter_mock
     stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
-      .with(body: { 'db' => 'pubmed', 'email' => '(fred@email.com)', 'id' => '5', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'bioruby' },
+      .with(body: { 'db' => 'pubmed', 'email' => 'fred@email.com', 'id' => '5', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'SEEK' },
             headers: { 'Accept' => '*/*',
                        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-                       'Content-Length' => '85',
                        'Content-Type' => 'application/x-www-form-urlencoded',
                        'User-Agent' => 'Ruby' })
       .to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))

@@ -3,7 +3,6 @@ require 'test_helper'
 class SinglePublishingTest < ActionController::TestCase
   tests DataFilesController
 
-  fixtures :all
 
   include AuthenticatedTestHelper
 
