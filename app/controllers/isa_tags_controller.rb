@@ -2,8 +2,8 @@ class ISATagsController < ApplicationController
   respond_to :json
   api_actions :show, :index
   before_action :ensure_json_request
-  before_action :isa_json_compliance_enabled?
-  before_action :login_required
+  before_action :ensure_isa_json_compliance_enabled?
+  before_action :ensure_logged_in
 
   def index
     respond_to do |format|
@@ -35,5 +35,23 @@ class ISATagsController < ApplicationController
       error: "Not Acceptable",
       message: "This endpoint only serves application/json."
     }, status: :not_acceptable # 406
+  end
+
+  def ensure_isa_json_compliance_enabled?
+    return if Seek::Config.isa_json_compliance_enabled
+
+    render json: {
+      error: "Not Available",
+      message: "ISA-JSON compliance is disabled. Endpoint not available."
+    }, status: :forbidden
+  end
+
+  def ensure_logged_in
+    return if logged_in?
+
+    render json: {
+      error: "Not Authenticated",
+      message: "Please log in."
+    }, status: :unauthorized
   end
 end

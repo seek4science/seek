@@ -14,7 +14,7 @@ class ISATagsControllerTest < ActionController::TestCase
     Seek::Config.isa_json_compliance_enabled = false
   end
 
-  test 'should return ISA tags if logged in' do
+  test 'should return available ISA tags' do
     login_as @authenticated_user
 
     get :index, as: :json
@@ -23,17 +23,37 @@ class ISATagsControllerTest < ActionController::TestCase
     assert_equal response_body["data"].count, 10
   end
 
+  test 'should return the ISA tag by id' do
+    login_as @authenticated_user
+    get :show, as: :json, params: { id: ISATag.first.id }
+    assert_response :success
+  end
+
   test 'should not return ISA tags if not logged in' do
     get :index, as: :json
     assert_response :unauthorized
-    assert_equal response.body, "HTTP Basic: Access denied.\n"
+    response_body = JSON.parse(response.body)
+    assert_equal response_body["error"], "Not Authenticated"
+    assert_equal response_body["message"], "Please log in."
   end
 
   test 'should not respond to anything else than json requests' do
+    login_as @authenticated_user
     get :index, as: :xml
     assert_response :not_acceptable
     response_body = JSON.parse(response.body)
     assert_equal response_body["error"], "Not Acceptable"
+    assert_equal response_body["message"], "This endpoint only serves application/json."
   end
 
+  test 'should not respond if ISA-JSON compliance is disabled' do
+    with_config_value :isa_json_compliance_enabled, false do
+      login_as @authenticated_user
+      get :index, as: :json
+      assert_response :forbidden
+      response_body = JSON.parse(response.body)
+      assert_equal response_body["error"], "Not Available"
+      assert_equal response_body["message"], "ISA-JSON compliance is disabled. Endpoint not available."
+    end
+  end
 end
