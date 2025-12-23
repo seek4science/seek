@@ -42,6 +42,7 @@ gem 'google-analytics-rails'
 gem 'handlebars_assets'
 gem 'html-pipeline'
 gem 'i18n-js', '~> 3.9.2' # Version 4+ does not support the asset pipeline
+gem "image_processing", "~> 1.8"
 gem 'indefinite_article'
 gem 'jbuilder'
 gem 'jbuilder-json_api'
@@ -99,6 +100,8 @@ gem 'rugged'
 gem 'sample-template-generator'
 gem 'sass-rails'
 gem 'seedbank'
+gem 'shrine'
+gem "aws-sdk-s3", "~> 1.14"
 gem 'simple-spreadsheet-extractor'
 gem 'sitemap_generator'
 gem 'sprockets-rails'

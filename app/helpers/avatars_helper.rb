@@ -35,7 +35,11 @@ module AvatarsHelper
   def avatar_according_to_user_upload(alternative, item, size, css_class = 'framed')
     if item.avatar_selected?
       if item.avatars.include?(item.avatar)
-        return image_tag avatar_url(item, item.avatar, size), alt: alternative, class: css_class
+        if item.is_a?(Person)
+          return image_tag item.avatar.image.derivation_url(:thumbnail, size), alt: alternative, class: css_class
+        else
+          return image_tag avatar_url(item, item.avatar, size), alt: alternative, class: css_class
+        end
       else
         raise 'Avatar does not belong to instance' unless Rails.env.production?
       end

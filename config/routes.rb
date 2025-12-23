@@ -844,6 +844,8 @@ SEEK::Application.routes.draw do
     resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
   end
 
+  mount Shrine::ImageUploader.derivation_endpoint => "/derivations/image"
+
   ### SPARQL ###
   resources :sparql, only: [:index] do
     collection do

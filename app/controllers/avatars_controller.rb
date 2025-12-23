@@ -23,14 +23,14 @@ class AvatarsController < ApplicationController
   # POST /people
   def create
     @avatar = @avatar_owner_instance.avatars.build(avatar_params)
-    @avatar.original_filename = avatar_params[:image_file].original_filename if avatar_params[:image_file]
+    #@avatar.original_filename = avatar_params[:image_file].original_filename if avatar_params[:image_file]
 
     respond_to do |format|
       if @avatar.save
         flash[:notice] = 'Avatar was successfully uploaded.'
         # updated to take account of possibly various locations from where this method can be called,
         # so multiple redirect options are possible -> now return link is passed as a parameter
-        format.html { redirect_to(params[:return_to] + "?use_unsaved_session_data=true") }
+        format.html { redirect_to polymorphic_path([@avatar_owner_instance, :avatars]) }
       else
         format.html { render action: 'new', status: :unprocessable_entity }
       end
@@ -122,7 +122,7 @@ class AvatarsController < ApplicationController
   end
 
   def avatar_params
-    params.fetch(:avatar, {}).permit(:image_file)
+    params.fetch(:avatar, {}).permit(:image_file, :image)
   end
 
   def find_avatars

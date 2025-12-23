@@ -1,15 +1,18 @@
 # it's fine to keep all avatars in one folder - as image IDs will be the same as record IDs in "avatars" table
 # (hence will be unique, no matter what kind of owner -- person/project/institution -- we have)
-
+require 'shrine/attachment'
 # DECLARING WHAT "LARGE" AVATAR IS
 LARGE_SIZE = '500'.freeze
 
 class Avatar < ApplicationRecord
+
+  include Shrine::ImageUploader::Attachment(:image)
+
   acts_as_fleximage do
     image_directory Seek::Config.avatar_filestore_path
     use_creation_date_based_directories false
     image_storage_format      :png
-    require_image             true
+    require_image             false
     missing_image_message     'is required'
     invalid_image_message     'was not a readable image'
   end
