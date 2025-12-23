@@ -31,6 +31,9 @@
               "description": {
                 "type": ["string", "null"]
               },
+              "allow_cv_free_text": {
+                "type": "boolean"
+              },
               "label": {
                 "type": "string"
               },
@@ -63,6 +66,9 @@
               },
               "description": {
                 "type": ["string", "null"]
+              },
+              "allow_cv_free_text": {
+                "type": "boolean"
               },
               "label": {
                 "type": "string"
