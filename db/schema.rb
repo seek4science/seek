@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_27_161227) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -352,6 +352,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_29_134054) do
     t.datetime "updated_at"
     t.boolean "deleted", default: false
     t.boolean "make_local_copy", default: false
+    t.text "file_data"
     t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
   end
 
