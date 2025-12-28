@@ -56,6 +56,51 @@ module Seek
 
     private
 
+
+    def shrine_s3_blob?
+      @content_blob.respond_to?(:file_attacher) && @content_blob.file_attacher&.attached?
+    end
+
+    def local_file_available?
+      @content_blob.file_exists? && !jerm_generated?
+    end
+
+    def remote_url_available?
+      @content_blob.url.present?
+    end
+
+    def jerm_generated?
+      @asset_version && @asset_version.contributor.nil?
+    end
+
+    def prepare_local_file(image_size)
+      if image_size.present? && @content_blob.is_image_convertable?
+        @content_blob.resize_image(image_size)
+        @content_blob.full_cache_path(image_size)
+      else
+        @content_blob.filepath
+      end
+    end
+
+    def handle_remote_download
+      if jerm_generated?
+        download_jerm_asset
+      else
+        case URI(@content_blob.url).scheme
+        when 'ftp'
+          stream_from_ftp_url
+        else
+          stream_from_http_url
+        end
+      end
+    rescue Seek::DownloadException
+      redirect_on_error @asset_version, 'The remote resource is inaccessible and no local copy is available.'
+    rescue JERM::JERMException => e
+      redirect_on_error @asset_version, e.message
+    end
+
+
+
     # for assets that only have a single content-blob
     def download_single(content_blob)
       @content_blob = content_blob
@@ -122,40 +167,24 @@ module Seek
     end
 
     def handle_download(disposition = 'attachment', image_size = nil)
-      jerm_generated = @asset_version && @asset_version.contributor.nil?
-      if @content_blob.file_exists? && !jerm_generated # JERM will try to download first
-        if image_size && @content_blob.is_image_convertable?
-          @content_blob.resize_image(image_size)
-          filepath = @content_blob.full_cache_path(image_size)
-          headers['Content-Length'] = File.size(filepath).to_s
-        else
-          filepath = @content_blob.filepath
-          # added for the benefit of the tests after rails3 upgrade - but doubt it is required
-          headers['Content-Length'] = @content_blob.file_size.to_s
-          headers['Content-MD5'] = @content_blob.md5sum if @content_blob.md5sum
+      if shrine_s3_blob?
+        redirect_to @content_blob.file_url, allow_other_host: true
+        return
         end
-        send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
-      elsif @content_blob.url.present?
-        begin
-          if jerm_generated
-            download_jerm_asset
-          else
-            case URI(@content_blob.url).scheme
-            when 'ftp'
-              stream_from_ftp_url
+
+      if local_file_available?
+        filepath = prepare_local_file(image_size)
+        send_file filepath,
+                  filename: @content_blob.original_filename,
+                  type: @content_blob.content_type || 'application/octet-stream',
+                  disposition: disposition
+      elsif remote_url_available?
+        handle_remote_download
             else
-              stream_from_http_url
-            end
+        redirect_on_error @asset_version, "Unable to locate a copy of the file. Please contact an administrator of #{Seek::Config.instance_name}."
           end
-        rescue Seek::DownloadException => de
-          redirect_on_error @asset_version, 'There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again.'
-        rescue JERM::JERMException => de
-          redirect_on_error @asset_version, de.message
-        end
-      else
-        redirect_on_error @asset_version, "Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.instance_name}."
       end
-    end
+
 
     def download_jerm_asset
       project = @asset_version.projects.first

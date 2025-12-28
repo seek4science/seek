@@ -85,9 +85,23 @@ module Seek
       File.read(filepath)
     end
 
-    def to_spreadsheet_xml
-      spreadsheet_to_xml(filepath, Seek::Config.jvm_memory_allocation)
+    def extract_csv
+      # Use Shrine storage if available
+      if file_exists?
+        return file_attacher.file.open { |io| io.read }
+      end
+
     end
+
+
+    def to_spreadsheet_xml
+      mem = Seek::Config.jvm_memory_allocation.presence || SysMODB::DEFAULT_MEMORY_ALLOCATION
+
+      file_attacher.file.download do |tempfile|
+        spreadsheet_to_xml(tempfile.path, mem)
+      end
+    end
+
 
     private
 

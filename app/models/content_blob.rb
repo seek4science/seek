@@ -4,10 +4,12 @@ require 'open-uri'
 require 'tmpdir'
 require 'docsplit'
 require 'rest-client'
+require "shrine/attachment"
 
 class ContentBlob < ApplicationRecord
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
+  include Shrine::FileUploader::Attachment(:file)
   extend Seek::UrlValidation
   prepend Seek::Openbis::Blob
   prepend Nels::Blob
@@ -31,7 +33,6 @@ class ContentBlob < ApplicationRecord
   # an Exception is raised if both are defined
   before_save :dump_data_to_file
   before_save :check_version
-  before_save :calculate_file_size
   after_create :create_retrieval_job
   before_save :clear_sample_type_matches
   after_destroy :delete_converted_files
@@ -132,8 +133,16 @@ class ContentBlob < ApplicationRecord
     nil
   end
 
-  def file_exists?(format = 'dat')
-    File.exist?(filepath(format))
+  # Check if the file is stored in Shrine (and hence in S3 as per the configured storage)
+  def stored_in_shrine?
+    respond_to?(:file_attacher) && file_attacher&.attached?
+  end
+
+  # Check if the file exists (delegates to stored_in_shrine?
+  def file_exists?
+    stored_in_shrine?
+  rescue Shrine::FileNotFound
+    false
   end
 
   def storage_filename(format = 'dat', uuid_to_use = nil)
@@ -168,7 +177,9 @@ class ContentBlob < ApplicationRecord
   end
 
   def file
-    @file ||= File.open(filepath)
+    if file_exists?
+      return file_attacher.file
+    end
   end
 
   def retrieve

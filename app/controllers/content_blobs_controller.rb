@@ -114,21 +114,25 @@ class ContentBlobsController < ApplicationController
   # then return the pdf file
   def pdf_or_convert(filepath = @content_blob.filepath)
     if @content_blob.is_pdf?
-      pdf_filepath = @content_blob.filepath
-      pdf_filename = @content_blob.original_filename
-    else
-      pdf_filepath = @content_blob.filepath('pdf')
-      unless File.exist?(pdf_filepath)
-        @content_blob.convert_to_pdf(filepath, pdf_filepath)
-        raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
-      end
+      pdf_filename = @content_blob.original_filename.to_s
 
-      pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
+      @content_blob.file.open do |io|
+        io.rewind if io.respond_to?(:rewind)
+        data = io.read
+        send_data data, filename: pdf_filename, type: "application/pdf", disposition: "attachment"
+        headers["Content-Length"] = data.bytesize.to_s
+      end
+    else
+      # pdf_filepath = @content_blob.filepath('pdf')
+      # unless File.exist?(pdf_filepath)
+      #   @content_blob.convert_to_pdf(filepath, pdf_filepath)
+      #   raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
+      # end
+      #
+      # pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
     end
 
-    send_file pdf_filepath, filename: pdf_filename, type: 'application/pdf', disposition: 'attachment'
 
-    headers['Content-Length'] = File.size(pdf_filepath).to_s
   end
 
   def get_file_from_jerm

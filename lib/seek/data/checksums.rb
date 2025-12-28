@@ -2,6 +2,8 @@ module Seek
   module Data
     # methods used for generating checksums, currently used by ContentBlob. Could be adapted to be reused by other file-based models
     module Checksums
+      CHECKSUM_CHUNK_SIZE = 2 ** 20
+
       extend ActiveSupport::Concern
 
       included do
@@ -35,11 +37,22 @@ module Seek
 
       # calculate the checksum for the file, using the digest type, which could be :md5 or :sha1
       def calculate_checksum(digest_type)
-        if file_exists?
+        return unless file_exists?
+
           digest = "Digest::#{digest_type.upcase}".constantize.new
-          digest.file(filepath)
-          send("#{digest_type.to_s.downcase}sum=", digest.hexdigest)
+
+        if file_exists?
+          file_attacher.file.open do |io|
+            io.binmode if io.respond_to?(:binmode)
+            while (chunk = io.read(CHECKSUM_CHUNK_SIZE))
+              digest.update(chunk)
+            end
+          end
+        else
+          return
         end
+
+        send("#{digest_type}sum=", digest.hexdigest)
       end
     end
   end
