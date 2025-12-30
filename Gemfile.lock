@@ -977,7 +977,7 @@ GEM
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
     unicode-types (1.10.0)
-    uri (1.0.3)
+    uri (1.0.4)
     useragent (0.16.11)
     uuid (2.3.9)
       macaddr (~> 1.0)
