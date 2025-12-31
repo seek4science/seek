@@ -20,7 +20,14 @@ class ISATagsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.json { render json: ISATag.find(params[:id]) }
+      format.json {
+        render json: ISATag.find(params[:id]),
+               serializer: ISATagSkeletonSerializer,
+               meta: {
+                 base_url: Seek::Config.site_base_host,
+                 api_version: ActiveModel::Serializer.config.api_version
+               }
+      }
     end
   end
 
