@@ -2509,6 +2509,69 @@
                   $ref: ../examples/sampleAttributeTypesResponse.json
       "501":
         $ref: "#/components/responses/notImplemented"
+/isa_tags:
+  get:
+    operationId: listIsaTags
+    summary: List possible ISA Tags
+    description:
+      $ref: ../descriptions/listIsaTags.md
+    tags:
+      - list
+      - isaTags
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaTagsResponse.json
+      "401":
+        $ref: "#/components/responses/unauthorized"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "406":
+        $ref: "#/components/responses/notAcceptable"
+/isa_tags/{id}:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The ID of the ISA tag to fetch
+      schema:
+        type: integer
+  get:
+    operationId: readIsaTag
+    summary: Fetch an Isa Tag
+    description:
+      $ref: ../descriptions/readIsaTag.md
+    tags:
+      - read
+      - isaTags
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaTagResponse.json
+      "401":
+        $ref: "#/components/responses/unauthorized"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "406":
+        $ref: "#/components/responses/notAcceptable"
 /sample_types:
   get:
     operationId: listSampleTypes

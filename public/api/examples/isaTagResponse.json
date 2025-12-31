@@ -1,0 +1,19 @@
+{
+  "data": {
+    "id": "1",
+    "type": "isa_tags",
+    "attributes": {
+      "title": "source"
+    },
+    "links": {
+      "self": "/isa_tags/1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "meta": {
+    "base_url": "http://fairdomhub.org",
+    "api_version": "0.3"
+  }
+}
