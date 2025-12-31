@@ -39,8 +39,12 @@ class ISATagsController < ApplicationController
     return if request.format.json?
 
     render json: {
-      error: "Not Acceptable",
-      message: "This endpoint only serves application/json."
+      errors: [
+        {
+          title: "Not Acceptable",
+          detail: "This endpoint only serves application/json."
+        }
+      ]
     }, status: :not_acceptable # 406
   end
 
@@ -48,8 +52,12 @@ class ISATagsController < ApplicationController
     return if Seek::Config.isa_json_compliance_enabled
 
     render json: {
-      error: "Not Available",
-      message: "ISA-JSON compliance is disabled. Endpoint not available."
+      errors:[
+        {
+          title: "Not Available",
+          detail: "ISA-JSON compliance is disabled. Endpoint not available."
+        }
+      ]
     }, status: :forbidden
   end
 
@@ -57,8 +65,12 @@ class ISATagsController < ApplicationController
     return if logged_in?
 
     render json: {
-      error: "Not Authenticated",
-      message: "Please log in."
+      errors: [
+        {
+          title: "Not Authenticated",
+          detail: "Please log in."
+        }
+      ]
     }, status: :unauthorized
   end
 end

@@ -33,8 +33,8 @@ class ISATagsControllerTest < ActionController::TestCase
     get :index, as: :json
     assert_response :unauthorized
     response_body = JSON.parse(response.body)
-    assert_equal response_body["error"], "Not Authenticated"
-    assert_equal response_body["message"], "Please log in."
+    assert_equal response_body["errors"].first["title"], "Not Authenticated"
+    assert_equal response_body["errors"].first["detail"], "Please log in."
   end
 
   test 'should not respond to anything else than json requests' do
@@ -42,8 +42,8 @@ class ISATagsControllerTest < ActionController::TestCase
     get :index, as: :xml
     assert_response :not_acceptable
     response_body = JSON.parse(response.body)
-    assert_equal response_body["error"], "Not Acceptable"
-    assert_equal response_body["message"], "This endpoint only serves application/json."
+    assert_equal response_body["errors"].first["title"], "Not Acceptable"
+    assert_equal response_body["errors"].first["detail"], "This endpoint only serves application/json."
   end
 
   test 'should not respond if ISA-JSON compliance is disabled' do
@@ -52,8 +52,8 @@ class ISATagsControllerTest < ActionController::TestCase
       get :index, as: :json
       assert_response :forbidden
       response_body = JSON.parse(response.body)
-      assert_equal response_body["error"], "Not Available"
-      assert_equal response_body["message"], "ISA-JSON compliance is disabled. Endpoint not available."
+      assert_equal response_body["errors"].first["title"], "Not Available"
+      assert_equal response_body["errors"].first["detail"], "ISA-JSON compliance is disabled. Endpoint not available."
     end
   end
 end
