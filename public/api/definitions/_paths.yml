@@ -2559,7 +2559,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/sampleResponse"
+              $ref: "#/components/schemas/isaTagResponse"
             examples:
               response:
                 value:

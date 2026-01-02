@@ -937,28 +937,6 @@ isaTagType:
   minLength: 1
   enum:
     - isa_tags
-#isaTag:
-#  type: object
-#  properties:
-#    id:
-#      $ref: "#/components/schemas/nonEmptyString"
-#    type:
-#      $ref: "#/components/schemas/isaTagType"
-#    attributes:
-#      type: object
-#      properties:
-#        title:
-#          $ref: "#/components/schemas/nonEmptyString"
-#      required:
-#        - title
-#      additionalProperties: false
-#    links:
-#      $ref: "#/components/schemas/indexLinks"
-#  required:
-#    - id
-#    - type
-#    - attributes
-#    - links
 modelType:
   type: string
   minLength: 1
@@ -3960,6 +3938,16 @@ isaTagResponse:
           properties:
             title:
               $ref: "#/components/schemas/nonEmptyString"
+          required:
+            - title
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/indexLinks"
+      required:
+        - id
+        - type
+        - attributes
+        - links
 modelResponse:
   type: object
   properties:

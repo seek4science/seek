@@ -114,6 +114,9 @@
   "jsonapi": {
     "version": "1.0"
   },
+  "links": {
+    "self": "/isa_tags"
+  },
   "meta": {
     "base_url": "http://fairdomhub.org",
     "api_version": "0.3"

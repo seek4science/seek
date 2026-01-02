@@ -1,4 +1,5 @@
 class ISATagsController < ApplicationController
+  include Seek::IndexPager
   respond_to :json
   api_actions :show, :index
   before_action :ensure_json_request
@@ -13,7 +14,8 @@ class ISATagsController < ApplicationController
                meta: {
                  base_url: Seek::Config.site_base_host,
                  api_version: ActiveModel::Serializer.config.api_version
-               }
+               },
+               links: json_api_links
       }
     end
   end
@@ -26,7 +28,8 @@ class ISATagsController < ApplicationController
                meta: {
                  base_url: Seek::Config.site_base_host,
                  api_version: ActiveModel::Serializer.config.api_version
-               }
+               },
+               links: json_api_links
       }
     end
   end
