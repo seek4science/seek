@@ -29,6 +29,7 @@ en:
   isa_study: "ISA Study"
   study_design: "Study Design"
   isa_assay: "ISA Assay"
+  isa_tag: "ISA tag"
 
   data_file: &data_file "Data file"
   discipline: "Discipline"
