@@ -57,7 +57,7 @@
               </p>
               <%= form_with url: run_workflow_path(asset, version: version), method: :post do |f| -%>
                 <div class="form-group">
-                  <label><%= t('workflows.run.select_label') -%></label>
+                  <%= f.label :execution_instance_url, t('workflows.run.select_label') %>
                   <%= f.url_field :execution_instance_url, placeholder: Seek::Config.galaxy_instance_default, required: true, class: 'form-control' %>
                 </div>
                 <%= f.submit t('submit_button.run'), class: 'btn btn-primary' %>

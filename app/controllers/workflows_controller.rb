@@ -3,7 +3,6 @@ require 'ro_crate'
 class WorkflowsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
-  extend Seek::UrlValidation
 
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
@@ -410,11 +409,25 @@ class WorkflowsController < ApplicationController
     params.permit(:execution_instance_url)
   end
 
+  def valid_execution_instance_url?(url)
+    uri = URI.parse(url)
+    uri.absolute? && %w[http https].include?(uri.scheme)
+  rescue URI::InvalidURIError
+    false
+  end
+
   def check_can_run
-    if run_params[:execution_instance_url].present? && !self.class.valid_url?(run_params[:execution_instance_url])
-      error('Invalid execution instance URL', '')
+    execution_instance_url = run_params.fetch(:execution_instance_url, nil)
+    if !execution_instance_url.nil? && !valid_execution_instance_url?(execution_instance_url)
+      message = 'Invalid execution instance URL'
+      respond_to do |format|
+        format.html do
+          flash[:error] = message
+          redirect_to workflow_path(@workflow)
+        end
+        format.json { render json: { title: 'Invalid URL', detail: message }, status: :unprocessable_entity }
+      end
     else
-      execution_instance_url = run_params[:execution_instance_url]
       return if @workflow.can_run?(execution_instance_url)
 
       error('Execution is not supported for this workflow', '')

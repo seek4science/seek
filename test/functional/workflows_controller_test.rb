@@ -1885,6 +1885,42 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'shows error if invalid scheme supplied' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    supplied_instance = 'ftp://invalid.scheme.galaxy.instance/'
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version, execution_instance_url: supplied_instance }
+
+      assert_redirected_to workflow_path(workflow)
+      assert flash[:error].include?('Invalid execution instance URL')
+    end
+  end
+
+  test 'shows error if no url supplied for galaxy instance' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    supplied_instance = ''
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version, execution_instance_url: supplied_instance }
+
+      assert_redirected_to workflow_path(workflow)
+      assert flash[:error].include?('Invalid execution instance URL')
+    end
+  end
+
+  test 'shows error if invalid url supplied for galaxy instance' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    supplied_instance = 'not a valid url'
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version, execution_instance_url: supplied_instance }
+
+      assert_redirected_to workflow_path(workflow)
+      assert flash[:error].include?('Invalid execution instance URL')
+    end
+  end
+
   test 'does not log run if run action fails' do
     workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
     refute workflow.can_run?
