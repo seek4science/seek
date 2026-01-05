@@ -57,10 +57,10 @@ FactoryBot.define do
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'apple name')
       cv_list_attribute = ExtendedMetadataAttribute.new(title: 'apple list', sample_attribute_type: FactoryBot.create(:cv_list_attribute_type),
-                                                      sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list")
+                                                      sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples list", label: "apple samples list", allow_cv_free_text: true)
       a.extended_metadata_attributes << cv_list_attribute
       cv_attribute = ExtendedMetadataAttribute.new(title: 'apple controlled vocab', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type),
-                                                 sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab")
+                                                 sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), description: "apple samples controlled vocab", label: "apple samples controlled vocab", allow_cv_free_text: false)
       a.extended_metadata_attributes << cv_attribute
     end
   end
