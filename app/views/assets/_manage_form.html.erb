@@ -11,12 +11,16 @@
   <% if show_projects %>
     <%= render partial: 'projects/project_selector', locals: { resource: resource } %>
   <% elsif resource.is_a?(Study) %>
-    <%= folding_panel("#{t('investigation')} details") do %>
-      <label class="required"><%= t('investigation') %></label>
-      <div id="investigation_collection">
-        <%= render partial: 'studies/investigation_list', locals: {
-          investigations: Investigation.all.select { |i| current_user.person.member_of?(i.projects)} } -%>
-      </div>
+    <% if @isa_json_compliant %>
+      <%= hidden_field(:study, :investigation_id) %>
+    <% else %>
+      <%= folding_panel("#{t('investigation')} details") do %>
+        <label class="required"><%= t('investigation') %></label>
+        <div id="investigation_collection">
+          <%= render partial: 'studies/investigation_list', locals: {
+            investigations: Investigation.all.select { |i| current_user.person.member_of?(i.projects)} } -%>
+        </div>
+      <% end %>
     <% end %>
 
     <%= render partial: 'projects/implicit_project_selector', locals: { action: 'manage',
@@ -24,9 +28,12 @@
                                                                         parents: Investigation.authorized_for('edit') } %>
   <% elsif resource.is_a?(Assay) %>
     <div class="form-group">
-      <label class="required"><%= t('study') -%></label>
-
-      <%= resource_study_selection('assay[study_id]', @assay.study) %>
+      <% if @isa_json_compliant %>
+        <%= hidden_field(:assay, :study_id) %>
+      <% else %>
+        <label class="required"><%= t('study') -%></label>
+        <%= resource_study_selection('assay[study_id]', @assay.study) %>
+      <% end %>
     </div>
 
     <%= render partial: 'projects/implicit_project_selector', locals: { action: 'manage',
@@ -35,6 +42,14 @@
   <% end %>
   <%= render partial: 'assets/manage_specific_attributes', locals: {f: f, sharing_link: sharing_link} %>
 
-  <%= form_submit_buttons(resource, validate:false) %>
+  <%
+    if @isa_json_compliant && !resource.projects.blank?
+      item_type = resource.is_a?(Assay) ? 'assay' : 'study'
+      options = { validate:false, cancel_path: single_page_path(id: resource.projects.first.id, item_type: item_type, item_id: resource.id) }
+    else
+      options = { validate:false }
+    end
+  %>
+  <%= form_submit_buttons(resource, **options) %>
 
 <% end -%>

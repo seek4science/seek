@@ -166,8 +166,7 @@ def load_seek_config_defaults!
   Seek::Config.default :type_managers,'admins'
   Seek::Config.default :tag_threshold,1
   Seek::Config.default :max_visible_tags,20
-  Seek::Config.default :pubmed_api_email,nil
-  Seek::Config.default :crossref_api_email,nil
+  Seek::Config.default :pubmed_api_email, nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
@@ -288,6 +287,9 @@ def load_seek_config_defaults!
       }
     }
   ]
+
+  Seek::Config.default :reindex_all_batch_size, 50
+  Seek::Config.default :default_citation_style, 'apa'
 
   load_seek_testing_defaults! if Rails.env.test?
 end

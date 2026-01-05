@@ -86,7 +86,7 @@ module Seek
               author_meta = author_meta.dereference if author_meta.respond_to?(:dereference)
               if author_meta.is_a?(::ROCrate::ContextualEntity) && !author_meta.is_a?(::ROCrate::Person)
                 other_creators << author_meta['name'] if author_meta['name'].present?
-              else
+              elsif author_meta.present?
                 author = extract_author(author_meta)
                 authors << author unless author.blank?
               end

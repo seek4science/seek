@@ -167,7 +167,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'invalid email address' do
-    post :update_settings, params: { pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com' }
+    post :update_settings, params: { pubmed_api_email: 'quentin' }
     refute_nil flash[:error]
   end
 

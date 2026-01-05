@@ -112,12 +112,31 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     asset.creators = []
     asset.save!
     assert_empty asset.creators
+    assert_empty asset.assets_creators
 
     post "/workflows/#{asset.id}/mint_doi"
     assert_redirected_to polymorphic_path(asset, version: asset.version)
     assert_includes flash[:error], 'creator is required'
 
     refute AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
+  end
+
+  test 'do not show error if non-SEEK creator present' do
+    mock_datacite_request
+    asset = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))
+    assert asset.is_published?
+    assert asset.can_manage?
+
+    asset.creators = []
+    asset.assets_creators.create!(given_name: 'Julia', family_name: 'Jones', orcid: 'https://orcid.org/0000-0001-8172-8981')
+    asset.save!
+    assert_empty asset.creators
+    assert_not_empty asset.assets_creators
+
+    post "/workflows/#{asset.id}/mint_doi"
+    assert_redirected_to polymorphic_path(asset, version: asset.version)
+    assert_not_nil flash[:notice]
+    assert AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
   end
 
   test 'handle error when mint_doi' do

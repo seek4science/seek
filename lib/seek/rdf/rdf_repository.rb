@@ -86,6 +86,15 @@ module Seek
         File.exist?(config_path) && enabled_for_environment?
       end
 
+      # whether the endpoint is available and responds to requests, even if configured
+      def available?
+        select('ask where {?s ?p ?o}')
+        true
+      rescue StandardError => e
+        Rails.logger.error("Error trying a simple query: #{e.message}")
+        false
+      end
+
       # provides the URI's of any items related to the item - discovered by querying the triple store to find both:
       #  <this_item> ?predicate <related_item>
       # or

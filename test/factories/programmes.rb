@@ -25,6 +25,7 @@ FactoryBot.define do
     projects { [FactoryBot.create(:max_project)] }
     programme_administrators { [FactoryBot.create(:person)] }
     after(:create) do |p|
+      p.is_activated = true
       p.annotate_with(['DFG'], 'funding_code', p.programme_administrators.first)
       p.save!
     end

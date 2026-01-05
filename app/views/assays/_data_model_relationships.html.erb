@@ -1,0 +1,32 @@
+<div class="data_model_relationship">
+  <% unless @assay.models.empty? %>
+    <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
+    <br/>
+    <ul class="related_models">
+      <% @assay.models.each do |m| %>
+        <li>
+          <% if m.can_view? %>
+            <%= link_to truncate(h(m.title), :length => 110), show_resource_path(m) %>
+          <% else %>
+            <span class="none_text">Hidden <%= t('model') %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+  <% unless @assay.data_files.empty? %>
+    <b>Data:</b>
+    <br/>
+    <ul class="related_data_files">
+      <% @assay.data_files.each do |d| %>
+        <li>
+          <% if d.can_view? %>
+            <%= link_to truncate(h(d.title), :length => 110), show_resource_path(d) %><%= d.relationship_type(@assay) ? (" <span class='relationship_type'>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
+          <% else %>
+            <span class="none_text">Hidden <%= t('data_file') %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

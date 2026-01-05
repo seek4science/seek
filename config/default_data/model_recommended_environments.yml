@@ -16,6 +16,9 @@ copasi:
 CPLEX:
   title: CPLEX Interactive Optimizer
 
+Docker:
+  title: Docker
+
 FLAME:
   title: FLAME
 
@@ -27,6 +30,15 @@ insilico discovery:
 
 JADE:
   title: JADE
+
+Julia:
+  title: Julia
+
+Jupyter Notebook:
+  title: Jupyter Notebook
+
+Keras:
+  title: Keras
 
 Jarnac:
   title: Jarnac (Systems Biology Workbench)
@@ -58,14 +70,32 @@ PKSim:
 PottersWheel:
   title: PottersWheel
 
+PyTorch:
+  title: PyTorch
+
+Python:
+  title: Python
+
 PySCeS:
   title: Python Simulator for Cellular Systems (PySCeS)
+
+R:
+  title: R
+
+RStudio:
+  title: RStudio
 
 roadrunner:
   title: roadrunner (Systems Biology Workbench)
 
 SBTOOLBOX2:
   title: Systems Biology Toolbox 2
+
+Scikit-learn:
+  title: Scikit-learn
+
+TensorFlow:
+  title: TensorFlow
 
 VCELL:
   title: Virtual Cell

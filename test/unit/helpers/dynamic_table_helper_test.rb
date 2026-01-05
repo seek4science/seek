@@ -326,4 +326,42 @@ class DynamicTableHelperTest < ActionView::TestCase
       assert_equal ro_cols_with_unit.count, 1
     end
   end
+
+  test 'should be able to deal with json metadata fields being `nil` for non-text attributes' do
+    # Add samples to the existing sample types
+    assert_difference '@sample_collection_sample_type.samples.count', 2 do
+      source1 = FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: @person)
+      source2 = FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: @person)
+      FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: @person)
+
+      FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, contributor: @person, linked_samples: [ source1 ])
+      FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, contributor: @person, linked_samples: [ source2 ])
+    end
+
+    # Add non-text attributes
+    assert_difference '@sample_collection_sample_type.sample_attributes.count', 4 do
+      sop_attribute = FactoryBot.create(:sop_sample_attribute, sample_type: @sample_collection_sample_type, title: 'registered SOP', required: false, is_title: false)
+      strain_attribute = FactoryBot.create(:strain_sample_attribute, sample_type: @sample_collection_sample_type, title: 'strain used', required: false, is_title: false)
+      data_file_attribute = FactoryBot.create(:data_file_sample_attribute, sample_type: @sample_collection_sample_type, title: 'data file', required: false, is_title: false)
+      cv_list_attribute = FactoryBot.create(:topics_list_controlled_vocab_attribute, sample_type: @sample_collection_sample_type, title: 'CV list', required: false, is_title: false, allow_cv_free_text: true)
+      @sample_collection_sample_type.sample_attributes.concat([sop_attribute, strain_attribute, data_file_attribute, cv_list_attribute])
+    end
+
+    # Test whether all samples don't have a value for every newly added attribute
+    assert @sample_collection_sample_type.samples.all? do |sample|
+      metadata = JSON.parse(sample.json_metadata)
+      title_attribute = @sample_collection_sample_type.sample_attributes.detect { |sa| sa.is_title }
+      sop_attribute = @sample_collection_sample_type.sample_attributes.detect { |sa| sa.title == 'registered SOP' }
+      strain_attribute = @sample_collection_sample_type.sample_attributes.detect { |sa| sa.title == 'strain used' }
+      data_file_attribute = @sample_collection_sample_type.sample_attributes.detect { |sa| sa.title == 'data file' }
+      cv_list_attribute = @sample_collection_sample_type.sample_attributes.detect { |sa| sa.title == 'CV list' }
+      metadata[sop_attribute.title].nil? && metadata[strain_attribute.title].nil? && metadata[data_file_attribute.title].nil? && metadata[cv_list_attribute.title].nil? && !metadata[title_attribute.title].nil?
+    end
+
+    User.with_current_user(@person.user) do
+      rows = dt_rows(@sample_collection_sample_type)
+      assert_equal rows.count, 2
+    end
+
+  end
 end
