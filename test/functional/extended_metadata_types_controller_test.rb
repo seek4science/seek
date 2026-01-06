@@ -3,7 +3,6 @@ require 'test_helper'
 class ExtendedMetadataTypesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  fixtures :sample_attribute_types
 
   test 'get form fields' do
     cmt = FactoryBot.create(:simple_investigation_extended_metadata_type)

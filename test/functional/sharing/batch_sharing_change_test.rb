@@ -3,7 +3,6 @@ require 'test_helper'
 class BatchSharingChangeTest < ActionController::TestCase
   tests PeopleController
 
-  fixtures :all
 
   include AuthenticatedTestHelper
 

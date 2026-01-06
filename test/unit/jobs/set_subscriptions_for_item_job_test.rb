@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
-  fixtures :all
 
   def setup
     User.current_user = FactoryBot.create(:user)
