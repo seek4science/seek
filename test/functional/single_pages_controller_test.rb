@@ -434,6 +434,39 @@ class SinglePagesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Should link registered assets to the sample metadata' do
+    project, assay_sample_type = setup_file_upload.values_at(
+      :project, :assay_sample_type
+    )
+    car_catalogue = car_catalogue(project, @member.person)
+    flower_based_names_catalogue = flower_names(project, @member.person)
+    _strains = bacteria_strains(project, @member.person)
+    _data_files = create_data_files(project, @member.person)
+    _sops = create_sops(project, @member.person)
+
+    assay_sample_type.sample_attributes << [
+      FactoryBot.create(:data_file_sample_attribute, required: false, is_title: false, sample_type: assay_sample_type, title: "Registered Data File"),
+      FactoryBot.create(:sop_sample_attribute, required: false, is_title: false, sample_type: assay_sample_type, title: "Registered SOP"),
+      FactoryBot.create(:strain_sample_attribute, required: false, is_title: false, sample_type: assay_sample_type, title: "Registered Strain"),
+      FactoryBot.create(:sample_sample_attribute, required: false, is_title: false, sample_type: assay_sample_type, title: "Registered Sample", linked_sample_type: car_catalogue),
+      FactoryBot.create(:sample_multi_sample_attribute, required: false, is_title: false, sample_type: assay_sample_type, title: "Registered Sample List", linked_sample_type: flower_based_names_catalogue),
+    ]
+    file_path = 'upload_single_page/05_combo_update_assay_samples_with_registered_assets_spreadsheet.xlsx'
+    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    post :upload_samples, as: :json, params: { file:, project_id:project.id, sample_type_id: assay_sample_type.id }
+
+    assert_response :success
+    response_data = JSON.parse(response.body)['uploadData']
+    updated_samples = response_data['updateSamples']
+    unauthorized_samples = response_data['unauthorized_samples']
+    new_samples = response_data['newSamples']
+
+    assert_equal updated_samples.size, 2
+    assert_equal unauthorized_samples.size, 0
+    assert_equal new_samples.size, 1
+  end
+
   private
 
   def setup_file_upload
@@ -545,5 +578,130 @@ class SinglePagesControllerTest < ActionController::TestCase
       "study_samples": study_samples,
       "assay_samples": assay_samples
     }
+  end
+
+  def car_catalogue(project, person)
+    sample_catalogue_cars = FactoryBot.build(:sample_type,
+                                              title: "Sample Catalogue Cars",
+                                              projects: [project],
+                                              contributor: person
+                                             )
+    sample_catalogue_cars.sample_attributes << [
+      FactoryBot.create(:any_string_sample_attribute, title: "Car name", sample_type: sample_catalogue_cars, is_title: true),
+      FactoryBot.create(:any_string_sample_attribute, title: "Brand", sample_type: sample_catalogue_cars),
+      FactoryBot.create(:any_string_sample_attribute, title: "Model", sample_type: sample_catalogue_cars),
+    ]
+    sample_catalogue_cars.save
+    names = [
+      "Herbie",
+      "Ecto-1",
+      "K.I.T.T.",
+      "General Lee",
+      "DeLorean Time Machine"
+    ]
+    brands = [
+      "Volkswagen",
+      "Cadillac",
+      "Pontiac",
+      "Dodge",
+      "DeLorean Motor Company"
+    ]
+    models = [
+      "Beetle",
+      "Miller-Meteor",
+      "Firebird Trans Am",
+      "Charger",
+      "DMC-12"
+    ]
+    _cars = (1..5).map do |n|
+      FactoryBot.create(:sample,
+                        id: 10_040 + n,
+                        title: names[n-1],
+                        sample_type: sample_catalogue_cars,
+                        project_ids: [project.id],
+                        contributor: person,
+                        data: {
+                          'Car name': names[n-1],
+                          Brand: brands[n-1],
+                          Model: models[n-1]
+                        }
+      )
+    end
+    sample_catalogue_cars.reload
+  end
+
+  def flower_names(project, person)
+    sample_catalogue_flower_names = FactoryBot.build(:sample_type,
+                                                title: "Sample Catalogue Flowers",
+                                                projects: [project],
+                                                contributor: person
+                                                )
+
+    sample_catalogue_flower_names.sample_attributes << [
+      FactoryBot.create(:any_string_sample_attribute, title: "Human name", sample_type: sample_catalogue_flower_names, is_title: true),
+      FactoryBot.create(:any_string_sample_attribute, title: "Scientific Name", sample_type: sample_catalogue_flower_names),
+      FactoryBot.create(:any_string_sample_attribute, title: "Trivial Name", sample_type: sample_catalogue_flower_names),
+    ]
+    sample_catalogue_flower_names.save
+    human_names = %w[Rosalind Sonny Daisy Lavanda Daffy]
+    scientific_names = ["Rosa indica", "Helianthus annuus", "Bellis perennis", "Lavandula", "Narcissus pseudonarcissus"]
+    trivial_names = ["Rose", "Sunflower", "English Daisy", "Lavender", "Wild Daffodil"]
+    _flowers = (1..5).map do |n|
+      FactoryBot.create(:sample,
+                        id: 10_050 + n,
+                        title: human_names[n - 1],
+                        sample_type: sample_catalogue_flower_names,
+                        project_ids: [project.id],
+                        contributor: person,
+                        data: {
+                          'Human name': human_names[n - 1],
+                          'Scientific Name': scientific_names[n-1],
+                          'Trivial Name': trivial_names[n-1]
+                        }
+      )
+    end
+    sample_catalogue_flower_names.reload
+  end
+
+  def bacteria_strains(project, person)
+    organism = FactoryBot.create(:organism, title: "Bacteriaceae", projects: [project])
+    bacteria_names = [
+      "Escherichia coli",
+      "Streptococcus pyogenes",
+      "Staphylococcus aureus",
+      "Streptococcus pneumoniae",
+      "Clostridioides difficile"
+    ]
+
+    (1..5).map do |n|
+      FactoryBot.create(:strain, id: 10_060 + n, title: bacteria_names[n-1], organism: organism, projects: [project], contributor: person)
+    end
+  end
+
+  def create_data_files(project, person)
+    file_types = [
+      "Comma-Separated Values",
+      "JavaScript Object Notation",
+      "Extensible Markup Language",
+      "Apache Parquet",
+      "Portable Document Format"
+    ]
+    (1..5).map do |n|
+      FactoryBot.create(:min_data_file, id: 10_070 + n, title: "My #{file_types[n-1]} file", projects: [project], contributor: person)
+    end
+  end
+
+  def create_sops(project, person)
+    lab_protocols = [
+      "Standard Operating Procedure for High-Performance Liquid Chromatography (HPLC) Analysis",
+      "Protocol for DNA Isolation and Purification Using the CTAB Method",
+      "Polymerase Chain Reaction (PCR) Program for Target Sequence Amplification",
+      "Protocol for Protein Extraction and SDS-PAGE Analysis",
+      "Standard Procedure for Chemical Spill Response and Hazardous Waste Disposal"
+    ]
+
+    (1..5).map do |n|
+      FactoryBot.create(:sop, id: 10_080 + n, title: lab_protocols[n-1], projects: [project], contributor: person)
+    end
   end
 end
