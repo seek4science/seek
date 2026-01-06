@@ -49,7 +49,10 @@ class SinglePagesController < ApplicationController
   end
 
   def download_samples_excel
-    sample_ids, sample_type_id, study_id, assay_id = Rails.cache.read(params[:uuid]).values_at(:sample_ids, :sample_type_id,
+    cached_asset_ids = Rails.cache.read(params[:uuid])
+    raise "Request took too long or was interrupted." if cached_asset_ids.nil?
+
+    sample_ids, sample_type_id, study_id, assay_id = cached_asset_ids.values_at(:sample_ids, :sample_type_id,
                                                                                                :study_id, :assay_id)
 
     @study = Study.find(study_id)
@@ -66,8 +69,6 @@ class SinglePagesController < ApplicationController
 
     @template = Template.find(@sample_type.template_id)
     
-    spreadsheet_name = @sample_type.title&.concat(".xlsx")
-
     spreadsheet_name = @sample_type.title&.concat(".xlsx")
 
     notice_message << '</ul>'
@@ -181,7 +182,7 @@ class SinglePagesController < ApplicationController
 
     # Retrieve all samples of the Sample Type, also the unauthorized ones
     @db_samples = sample_type_samples(@sample_type)
-    # Retrieve the Sample Types samples wich are authorized for editing
+    # Retrieve the Sample Types samples which are authorized for editing
     @authorized_db_samples = sample_type_samples(@sample_type, :edit)
 
     # Determine whether samples have been modified or not,
