@@ -240,12 +240,14 @@ class SinglePagesController < ApplicationController
     samples_data.map do |excel_sample|
       obj = {}
       (0..sample_fields.size - 1).map do |i|
+        cell_value = excel_sample[i]
         current_sample_attribute = sample_type_attributes.detect { |sa| sa[:title] == sample_fields[i] }
         validate_cv_terms = cv_sample_attributes.map{ |cv_sa| cv_sa[:title] }.include?(sample_fields[i])
-        validate_cv_terms &&= current_sample_attribute[:required] && !excel_sample[i].blank?
+        validate_cv_terms &&= current_sample_attribute[:required] && !cell_value.blank?
         attr_terms = validate_cv_terms ? cv_sample_attributes.detect { |sa| sa[:title] == sample_fields[i] }[:cv_terms] : []
         if @multiple_input_fields.include?(sample_fields[i])
-          parsed_excel_input_samples = JSON.parse(excel_sample[i].gsub(/"=>/x, '":')).map do |subsample|
+          parsed_json = cell_value.nil? ? [] : JSON.parse(cell_value.gsub(/"=>/x, '":'))
+          parsed_excel_input_samples = parsed_json.map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
             unless Sample.find(subsample['id'])&.authorized_for_view?
               raise "Unauthorized Sample was detected in spreadsheet: #{subsample.inspect}"
@@ -255,13 +257,16 @@ class SinglePagesController < ApplicationController
           end
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
         elsif @registered_sample_fields.include?(sample_fields[i])
-          parsed_excel_registered_sample = JSON.parse(excel_sample[i].gsub(/"=>/x, '":'))
-          unless Sample.find(parsed_excel_registered_sample['id'])&.authorized_for_view?
-            raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_sample.inspect}"
+          unless cell_value.nil?
+            parsed_excel_registered_sample = JSON.parse(cell_value.gsub(/"=>/x, '":'))
+
+            unless Sample.find(parsed_excel_registered_sample['id'])&.authorized_for_view?
+              raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_sample.inspect}"
+            end
           end
           obj.merge!(sample_fields[i] => parsed_excel_registered_sample)
         elsif @cv_list_fields.include?(sample_fields[i])
-          parsed_cv_terms = JSON.parse(excel_sample[i])
+          parsed_cv_terms = JSON.parse(cell_value)
           # CV validation for CV_LIST attributes
           parsed_cv_terms.map do |term|
             if !attr_terms.include?(term) && validate_cv_terms
@@ -270,18 +275,18 @@ class SinglePagesController < ApplicationController
           end
           obj.merge!(sample_fields[i] => parsed_cv_terms)
         elsif sample_fields[i] == 'id'
-          if excel_sample[i].blank?
+          if cell_value.blank?
             obj.merge!(sample_fields[i] => nil)
           else
-            obj.merge!(sample_fields[i] => excel_sample[i]&.to_i)
+            obj.merge!(sample_fields[i] => cell_value&.to_i)
           end
         else
           if validate_cv_terms
-            unless attr_terms.include?(excel_sample[i])
-              raise "Invalid Controlled vocabulary term detected '#{excel_sample[i]}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{excel_sample[i]} }"
+            unless attr_terms.include?(cell_value)
+              raise "Invalid Controlled vocabulary term detected '#{cell_value}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{cell_value} }"
             end
           end
-          obj.merge!(sample_fields[i] => excel_sample[i])
+          obj.merge!(sample_fields[i] => cell_value)
         end
       end
       obj
