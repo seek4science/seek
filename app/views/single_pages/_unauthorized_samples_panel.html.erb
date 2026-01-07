@@ -25,12 +25,20 @@
           <tr id='<%= "unauthorized-sample-#{unauthorized_sample['id']}" %>' class="">
             <% unauthorized_sample.map do |key, val| %>
               <% unless key == 'uuid' %>
-                <% if @multiple_input_fields.include?(key) %>
+                <% if @registered_sample_multi_fields.include?(key) %>
                   <td>
                     <% val.each do |sub_sample| %>
-                      <span class="badge" , title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <span class="badge" title="ID: <%= sub_sample['id'] %>"><%= sub_sample['title'] %></span>
                     <% end %>
                   </td>
+                <% elsif @registered_sample_fields.include?(key) %>
+                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
+                <% elsif @registered_data_file_fields.include?(key) %>
+                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
+                <% elsif @registered_strain_fields.include?(key) %>
+                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
+                <% elsif @registered_sops.include?(key) %>
+                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
                 <% else %>
                   <td><%= val %></td>
                 <% end %>

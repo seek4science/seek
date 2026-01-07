@@ -142,17 +142,29 @@ class SinglePagesController < ApplicationController
       raise "Sample Type '#{@sample_type.id}' doesn't belong to Assay #{@assay.id}. Sample Upload aborted."
     end
 
-    @multiple_input_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
-    end
+    @registered_sample_multi_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_sample_multi?
+    end.map(&:title)
 
-    @registered_sample_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE
-    end
+    @registered_sample_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_sample?
+    end.map(&:title)
 
-    @cv_list_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
-    end
+    @registered_data_file_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_data_file?
+    end.map(&:title)
+
+    @registered_strain_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_strain?
+    end.map(&:title)
+
+    @registered_sops = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_sop?
+    end.map(&:title)
+
+    @cv_list_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+    end.map(&:title)
 
     sample_fields, samples_data = get_spreadsheet_data(samples_sheet)
 
@@ -177,8 +189,8 @@ class SinglePagesController < ApplicationController
     # Construct Samples objects from Excel data
     excel_samples = generate_excel_samples(samples_data, sample_fields, sample_type_attributes)
 
-    existing_excel_samples = excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
-    new_excel_samples = excel_samples.map { |sample| sample if sample['id'].nil? }.compact
+    existing_excel_samples = excel_samples.select { |sample| !sample['id'].nil? }
+    new_excel_samples = excel_samples.select { |sample| sample['id'].nil? }
 
     # Retrieve all samples of the Sample Type, also the unauthorized ones
     @db_samples = sample_type_samples(@sample_type)
@@ -245,7 +257,7 @@ class SinglePagesController < ApplicationController
         validate_cv_terms = cv_sample_attributes.map{ |cv_sa| cv_sa[:title] }.include?(sample_fields[i])
         validate_cv_terms &&= current_sample_attribute[:required] && !cell_value.blank?
         attr_terms = validate_cv_terms ? cv_sample_attributes.detect { |sa| sa[:title] == sample_fields[i] }[:cv_terms] : []
-        if @multiple_input_fields.include?(sample_fields[i])
+        if @registered_sample_multi_fields.include?(sample_fields[i])
           parsed_json = cell_value.nil? ? [] : JSON.parse(cell_value.gsub(/"=>/x, '":'))
           parsed_excel_input_samples = parsed_json.map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
@@ -256,7 +268,7 @@ class SinglePagesController < ApplicationController
             subsample
           end
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
-        elsif @registered_sample_fields.include?(sample_fields[i])
+        elsif [@registered_sample_fields, @registered_sops, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(sample_fields[i]) }
           unless cell_value.nil?
             parsed_excel_registered_sample = JSON.parse(cell_value.gsub(/"=>/x, '":'))
 

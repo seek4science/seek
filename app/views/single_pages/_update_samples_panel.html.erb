@@ -18,12 +18,15 @@
           <tr id='<%= "update-sample-#{update_sample['id']}-updated" %>'>
             <% db_sample = @authorized_db_samples.select { |s| s['id'] == update_sample['id'] }.first %>
             <td rowspan=2>
-              <button id=<%= "remove-#{update_sample['id']}" %> class="btn glyphicon glyphicon-trash danger
-              " style="background-color:#d9534f;color:white;"
-              onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>></button></td>
+              <button id="<%= "remove-#{update_sample['id']}" %>"
+                      class="btn glyphicon glyphicon-trash danger"
+                      style="background-color:#d9534f;color:white;"
+                      onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>>
+              </button>
+            </td>
             <% update_sample.map do |key, val| %>
               <% unless key == 'uuid' %>
-                <% if @multiple_input_fields.include?(key) %>
+                <% if @registered_sample_multi_fields.include?(key) %>
                   <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
                     <% val.each do |sub_sample| %>
                       <span class="badge" title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
@@ -39,6 +42,18 @@
                   <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
                     <span class="badge" title='<%= val['id'] %>' data-attr_type="seek-sample"><%= val['title'] %></span>
                   </td>
+                <% elsif @registered_data_file_fields.include?(key) %>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
+                    <span class="badge" title='<%= val['id'] %>' data-attr_type="seek-data-file"><%= val['title'] %></span>
+                  </td>
+                <% elsif @registered_strain_fields.include?(key) %>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
+                    <span class="badge" title='<%= val['id'] %>' data-attr_type="seek-strain"><%= val['title'] %></span>
+                  </td>
+                <% elsif @registered_sops.include?(key) %>
+                  <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
+                    <span class="badge" title='<%= val['id'] %>' data-attr_type="seek-sop"><%= val['title'] %></span>
+                  </td>
                 <% else %>
                   <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'><%= val %></td>
                 <% end %>
@@ -48,7 +63,7 @@
           <tr id='<%= "update-sample-#{update_sample['id']}-original" %>'>
             <% db_sample.map do |key, val| %>
               <% unless key == 'uuid' %>
-                <% if @multiple_input_fields.include?(key) %>
+                <% if @registered_sample_multi_fields.include?(key) %>
                   <td>
                     <% val.each do |sub_sample| %>
                       <span class="badge" title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
@@ -61,6 +76,12 @@
                     <% end %>
                   </td>
                 <% elsif @registered_sample_fields.include?(key) %>
+                  <td><span class="badge" title='<%= val['id'] %>'><%= val['title'] %></span></td>
+                <% elsif @registered_data_file_fields.include?(key) %>
+                  <td><span class="badge" title='<%= val['id'] %>'><%= val['title'] %></span></td>
+                <% elsif @registered_strain_fields.include?(key) %>
+                  <td><span class="badge" title='<%= val['id'] %>'><%= val['title'] %></span></td>
+                <% elsif @registered_sops.include?(key) %>
                   <td><span class="badge" title='<%= val['id'] %>'><%= val['title'] %></span></td>
                 <% else %>
                   <td><%= val %></td>
