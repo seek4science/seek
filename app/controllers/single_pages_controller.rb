@@ -382,9 +382,9 @@ class SinglePagesController < ApplicationController
   end
 
   def valid_workbook?(workbook)
-    !((workbook.sheet_names.map do |sheet|
-         %w[Metadata Samples cv_ontology].include? sheet
-       end.include? false) && (workbook.sheets.size != 3))
+    ["Sample Type Metadata", "Samples", "Controlled Vocabularies"].all? do |expected_sheet|
+      workbook.sheet_names.include? expected_sheet
+    end
   end
 
   def set_up_instance_variable
