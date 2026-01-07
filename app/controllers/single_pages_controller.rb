@@ -111,7 +111,7 @@ class SinglePagesController < ApplicationController
     when 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       spreadsheet_xml = spreadsheet_to_xml(uploaded_file.path, Seek::Config.jvm_memory_allocation)
       wb = parse_spreadsheet_xml(spreadsheet_xml)
-      metadata_sheet = wb.sheet('Metadata')
+      metadata_sheet = wb.sheet('Sample Type Metadata')
       samples_sheet = wb.sheet('Samples')
     else
       raise "Please upload a valid spreadsheet file with extension '.xlsx'"
@@ -124,9 +124,9 @@ class SinglePagesController < ApplicationController
     end
 
     # Extract Samples metadata from spreadsheet
-    study_id = metadata_sheet.cell(2, 2).value.to_i
+    study_id = metadata_sheet.cell(10, 2).value.to_i
     @study = Study.find(study_id)
-    sample_type_id = metadata_sheet.cell(5, 2).value.to_i
+    sample_type_id = metadata_sheet.cell(2, 2).value.to_i
     @sample_type = SampleType.find(sample_type_id)
     is_assay = @sample_type.assays.any?
     @assay = @sample_type.assays.first
