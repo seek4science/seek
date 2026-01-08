@@ -111,6 +111,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
                          content_blob_uuid: assigns(:content_blob).uuid }
 
           assert_response :unprocessable_entity
+          assert_select 'div#error_explanation'
 
           assert_nil cb.reload.asset
           refute_equal 'A new version!', assigns(:workflow).versions.last.revision_comments
