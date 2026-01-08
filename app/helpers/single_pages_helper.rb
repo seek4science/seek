@@ -47,7 +47,7 @@ module SinglePagesHelper
 
   def get_values_for_registered_samples(sample_attribute)
     sample_attribute.linked_sample_type.samples.map do |sample|
-      { id: sample.id, type: 'Sample', title: sample.title }
+      { id: sample.id, type: 'Sample', title: sample.title }.to_json
     end
   end
 
@@ -59,16 +59,16 @@ module SinglePagesHelper
       sops = sample_attribute.sample_type.studies.first.sops
     end
 
-    sops.map { |sop| { id: sop.id, type: 'Sop', title: sop.title } }
+    sops.map { |sop| { id: sop.id, type: 'Sop', title: sop.title }.to_json }
   end
 
   def get_values_for_datafiles(sample_attribute)
     data_files = sample_attribute.sample_type.projects.first.data_files
-    data_files.map { |data_file| { id: data_file.id, type: 'DataFile', title: data_file.title } }
+    data_files.map { |data_file| { id: data_file.id, type: 'DataFile', title: data_file.title }.to_json }
   end
 
   def get_values_for_strains(sample_attribute)
     strains = sample_attribute.sample_type.projects.first.strains
-    strains.map { |strain| { id: strain.id, type: 'Strain', title: strain.title } }
+    strains.map { |strain| { id: strain.id, type: 'Strain', title: strain.title }.to_json }
   end
 end

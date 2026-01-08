@@ -461,10 +461,12 @@ class SinglePagesControllerTest < ActionController::TestCase
     updated_samples = response_data['updateSamples']
     unauthorized_samples = response_data['unauthorized_samples']
     new_samples = response_data['newSamples']
+    possible_duplicates = response_data['possibleDuplicates']
 
     assert_equal updated_samples.size, 2
     assert_equal unauthorized_samples.size, 0
     assert_equal new_samples.size, 1
+    assert_equal possible_duplicates.size, 1
   end
 
   private

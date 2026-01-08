@@ -124,10 +124,10 @@ class SinglePagesController < ApplicationController
     end
 
     # Extract Samples metadata from spreadsheet
+    sample_type_id_spreadsheet = metadata_sheet.cell(2, 2).value.to_i
+    @sample_type = SampleType.find(sample_type_id_spreadsheet)
     study_id = metadata_sheet.cell(10, 2).value.to_i
     @study = Study.find(study_id)
-    sample_type_id = metadata_sheet.cell(2, 2).value.to_i
-    @sample_type = SampleType.find(sample_type_id)
     is_assay = @sample_type.assays.any?
     @assay = @sample_type.assays.first
 
@@ -270,13 +270,28 @@ class SinglePagesController < ApplicationController
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
         elsif [@registered_sample_fields, @registered_sops, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(sample_fields[i]) }
           unless cell_value.nil?
-            parsed_excel_registered_sample = JSON.parse(cell_value.gsub(/"=>/x, '":'))
-
-            unless Sample.find(parsed_excel_registered_sample['id'])&.authorized_for_view?
-              raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_sample.inspect}"
+            parsed_excel_registered_asset = JSON.parse(cell_value.gsub(/"=>/x, '":'))
+            if @registered_sample_fields.include?(sample_fields[i])
+              unless Sample.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+                raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
+            elsif @registered_sops.include?(sample_fields[i])
+              unless Sop.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+                raise "Unauthorized Sop was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
+            elsif @registered_data_file_fields.include?(sample_fields[i])
+              unless DataFile.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+                raise "Unauthorized Data File was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
+            elsif @registered_strain_fields.include?(sample_fields[i])
+              unless Strain.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+                raise "Unauthorized Strain was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
+            else
+              raise "\"#{parsed_excel_registered_asset["type"]}\" is not a supported type of registered asset."
             end
           end
-          obj.merge!(sample_fields[i] => parsed_excel_registered_sample)
+          obj.merge!(sample_fields[i] => parsed_excel_registered_asset)
         elsif @cv_list_fields.include?(sample_fields[i])
           parsed_cv_terms = JSON.parse(cell_value)
           # CV validation for CV_LIST attributes
