@@ -850,6 +850,7 @@ anyType:
     - human_diseases
     - institutions
     - investigations
+    - isa_tags
     - models
     - observation_units
     - organisms
@@ -931,6 +932,11 @@ institutionType:
   minLength: 1
   enum:
     - institutions
+isaTagType:
+  type: string
+  minLength: 1
+  enum:
+    - isa_tags
 modelType:
   type: string
   minLength: 1
@@ -3144,6 +3150,24 @@ unprocessableEntityResponse:
     errors:
       - detail: id specified by the PUT request does not match object-id in the
           JSON input
+unauthorizedResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: Unauthorized
+        detail: You are not authorized to perform this action.
+notAcceptableResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: Not Acceptable
+        detail: Only Application/json is supported.
 badRequestResponse:
   type: object
   properties:
@@ -3899,6 +3923,31 @@ investigationResponse:
     - data
     - jsonapi
   additionalProperties: false
+isaTagResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/isaTagType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+          required:
+            - title
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/indexLinks"
+      required:
+        - id
+        - type
+        - attributes
+        - links
 modelResponse:
   type: object
   properties:
