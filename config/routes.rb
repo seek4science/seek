@@ -579,6 +579,7 @@ SEEK::Application.routes.draw do
       get :new_git_version
       post :create_version_metadata
       post :create_version_from_git
+      post :create_version_from_ro_crate
       get :edit_paths
       patch :update_paths
       post :run
