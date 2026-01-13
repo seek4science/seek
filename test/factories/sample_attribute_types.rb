@@ -238,7 +238,7 @@ FactoryBot.define do
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'HCS protocol')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'labeling protocol')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'sample collection protocol')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'nucleic acid library contruction protocol')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'nucleic acid library construction protocol')
 
     end
   end

@@ -98,7 +98,7 @@ class SopsController < ApplicationController
     respond_to do |format|
       format.html { render partial: 'sop_type_options', locals: { terms: terms, current_value: @sop&.sop_type } }
     end
-  rescue Exception => e
+  rescue StandardError => e
     respond_to do |format|
       format.html { render plain: e.message, status: :bad_request }
     end
