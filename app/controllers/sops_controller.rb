@@ -88,11 +88,26 @@ class SopsController < ApplicationController
     end
   end
 
+  def sop_type_options
+    return unless logged_in?
+
+    @sop = Sop.find(params[:sop_id])
+    scv_id = params[:scv_id]
+    terms = SampleControlledVocab.find_by(id: scv_id)&.sample_controlled_vocab_terms&.map(&:label) || []
+
+    respond_to do |format|
+      format.html { render partial: 'sop_type_options', locals: { terms: terms, current_value: @sop&.sop_type } }
+    end
+  rescue Exception => e
+    respond_to do |format|
+      format.html { render plain: e.message, status: :bad_request }
+    end
+  end
 
   private
 
   def sop_params
-    params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, *creator_related_params,
+    params.require(:sop).permit(:title, :description, :sop_type, { project_ids: [] }, :license, *creator_related_params,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { assay_assets_attributes: [:assay_id] },
                                 { publication_ids: [] }, {workflow_ids: []},
