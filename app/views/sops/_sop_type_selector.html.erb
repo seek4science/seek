@@ -1,0 +1,50 @@
+
+<div class="form-group" id="sop_type_selector">
+  <h3>SOP Type</h3>
+  <p>
+    Choose from a controlled vocabulary or provide your own SOP type as free text.
+  </p>
+  <label>Use a Controlled vocabulary (Optional)</label>
+  <% vocabs = SampleControlledVocab.order(:title) %>
+  <%= select_tag :sop_sample_controlled_vocab_id,
+                 options_from_collection_for_select(vocabs, :id, :title),
+                 include_blank: true,
+                 class: 'form-control'
+  %>
+  <label for=select-sop_type>Sop Type value</label>
+  <input type="hidden" name="sop[sop_type]" id="inpt-sop_type" value="" autocomplete="off" />
+  <select name="sop[sop_type]" id="select-sop_type" class="form-control" data-role="seek-objectsinput"
+          data-tags-limit="1" data-typeahead-template="typeahead/controlled_vocab_term"
+          data-allow-new-items="true" multiple>
+    <% if @sop.sop_type %>
+      <option selected="selected" value="<%= @sop.sop_type %>">
+        <%= @sop.sop_type %>
+      </option>
+    <% end %>
+  </select>
+</div>
+
+
+<script>
+  $j('select#sop_sample_controlled_vocab_id').change(function() {
+    const scvid = $j('select#sop_sample_controlled_vocab_id').val();
+    $j.ajax(
+      {
+        url: "<%= sop_type_options_sops_path %>",
+        method: "GET",
+        dataType: "html",
+        accepts: "html",
+        data: { scv_id: scvid, sop_id: <%= @sop.id %> },
+        success: function(data) {
+          $j('select#select-sop_type').empty().append(data);
+        },
+        error: function(err) {
+          alert(err.responseText);
+        },
+        complete: function() {
+          ObjectsInput.init()
+        }
+      }
+    );
+  });
+</script>
