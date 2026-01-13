@@ -227,4 +227,20 @@ FactoryBot.define do
     end
   end
 
+  factory(:protocol_types, class: SampleControlledVocab) do
+    title { 'Protocol types' }
+    source_ontology { 'OBI' }
+    ols_root_term_uris { 'http://purl.obolibrary.org/obo/OBI_0000272' }
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'conversion protocol')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'delivery method')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'extraction protocol')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'HCS protocol')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'labeling protocol')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'sample collection protocol')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'nucleic acid library contruction protocol')
+
+    end
+  end
+
 end

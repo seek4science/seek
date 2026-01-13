@@ -2222,6 +2222,91 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test 'should not return SOP type options when not logged in' do
+    logout
+    get :sop_type_options
+    assert_response :bad_request
+
+    login_as @user
+    get :sop_type_options
+    assert_response :success
+  end
+
+  test 'SOP type options when using a sample controlled vocabulary' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    protocol_type_cv = FactoryBot.create(:protocol_types)
+
+    # Scenario 0:
+    # SOP is not created yet (no sop_id)
+    # No Controlled vocabulary is used to set the SOP type (no scv_id)
+    # No options are expected
+    get :sop_type_options
+    assert_response :success
+    doc = Nokogiri::HTML::Document.parse(response.body)
+    options = doc.css('option')
+    assert_equal options.count, 0
+
+    # Scenario 1:
+    # SOP is not created yet (no sop_id)
+    # A Controlled vocabulary is used to set the SOP type
+    # The number of options equals the number of CV terms
+    get :sop_type_options, params: { scv_id: protocol_type_cv.id }
+
+    assert_response :success
+    doc = Nokogiri::HTML::Document.parse(response.body)
+    options = doc.css('option')
+    assert_equal options.count, protocol_type_cv.labels.count
+
+    # Scenario 2:
+    # A SOP is created that does NOT have a SOP type assigned
+    # No Controlled vocabulary is used to set the SOP type
+    # No options are expected
+    sop = FactoryBot.create(:sop, contributor: person, projects: [project])
+    get :sop_type_options, params: { sop_id: sop.id }
+
+    assert_response :success
+    doc = Nokogiri::HTML::Document.parse(response.body)
+    options = doc.css('option')
+    assert_equal options.count, 0
+
+    # Scenario 3:
+    # A SOP is created that does NOT have a SOP type assigned
+    # A Controlled vocabulary is used to set the SOP type
+    # The number of options equals the number of CV terms
+    get :sop_type_options, params: { scv_id: protocol_type_cv.id, sop_id: sop.id }
+
+    assert_response :success
+    doc = Nokogiri::HTML::Document.parse(response.body)
+    options = doc.css('option')
+    assert_equal options.count, protocol_type_cv.labels.count
+
+    # Scenario 4:
+    # A SOP is created that does have a SOP type assigned
+    # No Controlled vocabulary is used to set the SOP type
+    # The number of options equals 1
+    sop.update_column(:sop_type, 'Super special SOP type')
+    get :sop_type_options, params: { sop_id: sop.id }
+
+    assert_response :success
+    doc = Nokogiri::HTML::Document.parse(response.body)
+    options = doc.css('option')
+    assert_equal options.count, 1
+    assert options.to_s.include?('<option value="Super special SOP type" selected>Super special SOP type</option>')
+
+    # Scenario 5:
+    # A SOP is created that does have a SOP type assigned
+    # A Controlled vocabulary is used to set the SOP type
+    # The number of options equals the number of CV terms + 1
+    get :sop_type_options, params: { scv_id: protocol_type_cv.id, sop_id: sop.id }
+
+    assert_response :success
+    doc = Nokogiri::HTML::Document.parse(response.body)
+    options = doc.css('option')
+    assert_equal options.count, protocol_type_cv.labels.count + 1
+    assert options.to_s.include?('<option value="Super special SOP type" selected>Super special SOP type</option>')
+  end
+
   private
 
   def doi_citation_mock
