@@ -21,6 +21,8 @@ namespace :seek do
     db:seed:018_discipline_vocab
     strip_publication_abstracts
     db:seed:015_isa_tags
+    assign_isa_tag_id_to_sample_attributes
+    assign_isa_tag_id_to_template_attributes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
