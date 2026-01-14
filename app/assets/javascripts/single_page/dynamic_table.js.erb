@@ -61,7 +61,7 @@ const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
 const registeredSopsEnabled = <%= Seek::Config.sops_enabled %>;
 const registeredDataFilesEnabled = <%= Seek::Config.data_files_enabled %>;
 const registeredOrganismsEnabled = <%= Seek::Config.organisms_enabled %>;
-const idFieldName = window.instanceName + " id";
+const idFieldName = "<%= Seek::Config.instance_name %> id";
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
   if (!e.is(":checked")) {

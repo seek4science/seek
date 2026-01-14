@@ -70,7 +70,7 @@
 
 	<% if Seek::Config.isa_json_compliance_enabled && @study.is_isa_json_compliant?%>
 		<%= tab_pane('study_design') do %>
-			<%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
+			<%= render partial: 'isa_studies/study_design', locals: { study: @study} -%>
       <%= render partial: 'single_pages/change_batch_persmission_modal' %>
       <%= render partial: 'single_pages/upload_excel_modal' %>
     <% end %>
