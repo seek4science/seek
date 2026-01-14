@@ -44,6 +44,10 @@ class ISATag < ApplicationRecord
     title == Seek::ISA::TagType::PARAMETER_VALUE
   end
 
+  def isa_input?
+    title == Seek::ISA::TagType::INPUT
+  end
+
   def self.allowed_isa_tags_for_level(level)
     tags = case level
     when 'study source'
