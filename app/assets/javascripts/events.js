@@ -9,6 +9,7 @@ $j(document).ready(function () {
         const startDate = e.date;
         const endDate = startDate.clone().add(1, 'hours');
         $j('#event_end_date').data('DateTimePicker').date(endDate);
+        // reset the flag, as the above line will trigger the event as if manually changed
         endChanged = false;
     });
 
