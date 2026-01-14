@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class OrganismTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'assay association' do
     o = organisms(:Saccharomyces_cerevisiae)

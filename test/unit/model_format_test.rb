@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class ModelFormatTest < ActiveSupport::TestCase
-  fixtures :model_formats
 
   test 'validation' do
     existing = model_formats(:SBML)

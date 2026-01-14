@@ -96,7 +96,7 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
         git_version_attributes: {
           git_repository_id: repo.id,
           ref: 'refs/heads/master',
-          commit: 'a321b6e',
+          commit: 'a321b6e4dd2cfb5219cf03bb9e2743db344f537a',
         }
       }
     }

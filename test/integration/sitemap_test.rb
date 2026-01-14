@@ -71,8 +71,10 @@ class SitemapTest < ActionDispatch::IntegrationTest
     doc = Nokogiri::XML.parse(response.body)
     doc.remove_namespaces!
 
-    # +1 for root path, and -1 for disabled SOPs
-    expected_count = Seek::Util.searchable_types.count
+    # +1 for root path
+    # -1 for disabled SOPs
+    # -1 for ISA tags
+    expected_count = Seek::Util.searchable_types.count - 1
 
     assert_equal expected_count, doc.xpath('//urlset/url').count
     assert_equal 1, doc.xpath('//urlset/url/loc[text()="http://localhost:3000/"]').count
