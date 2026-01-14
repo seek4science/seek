@@ -2307,6 +2307,18 @@ class SopsControllerTest < ActionController::TestCase
     assert options.to_s.include?('<option value="Super special SOP type" selected>Super special SOP type</option>')
   end
 
+  test 'create SOP with SOP type' do
+    sop_params, blob = valid_sop
+    sop_params[:sop_type] = 'Custom SOP type'
+    assert_difference('Sop.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: { sop: sop_params, content_blobs: [blob], policy_attributes: valid_sharing }
+      end
+    end
+    sop = assigns(:sop)
+    assert sop.sop_type == 'Custom SOP type'
+  end
+
   private
 
   def doi_citation_mock

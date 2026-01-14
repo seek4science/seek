@@ -36,6 +36,7 @@ FactoryBot.define do
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
     projects { [FactoryBot.create(:max_project)] }
     assays { [FactoryBot.create(:public_assay)] }
+    sop_type { 'Custom SOP type' }
     workflows {[FactoryBot.build(:workflow, policy: FactoryBot.create(:public_policy))]}
     relationships {[FactoryBot.create(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication))]}
     after(:create) do |sop|
