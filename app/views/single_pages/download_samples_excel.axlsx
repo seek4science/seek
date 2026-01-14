@@ -141,6 +141,18 @@ workbook.add_worksheet name: 'Controlled Vocabularies' do |sheet|
     end
   end
 
+  # Hide ID and UUID columns
+  sheet.column_info[0..1].each { |col| col.hidden = true }
+
+  # Hide columns that do not have CV
+  # column index < 2 => ID and UUID column, already hidden
+  # No values means no CV
+  sample_attribute_value_map.each.with_index(2) do |(_key, values), i|
+    if values.empty?
+      sheet.column_info[i].hidden = true
+    end
+  end
+
   # Add sheet protection
   sheet.sheet_protection.password = secret_pwd
 end
