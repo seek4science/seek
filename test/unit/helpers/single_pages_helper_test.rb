@@ -88,6 +88,8 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
       FactoryBot.create(:data_file, title: "Data File #{i}", projects: [@project], contributor: @person)
       FactoryBot.create(:strain, title: "E. coli strain #{i}", organism: organism, projects: [@project], contributor: @person)
     end
+
+    (1..3).each { |i| FactoryBot.create(:min_sop, assays: [@assay], title: "Assay SOP #{i}", projects: [@project], contributor: @person) }
   end
 
   test 'should require (excel) data validation' do
@@ -127,39 +129,39 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
   test 'should get sample values for Seek Sample attributes' do
     # Driver attribute is of type Seek Sample
     reg_sample_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Driver" }
-    reg_sample_values = get_values_for_registered_samples(reg_sample_attr)
+    reg_sample_values = get_values_for_registered_samples(reg_sample_attr).map { |sample| JSON.parse(sample) }
     driver_ids = @drivers_sample_type.samples.pluck(:id)
-    assert reg_sample_values.all? { |rsv| driver_ids.include?(rsv[:id]) }
+    assert reg_sample_values.all? { |rsv| driver_ids.include?(rsv['id']) }
 
     # Cars attribute is of type Seek Sample Multi
     reg_sample_mult_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Cars" }
-    reg_sample_multi_values = get_values_for_registered_samples(reg_sample_mult_attr)
+    reg_sample_multi_values = get_values_for_registered_samples(reg_sample_mult_attr).map { |sample| JSON.parse(sample) }
     car_ids = @cars_sample_type.samples.pluck(:id)
-    assert reg_sample_multi_values.all? { |rsmv| car_ids.include?(rsmv[:id]) }
+    assert reg_sample_multi_values.all? { |rsmv| car_ids.include?(rsmv['id']) }
   end
 
   test 'should ge sample values for Seek Data File attributes' do
     # Registered Data File attribute is of type Seek Data File
     reg_data_file_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered Data File" }
-    reg_data_file_values = get_values_for_datafiles(reg_data_file_attr)
+    reg_data_file_values = get_values_for_datafiles(reg_data_file_attr).map { |rdfv| JSON.parse(rdfv) }
     data_file_ids = @project.data_files.pluck(:id)
-    assert reg_data_file_values.all? { |data_file| data_file_ids.include?(data_file[:id]) }
+    assert reg_data_file_values.all? { |data_file| data_file_ids.include?(data_file['id']) }
   end
 
   test 'should ge sample values for Seek Strain attributes' do
     # Registered Strain attribute is of type Seek Strain
     strain_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered Strain" }
-    strain_values = get_values_for_strains(strain_attr)
+    strain_values = get_values_for_strains(strain_attr).map { |strain| JSON.parse(strain) }
     strain_ids = @project.strains.pluck(:id)
-    assert strain_values.all? { |sv| strain_ids.include?(sv[:id]) }
+    assert strain_values.all? { |sv| strain_ids.include?(sv['id']) }
   end
 
   test 'should ge sample values for Seek SOP attributes' do
     # Registered SOP attribute is of type Seek SOP
     sop_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered SOP" }
-    sop_values = get_values_for_sops(sop_attr)
+    sop_values = get_values_for_sops(sop_attr).map { |sop| JSON.parse(sop) }
     sop_ids = @assay.sops.pluck(:id)
-    assert sop_values.all? { |sv| sop_ids.include?(sv[:id]) }
+    assert sop_values.all? { |sv| sop_ids.include?(sv['id']) }
   end
 
   private
