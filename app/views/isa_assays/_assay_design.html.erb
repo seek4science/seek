@@ -42,6 +42,7 @@
 	</p>
 <% end %>
 <script>
+  const instanceName = "<%= Seek::Config.instance_name %>"
 	async function loadDynamicTableFromDefaultView(element) {
 		await loadItemDetails(`/assays/${id}`, { view: "default" });
 	}
