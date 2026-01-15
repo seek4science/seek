@@ -120,7 +120,10 @@ namespace :seek do
 
   task(assign_isa_tag_id_to_sample_attributes: [:environment]) do
     puts 'Assigning isa tags to input sample attributes...'
-    old_input_attributes = SampleAttribute.select { |sa| sa.sample_type.is_isa_json_compliant? && sa.isa_tag_id.nil? && !sa.linked_sample_type.nil? && sa.seek_sample_multi? }
+    old_input_attributes = SampleAttribute.joins(:sample_type)
+                                          .where(isa_tag_id: nil)
+                                          .where.not(linked_sample_type_id: nil)
+                                          .select { |sa| sa.sample_type.is_isa_json_compliant? && sa.seek_sample_multi? }
     input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
     updated_count = 0
     old_input_attributes.each do |attribute|
@@ -133,7 +136,8 @@ namespace :seek do
 
   task(assign_isa_tag_id_to_template_attributes: [:environment]) do
     puts 'Assigning isa tags to input template attributes...'
-    old_input_attributes = TemplateAttribute.select { |ta| ta.isa_tag_id.nil? && ta.seek_sample_multi? }
+    old_input_attributes = TemplateAttribute.where(isa_tag_id: nil)
+                                            .select { |ta| ta.seek_sample_multi? }
     input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
     updated_count = 0
     old_input_attributes.each do |attribute|
