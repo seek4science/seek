@@ -57,11 +57,6 @@ const typeaheadSopsUrl = "<%= dynamic_table_typeahead_sops_path(study_id: '__STU
 const typeaheadDataFilesUrl = "<%= typeahead_data_files_path %>";
 const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
 
-// Checking if settings are enabled
-const registeredSopsEnabled = <%= Seek::Config.sops_enabled %>;
-const registeredDataFilesEnabled = <%= Seek::Config.data_files_enabled %>;
-const registeredOrganismsEnabled = <%= Seek::Config.organisms_enabled %>;
-const idFieldName = "<%= Seek::Config.instance_name %> id";
 const handleSelect = (e) => {
   $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
   if (!e.is(":checked")) {
@@ -80,8 +75,11 @@ const handleSelect = (e) => {
   };
   $j.dynamicTable.prototype = {
     init: function (rows, columns, options = {}) {
-      const studyId = options.studyId;
-      const assayId = options.assayId;
+      // Checking if settings in SEEK config are enabled
+      const registeredSopsEnabled = options.config.registeredSopsEnabled;
+      const registeredDataFilesEnabled = options.config.registeredDataFilesEnabled;
+      const registeredOrganismsEnabled = options.config.registeredOrganismsEnabled;
+      const idFieldName = options.config.idFieldName;
 
       columns.forEach((c) => {
         let linkedSamplesUrl;
