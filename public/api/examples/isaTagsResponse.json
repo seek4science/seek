@@ -1,0 +1,124 @@
+{
+  "data": [
+    {
+      "id": "1",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "source"
+      },
+      "links": {
+        "self": "/isa_tags/1"
+      }
+    },
+    {
+      "id": "2",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "source_characteristic"
+      },
+      "links": {
+        "self": "/isa_tags/2"
+      }
+    },
+    {
+      "id": "3",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "sample"
+      },
+      "links": {
+        "self": "/isa_tags/3"
+      }
+    },
+    {
+      "id": "4",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "sample_characteristic"
+      },
+      "links": {
+        "self": "/isa_tags/4"
+      }
+    },
+    {
+      "id": "5",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "protocol"
+      },
+      "links": {
+        "self": "/isa_tags/5"
+      }
+    },
+    {
+      "id": "6",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "other_material"
+      },
+      "links": {
+        "self": "/isa_tags/6"
+      }
+    },
+    {
+      "id": "7",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "other_material_characteristic"
+      },
+      "links": {
+        "self": "/isa_tags/7"
+      }
+    },
+    {
+      "id": "8",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "data_file"
+      },
+      "links": {
+        "self": "/isa_tags/8"
+      }
+    },
+    {
+      "id": "9",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "data_file_comment"
+      },
+      "links": {
+        "self": "/isa_tags/9"
+      }
+    },
+    {
+      "id": "10",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "parameter_value"
+      },
+      "links": {
+        "self": "/isa_tags/10"
+      }
+    },
+    {
+      "id": "11",
+      "type": "isa_tags",
+      "attributes": {
+        "title": "input"
+      },
+      "links": {
+        "self": "/isa_tags/11"
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/isa_tags"
+  },
+  "meta": {
+    "base_url": "http://fairdomhub.org",
+    "api_version": "0.3"
+  }
+}

@@ -1,4 +1,11 @@
 class ISATag < ApplicationRecord
+
+  if Seek::Config.solr_enabled
+    searchable(auto_index: false) do
+      text :title
+    end
+  end
+
   validates :title, presence: true
 
   has_many :template_attributes, inverse_of: :isa_tag

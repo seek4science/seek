@@ -29,6 +29,7 @@ en:
   isa_study: "ISA Study"
   study_design: "Study Design"
   isa_assay: "ISA Assay"
+  isa_tag: "ISA tag"
 
   data_file: &data_file "Data file"
   discipline: "Discipline"
@@ -48,6 +49,12 @@ en:
       files: 'Upload/Import Files'
       git: 'Import Git Repository'
       ro_crate: 'Upload/Import Workflow RO-Crate'
+    run:
+      on_galaxy: 'Run on Galaxy'
+      on_select: 'Run on...'
+      on_default: 'Run on default instance'
+      select_prompt: 'Please enter the URL of the Galaxy instance to run this workflow on:'
+      select_label: 'Galaxy instance URL'
   publication: &publication "Publication"
 
   presentation: &presentation "Presentation"
@@ -116,6 +123,7 @@ en:
     upload: 'Register'
     create: 'Create'
     update: 'Update'
+    run: 'Run'
 
   access:
     determined_by_group: "Individual access rights for each member"
@@ -256,7 +264,9 @@ en:
       assay:
         assay_type_uri: 'Assay Type'
         technology_type_uri: 'Technology Type'
-
+  activemodel:
+    models:
+      workflow_crate_extractor: *workflow
   oauth_session: 'OAuth Session'
   identity: 'Identity'
   api_token: 'API token'
