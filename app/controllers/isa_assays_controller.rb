@@ -16,7 +16,7 @@ class ISAAssaysController < ApplicationController
     study = Study.find(params[:study_id])
     new_position =
       if params[:is_assay_stream] || params[:source_assay_id].nil? # If first assay is of class assay stream
-        study.assay_streams.any? ? study.assay_streams.map(&:position).max + 1 : 0
+        study.assay_streams.any? ? (study.assay_streams.map(&:position).max || 0) + 1 : 0
       elsif params[:source_assay_id] == params[:assay_stream_id] # If first assay in the stream
         0
       else

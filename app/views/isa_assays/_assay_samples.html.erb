@@ -41,7 +41,7 @@
                         assaySamplesInitialLoad = false;
                         return;
                     }
-                    d.sample_type_id = '<%=sample_type.id%>';
+                    d.sample_type_id = '<%=sample_type&.id%>';
                     d.rows_pad = "true"
                 },
                 callback: () => assayDynamicTable.table.ajax.reload(),
