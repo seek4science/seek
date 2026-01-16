@@ -10,9 +10,9 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
   test 'should get new' do
     inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
-    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
-    sample_type = FactoryBot.create(:simple_sample_type)
-    study.sample_types << sample_type
+    study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: User.current_user.person)
+    # sample_type = FactoryBot.create(:simple_sample_type)
+    # study.sample_types << sample_type
 
     get :new, params: { study_id: study }
     assert_response :success
@@ -88,7 +88,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'author form partial uses correct nested param attributes' do
-    get :new, params: { study_id: FactoryBot.create(:study, contributor: User.current_user.person) }
+    get :new, params: { study_id: FactoryBot.create(:isa_json_compliant_study, contributor: User.current_user.person) }
     assert_response :success
     assert_select '#author-list[data-field-name=?]', 'isa_assay[assay][assets_creators_attributes]'
     assert_select '#isa_assay_assay_other_creators'
@@ -97,15 +97,12 @@ class ISAAssaysControllerTest < ActionController::TestCase
   test 'should show new when parameters are incomplete' do
     projects = User.current_user.person.projects
     inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
-    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: User.current_user.person)
 
-    source_sample_type = FactoryBot.create(:simple_sample_type)
-
-    sample_collection_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [projects.first.id])
-    sample_collection_sample_type.sample_attributes.last.linked_sample_type = source_sample_type
-
-    study.sample_types = [source_sample_type, sample_collection_sample_type]
-
+    # source_sample_type = study.sample_types.first
+    #
+    # sample_collection_sample_type = study.sample_types.second
+    #
     post :create, params: { isa_assay: {
       assay: { title: 'test', study_id: study.id,
                sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id] },
@@ -382,7 +379,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
                                                       '2': {
                                                         pos: '3', title: 'Input sample', required: '1',
                                                         sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
-                                                        linked_sample_type_id: study.sample_types.second.id, _destroy: '0'
+                                                        linked_sample_type_id: study.sample_types.second.id, _destroy: '0', isa_tag_id: FactoryBot.create(:input_isa_tag).id
                                                       },
                                                       '3': {
                                                         pos: '4', title: 'Some material characteristic', required: '1',
@@ -528,7 +525,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
                                                       '2': {
                                                         pos: '3', title: 'Input sample', required: '1',
                                                         sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
-                                                        linked_sample_type_id: study.sample_types.second.id, _destroy: '0'
+                                                        linked_sample_type_id: study.sample_types.second.id, _destroy: '0', isa_tag_id: FactoryBot.create(:input_isa_tag).id
                                                       },
                                                       '3': {
                                                         pos: '4', title: 'Some material characteristic', required: '1',
@@ -723,7 +720,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
                                              '2': {
                                                pos: '3', title: 'Input sample', required: '1',
                                                sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
-                                               linked_sample_type_id: study.sample_types.second.id, _destroy: '0'
+                                               linked_sample_type_id: study.sample_types.second.id, _destroy: '0', isa_tag_id: FactoryBot.create(:input_isa_tag).id
                                              },
                                              '3': {
                                                pos: '4', title: 'Some material characteristic', required: '1',
@@ -872,7 +869,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
         '2': {
           pos: '3', title: 'Input sample', required: '1',
           sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
-          linked_sample_type_id: linked_sample_type_id, _destroy: '0'
+          linked_sample_type_id: linked_sample_type_id, _destroy: '0', isa_tag_id: FactoryBot.create(:input_isa_tag).id
         },
         '3': {
           pos: '4', title: 'Some material characteristic', required: '1',
@@ -902,7 +899,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
         '2': {
           pos: '3', title: 'Input sample', required: '1',
           sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
-          linked_sample_type_id: linked_sample_type_id, _destroy: '0'
+          linked_sample_type_id: linked_sample_type_id, _destroy: '0', isa_tag_id: FactoryBot.create(:input_isa_tag).id
         },
         '3': {
           pos: '4', title: 'Some Data File comment', required: '1',
