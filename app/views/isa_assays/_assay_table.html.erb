@@ -20,19 +20,29 @@
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_aggregated(assay&.study, assay).to_json) %>
             window.assayDynamicTable = new $j.dynamicTable('#assay-table')
-            const ajax = {
-                url: dynamicTableDataPath,
-                data: function(d) {
-                    if (assayOverviewInitialLoad) {
-                        assayOverviewInitialLoad = false;
-                        return;
-                    }
-                    d.study_id = '<%=assay&.study&.id%>';
-                    d.assay_id = '<%=assay&.id%>';
-                    d.rows_pad = "true";
+          const options = {
+            config: {
+              registeredSopsEnabled: <%= Seek::Config.sops_enabled %>,
+              registeredDataFilesEnabled: <%= Seek::Config.data_files_enabled %>,
+              registeredOrganismsEnabled: <%= Seek::Config.organisms_enabled %>,
+              idFieldName: "<%= Seek::Config.instance_name %> id",
+            },
+            ajax: {
+              url: dynamicTableDataPath,
+              data: function (d) {
+                if (assayOverviewInitialLoad) {
+                  assayOverviewInitialLoad = false;
+                  return;
                 }
-            }
-            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true, level: "assay", ajax })
+                d.study_id = '<%=assay&.study&.id%>';
+                d.assay_id = '<%=assay&.id%>';
+                d.rows_pad = "true";
+              }
+            },
+            readonly: true,
+            level: "assay"
+          }
+            assayDynamicTable.init(dt.rows, dt.columns, options)
             const types = assayDynamicTable.getSampleTypes()
             createSampleTypeOptions(dt.sample_types)
         });
