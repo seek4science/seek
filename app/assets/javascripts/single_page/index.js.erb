@@ -274,7 +274,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectI
     .filter(row => !rowHasHiddenFields(row))
   // Finally only use the sample IDs
     .map(row => row[idFieldName]);
-debugger;
+
   // Use ajax for POST request with table data in the body
   // If succes => Redirect to download path for retrieving excel file
   $j.ajax({
