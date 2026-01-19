@@ -23,7 +23,7 @@ class TemplateAttribute < ApplicationRecord
   end
 
   def input_attribute?
-    isa_tag.isa_input?
+    isa_tag.isa_input? && title&.downcase&.include?('input') && seek_sample_multi?
   end
 
   private
