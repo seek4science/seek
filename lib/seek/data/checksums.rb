@@ -39,11 +39,27 @@ module Seek
       def calculate_checksum(digest_type)
         return unless file_exists?
 
-          digest = "Digest::#{digest_type.upcase}".constantize.new
+        digest = "Digest::#{digest_type.upcase}".constantize.new
 
-        if file_exists?
+        # Use storage-agnostic open_file helper if available (ContentBlob)
+        # Fall back to Shrine file_attacher if available
+        # Fall back to direct file path access for other models
+        if respond_to?(:open_file)
+          open_file do |io|
+            io.binmode if io.respond_to?(:binmode)
+            while (chunk = io.read(CHECKSUM_CHUNK_SIZE))
+              digest.update(chunk)
+            end
+          end
+        elsif respond_to?(:file_attacher) && file_attacher&.file
           file_attacher.file.open do |io|
             io.binmode if io.respond_to?(:binmode)
+            while (chunk = io.read(CHECKSUM_CHUNK_SIZE))
+              digest.update(chunk)
+            end
+          end
+        elsif respond_to?(:filepath)
+          File.open(filepath, 'rb') do |io|
             while (chunk = io.read(CHECKSUM_CHUNK_SIZE))
               digest.update(chunk)
             end
