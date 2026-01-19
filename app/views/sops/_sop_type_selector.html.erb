@@ -18,8 +18,7 @@
       <label for="select-sop_type">Sop Type value</label>
       <input type="hidden" name="sop[sop_type]" id="inpt-sop_type" value="" autocomplete="off" />
       <select name="sop[sop_type]" id="select-sop_type" class="form-control" data-role="seek-objectsinput"
-              data-tags-limit="1" data-typeahead-template="typeahead/controlled_vocab_term"
-              data-allow-new-items="true" multiple>
+              data-tags-limit="1" data-typeahead-template="typeahead/controlled_vocab_term" multiple>
         <% if @sop.sop_type %>
           <option selected="selected" value="<%= @sop.sop_type %>">
             <%= @sop.sop_type %>
