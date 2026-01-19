@@ -14,10 +14,6 @@ class TemplateAttribute < ApplicationRecord
 
   before_save :default_pos
 
-  def controlled_vocab?
-    sample_attribute_type&.base_type == Seek::Samples::BaseType::CV
-  end
-
   def allow_isa_tag_change?
     !inherited?
   end
