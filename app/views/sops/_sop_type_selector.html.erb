@@ -11,7 +11,7 @@
     <div class="col-md-4">
       <label>Change the Controlled vocabulary (Optional)</label>
       <%= select_tag :sop_sample_controlled_vocab_id,
-                     options_from_collection_for_select(vocabs, :id, :title, default_scv.id),
+                     options_from_collection_for_select(vocabs, :id, :title, default_scv&.id),
                      include_blank: false,
                      class: 'form-control'
       %>
