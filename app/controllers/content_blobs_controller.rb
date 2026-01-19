@@ -112,8 +112,9 @@ class ContentBlobsController < ApplicationController
 
   # check whether the file is pdf, otherwise convert to pdf
   # then return the pdf file
-  def pdf_or_convert(filepath = @content_blob.filepath)
+  def pdf_or_convert
     if @content_blob.is_pdf?
+      # File is already a PDF, stream it directly
       pdf_filename = @content_blob.original_filename.to_s
 
       @content_blob.open_file do |io|
@@ -123,17 +124,49 @@ class ContentBlobsController < ApplicationController
         headers["Content-Length"] = data.bytesize.to_s
       end
     else
-      # pdf_filepath = @content_blob.filepath('pdf')
-      # unless File.exist?(pdf_filepath)
-      #   @content_blob.convert_to_pdf(filepath, pdf_filepath)
-      #   raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
-      # end
-      #
-      # pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
+      # Convert non-PDF via temp files
+      @content_blob.with_tempfile do |src_tempfile|
+        out_file = Tempfile.create(["seek-converted-", ".pdf"], binmode: true)
+
+        begin
+          out_path = out_file.path
+          out_file.close # conversion tools often expect a path and will write to it
+
+          # Delete the empty temp file to force conversion
+          # (convert_to_pdf skips if output file exists)
+          FileUtils.rm(out_path) if File.exist?(out_path)
+
+          # Convert source file to PDF
+          begin
+            @content_blob.convert_to_pdf(src_tempfile.path, out_path)
+          rescue => conversion_error
+            Rails.logger.error("PDF conversion exception for content_blob #{@content_blob.id}: #{conversion_error.class.name}: #{conversion_error.message}")
+            raise conversion_error
+          end
+
+          unless File.exist?(out_path) && File.size?(out_path)
+            Rails.logger.error("PDF conversion failed for content_blob #{@content_blob.id}: file not created at #{out_path}")
+            raise "PDF conversion failed. Ensure LibreOffice or OpenOffice is installed and accessible on the system."
+          end
+
+          # Generate PDF filename from original
+          pdf_filename = File.basename(@content_blob.original_filename.to_s, File.extname(@content_blob.original_filename.to_s)) + '.pdf'
+
+          # Read entire converted PDF into memory and stream it
+          pdf_data = File.binread(out_path)
+
+          send_data pdf_data,
+                    filename: pdf_filename,
+                    type: "application/pdf",
+                    disposition: "attachment"
+          headers["Content-Length"] = pdf_data.bytesize.to_s
+        ensure
+          FileUtils.rm(out_path) if File.exist?(out_path)
+        end
+      end
     end
-
-
   end
+
 
   def get_file_from_jerm
     project = @asset_version.projects.first
