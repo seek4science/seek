@@ -36,7 +36,7 @@ class ContentBlobsController < ApplicationController
     if @content_blob.no_content?
       render plain: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
     elsif @content_blob.is_csv?
-        render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
+        render plain: (@content_blob.read_all(encoding: 'iso-8859-1') || ''), layout: false, content_type: 'text/csv'
     elsif @content_blob.is_excel?
       sheet = params[:sheet] || 1
       trim = params[:trim] || false
@@ -116,7 +116,7 @@ class ContentBlobsController < ApplicationController
     if @content_blob.is_pdf?
       pdf_filename = @content_blob.original_filename.to_s
 
-      @content_blob.file.open do |io|
+      @content_blob.open_file do |io|
         io.rewind if io.respond_to?(:rewind)
         data = io.read
         send_data data, filename: pdf_filename, type: "application/pdf", disposition: "attachment"

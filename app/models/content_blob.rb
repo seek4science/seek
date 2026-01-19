@@ -84,6 +84,68 @@ class ContentBlob < ApplicationRecord
     end
   end
 
+  # Open the blob data regardless of storage backend; yields IO when block given.
+  def open_file
+    return nil unless file_exists?
+
+    io = if stored_in_shrine?
+           file.open
+         else
+           File.open(filepath, 'rb')
+         end
+
+    return io unless block_given?
+
+    begin
+      yield io
+    ensure
+      io.close if io.respond_to?(:close)
+    end
+  end
+
+  # Download (or copy) the blob into a Tempfile and yield the Tempfile.
+  def with_tempfile
+    return nil unless file_exists?
+
+    if stored_in_shrine?
+      tempfile = file.download
+      begin
+        yield tempfile
+      ensure
+        tempfile.close! if tempfile.respond_to?(:close!)
+      end
+    else
+      with_temporary_copy do |path|
+        Tempfile.open(File.basename(path)) do |tmp|
+          FileUtils.cp(path, tmp.path)
+          tmp.flush
+          yield tmp
+        end
+      end
+    end
+  end
+
+  # Stream each chunk of the blob. Returns an enumerator when no block is supplied.
+  def stream_each_chunk(chunk_size = CHUNK_SIZE)
+    return enum_for(:stream_each_chunk, chunk_size) unless block_given?
+
+    open_file do |io|
+      io.rewind if io.respond_to?(:rewind)
+      while (chunk = io.read(chunk_size))
+        yield chunk
+      end
+    end
+  end
+
+  def read_all(encoding: nil)
+    open_file do |io|
+      io.rewind if io.respond_to?(:rewind)
+      data = io.read
+      data = data.force_encoding(encoding) if encoding && data.respond_to?(:force_encoding)
+      data
+    end
+  end
+
   def file_extension
     split_filename = original_filename&.split('.')
     if split_filename && split_filename.length > 2
@@ -129,8 +191,7 @@ class ContentBlob < ApplicationRecord
   def data_io_object
     return @tmp_io_object unless @tmp_io_object.nil?
     return StringIO.new(@data) unless @data.nil?
-    return File.open(filepath, 'rb') if file_exists?
-    nil
+    open_file
   end
 
   # Check if the file is stored in Shrine (and hence in S3 as per the configured storage)
@@ -138,9 +199,13 @@ class ContentBlob < ApplicationRecord
     respond_to?(:file_attacher) && file_attacher&.attached?
   end
 
-  # Check if the file exists (delegates to stored_in_shrine?
+  # Check if the file exists (delegates to Shrine or local file fallback)
   def file_exists?
-    stored_in_shrine?
+    if stored_in_shrine?
+      file_attacher&.file.present?
+    else
+      File.exist?(filepath)
+    end
   rescue Shrine::FileNotFound
     false
   end
@@ -314,7 +379,11 @@ class ContentBlob < ApplicationRecord
 
   def calculate_file_size
     self.file_size = if file_exists?
-                       File.size(filepath)
+                       if stored_in_shrine?
+                         file&.size || file&.metadata&.dig('size')
+                       else
+                         File.size(filepath)
+                       end
                      elsif url
                        remote_headers[:file_size]
                      end

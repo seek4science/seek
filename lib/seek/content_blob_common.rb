@@ -168,23 +168,57 @@ module Seek
 
     def handle_download(disposition = 'attachment', image_size = nil)
       if shrine_s3_blob?
-        redirect_to @content_blob.file_url, allow_other_host: true
+        stream_blob(@content_blob, disposition: disposition)
         return
-        end
-
-      if local_file_available?
-        filepath = prepare_local_file(image_size)
-        send_file filepath,
-                  filename: @content_blob.original_filename,
-                  type: @content_blob.content_type || 'application/octet-stream',
-                  disposition: disposition
-      elsif remote_url_available?
-        handle_remote_download
-            else
-        redirect_on_error @asset_version, "Unable to locate a copy of the file. Please contact an administrator of #{Seek::Config.instance_name}."
-          end
       end
 
+      if local_file_available?
+        stream_local_file(@content_blob, disposition: disposition, image_size: image_size)
+      elsif remote_url_available?
+        handle_remote_download
+      else
+        redirect_on_error @asset_version, "Unable to locate a copy of the file. Please contact an administrator of #{Seek::Config.instance_name}."
+      end
+    end
+
+    def stream_blob(content_blob, disposition: 'attachment')
+      content_type = content_blob.content_type || 'application/octet-stream'
+      content_length = blob_content_length(content_blob)
+
+      self.response.headers['Content-Type'] = content_type
+      self.response.headers['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: disposition, filename: content_blob.original_filename)
+      self.response.headers['Content-Length'] = content_length.to_s if content_length
+      self.response.headers['Last-Modified'] = Time.now.ctime.to_s
+
+      self.response_body = content_blob.stream_each_chunk
+    end
+
+    def stream_local_file(content_blob, disposition:, image_size: nil)
+      filepath = prepare_local_file(image_size)
+      content_type = content_blob.content_type || 'application/octet-stream'
+      content_length = File.size(filepath) if File.exist?(filepath)
+
+      self.response.headers['Content-Type'] = content_type
+      self.response.headers['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: disposition, filename: content_blob.original_filename)
+      self.response.headers['Content-Length'] = content_length.to_s if content_length
+      self.response.headers['Last-Modified'] = File.mtime(filepath).httpdate if File.exist?(filepath)
+
+      self.response_body = Enumerator.new do |yielder|
+        File.open(filepath, 'rb') do |io|
+          while (chunk = io.read(ContentBlob::CHUNK_SIZE))
+            yielder << chunk
+          end
+        end
+      end
+    end
+
+    def blob_content_length(content_blob)
+      if content_blob.stored_in_shrine?
+        content_blob.file&.size || content_blob.file&.metadata&.dig('size')
+      elsif content_blob.file_exists?
+        File.size(content_blob.filepath)
+      end
+    end
 
     def download_jerm_asset
       project = @asset_version.projects.first
@@ -254,7 +288,7 @@ module Seek
 
     def return_file_or_redirect_to(redirected_url = nil, error_message = nil)
       if @content_blob.file_exists?
-        send_file @content_blob.filepath, filename: @content_blob.original_filename, type: @content_blob.content_type, disposition: 'attachment'
+        stream_local_file(@content_blob, disposition: 'attachment')
       else
         flash[:error] = error_message if error_message
         redirect_to redirected_url, allow_other_host: true
