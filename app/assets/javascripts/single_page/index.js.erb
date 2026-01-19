@@ -253,7 +253,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectI
   }
 
   // Get the ID field (instance name + " id")
-  const idFieldName = "<%= Seek::Config.instance_name %> id";
+  const idFieldName = `${instanceName} id`;
 
   // Construct the list of objects
   const sampleIds = rows.map((row) => {

@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class DataDumpTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'can write dump and access via file object' do
     dump = create_workflow_dump

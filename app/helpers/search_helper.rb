@@ -3,7 +3,11 @@ require 'seek/external_search'
 module SearchHelper
 
   def search_type_options
-    [['All', '']] | Seek::Util.searchable_types.collect { |c| [(c.name.underscore.humanize == 'Sop' ? t('sop') : t(c.name.underscore).humanize.pluralize), c.name.underscore.pluralize] }
+    [['All', '']] | Seek::Util.searchable_types.collect do |c|
+      # Skip ISA tags => JSON-API only!
+      next if c.name.underscore.humanize == t('isa_tag')
+      [(c.name.underscore.humanize == 'Sop' ? t('sop') : t(c.name.underscore).humanize.pluralize), c.name.underscore.pluralize]
+    end.compact
   end
 
   def external_search_tooltip_text

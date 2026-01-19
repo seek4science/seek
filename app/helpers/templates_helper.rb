@@ -17,12 +17,12 @@ module TemplatesHelper
   def load_templates
     privilege = Seek::Permissions::Translator.translate('view')
     Template.order(:group, :group_order).select { |t| t.can_perform?(privilege) }.map do |item|
-      { title: item.title&.sanitize,
-        group: item.group&.sanitize,
-        level: item.level&.sanitize,
-        organism: item.organism&.sanitize,
+      { title: sanitize(item.title),
+        group: sanitize(item.group),
+        level: sanitize(item.level),
+        organism: sanitize(item.organism),
         template_id: item.id,
-        description: item.description&.sanitize,
+        description: sanitize(item.description),
         group_order: item.group_order,
         attributes: item.template_attributes.order(:pos).map { |a| map_template_attributes(a) } }
     end
@@ -77,19 +77,19 @@ module TemplatesHelper
   def map_template_attributes(attribute)
     {
       attribute_type_id: attribute.sample_attribute_type_id,
-      data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title&.sanitize,
+      data_type: sanitize(SampleAttributeType.find(attribute.sample_attribute_type_id)&.title),
       cv_id: attribute.sample_controlled_vocab_id,
       allow_cv_free_text: attribute.allow_cv_free_text,
-      title: attribute.title&.sanitize,
+      title: sanitize(attribute.title),
       is_title: attribute.is_title,
-      short_name: attribute.short_name&.sanitize,
-      description: attribute.description&.sanitize,
-      pid: attribute.pid&.sanitize,
+      short_name: sanitize(attribute.short_name),
+      description: sanitize(attribute.description),
+      pid: sanitize(attribute.pid),
       required: attribute.required,
       unit_id: attribute.unit_id,
       pos: attribute.pos,
       isa_tag_id: attribute.isa_tag_id,
-      isa_tag_title: attribute.isa_tag&.title&.sanitize,
+      isa_tag_title: sanitize(attribute.isa_tag&.title),
       linked_sample_type_id: attribute.linked_sample_type_id,
       template_attribute_id: attribute.id
     }

@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class MailerTest < ActionMailer::TestCase
-  fixtures :all
 
   def setup
     disable_authorization_checks { Person.where('first_name = ?', 'default admin').destroy_all }

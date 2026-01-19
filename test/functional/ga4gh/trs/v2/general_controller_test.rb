@@ -4,7 +4,6 @@ module Ga4gh
     module V2
       class GeneralControllerTest < ActionController::TestCase
         include AuthenticatedTestHelper
-        fixtures :users, :people
 
         test 'should get service info' do
           get :service_info

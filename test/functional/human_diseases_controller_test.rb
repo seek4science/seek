@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class HumanDiseasesControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 
