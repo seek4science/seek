@@ -204,6 +204,7 @@ class ContentBlob < ApplicationRecord
     if stored_in_shrine?
       file_attacher&.file.present?
     else
+      return false if filepath.blank?
       File.exist?(filepath)
     end
   rescue Shrine::FileNotFound

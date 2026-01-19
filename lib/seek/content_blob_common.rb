@@ -196,12 +196,12 @@ module Seek
     def stream_local_file(content_blob, disposition:, image_size: nil)
       filepath = prepare_local_file(image_size)
       content_type = content_blob.content_type || 'application/octet-stream'
-      content_length = File.size(filepath) if File.exist?(filepath)
+      content_length = File.size(filepath) if filepath.present? && File.exist?(filepath)
 
       self.response.headers['Content-Type'] = content_type
       self.response.headers['Content-Disposition'] = ActionDispatch::Http::ContentDisposition.format(disposition: disposition, filename: content_blob.original_filename)
       self.response.headers['Content-Length'] = content_length.to_s if content_length
-      self.response.headers['Last-Modified'] = File.mtime(filepath).httpdate if File.exist?(filepath)
+      self.response.headers['Last-Modified'] = File.mtime(filepath).httpdate if filepath.present? && File.exist?(filepath)
 
       self.response_body = Enumerator.new do |yielder|
         File.open(filepath, 'rb') do |io|
@@ -288,7 +288,11 @@ module Seek
 
     def return_file_or_redirect_to(redirected_url = nil, error_message = nil)
       if @content_blob.file_exists?
-        stream_local_file(@content_blob, disposition: 'attachment')
+        if @content_blob.respond_to?(:stored_in_shrine?) && @content_blob.stored_in_shrine?
+          stream_blob(@content_blob, disposition: 'attachment')
+        else
+            stream_local_file(@content_blob, disposition: 'attachment')
+        end
       else
         flash[:error] = error_message if error_message
         redirect_to redirected_url, allow_other_host: true
