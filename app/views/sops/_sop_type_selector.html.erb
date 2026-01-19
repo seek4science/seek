@@ -4,8 +4,9 @@
 <div class="form-group" id="sop_type_selector">
   <h3>SOP Type</h3>
   <p>
-    Choose from a controlled vocabulary or provide your own SOP type as free text.
+    By default, the protocols from the <%= link_to('Experimental Factor Ontology', 'https://www.ebi.ac.uk/ols4/ontologies/efo') %> are selected as controlled vocabulary, but you are free to pick an alternative one. If you do not find a suitable controlled vocabulary, please create one by clicking the button below.
   </p>
+  <%= button_link_to 'New Controlled Vocabulary', 'add', new_sample_controlled_vocab_path %>
   <div class="row d-flex">
     <div class="col-md-4">
       <label>Change the Controlled vocabulary (Optional)</label>
