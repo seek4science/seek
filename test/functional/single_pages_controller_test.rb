@@ -469,6 +469,22 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal possible_duplicates.size, 1
   end
 
+  test 'should raise error when Sample Type attributes don\'t match the spreadsheet header' do
+    project, assay_sample_type = setup_file_upload.values_at(
+      :project, :assay_sample_type
+    )
+
+    # In the spreadsheet:
+    # 'other material characteristic 1' was deleted
+    # 'other material characteristic 2' was renamed to 'My made up attribute'
+    file_path = 'upload_single_page/06_mismatch_sample_type_sample_header_row.xlsx'
+    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    post :upload_samples, as: :json, params: { file:, project_id:project.id, sample_type_id: assay_sample_type.id }
+    assert_response :bad_request
+    assert_equal JSON.parse(response.body)["error"], "The Sample Attributes '[\"other material characteristic 1\", \"other material characteristic 2\"]' where not found in the uploaded spreadsheet. Sample upload was aborted!"
+  end
+
   private
 
   def setup_file_upload

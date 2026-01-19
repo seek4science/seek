@@ -181,9 +181,9 @@ class SinglePagesController < ApplicationController
                               end
                             end)
 
-    has_unmapped_sample_attributes = sample_type_attributes.map { |sa| sample_fields.include?(sa[:title]) }.include?(false)
-    if has_unmapped_sample_attributes
-      raise "The Sample Attributes from the excel sheet don't match those of the Sample Type in the database. Sample upload was aborted!"
+    unmapped_attributes = sample_type_attributes.pluck(:title).select { |sa_title| !sample_fields.include?(sa_title) }
+    unless unmapped_attributes.blank?
+      raise "The Sample Attributes '#{unmapped_attributes}' where not found in the uploaded spreadsheet. Sample upload was aborted!"
     end
 
     # Construct Samples objects from Excel data
