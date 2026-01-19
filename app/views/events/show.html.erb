@@ -4,10 +4,6 @@
 
 <div class="tab-content">
   <%= tab_pane('overview') do %>
-    <p class="event_type">
-      <lable>Event type:</lable>
-      <%= @event.event_type&.title || 'Not specified' %>
-    </p>
 
     <%= item_description @event.description -%>
 
@@ -23,6 +19,17 @@
             <%= link_to @event.contributor.name, @event.contributor -%>
           </p>
         <% end %>
+
+        <p class="event_type">
+          <label><%= t('event') %> type:</label>
+          <%= text_or_not_specified @event.event_type&.title %>
+        </p>
+
+        <p class='location_type'>
+          <label>Location type:</label>
+          <%= text_or_not_specified @event.location_type&.humanize %>
+        </p>
+
         <p>
           <label>Start Time:</label>
           <% if @event.start_date.nil? %>
@@ -44,11 +51,6 @@
         <p class="web_page">
           <label><%= t('event') %> Website:</label>
           <%= text_or_not_specified(@event.url, :external_link=>true) -%>
-        </p>
-
-        <p class='location_type'>
-          <label>Location type:</label>
-          <%= @event.location_type.present? ? @event.location_type.humanize : 'Not specified' %>
         </p>
 
         <p class="address">
