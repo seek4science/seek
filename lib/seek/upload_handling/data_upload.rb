@@ -110,7 +110,13 @@ module Seek
                                              original_filename: blob.original_filename,
                                              content_type: blob.content_type,
                                              asset_version: new_version)
-        new_blob.tmp_io_object = File.open(blob.filepath) if File.exist?(blob.filepath)
+        if blob.respond_to?(:open_file)
+          blob.open_file do |io|
+            new_blob.tmp_io_object = io.read
+          end
+        elsif blob.respond_to?(:filepath) && File.exist?(blob.filepath)
+          new_blob.tmp_io_object = File.open(blob.filepath)
+        end
       end
 
       def process_upload(blob_params)
