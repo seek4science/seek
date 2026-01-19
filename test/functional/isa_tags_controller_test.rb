@@ -20,7 +20,7 @@ class ISATagsControllerTest < ActionController::TestCase
     get :index, as: :json
     assert_response :success
     response_body = JSON.parse(response.body)
-    assert_equal response_body["data"].count, 10
+    assert_equal response_body["data"].count, 11
   end
 
   test 'should return the ISA tag by id' do
