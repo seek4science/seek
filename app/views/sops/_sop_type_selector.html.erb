@@ -1,3 +1,6 @@
+<% vocabs = SampleControlledVocab.order(:title) %>
+<% default_scv = SampleControlledVocab::SystemVocabs.vocab_for_property(:protocols) || vocabs.first %>
+
 <div class="form-group" id="sop_type_selector">
   <h3>SOP Type</h3>
   <p>
@@ -5,11 +8,10 @@
   </p>
   <div class="row d-flex">
     <div class="col-md-4">
-      <label>Use a Controlled vocabulary (Optional)</label>
-      <% vocabs = SampleControlledVocab.order(:title) %>
+      <label>Change the Controlled vocabulary (Optional)</label>
       <%= select_tag :sop_sample_controlled_vocab_id,
-                     options_from_collection_for_select(vocabs, :id, :title),
-                     include_blank: true,
+                     options_from_collection_for_select(vocabs, :id, :title, default_scv.id),
+                     include_blank: false,
                      class: 'form-control'
       %>
     </div>
