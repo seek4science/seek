@@ -11,7 +11,7 @@
       <div class="form-group">
         <div class="row">
           <div class="col-md-6 col-xs-12">
-            <%= f.label :event_type_id, 'Event type' %>
+            <%= f.label :event_type_id, "#{t('event')} type" %>
             <%= f.collection_select :event_type_id,
                                     EventType.order(:title),
                                     :id,
