@@ -11,8 +11,6 @@ class ISAAssaysControllerTest < ActionController::TestCase
   test 'should get new' do
     inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
     study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: User.current_user.person)
-    # sample_type = FactoryBot.create(:simple_sample_type)
-    # study.sample_types << sample_type
 
     get :new, params: { study_id: study }
     assert_response :success
