@@ -1,7 +1,13 @@
 <%
   default_scv = SampleControlledVocab::SystemVocabs.vocab_for_property(:protocols)
-  sop_option_struct = Struct.new(:id, :title)
-  existing_items = [sop_option_struct.new(@sop.sop_type, @sop.sop_type)]
+
+  if @sop.sop_type.nil?
+    existing_items = []
+  else
+    sop_option_struct = Struct.new(:id, :title)
+    existing_items = [sop_option_struct.new(@sop.sop_type, @sop.sop_type)]
+  end
+
   options = {
     typeahead: {
       query_url: typeahead_sample_controlled_vocabs_path + "?scv_id=#{default_scv.id}" ,
