@@ -88,22 +88,6 @@ class SopsController < ApplicationController
     end
   end
 
-  def sop_type_options
-    raise 'Not allowed unless logged in. Please log in!' unless logged_in?
-
-    @sop = Sop.find(params[:sop_id]) if params[:sop_id].present?
-    scv_id = params[:scv_id]
-    terms = SampleControlledVocab.find_by(id: scv_id)&.sample_controlled_vocab_terms&.map(&:label) || []
-
-    respond_to do |format|
-      format.html { render partial: 'sop_type_options', locals: { terms: terms, current_value: @sop&.sop_type } }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.html { render plain: e.message, status: :bad_request }
-    end
-  end
-
   private
 
   def sop_params
