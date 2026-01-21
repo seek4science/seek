@@ -227,18 +227,19 @@ FactoryBot.define do
     end
   end
 
-  factory(:protocol_types, class: SampleControlledVocab) do
+  factory(:sop_types_controlled_vocab, class: SampleControlledVocab) do
     title { 'Protocol types' }
     source_ontology { 'OBI' }
     ols_root_term_uris { 'http://purl.obolibrary.org/obo/OBI_0000272' }
+    key { 'sop_type_annotations' }
     after(:build) do |vocab|
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'conversion protocol')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'delivery method')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'extraction protocol')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'HCS protocol')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'labeling protocol')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'sample collection protocol')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'nucleic acid library construction protocol')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'hydrolysis collection protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0010892', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'enrichment protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0009089', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'dissociation protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0009088', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'HCS protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0007570', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'labeling protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0003808', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'sample collection protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0005518', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'nucleic acid library construction protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0004184', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
 
     end
   end

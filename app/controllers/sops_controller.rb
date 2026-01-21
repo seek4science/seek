@@ -91,11 +91,12 @@ class SopsController < ApplicationController
   private
 
   def sop_params
-    params.require(:sop).permit(:title, :description, :sop_type, { project_ids: [] }, :license, *creator_related_params,
+    params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, *creator_related_params,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { assay_assets_attributes: [:assay_id] },
                                 { publication_ids: [] }, {workflow_ids: []},
                                 { extended_metadata_attributes: determine_extended_metadata_keys },
+                                { sop_type_annotations: [] },
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

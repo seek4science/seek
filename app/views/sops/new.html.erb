@@ -21,7 +21,7 @@
       </div>
 
       <div class="form-group">
-        <%= render partial: 'sop_type_selector' %>
+        <%= render partial: 'assets/controlled_vocab_annotations_form_properties', locals: { resource: @sop } %>
       </div>
 
       <%= fields_for(@sop) do |sop_fields| %>

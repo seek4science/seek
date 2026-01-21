@@ -1,1 +1,0 @@
-Seek::Data::SeedControlledVocab.seed("protocol-annotations-controlled-vocab.json", :protocols)
