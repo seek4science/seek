@@ -118,7 +118,7 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
     assert requires_data_validation?(@assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered SOP" })
   end
 
-  test 'should ge sample values for CV attributes' do
+  test 'should get sample values for CV attributes' do
     # Apples Controlled Vocab is of type CV
     cv_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Apples Controlled Vocab" }
     apple_labels = SampleControlledVocab.find_by(title: 'apples cv').labels
@@ -140,7 +140,7 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
     assert reg_sample_multi_values.all? { |rsmv| car_ids.include?(rsmv['id']) }
   end
 
-  test 'should ge sample values for Seek Data File attributes' do
+  test 'should get sample values for Seek Data File attributes' do
     # Registered Data File attribute is of type Seek Data File
     reg_data_file_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered Data File" }
     reg_data_file_values = get_values_for_datafiles(reg_data_file_attr).map { |rdfv| JSON.parse(rdfv) }
@@ -148,7 +148,7 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
     assert reg_data_file_values.all? { |data_file| data_file_ids.include?(data_file['id']) }
   end
 
-  test 'should ge sample values for Seek Strain attributes' do
+  test 'should get sample values for Seek Strain attributes' do
     # Registered Strain attribute is of type Seek Strain
     strain_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered Strain" }
     strain_values = get_values_for_strains(strain_attr).map { |strain| JSON.parse(strain) }
@@ -156,7 +156,7 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
     assert strain_values.all? { |sv| strain_ids.include?(sv['id']) }
   end
 
-  test 'should ge sample values for Seek SOP attributes' do
+  test 'should get sample values for Seek SOP attributes' do
     # Registered SOP attribute is of type Seek SOP
     sop_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered SOP" }
     sop_values = get_values_for_sops(sop_attr).map { |sop| JSON.parse(sop) }
