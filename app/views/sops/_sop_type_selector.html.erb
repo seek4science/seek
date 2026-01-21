@@ -1,57 +1,19 @@
-<% vocabs = SampleControlledVocab.order(:title) %>
-<% default_scv = SampleControlledVocab::SystemVocabs.vocab_for_property(:protocols) || vocabs.first %>
-
+<%
+  default_scv = SampleControlledVocab::SystemVocabs.vocab_for_property(:protocols)
+  sop_option_struct = Struct.new(:id, :title)
+  existing_items = [sop_option_struct.new(@sop.sop_type, @sop.sop_type)]
+  options = {
+    typeahead: {
+      query_url: typeahead_sample_controlled_vocabs_path + "?scv_id=#{default_scv.id}" ,
+      handlebars_template: 'typeahead/controlled_vocab_term'
+    },
+    limit: 1,
+    allow_new: true,
+    class: 'form-control',
+    name: 'sop[sop_type]'
+  }
+%>
 <div class="form-group" id="sop_type_selector">
-  <h3><%= t("sop") %> Type</h3>
-  <p>
-    By default, the protocols from the <%= link_to('Experimental Factor Ontology', 'https://www.ebi.ac.uk/ols4/ontologies/efo') %> are selected as controlled vocabulary, but you are free to pick an alternative one. If you do not find a suitable controlled vocabulary, please create one by clicking the button below.
-  </p>
-  <%= button_link_to 'New Controlled Vocabulary', 'add', new_sample_controlled_vocab_path %>
-  <div class="row d-flex">
-    <div class="col-md-4">
-      <label>Change the Controlled vocabulary (Optional)</label>
-      <%= select_tag :sop_sample_controlled_vocab_id,
-                     options_from_collection_for_select(vocabs, :id, :title, default_scv&.id),
-                     include_blank: false,
-                     class: 'form-control'
-      %>
-    </div>
-
-    <div class="col-md-8">
-      <label for="select-sop_type"><%= t("sop") %> Type value</label>
-      <input type="hidden" name="sop[sop_type]" id="inpt-sop_type" value="" autocomplete="off" />
-      <select name="sop[sop_type]" id="select-sop_type" class="form-control" data-role="seek-objectsinput"
-              data-tags-limit="1" data-typeahead-template="typeahead/controlled_vocab_term" multiple>
-        <% if @sop.sop_type %>
-          <option selected="selected" value="<%= @sop.sop_type %>">
-            <%= @sop.sop_type %>
-          </option>
-        <% end %>
-      </select>
-    </div>
-  </div>
+  <label for="sop[sop_type]"><%= t("sop") %> Type value</label>
+  <%= objects_input('sop[sop_type]', existing_items, options) %>
 </div>
-
-<script>
-  $j('select#sop_sample_controlled_vocab_id').change(function() {
-    const scvid = $j('select#sop_sample_controlled_vocab_id').val();
-    $j.ajax(
-      {
-        url: "<%= sop_type_options_sops_path %>",
-        method: "GET",
-        dataType: "html",
-        accepts: "html",
-        data: { scv_id: scvid, sop_id: "<%= @sop.id %>" },
-        success: function(data) {
-          $j('select#select-sop_type').empty().append(data);
-        },
-        error: function(err) {
-          alert(err.responseText);
-        },
-        complete: function() {
-          ObjectsInput.init()
-        }
-      }
-    );
-  });
-</script>
