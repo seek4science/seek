@@ -7,6 +7,7 @@ An **Event** has the following associated information:
 * A description of the **Event**
 * A URI to a webpage about the **Event**
 * The Location type of the **Event** ( null | in_person | hybrid | online )
+* A string specifying the **Event** type
 * The two-letter country code for where the **Event** is
 * The name of the city where the **Event** takes place
 * The address within the city where the **Event** takes place
