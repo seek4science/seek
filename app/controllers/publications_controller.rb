@@ -12,7 +12,7 @@ class PublicationsController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf soft_delete_fulltext]
   before_action :suggest_authors, only: [:manage]
-  before_action :find_display_asset, :only=>[:show, :download]
+  before_action :find_display_asset, only: %i[show download]
 
   include Seek::ISAGraphExtensions
   include PublicationsHelper
