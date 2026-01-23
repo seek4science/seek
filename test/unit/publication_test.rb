@@ -305,10 +305,10 @@ class PublicationTest < ActiveSupport::TestCase
     journal = FactoryBot.create :journal
     pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project],publication_type_id: journal.id)
     with_config_value(:pubmed_api_email, '') do
-      #error = assert_raises(Publication::NoEmailConfiguredException) do
+      error = assert_raises(Publication::NoEmailConfiguredException) do
         pub.export(:enw)
-      #end
-      #assert_equal 'An email address must be configured to use the PubMed API. Please contact your SEEK administrator to resolve this.', error.message
+      end
+      assert_equal 'An email address must be configured to use the PubMed API', error.message
     end
   end
 

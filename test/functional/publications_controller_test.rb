@@ -500,7 +500,7 @@ class PublicationsControllerTest < ActionController::TestCase
       get :show, params: { id: publication, format: 'bibtex' }
     end
     assert_redirected_to publication_path(publication)
-    assert_equal 'something about the email not being configured', flash[:error]
+    assert_equal 'An email address must be configured to use the PubMed API. Please contact an administrator.', flash[:error]
   end
 
   test 'should export pre-print publication as bibtex' do
@@ -659,11 +659,10 @@ class PublicationsControllerTest < ActionController::TestCase
     refute_nil pub.pubmed_id
 
     with_config_value(:pubmed_api_email, '') do
-      # Tests e.g. /people/123/publications
       get :index, format: :enw
     end
     assert_redirected_to publications_path
-    assert_equal 'something about the email not being configured', flash[:error]
+    assert_equal 'An email address must be configured to use the PubMed API. Please contact an administrator.', flash[:error]
 
   end
 
