@@ -12,7 +12,7 @@ class Sop < ApplicationRecord
   validates :projects, presence: true, projects: { self: true }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
-  has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted=?', r.version, false) }, as: :asset, foreign_key: :asset_id
   has_and_belongs_to_many :workflows
   has_many :sample_resource_links, -> { where(resource_type: 'Sop') }, foreign_key: :resource_id
   has_many :linked_samples, through: :sample_resource_links, source: :sample
@@ -34,7 +34,7 @@ class Sop < ApplicationRecord
     acts_as_favouritable
 
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
-            :primary_key => :sop_id, :foreign_key => :asset_id
+            primary_key: :sop_id, foreign_key: :asset_id
   end
 
   def supports_spreadsheet_explore?

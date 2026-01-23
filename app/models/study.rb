@@ -2,7 +2,7 @@ class Study < ApplicationRecord
 
   belongs_to :assignee, class_name: 'Person'
 
-  searchable(:auto_index => false) do
+  searchable(auto_index: false) do
     text :experimentalists
   end if Seek::Config.solr_enabled
 
@@ -32,7 +32,7 @@ class Study < ApplicationRecord
 
   has_and_belongs_to_many :sample_types
 
-  validates :investigation, presence: { :message => "is blank or invalid" }, projects: true
+  validates :investigation, presence: { message: "is blank or invalid" }, projects: true
 
   enforce_authorization_on_association :investigation, :view
 

@@ -2,22 +2,22 @@
 
 <%= index_and_new_help_icon controller_name %>
 
-<%= form_tag({:action => :create}, :multipart => true) do -%>
+<%= form_tag({action: :create}, multipart: true) do -%>
     <div class="asset_form">
       <%= error_messages_for :sop -%>
 
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@sop} -%>
+      <%= render partial: "assets/upload_box", locals: {resource: @sop} -%>
 
       <div class="form-group">
         <label class="required">Title</label>
         <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
-        <%= text_field_tag 'sop[title]', sop_title_value, :class=>"form-control" -%>
+        <%= text_field_tag 'sop[title]', sop_title_value, class: "form-control" -%>
       </div>
 
       <div class="form-group">
         <label>Description</label>
         <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
-        <%= text_area_tag 'sop[description]', sop_description_value, :class=>"form-control rich-text-edit" -%>
+        <%= text_area_tag 'sop[description]', sop_description_value, class: "form-control rich-text-edit" -%>
       </div>
 
       <%= fields_for(@sop) do |sop_fields| %>
@@ -25,15 +25,15 @@
         <%= render partial: 'extended_metadata/extended_metadata_attribute_input', locals: { f: sop_fields, resource: @sop } %>
       <% end %>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @sop } %>
+      <%= render partial: "projects/project_selector", locals: { resource: @sop } %>
 
-      <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
+      <%= render partial: 'assets/license_selector', locals: { resource: @sop } %>
 
-      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @sop} -%>
+      <%= render partial: "assets/discussion_links_form", locals: {resource: @sop} -%>
 
-      <%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+      <%= fields_for(@sop) { |f| render partial: "assets/asset_form_bottom", locals: {show_publications: false, f: f} }-%>
 
-      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
+      <%= render partial: "assays/associate_assays", locals: {resource: @sop} -%>
 
       <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } -%>
 
