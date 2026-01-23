@@ -22,32 +22,22 @@ class PublicationsController < ApplicationController
   # GET /publications/1
   def show
     respond_to do |format|
-      format.html { render(params[:only_content] ? { layout: false } : {}) } # show.html.erb
+      format.html { render(params[:only_content] ? { layout: false } : {}) }
       format.rdf { render template: 'rdf/show' }
       format.json { render json: @publication, include: [params[:include]] }
+
       format.any(*Publication::EXPORT_TYPES.keys) do
-        send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}"
-      rescue Publication::NoEmailConfiguredException => e
-        Seek::Errors::ExceptionForwarder.send_notification(e, env: request.env, data: { message: "No configured pubmed api email when exporting publication as #{request.format}" })
-
-        flash[:error] = I18n.t('publications.no_pubmed_email_error')
-        redirect_to @publication
-      rescue StandardError => e
-        Seek::Errors::ExceptionForwarder.send_notification(e, env: request.env, data: { message: "Error exporting publication as #{request.format}" })
-
-        flash[:error] = "There was a problem communicating with PubMed to generate the requested #{request.format.to_sym.to_s.upcase}."
-        redirect_to @publication
+        with_export_rescue(@publication) do
+          send_data @publication.export(request.format.to_sym),
+                    type: request.format.to_sym,
+                    filename: "#{@publication.title}.#{request.format.to_sym}"
+        end
       end
     end
   end
 
   def index
-    super
-  rescue Publication::NoEmailConfiguredException => e
-    Seek::Errors::ExceptionForwarder.send_notification(e, env: request.env, data: { message: "No configured pubmed api email when exporting publication as #{request.format}" })
-
-    flash[:error] = I18n.t('publications.no_pubmed_email_error')
-    redirect_to publications_path
+    with_export_rescue(publications_path) { super }
   end
 
   # GET /publications/1/edit
@@ -673,5 +663,33 @@ class PublicationsController < ApplicationController
 
   def override_page_for_export
     params[:page] = 'all' if Publication::EXPORT_TYPES.keys.include?(request.format.to_sym)
+  end
+
+  def with_export_rescue(redirect_target)
+    yield
+  rescue Publication::NoEmailConfiguredException => e
+    handle_pubmed_no_email(e, redirect_target)
+  rescue StandardError => e
+    handle_export_error(e, redirect_target)
+  end
+
+  def handle_pubmed_no_email(exception, redirect_target)
+    Seek::Errors::ExceptionForwarder.send_notification(
+      exception,
+      env: request.env,
+      data: { message: "No configured pubmed api email when exporting publication as #{request.format}" }
+    )
+    flash[:error] = I18n.t('publications.no_pubmed_email_error')
+    redirect_to redirect_target
+  end
+
+  def handle_export_error(exception, redirect_target)
+    Seek::Errors::ExceptionForwarder.send_notification(
+      exception,
+      env: request.env,
+      data: { message: "Error exporting publication as #{request.format}" }
+    )
+    flash[:error] = "There was a problem communicating with PubMed to generate the requested #{request.format.to_sym.to_s.upcase}."
+    redirect_to redirect_target
   end
 end
