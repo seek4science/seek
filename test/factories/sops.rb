@@ -36,7 +36,6 @@ FactoryBot.define do
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
     projects { [FactoryBot.create(:max_project)] }
     assays { [FactoryBot.create(:public_assay)] }
-    sop_type { 'Custom SOP type' }
     workflows {[FactoryBot.build(:workflow, policy: FactoryBot.create(:public_policy))]}
     relationships {[FactoryBot.create(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication))]}
     after(:create) do |sop|
@@ -44,7 +43,7 @@ FactoryBot.define do
 
       sop.content_blob = FactoryBot.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
       sop.annotate_with(['Sop-tag1', 'Sop-tag2', 'Sop-tag3', 'Sop-tag4', 'Sop-tag5'], 'tag', sop.contributor)
-      sop.sop_type_annotations = 'HCS protocol'
+      sop.sop_type_annotations << 'HCS protocol'
       sop.save!
     end
     other_creators { 'Blogs, Joe' }
