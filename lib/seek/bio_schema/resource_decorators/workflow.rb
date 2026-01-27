@@ -4,13 +4,24 @@ module Seek
       # Decorator that provides extensions for a Workflow
       class Workflow < CreativeWork
         WORKFLOW_PROFILE = 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'.freeze
-
+        WORKFLOW_TYPE = 'https://bioschemas.org/ComputationalWorkflow'.freeze
         FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'.freeze
+        FORMALPARAMETER_TYPE = 'https://bioschemas.org/FormalParameter'.freeze
+
 
         schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
                         outputs: :output,
                         sd_publisher: :sdPublisher
+
+        def context
+          super.merge(
+            input: "#{WORKFLOW_TYPE}#input",
+            output: "#{WORKFLOW_TYPE}#output",
+            ComputationalWorkflow: WORKFLOW_TYPE,
+            FormalParameter: FORMALPARAMETER_TYPE
+          )
+        end
 
         def contributors
           [contributor]

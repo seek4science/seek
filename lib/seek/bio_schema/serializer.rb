@@ -7,7 +7,8 @@ module Seek
       include ActionView::Helpers::SanitizeHelper
       attr_reader :resource
 
-      SCHEMA_ORG = 'https://schema.org'
+      SCHEMA_ORG = 'https://schema.org/'.freeze
+      DCT = 'http://purl.org/dc/terms/'.freeze
 
       # initialise with a resource
       def initialize(resource)
