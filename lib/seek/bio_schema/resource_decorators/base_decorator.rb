@@ -26,7 +26,10 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          Seek::BioSchema::Serializer::SCHEMA_ORG
+          {
+            '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+            dct: Seek::BioSchema::Serializer::DCT
+          }
         end
 
         # The schema.org @type .

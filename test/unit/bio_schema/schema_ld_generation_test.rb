@@ -17,7 +17,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'DataCatalog',
       '@id' => 'http://fairyhub.org',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
@@ -68,7 +71,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'DataCatalog',
       '@id' => 'http://fairyhub.org',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
@@ -115,7 +121,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { @person.save! }
     institution = @person.institutions.first
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE },
@@ -153,7 +162,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     refute df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -211,7 +223,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_nil df.content_blob
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -259,7 +274,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'dct:conformsTo' => { '@id' => 'https://bioschemas.org/profiles/Dataset/1.0-RELEASE' },
@@ -302,7 +320,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     institution = @project.institutions.first
     event = @project.events.first
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
       'name' => @project.title,
@@ -336,7 +357,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Sample',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Sample::SAMPLE_PROFILE },
       '@id' => "http://localhost:3000/samples/#{sample.id}",
@@ -361,7 +385,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     data_file = event.data_files.first
     presentation = event.presentations.first
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@id' => "http://localhost:3000/events/#{event.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE },
       '@type' => 'Event',
@@ -402,7 +429,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'DigitalDocument',
       '@id' => "http://localhost:3000/documents/#{document.id}",
       'name' => 'This Document',
@@ -435,7 +465,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'PresentationDigitalDocument',
       '@id' => "http://localhost:3000/presentations/#{presentation.id}",
       'name' => 'This presentation',
@@ -484,7 +517,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'input' => "#{Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE}#input",
+        'output' => "#{Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE}#output",
+        'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE,
+        'FormalParameter' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_TYPE
+      },
       '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
       '@id' => "http://localhost:3000/workflows/#{workflow.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE },
@@ -606,7 +646,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     df1 = sel_assets[2]
     df2 = sel_assets[3]
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Collection',
       '@id' => "http://localhost:3000/collections/#{collection.id}",
       'description' => 'A collection of very interesting things',
@@ -650,7 +693,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Taxon',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::HumanDisease::TAXON_PROFILE },
       '@id' => "http://localhost:3000/human_diseases/#{human_disease.id}",
@@ -674,7 +720,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
       'name' => 'University of Manchester',
@@ -703,7 +752,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Taxon',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Organism::TAXON_PROFILE },
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
@@ -725,7 +777,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'FundingScheme',
       '@id' => "http://localhost:3000/programmes/#{programme.id}",
       'description' => 'A very exciting programme',
@@ -756,7 +811,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     refute df.content_blob.show_as_external_link?
 
     v1_expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -794,7 +852,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     v2_expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -840,7 +901,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset without data dump' do
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Dataset::DATASET_PROFILE },
       '@id' => 'http://localhost:3000/workflows',
@@ -874,7 +938,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     size = ActiveSupport::NumberHelper::NumberToHumanSizeConverter.new(dump.size, {}).convert
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Dataset::DATASET_PROFILE },
       '@id' => 'http://localhost:3000/workflows',
@@ -917,7 +984,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'LabProtocol',
       '@id' => "http://localhost:3000/sops/#{sop.id}",
       'description' => 'How to run a simulation in GROMACS',
