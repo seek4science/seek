@@ -2221,6 +2221,20 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test 'create SOP with SOP type annotations' do
+    sop_params, blob = valid_sop
+    sop_params[:sop_type_annotations] = ["HCS protocol"]
+    sop_types_cv = FactoryBot.create(:sop_types_controlled_vocab)
+    assert_difference('Sop.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: { sop: sop_params, content_blobs: [blob], policy_attributes: valid_sharing }
+      end
+    end
+    sop = assigns(:sop)
+    expected_term = sop_types_cv.sample_controlled_vocab_terms.detect { |term| term.label == "HCS protocol" }
+    assert sop.sop_type_annotations == [expected_term.iri]
+  end
+
   private
 
   def doi_citation_mock
