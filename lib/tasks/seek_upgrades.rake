@@ -20,6 +20,9 @@ namespace :seek do
     update_morpheus_model
     db:seed:018_discipline_vocab
     strip_publication_abstracts
+    db:seed:015_isa_tags
+    assign_isa_tag_id_to_sample_attributes
+    assign_isa_tag_id_to_template_attributes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -113,6 +116,36 @@ namespace :seek do
       end
     end
     puts "... updated #{updated_count} publications"
+  end
+
+  task(assign_isa_tag_id_to_sample_attributes: [:environment]) do
+    puts 'Assigning isa tags to input sample attributes...'
+    old_input_attributes = SampleAttribute.joins(:sample_type)
+                                          .where(isa_tag_id: nil)
+                                          .where.not(linked_sample_type_id: nil)
+                                          .select { |sa| sa.sample_type.is_isa_json_compliant? && sa.seek_sample_multi? }
+    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
+    updated_count = 0
+    old_input_attributes.each do |attribute|
+      attribute.update_column(:isa_tag_id, input_isa_tag_id)
+      updated_count += 1
+      puts '.'
+    end
+    puts "... #{updated_count} input sample attributes were updated."
+  end
+
+  task(assign_isa_tag_id_to_template_attributes: [:environment]) do
+    puts 'Assigning isa tags to input template attributes...'
+    old_input_attributes = TemplateAttribute.where(isa_tag_id: nil)
+                                            .select { |ta| ta.seek_sample_multi? }
+    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
+    updated_count = 0
+    old_input_attributes.each do |attribute|
+      attribute.update_column(:isa_tag_id, input_isa_tag_id)
+      updated_count += 1
+      puts '.'
+    end
+    puts "... #{updated_count} input template attributes were updated."
   end
 
   private
