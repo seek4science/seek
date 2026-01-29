@@ -20,6 +20,7 @@ namespace :seek do
     update_morpheus_model
     db:seed:018_discipline_vocab
     strip_publication_abstracts
+    db:seed:019_sop_type_controlled_vocab
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
