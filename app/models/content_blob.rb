@@ -278,10 +278,22 @@ class ContentBlob < ApplicationRecord
     raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     return unless @tmp_io_object
 
-    @tmp_io_object.rewind
-    File.open(filepath, 'wb+') do |f|
-      until (chunk = @tmp_io_object.read(CHUNK_SIZE)).nil?
-        f.write(chunk)
+    if @tmp_io_object.respond_to?(:path) && File.exist?(@tmp_io_object.path)
+      @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
+      if @tmp_io_object.path
+        FileUtils.cp @tmp_io_object.path, filepath
+
+        # only clean up if object is within the temp (/tmp/) directory, otherwise the original file should be kept
+        if @tmp_io_object.path.start_with?("#{Dir.tmpdir}#{File::SEPARATOR}")
+          File.delete(@tmp_io_object.path)
+        end
+      end
+    else
+      @tmp_io_object.rewind
+      File.open(filepath, 'wb+') do |f|
+        until (chunk = @tmp_io_object.read(CHUNK_SIZE)).nil?
+          f.write(chunk)
+        end
       end
     end
 
