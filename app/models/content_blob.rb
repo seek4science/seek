@@ -44,7 +44,7 @@ class ContentBlob < ApplicationRecord
 
   include Seek::Data::Checksums
 
-  CHUNK_SIZE = 10 ** 8 #100 Mb
+  CHUNK_SIZE = 10 ** 6 # 1 MB
 
   acts_as_fleximage do
     image_directory Seek::Config.temporary_filestore_path + '/image_assets'
