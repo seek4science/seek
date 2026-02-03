@@ -17,6 +17,40 @@ class ContentBlobApiTest < ActionDispatch::IntegrationTest
     @sop = @content_blob.asset
   end
 
+  test 'update content blob data' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy),
+                            contributor: @current_user.person,
+                            content_blob: FactoryBot.create(:content_blob, data: nil))
+    blob = sop.content_blob
+    assert blob.no_content?
+    new_data = 'X'*123
+
+    assert sop.can_edit?
+    put polymorphic_url([sop, blob]), params: new_data, headers: {'Content-Type': 'application/octet-stream'}
+    assert_response :success
+    assert_equal '123', response.body
+    blob.reload
+    assert_equal new_data, blob.data_io_object.read
+    assert_equal '28488119a9628c90674ccb5353330f42', blob.md5sum
+
+    # now try with an UploadFile
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy),
+                            contributor: @current_user.person,
+                            content_blob: FactoryBot.create(:content_blob, data: nil))
+    blob = sop.content_blob
+    assert blob.no_content?
+
+    assert sop.can_edit?
+    put polymorphic_url([sop, blob]), params: fixture_file_upload('a_pdf_file.pdf', 'application/pdf'), headers: {'Content-Type': 'application/octet-stream'}
+    assert_response :success
+    assert_equal '8827', response.body
+
+    blob.reload
+    assert_equal 8827, blob.data_io_object.size
+    assert_equal '565ae8a7a743c3bfd9f15c69647f5b8b', blob.md5sum
+
+  end
+
   private
 
   def collection_url
