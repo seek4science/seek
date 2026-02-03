@@ -986,7 +986,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE
       },
       '@type' => 'LabProtocol',
       '@id' => "http://localhost:3000/sops/#{sop.id}",

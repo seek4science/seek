@@ -23,6 +23,10 @@ module Seek
           )
         end
 
+        def mini_context
+          super.merge(ComputationalWorkflow: WORKFLOW_TYPE)
+        end
+
         def contributors
           [contributor]
         end
