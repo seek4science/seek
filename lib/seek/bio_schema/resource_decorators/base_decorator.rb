@@ -32,6 +32,10 @@ module Seek
           }
         end
 
+        def mini_context
+          {}
+        end
+
         # The schema.org @type .
         # defaults to the resource class name, but can be overridden
         def schema_type
@@ -81,11 +85,20 @@ module Seek
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
+          # Also adds to the context the mini_context for each item in the associated resources
           def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
                 mini_definitions(send(collection)) if respond_to?(collection)
               end
+            end
+
+            define_method(:context) do
+              ctx = {}
+              pairs.each_value do |collection|
+                ctx.merge!(mini_contexts(send(collection))) if respond_to?(collection)
+              end
+              ctx.merge!(super())
             end
           end
 
@@ -117,6 +130,19 @@ module Seek
             mini_col << Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
           mini_col
+        end
+
+        def mini_contexts(collection)
+          return {} if collection.empty?
+
+          ctx = {}
+          collection.each do |item|
+            next if item.respond_to?(:public?) && !item.public?
+
+            decorator = Seek::BioSchema::ResourceDecorators::Factory.instance.get(item)
+            ctx.merge!(decorator.mini_context)
+          end
+          ctx
         end
 
         def respond_to_missing?(name, include_private = false)
