@@ -49,7 +49,7 @@
                   <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
                     <span class="badge" title="<%= val['id'] %>" data-attr_type="seek-strain"><%= val['title'] %></span>
                   </td>
-                <% elsif @registered_sops.include?(key) %>
+                <% elsif @registered_sops_fields.include?(key) %>
                   <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
                     <span class="badge" title="<%= val['id'] %>" data-attr_type="seek-sop"><%= val['title'] %></span>
                   </td>

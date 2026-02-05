@@ -158,7 +158,7 @@ class SinglePagesController < ApplicationController
       sa_attr.sample_attribute_type.seek_strain?
     end.map(&:title)
 
-    @registered_sops = @sample_type.sample_attributes.select do |sa_attr|
+    @registered_sops_fields = @sample_type.sample_attributes.select do |sa_attr|
       sa_attr.sample_attribute_type.seek_sop?
     end.map(&:title)
 
@@ -268,14 +268,14 @@ class SinglePagesController < ApplicationController
             subsample
           end
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
-        elsif [@registered_sample_fields, @registered_sops, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(sample_fields[i]) }
+        elsif [@registered_sample_fields, @registered_sops_fields, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(sample_fields[i]) }
           unless cell_value.nil?
             parsed_excel_registered_asset = JSON.parse(cell_value.gsub(/"=>/x, '":'))
             if @registered_sample_fields.include?(sample_fields[i])
               unless Sample.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
                 raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
-            elsif @registered_sops.include?(sample_fields[i])
+            elsif @registered_sops_fields.include?(sample_fields[i])
               unless Sop.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
                 raise "Unauthorized Sop was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end

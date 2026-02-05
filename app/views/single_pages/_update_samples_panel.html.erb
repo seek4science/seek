@@ -50,7 +50,7 @@
                   <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
                     <span class="badge" title='<%= val['id'] %>' data-attr_type="seek-strain"><%= val['title'] %></span>
                   </td>
-                <% elsif @registered_sops.include?(key) %>
+                <% elsif @registered_sops_fields.include?(key) %>
                   <td class='<%= (val != db_sample[key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{key}]" %>'>
                     <span class="badge" title='<%= val['id'] %>' data-attr_type="seek-sop"><%= val['title'] %></span>
                   </td>
@@ -81,7 +81,7 @@
                   <td><span class="badge" title='<%= val['id'] %>'><%= val['title'] %></span></td>
                 <% elsif @registered_strain_fields.include?(key) %>
                   <td><span class="badge" title='<%= val['id'] %>'><%= val['title'] %></span></td>
-                <% elsif @registered_sops.include?(key) %>
+                <% elsif @registered_sops_fields.include?(key) %>
                   <td><span class="badge" title='<%= val['id'] %>'><%= val['title'] %></span></td>
                 <% else %>
                   <td><%= val %></td>
