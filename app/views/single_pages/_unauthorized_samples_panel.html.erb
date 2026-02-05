@@ -32,13 +32,13 @@
                     <% end %>
                   </td>
                 <% elsif @registered_sample_fields.include?(key) %>
-                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
+                  <td><span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span></td>
                 <% elsif @registered_data_file_fields.include?(key) %>
-                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
+                  <td><span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span></td>
                 <% elsif @registered_strain_fields.include?(key) %>
-                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
+                  <td><span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span></td>
                 <% elsif @registered_sops_fields.include?(key) %>
-                  <span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span>
+                  <td><span class="badge" title="ID: <%= val['id'] %>"><%= val['title'] %></span></td>
                 <% else %>
                   <td><%= val %></td>
                 <% end %>
