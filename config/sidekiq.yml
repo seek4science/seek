@@ -1,0 +1,15 @@
+---
+:concurrency: 5
+:max_retries: 0
+# Timeout for job execution (24 hours) - matches previous delayed_job max_run_time
+:timeout: 86400
+
+:queues:
+  - default
+  - mailers
+  - authlookup
+  - remotecontent
+  - samples
+  - indexing
+  - templates
+  - datafiles
