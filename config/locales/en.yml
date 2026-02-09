@@ -87,6 +87,9 @@ en:
     allow_free_text_label_hint: 'free text allowed'
     allow_free_text_checkbox_label: 'Allow free text?'
 
+  publications:
+    no_pubmed_email_error: 'An email address must be configured to use the PubMed API. Please contact an administrator.'
+
   templates:
     isa_tag_info_text: 'ISA tags define the relation of each attribute to either the sample or the protocol, following the categories specified by the ISA model.'
 

@@ -9,6 +9,8 @@ class Sop < ApplicationRecord
 
   acts_as_doi_parent
 
+  has_controlled_vocab_annotations :sop_types
+
   validates :projects, presence: true, projects: { self: true }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
