@@ -510,7 +510,7 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_response :ok
 
     response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    assert response_body.key?('uuid'), "Response body is expected to have a 'uuid' key"
     cache_uuid = response_body['uuid']
 
     get :download_samples_excel, params: { uuid: cache_uuid }

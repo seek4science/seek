@@ -74,9 +74,7 @@ class SinglePagesController < ApplicationController
               "#{@study.id} - #{@study.title} sources table.xlsx"
             when 'study sample'
               "#{@study.id} - #{@study.title} samples table.xlsx"
-            when 'assay - material'
-              "#{@assay&.id} - #{@assay&.title} table.xlsx"
-            when 'assay - data file'
+            when 'assay - material', 'assay - data file'
               "#{@assay&.id} - #{@assay&.title} table.xlsx"
             else
               @sample_type.title&.concat(".xlsx")
