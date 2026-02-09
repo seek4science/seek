@@ -59,7 +59,7 @@ sample_temp_attributes << upsert_template_attribute('Input',
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                     is_title: false,
                                                     required: true,
-                                                    isa_tag: ISATag.find_by(title: 'input'))
+                                                    isa_tag: ISATag.all.detect { |tag| tag.isa_input? })
 
 sample_temp_attributes << upsert_template_attribute('Name of a protocol with samples as outputs',
                                                     sample_template.id,
