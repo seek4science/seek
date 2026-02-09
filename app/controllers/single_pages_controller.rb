@@ -69,17 +69,18 @@ class SinglePagesController < ApplicationController
 
     @template = Template.find(@sample_type.template_id)
 
-    if @assay
-      spreadsheet_name = "#{@assay&.id} - #{@assay&.title} table.xlsx"
-    elsif @study
-      if @sample_type.level == 'study source'
-        spreadsheet_name = "#{@study.id} - #{@study.title} sources table.xlsx"
-      else
-        spreadsheet_name = "#{@study.id} - #{@study.title} samples table.xlsx"
-      end
-    else
-      spreadsheet_name = @sample_type.title&.concat(".xlsx")
-    end
+    spreadsheet_name = case @sample_type.level
+            when 'study source'
+              "#{@study.id} - #{@study.title} sources table.xlsx"
+            when 'study sample'
+              "#{@study.id} - #{@study.title} samples table.xlsx"
+            when 'assay - material'
+              "#{@assay&.id} - #{@assay&.title} table.xlsx"
+            when 'assay - data file'
+              "#{@assay&.id} - #{@assay&.title} table.xlsx"
+            else
+              @sample_type.title&.concat(".xlsx")
+            end
 
     notice_message << '</ul>'
     flash[:notice] = notice_message.html_safe
