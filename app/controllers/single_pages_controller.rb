@@ -80,7 +80,7 @@ class SinglePagesController < ApplicationController
               "#{@assay&.id} - #{@assay&.title} table.xlsx"
             else
               @sample_type.title&.concat(".xlsx")
-            end
+            end.sanitize
 
     notice_message << '</ul>'
     flash[:notice] = notice_message.html_safe

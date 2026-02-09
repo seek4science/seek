@@ -485,6 +485,41 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert_equal JSON.parse(response.body)["error"], "The Sample Attributes '[\"other material characteristic 1\", \"other material characteristic 2\"]' where not found in the uploaded spreadsheet. Sample upload was aborted!"
   end
 
+  test 'Should sanitize spreadsheet name' do
+    # Generate the excel data
+    id_label, person, _project, study, source_sample_type, sources = setup_file_upload.values_at(
+      :id_label, :person, :project, :study, :source_sample_type, :sources
+    )
+
+    study.update_column(:title, '<script>alert("This should be removed!")</script>My sample type')
+
+    source_ids = sources.map { |s| { id_label => s.id } }
+    sample_type_id = source_sample_type.id
+    study_id = study.id
+    assay_id = nil
+
+    login_as(person)
+
+    post_params = { sample_ids: source_ids.to_json,
+                    sample_type_id: sample_type_id.to_json,
+                    study_id: study_id.to_json,
+                    assay_id: assay_id.to_json }
+
+    post :export_to_excel, params: post_params, xhr: true
+
+    assert_response :ok
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_samples_excel, params: { uuid: cache_uuid }
+    response_cd = response.headers["Content-Disposition"]
+    assert_response :ok
+    assert response_cd.include?("filename=\"#{study.id} - My sample type sources table.xlsx\"")
+
+  end
+
   private
 
   def setup_file_upload
