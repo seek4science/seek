@@ -3,7 +3,6 @@
 require 'rubygems'
 require 'rake'
 
-
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
@@ -23,6 +22,7 @@ namespace :seek do
     db:seed:015_isa_tags
     assign_isa_tag_id_to_sample_attributes
     assign_isa_tag_id_to_template_attributes
+    db:seed:017_minimal_starter_isa_templates
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -74,15 +74,14 @@ namespace :seek do
   end
 
   task(update_morpheus_model: [:environment]) do
-    puts "... updating morpheus model"
+    puts '... updating morpheus model'
     affected_models = []
     errors = []
     Model.find_each do |model|
       next unless model.is_morpheus_supported?
+
       begin
-        unless model.model_format
-          model.model_format = ModelFormat.find_by!(title: 'Morpheus')
-        end
+        model.model_format = ModelFormat.find_by!(title: 'Morpheus') unless model.model_format
         unless model.recommended_environment
           model.recommended_environment = RecommendedModelEnvironment.find_by!(title: 'Morpheus')
         end
@@ -92,13 +91,14 @@ namespace :seek do
         errors << error_message
         next
       end
-      model.update_columns(model_format_id: model.model_format_id, recommended_environment_id: model.recommended_environment_id)
+      model.update_columns(model_format_id: model.model_format_id,
+                           recommended_environment_id: model.recommended_environment_id)
       affected_models << model
     end
     ReindexingQueue.enqueue(affected_models)
     puts "... reindexing job triggered for #{affected_models.count} models"
     unless errors.empty?
-      puts "The following errors were encountered during the update:"
+      puts 'The following errors were encountered during the update:'
       errors.each { |error| puts error }
     end
   end
