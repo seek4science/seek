@@ -59,6 +59,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         with_config_value(:site_base_host, 'http://fairyhub.org') do
           json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
           assert_equal expected, json
+          check_schema_org_terms(json)
         end
       end
     end
@@ -113,6 +114,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        site_base_host: 'http://fairyhub.org') do
       json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
       assert_equal expected, json
+      check_schema_org_terms(json)
     end
   end
 
@@ -147,6 +149,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(@person.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'data file' do
@@ -205,6 +208,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
     check_version(df.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'data file without content blob' do
@@ -258,6 +262,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
     check_version(df.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'dataset with weblink' do
@@ -310,6 +315,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
     check_version(df.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'project' do
@@ -345,6 +351,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(@project.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'sample' do
@@ -378,6 +385,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(sample.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'event' do
@@ -418,6 +426,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(event.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'document' do
@@ -454,6 +463,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(document.to_schema_ld)
     assert_equal expected, json
     check_version(document.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'presentation' do
@@ -489,6 +499,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(presentation.to_schema_ld)
     assert_equal expected, json
     check_version(presentation.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'workflow' do
@@ -622,6 +633,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     fine_json_comparison expected, json
     assert_equal expected, json
     check_version(workflow.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'collection' do
@@ -683,6 +695,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(collection.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'human_disease' do
@@ -708,6 +721,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(human_disease.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'institution' do
@@ -735,6 +749,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(institution.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
 
     # check without ror_id and department
     institution.update_columns(department:'', ror_id:nil)
@@ -742,6 +757,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected.delete('department')
     expected.delete('identifier')
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'organism' do
@@ -767,6 +783,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(organism.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'programme' do
@@ -790,6 +807,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(programme.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'version of data file' do
@@ -895,8 +913,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(df.find_version(1).to_schema_ld)
     assert_equal v1_expected, json
+    check_schema_org_terms(json)
     json = JSON.parse(df.find_version(2).to_schema_ld)
     assert_equal v2_expected, json
+    check_schema_org_terms(json)
   end
 
   test 'dataset without data dump' do
@@ -926,6 +946,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     with_config_value(:metadata_license, 'CC0-1.0') do
       json = JSON.parse(resource.to_schema_ld)
       assert_equal expected, json
+      check_schema_org_terms(json)
     end
   end
 
@@ -969,6 +990,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       assert dump.exists?
       json = JSON.parse(resource.to_schema_ld)
       assert_equal expected, json
+      check_schema_org_terms(json)
     end
   end
 
@@ -1009,6 +1031,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(sop.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   private
@@ -1025,5 +1048,45 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   def fine_json_comparison(expected, json)
     expected.each { |k, v| assert_equal v, json[k], "mismatch with key #{k}" }
     json.each { |k, v| assert_equal v, expected[k], "mismatch with key #{k}" }
+  end
+
+  def schema_org_terms
+    @schema_org_terms ||= begin
+      schema_iris = Set.new
+      RDF::Vocab::SCHEMAS.each_entry do |entry|
+        schema_iris << entry.to_s
+      end
+      schema_iris
+    end
+  end
+
+  def check_schema_org_terms(actual)
+    result = JSON::LD::API.expand(actual)
+    terms = collect_schema_terms(result)
+
+    schema_terms = schema_org_terms
+    terms.each do |t|
+      assert schema_terms.include?(t), "Term #{t} is not a valid schema.org term"
+    end
+  end
+
+  def collect_schema_terms(json_array, terms: nil)
+    terms ||= Set.new
+    json_array.each do |node|
+      next unless node.is_a?(Hash)
+
+      Array(node['@type']).each { |t| terms << t if t.start_with?(Seek::BioSchema::Serializer::SCHEMA_ORG) }
+      node.each do |key, value|
+        next unless key.start_with?(Seek::BioSchema::Serializer::SCHEMA_ORG)
+
+        terms << key
+        Array(value).each do |v|
+          next unless v.is_a?(Hash)
+
+          collect_schema_terms([v], terms: terms)
+        end
+      end
+    end
+    terms
   end
 end
