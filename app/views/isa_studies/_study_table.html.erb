@@ -21,18 +21,27 @@
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
-            const ajax = {
+            const options = {
+              config: {
+                registeredSopsEnabled: <%= Seek::Config.sops_enabled %>,
+                registeredDataFilesEnabled: <%= Seek::Config.data_files_enabled %>,
+                registeredOrganismsEnabled: <%= Seek::Config.organisms_enabled %>,
+                idFieldName: "<%= Seek::Config.instance_name %> id"
+              },
+              ajax: {
                 url: dynamicTableDataPath,
-                data: function(d) {
-                    if (studyTableInitialLoad) {
-                        studyTableInitialLoad = false;
-                        return;
-                    }
-                    d.study_id = '<%=study&.id%>';
-                    d.rows_pad = "true";
+                data: function (d) {
+                  if (studyTableInitialLoad) {
+                    studyTableInitialLoad = false;
+                    return;
+                  }
+                  d.study_id = '<%=study&.id%>';
+                  d.rows_pad = "true";
                 }
+              },
+              readonly: true
             }
-            studyDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
+            studyDynamicTable.init(dt.rows, dt.columns, options)
             const types = studyDynamicTable.getSampleTypes()
             createSampleTypeOptions(dt.sample_types)
 

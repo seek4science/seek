@@ -2,6 +2,9 @@ require 'libxml'
 require 'seek/doi/base_exception'
 
 class Publication < ApplicationRecord
+
+  class NoEmailConfiguredException < RuntimeError; end;
+
   include Seek::Rdf::RdfGeneration
   include Seek::ActsAsHavingMiscLinks
   include PublicationsHelper
@@ -550,6 +553,7 @@ class Publication < ApplicationRecord
 
   def pubmed_entry(pm_id = pubmed_id)
     return unless pm_id
+    raise NoEmailConfiguredException, 'An email address must be configured to use the PubMed API' if Seek::Config.pubmed_api_email.blank?
 
     Rails.cache.fetch("bio-reference-#{pm_id}") do
       entry = Bio::PubMed.efetch(pm_id).first
