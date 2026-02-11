@@ -8,7 +8,6 @@ module Seek
         FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'.freeze
         FORMALPARAMETER_TYPE = 'https://bioschemas.org/FormalParameter'.freeze
 
-
         schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
                         outputs: :output,

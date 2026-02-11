@@ -26,10 +26,12 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          {
+          ctx = {
             '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
             dct: Seek::BioSchema::Serializer::DCT
           }
+          ctx.merge!(additional_contexts) if respond_to?(:additional_contexts)
+          ctx
         end
 
         def mini_context
@@ -93,12 +95,12 @@ module Seek
               end
             end
 
-            define_method(:context) do
+            define_method(:additional_contexts) do
               ctx = {}
               pairs.each_value do |collection|
                 ctx.merge!(mini_contexts(send(collection))) if respond_to?(collection)
               end
-              ctx.merge!(super())
+              ctx
             end
           end
 
