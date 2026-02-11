@@ -144,7 +144,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'ResearchOrganization', '@id' => "http://localhost:3000/institutions/#{institution.id}",
           'name' => institution.title }
       ],
-      'orcid' => 'https://orcid.org/0000-0001-9842-9718'
+      'identifier' => 'https://orcid.org/0000-0001-9842-9718'
     }
 
     json = JSON.parse(@person.to_schema_ld)
@@ -366,7 +366,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'Sample' => Seek::BioSchema::ResourceDecorators::Sample::SAMPLE_TYPE
       },
       '@type' => 'Sample',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Sample::SAMPLE_PROFILE },
@@ -375,9 +376,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/samples/#{sample.id}",
       'keywords' => 'keyword',
       'additionalProperty' => [
-        { '@type' => 'PropertyValue', 'name' => 'title', 'propertyId' => 'dc:title', 'value' => 'The Title' },
-        { '@type' => 'PropertyValue', 'name' => 'description', 'propertyId' => 'dc:description', 'value' => 'The Description' },
-        { '@type' => 'PropertyValue', 'name' => 'enzyme', 'propertyId' => 'http://purl.uniprot.org/core/enzyme', 'value' => 'EC 4.1.2.13' },
+        { '@type' => 'PropertyValue', 'name' => 'title', 'propertyID' => 'dc:title', 'value' => 'The Title' },
+        { '@type' => 'PropertyValue', 'name' => 'description', 'propertyID' => 'dc:description', 'value' => 'The Description' },
+        { '@type' => 'PropertyValue', 'name' => 'enzyme', 'propertyID' => 'http://purl.uniprot.org/core/enzyme', 'value' => 'EC 4.1.2.13' },
         { '@type' => 'PropertyValue', 'name' => 'weight', 'value' => '88700.2', 'unitCode' => 'g',
           'unitText' => 'gram' },
       ]
@@ -395,7 +396,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
       },
       '@id' => "http://localhost:3000/events/#{event.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE },
@@ -660,7 +664,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE
       },
       '@type' => 'Collection',
       '@id' => "http://localhost:3000/collections/#{collection.id}",
@@ -1009,7 +1014,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
         'dct' => Seek::BioSchema::Serializer::DCT,
-        'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE
+        'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE,
+        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE,
+        'computationalTool' => "#{Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE}#computationalTool"
       },
       '@type' => 'LabProtocol',
       '@id' => "http://localhost:3000/sops/#{sop.id}",

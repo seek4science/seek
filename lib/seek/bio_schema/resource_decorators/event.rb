@@ -4,6 +4,9 @@ module Seek
       # Decorator that provides extensions for a Event
       class Event < Thing
         EVENT_PROFILE = 'https://bioschemas.org/profiles/Event/0.3-DRAFT'.freeze
+        HOST_INSTITUTION_PROPERTY = 'https://bioschemas.org/properties/hostInstitution'.freeze
+        CONTACT_PROPERTY = 'https://bioschemas.org/properties/contact'.freeze
+        EVENT_TYPE_PROPERTY = 'https://bioschemas.org/properties/eventType'.freeze
 
         associated_items contact: :contributors,
                          host_institution: :projects,
@@ -18,6 +21,14 @@ module Seek
                         all_assets: :about,
                         created_at: :dateCreated,
                         updated_at: :dateModified
+
+        def context
+          super.merge(
+            contact: CONTACT_PROPERTY,
+            eventType: EVENT_TYPE_PROPERTY,
+            hostInstitution: HOST_INSTITUTION_PROPERTY
+          )
+        end
 
         def conformance
           EVENT_PROFILE
