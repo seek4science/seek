@@ -54,7 +54,7 @@
                    end, attribute_type_id),
                    class: 'form-control sample-type-attribute-type', data: {attr: "type"} %>
 
-    <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) || template_attribute.try(:seek_cv_list?) %>">
+    <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                      options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable': scv.can_edit?}] },
