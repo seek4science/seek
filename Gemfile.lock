@@ -268,7 +268,7 @@ GEM
     execjs (2.10.0)
     factory_bot (6.5.1)
       activesupport (>= 6.1.0)
-    faraday (2.12.2)
+    faraday (2.14.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -284,8 +284,8 @@ GEM
       zlib (~> 2.1)
     faraday-http-cache (2.5.1)
       faraday (>= 0.8)
-    faraday-net_http (3.4.0)
-      net-http (>= 0.5.0)
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
     faraday-retry (2.2.1)
       faraday (~> 2.0)
     fastimage (2.4.0)
@@ -506,8 +506,8 @@ GEM
     net-ftp (0.3.8)
       net-protocol
       time
-    net-http (0.6.0)
-      uri
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.6)
       connection_pool (~> 2.2, >= 2.2.4)
@@ -977,7 +977,7 @@ GEM
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
     unicode-types (1.10.0)
-    uri (1.0.4)
+    uri (1.1.1)
     useragent (0.16.11)
     uuid (2.3.9)
       macaddr (~> 1.0)
