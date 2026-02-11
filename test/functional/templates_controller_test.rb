@@ -414,7 +414,7 @@ class TemplatesControllerTest < ActionController::TestCase
       description: 'attribute1 description',
       sample_attribute_type_id: @registered_sample_multi_attribute_type.id,
       isa_tag_id: @input_isa_tag.id,
-      linked_sample_type_id: 'self',
+      linked_sample_type_id: nil,
       _destroy: '0'
     }
 

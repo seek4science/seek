@@ -121,14 +121,15 @@ namespace :seek do
 
   task(assign_isa_tag_id_to_sample_attributes: [:environment]) do
     puts 'Assigning isa tags to input sample attributes...'
-    old_input_attributes = SampleAttribute.joins(:sample_type)
-                                          .where(isa_tag_id: nil)
-                                          .where.not(linked_sample_type_id: nil)
-                                          .select { |sa| sa.sample_type.is_isa_json_compliant? && sa.seek_sample_multi? }
-    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
     updated_count = 0
-    old_input_attributes.each do |attribute|
-      attribute.update_column(:isa_tag_id, input_isa_tag_id)
+    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
+    SampleAttribute.joins(:sample_type)
+                   .where(isa_tag_id: nil)
+                   .where.not(linked_sample_type_id: nil)
+                   .find_each(batch_size: 1000) do |sa|
+      next unless sa.sample_type.is_isa_json_compliant? && sa.seek_sample_multi?
+
+      sa.update_column(:isa_tag_id, input_isa_tag_id)
       updated_count += 1
       puts '.'
     end
@@ -137,12 +138,12 @@ namespace :seek do
 
   task(assign_isa_tag_id_to_template_attributes: [:environment]) do
     puts 'Assigning isa tags to input template attributes...'
-    old_input_attributes = TemplateAttribute.where(isa_tag_id: nil)
-                                            .select { |ta| ta.seek_sample_multi? }
     input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
     updated_count = 0
-    old_input_attributes.each do |attribute|
-      attribute.update_column(:isa_tag_id, input_isa_tag_id)
+    TemplateAttribute.where(isa_tag_id: nil).find_each(batch_size: 1000) do |ta|
+      next unless ta.seek_sample_multi?
+
+      ta.update_column(:isa_tag_id, input_isa_tag_id)
       updated_count += 1
       puts '.'
     end

@@ -85,7 +85,7 @@ class ISAAssay
 
     if @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
       errors.add(:base,
-                  "[Sample type]: All attributes should have an ISA Tag .".html_safe)
+                  "[Sample type]: All attributes should have an ISA Tag.".html_safe)
     end
 
     assay_sample_or_datafile_attributes = @sample_type.sample_attributes.select do |a|
