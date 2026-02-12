@@ -8,10 +8,11 @@ module Seek
         include ActionView::Helpers::SanitizeHelper
         include Seek::Util.routes
 
-        attr_reader :resource
+        attr_reader :resource, :additional_context
 
         def initialize(resource)
           @resource = resource
+          @additional_context = {}
         end
 
         def mappings
@@ -26,16 +27,10 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          ctx = {
+          {
             '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
             dct: Seek::BioSchema::Serializer::DCT
           }
-          ctx.merge!(additional_contexts) if respond_to?(:additional_contexts)
-          ctx
-        end
-
-        def mini_context
-          {}
         end
 
         # The schema.org @type .
@@ -87,20 +82,15 @@ module Seek
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
-          # Also adds to the context the mini_context for each item in the associated resources
+          # Also adds to the additional_context the context for each item in the associated resources
           def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
-                mini_definitions(send(collection)) if respond_to?(collection)
-              end
-            end
+                return unless respond_to?(collection)
 
-            define_method(:additional_contexts) do
-              ctx = {}
-              pairs.each_value do |collection|
-                ctx.merge!(mini_contexts(send(collection))) if respond_to?(collection)
+                @additional_context.merge!(additional_contexts(send(collection)))
+                mini_definitions(send(collection))
               end
-              ctx
             end
           end
 
@@ -134,7 +124,7 @@ module Seek
           mini_col
         end
 
-        def mini_contexts(collection)
+        def additional_contexts(collection)
           return {} if collection.empty?
 
           ctx = {}
@@ -142,7 +132,7 @@ module Seek
             next if item.respond_to?(:public?) && !item.public?
 
             decorator = Seek::BioSchema::ResourceDecorators::Factory.instance.get(item)
-            ctx.merge!(decorator.mini_context)
+            ctx.merge!(decorator.context)
           end
           ctx
         end
