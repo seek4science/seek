@@ -167,7 +167,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
       },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
@@ -229,7 +232,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
       },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
@@ -281,7 +287,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
       },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
@@ -328,7 +337,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
       },
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -535,8 +547,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
         'dct' => Seek::BioSchema::Serializer::DCT,
-        'input' => "#{Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE}#input",
-        'output' => "#{Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE}#output",
+        'input' => Seek::BioSchema::ResourceDecorators::Workflow::INPUT_PROPERTY,
+        'output' => Seek::BioSchema::ResourceDecorators::Workflow::OUTPUT_PROPERTY,
         'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE,
         'FormalParameter' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_TYPE
       },
@@ -665,7 +677,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
         'dct' => Seek::BioSchema::Serializer::DCT,
-        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE
+        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE,
+        'computationalTool' => Seek::BioSchema::ResourceDecorators::Sop::COMPUTATIONAL_TOOL_PROPERTY
       },
       '@type' => 'Collection',
       '@id' => "http://localhost:3000/collections/#{collection.id}",
@@ -836,7 +849,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     v1_expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
       },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
@@ -877,7 +893,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     v2_expected = {
       '@context' => {
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-        'dct' => Seek::BioSchema::Serializer::DCT
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
       },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
@@ -1015,8 +1034,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
         'dct' => Seek::BioSchema::Serializer::DCT,
         'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE,
+        'input' => Seek::BioSchema::ResourceDecorators::Workflow::INPUT_PROPERTY,
+        'output' => Seek::BioSchema::ResourceDecorators::Workflow::OUTPUT_PROPERTY,
+        'FormalParameter' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_TYPE,
         'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE,
-        'computationalTool' => "#{Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE}#computationalTool"
+        'computationalTool' => Seek::BioSchema::ResourceDecorators::Sop::COMPUTATIONAL_TOOL_PROPERTY
       },
       '@type' => 'LabProtocol',
       '@id' => "http://localhost:3000/sops/#{sop.id}",
