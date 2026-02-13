@@ -2,7 +2,6 @@ require 'test_helper'
 
 class AssetTest < ActiveSupport::TestCase
 
-  fixtures :all
   include ApplicationHelper
 
   test 'can create' do

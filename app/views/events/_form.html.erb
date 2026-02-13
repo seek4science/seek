@@ -1,4 +1,3 @@
-<% current_user_authorized_to_manage = @event.new_record?|| @event.can_manage? -%>
 <% default_time_zone = 'Etc/UTC' -%>
 
 <h1><%= @event.new_record? ? "New #{t('event')}" : ("Editing #{t('event')}: ".html_safe + link_to(@event.title, event_path(@event))) -%></h1>
@@ -19,24 +18,25 @@
         <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" %>
       </div>
 
-      <div class="form-group">
-        <div class="row">
-          <div class="col-md-8 col-xs-12">
-            <%= f.label :start_date, class: 'required' %>
-            <%= f.text_field :start_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
-          </div>
-          <div class="col-md-4 col-xs-12">
-            <%= f.label :time_zone %>
-            <%= f.select :time_zone, options_for_select(ActiveSupport::TimeZone.all.map { |z| [z.to_s, z.tzinfo.name] }, selected: f.object.time_zone || default_time_zone), {}, class: 'form-control' %>
+      <div id="event-dates">
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-8 col-xs-12">
+              <%= f.label :start_date, class: 'required' %>
+              <%= f.text_field :start_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+            </div>
+            <div class="col-md-4 col-xs-12">
+              <%= f.label :time_zone %>
+              <%= f.select :time_zone, options_for_select(ActiveSupport::TimeZone.all.map { |z| [z.to_s, z.tzinfo.name] }, selected: f.object.time_zone || default_time_zone), {}, class: 'form-control' %>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="form-group">
-        <div class="row">
-          <div class="col-md-8 col-xs-12">
-            <%= f.label :end_date %>
-            <%= f.text_field :end_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-8 col-xs-12">
+              <%= f.label :end_date %>
+              <%= f.text_field :end_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+            </div>
           </div>
         </div>
       </div>

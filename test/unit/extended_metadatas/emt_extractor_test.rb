@@ -2,8 +2,6 @@ require 'test_helper'
 
 class EmtExtractorTest < ActiveSupport::TestCase
 
-  fixtures :sample_attribute_types
-
   test 'creates extended metadata type with simple attributes from valid json file' do
 
     emt_file = fixture_file_upload('extended_metadata_type/valid_simple_emt.json', 'application/json')
@@ -89,6 +87,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
     assert_equal SampleAttributeType.find_by(title: 'Controlled Vocabulary'), topics_attr.sample_attribute_type
     assert topics_attr.required
     assert_equal 'http://edamontology.org/topic_0003', topics_attr.pid
+    assert topics_attr.allow_cv_free_text
 
     assert_equal topic_cv, topics_attr.sample_controlled_vocab
     assert_equal 4, topics_attr.sample_controlled_vocab.sample_controlled_vocab_terms.count
@@ -152,5 +151,4 @@ class EmtExtractorTest < ActiveSupport::TestCase
 
 
 end
-
 

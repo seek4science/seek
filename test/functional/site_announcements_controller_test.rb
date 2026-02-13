@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SiteAnnouncementsControllerTest < ActionController::TestCase
-  fixtures :users, :people, :roles
 
   include AuthenticatedTestHelper
 

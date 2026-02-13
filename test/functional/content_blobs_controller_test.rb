@@ -3,7 +3,6 @@ require 'minitest/mock'
 require 'private_address_check'
 
 class ContentBlobsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 

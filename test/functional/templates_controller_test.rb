@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class TemplatesControllerTest < ActionController::TestCase
-  fixtures :isa_tags
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -27,6 +26,7 @@ class TemplatesControllerTest < ActionController::TestCase
     @controlled_vocab_type = SampleAttributeType.find_by(title: "Controlled Vocabulary") || FactoryBot.create(:controlled_vocab_attribute_type, title: "Controlled Vocabulary")
     @controlled_vocab_list_type = SampleAttributeType.find_by(title: "Controlled Vocabulary List") || FactoryBot.create(:cv_list_attribute_type, title: "Controlled Vocabulary List")
     @default_isa_tag = FactoryBot.create(:default_isa_tag)
+    @input_isa_tag = FactoryBot.create(:input_isa_tag)
   end
 
   teardown do
@@ -413,6 +413,7 @@ class TemplatesControllerTest < ActionController::TestCase
       ontology_version: '0.1.2',
       description: 'attribute1 description',
       sample_attribute_type_id: @registered_sample_multi_attribute_type.id,
+      isa_tag_id: @input_isa_tag.id,
       linked_sample_type_id: nil,
       _destroy: '0'
     }

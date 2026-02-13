@@ -120,6 +120,7 @@
         {
           "type": "string",
           "enum": [
+            "input",
             "source",
             "sample",
             "protocol",

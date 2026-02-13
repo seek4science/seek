@@ -278,6 +278,111 @@ class GitWorkflowVersioningTest < ActionDispatch::IntegrationTest
     assert_equal annotation_count + 1, Git::Annotation.count
   end
 
+  test 'handles errors when creating version metadata' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    person = workflow.contributor
+
+
+    login_as(person.user)
+
+    assert_no_difference('Workflow.count') do
+      assert_no_difference('Git::Version.count') do
+        assert_no_difference('Git::Annotation.count') do
+          post create_version_from_ro_crate_workflow_path(workflow), params: {
+            ro_crate: { data: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip') }
+          }
+
+          assert_response :success
+          new_version = assigns(:workflow).git_version
+
+          post create_version_metadata_workflow_path, params: {
+            id: workflow.id,
+            workflow: {
+              workflow_class_id: workflow.workflow_class_id,
+              title: 'blabla',
+              project_ids: [person.projects.first.id],
+              git_version_attributes: {
+                root_path: '/',
+                git_repository_id: new_version.git_repository_id,
+                commit: new_version.commit,
+                main_workflow_path: 'this path does not exist'
+              }
+            }
+          }
+
+          assert_response :unprocessable_entity
+
+          assert_select 'div#error_explanation'
+          assert_select 'input[name="workflow[title]"]', count: 1
+        end
+      end
+    end
+  end
+
+  test 'can create a new version using an RO-Crate' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    person = workflow.contributor
+    original_version = workflow.latest_git_version
+
+    repo_count = Git::Repository.count
+    workflow_count = Workflow.count
+    version_count = Git::Version.count
+    annotation_count = Git::Annotation.count
+
+    login_as(person.user)
+
+    assert_no_difference('Workflow.count') do
+      assert_difference('Git::Version.count', 1) do
+        assert_difference('Git::Annotation.count', 1) do
+          post create_version_from_ro_crate_workflow_path(workflow), params: {
+            ro_crate: { data: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip') }
+          }
+
+          assert_response :success
+          assert_select 'input[name="workflow[title]"]', count: 1
+          new_version = assigns(:workflow).git_version
+
+          post create_version_metadata_workflow_path, params: {
+            id: workflow.id,
+            workflow: {
+              workflow_class_id: workflow.workflow_class_id,
+              title: 'blabla',
+              project_ids: [person.projects.first.id],
+              git_version_attributes: {
+                root_path: '/',
+                git_repository_id: new_version.git_repository_id,
+                commit: new_version.commit,
+                main_workflow_path: new_version.main_workflow_path
+              }
+            }
+          } # Should go to workflow page...
+
+          assert_redirected_to workflow_path(assigns(:workflow))
+        end
+      end
+    end
+
+    created_version = assigns(:workflow).latest_git_version
+
+    assert_equal 2, created_version.version
+    assert created_version.mutable?
+
+    assert created_version.file_exists?('main.nf')
+    refute created_version.file_exists?('concat_two_files.ga')
+
+    refute original_version.file_exists?('main.nf')
+    assert original_version.file_exists?('concat_two_files.ga')
+
+    assert_not_equal original_version.commit, created_version.commit
+    assert_equal [original_version.commit], created_version.commit_object.parents.map(&:oid)
+
+    # Check there wasn't anything extra created in the whole flow...
+    assert_equal repo_count, Git::Repository.count
+    assert_equal workflow_count, Workflow.count
+    assert_equal version_count + 1, Git::Version.count
+    assert_equal annotation_count + 1, Git::Annotation.count
+  end
+
   private
 
   def login_as(user)

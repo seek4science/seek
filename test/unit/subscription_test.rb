@@ -1,7 +1,6 @@
 require 'test_helper'
 # Authorization tests that are specific to public access
 class SubscriptionTest < ActiveSupport::TestCase
-  fixtures :all
 
   def setup
     User.current_user = FactoryBot.create(:user)
