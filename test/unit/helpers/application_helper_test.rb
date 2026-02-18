@@ -434,4 +434,18 @@ class ApplicationHelperTest < ActionView::TestCase
   test 'markdown renderer allows non-ASCII characters' do
     assert_equal "<p>x🍌y</p>", Seek::Markdown.render("x🍌y")
   end
+
+  test 'markdown stripper removes markdown tags and HTML' do
+   assert_equal "Hello\nThis is some markdown Yep &lt;script>alert('hi');&lt;/script>hey",
+                Seek::Markdown.strip_markdown("# Hello\n\nThis is some **markdown** <table><tr><td>Yep <script>alert('hi');</script>hey</td></tr></table>")
+  end
+
+  test 'markdown stripper handles blank input' do
+    assert_equal '', Seek::Markdown.strip_markdown('')
+  end
+
+  test 'markdown stripper handles non-UTF-8 and special characters' do
+    assert_equal "x � y", Seek::Markdown.strip_markdown("x \xD7 y")
+    assert_equal "x🍌y", Seek::Markdown.strip_markdown("x🍌y")
+  end
 end
