@@ -322,11 +322,24 @@ module ISAExporter
 
       ontology = get_ontology_details(protocol_attrbute, protocol_attrbute.title, false)
 
-      isa_protocol[:protocolType] = {
-        annotationValue: protocol_attrbute.title,
-        termAccession: ontology[:termAccession],
-        termSource: ontology[:termSource]
-      }
+      # If a registered SOP was used that has sop_type_annotation_values,
+      # the protocolType
+      sop_type = sop.sop_type_annotation_values&.first
+
+      if sop_type
+        isa_protocol[:protocolType] = {
+          annotationValue: sop_type&.label,
+          termAccession: sop_type&.iri,
+          termSource: sop_type&.sample_controlled_vocab&.source_ontology,
+        }
+      else
+        isa_protocol[:protocolType] = {
+          annotationValue: protocol_attrbute.title,
+          termAccession: ontology[:termAccession],
+          termSource: ontology[:termSource]
+        }
+      end
+
       isa_protocol[:description] = sop[:description] || ''
       isa_protocol[:uri] = ontology[:termAccession]
       isa_protocol[:version] = ''
