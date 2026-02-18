@@ -657,20 +657,43 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'show enabled extended metadata types only' do
+    login_as(FactoryBot.create(:person))
+
+    # Since the investigation level MIAPPE EMT is seeded in the Database, one option should always be present
+    miappe_emt = ExtendedMetadataType.find_by(title: 'MIAPPE metadata v1.1')
+    get :new
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option', text: miappe_emt.title, count: 1
+    end
+
+    # Adding two new investigation level EMTs
+    # One is enabled, the other disabled
+    # In total two options should be visible
     emt = FactoryBot.create(:simple_investigation_extended_metadata_type)
     emt2 = FactoryBot.create(:simple_investigation_extended_metadata_type, enabled: false)
-    login_as(FactoryBot.create(:person))
     get :new
     assert_response :success
     assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
-      assert_select 'option[value=?]',emt.id, text:emt.title, count: 1
-      assert_select 'option[value=?]',emt2.id, text:emt2.title, count: 0
+      assert_select 'option', text: miappe_emt.title, count: 1
+      assert_select 'option[value=?]',emt.id, text: emt.title, count: 1
+      assert_select 'option[value=?]',emt2.id, text: emt2.title, count: 0
     end
+
+    # Setting 'emt' as disabled, should remove this option as well
     emt.update_column(:enabled, false)
     get :new
     assert_response :success
-    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id', count: 0
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id' do
+      assert_select 'option', text: miappe_emt.title, count: 1
+      assert_select 'option[value=?]',emt.id, text: emt.title, count: 0
+      assert_select 'option[value=?]',emt2.id, text: emt2.title, count: 0
+    end
 
+    # Also disabling the investigation level MIAPPE EMT should hide the EM section on the new investigation form completely
+    miappe_emt.update_column(:enabled, false)
+    get :new
+    assert_response :success
+    assert_select 'select#extended_metadata_attributes_extended_metadata_type_id', count: 0
   end
 
   test 'editing an investigation with disabled extended metadata should show the option' do
