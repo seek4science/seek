@@ -1248,13 +1248,21 @@ class SamplesControllerTest < ActionController::TestCase
     error = response_body['errors'][0]
     assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Sample with id '#{random_id}' not found." }
   end
+
+  test 'batch delete unauthorized samples' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    other_person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:min_sample_type, contributor: person, projects: [project])
+    authorized_sample = FactoryBot.create(:sample, contributor: person, sample_type: sample_type, data: { full_name: 'John Smith' })
+    unauthorized_sample = FactoryBot.create(:sample, contributor: other_person, sample_type: sample_type, data: { full_name: 'Jane Doe' })
     assert_equal sample_type.samples.count, 2
 
     login_as(person)
     # One of the samples is a hidden sample and has '#HIDDEN' for id
     assert_no_difference('Sample.count') do
       delete_data = [
-        { ex_id: "#{sample_type.id}-#{1}", id: "#HIDDEN" },
+        { ex_id: "#{sample_type.id}-#{1}", id: unauthorized_sample.id },
         { ex_id: "#{sample_type.id}-#{2}", id: authorized_sample.id }
       ]
       delete :batch_delete, params: { data: delete_data }
@@ -1263,8 +1271,9 @@ class SamplesControllerTest < ActionController::TestCase
     response_body = JSON.parse(response.body)
     assert_equal 1, response_body['errors'].length
     error = response_body['errors'][0]
-    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => 'Sample with id \'#HIDDEN\' not found.' }
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Unauthorized to delete Sample with id '#{unauthorized_sample.id}'." }
   end
+
   test 'JS request does not raise CORS error' do
     sample = FactoryBot.create(:sample)
     login_as(sample.contributor)
