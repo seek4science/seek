@@ -1218,6 +1218,7 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     response_body = JSON.parse(response.body)
+    assert_equal response_body['status'], 'unprocessable_entity'
     assert_equal 1, response_body['errors'].length
     error = response_body['errors'][0]
     assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => 'Sample with id \'#HIDDEN\' not found.' }
@@ -1242,6 +1243,7 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     response_body = JSON.parse(response.body)
+    assert_equal response_body['status'], 'unprocessable_entity'
     assert_equal 1, response_body['errors'].length
     error = response_body['errors'][0]
     assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Sample with id '#{random_id}' not found." }
@@ -1267,6 +1269,7 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     response_body = JSON.parse(response.body)
+    assert_equal response_body['status'], 'unprocessable_entity'
     assert_equal 1, response_body['errors'].length
     error = response_body['errors'][0]
     assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Unauthorized to delete Sample with id '#{unauthorized_sample.id}'." }
