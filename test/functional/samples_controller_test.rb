@@ -1180,12 +1180,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 33.1, last_updated_sample.get_attribute_value(:weight)
   end
 
-  test 'batch_delete' do
+  test 'batch delete samples' do
     person = FactoryBot.create(:person)
     sample1 = FactoryBot.create(:patient_sample, contributor: person)
     sample2 = FactoryBot.create(:patient_sample, contributor: person)
-    type1 = sample1.sample_type
-    type2 = sample1.sample_type
     login_as(person.user)
     assert sample1.can_delete?
     assert sample2.can_delete?
