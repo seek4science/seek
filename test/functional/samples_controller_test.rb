@@ -1193,9 +1193,13 @@ class SamplesControllerTest < ActionController::TestCase
       delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
     end
 
-      # For the Single Page to work properly, these must be included in the response
-      assert response.body.include?('errors')
-      assert response.body.include?('status')
+    # For the Single Page to work properly, these must be included in the response
+    # No errors should occur in this request, meaning status should be 'ok'
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('errors')
+    assert_empty response_body['errors']
+    assert response_body.key?('status')
+    assert_equal response_body['status'], 'ok'
   end
 
   test 'JS request does not raise CORS error' do
