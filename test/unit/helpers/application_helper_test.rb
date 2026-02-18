@@ -436,8 +436,8 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test 'markdown stripper removes markdown tags and HTML' do
-   assert_equal "Hello\nThis is some markdown Yep &lt;script>alert('hi');&lt;/script>hey",
-                Seek::Markdown.strip_markdown("# Hello\n\nThis is some **markdown** <table><tr><td>Yep <script>alert('hi');</script>hey</td></tr></table>")
+   assert_equal "Hello\nThis is some markdown Yep alert('hi');hey http://hello.com a link",
+                Seek::Markdown.strip_markdown("# Hello\n\nThis <span>is</span> some **markdown** <table><tr><td>Yep <script>alert('hi');</script>hey</td></tr></table> http://hello.com [a link](http://link.com)")
   end
 
   test 'markdown stripper handles blank input' do

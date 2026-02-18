@@ -19,7 +19,7 @@ module Seek
       end
     end
 
-    markdown_pipeline_config = {
+    MarkdownPipeline = HTMLPipeline.new(
       convert_filter: HTMLPipeline::ConvertFilter::MarkdownFilter.new(context: {
         markdown: {
           render: { unsafe: true, github_pre_lang: true, hardbreaks: false },
@@ -27,11 +27,17 @@ module Seek
         }
       }),
       node_filters: [LinkNofollowFilter.new]
-    }
+    )
 
-    MarkdownPipeline = HTMLPipeline.new(**markdown_pipeline_config)
-
-    MarkdownPlainTextPipeline = HTMLPipeline.new(**markdown_pipeline_config.merge(sanitization_config: { elements: [] }))
+    MarkdownPlainTextPipeline = HTMLPipeline.new(
+      convert_filter: HTMLPipeline::ConvertFilter::MarkdownFilter.new(context: {
+        markdown: {
+          render: { github_pre_lang: true, hardbreaks: false },
+          extension: { table: true, strikethrough: true, autolink: true }
+        }
+      }),
+      sanitization_config: { elements: [] }
+    )
 
     # Renders a markdown string to HTML
     def self.render(markdown)
