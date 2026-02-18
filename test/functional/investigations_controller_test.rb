@@ -888,12 +888,21 @@ class InvestigationsControllerTest < ActionController::TestCase
       other_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
       investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person, is_isa_json_compliant: true)
 
+      study_sop = FactoryBot.create(:max_sop, projects: [project], contributor: current_user.person, title:'Sample collection protocol')
+      assay1_sop = FactoryBot.create(:min_sop, projects: [project], contributor: current_user.person, title: 'Protocol Assay 1')
+      assay2_sop = FactoryBot.create(:min_sop, projects: [project], contributor: current_user.person, title: 'Protocol Assay 2')
+      sop_sample_attribute_type = FactoryBot.create(:sop_sample_attribute_type)
+
       source_sample_type = FactoryBot.create(:isa_source_sample_type, template_id: FactoryBot.create(:isa_source_template).id)
       sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type, template_id: FactoryBot.create(:isa_sample_collection_template).id)
+      sample_collection_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
       accessible_study = FactoryBot.create(:study,
                                            investigation: investigation,
                                            sample_types:[source_sample_type, sample_collection_sample_type],
-                                           contributor: current_user.person)
+                                           contributor: current_user.person,
+                                           sops: [study_sop])
 
 
       source_sample = FactoryBot.create(:sample,
@@ -921,7 +930,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [source_sample.id],
-                            'sample collection': 'sample collection',
+                            'sample collection': study_sop.id,
                             'sample collection parameter value 1': 'sample collection parameter value 1',
                             'Sample Name': 'sample name',
                             'sample characteristic 1': 'sample characteristic 1'
@@ -935,7 +944,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [source_sample.id],
-                            'sample collection': 'sample collection',
+                            'sample collection': study_sop.id,
                             'sample collection parameter value 1': 'sample collection parameter value 2',
                             'Sample Name': 'sample name 2',
                             'sample characteristic 1': 'sample characteristic 2'
@@ -947,17 +956,32 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_equal(stream_1.study, accessible_study)
       assert(stream_1.is_assay_stream?)
       assay_1_stream_1_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: other_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
-      assay_1_stream_1 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+      assay_1_stream_1_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
+
+      assay_1_stream_1 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id, sops: [assay1_sop])
       assay_2_stream_1_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: other_user.person, linked_sample_type: assay_1_stream_1_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
-      assay_2_stream_1 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+      assay_2_stream_1_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
+
+      assay_2_stream_1 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id, sops: [assay2_sop])
 
       # Create an assay stream with all assays visible
       stream_2 = FactoryBot.create(:assay_stream, title: 'Assay Stream 2', study: accessible_study, contributor: current_user.person)
       assert_equal(stream_2.study, accessible_study)
       assert(stream_2.is_assay_stream?)
       assay_1_stream_2_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: current_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_2_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
       assay_1_stream_2 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
+
       assay_2_stream_2_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: current_user.person, linked_sample_type: assay_1_stream_2_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_2_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
       assay_2_stream_2 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
 
       # create samples in second assay stream with viewing permission
@@ -969,7 +993,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [study_sample.id],
-                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Protocol Assay 1': assay1_sop.id,
                             'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
                             'Assay 1 parameter value 2': assay_1_stream_2_sample_type
                                                            .sample_attributes
@@ -1010,7 +1034,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [study_sample.id],
-                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Protocol Assay 1': assay1_sop.id,
                             'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
                             'Assay 1 parameter value 2': assay_1_stream_2_sample_type
                                                            .sample_attributes
@@ -1051,7 +1075,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [assay_1_stream_2_sample.id],
-                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Protocol Assay 2': assay2_sop.id,
                             'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
                             'Assay 2 parameter value 2': assay_2_stream_2_sample_type
                                                            .sample_attributes
@@ -1092,7 +1116,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [assay_1_stream_2_sample.id],
-                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Protocol Assay 2': assay2_sop.id,
                             'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
                             'Assay 2 parameter value 2': assay_2_stream_2_sample_type
                                                            .sample_attributes
@@ -1158,6 +1182,13 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert study_output_ids.include? "#sample/#{study_sample.id}"
       refute study_output_ids.include? "#sample/#{hidden_study_sample.id}"
 
+      # Check the protocols at the study level
+      protocols_json = study_json['protocols']
+      assert_equal protocols_json.length, 3
+      sops_with_sop_type_annotations = protocols_json.select { |protocol| !protocol["protocolType"]["termAccession"].blank? }
+      assert_equal sops_with_sop_type_annotations.length, 1
+      assert_equal sops_with_sop_type_annotations.first["protocolType"]["termAccession"], study_sop.sop_type_annotations.first
+      assert_equal sops_with_sop_type_annotations.first["protocolType"]["termSource"], study_sop.sop_type_annotation_values.first.sample_controlled_vocab.source_ontology
       assay_json = study_json['assays'].first
 
       # Check otherMaterials
