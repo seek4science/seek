@@ -1207,6 +1207,47 @@ class SamplesControllerTest < ActionController::TestCase
     project = person.projects.first
     sample_type = FactoryBot.create(:min_sample_type, contributor: person, projects: [project])
     authorized_sample = FactoryBot.create(:sample, contributor: person, sample_type: sample_type, data: { full_name: 'John Smith' })
+    assert_equal sample_type.samples.count, 1
+
+    login_as(person)
+    # One of the samples is a hidden sample and has '#HIDDEN' for id
+    assert_no_difference('Sample.count') do
+      delete_data = [
+        { ex_id: "#{sample_type.id}-#{1}", id: "#HIDDEN" },
+        { ex_id: "#{sample_type.id}-#{2}", id: authorized_sample.id }
+      ]
+      delete :batch_delete, params: { data: delete_data }
+    end
+
+    response_body = JSON.parse(response.body)
+    assert_equal 1, response_body['errors'].length
+    error = response_body['errors'][0]
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => 'Sample with id \'#HIDDEN\' not found.' }
+  end
+
+  test 'batch delete inexisting samples' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    sample_type = FactoryBot.create(:min_sample_type, contributor: person, projects: [project])
+    authorized_sample = FactoryBot.create(:sample, contributor: person, sample_type: sample_type, data: { full_name: 'John Smith' })
+    assert_equal sample_type.samples.count, 1
+
+    login_as(person)
+    # One of the samples is a hidden sample and has '#HIDDEN' for id
+    random_id = rand((10000..100000))
+    assert_no_difference('Sample.count') do
+      delete_data = [
+        { ex_id: "#{sample_type.id}-#{1}", id: random_id },
+        { ex_id: "#{sample_type.id}-#{2}", id: authorized_sample.id }
+      ]
+      delete :batch_delete, params: { data: delete_data }
+    end
+
+    response_body = JSON.parse(response.body)
+    assert_equal 1, response_body['errors'].length
+    error = response_body['errors'][0]
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Sample with id '#{random_id}' not found." }
+  end
     assert_equal sample_type.samples.count, 2
 
     login_as(person)
