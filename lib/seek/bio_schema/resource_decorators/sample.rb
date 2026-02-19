@@ -6,6 +6,11 @@ module Seek
         schema_mappings properties: :additionalProperty
 
         SAMPLE_PROFILE = 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/'.freeze
+        SAMPLE_TYPE = 'https://bioschemas.org/types/Sample/0.2-DRAFT-2018_11_09'.freeze
+
+        def context
+          super.merge(Sample: SAMPLE_TYPE)
+        end
 
         def schema_type
           'Sample'
@@ -31,7 +36,7 @@ module Seek
             'value' => value.to_s
           }
           if attribute.pid
-            data['propertyId'] = attribute.pid
+            data['propertyID'] = attribute.pid
           end
           resolved = attribute.resolve(value)
           data['identifier'] = resolved if resolved
