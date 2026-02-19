@@ -102,16 +102,31 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'can download?' do
-    # essentially the same as can_view?
-
-    # can't download if not a project member
-    st = FactoryBot.create(:simple_sample_type)
-    assert_empty st.projects & @person.projects
-
-    refute st.can_download?(@person.user)
-    User.with_current_user(@person.user) do
+    with_auth_lookup_enabled do
+      person = FactoryBot.create(:person)
+      another_person = FactoryBot.create(:person)
+      # essentially the same as can_view?
+      st = FactoryBot.create(:simple_sample_type, policy:FactoryBot.create(:private_policy), contributor: person)
+      assert_equal Policy::NO_ACCESS, st.policy.access_type
+      st.update_lookup_table_for_all_users
+      assert st.can_download?(person.user)
+      refute st.can_download?(another_person.user)
       refute st.can_download?
+      assert st.authorized_for_download?(person.user)
+      refute st.authorized_for_download?(another_person.user)
+      refute st.authorized_for_download?
+
+      st = FactoryBot.create(:simple_sample_type, policy:FactoryBot.create(:publicly_viewable_policy), contributor: person)
+      assert_equal Policy::VISIBLE, st.policy.access_type
+      st.update_lookup_table_for_all_users
+      assert st.can_download?(person.user)
+      assert st.can_download?(another_person.user)
+      assert st.can_download?
+      assert st.authorized_for_download?(person.user)
+      assert st.authorized_for_download?(another_person.user)
+      assert st.authorized_for_download?
     end
+
   end
 
   test 'not an asset or downloadable' do
