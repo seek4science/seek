@@ -158,6 +158,7 @@ class SampleType < ApplicationRecord
   end
 
   def authorized_for_download?(user = User.current_user)
+    return false if user.nil?
     authorized_for_view?(user)
   end
 
