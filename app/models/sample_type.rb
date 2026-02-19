@@ -157,6 +157,10 @@ class SampleType < ApplicationRecord
     Sample.user_creatable?
   end
 
+  def authorized_for_download?(user = User.current_user)
+    authorized_for_view?(user)
+  end
+
   def self.can_create?
     can = User.logged_in_and_member? && Seek::Config.samples_enabled
     can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.is_admin_or_project_administrator?)
