@@ -121,10 +121,10 @@ class SampleTypeTest < ActiveSupport::TestCase
       st.update_lookup_table_for_all_users
       assert st.can_download?(person.user)
       assert st.can_download?(another_person.user)
-      assert st.can_download?
+      refute st.can_download?
       assert st.authorized_for_download?(person.user)
       assert st.authorized_for_download?(another_person.user)
-      assert st.authorized_for_download?
+      refute st.authorized_for_download?
     end
 
   end

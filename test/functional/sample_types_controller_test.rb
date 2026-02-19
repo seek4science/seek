@@ -297,15 +297,16 @@ class SampleTypesControllerTest < ActionController::TestCase
                                  project_ids: person.projects.collect(&:id),
                                  contributor: person,
                                  content_blob: FactoryBot.create(:sample_type_template_content_blob),
-                                 policy: FactoryBot.create(:downloadable_public_policy)
+                                 policy: FactoryBot.create(:publicly_viewable_policy)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
     assert sample_type.can_view?
     assert sample_type.can_download?
     get :show, params: { id: sample_type }
     assert_response :success
-    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download'
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text: 'Download'
 
+    logout
     sample_type.policy = FactoryBot.create(:publicly_viewable_policy)
     disable_authorization_checks { sample_type.save! }
     assert sample_type.can_view?
