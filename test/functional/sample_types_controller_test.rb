@@ -307,8 +307,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text: 'Download'
 
     logout
-    sample_type.policy = FactoryBot.create(:publicly_viewable_policy)
-    disable_authorization_checks { sample_type.save! }
+
     assert sample_type.can_view?
     refute sample_type.can_download?
     get :show, params: { id: sample_type }
