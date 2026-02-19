@@ -43,7 +43,11 @@ FactoryBot.define do
 
       sop.content_blob = FactoryBot.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
       sop.annotate_with(['Sop-tag1', 'Sop-tag2', 'Sop-tag3', 'Sop-tag4', 'Sop-tag5'], 'tag', sop.contributor)
-      sop.sop_type_annotations << 'HCS protocol'
+      sop.sop_type_annotations = [SampleControlledVocab::SystemVocabs
+                                          .vocab_for_property(:sop_types)
+                                          .sample_controlled_vocab_terms
+                                          .detect { |term| term.label == 'enrichment protocol' }
+                                          .iri]
       sop.save!
     end
     other_creators { 'Blogs, Joe' }
