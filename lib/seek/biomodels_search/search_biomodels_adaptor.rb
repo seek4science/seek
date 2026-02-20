@@ -73,11 +73,13 @@ module Seek
         if json['firstPublished']
           self.publication_title = json.dig('publication', 'title')
           self.authors = (json.dig('publication', 'authors') || []).collect { |author| author['name'] }
-          self.published_date = Time.at(json['firstPublished'].to_i)
-          latest_version = (json.dig('history','revisions') || []).sort { |rev| rev['version'] }&.first
-          if latest_version&.fetch('submitted')
-            self.last_modification_date = Time.at(latest_version['submitted'].to_i)
-          end
+          revisions = (json.dig('history', 'revisions') || []).sort { |rev| rev['version'] }&.reverse
+          first_version = revisions&.first
+          latest_version = revisions&.last
+
+          self.published_date = Time.at(first_version['submitted'].to_i) if first_version&.fetch('submitted')
+          self.last_modification_date = Time.at(latest_version['submitted'].to_i) if latest_version&.fetch('submitted')
+
           self.main_filename = (json.dig('files','main') || []).first&.fetch('name')
           self.unreleased = false
         else
