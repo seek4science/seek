@@ -21,14 +21,13 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
       assert_equal 25, results.count { |r| r.is_a?(Seek::BiomodelsSearch::BiomodelsSearchResult) }
       # results will all be the same due to the mocking of getSimpleModelById webservice call
       result = results.first
-      assert_equal 5, result.authors.count
-      assert_equal 'Schaber J', result.authors.first
-      assert_equal 'Schaber2012 - Hog pathway in yeast', result.title
-      #assert_equal '18846089', result.publication_id
-      assert_match(/The high osmolarity glycerol \(HOG\) pathway in the yeast Saccharomyces cerevisiae/, result.abstract)
-      assert_equal DateTime.parse('2012-11-22 18:31:29 +0000'), result.published_date
-      assert_equal 'BIOMD0000000429', result.model_id
-      assert_equal DateTime.parse('2012-12-14 14:24:40 +0000'), result.last_modification_date
+      assert_equal 6, result.authors.count
+      assert_equal 'Messiha HL', result.authors.first
+      assert_equal 'Smallbone2013 - Yeast metabolic model with linlog rate law', result.title
+      assert_match(/Kieran Smallbone & Pedro Mendes. Large-Scale Metabolic Models: From Reconstruction to Differential Equations. Industrial Biotechnology 9, 4 \(2013\)/, result.abstract)
+      assert_equal DateTime.parse('2013-02-14 10:57:43 +0000'), result.published_date
+      assert_equal 'BIOMD0000000471', result.model_id
+      assert_equal DateTime.parse('2024-08-21 22:11:16 +0100'), result.last_modification_date
       assert_equal 'search/partials/test_partial', result.partial_path
       assert_equal 'EBI Biomodels', result.tab
     end
@@ -43,13 +42,12 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
 
       # results will all be the same due to the mocking of getSimpleModelById webservice call
       assert_equal 5, result.authors.count
-      assert_equal 'Schaber J', result.authors.first
+      assert_equal 'Jörg Schaber', result.authors.first
       assert_equal 'Schaber2012 - Hog pathway in yeast', result.title
-      #assert_equal '18846089', result.publication_id
       assert_match(/The high osmolarity glycerol \(HOG\) pathway in the yeast Saccharomyces cerevisiae/, result.abstract)
-      assert_equal DateTime.parse('2012-11-22 18:31:29 +0000'), result.published_date
+      assert_equal DateTime.parse('2012-09-11 12:47:29 +0100'), result.published_date
       assert_equal 'BIOMD0000000429', result.model_id
-      assert_equal DateTime.parse('2012-12-14 14:24:40 +0000'), result.last_modification_date
+      assert_equal DateTime.parse('2024-08-21 21:45:24 +0100'), result.last_modification_date
       assert_equal 'search/partials/test_partial', result.partial_path
       assert_equal 'EBI Biomodels', result.tab
       assert_equal 'BIOMD0000000429_url.xml', result.main_filename
@@ -57,19 +55,19 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
 
   end
 
-  test 'search does not need pubmed email' do
-    VCR.use_cassette('biomodels/search') do
-      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new('partial_path' => 'search/partials/test_partial')
-      results = adaptor.search('yeast')
-      assert_equal 25, results.count
-    end
-  end
-
-  test 'search does not files' do
+  test 'search handles missing filename' do
     VCR.use_cassette('biomodels/search-2024') do
       adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new('partial_path' => 'search/partials/test_partial')
       results = adaptor.search('2024')
       assert_equal 25, results.count
+    end
+  end
+
+  test 'search handles unrecognized model in search' do
+    VCR.use_cassette('biomodels/search-2025') do
+      adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new('partial_path' => 'search/partials/test_partial')
+      results = adaptor.search('2025')
+      assert_equal 24, results.count
     end
   end
 
