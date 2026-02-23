@@ -3,7 +3,6 @@
 require 'rubygems'
 require 'rake'
 
-
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
@@ -119,6 +118,37 @@ namespace :seek do
       end
     end
     puts "... updated #{updated_count} publications"
+  end
+
+  task(assign_isa_tag_id_to_sample_attributes: [:environment]) do
+    puts 'Assigning isa tags to input sample attributes...'
+    updated_count = 0
+    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
+    SampleAttribute.joins(:sample_type)
+                   .where(isa_tag_id: nil)
+                   .where.not(linked_sample_type_id: nil)
+                   .find_each(batch_size: 1000) do |sa|
+      next unless sa.sample_type.is_isa_json_compliant? && sa.seek_sample_multi?
+
+      sa.update_column(:isa_tag_id, input_isa_tag_id)
+      updated_count += 1
+      puts '.'
+    end
+    puts "... #{updated_count} input sample attributes were updated."
+  end
+
+  task(assign_isa_tag_id_to_template_attributes: [:environment]) do
+    puts 'Assigning isa tags to input template attributes...'
+    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
+    updated_count = 0
+    TemplateAttribute.where(isa_tag_id: nil).find_each(batch_size: 1000) do |ta|
+      next unless ta.seek_sample_multi?
+
+      ta.update_column(:isa_tag_id, input_isa_tag_id)
+      updated_count += 1
+      puts '.'
+    end
+    puts "... #{updated_count} input template attributes were updated."
   end
 
   private
