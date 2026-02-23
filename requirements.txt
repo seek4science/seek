@@ -4,5 +4,5 @@ html5lib==1.0.1
 galaxy2cwl==0.1.4
 #isatools==0.11.0
 gxformat2==0.15.0
-nbconvert==7.16.6
+nbconvert==7.17.0
 ipython==8.18.1
