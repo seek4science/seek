@@ -72,8 +72,8 @@ module Seek
         self.abstract = json['description']
         if json['firstPublished']
           self.publication_title = json.dig('publication', 'title')
-          self.authors = (json.dig('publication', 'authors') || []).collect { |author| author['name'] }
-          revisions = (json.dig('history', 'revisions') || []).sort { |rev| rev['version'] }&.reverse
+          self.authors = (json.dig('publication', 'authors') || []).collect{|author| author['name'] }
+          revisions = (json.dig('history', 'revisions') || []).sort_by{|rev| rev['version'] }
           first_version = revisions&.first
           latest_version = revisions&.last
 

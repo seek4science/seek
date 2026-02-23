@@ -55,7 +55,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
 
   end
 
-  test 'search handles missing filename' do
+  test 'search handles missing filename in search for 2024' do
     VCR.use_cassette('biomodels/search-2024') do
       adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new('partial_path' => 'search/partials/test_partial')
       results = adaptor.search('2024')
