@@ -73,6 +73,11 @@ module Seek
             value_field: 'country',
             label_mapping: MAPPINGS[:country_name]
         ),
+        event_type: Seek::Filtering::Filter.new(
+          value_field: 'event_types.id',
+          label_field: 'event_types.title',
+          joins: [:event_type]
+        ),
         organism: Seek::Filtering::Filter.new(
             value_field: 'organisms.id',
             label_field: 'organisms.title',

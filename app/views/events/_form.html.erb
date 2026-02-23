@@ -9,6 +9,28 @@
       <%= f.error_messages %>
 
       <div class="form-group">
+        <div class="row">
+          <div class="col-md-6 col-xs-12">
+            <%= f.label :event_type_id, "#{t('event')} type" %>
+            <%= f.collection_select :event_type_id,
+                                    EventType.order(:title),
+                                    :id,
+                                    :title,
+                                    { include_blank: 'Not specified' },
+                                    class: 'form-control' %>
+          </div>
+          <div class="col-md-6 col-xs-12">
+            <%= f.label :location_type, "Location type" %>
+            <%= f.select :location_type,
+                         Event.location_types.keys.map { |k| [k.humanize, k] },
+                         { include_blank: 'Not specified' },
+                         { class: 'form-control' } %>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="form-group">
         <label class="required">Title</label>
         <%= f.text_field :title, :class=>"form-control" -%>
       </div>

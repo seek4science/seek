@@ -94,7 +94,8 @@ class EventsControllerTest < ActionController::TestCase
     assert_difference('Event.count', 1) do
       post :create, params: { event: valid_event, sharing: valid_sharing }
     end
-    assert_equal 'FR',assigns(:event).country
+    assert_equal 'FR', assigns(:event).country
+    assert_equal 'online', assigns(:event).location_type
   end
 
   test 'should create valid event with country name' do
@@ -121,7 +122,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   def valid_event
-    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, project_ids: [@project.id], country:'FR' }
+    { title: 'Barn Raising', start_date: DateTime.now, end_date: DateTime.now, location_type: 'online', project_ids: [@project.id], country: 'FR' }
   end
 
   test 'should get edit' do
@@ -169,6 +170,27 @@ class EventsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should show location type' do
+    event = FactoryBot.create(:event, location_type: 'online', policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /Online/
+
+    event.update_column(:location_type, 'in_person')
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /In person/
+
+    event.update_column(:location_type, 'hybrid')
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /Hybrid/
+
+    event.update_column(:location_type, nil)
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.location_type', text: /Not specified/
+  end
 
   test 'create, update and show an event with extended metadata' do
     cmt = FactoryBot.create(:simple_event_extended_metadata_type)
@@ -400,4 +422,30 @@ class EventsControllerTest < ActionController::TestCase
       assert flash[:error].include?('disabled')
     end
   end
+
+  test 'should create event with event_type' do
+    event_type = FactoryBot.create(:event_type, title: 'Controller Test Type')
+    assert_difference('Event.count', 1) do
+      post :create, params: { event: valid_event.merge(event_type_id: event_type.id), sharing: valid_sharing }
+    end
+
+    created = assigns(:event)
+    assert_not_nil created
+    assert_equal event_type.id, created.event_type_id
+  end
+
+  test 'show displays event_type name' do
+    event_type = FactoryBot.create(:event_type, title: 'Visible Type')
+    event = FactoryBot.create(:event, event_type: event_type, policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.event_type', text: /Visible Type/
+
+    # no event type
+    event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: event.id }
+    assert_response :success
+    assert_select 'p.event_type', text: /Not specified/
+  end
+
 end

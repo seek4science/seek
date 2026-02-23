@@ -9,7 +9,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2009",
+              "id": "1196",
               "type": "projects"
             },
             "access": "edit"
@@ -17,6 +17,8 @@
         ]
       },
       "url": "http://www.example.com/events/123",
+      "event_type": "Workshop",
+      "location_type": "in_person",
       "address": "Sofienstr 2",
       "city": "Heidelberg",
       "country": "Germany",
@@ -27,7 +29,7 @@
       "projects": {
         "data": [
           {
-            "id": "2009",
+            "id": "1196",
             "type": "projects"
           }
         ]
@@ -35,7 +37,7 @@
       "data_files": {
         "data": [
           {
-            "id": "170",
+            "id": "286",
             "type": "data_files"
           }
         ]
@@ -43,7 +45,7 @@
       "presentations": {
         "data": [
           {
-            "id": "55",
+            "id": "286",
             "type": "presentations"
           }
         ]
@@ -51,7 +53,7 @@
       "publications": {
         "data": [
           {
-            "id": "127",
+            "id": "286",
             "type": "publications"
           }
         ]

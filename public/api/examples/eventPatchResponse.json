@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "101",
+    "id": "344",
     "type": "events",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2030",
+              "id": "1217",
               "type": "projects"
             },
             "access": "edit"
@@ -18,17 +18,19 @@
       "title": "A Maximally Patched Event",
       "description": "A thing happening",
       "url": "http://www.example.com/events/123",
+      "location_type": "in_person",
       "address": "Sofienstr 2",
       "city": "Heidelberg",
       "country": "Germany",
       "start_date": "2017-01-01T00:20:00.000Z",
-      "end_date": "2017-01-01T00:22:00.000Z"
+      "end_date": "2017-01-01T00:22:00.000Z",
+      "event_type": "Workshop"
     },
     "relationships": {
       "submitter": {
         "data": [
           {
-            "id": "2144",
+            "id": "1217",
             "type": "people"
           }
         ]
@@ -36,7 +38,7 @@
       "projects": {
         "data": [
           {
-            "id": "2030",
+            "id": "1217",
             "type": "projects"
           }
         ]
@@ -44,7 +46,7 @@
       "data_files": {
         "data": [
           {
-            "id": "175",
+            "id": "291",
             "type": "data_files"
           }
         ]
@@ -52,7 +54,7 @@
       "publications": {
         "data": [
           {
-            "id": "132",
+            "id": "291",
             "type": "publications"
           }
         ]
@@ -60,21 +62,21 @@
       "presentations": {
         "data": [
           {
-            "id": "60",
+            "id": "291",
             "type": "presentations"
           }
         ]
       }
     },
     "links": {
-      "self": "/events/101"
+      "self": "/events/344"
     },
     "meta": {
-      "created": "2024-11-20T10:15:47.000Z",
-      "modified": "2024-11-20T10:15:47.000Z",
+      "created": "2025-12-17T11:38:01.995Z",
+      "modified": "2025-12-17T11:38:02.081Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "55968390-8956-013d-24a2-0a81884ed284"
+      "uuid": "c4ad1bc0-bd6a-013e-6464-00155d44e13d"
     }
   },
   "jsonapi": {

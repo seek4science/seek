@@ -1,5 +1,6 @@
 class EventSerializer < BaseSerializer
   attributes :title, :description, :url,
+             :location_type,
              :address, :city, :country,
              :start_date, :end_date
 
@@ -8,6 +9,10 @@ class EventSerializer < BaseSerializer
   has_many :data_files
   has_many :publications
   has_many :presentations
+
+  attribute :event_type do
+    object.event_type&.title
+  end
 
   def country
     if object.country
