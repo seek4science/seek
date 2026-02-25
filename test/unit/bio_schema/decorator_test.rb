@@ -8,9 +8,13 @@ class DecoratorTest < ActiveSupport::TestCase
 
     decorator = Seek::BioSchema::ResourceDecorators::Thing.new(data_file)
     identifier = "http://localhost:3000/data_files/#{data_file.id}"
+    context = {
+      '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      :dct => Seek::BioSchema::Serializer::DCT
+    }
     assert_equal identifier, decorator.identifier
     assert_equal identifier, decorator.url
-    assert_equal Seek::BioSchema::Serializer::SCHEMA_ORG, decorator.context
+    assert_equal context, decorator.context
     assert_equal %w[blue green red], decorator.keywords.split(',').collect(&:strip).sort
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
