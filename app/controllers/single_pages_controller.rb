@@ -68,12 +68,21 @@ class SinglePagesController < ApplicationController
     raise "Could not retrieve #{assay_id.nil? ? 'Study' : 'Assay'} Sample Type! Do you have at least viewing permissions?" unless @sample_type.can_view?
 
     @template = Template.find(@sample_type.template_id)
-    
-    spreadsheet_name = @sample_type.title&.concat(".xlsx")
+
+    spreadsheet_name = case @sample_type.level
+            when 'study source'
+              "#{@study.id} - #{@study.title} sources table.xlsx"
+            when 'study sample'
+              "#{@study.id} - #{@study.title} samples table.xlsx"
+            when 'assay - material', 'assay - data file'
+              "#{@assay&.id} - #{@assay&.title} table.xlsx"
+            else
+              @sample_type.title&.concat(".xlsx")
+            end
 
     notice_message << '</ul>'
     flash[:notice] = notice_message.html_safe
-    render xlsx: 'download_samples_excel', filename: spreadsheet_name, disposition: 'inline'
+    render xlsx: 'download_samples_excel', filename: helpers.sanitized_text(spreadsheet_name), disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
