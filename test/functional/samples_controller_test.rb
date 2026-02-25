@@ -1180,12 +1180,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 33.1, last_updated_sample.get_attribute_value(:weight)
   end
 
-  test 'batch_delete' do
+  test 'batch delete samples' do
     person = FactoryBot.create(:person)
     sample1 = FactoryBot.create(:patient_sample, contributor: person)
     sample2 = FactoryBot.create(:patient_sample, contributor: person)
-    type1 = sample1.sample_type
-    type2 = sample1.sample_type
     login_as(person.user)
     assert sample1.can_delete?
     assert sample2.can_delete?
@@ -1193,9 +1191,88 @@ class SamplesControllerTest < ActionController::TestCase
       delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
     end
 
-      # For the Single Page to work properly, these must be included in the response
-      assert response.body.include?('errors')
-      assert response.body.include?('status')
+    # For the Single Page to work properly, these must be included in the response
+    # No errors should occur in this request, meaning status should be 'ok'
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('errors')
+    assert_empty response_body['errors']
+    assert response_body.key?('status')
+    assert_equal response_body['status'], 'ok'
+  end
+
+  test 'batch delete hidden samples' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    sample_type = FactoryBot.create(:min_sample_type, contributor: person, projects: [project])
+    authorized_sample = FactoryBot.create(:sample, contributor: person, sample_type: sample_type, data: { full_name: 'John Smith' })
+    assert_equal sample_type.samples.count, 1
+
+    login_as(person)
+    # One of the samples is a hidden sample and has '#HIDDEN' for id
+    assert_no_difference('Sample.count') do
+      delete_data = [
+        { ex_id: "#{sample_type.id}-#{1}", id: "#HIDDEN" },
+        { ex_id: "#{sample_type.id}-#{2}", id: authorized_sample.id }
+      ]
+      delete :batch_delete, params: { data: delete_data }
+    end
+
+    response_body = JSON.parse(response.body)
+    assert_equal response_body['status'], 'unprocessable_entity'
+    assert_equal 1, response_body['errors'].length
+    error = response_body['errors'][0]
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => 'Sample with id \'#HIDDEN\' not found.' }
+  end
+
+  test 'batch delete inexisting samples' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    sample_type = FactoryBot.create(:min_sample_type, contributor: person, projects: [project])
+    authorized_sample = FactoryBot.create(:sample, contributor: person, sample_type: sample_type, data: { full_name: 'John Smith' })
+    assert_equal sample_type.samples.count, 1
+
+    login_as(person)
+    # One of the samples has a random id and does not exist
+    random_id = rand((10000..100000))
+    assert_no_difference('Sample.count') do
+      delete_data = [
+        { ex_id: "#{sample_type.id}-#{1}", id: random_id },
+        { ex_id: "#{sample_type.id}-#{2}", id: authorized_sample.id }
+      ]
+      delete :batch_delete, params: { data: delete_data }
+    end
+
+    response_body = JSON.parse(response.body)
+    assert_equal response_body['status'], 'unprocessable_entity'
+    assert_equal 1, response_body['errors'].length
+    error = response_body['errors'][0]
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Sample with id '#{random_id}' not found." }
+  end
+
+  test 'batch delete unauthorized samples' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    other_person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:min_sample_type, contributor: person, projects: [project])
+    authorized_sample = FactoryBot.create(:sample, contributor: person, sample_type: sample_type, data: { full_name: 'John Smith' })
+    unauthorized_sample = FactoryBot.create(:sample, contributor: other_person, sample_type: sample_type, data: { full_name: 'Jane Doe' })
+    assert_equal sample_type.samples.count, 2
+
+    login_as(person)
+    # One of the samples is created by another user, so the current user is not authorized to delete it
+    assert_no_difference('Sample.count') do
+      delete_data = [
+        { ex_id: "#{sample_type.id}-#{1}", id: unauthorized_sample.id },
+        { ex_id: "#{sample_type.id}-#{2}", id: authorized_sample.id }
+      ]
+      delete :batch_delete, params: { data: delete_data }
+    end
+
+    response_body = JSON.parse(response.body)
+    assert_equal response_body['status'], 'unprocessable_entity'
+    assert_equal 1, response_body['errors'].length
+    error = response_body['errors'][0]
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Unauthorized to delete Sample with id '#{unauthorized_sample.id}'." }
   end
 
   test 'JS request does not raise CORS error' do
