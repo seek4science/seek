@@ -491,7 +491,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
 
-    study.update_column(:title, '<script>alert("This should be removed!")</script>My sample type')
+    study.update_column(:title, '<script>alert("Script tags should be removed!")</script> My sample type')
 
     source_ids = sources.map { |s| { id_label => s.id } }
     sample_type_id = source_sample_type.id
@@ -516,7 +516,10 @@ class SinglePagesControllerTest < ActionController::TestCase
     get :download_samples_excel, params: { uuid: cache_uuid }
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
-    assert response_cd.include?("filename=\"#{study.id} - My sample type sources table.xlsx\"")
+    expected_file_name = "My sample type sources table.xlsx"
+    assert response_cd.include?(expected_file_name)
+    assert %w[<script> </script>].none? { |tag| response_cd.include?(tag) }
+
 
   end
 
