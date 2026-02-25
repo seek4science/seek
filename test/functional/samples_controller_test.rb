@@ -1232,7 +1232,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal sample_type.samples.count, 1
 
     login_as(person)
-    # One of the samples is a hidden sample and has '#HIDDEN' for id
+    # One of the samples has a random id and does not exist
     random_id = rand((10000..100000))
     assert_no_difference('Sample.count') do
       delete_data = [
@@ -1259,7 +1259,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal sample_type.samples.count, 2
 
     login_as(person)
-    # One of the samples is a hidden sample and has '#HIDDEN' for id
+    # One of the samples is created by another user, so the current user is not authorized to delete it
     assert_no_difference('Sample.count') do
       delete_data = [
         { ex_id: "#{sample_type.id}-#{1}", id: unauthorized_sample.id },
