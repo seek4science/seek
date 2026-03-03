@@ -99,3 +99,5 @@ docker-compose.override.yml
 /.claude/
 .ruby-lsp/*
 .devcontainer*
+.env
+TODO.md
