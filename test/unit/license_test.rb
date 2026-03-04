@@ -171,4 +171,18 @@ class LicenseTest < ActiveSupport::TestCase
     assert_equal 'No license - no permission to use unless the owner grants a licence', license.full_display_title
   end
 
+  test 'normalize incoming license' do
+    assert_equal 'CC-BY-4.0', Seek::License.normalize('https://spdx.org/licenses/CC-BY-4.0.html')
+    assert_equal 'CC-BY-4.0', Seek::License.normalize('https://spdx.org/licenses/CC-BY-4.0')
+    assert_equal 'CC-BY-4.0', Seek::License.normalize('https://creativecommons.org/licenses/by/4.0/')
+    assert_equal 'CC-BY-4.0', Seek::License.normalize('https://creativecommons.org/licenses/by/4.0/legalcode')
+    assert_equal 'CC-BY-4.0', Seek::License.normalize('CC-BY-4.0')
+    assert_equal 'CC-BY-4.0', Seek::License.normalize('cc-by-4.0')
+    assert_equal 'CC-BY-4.0', Seek::License.normalize('cc-By-4.0')
+    assert_equal 'CC-BY-4.0', Seek::License.normalize("         cc-By-4.0\n  ")
+    assert_nil Seek::License.normalize('huh what')
+    assert_nil Seek::License.normalize(nil)
+    assert_nil Seek::License.normalize('')
+  end
+
 end
