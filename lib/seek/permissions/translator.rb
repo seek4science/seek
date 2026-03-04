@@ -13,6 +13,7 @@ module Seek
                             download named_download launch submit_job data execute plot explore
                             download_log download_results input output download_output download_input
                             view_result compare_versions simulate copasi_simulate diagram ro_crate ro_crate_metadata run
+                            export_isa export_isatab_json
                           ]).freeze,
 
         edit: Set.new(%i[
