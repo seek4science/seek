@@ -1648,8 +1648,7 @@ class InvestigationsControllerTest < ActionController::TestCase
       project = person.projects.first
 
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
-      study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
-      FactoryBot.create(:complete_assay_stream, study: study, contributor: person, sample_collection_sample_type: study.sample_types.second)
+      FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
 
       get :export_isa, params: { id: investigation.id }
       assert_redirected_to investigation_path(investigation)
@@ -1657,7 +1656,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
       login_as person
       get :export_isa, params: { id: investigation.id }
-      assert :success
+      assert_response :ok
     end
   end
 
@@ -1676,7 +1675,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     login_as person
     get :export_isatab_json, params: { id: investigation.id }
-    assert :success
+    assert_response :ok
   end
 
   private
