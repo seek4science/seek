@@ -180,7 +180,9 @@ class LicenseTest < ActiveSupport::TestCase
     assert_equal 'CC-BY-4.0', Seek::License.normalize('cc-by-4.0')
     assert_equal 'CC-BY-4.0', Seek::License.normalize('cc-By-4.0')
     assert_equal 'CC-BY-4.0', Seek::License.normalize("         cc-By-4.0\n  ")
-    assert_nil Seek::License.normalize('huh what')
+    assert_equal 'HUH what', Seek::License.normalize('HUH what'), 'Should not modify unrecognized licenses'
+    assert_equal 'huh what', Seek::License.normalize('huh what'), 'Should not modify unrecognized licenses'
+    assert_equal 'http://cool-license.golf', Seek::License.normalize('http://cool-license.golf'), 'Should not modify unrecognized licenses'
     assert_nil Seek::License.normalize(nil)
     assert_nil Seek::License.normalize('')
   end

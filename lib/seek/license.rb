@@ -52,11 +52,10 @@ module Seek
       return nil if license.blank?
       license = license.strip
       if license.start_with?(/https?:/)
-        license = uri_to_id(license)
+        uri_to_id(license) || license
       else
-        license = normalized_id_map[license.downcase]
+        normalized_id_map[license.downcase] || license
       end
-      license
     end
 
     def is_null_license?
