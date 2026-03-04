@@ -90,7 +90,7 @@ function rorQuerySource(query, processSync, processAsync) {
 function localSuggestionTemplate(data) {
     return `
         <div>
-            <strong>${data.department ? `${data.department}, ` : ''}${data.text}</strong>
+            <strong>${data.text}</strong>
             <small>${data.hint || ''}</small>
         </div>`;
 }
@@ -221,7 +221,7 @@ $j(document).ready(function () {
         $j('#combined_typeahead .typeahead').typeahead('close');
 
         if (data.hasOwnProperty("text")) {
-            $j('#institution_title').val(data.text);
+            $j('#institution_title').val(data.base_title);
             $j('#institution_id').val(data.id);
             $j('#institution_ror_id').val(data.ror_id);
             $j('#institution_department').val(data.department);
