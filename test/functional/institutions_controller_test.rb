@@ -480,5 +480,51 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal({ error: 'Missing ROR ID' }.to_json, response.body)
   end
 
+  def test_typeahead_json_contract_with_departments_and_base_title
+    Institution.destroy_all
+    inst1 = Institution.create!(title: 'Institution X', department: 'Dept A')
+    inst2 = Institution.create!(title: 'Institution X', department: 'Dept B')
+    inst3 = Institution.create!(title: 'Institution X')
 
+    get :typeahead, params: { q: 'Institution X', format: :json }
+    assert_response :success
+    json = JSON.parse(@response.body)
+    results = json['results']
+    assert_equal 3, results.size
+
+    # Should have distinct text values for department-specific institutions
+    texts = results.map { |r| r['text'] }
+    assert_includes texts, 'Dept A, Institution X'
+    assert_includes texts, 'Dept B, Institution X'
+    assert_includes texts, 'Institution X'
+    assert_equal texts.uniq.size, 3
+
+    results.each do |r|
+      assert_equal 'Institution X', r['base_title']
+    end
+
+    # Searching for a department should return only the institutions with that department
+    get :typeahead, params: { q: 'Dept', format: :json }
+    assert_response :success
+    dept_json = JSON.parse(@response.body)
+    dept_results = dept_json['results']
+    # Expect at least the two departmented institutions to appear
+    dept_texts = dept_results.map { |r| r['text'] }
+    assert_includes dept_texts, 'Dept A, Institution X'
+    assert_includes dept_texts, 'Dept B, Institution X'
+
+    dept_results.each do |r|
+      assert_equal 'Institution X', r['base_title']
+    end
+
+    assert_equal 2, dept_results.size
+
+    # Searching for a specific department should return only that one
+    get :typeahead, params: { q: 'Dept A', format: :json }
+    assert_response :success
+    dept_json = JSON.parse(@response.body)
+    dept_results = dept_json['results']
+    assert_equal 1, dept_results.size
+
+  end
 end
