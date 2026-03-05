@@ -49,6 +49,12 @@ module Seek
     end
 
     def self.normalize(license)
+      if license.is_a?(Hash)
+        hash = license.with_indifferent_access
+        license = hash['identifier'].presence
+        license ||= hash['@id'] if hash['@id'].present? && hash['@id'].start_with?(/https?:/)
+        license ||= hash['url'].presence
+      end
       return nil if license.blank?
       license = license.strip
       if license.start_with?(/https?:/)

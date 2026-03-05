@@ -180,11 +180,42 @@ class LicenseTest < ActiveSupport::TestCase
     assert_equal 'CC-BY-4.0', Seek::License.normalize('cc-by-4.0')
     assert_equal 'CC-BY-4.0', Seek::License.normalize('cc-By-4.0')
     assert_equal 'CC-BY-4.0', Seek::License.normalize("         cc-By-4.0\n  ")
+
+    assert_equal 'CC-BY-4.0', Seek::License.normalize({ '@id' => 'https://spdx.org/licenses/CC-BY-4.0' })
+    assert_equal 'CC-BY-4.0', Seek::License.normalize({
+                                                        '@type' => 'CreativeWork',
+                                                        '@id' => '#anonymousnode',
+                                                        'identifier' => 'https://spdx.org/licenses/CC-BY-4.0'
+                                                      })
+    assert_equal 'CC-BY-4.0', Seek::License.normalize({
+                                                        '@type' => 'CreativeWork',
+                                                        '@id' => '#anonymousnode',
+                                                        'url' => 'https://creativecommons.org/licenses/by/4.0/'
+                                                      })
+    assert_equal 'MIT', Seek::License.normalize({
+                                                        '@type' => 'CreativeWork',
+                                                        '@id' => 'https://spdx.org/licenses/CC-BY-4.0',
+                                                        'url' => 'https://spdx.org/licenses/Zed',
+                                                        'identifier' => 'MIT'
+                                                      }), 'Precedence: identifier, @id, url'
+    assert_equal 'CC-BY-4.0', Seek::License.normalize({
+                                                        '@type' => 'CreativeWork',
+                                                        '@id' => '#anonymousnode',
+                                                        'url' => 'https://creativecommons.org/licenses/by/4.0/'
+                                                      }.symbolize_keys)
+
     assert_equal 'HUH what', Seek::License.normalize('HUH what'), 'Should not modify unrecognized licenses'
     assert_equal 'huh what', Seek::License.normalize('huh what'), 'Should not modify unrecognized licenses'
+
     assert_equal 'http://cool-license.golf', Seek::License.normalize('http://cool-license.golf'), 'Should not modify unrecognized licenses'
+    assert_equal 'http://cool-LICENSE.golf', Seek::License.normalize('http://cool-LICENSE.golf'), 'Should not modify unrecognized licenses'
+
     assert_nil Seek::License.normalize(nil)
     assert_nil Seek::License.normalize('')
+    assert_nil Seek::License.normalize({
+                                                        '@type' => 'CreativeWork',
+                                                        'name' => 'Nothing useful here'
+                                                      })
   end
 
 end
