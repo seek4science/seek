@@ -1640,6 +1640,43 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'can\'t export isa json if not authenticated' do
+    with_config_value(:project_single_page_enabled, true) do
+      logout
+      person = FactoryBot.create(:person)
+      project = person.projects.first
+
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
+      FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
+
+      get :export_isa, params: { id: investigation.id }
+      assert_redirected_to investigation_path(investigation)
+      assert_equal flash[:error], "You are not authorized to download this Investigation, you may need to login first."
+
+      login_as person
+      get :export_isa, params: { id: investigation.id }
+      assert_response :ok
+    end
+  end
+
+  test 'can\'t export isatab json if not authenticated' do
+    logout
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
+    FactoryBot.create(:complete_assay_stream, study: study, contributor: person, sample_collection_sample_type: study.sample_types.second)
+
+    get :export_isatab_json, params: { id: investigation.id }
+    assert_redirected_to investigation_path(investigation)
+    assert_equal flash[:error], "You are not authorized to download this Investigation, you may need to login first."
+
+    login_as person
+    get :export_isatab_json, params: { id: investigation.id }
+    assert_response :ok
+  end
+
   private
 
   def setup_test_case_investigation
