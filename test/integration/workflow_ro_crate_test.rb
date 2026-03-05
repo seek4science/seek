@@ -7,7 +7,8 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
   test 'parse generated Workflow RO-Crate' do
     project = FactoryBot.create(:project, title: 'Cool Project')
     person = FactoryBot.create(:person, first_name: 'Xavier', last_name: 'Xavierson')
-    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person], other_creators: 'Jane Bloggs')
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person],
+                                 other_creators: 'Jane Bloggs', license: 'CC-BY-4.0')
     zip = workflow.ro_crate_zip
 
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
@@ -26,6 +27,8 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     cwl = crate.get('Genomics-1-PreProcessing_without_downloading_from_SRA.cwl')
     assert cwl
     assert_equal cwl, crate.main_workflow_cwl
+
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', crate.license, 'Should convert license to full SPDX URI'
   end
 
   test 'include remotes in generated Workflow RO-Crate' do
