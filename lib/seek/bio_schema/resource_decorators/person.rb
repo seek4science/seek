@@ -12,7 +12,7 @@ module Seek
                         last_name: :familyName,
                         image: :image,
                         member_of: :memberOf,
-                        orcid: :orcid,
+                        orcid: :identifier,
                         works_for: :worksFor
 
         def conformance
