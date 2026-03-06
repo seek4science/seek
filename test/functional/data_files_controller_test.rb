@@ -3202,22 +3202,27 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'create metadata' do
     person = FactoryBot.create(:person)
     login_as(person)
+    attributed_data_file = FactoryBot.create(:data_file, contributor: person, policy: FactoryBot.create(:public_policy))
     blob = FactoryBot.create(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
-    }, tag_list:'fish, soup',
-               policy_attributes: valid_sharing,
-               content_blob_id: blob.id.to_s,
-               assay_ids: [] }
+      title: 'Small File',
+      project_ids: [project.id]
+    }, tag_list: 'fish, soup',
+       policy_attributes: valid_sharing,
+       content_blob_id: blob.id.to_s,
+       assay_ids: [],
+       attributions: ActiveSupport::JSON.encode([['DataFile', attributed_data_file.id]])
+    }
 
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
-        assert_no_difference('Assay.count') do
-          assert_no_difference('AssayAsset.count') do
-            post :create_metadata, params: params
+        assert_difference('Relationship.count', 1) do
+          assert_no_difference('Assay.count') do
+            assert_no_difference('AssayAsset.count') do
+              post :create_metadata, params: params
+            end
           end
         end
       end
@@ -3233,6 +3238,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal person, df.contributor
     assert_empty df.assays
     assert_equal ['fish','soup'].sort,df.tags.sort
+    assert_equal [attributed_data_file], df.attributions.collect(&:other_object)
 
     al = ActivityLog.last
     assert_equal 'create', al.action
