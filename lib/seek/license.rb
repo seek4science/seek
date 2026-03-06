@@ -41,11 +41,27 @@ module Seek
     end
 
     def self.uri_to_id(uri)
-      uri_map[uri]
+      uri_map[uri.downcase]
     end
 
     def self.find_as_hash(id, source = Seek::License.combined)
       source[id]
+    end
+
+    def self.normalize(license)
+      if license.is_a?(Hash)
+        hash = license.with_indifferent_access
+        license = hash['identifier'].presence
+        license ||= hash['@id'] if hash['@id'].present? && hash['@id'].start_with?(/https?:/)
+        license ||= hash['url'].presence
+      end
+      return nil if license.blank?
+      license = license.strip
+      if license.start_with?(/https?:/)
+        uri_to_id(license) || license
+      else
+        normalized_id_map[license.downcase] || license
+      end
     end
 
     def is_null_license?
@@ -84,10 +100,19 @@ module Seek
       @uri_map = {}
       combined.each do |id, license|
         (license['urls'] || []).each do |url|
-          @uri_map[url] ||= id
+          @uri_map[url.downcase] ||= id
         end
       end
       @uri_map
+    end
+
+    def self.normalized_id_map
+      return @normalized_id_map if @normalized_id_map
+      @normalized_id_map = {}
+      combined.each_key do |id|
+        @normalized_id_map[id.downcase] = id
+      end
+      @normalized_id_map
     end
   end
 end
