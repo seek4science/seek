@@ -198,9 +198,16 @@ class SamplesController < ApplicationController
       params[:data].each do |par|
         begin
           sample = Sample.find(par[:id])
-          errors.push({ ex_id: par[:ex_id], error: "Can not be deleted." }) if !(sample.can_delete? && sample.destroy)
-        rescue 
-          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+
+          if sample.can_delete?
+            sample.destroy
+          else
+            errors.push({ ex_id: par[:ex_id], error: "Unauthorized to delete Sample with id '#{par[:id]}'." })
+          end
+        rescue ActiveRecord::RecordNotFound
+          errors.push({ ex_id: par[:ex_id], error: "Sample with id '#{par[:id]}' not found." })
+        rescue
+          errors.push({ ex_id: par[:ex_id], error: sample&.errors&.messages })
         end
       end
       raise ActiveRecord::Rollback if errors.any?
