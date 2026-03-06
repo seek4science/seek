@@ -408,6 +408,7 @@ class DataFilesController < ApplicationController
 
     update_sharing_policies(@data_file)
     update_annotations(params[:tag_list], @data_file)
+    update_relationships(@data_file, params)
 
     @assay = Assay.new(assay_params)
     if sop_id
