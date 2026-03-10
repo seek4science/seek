@@ -20,6 +20,10 @@ class PublicationSerializer < ContributedResourceSerializer
     object.publication_type.try(:title) || 'Not specified'
   end
 
+  attribute :registered_mode do
+    publication_registered_mode(object.registered_mode) if object.registered_mode
+  end
+
   attribute :authors do
     if object.publication_author_names.blank?
       []
