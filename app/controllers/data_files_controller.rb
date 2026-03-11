@@ -408,6 +408,7 @@ class DataFilesController < ApplicationController
 
     update_sharing_policies(@data_file)
     update_annotations(params[:tag_list], @data_file)
+    update_relationships(@data_file, params)
 
     @assay = Assay.new(assay_params)
     if sop_id
@@ -438,10 +439,6 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
-
-      update_relationships(@data_file, params)      
-      
-
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         # parse the data file if it is with sample data
