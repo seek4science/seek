@@ -439,10 +439,6 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
-
-      update_relationships(@data_file, params)      
-      
-
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         # parse the data file if it is with sample data
