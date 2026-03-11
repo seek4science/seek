@@ -100,7 +100,7 @@ module Seek
           existing_metadata[:description] = cwl['doc']
         end
         if cwl.key?('s:license')
-          existing_metadata[:license] = cwl['s:license']
+          existing_metadata[:license] = Seek::License.normalize(cwl['s:license'])
         end
 
         existing_metadata[:internals] = {

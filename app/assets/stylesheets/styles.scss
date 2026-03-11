@@ -807,3 +807,10 @@ div#super_tag_cloud {
 #register-terms-and-conds {
   margin-top: 1em;
 }
+
+ul.attributions_list {
+  padding-left: 0;
+  li {
+    list-style-type: none;
+  }
+}

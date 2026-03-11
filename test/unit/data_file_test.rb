@@ -538,7 +538,7 @@ class DataFileTest < ActiveSupport::TestCase
     df = FactoryBot.create(:data_file, description: 'Hello\nWorld\n\n> quote')
     FactoryBot.create(:tag, annotatable: df, source: df.contributor, value: 'aaa')
     FactoryBot.create(:tag, annotatable: df, source: df.contributor, value: 'bbb')
-    assert_equal "<p>Hello\\nWorld\\n\\n&gt; quote</p>", df.send(:strip_markdown, df.description)
+    assert_equal "Hello\\nWorld\\n\\n&gt; quote", df.send(:strip_markdown, df.description)
     assert_equal ['aaa', 'bbb'], df.send(:searchable_tags)
   end
 

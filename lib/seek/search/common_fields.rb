@@ -34,7 +34,7 @@ module Seek
           private 
 
           def strip_markdown(text)
-            Seek::Markdown.render(text || '')
+            Seek::Markdown.strip_markdown(text || '')
           end
         end
       end
