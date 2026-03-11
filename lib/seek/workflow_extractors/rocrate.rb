@@ -74,7 +74,7 @@ module Seek
 
         m[:title] = crate['name'] if crate['name'].present?
         m[:description] = crate['description'] if crate['description'].present?
-        m[:license] = crate['license'] if crate['license'].present?
+        m[:license] = Seek::License.normalize(crate['license']) if crate['license'].present?
 
         other_creators = []
         authors = []

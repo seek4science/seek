@@ -127,6 +127,20 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
     assert_equal 'Apache-2.0', metadata[:license]
   end
 
+  test 'extracts and normalizes URI license from ro-crate-metadata, and ignores Licensee "other" license file' do
+    # Checks 2 things:
+    # 1. A URI license, e.g. https://opensource.org/licenses/MIT, is normalized to its SPDX ID
+    #   (which means the correct license will be selected in the dropdown).
+    # 2. The SPDX ID `NOASSERTION`, returned by Licensee (which flags the file `not_a_license.py` as potentially containing a license),
+    #    is ignored in favour of the MIT license from the RO-Crate metadata.
+
+    wf = open_fixture_file('workflows/ro-crate-with-other-license-file.crate.zip')
+    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    metadata = extractor.metadata
+
+    assert_equal 'MIT', metadata[:license]
+  end
+
   test 'extracts author with affiliation as array' do
     # Also note that the following is just a regular RO-Crate, not a Workflow RO-Crate
     wf = open_fixture_file('ro_crates/affiliation_array.crate.zip')
