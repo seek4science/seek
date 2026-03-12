@@ -220,12 +220,12 @@ class AssetTest < ActiveSupport::TestCase
     assert Study.supports_doi?
     assert Assay.supports_doi?
 
-    refute Presentation.supports_doi?
+    assert Presentation.supports_doi?
     refute Publication.supports_doi?
 
     assert FactoryBot.create(:model).supports_doi?
     assert FactoryBot.create(:data_file).supports_doi?
-    refute FactoryBot.create(:presentation).supports_doi?
+    assert FactoryBot.create(:presentation).supports_doi?
     refute FactoryBot.create(:publication).supports_doi?
   end
 

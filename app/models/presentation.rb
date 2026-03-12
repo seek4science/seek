@@ -7,12 +7,14 @@ class Presentation < ApplicationRecord
   #searchable must come before acts_as_asset call - although empty is seems this is needed to avoid the autoindex
   #even though in Seek::ActsAsAsset::Search it is already set to false!
   acts_as_asset
+  acts_as_doi_parent
 
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND deleted =?', r.version, false) }, :as => :asset, :foreign_key => :asset_id
 
   validates :projects, presence: true, projects: { self: true }
 
   explicit_versioning(:version_column => "version") do
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
