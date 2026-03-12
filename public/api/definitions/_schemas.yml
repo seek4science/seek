@@ -2116,8 +2116,6 @@ personPost:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
               $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
-              $ref: "#/components/schemas/nullableNonEmptyString"
           required:
             - first_name
             - last_name
@@ -2162,8 +2160,6 @@ personPatch:
             tools:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
-              $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
               $ref: "#/components/schemas/nullableNonEmptyString"
           additionalProperties: false
       required:
@@ -4100,8 +4096,6 @@ personResponse:
             tools:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
-              $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
               $ref: "#/components/schemas/nullableNonEmptyString"
             login:
               $ref: "#/components/schemas/nullableNonEmptyString"
