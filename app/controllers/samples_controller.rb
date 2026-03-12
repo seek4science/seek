@@ -205,7 +205,11 @@ class SamplesController < ApplicationController
             errors.push({ ex_id: par[:ex_id], error: "Unauthorized to delete Sample with id '#{par[:id]}'." })
           end
         rescue ActiveRecord::RecordNotFound
-          errors.push({ ex_id: par[:ex_id], error: "Sample with id '#{par[:id]}' not found." })
+          if par[:id] == "#HIDDEN"
+            errors.push({ ex_id: par[:ex_id], error: "You cannot delete a hidden sample!" })
+          else
+            errors.push({ ex_id: par[:ex_id], error: "Sample with id '#{par[:id]}' not found." })
+          end
         rescue
           errors.push({ ex_id: par[:ex_id], error: sample&.errors&.messages })
         end
