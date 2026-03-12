@@ -756,7 +756,6 @@ function simpleObjectsInput(column, data, options, url, multiInput) {
 
 const handleFailure = (table, res) => {
   const errors = new Set();
-  errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
   res.errors.forEach((error) => {
     const [rowId, sampleTypeId] = error.ex_id.split("-");
     const errorColNames = Object.keys(error.error);
@@ -765,11 +764,12 @@ const handleFailure = (table, res) => {
       const idx = this.index().column;
       const colTitle = $j(table.column(idx).header()).text().replace("*", "");
       if (errorColNames.includes(colTitle)) {
+        errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
         $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
         $j(this.node()).attr("title", error.error[colTitle]);
-      } else if (['You are not allowed to edit this sample.', 'Can not be deleted.'].includes(error.error)) {
+      } else {
         $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
-        errors.add(error.error);
+        errors.add(`Row ${parseInt(rowId)+ 1}: ${error.error}`);
       }
     });
   });
