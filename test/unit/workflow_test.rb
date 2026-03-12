@@ -153,7 +153,7 @@ class WorkflowTest < ActiveSupport::TestCase
       raise 'oh dear'
     end
 
-    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
+    Seek::WorkflowExtractors::CWLDotGenerator.stub :new, bad_generator do
       workflow = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?
       crate = nil
@@ -499,6 +499,24 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal 2, v.inputs.length
     assert_equal 15, v.steps.length
     assert_equal 31, v.outputs.length
+  end
+
+  test 'setting main workflow path for first time refreshes internals structure' do
+    workflow = FactoryBot.create(:annotationless_local_git_workflow)
+    v = workflow.git_version
+
+    assert_nil v.main_workflow_path
+
+    disable_authorization_checks do
+      v.main_workflow_path = 'concat_two_files.ga'
+      assert v.main_workflow_path_changed?
+      v.save!
+    end
+
+    assert_equal 'concat_two_files.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.length
+    assert_equal 1, v.steps.length
+    assert_equal 1, v.outputs.length
   end
 
   test 'changing diagram path clears the cached diagram' do
@@ -852,6 +870,7 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'can_run?' do
     assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy)).can_run?
     assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy), execution_instance_url: 'https://mygalaxy.instance/').can_run?
+    assert FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy)).can_run?('https://another.galaxy.instance/')
     refute FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:private_policy)).can_run?
     refute FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy)).can_run?
   end
@@ -876,6 +895,12 @@ class WorkflowTest < ActiveSupport::TestCase
     v2_trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/2")
     assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{v2_trs_url}&run_form=true", workflow.run_url
     assert_equal "https://mygalaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", workflow.find_version(1).run_url
+
+    # With explicitly provided execution base url
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow)
+    trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+    run_url = workflow.run_url('https://another.galaxy.instance/')
+    assert_equal "https://another.galaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true", run_url
 
     # Galaxy instance with sub-URI
     workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, execution_instance_url: 'https://mygalaxy.instance/galaxy/')
@@ -939,5 +964,28 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal Policy::ACCESSIBLE, policy.access_type
       assert_equal 0, policy.permissions.count
     end
+  end
+
+  test 'ignores blank value when setting disciplines' do
+    FactoryBot.create(:disciplines_controlled_vocab) unless SampleControlledVocab::SystemVocabs.disciplines_controlled_vocab
+
+    workflow = FactoryBot.create(:workflow)
+    User.with_current_user(workflow.contributor.user) do
+      workflow.discipline_annotations = ['', 'Physics and Astronomy']
+      assert workflow.save
+    end
+
+    assert_equal ['Physics and Astronomy'], workflow.reload.discipline_annotation_labels
+  end
+
+  test 'sets datePublished in RO-Crate metadata' do
+    time = Time.zone.local(2024, 9, 15, 12, 0, 0)
+    travel_to(time) do
+      assert_equal time, FactoryBot.create(:cwl_workflow).ro_crate['datePublished'],
+                   'Should set datePublished to current time'
+    end
+
+    assert_equal '2021-03-31 15:01:47 UTC', FactoryBot.create(:remote_git_workflow).ro_crate['datePublished'].utc.to_s,
+                 'Should set datePublished to time of git commit'
   end
 end

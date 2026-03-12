@@ -100,8 +100,17 @@ Kernel.class_eval do
     Rails.application.config.relative_url_root = root
     Rails.application.default_url_options = Seek::Config.site_url_options
     yield
+  ensure
     Rails.application.config.relative_url_root = oldval
     Rails.application.default_url_options = Seek::Config.site_url_options
+  end
+
+  def with_timezone(timezone)
+    oldtz = ENV['TZ']
+    ENV['TZ'] = timezone
+    yield
+  ensure
+    ENV['TZ'] = oldtz
   end
 end
 
@@ -109,6 +118,7 @@ class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   include ActionMailer::TestHelper
 
+  fixtures :all
   setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
@@ -173,10 +183,6 @@ class ActiveSupport::TestCase
   self.use_instantiated_fixtures = false
 
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
-  #
-  # Note: You'll currently still have to declare fixtures explicitly in integration tests
-  # -- they do not yet inherit this setting
-  # fixtures :all
 
   set_fixture_class sop_versions: Sop::Version
   set_fixture_class model_versions: Model::Version
@@ -264,6 +270,9 @@ VCR.configure do |config|
   config.ignore_request do |request|
     request.uri =~ /sparql-auth/
   end
+
+  # Disable VCR recording when running in CI to detect missing cassettes and avoid making live requests.
+  config.default_cassette_options = { record: ENV['CI'] ? :none : :once }
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time

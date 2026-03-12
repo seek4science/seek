@@ -81,10 +81,12 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                 "targets": strainColumns,
                 "render": function (data, type, row) {
                     if(data && data.id) {
-                        if (data.title)
-                            return '<a href="/strains/' + data.id + '">' + data.title + '</a>';
-                        else
+                        if (data.title) {
+                            var href = URL_ROOT + '/strains/' + data.id;
+                            return '<a href="' + href + '">' + data.title + '</a>';
+                        } else {
                             return '<span class="none_text">' + data.id + '</span>';
+                        }
                     } else {
                         return '<span class="none_text">Not specified</span>';
                     }
@@ -105,10 +107,12 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                     var values = Array.isArray(data) ? data : [data];
                     var result = $j.map(values, function(value, i) {
                         if(value && value.id) {
-                            if (value.title)
-                                return '<a href="/samples/' + value.id + '">' + value.title + '</a>';
-                            else
+                            if (value.title) {
+                                var href = URL_ROOT + '/samples/' + value.id;
+                                return '<a href="' + href + '">' + value.title + '</a>';
+                            } else {
                                 return '<span class="none_text">' + (value.id || value.title) + '</span>';
+                            }
                         } else {
                             return '<span class="none_text">Not specified</span>';
                         }
@@ -124,7 +128,8 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                 options["columnDefs"].push({
                     "targets": [index],
                     "render": function (data, type, row) {
-                        return '<a href="/samples/' + row.id + '">' + row.title + '</a>';
+                        var href = URL_ROOT + '/samples/' + row.id;
+                        return '<a href="' + href + '">' + row.title + '</a>';
                     }
                 });
             }

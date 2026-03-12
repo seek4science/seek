@@ -12,10 +12,6 @@ module Seek
                         funder: :funder,
                         event: :event
 
-        def conformance
-          'https://schema.org/Project'
-        end
-
         def programme_set
           [programme].reject(&:blank?)
         end

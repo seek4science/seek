@@ -5,7 +5,13 @@
 <% end %>
 <%= render partial: "templates/template_modal" -%>
 <div class="show_basic">
-	<%= form_for @isa_assay, url: { controller: "isa_assays", action: "update", id: params[:id] }, method: :put do |f| %>
+
+  <!--This cannot be placed inside form tags-->
+  <span id='modal-dialogues'>
+    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
+  </span>
+
+  <%= form_for @isa_assay, url: { controller: "isa_assays", action: "update", id: params[:id] }, method: :put do |f| %>
 	  <%= render :partial => "form", :locals => { :f => f, :action=>:edit } -%>
 	<% end -%>
 </div>

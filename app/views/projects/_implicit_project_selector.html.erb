@@ -1,39 +1,43 @@
 <%# Selects a project implicitly when a study/investigation is selected from an assay/study.%>
 <%# Populates the sharing form, prompts to apply the default policy%>
 
-<%= content_tag :script, project_policies_json(parents.map(&:projects).flatten.uniq), type: 'application/json', id: 'project-default-policies-json' %>
 <%= content_tag :script, project_lookup_json(parents), type: 'application/json', id: 'project-lookup-json' %>
 <script>
-  var projectsLookup = JSON.parse($j('#project-lookup-json').text());
-  Sharing.implicitProjects = [];
-  Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
+    Sharing.implicitProjects = [];
 
-  function setImplicitProjects(lookupId, skipPrompt) {
-    Sharing.removeMandatoryProjectPermissions();
-    if (lookupId) {
-      var projects = projectsLookup[parseInt(lookupId)];
-      if (projects && projects.length) {
-        Sharing.implicitProjects = projects;
+    $j(document).ready(function () {
+        const projectsLookup = JSON.parse($j('#project-lookup-json').text());
+        function setImplicitProjects(projectId) {
+            if (projectId) {
+                var projects = projectsLookup[parseInt(projectId)];
+                if (projects && projects.length) {
+                    Sharing.implicitProjects = projects;
 
-        if (projects.length === 1) {
-          Sharing.defaultPolicyPrompt(projects[0], skipPrompt);
+                    for (var i = 0; i < projects.length; i++) {
+                        Sharing.addPermissionForProject(projects[i]);
+                    }
+                }
+            }
         }
 
-        for (var i = 0; i < projects.length; i++) {
-          Sharing.addPermissionForProject(projects[i]);
+        function applyDefaultPolicy(skipPrompt) {
+            if (Sharing.implicitProjects.length === 1) {
+                Sharing.fetchDefaultData(Sharing.implicitProjects[0]).then((data) => {
+                    Sharing.defaultPolicyPrompt(Sharing.implicitProjects[0], data.policy, skipPrompt);
+                });
+            }
         }
-      }
-    }
-  }
 
-  $j(document).ready(function () {
-    $j('<%= select_id -%>').change(function () {
-      setImplicitProjects($j(this).val());
+        const select = $j('<%= select_id -%>');
+        select.change(function () {
+            setImplicitProjects($j(this).val());
+            applyDefaultPolicy();
+        });
+
+        // Handle initial state
+        setImplicitProjects(select.val());
+        <% if action == :new %>
+          applyDefaultPolicy(true); // Set default policy page load if it is a new resource
+        <% end %>
     });
-
-    <% if action == :new %>
-      // Set on page load if it is a new resource
-      setImplicitProjects($j('<%= select_id -%>').val());
-    <% end %>
-  });
 </script>

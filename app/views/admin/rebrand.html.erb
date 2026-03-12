@@ -1,6 +1,6 @@
 <h1>Site branding</h1>
 
-<%= form_tag({:action => "update_rebrand"}, :multipart => true) do %>
+<%= form_tag({action: "update_rebrand"}, multipart: true) do %>
 
   <%= panel('Instance details', help_text: "Details that describe this running instance of #{Seek::Config.application_name}. These are used in various places of the interface, emails, and markup for search engines.") do %>
 
@@ -34,7 +34,7 @@
   <%= panel('Header image', help_text:'Customize the image at the top left of the page') do %>
     <%= admin_checkbox_setting(:header_image_enabled, 1, Seek::Config.header_image_enabled,
                                "Header logo image enabled", "Whether a header logo image appears on the left in the header.",
-                               :onchange => toggle_appear_javascript('header_image_details')) %>
+                               onchange: toggle_appear_javascript('header_image_details')) %>
 
     <div id="header_image_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.header_image_enabled -%>">
       <%= admin_file_setting(:header_image_file,
@@ -47,60 +47,60 @@
 
   <%= panel('Footer', help_text:'Details that will appear in the footer of all pages') do %>
     <%= admin_checkbox_setting(:copyright_addendum_enabled, 1, Seek::Config.copyright_addendum_enabled,
-                               "Copyright addendum enabled", "If you have been developing SEEK for your #{t('project')}, you may been to provide some additional copyright information.",
-                               :onchange => toggle_appear_javascript('copyright_details')) %>
+                               "Copyright addendum enabled", "If you have been developing SEEK for your #{t('project')}, you may provide some additional copyright information.",
+                               onchange: toggle_appear_javascript('copyright_details')) %>
 
     <div class="additional_settings" id="copyright_details" style="<%= show_or_hide_block Seek::Config.copyright_addendum_enabled -%>">
-      <%= admin_text_setting(:copyright_addendum_content, Seek::Config.copyright_addendum_content,
-                             "Copyright addendum content", "Additional copyright information that is appended to the information in the footer") %>
+      <%= admin_textarea_setting(:copyright_addendum_content, Seek::Config.copyright_addendum_content,
+                             "Copyright addendum content", "Additional copyright information that is appended to the information in the footer", rows: 30) %>
     </div>
 
     <%= admin_checkbox_setting(:imprint_enabled, 1, Seek::Config.imprint_enabled,
                                "Imprint enabled", "Whether you enabled imprint link at the bottom left of the page. This is obligatory for the SEEK instance running in Germany",
-                               :onchange => toggle_appear_javascript('imprint_details')) %>
+                               onchange: toggle_appear_javascript('imprint_details')) %>
 
     <div class="additional_settings" id="imprint_details" style="<%= show_or_hide_block Seek::Config.imprint_enabled -%>">
       <%= admin_textarea_setting(:imprint_description, Seek::Config.imprint_description,
                                  nil, "Here you give the text for your SEEK imprint, to comply with German/your country's law and your organization's rules.
                                Or you can give the link to its content from external site. You can input basic html tags and formats.
-                               Below is an example. You can see how it is under homes/imprint", :rows => 30) %>
+                               Below is an example. You can see how it is under homes/imprint", rows: 30) %>
     </div>
 
     <%= admin_checkbox_setting(:terms_enabled, 1, Seek::Config.terms_enabled,
                                "Terms and Conditions enabled", "Add your Terms and Conditions to comply with the GDPR",
-                               :onchange => toggle_appear_javascript('terms_details')) %>
+                               onchange: toggle_appear_javascript('terms_details')) %>
 
     <div class="additional_settings" id="terms_details" style="<%= show_or_hide_block Seek::Config.terms_enabled -%>">
       <%= admin_textarea_setting(:terms_page, Seek::Config.terms_page,
                                  nil, "Here you can specify the text for your SEEK Terms and Conditions.
                                Or you can give the link to its content from external site. You can input basic html tags and formats.
-                               Below is an example.", :rows => 30) %>
+                               Below is an example.", rows: 30) %>
     </div>
 
     <%= admin_checkbox_setting(:privacy_enabled, 1, Seek::Config.privacy_enabled,
                                "Privacy policy enabled", "Add your privacy policy to comply with the GDPR",
-                               :onchange => toggle_appear_javascript('privacy_details')) %>
+                               onchange: toggle_appear_javascript('privacy_details')) %>
 
     <div class="additional_settings" id="privacy_details" style="<%= show_or_hide_block Seek::Config.privacy_enabled -%>">
       <%= admin_textarea_setting(:privacy_page, Seek::Config.privacy_page,
                                  nil, "Here you can specify the text for your SEEK privacy policy.
                                Or you can give the link to its content from external site. You can input basic html tags and formats.
-                               Below is an example.", :rows => 30) %>
+                               Below is an example.", rows: 30) %>
     </div>
 
     <%= admin_text_setting(:funding_link, Seek::Config.funding_link,
-                           "Funding link", "Optional external link providing funding information (shown in footer)",:placeholder=>"http://use-full-URLs.com") %>
+                           "Funding link", "Optional external link providing funding information (shown in footer)", placeholder: "http://use-full-URLs.com") %>
   <% end %>
 
   <%= panel('Information', help_text:'These options will be shown under "About" in the navigation bar') do %>
     <%= admin_checkbox_setting(:about_page_enabled, 1, Seek::Config.about_page_enabled,
                                '"About" page enabled', 'Add a custom "About" page link to the About menu where users can find out more information about this SEEK instance.',
-                               :onchange => toggle_appear_javascript('about_page_details')) %>
+                               onchange: toggle_appear_javascript('about_page_details')) %>
 
     <div class="additional_settings" id="about_page_details" style="<%= show_or_hide_block Seek::Config.about_page_enabled -%>">
       <%= admin_textarea_setting(:about_page, Seek::Config.about_page,
                                  nil, "Here you can specify content for your instance's \"About\" page. You can input basic html tags and formats.
-                               Below is an example.", :rows => 30) %>
+                               Below is an example.", rows: 30) %>
     </div>
 
 
@@ -111,13 +111,13 @@
                                '"About" the instance administrator enabled', "When enabled an item will appear in the About menu that uses the instance administrator name and link provided above.") %>
 
     <%= admin_text_setting(:cite_link, Seek::Config.cite_link,
-                           "Cite link", "Optional external link providing instructions on how to cite you. (shown in footer as well)",:placeholder=>"http://use-full-URLs.com") %>
+                           "Cite link", "Optional external link providing instructions on how to cite you. (shown in footer as well)", placeholder: "http://use-full-URLs.com") %>
 
     <%= admin_text_setting(:contact_link, Seek::Config.contact_link,
-                           "Contact link", "Optional external link providing contact information. (shown in footer as well)",:placeholder=>"http://use-full-URLs.com") %>
+                           "Contact link", "Optional external link providing contact information. (shown in footer as well)", placeholder: "http://use-full-URLs.com") %>
   <% end %>
 
-  <%= submit_tag "Update", data: {disable_with: 'Updating...'}, :class => 'btn btn-primary' -%> or
+  <%= submit_tag "Update", data: {disable_with: 'Updating...'}, class: 'btn btn-primary' -%> or
   <%= cancel_button admin_path %>
 
 <% end %>

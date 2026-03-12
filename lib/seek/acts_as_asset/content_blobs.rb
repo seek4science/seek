@@ -35,7 +35,7 @@ module Seek
             if blob.url && projects.first
               begin
                 p = projects.first
-                downloader = Jerm::DownloaderFactory.create p.title
+                downloader = JERM::DownloaderFactory.create p.title
                 resource_type         = self.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
                 data_hash             = downloader.get_remote_data blob.url, p.site_username, p.site_password, resource_type
                 blob.tmp_io_object = File.open data_hash[:data_tmp_path], 'r'

@@ -4,7 +4,7 @@ class WorkflowCrateTest < ActiveSupport::TestCase
   test 'conformsTo' do
     crate = ROCrate::WorkflowCrate.new
 
-    ids = crate['conformsTo'].map { |x| x['@id'] }
+    ids = crate.metadata['conformsTo'].map { |x| x['@id'] }
     assert_includes ids, 'https://w3id.org/ro/crate/1.1'
     assert_includes ids, 'https://w3id.org/workflowhub/workflow-ro-crate/1.0'
   end
@@ -33,5 +33,13 @@ class WorkflowCrateTest < ActiveSupport::TestCase
     assert_includes ids, '#test_suite1'
     assert_includes ids, '#test_suite2'
     assert_includes ids, '#test_suite3'
+  end
+
+  test 'diagram types match spec' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    crate = ROCrate::WorkflowCrate.new
+
+    e = workflow.diagram.to_crate_entity(crate)
+    assert_equal ['File', 'ImageObject'], e.type.sort
   end
 end

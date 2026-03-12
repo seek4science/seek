@@ -65,6 +65,55 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_not_empty v.blobs
   end
 
+  test 'add multiple files' do
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
+
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
+    v.add_files([
+                  ['blah.txt', StringIO.new('blah')],
+                  ['hello/whatever.txt', StringIO.new('whatever')]
+                ])
+    assert v.commit.present?
+    assert v.file_exists?('blah.txt')
+    assert v.file_exists?('hello/whatever.txt')
+    assert_equal 'blah', v.file_contents('blah.txt')
+    assert_equal 'whatever', v.file_contents('hello/whatever.txt')
+    assert_not_empty v.blobs
+  end
+
+  test 'replace files' do
+    workflow = FactoryBot.create(:workflow)
+    repo = FactoryBot.create(:blank_repository, resource: workflow)
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
+    v.add_files([
+                  ['blah.txt', StringIO.new('123')],
+                  ['whatever.txt', StringIO.new('whatever')]
+                ])
+
+    assert v.reload.commit.present?
+    assert_equal 'Added/updated 2 files', v.commit_object.message
+    assert v.file_exists?('blah.txt')
+    assert v.file_exists?('whatever.txt')
+    assert_equal 2, v.blobs.count
+    assert_equal '123', v.file_contents('blah.txt')
+    assert_equal 'whatever', v.file_contents('whatever.txt')
+
+    v.replace_files([
+                      ['blah.txt', StringIO.new('456')],
+                      ['something_else.txt', StringIO.new('something_else')]
+                    ], message: 'Replaced some files!')
+
+    assert v.reload.commit.present?
+    assert_equal 'Replaced some files!', v.commit_object.message
+    assert v.file_exists?('blah.txt')
+    refute v.file_exists?('whatever.txt')
+    assert v.file_exists?('something_else.txt')
+    assert_equal 2, v.blobs.count
+    assert_equal '456', v.file_contents('blah.txt')
+    assert_equal 'something_else', v.file_contents('something_else.txt')
+  end
+
   test 'change git author' do
     workflow = FactoryBot.create(:workflow)
     repo = FactoryBot.create(:blank_repository, resource: workflow)
@@ -300,6 +349,10 @@ class GitVersionTest < ActiveSupport::TestCase
     assert v.commit.blank?
     assert_empty v.blobs
 
+    assert_nothing_raised do
+      v.add_file('normal_file', StringIO.new('blah'))
+    end
+
     assert_raise(Git::InvalidPathException) do
       v.add_file('///', StringIO.new('blah'))
     end
@@ -424,12 +477,12 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_empty v.remote_sources
   end
 
-  test 'empty?' do
+  test 'no_content?' do
     workflow = FactoryBot.create(:empty_git_workflow)
-    assert workflow.git_version.empty?
+    assert workflow.git_version.no_content?
 
     workflow.git_version.add_file('folder/blah.txt', StringIO.new('blah'))
-    refute workflow.git_version.empty?
+    refute workflow.git_version.no_content?
   end
 
   test 'get blob' do
@@ -460,5 +513,25 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_equal 288, nested_tree.total_size
 
     assert_nil gv.get_tree('banana')
+  end
+
+  test 'reverts to last local commit before committing' do
+    workflow = FactoryBot.create(:workflow)
+    disable_authorization_checks do
+      v1 = workflow.git_versions.create!(mutable: true)
+      v1.add_file('text.txt', StringIO.new('text'))
+      v1.save!
+      parent_commit = v1.commit
+      # Make a change to the repo, but don't save the change to the `commit` of the Git::Version
+      v1.add_file('text2.txt', StringIO.new('text2'))
+      orphaned_commit = v1.commit
+      v1.reload
+      assert_equal parent_commit, v1.commit
+      assert v1.git_base.head.target.tree.path('text2.txt') # Check the file is actually there in the repo
+      v1.add_file('text3.txt', StringIO.new('text3'))
+      v1.save!
+      assert_equal parent_commit, v1.commit_object.parents.first.oid
+      assert_equal ['text.txt', 'text3.txt'], v1.blobs.map(&:path).sort
+    end
   end
 end

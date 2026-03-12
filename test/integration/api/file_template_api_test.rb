@@ -21,7 +21,10 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
     assert ft.can_edit?(@current_user)
 
     original_md5 = ft.content_blob.md5sum
-    put file_template_content_blob_path(ft, ft.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put file_template_content_blob_path(ft, ft.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth }
 
     assert_response :success
     blob = ft.content_blob.reload
@@ -53,7 +56,10 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
     assert ft.can_edit?(@current_user)
 
     original_md5 = ft.content_blob.md5sum
-    put file_template_content_blob_path(ft, ft.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
+    put file_template_content_blob_path(ft, ft.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')),
+      'Authorization' => write_access_auth }
 
     assert_response :bad_request
     blob = ft.content_blob.reload
@@ -74,7 +80,7 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
     to_post = load_template('post_bad_file_template.json.erb')
 
     assert_no_difference(-> { model.count }) do
-      post "/#{plural_name}.json", params: to_post
+      post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       #assert_response :unprocessable_entity
     end
 

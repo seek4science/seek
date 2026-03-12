@@ -86,9 +86,11 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 3, links.size
+
+    assert_equal 4, links.size
     assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :datacite_xml)
     assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :rdf)
+    assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :jsonld)
     assert_link(links, download_sop_url(sop, version: 1), rel: 'item', type: :pdf)
   end
 
@@ -129,14 +131,16 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
     get file_templates_path
 
     assert_response :success
-    assert_nil response.headers['Link'], 'Should not have any signposting links'
+    links = parse_link_header.reject { |link, props| link.include?('assets/application.') } # Ignore Rails' CSS/JS Links
+    assert_empty links, 'Should not have any signposting links'
   end
 
   test 'fair signposting for privacy page' do
     get privacy_home_path
 
     assert_response :success
-    assert_nil response.headers['Link'], 'Should not have any signposting links'
+    links = parse_link_header.reject { |link, props| link.include?('assets/application.') } # Ignore Rails' CSS/JS Links
+    assert_empty links, 'Should not have any signposting links'
   end
 
   private

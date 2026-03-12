@@ -2,28 +2,27 @@ FactoryBot.define do
   # PublicationType
   # :journal rely on the existence of the PublicationTypes
   factory(:journal, class: PublicationType) do
-    title { 'Journal' }
-    key { 'article' }
+    title { 'Journal Article' }
+    key   { 'journalarticle' }
   end
   
   
   factory(:phdthesis, class: PublicationType) do
-    title { 'Phd Thesis' }
-    key { 'phdthesis' }
+    title { 'PhD Thesis' }
+    key   { 'phdthesis' }
   end
   
   
   factory(:inproceedings, class: PublicationType) do
-    title { 'InProceedings' }
-    key { 'inproceedings' }
+    title { 'Conference Paper' }
+    key   { 'conferencepaper' }
   end
   
   # Publication
   factory(:publication) do
     sequence(:title) { |n| "A Publication #{n}" }
+    with_project_contributor
     sequence(:pubmed_id) { |n| n }
-    projects { [FactoryBot.create(:project)] }
-    association :contributor, factory: :person, strategy: :create
     association :publication_type, factory: :journal
   end
   

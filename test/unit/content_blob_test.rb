@@ -8,7 +8,6 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   include NelsTestHelper
 
-  fixtures :content_blobs
 
   test 'search terms' do
     blob = ContentBlob.new

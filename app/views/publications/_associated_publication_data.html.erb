@@ -1,10 +1,11 @@
 <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication } %>
 <div class="form-group">
   <label>Abstract</label>
-  <p class="help-block">
-    When adding a publication through a DOI, it is not possible to fetch the original abstract automatically.
-    <br/>Please paste the abstract below
-  </p>
+  <% if @publication.abstract.blank? %>
+    <p class="help-block">
+      Please paste the abstract below
+    </p>
+  <% end %>
   <%= text_area(:publication, :abstract, :cols => 90, :rows => 8, :class => 'form-control') %>
 </div>
 

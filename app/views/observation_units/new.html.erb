@@ -1,0 +1,21 @@
+<% if Investigation.authorized_for('view').none? %>
+    <%= alert_box('info') do %>
+        <%= "No #{t('study')} and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your #{t('study')} and #{t('observation_unit')}!" %>
+    <% end %>
+    <div class="text-center">
+        <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
+    </div>
+<% elsif Study.authorized_for('view').none? %>
+    <%= alert_box('info') do %>
+        <%= "No #{t('study')} available, you have to create a new #{t('study')} before creating your #{t('observation_unit')}!" %>
+    <% end %>
+    <div class="text-center">
+        <%= button_link_to("New #{t('study')}", 'arrow_right', new_study_path) -%>
+    </div>
+<% else %>
+    <h1>New <%= t('observation_unit') %></h1>
+    <%= index_and_new_help_icon controller_name %>
+    <%= form_for @observation_unit do |f| %>
+        <%= render partial: "form", locals: { f: f, action: :new } -%>
+    <% end %>
+<% end %>

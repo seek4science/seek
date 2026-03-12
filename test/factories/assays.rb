@@ -101,21 +101,51 @@ FactoryBot.define do
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
   end
 
-  factory(:isa_json_compliant_assay, parent: :assay) do
-    title { 'ISA JSON compliant assay' }
-    description { 'An assay linked to an ISA JSON compliant study and a sample type' }
-    after(:build) do |assay|
-      assay.study ||= FactoryBot.create(:isa_json_compliant_study)
-      assay.sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: assay.study.sample_types.last)
-    end
-  end
-
   factory(:assay_stream, parent: :assay_base) do
-    title { 'Assay Stream' }
+    sequence(:title) { |n| "Assay Stream #{n}" }
     description { 'A holder assay holding multiple child assays' }
     association :assay_class, factory: :assay_stream_class
     after(:build) do |assay|
       assay.study ||= FactoryBot.create(:isa_json_compliant_study, contributor: assay.contributor)
+    end
+  end
+
+  factory(:isa_json_compliant_material_assay, parent: :assay) do
+    transient do
+      linked_sample_type { nil }
+    end
+    sequence(:title) { |n| "ISA JSON compliant material assay #{n}" }
+    description { 'An assay linked to an ISA JSON compliant study and a sample type' }
+    after(:build) do |assay, eval|
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study)
+      assay.sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: eval.linked_sample_type)
+    end
+  end
+
+  factory(:isa_json_compliant_data_file_assay, parent: :assay) do
+    transient do
+      linked_sample_type { nil }
+    end
+    sequence(:title) { |n| "ISA JSON compliant data file assay #{n}" }
+    description { 'An assay linked to an ISA JSON compliant study and a sample type' }
+    after(:build) do |assay, eval|
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study)
+      assay.sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: eval.linked_sample_type)
+    end
+  end
+
+  factory(:complete_assay_stream, parent: :assay_stream) do
+    transient do
+      sample_collection_sample_type { nil }
+    end
+    sequence(:title) { |n| "Complete Assay Stream #{n}" }
+    description { 'An assay stream populated with assays' }
+    association :assay_class, factory: :assay_stream_class
+    after(:build) do |assay_stream, eval|
+      first_material_assay = FactoryBot.create(:isa_json_compliant_material_assay, title: 'Pre-treatment', linked_sample_type: eval.sample_collection_sample_type, study: assay_stream.study, contributor: assay_stream.contributor)
+      second_material_assay = FactoryBot.create(:isa_json_compliant_material_assay, title: 'Extraction', linked_sample_type: first_material_assay.sample_type, study: assay_stream.study, contributor: assay_stream.contributor)
+      data_file_assay = FactoryBot.create(:isa_json_compliant_data_file_assay, title: 'Measurement', linked_sample_type: second_material_assay.sample_type, study: assay_stream.study, contributor: assay_stream.contributor)
+      assay_stream.child_assays = [first_material_assay, second_material_assay, data_file_assay]
     end
   end
 

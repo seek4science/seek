@@ -1,8 +1,7 @@
 # use the rails logger for loggin OmniAuth; otherwise it will use std::out
 OmniAuth.config.logger = Rails.logger
-
-if Seek::Config.omniauth_enabled
-  Rails.application.config.middleware.use OmniAuth::Builder do
+Rails.application.config.middleware.use OmniAuth::Builder do
+  if Seek::Config.omniauth_enabled
     # To add more providers, see the `omniauth_providers` definition in: `lib/seek/config.rb`
     begin
       providers = Seek::Config.omniauth_providers

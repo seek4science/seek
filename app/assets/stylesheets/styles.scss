@@ -347,6 +347,10 @@ div.renderer {
   color: if(lightness($text-color) > 50, darken($text-color, 20%), lighten($text-color, 30%));
 }
 
+.select2-results__option--highlighted .subtle {
+  color: unset;
+}
+
 span.truncated-name {
   display: inline-block;
   overflow: hidden;
@@ -798,4 +802,15 @@ div#super_tag_cloud {
 .svg-pan-zoom {
   max-width: 100%;
   border: 1px solid #ddd;
+}
+
+#register-terms-and-conds {
+  margin-top: 1em;
+}
+
+ul.attributions_list {
+  padding-left: 0;
+  li {
+    list-style-type: none;
+  }
 }

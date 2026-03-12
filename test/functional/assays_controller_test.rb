@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class AssaysControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -126,7 +125,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: assay, assay: { data_file_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title } }
+      put :update, params: { id: assay, assay: { data_files_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title } }
     end
 
     assert_redirected_to assay_path(assay)
@@ -885,6 +884,7 @@ class AssaysControllerTest < ActionController::TestCase
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::EDITING)]))
     get :edit, params: { id: assay.id }
+    assert_response :success
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
@@ -1006,8 +1006,14 @@ class AssaysControllerTest < ActionController::TestCase
     model2 = FactoryBot.create(:model, title: 'public model', policy: FactoryBot.create(:public_policy),contributor: person)
     assay = FactoryBot.create(:modelling_assay, policy: FactoryBot.create(:public_policy),contributor: person)
 
-    assay.data_files << df
-    assay.data_files << df2
+    simulation_data = RelationshipType.find_by_title('Simulation Data')
+    test_data = RelationshipType.find_by_title('Test data')
+    refute_nil simulation_data, 'check fixtures for relationship types match title'
+    refute_nil test_data, 'check fixtures for relationship types match title'
+    assay.update(data_files_attributes:[
+      {asset_id: df.id, relationship_type_id: simulation_data.id},
+      {asset_id: df2.id, relationship_type_id: test_data.id},
+    ])
     assay.models << model
     assay.models << model2
 
@@ -1027,6 +1033,69 @@ class AssaysControllerTest < ActionController::TestCase
         assert_select 'li a[href=?]', data_file_path(df2), text: /#{df2.title}/, count: 1
         assert_select 'li a[href=?]', data_file_path(df), text: /#{df.title}/, count: 0
         assert_select 'li', text: /Hidden/, count: 1
+        assert_select 'span.relationship_type', count: 1
+        assert_select 'span.relationship_type', text:/Simulation Data/, count: 0
+        assert_select 'span.relationship_type', text:/Test data/
+      end
+    end
+  end
+
+  test 'should show model if no data for modelling analysis' do
+    person = User.current_user.person
+    model = FactoryBot.create(:model, title: 'public model', policy: FactoryBot.create(:public_policy),contributor: person)
+    model2 = FactoryBot.create(:model, title: 'public model2', policy: FactoryBot.create(:public_policy),contributor: person)
+    assay = FactoryBot.create(:modelling_assay, policy: FactoryBot.create(:public_policy),contributor: person)
+
+    assay.models << model
+    assay.models << model2
+
+    assay.save!
+
+    login_as FactoryBot.create(:person)
+
+    get :show, params: { id: assay.id }
+    assert_response :success
+    assert_select 'div.data_model_relationship' do
+      assert_select 'ul.related_models' do
+        assert_select 'li a[href=?]', model_path(model), text: /#{model.title}/, count: 1
+        assert_select 'li a[href=?]', model_path(model2), text: /#{model2.title}/, count: 1
+      end
+      assert_select 'ul.related_data_files', count: 0
+    end
+  end
+
+  test 'should show data if no model for modelling analysis' do
+    person = User.current_user.person
+    df = FactoryBot.create(:data_file, title: 'public data file', policy: FactoryBot.create(:public_policy),contributor: person)
+    df2 = FactoryBot.create(:data_file, title: 'public data file 2', policy: FactoryBot.create(:public_policy),contributor: person)
+    df3 = FactoryBot.create(:data_file, title: 'public data file 2', policy: FactoryBot.create(:public_policy),contributor: person)
+    assay = FactoryBot.create(:modelling_assay, policy: FactoryBot.create(:public_policy),contributor: person)
+
+    simulation_data = RelationshipType.find_by_title('Simulation Data')
+    test_data = RelationshipType.find_by_title('Test data')
+    refute_nil simulation_data, 'check fixtures for relationship types match title'
+    refute_nil test_data, 'check fixtures for relationship types match title'
+    assay.update(data_files_attributes:[
+      {asset_id: df.id, relationship_type_id: simulation_data.id},
+      {asset_id: df2.id, relationship_type_id: test_data.id},
+      {asset_id: df3.id, relationship_type_id: nil}
+    ])
+
+    assay.save!
+
+    login_as FactoryBot.create(:person)
+
+    get :show, params: { id: assay.id }
+    assert_response :success
+    assert_select 'div.data_model_relationship' do
+      assert_select 'ul.related_models', count: 0
+      assert_select 'ul.related_data_files' do
+        assert_select 'li a[href=?]', data_file_path(df), text: /#{df.title}/, count: 1
+        assert_select 'li a[href=?]', data_file_path(df2), text: /#{df2.title}/, count: 1
+        assert_select 'li a[href=?]', data_file_path(df3), text: /#{df3.title}/, count: 1
+        assert_select 'span.relationship_type', count: 2
+        assert_select 'span.relationship_type', text:/Simulation Data/
+        assert_select 'span.relationship_type', text:/Test data/
       end
     end
   end
@@ -1326,7 +1395,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id: assay }
 
     assert_response :success
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 1
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 1
   end
 
   test 'should not show NeLS button if NeLS integration disabled' do
@@ -1343,7 +1412,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 0
   end
 
   test 'should not show NeLS button for non-NeLS' do
@@ -1357,7 +1426,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, params: { id: assay }
 
     assert_response :success
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 0
   end
 
   test 'should not show NeLS button for NeLS-enabled project to non-NeLS project member' do
@@ -1379,7 +1448,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
-    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
+    assert_select 'a[href=?]', assay_nels_path(assay.id), count: 0 # But not browse NeLS
   end
 
   test 'can delete an assay with subscriptions' do
@@ -2179,6 +2248,22 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should redirect isa json compliant assay to isa assay edit page' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+      project = person.projects.first
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation )
+      assay_stream = FactoryBot.create(:assay_stream, study: study, contributor: person)
+      assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, projects: [project], contributor: person)
+      assay = FactoryBot.create(:assay, contributor: person, study: study, assay_stream:, sample_type: assay_sample_type)
+
+      get :edit, params: { id: assay  }
+      assert_redirected_to edit_isa_assay_path(assay)
+    end
+  end
+
   test 'Should propagate assay stream permissions' do
     with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
@@ -2187,18 +2272,30 @@ class AssaysControllerTest < ActionController::TestCase
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
       assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
 
-      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0)
+      sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, contributor: person)
+      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0, sample_type:)
 
       login_as(person)
       refute authorized_child_assay.can_manage?(other_person)
+      refute sample_type.can_manage?(other_person)
+
+      get :manage, params: { id: assay_stream }
+      # Manage page should show correct study ID
+      assert_select '#assay_study_id', value: study.id
+      # Manage page should show the checkbox
+      assert_select '#propagate_permissions', count: 1
+
       patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [other_person.id]}, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
 
       # assert that the permissions of the authorized assay were propagated
       # other_person should see the assay stream and the authorized assay
       assay_stream.reload
       assert assay_stream.can_manage?(other_person)
+      assert_equal assay_stream.study, study
       authorized_child_assay.reload
       assert authorized_child_assay.can_manage?(other_person)
+      sample_type.reload
+      assert sample_type.can_manage?(other_person)
     end
   end
 
@@ -2211,7 +2308,8 @@ class AssaysControllerTest < ActionController::TestCase
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
       assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
-      unauthorized_child_assay = FactoryBot.create(:assay, contributor: second_person, study:, assay_stream:, position: 0)
+      sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, contributor: second_person)
+      unauthorized_child_assay = FactoryBot.create(:assay, contributor: second_person, study:, assay_stream:, position: 0, sample_type:)
 
       login_as(person)
       patch :manage_update, params: { id: assay_stream, propagate_permissions: '1', assay: {creator_ids: [third_person.id]}, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: third_person.id, access_type: Policy::MANAGING}}}}
@@ -2226,6 +2324,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert assay_stream.can_manage?(third_person)
       unauthorized_child_assay.reload
       refute unauthorized_child_assay.can_manage?(third_person)
+      refute sample_type.can_manage?(third_person)
     end
   end
   
@@ -2236,8 +2335,9 @@ class AssaysControllerTest < ActionController::TestCase
       investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
       study = FactoryBot.create(:isa_json_compliant_study, investigation: )
       assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
-      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0)
-      
+      sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: study.sample_types.second, contributor: person)
+      authorized_child_assay = FactoryBot.create(:assay, contributor: person, study:, assay_stream:, position: 0, sample_type:)
+
       login_as(person)
       refute authorized_child_assay.can_manage?(other_person)
       patch :manage_update, params: { id: assay_stream, assay: {creator_ids: [other_person.id] }, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
@@ -2248,6 +2348,7 @@ class AssaysControllerTest < ActionController::TestCase
       # other_person should not see the authorized assay
       authorized_child_assay.reload
       refute authorized_child_assay.can_manage?(other_person)
+      refute sample_type.can_manage?(other_person)
 
       patch :manage_update, params: { id: assay_stream, propagate_permissions: '0', assay: {creator_ids: [other_person.id] }, policy_attributes: {access_type: Policy::NO_ACCESS, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}}}
 
@@ -2257,8 +2358,32 @@ class AssaysControllerTest < ActionController::TestCase
       # other_person should not see the authorized assay
       authorized_child_assay.reload
       refute authorized_child_assay.can_manage?(other_person)
-
+      refute sample_type.can_manage?(other_person)
     end
+  end
+
+  test 'should not show assay stream permission propagation checkbox if assay stream has no child assays' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
+    assay_stream = FactoryBot.create(:assay_stream, study:, contributor: person, position: 0)
+    login_as(person)
+    get :manage, params: {id: assay_stream.id}
+    assert_select '#assay_study_id', value: study.id
+    assert_select '#propagate_permissions', count: 0
+  end
+
+  test 'can show and edit with deleted contributor' do
+    assay = FactoryBot.create(:assay, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    assay.update_column(:contributor_id, nil)
+    assert assay.can_view?
+    assert assay.can_edit?
+    assert_nil assay.contributor
+    get :show, params: { id: assay.id }
+    assert_response :success
+    get :edit, params: { id: assay.id }
+    assert_response :success
   end
 
 end

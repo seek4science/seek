@@ -1,8 +1,8 @@
 require 'spec_helper'
 require 'datacite/client'
 
-describe DataCite::Client do
-  let(:endpoint)    { DataCite::Client.new('test', 'test', DataCite::Client::TEST_ENDPOINT) }
+describe Datacite::Client do
+  let(:endpoint)    { Datacite::Client.new('test', 'test', Datacite::Client::TEST_ENDPOINT) }
   let(:doi)    { '10.5072/MY_TEST' }
   let(:url)    { 'https://seek.sysmo-db.org' }
 
@@ -16,7 +16,7 @@ describe DataCite::Client do
        vcr: { cassette_name: 'resolve_a_DOI/returns_a_401_for_un-authorized_account' } do
       invalid_user = 'invalid'
       invalid_password = 'invalid'
-      endpoint = DataCite::Client.new(invalid_user, invalid_password, DataCite::Client::TEST_ENDPOINT)
+      endpoint = Datacite::Client.new(invalid_user, invalid_password, Datacite::Client::TEST_ENDPOINT)
       expect { endpoint.resolve(doi) }.to raise_error(RestClient::Unauthorized)
     end
 

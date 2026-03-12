@@ -3,9 +3,15 @@
     "type": "observation_units",
     "attributes": {
       "policy": {
-        "access": "manage",
+        "access": "download",
         "permissions": [
-
+          {
+            "resource": {
+              "id": "152",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
         ]
       },
       "title": "Max observation unit",
@@ -15,7 +21,7 @@
         "tag2"
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "342",
+        "extended_metadata_type_id": "21",
         "attribute_map": {
           "name": "unit 1",
           "strain": "strain 1"
@@ -32,29 +38,21 @@
       "creators": {
         "data": [
           {
-            "id": "3123",
+            "id": "154",
             "type": "people"
-          }
-        ]
-      },
-      "projects": {
-        "data": [
-          {
-            "id": "3339",
-            "type": "projects"
           }
         ]
       },
       "study": {
         "data": {
-          "id": "522",
+          "id": "41",
           "type": "studies"
         }
       },
       "samples": {
         "data": [
           {
-            "id": "72",
+            "id": "25",
             "type": "samples"
           }
         ]
@@ -62,7 +60,7 @@
       "data_files": {
         "data": [
           {
-            "id": "210",
+            "id": "25",
             "type": "data_files"
           }
         ]

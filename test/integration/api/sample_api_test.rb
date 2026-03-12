@@ -18,6 +18,8 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
     @sample = FactoryBot.create(:max_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
     @sample_type = @sample.sample_type
+    @sample_type.policy.update_column(:access_type, Policy::ACCESSIBLE)
+    assert @sample_type.can_view?
     @project = @sample.projects.first
     @assay = FactoryBot.create(:assay, contributor: current_person)
 
@@ -82,7 +84,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   test 'set sample_type and attributes in post' do
     user_login
-    patient_sample_type = FactoryBot.create(:patient_sample_type)
+    patient_sample_type = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
     params = {
       "data": {
         "type": "samples",
@@ -114,7 +116,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
       }
     }
     assert_difference('Sample.count') do
-      post samples_path(format: :json), params: params, as: :json
+      post samples_path(format: :json), params: params, as: :json, headers: { 'Authorization' => write_access_auth }
     end
     assert_response :success
     sample = Sample.last
@@ -126,7 +128,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   test 'create with multi sample and cv list' do
     user_login
-    max_sample_type = FactoryBot.create(:max_sample_type)
+    max_sample_type = FactoryBot.create(:max_sample_type, policy: FactoryBot.create(:public_policy))
     patients = [FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy)), FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))]
 
     params = {
@@ -162,7 +164,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('Sample.count') do
-      post samples_path(format: :json), params: params, as: :json
+      post samples_path(format: :json), params: params, as: :json, headers: { 'Authorization' => write_access_auth }
     end
     assert_response :success
 
@@ -178,7 +180,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   test 'create with multi sample and cv list - as array' do
     user_login
-    max_sample_type = FactoryBot.create(:max_sample_type)
+    max_sample_type = FactoryBot.create(:max_sample_type, policy: FactoryBot.create(:public_policy))
     patients = [FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy)), FactoryBot.create(:patient_sample, policy:FactoryBot.create(:public_policy))]
 
     params = {
@@ -214,7 +216,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('Sample.count') do
-      post samples_path(format: :json), params: params, as: :json
+      post samples_path(format: :json), params: params, as: :json, headers: { 'Authorization' => write_access_auth }
     end
     assert_response :success
 
@@ -280,7 +282,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     assert_difference('Sample.count', 0) do
       assert_difference('AssayAsset.count', 0) do
         assert_difference('SampleType.count', 0) do
-          post "/samples/batch_create", as: :json, params: params
+          post "/samples/batch_create", as: :json, params: params, headers: { 'Authorization' => write_access_auth }
           assert_response :success
         end
       end
@@ -291,7 +293,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     assert_difference('Sample.count', 2) do
       assert_difference('AssayAsset.count', 2) do
         assert_difference('SampleType.count', 0) do
-          post "/samples/batch_create", as: :json, params: params
+          post "/samples/batch_create", as: :json, params: params, headers: { 'Authorization' => write_access_auth }
           assert_response :success
         end
       end

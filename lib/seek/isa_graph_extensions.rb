@@ -1,6 +1,6 @@
 module Seek
-  module IsaGraphExtensions
-    include IsaHelper
+  module ISAGraphExtensions
+    include ISAHelper
 
   end
 end

@@ -5,7 +5,6 @@ class UserTest < ActiveSupport::TestCase
   # Then, you can remove it from this and the functional test.
 
   include AuthenticatedTestHelper
-  fixtures :users, :sops, :data_files, :models, :assets
 
   test 'validates email if set' do
     u = FactoryBot.create :user

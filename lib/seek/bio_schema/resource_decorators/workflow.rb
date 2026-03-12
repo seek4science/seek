@@ -63,7 +63,7 @@ module Seek
               "@type": 'FormalParameter',
               "@id": ROCrate::ContextualEntity.format_local_id("#{wf_name}-#{group_name}-#{property.id}"),
               name: property.name || property.id,
-              "dct:conformsTo": FORMALPARAMETER_PROFILE
+              "dct:conformsTo": { '@id' => FORMALPARAMETER_PROFILE }
             }
           end
         end

@@ -3,7 +3,6 @@ require 'minitest/mock'
 require 'private_address_check'
 
 class ContentBlobsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 
@@ -214,6 +213,27 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert @response.body.include?('Unhandled URL scheme')
     assert_equal 'warning', assigns(:type)
     assert assigns(:warning_msg)
+  end
+
+  test 'examine url bad cert' do
+    stub_request(:head, 'https://iuseaselfsigned.cert').to_raise(OpenSSL::SSL::SSLError)
+    get :examine_url, xhr: true, params: { data_url: 'https://iuseaselfsigned.cert' }
+    assert_response 400
+    assert @response.body.include?('SSL connection to the URL failed')
+    assert_equal 'error', assigns(:type)
+    assert assigns(:error_msg)
+  end
+
+  test 'examine url unhandled exception' do
+    Rails.application.config.consider_all_requests_local = false
+    stub_request(:head, 'https://somethingeterrible').to_raise(NoMethodError)
+    get :examine_url, xhr: true, params: { data_url: 'https://somethingeterrible' }
+    assert_response 400
+    assert @response.body.include?('An unexpected error occurred')
+    assert_equal 'error', assigns(:type)
+    assert assigns(:error_msg)
+  ensure
+    Rails.application.config.consider_all_requests_local = true
   end
 
   test 'examine url localhost' do

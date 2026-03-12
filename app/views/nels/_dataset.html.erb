@@ -1,23 +1,62 @@
-<h2><%= @dataset['name'] -%> <small><%= @dataset['type'] -%></small></h2>
-<p><%= @dataset['description'] %></p>
+
+<h2>
+  <span class="<%= nels_dataset_glyph %>"/>
+  &nbsp;
+  Dataset: <%= @dataset['name'] -%>
+  <%= nels_locked_dataset_icon if is_nels_dataset_locked?(@dataset, @project) %>
+  <br/>
+  <small><%= @dataset['type'] -%></small>
+</h2>
+
+<p>
+  <label>Associated NeLS Project:</label>
+  <%= link_to(@project['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"project#{@project['id']}"}) %>
+</p>
+
+<%= item_description @dataset['description'] -%>
+
 <% if @dataset['owner_name'].present? %>
-    <strong>Owner:</strong> <%= @dataset['owner_name'] %><br/>
+  <p>
+    <label>Owner:</label> <%= @dataset['owner_name'] %>
+  </p>
 <% end %>
 <% if (time = Time.parse(@dataset['creation_date']) rescue nil).present? %>
-    <strong>Created:</strong> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span><br/>
+  <p>
+    <label>Created:</label> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span>
+  </p>
 <% end %>
 <br/>
-<h5>Subtypes</h5>
+<h4>Subtypes</h4>
 <ul class="list-group">
   <% @dataset['subtypes'].each do |subtype| %>
       <li class="list-group-item">
-        <%= form_tag(register_assay_nels_path(params[:assay_id]), method: :post) do %>
-            <%= hidden_field_tag('project_id', params[:project_id]) %>
-            <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
-            <%= hidden_field_tag('subtype_name', subtype['type']) %>
-            <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
-            <%= submit_tag('Register', class: 'btn btn-primary btn-xs pull-right') %>
+        <%= link_to(subtype['type'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"#{subtype['type']}#{@dataset['id']}"}) %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
+        <%= button_link_to('Add metadata', 'add', nil, { id: :add_metadata, 'data-project-id': @project['id'], 'data-dataset-id': @dataset['id'], 'data-subtype-name': subtype['type'], class: :add_metadata }) %>
+
+        <% if subtype["metadata"] %>
+          <%= button_link_to('Download metadata', 'download', {action: :get_metadata,
+            project_id: params[:project_id],dataset_id: params[:dataset_id],subtype_name: subtype['type']},
+            method: :get) %>
+          <% if @assay && params[:assay_id]%>
+            <%= form_tag(register_nels_path(assay_id: params[:assay_id]), method: :post, class: 'pull-right') do %>
+              <%= hidden_field_tag('project_id', params[:project_id]) %>
+              <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
+              <%= hidden_field_tag('subtype_name', subtype['type']) %>
+              <%= submit_tag('Register metadata', class: 'btn btn-primary') %>
+            <% end %>
+          <% end %>
         <% end %>
+
       </li>
   <% end %>
 </ul>
+
+<%= render partial: 'upload_metadata_dialog' %>
+
+
+<script>
+  $j(document).ready(function () {
+    bindTooltips('#nels-browser');
+    NelsBrowser.bindNelsTreeNodeLinks();
+  });
+</script>

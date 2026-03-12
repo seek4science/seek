@@ -40,7 +40,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     logout "http://www.example.com/data_files/#{data_file.id}"
-    assert_redirected_to data_file_path(data_file)
+    assert_redirected_to :root
     get "/data_files/#{data_file.id}", headers: { 'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}" }
     assert_response :forbidden
 

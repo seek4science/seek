@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class InvestigationsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -1211,5 +1210,493 @@ class InvestigationsControllerTest < ActionController::TestCase
 
       assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
     end
+  end
+
+  test 'compliance to isa json checked if ISA-JSON compliance enabled' do
+    current_user = FactoryBot.create(:user)
+    login_as(current_user)
+
+    with_config_values({isa_json_compliance_enabled: false, project_single_page_enabled: false}) do
+      get :new
+      assert_response :success
+
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 0
+    end
+
+    with_config_values({isa_json_compliance_enabled: true, project_single_page_enabled: true}) do
+      get :new
+      assert_response :success
+
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 1
+    end
+  end
+
+  test 'isa json compliance on edit page' do
+    current_user = FactoryBot.create(:user)
+
+    inv = FactoryBot.create(:investigation, contributor: current_user.person)
+    isa_json_inv = FactoryBot.create(:investigation, contributor: current_user.person, is_isa_json_compliant: true)
+
+    login_as(current_user)
+    with_config_values({isa_json_compliance_enabled: false, project_single_page_enabled: false}) do
+      get :edit, params: { id: inv }
+      assert_response :success
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 0
+
+      get :edit, params: { id: isa_json_inv }
+      assert_response :success
+      assert_select 'input[type="checkbox"][checked="checked"]#investigation_is_isa_json_compliant', count: 1
+
+    end
+  end
+
+  test 'update from fair data menu option' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    inv = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier', contributor: person)
+    inv2 = FactoryBot.create(:investigation, external_identifier:'', contributor: person)
+    inv3 = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier2', contributor: FactoryBot.create(:person), policy: FactoryBot.create(:editing_public_policy))
+    assert inv.can_manage?
+    assert inv2.can_manage?
+    refute inv3.can_manage?
+    assert inv3.can_view?
+
+    with_config_value(:fair_data_station_enabled, true) do
+      get :show, params: { id: inv }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIR Data Station', count: 1
+
+      get :show, params: { id: inv2 }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv2), text:'Update from FAIR Data Station', count: 0
+
+      get :show, params: { id: inv3 }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv3), text:'Update from FAIR Data Station', count: 0
+    end
+
+    with_config_value(:fair_data_station_enabled, false) do
+      get :show, params: { id: inv }
+      assert_response :success
+      assert_select 'li a[href=?]', update_from_fairdata_station_investigation_path(inv), text:'Update from FAIR Data Station', count: 0
+    end
+  end
+
+  test 'update from fairdata station' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    inv = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier', contributor: person)
+    inv2 = FactoryBot.create(:investigation, external_identifier:'test-inv-identifier2', contributor: FactoryBot.create(:person), policy: FactoryBot.create(:editing_public_policy))
+    with_config_value(:fair_data_station_enabled, true) do
+      get :update_from_fairdata_station, params: { id: inv }
+      assert_response :success
+
+      get :update_from_fairdata_station, params: { id: inv2 }
+      assert_redirected_to inv2
+      assert_match /You are not authorized to manage this Investigation/, flash[:error]
+    end
+
+    with_config_value(:fair_data_station_enabled, false) do
+      get :update_from_fairdata_station, params: { id: inv }
+      assert_redirected_to :root
+      assert_match /Fair data station are disabled/, flash[:error]
+    end
+  end
+
+  test 'disable fair data station submit if currently in progress' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    login_as(upload.contributor)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input.disabled#datastation_data[type="file"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled[type="submit"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input.disabled#datastation_data[type="file"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled[type="submit"]' do |input|
+      assert input.attr('onclick').present?
+      assert input.attr('data-tooltip').present?
+    end
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_task.update_attribute(:status, Task::STATUS_FAILED)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel'
+
+    upload.update_attribute(:show_status, false)
+    get :update_from_fairdata_station, params: { id: upload.investigation }
+    assert_response :success
+    assert_select 'input#datastation_data[type="file"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input[type="submit"]' do |input|
+      refute input.attr('onclick').present?
+      refute input.attr('data-tooltip').present?
+    end
+    assert_select 'input.disabled#datastation_data[type="file"]', count: 0
+    assert_select 'input.disabled[type="submit"]', count: 0
+    assert_select 'div#fair-data-station-update-status-panel.panel', count: 0
+  end
+
+  test 'submit from fair data station' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_difference('ContentBlob.count') do
+          assert_enqueued_jobs(1, only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_redirected_to update_from_fairdata_station_investigation_path(investigation)
+          end
+        end
+      end
+    end
+
+    fds_upload = FairDataStationUpload.last
+    assert fds_upload.update_purpose?
+    assert_equal investigation.contributor, fds_upload.contributor
+    assert_equal investigation,  fds_upload.investigation
+    assert_equal 'seek-test-investigation', fds_upload.investigation_external_identifier
+    content_blob = fds_upload.content_blob
+    assert_equal 'seek-fair-data-station-modified-test-case.ttl', content_blob.original_filename
+    assert_equal 'text/turtle', content_blob.content_type
+    assert_equal ttl_file.size, content_blob.file_size
+    assert fds_upload.update_task&.pending?
+    refute fds_upload.import_task&.pending?
+  end
+
+  test 'submit fairdata station no file' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation }
+            assert_response :unprocessable_entity
+            assert_match /No file was submitted/, flash[:error]
+            assert_select 'div#error_flash', text: /No file was submitted/
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit fairdata station invalid file' do
+    investigation = setup_test_case_investigation
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/empty.ttl')
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_response :unprocessable_entity
+            assert_match /Unable to find an Investigation within the file/, flash[:error]
+            assert_select 'div#error_flash', text: /Unable to find an Investigation within the file/
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station no permission or disabled' do
+    investigation = setup_test_case_investigation
+    investigation.update(policy: FactoryBot.create(:editing_public_policy))
+    login_as(FactoryBot.create(:person))
+    assert investigation.can_edit?
+    refute investigation.can_manage?
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_redirected_to investigation
+            assert_match /You are not authorized to manage this Investigation/, flash[:error]
+          end
+        end
+      end
+    end
+
+
+    login_as(investigation.contributor)
+    assert investigation.can_manage?
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            with_config_value(:fair_data_station_enabled, false) do
+              post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+              assert_redirected_to :root
+              assert_match /Fair data station are disabled/, flash[:error]
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station external id mis match' do
+    investigation = setup_test_case_investigation
+    investigation.update(external_identifier: 'some-other-id')
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_response :unprocessable_entity
+            assert_match /Investigation external identifiers do not match/, flash[:error]
+            assert_select 'div#error_flash', text: /Investigation external identifiers do not match/
+          end
+        end
+      end
+    end
+  end
+
+  test 'submit from fair data station already in progress' do
+    investigation = setup_test_case_investigation
+    upload = FactoryBot.create(:update_fair_data_station_upload, investigation: investigation,
+                               investigation_external_identifier: investigation.external_identifier,
+                               contributor: investigation.contributor)
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    login_as(investigation.contributor)
+    ttl_file = fixture_file_upload('fair_data_station/seek-fair-data-station-modified-test-case.ttl')
+
+    assert_no_difference('FairDataStationUpload.count') do
+      assert_no_difference('Policy.count') do
+        assert_no_difference('ContentBlob.count') do
+          assert_no_enqueued_jobs(only: FairDataStationUpdateJob) do
+            post :submit_fairdata_station, params: { id: investigation, datastation_data: ttl_file }
+            assert_response :unprocessable_entity
+            assert_match /An existing update of this Investigation is currently already in progress/, flash[:error]
+            assert_select 'div#error_flash', text: /An existing update of this Investigation is currently already in progress/
+          end
+        end
+      end
+    end
+
+  end
+
+  test 'fair_data_station_update_status' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload_other_investigation = FactoryBot.create(:update_fair_data_station_upload, contributor: upload.contributor)
+    refute_equal upload.investigation, upload_other_investigation.investigation
+    assert_equal upload.contributor, upload_other_investigation.contributor
+    upload.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+    upload_other_investigation.update_task.update_attribute(:status, Task::STATUS_QUEUED)
+
+    login_as(upload.contributor)
+
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload.id}
+    assert_response :success
+    assert_select "div#fair-data-station-update-#{upload.id}" do
+      assert_select 'div.alert-info', text:/Queued/
+    end
+
+    # wrong investigation
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload_other_investigation.id}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # different person
+    other_person = FactoryBot.create(:person)
+    upload.update_column(:contributor_id, other_person.id)
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: upload.id}
+    assert_response :forbidden
+    assert_empty @response.body
+    upload.update_column(:contributor_id, upload.contributor.id)
+
+    # invalid id
+    get :fair_data_station_update_status, params: {id: upload.investigation, upload_id: FairDataStationUpload.last.id + 1}
+    assert_response :forbidden
+    assert_empty @response.body
+
+    # no permission
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:editing_public_policy))
+    assert investigation.can_edit?
+    refute investigation.can_manage?
+    get :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_redirected_to investigation_path(investigation)
+    assert_equal 'You are not authorized to manage this Investigation.', flash[:error]
+  end
+
+  test 'hide_fair_data_station_update_status' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    investigation = upload.investigation
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :success
+    upload.reload
+    refute upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status not the owner' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    investigation = upload.investigation
+    another_person = FactoryBot.create(:person)
+    investigation.policy.permissions.create(access_type: Policy::MANAGING, contributor: another_person)
+    assert upload.show_status?
+    login_as(another_person)
+    assert investigation.can_manage?
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status wrong purpose' do
+    upload = FactoryBot.create(:fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_DONE)
+    person = upload.contributor
+    investigation = FactoryBot.create(:investigation, contributor:person, projects:[upload.project])
+    upload.investigation = investigation
+    upload.save!
+    assert upload.import_purpose?
+    assert upload.show_status?
+    login_as(person)
+    post :fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'hide_fair_data_station_update_status not finished' do
+    upload = FactoryBot.create(:update_fair_data_station_upload)
+    upload.update_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    person = upload.contributor
+    investigation = upload.investigation
+    assert upload.show_status?
+    login_as(person)
+    post :hide_fair_data_station_update_status, params: {id: investigation, upload_id: upload.id}
+    assert_response :forbidden
+    upload.reload
+    assert upload.show_status?
+  end
+
+  test 'can show and edit with deleted contributor' do
+    investigation = FactoryBot.create(:investigation, deleted_contributor:'Person:99', policy: FactoryBot.create(:public_policy))
+    investigation.update_column(:contributor_id, nil)
+    assert investigation.can_view?
+    assert investigation.can_edit?
+    assert_nil investigation.contributor
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    get :edit, params: { id: investigation.id }
+    assert_response :success
+  end
+
+  test 'can\'t export isa json if not authenticated' do
+    with_config_value(:project_single_page_enabled, true) do
+      logout
+      person = FactoryBot.create(:person)
+      project = person.projects.first
+
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
+      FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
+
+      get :export_isa, params: { id: investigation.id }
+      assert_redirected_to investigation_path(investigation)
+      assert_equal flash[:error], "You are not authorized to download this Investigation, you may need to login first."
+
+      login_as person
+      get :export_isa, params: { id: investigation.id }
+      assert_response :ok
+    end
+  end
+
+  test 'can\'t export isatab json if not authenticated' do
+    logout
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation, contributor: person)
+    FactoryBot.create(:complete_assay_stream, study: study, contributor: person, sample_collection_sample_type: study.sample_types.second)
+
+    get :export_isatab_json, params: { id: investigation.id }
+    assert_redirected_to investigation_path(investigation)
+    assert_equal flash[:error], "You are not authorized to download this Investigation, you may need to login first."
+
+    login_as person
+    get :export_isatab_json, params: { id: investigation.id }
+    assert_response :ok
+  end
+
+  private
+
+  def setup_test_case_investigation
+    FactoryBot.create(:fairdata_test_case_investigation_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_study_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_obsv_unit_extended_metadata)
+    FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    FactoryBot.create(:fairdatastation_test_case_sample_type)
+    FactoryBot.create(:experimental_assay_class)
+
+    contributor = FactoryBot.create(:person)
+    project = contributor.projects.first
+    policy = FactoryBot.create(:public_policy)
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    investigation = Seek::FairDataStation::Writer.new.construct_isa(inv, contributor, [project], policy)
+    assert_difference('Investigation.count', 1) do
+      investigation.save!
+    end
+    assert_equal 'seek-test-investigation', investigation.external_identifier
+    investigation
   end
 end

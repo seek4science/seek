@@ -2,7 +2,6 @@ require 'test_helper'
 require 'minitest/mock'
 
 class DocumentsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -678,6 +677,42 @@ class DocumentsControllerTest < ActionController::TestCase
 
     get :index
     assert_select '.index-filters', count: 1
+    assert_select '.alert-warning', count: 0
+  end
+
+  test 'dont show filters if max met and remove excess' do
+    document = FactoryBot.create(:document)
+    contributor = document.contributor
+    project = document.projects.first
+    with_config_value(:max_filters, 2) do
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1], creator: [1,2] } }
+      assert_equal 2, assigns(:filters).values.flatten.length
+      assert_select '.index-filters', count: 0
+      assert_select '.alert-warning', text:/maximum of 2 filters has been reached/, count: 1
+    end
+  end
+
+  test 'do show filters if max met but user logged in' do
+    document = FactoryBot.create(:document)
+    contributor = document.contributor
+    project = document.projects.first
+    login_as(FactoryBot.create(:user))
+    with_config_value(:max_filters, 2) do
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1] } }
+      assert_equal 3, assigns(:filters).values.flatten.length
+      assert_select '.index-filters', count: 1
+      assert_select '.alert-warning', count: 0
+    end
+  end
+
+  test 'dont remove excess filters if an api call' do
+    document = FactoryBot.create(:document)
+    contributor = document.contributor
+    project = document.projects.first
+    with_config_value(:max_filters, 2) do
+      get :index, params: { filter: { contributor: contributor.id, project: [project.id, project.id+1], creator: [1,2] } }, format: :json
+      assert_equal 5, assigns(:filters).values.flatten.length
+    end
   end
 
   test 'do not show filters on index if disabled' do
@@ -711,7 +746,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="project"]' do
       assert_select '.filter-category-title', text: 'Project'
-      assert_select '.filter-option', count: 2
+      assert_select ".filter-option[rel='nofollow']", count: 2
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select ".filter-option[title='#{project.title}']" do
         assert_select '[href=?]', documents_path(filter: { project: project.id })
@@ -728,7 +763,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
       assert_select '.filter-category-title', text: 'Submitter'
-      assert_select '.filter-option', href: /documents\?filter\[contributor\]=\d+/, count: 8
+      assert_select ".filter-option[rel='nofollow']", href: /documents\?filter\[contributor\]=\d+/, count: 8
       assert_select '.filter-option.filter-option-active', count: 0
       # Should show 6 options and hide the rest
       assert_select '.filter-option.filter-option-hidden', count: 2
@@ -737,7 +772,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="tag"]' do
       assert_select '.filter-category-title', text: 'Tag'
-      assert_select '.filter-option', count: 1
+      assert_select ".filter-option[rel='nofollow']", count: 1
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select ".filter-option[title='awkward&id=1unsafe[]tag !']" do
         assert_select '.filter-option-label', text: 'awkward&id=1unsafe[]tag !'
@@ -772,14 +807,14 @@ class DocumentsControllerTest < ActionController::TestCase
     # Should show other project in projects category
     assert_select '.filter-category[data-filter-category="project"]' do
       assert_select '.filter-category-title', text: 'Project'
-      assert_select '.filter-option.filter-option-active', count: 1
-      assert_select '.filter-option', count: 2
-      assert_select ".filter-option[title='#{project.title}']" do
+      assert_select ".filter-option[rel='nofollow'].filter-option-active", count: 1
+      assert_select ".filter-option[rel='nofollow']", count: 2
+      assert_select ".filter-option[title='#{project.title}'][rel='nofollow']" do
         assert_select '[href=?]', documents_path(filter: { programme: programme.id, project: [other_project.id, project.id] })
         assert_select '.filter-option-label', text: project.title
         assert_select '.filter-option-count', text: '7'
       end
-      assert_select ".filter-option[title='#{other_project.title}'].filter-option-active" do
+      assert_select ".filter-option[title='#{other_project.title}'][rel='nofollow'].filter-option-active" do
         assert_select '[href=?]', documents_path(filter: { programme: programme.id })
         assert_select '.filter-option-label', text: other_project.title
         assert_select '.filter-option-count', text: '1'
@@ -789,7 +824,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.filter-category[data-filter-category="contributor"]' do
       assert_select '.filter-category-title', text: 'Submitter'
-      assert_select '.filter-option', count: 1
+      assert_select ".filter-option[rel='nofollow']", count: 1
       assert_select '.filter-option.filter-option-active', count: 0
       assert_select '.filter-option.filter-option-hidden', count: 0
       assert_select ".filter-option[title='#{other_project_doc.contributor.name}']" do
@@ -808,11 +843,11 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_select '.active-filters' do
       assert_select '.active-filter-category-title', count: 2
-      assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
+      assert_select ".filter-option[title='#{programme.title}'][rel='nofollow'].filter-option-active" do
         assert_select '[href=?]', documents_path(filter: { project: other_project.id })
         assert_select '.filter-option-label', text: programme.title
       end
-      assert_select ".filter-option[title='#{other_project.title}'].filter-option-active" do
+      assert_select ".filter-option[title='#{other_project.title}'][rel='nofollow'].filter-option-active" do
         assert_select '[href=?]', documents_path(filter: { programme: programme.id })
         assert_select '.filter-option-label', text: other_project.title
       end
@@ -1480,6 +1515,20 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_redirected_to root_path
       assert flash[:error].include?('Parent resource not recognized')
     end
+  end
+
+  test 'can filter search result set with many results and sort by relevance' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    documents = FactoryBot.create_list(:document, 85, contributor: person)
+    first_doc = documents.delete_at(31) # Pick a random doc from the middle of the collection and move it to the front
+    documents.unshift(first_doc)
+    assert_equal first_doc, documents.first
+    Document.stub(:solr_cache, -> (q) { documents.map(&:id) }) do
+      get :index, params: { filter: { query: 'test', contributor: person.id } }
+    end
+
+    assert_equal first_doc, assigns(:documents).first
   end
 
   private

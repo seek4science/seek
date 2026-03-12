@@ -12,7 +12,7 @@ module Seek
       private
 
       def style
-        params[:style] || Seek::Citations::DEFAULT
+        params[:style] || Seek::Config.default_citation_style
       end
     end
   end

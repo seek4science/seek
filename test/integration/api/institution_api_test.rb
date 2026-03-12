@@ -1,12 +1,14 @@
 require 'test_helper'
 
 class InstitutionApiTest < ActionDispatch::IntegrationTest
+  include MockHelper
   include ReadApiTestSuite
   include WriteApiTestSuite
 
   def setup
     admin_login
     @institution = FactoryBot.create(:institution)
+    ror_mock
   end
 
   def populate_extra_attributes(hash)
@@ -23,7 +25,7 @@ class InstitutionApiTest < ActionDispatch::IntegrationTest
     user_login(FactoryBot.create(:person))
     body = api_max_post_body
     assert_no_difference('Institution.count') do
-      post collection_url, params: body, as: :json
+      post collection_url, params: body, headers: { 'Authorization' => write_access_auth }
     end
   end
 end

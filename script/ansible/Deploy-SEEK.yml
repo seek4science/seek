@@ -192,6 +192,7 @@
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
+        - python3.9 -m pip install --upgrade pip
         - python3.9 -m pip install setuptools==58
         - python3.9 -m pip install -r requirements.txt
       args:

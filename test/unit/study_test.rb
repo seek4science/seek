@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class StudyTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'associations' do
     study = studies(:metabolomics_study)
@@ -23,10 +22,12 @@ class StudyTest < ActiveSupport::TestCase
     object = FactoryBot.create(:study, description: 'My famous study')
     FactoryBot.create_list(:assay, 2, contributor: object.contributor, study: object)
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), graph.statements.first.subject
+
   end
 
   test 'supports extended metadata?' do
@@ -44,18 +45,20 @@ class StudyTest < ActiveSupport::TestCase
                                  }
                                })
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), reader.statements.first.subject
-      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/alias")}
-      assert_equal RDF::Literal('the alias'), statement.object
-
-      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_alias")}
-      assert_equal RDF::Literal('the submission alias'), statement.object
-
-      statement = reader.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_lab_name")}
-      assert_equal RDF::Literal(''), statement.object
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), graph.statements.first.subject
+    statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/alias")}
+    assert_equal RDF::Literal('the alias'), statement.object
+
+    statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_alias")}
+    assert_equal RDF::Literal('the submission alias'), statement.object
+
+    statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_lab_name")}
+    assert_equal RDF::Literal(''), statement.object
+
   end
 
   # only authorized people can delete a study, and a study must have no assays
@@ -264,6 +267,46 @@ class StudyTest < ActiveSupport::TestCase
     sample_collection_st = FactoryBot.create(:isa_sample_collection_sample_type, studies: [study], linked_sample_type: source_st)
 
     assert study.is_isa_json_compliant?
+  end
+
+  test 'related data files' do
+    contributor = FactoryBot.create(:person)
+    df1 = FactoryBot.create(:data_file, contributor: contributor)
+    df2 = FactoryBot.create(:data_file, contributor: contributor)
+
+    # related just through an assay
+    assay = FactoryBot.create(:assay, data_files:[df1], contributor: contributor)
+    study = assay.study
+    assert_equal [df1], study.related_data_files
+
+    # related just through an observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, data_files: [df2])
+    assert_equal [df2], obs_unit.study.related_data_files
+
+    # related through both an assay and observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, data_files: [df2], study: study)
+    study.reload
+    assert_equal [df1, df2].sort, study.related_data_files.sort
+  end
+
+  test 'related samples' do
+    contributor = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:sample, contributor: contributor)
+    sample2 = FactoryBot.create(:sample, contributor: contributor)
+
+    # related just through an assay
+    assay = FactoryBot.create(:assay, samples: [sample1], contributor: contributor)
+    study = assay.study
+    assert_equal [sample1], study.related_samples
+
+    # related just through an observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, samples: [sample2])
+    assert_equal [sample2], obs_unit.study.related_samples
+
+    # related through both an assay and observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, samples:[sample2], study: study)
+    study.reload
+    assert_equal [sample1, sample2].sort, study.related_samples.sort
   end
 
 end

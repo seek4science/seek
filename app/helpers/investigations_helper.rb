@@ -14,4 +14,5 @@ module InvestigationsHelper
   def authorised_investigations(projects = nil)
     authorised_assets(Investigation, projects, 'view')
   end
+
 end

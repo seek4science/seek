@@ -5,7 +5,14 @@
   <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
                              "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.") %>
 
-  <%= admin_checkbox_setting(:filtering_enabled, 1, Seek::Config.filtering_enabled, "Filtering enabled", "Whether filtering system is enabled on index pages.") %>
+  <%= admin_checkbox_setting(:filtering_enabled, 1, Seek::Config.filtering_enabled,
+                             "Filtering enabled", "Whether filtering system is enabled on index pages.",
+                             onchange: toggle_appear_javascript('filtering_details')) %>
+  <div id="filtering_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.filtering_enabled -%>">
+    <%= admin_text_setting(:max_filters, Seek::Config.max_filters,
+                           'Filters limit', 'The maximum number of filters that can be applied, after which additional filters cannot be added',
+                           onkeypress: "javascript: return onlyNumbers(event);") %>
+  </div>
 
   <%= render :partial => 'admin/email' %>
 
@@ -57,8 +64,14 @@
                              "#{t('event').pluralize} enabled","Whether the #{t('event').pluralize} are displayed and can be added.") %>
 
   <%= admin_checkbox_setting(:isa_enabled, 1, Seek::Config.isa_enabled,
-                             "ISA enabled", "Whether the ISA framework is enabled. The ISA framework allows users to create Investigations, Studies and Assays to organize their work.") %>
-
+                             "ISA enabled", "Whether the ISA framework is enabled. The ISA framework allows users to create Investigations, Studies and Assays to organize their work.",
+                             onchange: toggle_appear_javascript('isa_details')) %>
+  <div id="isa_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.isa_enabled -%>">
+    <%= admin_checkbox_setting(:observation_units_enabled, 1, Seek::Config.observation_units_enabled,
+                               "Observation Units enabled", "Whether the users can register Observation Units to organize their work. Requires ISA enabled to function correctly.") %>
+    <%= admin_checkbox_setting(:fair_data_station_enabled, 1, Seek::Config.fair_data_station_enabled,
+                               "FAIR Data Station enabled", "Whether the users can import or update using metadata from FAIR Data Station. Requires ISA and Observation Units to be enabled to function correctly") %>
+  </div>
   <%= admin_checkbox_setting(:models_enabled, 1, Seek::Config.models_enabled,
                              "Models enabled", "Whether the users can register computational models in SEEK.") %>
 
@@ -124,6 +137,8 @@
   <%= admin_checkbox_setting(:copasi_enabled, 1, Seek::Config.copasi_enabled,
                              "Copasi enabled", "Whether support for running a publicly available model in Copasi is enabled.") %>
 
+  <%= admin_checkbox_setting(:morpheus_enabled, 1, Seek::Config.morpheus_enabled,
+                             "Morpheus enabled", "Whether support for running a publicly available model in Morpheus is enabled.") %>
 
   <%= admin_checkbox_setting(:require_cookie_consent, 1, Seek::Config.require_cookie_consent,
                              "Add a cookie consent banner and a cookie setting page", "Show a banner asking for consent for the use of cookies. SEEK uses an essential cookie for session handling, and optional cookies for tracking if set below.

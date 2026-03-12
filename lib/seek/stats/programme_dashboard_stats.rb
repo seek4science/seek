@@ -26,7 +26,7 @@ module Seek
       end
 
       def scoped_isa
-        @isa ||= programme.investigations + programme.studies + programme.assays
+        @isa ||= programme.investigations + programme.studies + programme.assays + programme.observation_units
       end
 
       def project_scope

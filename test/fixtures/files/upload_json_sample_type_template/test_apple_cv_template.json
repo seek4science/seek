@@ -1,0 +1,102 @@
+{
+  "data": [
+    {
+      "metadata": {
+        "name": "Test Apple CV Template",
+        "group": "SEEK Test",
+        "group_order": 1,
+        "temporary_name": "1_test_apple_cv_template",
+        "version": "1.0.0",
+        "isa_config": null,
+        "isa_measurement_type": null,
+        "isa_technology_type": null,
+        "isa_protocol_type": null,
+        "repo_schema_id": null,
+        "organism": "any",
+        "level": "study source"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Source Name",
+          "description": "Sources are considered as the starting biological material used in a study.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "source"
+        },
+        {
+          "iri": null,
+          "name": "Source Characteristic 1",
+          "description": "A characteristic of the source",
+          "dataType": "String",
+          "required": true,
+          "ontology": null,
+          "allowCVFreeText": null,
+          "CVList": null,
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "apples controlled vocab for template",
+          "description": "",
+          "dataType": "Controlled Vocabulary",
+          "required": false,
+          "ontology": null,
+          "allowCVFreeText": true,
+          "CVList": [
+            "Granny Smith",
+            "Golden Delicious",
+            "Bramley",
+            "Cox's Orange Pippin"
+          ],
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "physics ontology",
+          "description": "",
+          "dataType": "Controlled Vocabulary List",
+          "required": false,
+          "ontology": {
+            "name": "edam",
+            "version": "",
+            "description": "The study of matter, space and time, and related concepts such as energy and force.",
+            "rootTermURI": "http://edamontology.org/topic_3318"
+          },
+          "allowCVFreeText": false,
+          "CVList": null,
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "New CV List",
+          "description": "",
+          "dataType": "Controlled Vocabulary List",
+          "required": false,
+          "ontology": null,
+          "CVList": [
+            "term 1",
+            "term 2"
+          ],
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "New ontology List",
+          "description": "",
+          "dataType": "Controlled Vocabulary List",
+          "required": false,
+          "ontology": {
+            "name": "FBbi",
+            "version": "",
+            "description": "Imaging method",
+            "rootTermURI": "http://purl.obolibrary.org/obo/FBbi_00000222"
+          },
+          "CVList": null,
+          "isaTag": "source_characteristic"
+        }
+      ]
+    }
+  ]
+}

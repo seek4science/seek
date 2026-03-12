@@ -1,4 +1,5 @@
 <% object ||= nil %>
+<% isa_json_compliance_default = @investigation.new_record? ? Seek::Config.isa_json_compliance_enabled : @investigation.is_isa_json_compliant %>
 
 <%= f.error_messages -%>
 
@@ -26,7 +27,7 @@
       <% if @investigation.studies.any? %>
         <%= f.check_box :is_isa_json_compliant, disabled: "disabled"%>
       <% else %>
-        <%= f.check_box :is_isa_json_compliant%>
+        <%= f.check_box :is_isa_json_compliant, checked: isa_json_compliance_default %>
       <% end %>
       <%= "Make #{t('investigation')} compliant to ISA-JSON schemas?" %>
     </label>

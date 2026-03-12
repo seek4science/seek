@@ -1,0 +1,108 @@
+# test/fixtures/sample_attribute_types.yml
+date_time:
+  title: "Date time"
+  base_type: "DateTime"
+
+date:
+  title: "Date"
+  base_type: "Date"
+
+real_number:
+  title: "Real number"
+  base_type: "Float"
+
+integer:
+  title: "Integer"
+  base_type: "Integer"
+
+web_link:
+  title: "Web link"
+  base_type: "String"
+
+email_address:
+  title: "Email address"
+  base_type: "String"
+
+text:
+  title: "Text"
+  base_type: "Text"
+
+string:
+  title: "String"
+  base_type: "String"
+
+chebi:
+  title: "ChEBI"
+  base_type: "String"
+
+ecn:
+  title: "ECN"
+  base_type: "String"
+
+meta_netx_chemical:
+  title: "MetaNetX chemical"
+  base_type: "String"
+
+meta_netx_reaction:
+  title: "MetaNetX reaction"
+  base_type: "String"
+
+meta_netx_compartment:
+  title: "MetaNetX compartment"
+  base_type: "String"
+
+inchi:
+  title: "InChI"
+  base_type: "String"
+
+ena_custom_date:
+  title: "ENA custom date"
+  base_type: "String"
+
+boolean:
+  title: "Boolean"
+  base_type: "Boolean"
+
+registered_strain:
+  title: "Registered Strain"
+  base_type: "SeekStrain"
+
+registered_sample:
+  title: "Registered Sample"
+  base_type: "SeekSample"
+
+registered_sample_list:
+  title: "Registered Sample List"
+  base_type: "SeekSampleMulti"
+
+controlled_vocabulary:
+  title: "Controlled Vocabulary"
+  base_type: "CV"
+
+controlled_vocabulary_list:
+  title: "Controlled Vocabulary List"
+  base_type: "CVList"
+
+uri:
+  title: "URI"
+  base_type: "String"
+
+doi:
+  title: "DOI"
+  base_type: "String"
+
+ncbi_id:
+  title: "NCBI ID"
+  base_type: "String"
+
+registered_data_file:
+  title: "Registered Data file"
+  base_type: "SeekDataFile"
+
+linked_extended_metadata:
+  title: "Linked Extended Metadata"
+  base_type: "LinkedExtendedMetadata"
+
+linked_extended_metadata_multiple:
+  title: "Linked Extended Metadata (multiple)"
+  base_type: "LinkedExtendedMetadataMulti"

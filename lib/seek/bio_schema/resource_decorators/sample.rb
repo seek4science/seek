@@ -8,7 +8,7 @@ module Seek
         SAMPLE_PROFILE = 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/'.freeze
 
         def schema_type
-          %w[Thing Sample]
+          'Sample'
         end
 
         def conformance
@@ -30,6 +30,9 @@ module Seek
             'name' => attribute.title,
             'value' => value.to_s
           }
+          if attribute.pid
+            data['propertyId'] = attribute.pid
+          end
           resolved = attribute.resolve(value)
           data['identifier'] = resolved if resolved
           if attribute.unit

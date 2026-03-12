@@ -19,7 +19,7 @@ class DecoratorTest < ActiveSupport::TestCase
 
   test 'CreativeWork' do
     event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
-    document = FactoryBot.create(:document, events: [event], license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)])
+    document = FactoryBot.create(:document, events: [event], license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)], doi: '10.10.10.10/test.1')
     document.add_annotations('yellow, lorry', 'tag', User.first)
     disable_authorization_checks { document.save! }
 
@@ -29,6 +29,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal %w[lorry yellow], decorator.keywords.split(',').collect(&:strip).sort
     assert_equal 'https://spdx.org/licenses/CC-BY-4.0', decorator.license
     assert_equal 'application/pdf', decorator.content_type
+    assert_equal 'https://doi.org/10.10.10.10/test.1', decorator.doi
     project = document.projects.first
     person = document.creators.first
     assert_equal [{ :@type => 'Event', :@id => "http://localhost:3000/events/#{event.id}", :name => event.title }], decorator.subject_of
@@ -36,7 +37,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.all_creators
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'image', 'isBasedOn', 'isPartOf', 'keywords', 'license', 'name', 'producer', 'subjectOf', 'url', 'version'], properties
+    assert_equal %w[@id creator dateCreated dateModified description encodingFormat identifier image isBasedOn isPartOf keywords license name producer subjectOf url version], properties
   end
 
   test 'Dataset pads or truncates description' do

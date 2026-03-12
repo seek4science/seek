@@ -17,12 +17,12 @@ module TemplatesHelper
   def load_templates
     privilege = Seek::Permissions::Translator.translate('view')
     Template.order(:group, :group_order).select { |t| t.can_perform?(privilege) }.map do |item|
-      { title: item.title,
-        group: item.group,
-        level: item.level,
-        organism: item.organism,
+      { title: sanitize(item.title),
+        group: sanitize(item.group),
+        level: sanitize(item.level),
+        organism: sanitize(item.organism),
         template_id: item.id,
-        description: item.description,
+        description: sanitize(item.description),
         group_order: item.group_order,
         attributes: item.template_attributes.order(:pos).map { |a| map_template_attributes(a) } }
     end
@@ -77,19 +77,19 @@ module TemplatesHelper
   def map_template_attributes(attribute)
     {
       attribute_type_id: attribute.sample_attribute_type_id,
-      data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title,
+      data_type: sanitize(SampleAttributeType.find(attribute.sample_attribute_type_id)&.title),
       cv_id: attribute.sample_controlled_vocab_id,
       allow_cv_free_text: attribute.allow_cv_free_text,
-      title: attribute.title,
+      title: sanitize(attribute.title),
       is_title: attribute.is_title,
-      short_name: attribute.short_name,
-      description: attribute.description,
-      pid: attribute.pid,
+      short_name: sanitize(attribute.short_name),
+      description: sanitize(attribute.description),
+      pid: sanitize(attribute.pid),
       required: attribute.required,
       unit_id: attribute.unit_id,
       pos: attribute.pos,
       isa_tag_id: attribute.isa_tag_id,
-      isa_tag_title: attribute.isa_tag&.title,
+      isa_tag_title: sanitize(attribute.isa_tag&.title),
       linked_sample_type_id: attribute.linked_sample_type_id,
       template_attribute_id: attribute.id
     }

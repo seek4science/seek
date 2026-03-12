@@ -3,10 +3,12 @@
 
 module ApplicationHelper
   include FancyMultiselectHelper
-  include Recaptcha::ClientHelper
   include VersionHelper
   include ImagesHelper
   include SessionsHelper
+
+  ALLOWED_HTML_WITH_TABLES = Rails::HTML::Concern::Scrubber::SafeList::DEFAULT_ALLOWED_TAGS.dup +
+    Set.new(%w(table thead tbody tfoot tr th td))
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
@@ -64,12 +66,13 @@ module ApplicationHelper
       if date.blank?
         str = "<span class='none_text'>No date defined</span>"
       else
-        str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
-        str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+        date = date.localtime
+        format = ":day: %b %Y"
+        format += " at %H:%M" if show_time_of_day
+        str = date.strftime(format.sub(':day:', date.day.ordinalize))
         if time_zone.present?
           date_in_tz = date.in_time_zone(time_zone)
-          tz_str = date_in_tz.strftime("#{date_in_tz.day.ordinalize} %b %Y")
-          tz_str = date_in_tz.strftime("#{tz_str} at %H:%M") if show_time_of_day
+          tz_str = date_in_tz.strftime(format.sub(':day:', date_in_tz.day.ordinalize))
           str += "\t(#{tz_str} (#{time_zone}))"
         end
       end
@@ -209,9 +212,7 @@ module ApplicationHelper
   end
 
   def render_markdown(markdown)
-    doc = CommonMarker.render_doc(markdown, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
-    renderer = CommonMarker::SeekHtmlRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
-    renderer.render(doc)
+    Seek::Markdown.render(markdown)
   end
 
   def text_or_not_specified(text, options = {})
@@ -224,7 +225,7 @@ module ApplicationHelper
     else
       text.capitalize! if options[:capitalize]
       res = text.html_safe
-      res = sanitized_text(res)
+      res = sanitized_text(res, allow_tables: options[:markdown])
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
       if options[:markdown]
         # Convert `&gt;` etc. back to `>` so markdown blockquotes can be used.
@@ -428,8 +429,10 @@ module ApplicationHelper
     Seek::Docker.using_docker?
   end
 
-  def sanitized_text(text)
-    Rails::Html::SafeListSanitizer.new.sanitize(text)
+  def sanitized_text(text, allow_tables: false)
+    opts = {}
+    opts[:tags] = ALLOWED_HTML_WITH_TABLES if allow_tables
+    Rails::Html::SafeListSanitizer.new.sanitize(text, opts)
   end
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)

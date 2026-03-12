@@ -5,7 +5,6 @@ require 'openbis_test_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
 
-  fixtures :all
 
   include AuthenticatedTestHelper
   include RdfTestCases
@@ -1923,13 +1922,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not create cache job if setting disabled even if user requests 'make_local_copy'" do
     mock_http
     params = { data_file: {
-        title: 'Big File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Big File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/big.txt',
-                                   original_filename: '',
-                                   make_local_copy: '1'
+                                 data_url: 'http://mockedlocation.com/big.txt',
+                                 original_filename: '',
+                                 make_local_copy: '1'
                                }],
                policy_attributes: valid_sharing }
     with_config_value(:cache_remote_files, false) do
@@ -1944,8 +1943,9 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_redirected_to data_file_path(assigns(:data_file))
       blob = assigns(:data_file).content_blob
       refute blob.external_link?
-      assert !blob.cachable?
-      assert !blob.url.blank?
+      refute blob.cachable?
+      refute blob.url.blank?
+      assert blob.make_local_copy?
       assert_equal 'big.txt', blob.original_filename
       assert_equal 'text/plain', blob.content_type
       assert_equal 5000, blob.file_size
@@ -1956,12 +1956,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not automatically create cache job for large file' do
     mock_http
     params = { data_file: {
-        title: 'Big File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Big File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/big.txt',
-                                   make_local_copy: '0'
+                                 data_url: 'http://mockedlocation.com/big.txt',
+                                 make_local_copy: '0'
                                }],
                policy_attributes: valid_sharing }
 
@@ -1975,7 +1975,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     blob = assigns(:data_file).content_blob
-    refute blob.make_local_copy
+    refute blob.make_local_copy?
     refute blob.cachable?
     refute blob.url.blank?
     assert_equal 'big.txt', blob.original_filename
@@ -2198,7 +2198,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'should display license for current version' do
@@ -2209,11 +2209,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show, params: { id: df, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
 
     get :show, params: { id: df, version: dfv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal (CC0-1.0)'
   end
 
   test 'should update license' do
@@ -2227,7 +2227,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: df }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
     assert_equal 'CC-BY-SA-4.0', assigns(:data_file).license
   end
 
@@ -2236,7 +2236,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :edit, params: { id: df }
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
 
     df2 = FactoryBot.create :data_file, license: nil, policy: FactoryBot.create(:public_policy)
 
@@ -2246,7 +2246,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'can disambiguate sample type' do
@@ -2385,20 +2385,25 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should get table view for data file' do
-    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
     sample_type = FactoryBot.create(:simple_sample_type)
     3.times do
-      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:public_policy),
               originating_data_file: data_file)
     end
-    login_as(data_file.contributor)
+    private_sample = FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
+                                       originating_data_file: data_file)
+    login_as(FactoryBot.create(:person))
 
-    get :samples_table, params: { format: :json, id: data_file.id }
+    get :extracted_samples_table, params: { format: :json, id: data_file.id }
 
     assert_response :success
 
     json = JSON.parse(@response.body)
+    # should not include the private sample
     assert_equal 3, json['data'].length
+    assert_not_includes json['data'].collect{|d| d['id']}, private_sample.id
+
   end
 
   test 'should not get table view for private data file if unauthorized' do
@@ -2406,12 +2411,39 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type = FactoryBot.create(:simple_sample_type)
     3.times do
       FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
-              originating_data_file: data_file)
+                        originating_data_file: data_file)
     end
 
-    get :samples_table, params: { format: :json, id: data_file.id }
+    get :extracted_samples_table, params: { format: :json, id: data_file.id }
 
     assert_response :forbidden
+  end
+
+  test 'should get table view for extracted samples' do
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    sample_type = FactoryBot.create(:simple_sample_type)
+    private_samples = 2.times.collect do # private
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:private_policy),
+                        originating_data_file: data_file)
+    end
+    public_samples = 2.times.collect do # public
+      FactoryBot.create(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: FactoryBot.create(:public_policy),
+                        originating_data_file: data_file)
+    end
+
+    login_as(FactoryBot.create(:person))
+
+    get :extracted_samples, params: { id: data_file.id }
+
+    assert_response :success
+    # dont show private samples
+    assert_select '#samples-table tbody tr', count: 2 do
+      assert_select 'td', text: public_samples.first.title
+      assert_select 'td', text: public_samples.last.title
+      assert_select 'td', text: private_samples.first.title, count: 0
+      assert_select 'td', text: private_samples.last.title, count: 0
+    end
+    assert_select '#samples-table thead th', count: 3
   end
 
   test "can't extract from data file if no permissions" do
@@ -2518,7 +2550,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#sample-persistence-status' do
       assert_select '.alert-success', text:/Sample creation complete/
-      assert_select '.alert-success a[href=?]', data_file_samples_path(df), text: /View Created Samples/
+      assert_select '.alert-success a[href=?]', extracted_samples_data_file_path(df), text: /View Created Samples/
     end
 
     df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
@@ -3169,22 +3201,27 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'create metadata' do
     person = FactoryBot.create(:person)
     login_as(person)
+    attributed_data_file = FactoryBot.create(:data_file, contributor: person, policy: FactoryBot.create(:public_policy))
     blob = FactoryBot.create(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
-    }, tag_list:'fish, soup',
-               policy_attributes: valid_sharing,
-               content_blob_id: blob.id.to_s,
-               assay_ids: [] }
+      title: 'Small File',
+      project_ids: [project.id]
+    }, tag_list: 'fish, soup',
+       policy_attributes: valid_sharing,
+       content_blob_id: blob.id.to_s,
+       assay_ids: [],
+       attributions: ActiveSupport::JSON.encode([['DataFile', attributed_data_file.id]])
+    }
 
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
-        assert_no_difference('Assay.count') do
-          assert_no_difference('AssayAsset.count') do
-            post :create_metadata, params: params
+        assert_difference('Relationship.count', 1) do
+          assert_no_difference('Assay.count') do
+            assert_no_difference('AssayAsset.count') do
+              post :create_metadata, params: params
+            end
           end
         end
       end
@@ -3200,6 +3237,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal person, df.contributor
     assert_empty df.assays
     assert_equal ['fish','soup'].sort,df.tags.sort
+    assert_equal [attributed_data_file], df.attributions.collect(&:other_object)
 
     al = ActivityLog.last
     assert_equal 'create', al.action
@@ -3674,6 +3712,117 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_response :unprocessable_entity
+  end
+
+  test 'only editable observation units listed as options' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    df = FactoryBot.create(:data_file, contributor: person)
+    study = FactoryBot.create(:study, investigation: FactoryBot.create(:investigation, projects:person.projects))
+    obs_unit1 = FactoryBot.create(:observation_unit, contributor: person, study:study)
+    obs_unit2 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy), study:study)
+    obs_unit3 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy), study:study)
+    obs_unit4 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:downloadable_public_policy), study:study)
+    obs_unit5 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy), study:study)
+
+    assert_equal person.projects, obs_unit1.projects
+    assert_equal person.projects, obs_unit2.projects
+    assert_equal person.projects, obs_unit3.projects
+    assert_equal person.projects, obs_unit4.projects
+    assert_equal person.projects, obs_unit5.projects
+
+    #different projects
+    obs_unit6 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy))
+    obs_unit7 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:publicly_viewable_policy))
+    obs_unit8 = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+
+    refute_equal person.projects, obs_unit6.projects
+    refute_equal person.projects, obs_unit7.projects
+    refute_equal person.projects, obs_unit8.projects
+
+    assert obs_unit1.can_edit?
+    assert obs_unit2.can_edit?
+    refute obs_unit3.can_edit?
+    refute obs_unit4.can_edit?
+    assert obs_unit4.can_download?
+    refute obs_unit5.can_edit?
+    assert obs_unit6.can_edit?
+    refute obs_unit7.can_edit?
+    refute obs_unit8.can_edit?
+
+    get :edit, params: { id: df.id }
+    assert_response :success
+
+    assert_select '#possible_data_file_observation_unit_ids' do
+      assert_select 'option[value=?]', obs_unit1.id
+      assert_select 'option[value=?]', obs_unit2.id
+      assert_select 'option[value=?]', obs_unit3.id, count: 0
+      assert_select 'option[value=?]', obs_unit4.id, count: 0
+      assert_select 'option[value=?]', obs_unit5.id, count: 0
+      assert_select 'option[value=?]', obs_unit6.id, count: 0
+      assert_select 'option[value=?]', obs_unit7.id, count: 0
+      assert_select 'option[value=?]', obs_unit8.id, count: 0
+    end
+
+    assert_select 'select[data-associations-list-id="data_file_observation_unit_ids"]' do
+      assert_select 'option[value=?]', obs_unit6.id
+      assert_select 'option[value=?]', obs_unit7.id, count: 0
+      assert_select 'option[value=?]', obs_unit8.id, count: 0
+    end
+  end
+
+  test 'update with link to editable observation unit' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    data_file = FactoryBot.create(:data_file,contributor:person,projects:person.projects)
+    assert data_file.can_edit?
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
+    bad_obs_unit = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+    assert obs_unit.can_edit?
+    refute bad_obs_unit.can_edit?
+
+    assert_difference('ObservationUnitAsset.count') do
+      put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_ids:[obs_unit.id] } }
+    end
+    data_file.reload
+    assert_equal [obs_unit], data_file.observation_units
+
+    assert_no_difference('ObservationUnitAsset.count') do
+      assert_raises(ActiveRecord::RecordNotSaved) do
+        put :update, params: { id: data_file.id, data_file: { title: data_file.title, observation_unit_ids:[bad_obs_unit.id] } }
+      end
+    end
+    data_file.reload
+    assert_equal [obs_unit], data_file.observation_units
+
+  end
+
+  test 'create with link to editable observation unit' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    obs_unit = FactoryBot.create(:observation_unit, contributor: person)
+    bad_obs_unit = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:private_policy))
+    assert obs_unit.can_edit?
+    refute bad_obs_unit.can_edit?
+
+    data_file, blob = valid_data_file
+
+    assert_difference('ObservationUnitAsset.count') do
+      assert_difference('DataFile.count') do
+        post :create, params: { data_file: data_file.merge(observation_unit_ids:[obs_unit.id]), content_blobs: [blob], policy_attributes: valid_sharing }
+        assert_redirected_to data_file_path(assigns(:data_file))
+      end
+    end
+
+    data_file = assigns(:data_file)
+    assert_equal [obs_unit], data_file.observation_units
+
+    data_file, blob = valid_data_file
+    assert_no_difference('ObservationUnitAsset.count') do
+      assert_no_difference('DataFile.count') do
+        post :create, params: { data_file: data_file.merge(observation_unit_ids:[bad_obs_unit.id]), content_blobs: [blob], policy_attributes: valid_sharing }
+      end
+    end
   end
 
   test 'when updating, assay linked to must be editable' do
@@ -4270,5 +4419,31 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_redirected_to root_path
       assert flash[:error].include?('disabled')
     end
+  end
+
+  test 'view data file with nil content blob' do
+    df = FactoryBot.create(:data_file_with_no_content_blob)
+    assert_nil df.content_blob
+    login_as(df.contributor)
+    get :show, params: { id: df }
+    assert_response :success
+  end
+
+  test 'edit data file with nil content blob' do
+    df = FactoryBot.create(:data_file_with_no_content_blob)
+    assert_nil df.content_blob
+    login_as(df.contributor)
+    get :edit, params: { id: df }
+    assert_response :success
+  end
+
+  test 'update data file with nil content blob' do
+    df = FactoryBot.create(:data_file_with_no_content_blob, title: 'old title')
+    assert_nil df.content_blob
+    login_as(df.contributor)
+    put :update, params: { id: df, data_file: { title: 'new title' } }
+    assert_response :redirect
+    df.reload
+    assert_equal 'new title', df.title
   end
 end

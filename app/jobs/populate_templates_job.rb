@@ -2,9 +2,9 @@
 class PopulateTemplatesJob < ApplicationJob
   queue_with_priority 1
   queue_as QueueNames::TEMPLATES
-  def perform
+  def perform(user)
     return unless Seek::Config.isa_json_compliance_enabled
 
-    Seek::IsaTemplates::TemplateExtractor.extract_templates
+    Seek::ISATemplates::TemplateExtractor.extract_templates(user)
   end
 end

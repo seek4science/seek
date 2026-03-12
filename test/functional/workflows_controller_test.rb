@@ -220,7 +220,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow }
 
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
   end
 
   test 'should display license for current version' do
@@ -231,11 +231,11 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: { id: workflow, version: 1 }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution 4.0 International (CC-BY-4.0)'
 
     get :show, params: { id: workflow, version: workflowv.version }
     assert_response :success
-    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Zero v1.0 Universal (CC0-1.0)'
   end
 
   test 'should update license' do
@@ -250,7 +250,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :redirect
 
     get :show, params: { id: workflow }
-    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International'
+    assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)'
     assert_equal 'CC-BY-SA-4.0', assigns(:workflow).license
   end
 
@@ -513,7 +513,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       raise 'oh dear'
     end
 
-    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
+    Seek::WorkflowExtractors::CWLDotGenerator.stub :new, bad_generator do
       wf = FactoryBot.create(:generated_galaxy_no_diagram_ro_crate_workflow)
       login_as(wf.contributor)
       refute wf.diagram_exists?
@@ -981,6 +981,22 @@ class WorkflowsControllerTest < ActionController::TestCase
       workflow.reload
       assert_nil workflow.main_workflow_path
       assert_nil workflow.latest_git_version.main_workflow_path
+    end
+  end
+
+  test 'updating main workflow path to blank path does not cause error' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    login_as(workflow.contributor)
+
+    assert_equal 'concat_two_files.ga', workflow.main_workflow_path
+    assert_equal 'concat_two_files.ga', workflow.latest_git_version.main_workflow_path
+    assert_difference('Git::Annotation.count', -1) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { main_workflow_path: '' },
+                                     workflow: { title: workflow.title } } # workflow is required in params...
+
+      assert_redirected_to workflow_path(workflow)
+      assert_nil assigns(:workflow).main_workflow_path
     end
   end
 
@@ -1790,23 +1806,44 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'shows run button for galaxy workflows using default galaxy endpoint' do
+  test 'shows dropdown link for galaxy workflows using default galaxy endpoint' do
     workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
     get :show, params: { id: workflow.id }
 
     assert workflow.can_run?
-    assert_select 'a.btn[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on Galaxy' }
+    assert_select '.dropdown-toggle', { text: 'Run on Galaxy'}
+    assert_select '.dropdown-menu a[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on default instance' }
   end
 
-  test 'shows run button for galaxy workflows using specified galaxy endpoint' do
+  test 'shows dropdown link for galaxy workflows using specified galaxy endpoint' do
     workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy),
                        execution_instance_url: 'https://galaxygalaxy.org/mygalaxy/')
 
     get :show, params: { id: workflow.id }
 
     assert workflow.can_run?
-    assert_select 'a.btn[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on Galaxy' }
+    assert_select '.dropdown-toggle', { text: 'Run on Galaxy'}
+    assert_select '.dropdown-menu a[href=?]', run_workflow_path(workflow, version: workflow.version), { text: 'Run on default instance' }
+  end
+
+  test 'shows dropdown link for galaxy workflows to specify galaxy endpoint' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    assert_select '.dropdown-toggle', { text: 'Run on Galaxy' }
+    assert_select '.dropdown-menu a[data-target=?]', '#run-galaxy-modal', { text: 'Run on...' }
+  end
+
+  test 'has a modal for specifying the galaxy instance to run on' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    assert_select '.modal#run-galaxy-modal'
+    assert_select '.modal form[action=?]', run_workflow_path(workflow, version: workflow.version)
   end
 
   test 'redirects to default galaxy instance when run attempted' do
@@ -1831,6 +1868,56 @@ class WorkflowsControllerTest < ActionController::TestCase
 
       trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
       assert_redirected_to "https://galaxygalaxy.org/mygalaxy/workflows/trs_import?trs_url=#{trs_url}&run_form=true"
+    end
+  end
+
+  test 'redirects to supplied galaxy instance when run attempted with supplied instance' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    supplied_instance = 'https://another.galaxy.instance/'
+
+    assert workflow.can_run?(supplied_instance)
+
+    assert_difference('workflow.run_count', 1) do
+      post :run, params: { id: workflow.id, version: workflow.version, execution_instance_url: supplied_instance }
+
+      trs_url = URI.encode_www_form_component("http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1")
+      assert_redirected_to "https://another.galaxy.instance/workflows/trs_import?trs_url=#{trs_url}&run_form=true"
+    end
+  end
+
+  test 'shows error if invalid scheme supplied' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    supplied_instance = 'ftp://invalid.scheme.galaxy.instance/'
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version, execution_instance_url: supplied_instance }
+
+      assert_redirected_to workflow_path(workflow)
+      assert flash[:error].include?('Invalid execution instance URL')
+    end
+  end
+
+  test 'shows error if no url supplied for galaxy instance' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    supplied_instance = ''
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version, execution_instance_url: supplied_instance }
+
+      assert_redirected_to workflow_path(workflow)
+      assert flash[:error].include?('Invalid execution instance URL')
+    end
+  end
+
+  test 'shows error if invalid url supplied for galaxy instance' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+    supplied_instance = 'not a valid url'
+
+    assert_no_difference('workflow.run_count') do
+      post :run, params: { id: workflow.id, version: workflow.version, execution_instance_url: supplied_instance }
+
+      assert_redirected_to workflow_path(workflow)
+      assert flash[:error].include?('Invalid execution instance URL')
     end
   end
 

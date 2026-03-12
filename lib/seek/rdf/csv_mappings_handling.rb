@@ -71,7 +71,7 @@ module Seek
         return '' if item.nil?
         if item.is_a?(URI)
           return nil unless item.to_s =~ URI.regexp # rejects invalid URI's
-          RDF::Literal.new(item, datatype: RDF::XSD.anyURI)
+          RDF::Literal.new(item.to_s, datatype: RDF::XSD.anyURI)
         else
           RDF::Literal.new(item)
         end

@@ -4,7 +4,6 @@ class OmniauthTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
   include HtmlHelper
 
-  fixtures :users, :people
 
   def setup
     OmniAuth.config.test_mode = true
@@ -137,7 +136,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
           assert_nil session[:user_id]
 
           # AAI
-          post omniauth_authorize_path(:elixir_aai)
+          post omniauth_authorize_path(:elixir_aai, state: 'return_to:/')
           follow_redirect!
           assert_redirected_to root_path
           assert_equal existing_user.id, session[:user_id]

@@ -24,14 +24,14 @@
     "relationships": {
       "sample_type": {
         "data": {
-          "id": "234",
+          "id": "157",
           "type": "sample_types"
         }
       },
       "creators": {
         "data": [
           {
-            "id": "3995",
+            "id": "1287",
             "type": "people"
           }
         ]
@@ -39,7 +39,7 @@
       "projects": {
         "data": [
           {
-            "id": "4247",
+            "id": "1123",
             "type": "projects"
           }
         ]
@@ -47,7 +47,7 @@
       "assays": {
         "data": [
           {
-            "id": "540",
+            "id": "149",
             "type": "assays"
           }
         ]

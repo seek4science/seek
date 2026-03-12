@@ -1,0 +1,19 @@
+$j(document).ready(function () {
+    let endChanged = false
+
+    // set the end date 1 hour after the start date, unless the end date has been manually changed (can be reset by deleting).
+    $j("#event-dates input#event_start_date").on('dp.change', function(e){
+        if (endChanged) {
+            return;
+        }
+        const startDate = e.date;
+        const endDate = startDate.clone().add(1, 'hours');
+        $j('#event_end_date').data('DateTimePicker').date(endDate);
+        // reset the flag, as the above line will trigger the event as if manually changed
+        endChanged = false;
+    });
+
+    $j("#event-dates input#event_end_date").on('dp.change', function(e){
+        endChanged = $j(this).val() !== '';
+    });
+});

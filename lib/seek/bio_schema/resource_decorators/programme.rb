@@ -9,10 +9,6 @@ module Seek
           'FundingScheme'
         end
 
-        def conformance
-          'https://schema.org/FundingScheme'
-        end
-
         def url
           web_page.blank? ? identifier : web_page
         end

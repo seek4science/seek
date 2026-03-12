@@ -2,7 +2,7 @@ require 'test_helper'
 require 'libxml'
 
 class RDFGenerationTest < ActiveSupport::TestCase
-  include RightField
+  include Rightfield::Rightfield
 
   test 'rightfield rdf generation' do
     df = FactoryBot.create :rightfield_annotated_datafile
@@ -48,12 +48,13 @@ class RDFGenerationTest < ActiveSupport::TestCase
     # a file that was found to cause an error during the RightField part of the RDF generation.
     df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/test_file_FakStudied_OK.xls", 'rb').read))
     rdf = df.to_rdf
-    assert_not_nil(rdf)
+    refute_nil rdf
 
-    # just checks it is valid rdf/xml and contains some statements for now
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    # just checks it is valid and contains some statements
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), graph.statements.first.subject
   end
 
   test 'save private rdf' do
@@ -131,10 +132,13 @@ class RDFGenerationTest < ActiveSupport::TestCase
     rdf = df.to_rdf
     assert_not_nil rdf
     # just checks it is valid rdf/xml and contains some statements for now
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 0
-      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+
+    assert graph.statements.count > 0
+    assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), graph.statements.first.subject
+
   end
 
   test 'non spreadsheet datafile to_rdf' do
@@ -142,10 +146,12 @@ class RDFGenerationTest < ActiveSupport::TestCase
     rdf = df.to_rdf
     assert_not_nil rdf
 
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 0
-      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 0
+    assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), graph.statements.first.subject
+
   end
 
   test 'xlsx datafile to_rdf' do
@@ -154,10 +160,12 @@ class RDFGenerationTest < ActiveSupport::TestCase
     rdf = df.to_rdf
     assert_not_nil rdf
 
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 0
-      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 0
+    assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), graph.statements.first.subject
+
   end
 
   test 'rdf type uri' do

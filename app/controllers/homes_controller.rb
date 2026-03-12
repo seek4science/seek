@@ -11,7 +11,7 @@ class HomesController < ApplicationController
       format.html
       format.jsonld do
         resource = determine_resource_for_schema_ld
-        render json: Seek::BioSchema::Serializer.new(resource).json_representation, adapter: :attributes
+        render body: Seek::BioSchema::Serializer.new(resource).json_ld
       end
     end
   end
@@ -84,6 +84,10 @@ class HomesController < ApplicationController
     if User.logged_in? && !User.logged_in_and_member?
       redirect_to create_or_join_project_home_path
     end
+  end
+
+  def api_docs
+    render file: "#{Rails.root}/public/api/index.html", layout: false
   end
 
   private

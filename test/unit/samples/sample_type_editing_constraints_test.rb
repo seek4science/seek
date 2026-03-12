@@ -20,23 +20,6 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.samples?
   end
 
-  test 'allow title change?' do
-    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    refute c.allow_name_change?(:address)
-    attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'address' }
-    refute_nil attr
-    refute c.allow_name_change?(attr)
-    assert c.allow_name_change?(nil)
-
-    # ok if there are no samples
-    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
-    assert c.allow_name_change?(:the_title)
-    attr = c.sample_type.sample_attributes.detect { |t| t.accessor_name == 'the_title' }
-    refute_nil attr
-    assert c.allow_name_change?(attr)
-    assert c.allow_name_change?(nil)
-  end
-
   test 'allow type change?' do
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     refute c.allow_type_change?(:address)
@@ -159,14 +142,6 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.send(:all_blank?, 'full name')
   end
 
-  test 'allow_new_attribute' do
-    # currently only allowed if there are not samples
-    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    refute c.allow_new_attribute?
-    c = Seek::Samples::SampleTypeEditingConstraints.new(FactoryBot.create(:simple_sample_type))
-    assert c.allow_new_attribute?
-  end
-
   test 'allow editing isa tag' do
     person = FactoryBot.create(:person)
     project = person.projects.first
@@ -218,14 +193,51 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c_inherited.allow_isa_tag_change?(extra_source_characteristic)
   end
 
+  test 'allow editing unit' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    # Create sample type
+    # 'weight' attribute has a unit with symbol 'g'
+    sample_type = FactoryBot.create(:patient_sample_type,
+                                    projects: [project],
+                                    contributor: person)
+    weight_attribute = sample_type.sample_attributes.detect { |sa| sa.title == 'weight' }
+
+    # Allow attribute unit to change when there are no samples
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    assert c.allow_isa_tag_change?(weight_attribute)
+
+    # Adding samples that have no value for the weight attribute should still allow users to change the attribute's unit
+    sample_no_weight = Sample.new(sample_type: sample_type, projects: [project], contributor: person)
+    sample_no_weight.set_attribute_value('full name', 'Anakin Skywalker')
+    sample_no_weight.set_attribute_value(:age, 49)
+    sample_no_weight.save
+    assert sample_no_weight.valid?
+    assert_equal sample_type.samples.count, 1
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    assert c.allow_unit_change?(weight_attribute)
+
+    # Adding samples that do have a value for the weight attribute should prevent users to change the attribute's unit
+    sample_with_weight = Sample.new(sample_type: sample_type, projects: [project], contributor: person)
+    sample_with_weight.set_attribute_value('full name', 'Luke Skywalker')
+    sample_with_weight.set_attribute_value(:age, 25)
+    sample_with_weight.set_attribute_value(:weight, 75111.1)
+    sample_with_weight.save
+    assert sample_with_weight.valid?
+    assert_equal sample_type.samples.count, 2
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    refute c.allow_unit_change?(weight_attribute)
+  end
+
   private
 
   # sample type with 3 samples
   # - the address attribute includes some blanks
   # - the postcode is always blank
   # - full name and age are required and always have values
-  def sample_type_with_samples
-    person = FactoryBot.create(:person)
+  def sample_type_with_samples(person = nil)
+    person ||= FactoryBot.create(:person)
 
     sample_type = User.with_current_user(person.user) do
       project = person.projects.first

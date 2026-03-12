@@ -20,7 +20,7 @@ module Seek
         format.rdf { render template: 'rdf/show' }
         format.json { render json: asset, scope: { requested_version: asset_version }, include: json_api_include_param }
         format.datacite_xml { render xml: asset_version.datacite_metadata.to_s } if asset_version.respond_to?(:datacite_metadata)
-        format.jsonld { render json: Seek::BioSchema::Serializer.new(asset_version).json_representation, adapter: :attributes } if asset_version.respond_to?(:to_schema_ld)
+        format.jsonld { render body: asset_version.to_schema_ld } if asset_version.respond_to?(:to_schema_ld)
       end
     end
 

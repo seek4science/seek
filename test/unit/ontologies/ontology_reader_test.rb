@@ -67,30 +67,27 @@ class OntologyReaderTest < ActiveSupport::TestCase
   end
 
   test 'subclasses must implement default_parent_class_uri method' do
-    class SubOntologyReader < Seek::Ontologies::OntologyReader
+    class NoParentClassURIMethodOntologyReader < Seek::Ontologies::OntologyReader
       def ontology_file
         'https://somewhere.on.the.web.org/JERM2-alpha-2.1.rdf'
       end
     end
-    reader = SubOntologyReader.instance
-    begin
+    reader = NoParentClassURIMethodOntologyReader.instance
+    assert_raises NotImplementedError, match: 'Subclasses must implement a default_parent_class_uri method' do
       reader.class_hierarchy
-    rescue NotImplementedError => error
-      assert !error.nil?
     end
+
   end
 
   test 'subclasses must implement ontology file method' do
-    class SubOntologyReader < Seek::Ontologies::OntologyReader
+    class NoOntologyFileMethodOntologyReader < Seek::Ontologies::OntologyReader
       def default_parent_class_uri
         RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Progressive_curve_experiment')
       end
     end
-    reader = SubOntologyReader.instance
-    begin
+    reader = NoOntologyFileMethodOntologyReader.instance
+    assert_raises NotImplementedError, match: 'Subclasses must implement a ontology_file method' do
       reader.class_hierarchy
-    rescue NotImplementedError => error
-      assert !error.nil?
     end
   end
 end

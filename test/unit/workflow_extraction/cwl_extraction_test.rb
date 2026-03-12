@@ -72,4 +72,23 @@ class CWLExtractionTest < ActiveSupport::TestCase
     assert diagram.length > 100
     assert diagram[0..256].include?('<svg ')
   end
+
+  test 'parses record input field types correctly' do
+    wf = open_fixture_file('workflows/workflow_microbial_annotation.cwl')
+    extractor = Seek::WorkflowExtractors::CWL.new(wf)
+    metadata = extractor.metadata
+    internals = metadata[:internals]
+
+    structure = WorkflowInternals::Structure.new(internals)
+
+    assert_equal 17, structure.inputs.count
+    assert_equal 4, structure.outputs.count
+    assert_equal 9, structure.steps.count
+    assert_equal 57, structure.links.count
+
+    record = structure.inputs.detect { |i| i.id == 'eggnog_dbs' }
+    record_type = record.type[1]
+    assert_equal 'record', record_type['type']
+    assert_equal [{ 'type' => 'Directory?' }, { 'type' => 'File?' }, { 'type' => 'File?' }], record_type['fields']
+  end
 end

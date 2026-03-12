@@ -1,0 +1,29 @@
+<%= modal(id: 'create-folder-dialog', size: 'm', class: 'text-left') do %>
+  <%= form_tag({action: :create_folder}, id: 'create-folder-form', multipart: true) do %>
+    <%= modal_header('Create a folder') %>
+    <%= modal_body do %>
+      <label>Folder name</label>
+      <p class='small'>Cannot contain spaces</p>
+      <%= text_field_tag :new_folder, '', class:'form-control' %>
+      <%= hidden_field_tag :project_id, project_id %>
+      <%= hidden_field_tag :dataset_id, dataset_id %>
+      <%= hidden_field_tag :assay_id, params[:assay_id] if params[:assay_id] %>
+      <%= hidden_field_tag :subtype_name, subtype_name %>
+      <!-- will be replaced with api response -->
+      <%= hidden_field_tag :file_path, path %>
+    <% end %>
+    <%= modal_footer do %>
+      <%= create_button id:"create-folder-submit-button", button_text:'Create',
+                        class:'btn btn-primary' %>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= modal(id: 'create-folder-spinner', size: 'm', class: 'text-center') do %>
+  <%= modal_body do %>
+    <h1>Creating folder ...</h1>
+    <div class='large_spinner'></div>
+  <% end %>
+<% end %>
+

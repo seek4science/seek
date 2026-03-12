@@ -17,11 +17,11 @@ class WorkflowsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
   include Seek::Doi::Minting
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
   include RoCrateHandling
   include Legacy::WorkflowSupport
 
-  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :ro_crate_metadata, :create_version
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :ro_crate_metadata, :create_version, :submit
 
   rescue_from ROCrate::ReadException do |e|
     logger.error("Error whilst attempting to read RO-Crate metadata for Workflow #{@workflow&.id}: #{e.exception.class.name} #{e.message}")
@@ -55,7 +55,7 @@ class WorkflowsController < ApplicationController
 
   def create_version
     if params[:ro_crate]
-      handle_ro_crate_post(true)
+      handle_ro_crate_api_post(true)
     else
       if handle_upload_data(true)
         comments = params[:revision_comments]
@@ -144,6 +144,20 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def create_version_from_ro_crate
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(workflow: @workflow))
+    @workflow = @crate_extractor.build
+
+    respond_to do |format|
+      if @crate_extractor.valid?
+        format.html { render :provide_metadata }
+      else
+        @git_version = @workflow.git_version
+        format.html { render action: :new_git_version, status: :unprocessable_entity }
+      end
+    end
+  end
+
   #
   # # Displays the form Wizard for providing the metadata for the workflow
   # def provide_metadata
@@ -215,7 +229,7 @@ class WorkflowsController < ApplicationController
       valid = @content_blob && @workflow.save_as_new_version(params[:revision_comments]) && @content_blob.save
       @content_blob.update_column(:asset_id, nil) unless valid # Have to do this otherwise the content blob keeps the workflow's ID
     elsif @workflow.git_version_attributes.present?
-      valid = @workflow.save_as_new_git_version
+      valid = @workflow.save_as_new_git_version.valid?
     else
       valid = false
     end
@@ -293,7 +307,7 @@ class WorkflowsController < ApplicationController
 
   def create
     if params[:ro_crate]
-      handle_ro_crate_post
+      handle_ro_crate_api_post
     else
       super
     end
@@ -310,11 +324,11 @@ class WorkflowsController < ApplicationController
   end
 
   def submit
-    @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, update_existing: true)
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, detect_workflow: true)
 
     if @crate_extractor.valid?
       @workflow = @crate_extractor.build
-      if @workflow.git_version.save && @workflow.save
+      if @workflow.save && @workflow.git_version.save
         render json: @workflow, include: json_api_include_param
       else
         render json: json_api_errors(@workflow), status: :unprocessable_entity
@@ -325,16 +339,17 @@ class WorkflowsController < ApplicationController
   end
 
   def run
+    instance_url = run_params[:execution_instance_url]
     # Support other execution methods in the future
     respond_to do |format|
-      format.html { redirect_to @display_workflow.run_url }
+      format.html { redirect_to @display_workflow.run_url(instance_url), allow_other_host: true }
     end
   end
 
   private
 
-  def handle_ro_crate_post(new_version = false)
-    return legacy_handle_ro_crate_post(new_version) unless Seek::Config.git_support_enabled
+  def handle_ro_crate_api_post(new_version = false)
+    return legacy_handle_ro_crate_api_post(new_version) unless Seek::Config.git_support_enabled
 
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params)
     if new_version
@@ -344,8 +359,6 @@ class WorkflowsController < ApplicationController
         return
       else
         @crate_extractor.workflow = @workflow
-        @workflow.latest_git_version.lock if @workflow.latest_git_version.mutable?
-        @crate_extractor.git_version = @workflow.latest_git_version.next_version(mutable: true)
       end
     end
     @workflow = @crate_extractor.build
@@ -377,7 +390,7 @@ class WorkflowsController < ApplicationController
                                      { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] }, { sop_ids: [] },
                                      { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
                                      :internals, :maturity_level, :source_link_url, :execution_instance_url,
-                                     { topic_annotations: [] }, { operation_annotations: [] },
+                                     { topic_annotations: [] }, { operation_annotations: [] }, { discipline_annotations: [] },
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
@@ -404,8 +417,32 @@ class WorkflowsController < ApplicationController
     params.require(:git_version).permit(:main_workflow_path, :abstract_cwl_path, :diagram_path)
   end
 
+  def run_params
+    params.permit(:execution_instance_url)
+  end
+
+  def valid_execution_instance_url?(url)
+    uri = URI.parse(url)
+    uri.absolute? && %w[http https].include?(uri.scheme)
+  rescue URI::InvalidURIError
+    false
+  end
+
   def check_can_run
-    return if @workflow.can_run?
-    error('Execution is not supported for this workflow', '')
+    execution_instance_url = run_params.fetch(:execution_instance_url, nil)
+    if !execution_instance_url.nil? && !valid_execution_instance_url?(execution_instance_url)
+      message = 'Invalid execution instance URL'
+      respond_to do |format|
+        format.html do
+          flash[:error] = message
+          redirect_to workflow_path(@workflow)
+        end
+        format.json { render json: { title: 'Invalid URL', detail: message }, status: :unprocessable_entity }
+      end
+    else
+      return if @workflow.can_run?(execution_instance_url)
+
+      error('Execution is not supported for this workflow', '')
+    end
   end
 end

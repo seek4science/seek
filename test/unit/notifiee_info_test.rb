@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class NotifieeInfoTest < ActiveSupport::TestCase
-  fixtures :site_announcements
 
   def test_unique_key_generation
     # the SiteAnnouncementCategory is used as a dummy notifiee

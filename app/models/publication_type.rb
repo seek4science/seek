@@ -1,143 +1,184 @@
-class PublicationType  < ActiveRecord::Base
-
+class PublicationType < ActiveRecord::Base
   has_many :publications
 
-  #this returns an instance of PublicationType according to one of the publication types
-  #if there is not a match nil is returned
 
-  #http://bib-it.sourceforge.net/help/fieldsAndEntryTypes.php#Entries
-
-  def self.for_type type
-    keys = { "Journal"=>"article",
-             "Book"=>"book",
-             "Booklet"=>"booklet",
-             "InBook"=>"inbook",
-             "InCollection"=>"incollection",
-             "InProceedings"=>"inproceedings",
-             "Manual"=>"manual",
-             "Masters_Thesis"=>"masters_thesis",
-             "Misc"=>"misc",
-             "Phd_Thesis"=>"phd_thesis",
-             "Bachelor_Thesis"=>"bachelorsthesis",
-             "Proceedings"=>"proceedings",
-             "Tech_Report"=>"tech_report",
-             "Unpublished"=>"unpublished" }
-    return PublicationType.find_by(key: keys[type])
-  end
+  # Map BibTeX keys → DataCite keys
+  BIBTEX_TO_DATACITE_KEY = {
+    'article' => 'journalarticle',
+    'book' => 'book',
+    'booklet' => 'booklet',
+    'inbook' => 'bookchapter',
+    'incollection' => 'collection',
+    'inproceedings' => 'conferencepaper',
+    'proceedings' => 'conferenceproceeding',
+    'manual' => 'text',
+    'misc' => 'other',
+    'unpublished' => 'preprint',
+    'techreport' => 'report',
+    'phdthesis' => 'phdthesis',
+    'mastersthesis' => 'mastersthesis',
+    'bachelorsthesis' => 'bachelorsthesis'
+  }.freeze
 
 
-
-  def self.get_publication_type_id(bibtex_record)
-    str_begin = "@"
-    str_end = "{"
-    publication_key = bibtex_record.try(:to_s)[/#{str_begin}(.*?)#{str_end}/m, 1]
-    unless PublicationType.find_by(key: publication_key).nil?
-       return PublicationType.find_by(key: publication_key).id
-    else
-      return PublicationType.find_by(key: "misc").id
-    end
+  def journalarticle?
+    key == 'journalarticle'
   end
 
-
-  def self.Journal
-    self.for_type('Journal')
-  end
-
-  def self.Book
-    self.for_type('Book')
-  end
-
-  def self.Booklet
-    self.for_type('Booklet')
-  end
-  def self.InBook
-    self.for_type('InBook')
-  end
-  def self.InCollection
-    self.for_type('InCollection')
-  end
-  def self.InProceedings
-    self.for_type('InProceedings')
-  end
-  def self.Manual
-    self.for_type('Manual')
-  end
-  def self.Masters_Thesis
-    self.for_type('Masters_Thesis')
-  end
-  def self.Misc
-    self.for_type('Misc')
-  end
-  def self.Bachelor_Thesis
-    self.for_type('Bachelor_Thesis')
-  end
-  def self.Phd_Thesis
-    self.for_type('Phd_Thesis')
-  end
-  def self.Proceedings
-    self.for_type('Proceedings')
-  end
-  def self.Tech_Report
-    self.for_type('Tech_Report')
-  end
-  def self.Unpublished
-    self.for_type('Unpublished')
-  end
-
-  def is_journal?
-    key == "article"
-  end
-
-  def is_book?
+  def book?
     key == 'book'
   end
 
-  def is_booklet?
+  def booklet?
     key == 'booklet'
   end
 
-  def is_inbook?
-    key == 'inbook'
+  def bookchapter?
+    key == 'bookchapter'
   end
 
-  def is_incollection?
-    key == 'incollection'
+  def collection?
+    key == 'collection'
   end
 
-  def is_inproceedings?
-    key == 'inproceedings'
+  def conferencepaper?
+    key == 'conferencepaper'
   end
 
-  def is_manual?
-    key == 'manual'
+  def conferenceproceeding?
+    key == 'conferenceproceeding'
   end
 
-  def is_masters_thesis?
-    key == 'mastersthesis'
+  def text?
+    key == 'text'
   end
 
-  def is_misc?
-    key == 'misc'
-  end
-
-  def is_phd_thesis?
-    key == 'phdthesis'
-  end
-
-  def is_bachelor_thesis?
+  def bachelorsthesis?
     key == 'bachelorsthesis'
   end
 
-  def is_proceedings?
-    key == 'proceedings'
+  def mastersthesis?
+    key == 'mastersthesis'
   end
 
-  def is_tech_report?
-    key == 'techreport'
+  def diplomathesis?
+    key == 'diplomathesis'
   end
 
-  def is_unpublished?
-    key == 'unpublished'
+  def phdthesis?
+    key == 'phdthesis'
+  end
+
+  def dissertation?
+    %w[bachelorsthesis mastersthesis diplomathesis phdthesis].include?(key)
+  end
+
+  def other?
+    key == 'other'
+  end
+
+  def preprint?
+    key == 'preprint'
+  end
+
+  def report?
+    key == 'report'
+  end
+
+  def audiovisual?
+    key == 'audiovisual'
+  end
+
+  def award?
+    key == 'award'
+  end
+
+  def computationalnotebook?
+    key == 'computationalnotebook'
+  end
+
+  def datapaper?
+    key == 'datapaper'
+  end
+
+  def dataset?
+    key == 'dataset'
+  end
+
+  def event?
+    key == 'event'
+  end
+
+  def image?
+    key == 'image'
+  end
+
+  def instrument?
+    key == 'instrument'
+  end
+
+  def interactiveresource?
+    key == 'interactiveresource'
+  end
+
+  def model?
+    key == 'model'
+  end
+
+  def outputmanagementplan?
+    key == 'outputmanagementplan'
+  end
+
+  def peerreview?
+    key == 'peerreview'
+  end
+
+  def physicalobject?
+    key == 'physicalobject'
+  end
+
+  def project?
+    key == 'project'
+  end
+
+  def service?
+    key == 'service'
+  end
+
+  def software?
+    key == 'software'
+  end
+
+  def sound?
+    key == 'sound'
+  end
+
+  def standard?
+    key == 'standard'
+  end
+
+  def studyregistration?
+    key == 'studyregistration'
+  end
+
+  def workflow?
+    key == 'workflow'
+  end
+
+  def projectdeliverable?
+    key == 'projectdeliverable'
+  end
+
+  
+  # Extract publication type from BibTeX record
+  def self.get_publication_type_id(bibtex_record)
+    # Extract the BibTeX entry type, e.g. article, inbook, misc...
+    publication_key = bibtex_record.to_s[/@(.*?)\{/m, 1].to_s.downcase.strip
+    datacite_key = BIBTEX_TO_DATACITE_KEY[publication_key] || 'other'
+    pub_type = PublicationType.find_by(key: datacite_key)
+    return pub_type.id if pub_type
+    other_type = PublicationType.find_by(key: 'other')
+    other_type&.id
   end
 
 end

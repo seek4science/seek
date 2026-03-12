@@ -7,8 +7,8 @@ class ObservationUnitApiTest < ActionDispatch::IntegrationTest
   def setup
     user_login
     @creator = FactoryBot.create(:person)
-    @project = @current_user.person.projects.first
     @study = FactoryBot.create(:study, contributor: @current_user.person)
+    @project = @study.projects.first
     @sample = FactoryBot.create(:sample, contributor: @current_user.person)
     @data_file = FactoryBot.create(:data_file, contributor: @current_user.person)
     @extended_metadata_type = FactoryBot.create(:simple_observation_unit_extended_metadata_type)

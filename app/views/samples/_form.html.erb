@@ -24,5 +24,7 @@
     <% end %>
   </div>
 
+  <%= render partial: 'associate_observation_unit', locals: {f: f, resource: @sample} if Seek::Config.observation_units_enabled %>
+
   <%= form_submit_buttons(@sample, validate:false) %>
 </div>

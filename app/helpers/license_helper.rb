@@ -2,6 +2,7 @@ require 'json'
 require 'seek/license'
 
 module LicenseHelper
+  include ImagesHelper
   def license_select(name, selected = nil, opts = {})
     opts[:data] ||= {}
     opts[:data]['seek-license-select'] ||= 'true'
@@ -53,31 +54,23 @@ module LicenseHelper
     current_user.person.projects_with_default_license.any?
   end
 
-  # JSON that creates a lookup for project license by id
-  def project_licenses_json
-    projects = current_user.person.projects_with_default_license
-    Hash[projects.collect { |proj| [proj.id, proj.default_license] }].to_json.html_safe
-  end
-
   private
 
   def license_description_content(license)
-    if license
-      url = license.url
-      title = license.title
-      if url.blank?
-        title
-      else
-        link_to(title, url, target: :_blank)
-      end
+    license ||= Seek::License.find(Seek::License::NULL_LICENSE)
+    url = license.url
+    title = license.full_display_title
+    if url.blank?
+      title
     else
-      link_to(t('null_license') ,Seek::Help::HelpDictionary.instance.help_link(:null_license),target: :_blank)
+      link_to(title, url, target: :_blank)
     end
   end
 
   def license_options(licenses)
     licenses.map do |value|
-      [value['title'], value['id'], { 'data-url' => value['url'] }]
+      display_name = Seek::License.new(value).full_display_title
+      [display_name, value['id'], { 'data-url' => value['url'] }]
     end.sort_by do |value|
       if value[1] == Seek::License::NULL_LICENSE # Put null license first
         '-'

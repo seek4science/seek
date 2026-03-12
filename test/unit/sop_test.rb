@@ -2,7 +2,6 @@ require 'test_helper'
 
 class SopTest < ActiveSupport::TestCase
 
-  fixtures :all
 
   def setup
     @person = FactoryBot.create(:person)
@@ -25,15 +24,16 @@ class SopTest < ActiveSupport::TestCase
     refute_empty object.creators
 
     rdf = object.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), reader.statements.first.subject
-
-      #check for OPSK-1281 - where the creators weren't appearing
-      assert_includes reader.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
-      assert_includes reader.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), graph.statements.first.subject
+
+    #check for OPSK-1281 - where the creators weren't appearing
+    assert_includes graph.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
+    assert_includes graph.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+
   end
 
   def test_title_trimmed
@@ -341,6 +341,29 @@ class SopTest < ActiveSupport::TestCase
     assert_nil v3.doi
     assert v3.latest_version?
     refute v3.can_change_visibility?
+  end
+
+  test 'related samples' do
+    project = FactoryBot.create(:project)
+
+    sample_type = FactoryBot.create(:sop_sample_type, project_ids: [project.id])
+    sop_attr = FactoryBot.build(:sop_sample_attribute, title: 'sop 2', sample_type: sample_type)
+
+    sop = FactoryBot.create(:sop)
+    another_sop = FactoryBot.create(:sop)
+    sop_without_samples = FactoryBot.create(:sop)
+
+    sample1 = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample1.update(data: { 'sop': sop.id })
+    sample1.update(data: { 'sop 2': another_sop.id })
+    sample1.save!
+    sample2 = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample2.update(data: { 'sop': another_sop.id })
+    sample2.update(data: { 'sop 2': sop.id })
+    sample2.save!
+
+    assert_empty sop_without_samples.related_samples
+    assert_equal [sample1, sample2].sort_by(&:id), sop.related_samples.sort_by(&:id)
   end
 
 end

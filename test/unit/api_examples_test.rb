@@ -16,7 +16,9 @@ class ApiExamplesTest < ActiveSupport::TestCase
       fragment = fragment.sub('PatchResponse', 'Response')
       fragment = fragment.sub(/[a-zA-Z]+sResponse|peopleResponse/, 'indexResponse') unless fragment.end_with?('sampleAttributeTypesResponse')
       define_method("test_#{item.sub('.', '_')}") do
-        validate_json(example.to_json, fragment)
+        assert_nothing_raised do
+          validate_json(example.to_json, fragment)
+        end
       end
     end
 end

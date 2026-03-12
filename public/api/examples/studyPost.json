@@ -11,7 +11,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "3149",
+              "id": "4779",
               "type": "projects"
             },
             "access": "view"
@@ -19,7 +19,7 @@
         ]
       },
       "extended_attributes": {
-        "extended_metadata_type_id": "316",
+        "extended_metadata_type_id": "442",
         "attribute_map": {
           "name": "Fred Bloggs",
           "age": 44,
@@ -30,14 +30,14 @@
     "relationships": {
       "investigation": {
         "data": {
-          "id": "572",
+          "id": "840",
           "type": "investigations"
         }
       },
       "publications": {
         "data": [
           {
-            "id": "288",
+            "id": "326",
             "type": "publications"
           }
         ]
@@ -45,7 +45,7 @@
       "creators": {
         "data": [
           {
-            "id": "2942",
+            "id": "4853",
             "type": "people"
           }
         ]

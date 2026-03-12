@@ -1,0 +1,51 @@
+<%
+  return unless upload.show_status?
+  task = upload.update_task
+  job_status = task.status
+  in_progress = task.in_progress?
+  failed = task.failed?
+  success = task.success?
+  element_id = "fair-data-station-update-#{upload.id}"
+  external_id = upload.investigation_external_identifier
+%>
+
+<%
+  alert_style = 'alert-info'
+  alert_style = 'alert-warning' if failed
+  alert_style = 'alert-success' if success
+%>
+
+<div id='<%= element_id %>' class='fair-data-station-status'>
+  <% if in_progress || failed || success %>
+    <div class="alert <%= alert_style %>" role="alert">
+      <strong>FAIR Data Station update status ( ID: <%= external_id %> ) :</strong>
+
+      <% if in_progress %>
+        <%= job_status.to_s.humanize %>
+        <%= image 'spinner' %>
+        <script>
+          const endpoint = '<%= fair_data_station_update_status_investigation_path(upload.investigation, upload_id: upload.id) %>';
+          const elementId = '<%= element_id %>';
+          const jobStatus = '<%= job_status -%>';
+            FairDataStation.updateStatusPolling(endpoint,elementId, jobStatus);
+        </script>
+      <% elsif failed %>
+        Failed. An administrator will have been notified of the problem, but you could try again.
+        <%= fair_data_station_close_status_button(upload, :update) %>
+        <script>
+          FairDataStation.reenableNewUpdateButtons();
+        </script>
+      <% elsif success %>
+        Completed
+
+        <%= link_to("View updated #{t('investigation')}", investigation_path(upload.investigation),
+                    class: 'btn btn-primary ml-3') if upload.investigation %>
+
+        <%= fair_data_station_close_status_button(upload, :update) %>
+        <script>
+            FairDataStation.reenableNewUpdateButtons();
+        </script>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "289",
+    "id": "178",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "4656",
+              "id": "3418",
               "type": "projects"
             },
             "access": "edit"
@@ -19,7 +19,7 @@
 
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "447",
+        "extended_metadata_type_id": "279",
         "attribute_map": {
           "role_email": "alice@email.com",
           "role_phone": "0012345",
@@ -46,32 +46,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/289?version=1",
+          "url": "http://localhost:3000/documents/178?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-07-03T13:54:14.000Z",
-      "updated_at": "2024-07-03T13:54:14.000Z",
+      "created_at": "2024-11-20T10:19:05.000Z",
+      "updated_at": "2024-11-20T10:19:05.000Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-304",
+          "original_filename": "file-193",
           "url": null,
-          "md5sum": "713ff0a7ead2a1f98a0ee54f67ebcd9f",
-          "sha1sum": "3f459d9381889e68408f7e4cdf3f07620504daf2",
+          "md5sum": "53df19282097a81dc61c6a92a88516f9",
+          "sha1sum": "2dcefcee725d07c63dfd79548fd0f0ee24e78354",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/289/content_blobs/1448",
+          "link": "http://localhost:3000/documents/178/content_blobs/1048",
           "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/4394",
+          "profile": "/people/3546",
           "family_name": "Last",
-          "given_name": "Person3653",
-          "affiliation": "An Institution: 4466",
+          "given_name": "Person2977",
+          "affiliation": "An Institution: 3593",
           "orcid": null
         }
       ],
@@ -81,7 +81,7 @@
       "creators": {
         "data": [
           {
-            "id": "4394",
+            "id": "3546",
             "type": "people"
           }
         ]
@@ -89,7 +89,7 @@
       "submitter": {
         "data": [
           {
-            "id": "4393",
+            "id": "3544",
             "type": "people"
           }
         ]
@@ -97,11 +97,11 @@
       "people": {
         "data": [
           {
-            "id": "4393",
+            "id": "3544",
             "type": "people"
           },
           {
-            "id": "4394",
+            "id": "3546",
             "type": "people"
           }
         ]
@@ -109,7 +109,7 @@
       "projects": {
         "data": [
           {
-            "id": "4656",
+            "id": "3418",
             "type": "projects"
           }
         ]
@@ -117,7 +117,7 @@
       "investigations": {
         "data": [
           {
-            "id": "849",
+            "id": "497",
             "type": "investigations"
           }
         ]
@@ -125,7 +125,7 @@
       "studies": {
         "data": [
           {
-            "id": "747",
+            "id": "484",
             "type": "studies"
           }
         ]
@@ -133,7 +133,7 @@
       "assays": {
         "data": [
           {
-            "id": "614",
+            "id": "398",
             "type": "assays"
           }
         ]
@@ -146,21 +146,21 @@
       "workflows": {
         "data": [
           {
-            "id": "206",
+            "id": "193",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/289?version=1"
+      "self": "/documents/178?version=1"
     },
     "meta": {
-      "created": "2024-07-03T13:54:14.000Z",
-      "modified": "2024-07-03T13:54:14.000Z",
+      "created": "2024-11-20T10:19:05.000Z",
+      "modified": "2024-11-20T10:19:05.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "a7f079d0-1b71-013d-1ffe-0a81884ed284"
+      "uuid": "cb875c20-8956-013d-24a2-0a81884ed284"
     }
   },
   "jsonapi": {

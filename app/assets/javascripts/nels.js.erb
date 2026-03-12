@@ -1,0 +1,401 @@
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
+
+const NelsTree = {
+
+    selectNelsTreeNode: function (nodeId) {
+        $j('#' + nodeId + ' > a').click();
+    },
+    showSubtype: function (projectId, datasetId, subtype, folder_path, assay_id = null) {
+        $j('#nels-dataset').html('').spinner('add').show();
+        $j('#nels-content').hide();
+
+        const data = {
+            project_id: projectId,
+            dataset_id: datasetId,
+            subtype: subtype,
+            path: folder_path
+        }
+        if (assay_id) {
+            data.assay_id = assay_id
+        }
+
+        $j.ajax({
+            url: '<%= subtype_nels_path %>',
+            data: data,
+            success: function (data) {
+                $j('#nels-dataset').html(data).spinner('remove');
+            }
+        });
+    },
+    saveLastSelectedNode: function (projectId, datasetId = null, subtypeId = null) {
+        let val = `project${projectId}`;
+        if (datasetId) {
+            val = val + `,dataset${datasetId}`;
+        }
+        if (subtypeId) {
+            val = val + `,${subtypeId}`;
+        }
+
+        sessionStorage.setItem('nels_tree_state', val);
+    },
+    reopenLastSelectedNode: function () {
+        // Reopen the tree at previous existing location
+        if (sessionStorage.getItem("nels_tree_state")) {
+            const path = sessionStorage.getItem("nels_tree_state").split(',')
+
+            // // Open all nodes except the last one
+            path.slice(0, path.length - 1).forEach(element => {
+                NelsTree.waitForElm(`#${element}`).then((elm) => $j("#nels-tree").jstree("open_node", element))
+            });
+            // // Then select and click the last node in the path
+            NelsTree.waitForElm(`#${path[path.length - 1]}`).then((elm) => {
+                NelsTree.selectNelsTreeNode(path[path.length - 1]);
+            });
+        }
+    },
+    // Waits till the given element is loaded
+    waitForElm: function (selector) {
+        return new Promise(resolve => {
+            if (document.querySelector(selector)) {
+                return resolve(document.querySelector(selector));
+            }
+
+            const observer = new MutationObserver(mutations => {
+                if (document.querySelector(selector)) {
+                    resolve(document.querySelector(selector));
+                    observer.disconnect();
+                }
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    },
+    bindTree: function () {
+        $j('#nels-tree')
+            .bind('loaded.jstree', function () {
+            })
+            .jstree({
+                'core': {
+                    'check_callback': true,
+                    'force_text': true,
+                    'data': {
+                        'url': function (node) {
+                            if (node.id === '#') {
+                                return '<%= projects_nels_path %>';
+                            } else {
+                                return '<%= datasets_nels_path %>';
+                            }
+                        },
+                        'data': function (node) {
+                            if (node.id === '#') {
+                                return {};
+                            }
+                            const data = {id: node.data.id};
+                            if ($j('#assay_id').val()) {
+                                data.assay_id = $j('#assay_id').val()
+                            }
+                            return data;
+
+                        },
+                        'error': function (error) {
+                            $j('#nels-dataset').hide();
+                            $j('#nels-content').show();
+                            $j('#nels-content').html(HandlebarsTemplates['nels/error'](error));
+                            if (error.responseJSON.url) {
+                                window.location.href = error.responseJSON.url;
+                            }
+                        }
+                    }
+                }
+            })
+            .on('activate_node.jstree', function (e, data) {
+                NelsTreeEvents.nodeActivated(data);
+            }).on('load_node.jstree', function (e, data) {
+            NelsTreeEvents.nodeLoaded(data);
+        }).on('select_node.jstree', function (e, data) {
+            NelsTreeEvents.nodeSelected(data);
+        });
+
+    }
+
+}
+
+const NelsTreeEvents = {
+    nodeActivated: function (data) {
+        if (data.node.data.is_subtype) {// subtype selected
+            NelsTreeEvents.subTypeSelected(data);
+        } else if (data.node.data.is_dataset) {// dataset selected
+            NelsTreeEvents.datasetSelected(data);
+        } else {// Project selected
+            NelsTreeEvents.projectSelected(data);
+        }
+    },
+    nodeLoaded: function (data) {
+        if (data.node.id === '#') { // The root node - list of projects
+            if (!data.node.children.length) {
+                $j('#nels-dataset').hide();
+                $j('#nels-content').show();
+                $j('#nels-content').html(HandlebarsTemplates['nels/no_projects']);
+            } else {
+                $j('#nels-dataset').hide();
+                $j('#nels-content').show();
+            }
+        }
+    },
+    nodeSelected: function (data) {
+        if (data.node.data.is_dataset) {// dataset selected
+            // open this node and collapse siblings
+            data.instance.open_node(data.node);
+            const siblings = data.instance.get_node(data.node.parent).children;
+            $j(siblings).each(function (index, node) {
+                if (node != data.node.id) {
+                    data.instance.close_node(node);
+                }
+            });
+        } else {
+            data.instance.open_node(data.node);
+        }
+    },
+    subTypeSelected: function (data) {
+        $j('#nels-dataset').html('').spinner('add').show();
+        $j('#nels-content').hide();
+
+        // For NeLS file browser, project and dataset names are needed
+        // Find project parent node, which for subtype will always be the second position
+        project_name = $j('#nels-tree').jstree().get_node(data.node.parents[1]).text
+
+        // Save current state
+        NelsTree.saveLastSelectedNode(data.node.data.project_id, data.node.data.dataset_id, data.node.data.id);
+
+
+        //folder_path = sessionStorage.getItem('nels_folder_state');
+        folder_path = `Storebioinfo/${encodeURIComponent(project_name)}/${encodeURIComponent(data.node.data.dataset_name)}/${encodeURIComponent(data.node.data.text)}/`;
+
+        NelsTree.showSubtype(data.node.data.project_id, data.node.data.dataset_id, data.node.data.text, folder_path, data.node.data.assay_id);
+    },
+    datasetSelected: function (data) {
+        $j('#nels-dataset').html('').spinner('add').show();
+        $j('#nels-content').hide();
+
+        // Save current state
+        NelsTree.saveLastSelectedNode(data.node.data.project_id, data.node.data.id);
+
+        const ajaxData = {
+            project_id: data.node.data.project_id,
+            dataset_id: data.node.data.id
+        }
+        if (data.node.data.assay_id) {
+            ajaxData.assay_id = data.node.data.assay_id;
+        }
+        $j.ajax({
+            url: '<%= dataset_nels_path %>',
+            data: ajaxData,
+            success: function (data) {
+                $j('#nels-dataset').html(data).spinner('remove');
+            }
+        });
+    },
+    projectSelected: function (data) {
+        $j('#nels-dataset').hide();
+        $j('#nels-content').show();
+
+        // Save current state
+        NelsTree.saveLastSelectedNode(data.node.data.id);
+
+        $j.ajax({
+            url: '<%= project_nels_path %>',
+            data: {
+                project: data.node.data,
+            },
+            success: function (data) {
+                $j('#nels-content').html(data).spinner('remove');
+            }
+        });
+    }
+}
+
+const NelsBrowser = {
+    storeCurrentFileFolder: function (path) {
+        sessionStorage.setItem('nels_folder_state', path);
+    },
+    bindNelsTreeNodeLinks: function () {
+        $j('[data-role="nels-tree-node-link"]').on('click', function () {
+            const nodeId = $j(this).data('tree-node-id');
+            NelsTree.selectNelsTreeNode(nodeId);
+        });
+    },
+    downloadFile: function (element) {
+        const index = element.data('index');
+        const json = JSON.parse($j('#file-items-json').html())[index];
+        element.spinner('add');
+        $j.ajax({
+            url: '<%= download_file_nels_path() %>',
+            dataType: 'json',
+            data: {
+                project_id: json['project_id'],
+                dataset_id: json['dataset_id'],
+                dataset_name: json['dataset_name'],
+                project_name: json['project_name'],
+                subtype_name: json['subtype_name'],
+                path: json['path'],
+                filename: json['filename']
+            },
+            success: function (data) {
+                let download_url = `<%= fetch_file_nels_path %>`;
+                download_url = download_url + '?' + $j.param(data)
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = download_url;
+                a.download = data['filename'];
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            },
+            error: function (response, status, error) {
+                NelsBrowser.alertAjaxError(response)
+            },
+            complete: function (data) {
+                element.spinner('remove');
+            }
+        });
+    },
+    bindSubtypeEvents: function () {
+
+        $j('.nels-folder').click(function () {
+            NelsBrowser.fileFolderSelected($j(this));
+        });
+
+        $j('.nels-download-link').on('click', function () {
+            NelsBrowser.downloadFile($j(this));
+        });
+
+        $j('#create_folder').on('click', function () {
+            $j('#create-folder-dialog').modal('show');
+            return false;
+        });
+
+        $j('#create-folder-submit-button').on('click', function () {
+            NelsBrowser.createFolder();
+            return false;
+        });
+
+        $j('#upload-file-submit-button').on('click', function () {
+            NelsBrowser.uploadFile();
+        });
+
+        $j('#upload_file').on('click', function () {
+            // Show upload file form and populate the params as hidden fields
+            $j('#upload-file').modal('show');
+            return false;
+        });
+    },
+    createFolder: function () {
+        $j('#create-folder-dialog').modal('hide');
+        $j('#create-folder-spinner').modal('show');
+        const data = new FormData($j('#create-folder-form')[0]);
+
+        const folder_name = data.get('new_folder');
+        if (folder_name.length < 1) {
+            alert('Please provide a name for the folder');
+            $j('#create-folder-dialog').modal('show');
+            $j('#create-folder-spinner').modal('hide');
+            return false;
+        }
+        if ((/\s/).test(folder_name)) {
+            alert('Folder names containing spaces are not allowed');
+            $j('#create-folder-dialog').modal('show');
+            $j('#create-folder-spinner').modal('hide');
+            return false;
+        }
+
+        $j.ajax({
+            url: '<%= create_folder_nels_path() %>',
+            data: data,
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            success: function (result) {
+                const projectId = data.get('project_id');
+                const datasetId = data.get('dataset_id');
+                const subtype = data.get('subtype_name');
+                const folder_path = data.get('file_path');
+                const assayId = data.get('assay_id');
+                $j('#create-folder-spinner').modal('hide');
+                NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+            },
+            error: function (response, status, error) {
+                $j('#create-folder-spinner').modal('hide');
+                NelsBrowser.alertAjaxError(response);
+            },
+            complete: function (data) {
+                $j('#create-folder-spinner').modal('hide');
+            }
+        });
+    },
+    uploadFile: function () {
+        const valid = validateResourceFields('data', 'upload-file');
+        if (valid) {
+            $j('#upload-file').modal('hide');
+            $j('#upload-spinner').modal('show');
+            const data = new FormData($j('#upload-file-form')[0]);
+            $j.ajax({
+                url: '<%= upload_file_nels_path() %>',
+                data: data,
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                success: function (result) {
+                    const projectId = data.get('project_id');
+                    const datasetId = data.get('dataset_id');
+                    const subtype = data.get('subtype_name');
+                    const folder_path = data.get('file_path');
+                    const assayId = data.get('assay_id');
+                    $j('#upload-spinner').modal('hide');
+                    NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+                },
+                error: function (response, status, error) {
+                    $j('#upload-spinner').modal('hide');
+                    NelsBrowser.alertAjaxError(response);
+                },
+                complete: function (data) {
+                    $j('#upload-spinner').modal('hide');
+                }
+            });
+        }
+
+        return false;
+    },
+    fileFolderSelected: function (element) {
+        const folder_path = element.data('path');
+        const projectId = element.data('project-id');
+        const datasetId = element.data('dataset-id');
+        const subtype = element.data('subtype');
+        const assayId = element.data('assay-id');
+        NelsTree.showSubtype(projectId, datasetId, subtype, folder_path, assayId);
+    },
+    validateMetadataFile: function () {
+        return validateResourceFields('DataFile', 'upload-metadata-file') && NelsBrowser.validateMetadataFileExtension('xlsx', 'upload-metadata-file');
+    },
+    validateMetadataFileExtension: function (extension, parentId = null) {
+        const files = $j(`#${parentId} input[type="file"][name="content_blobs[][data]"]`);
+        const filepath = files[0].value;
+        if (filepath.split(".").pop() == extension) {
+            return true;
+        } else {
+            alert(`Please select a file of format ${extension}`);
+            return false;
+        }
+    },
+    alertAjaxError: function(response) {
+        const exception = response.responseJSON['exception'];
+        const message = response.responseJSON['message'];
+        alert(message + ' (' + exception + ')');
+    }
+}

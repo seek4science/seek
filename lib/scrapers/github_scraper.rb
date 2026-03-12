@@ -7,7 +7,7 @@ module Scrapers
   class GithubScraper
     attr_reader :output
 
-    def initialize(organization, project, contributor, main_branch: 'master', debug: false, output: STDOUT, only_latest: true)
+    def initialize(project, contributor, organization:, main_branch: 'master', debug: false, output: STDOUT, only_latest: true)
       @organization = organization # The GitHub organization to scrape
       raise "Missing GitHub organization" unless @organization
       @project = project # The SEEK project who will own the resources
@@ -175,7 +175,8 @@ module Scrapers
     end
 
     def all_tags(repo)
-      repo.remote_refs[:tags]&.map { |t| t[:name] } || []
+      # Reverse order
+      repo.remote_refs[:tags]&.sort_by { |t| t[:time] }&.map { |t| t[:name] } || []
     end
   end
 end

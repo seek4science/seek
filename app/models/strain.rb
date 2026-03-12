@@ -1,7 +1,6 @@
 class Strain < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
-  include Seek::ActsAsCachedTree
   include Seek::Subscribable
   include Seek::Biosamples::PhenoTypesAndGenoTypes
   include Seek::Search::BackgroundReindexing
@@ -10,6 +9,7 @@ class Strain < ApplicationRecord
   acts_as_authorized
   acts_as_uniquely_identifiable
   acts_as_favouritable
+  has_external_identifier
 
   include Seek::Taggable
   grouped_pagination
@@ -25,6 +25,8 @@ class Strain < ApplicationRecord
   has_many :assays,:through=>:assay_organisms
   has_many :sample_resource_links, as: :resource, dependent: :destroy
   has_many :samples, through: :sample_resource_links
+  belongs_to :parent, class_name: 'Strain', optional: true, inverse_of: :children
+  has_many :children, class_name: 'Strain', foreign_key: :parent_id, inverse_of: :parent
 
   before_destroy :destroy_genotypes_phenotypes
 

@@ -6,8 +6,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
       Settings.defaults[:support_email_address] = 'support@seek.org'
 
-      Settings.defaults[:crossref_api_email] = "sowen@cs.man.ac.uk"
-
       Settings.defaults[:jws_enabled] = true
       Settings.defaults[:jws_online_root] = "http://jws.sysmo-db.org"
       Settings.defaults[:internal_help_enabled] = false
@@ -37,6 +35,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:file_templates_enabled] = true
       Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
+      Settings.defaults[:observation_units_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:organisms_enabled] = true
       Settings.defaults[:programmes_enabled] = true

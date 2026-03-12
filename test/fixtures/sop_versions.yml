@@ -5,8 +5,8 @@ my_first_sop_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: my_first_sop
   version: 1
   projects: [sysmo_project]
@@ -20,8 +20,8 @@ sop_with_fully_public_policy_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_fully_public_policy
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -35,8 +35,8 @@ sop_with_download_for_all_sysmo_users_policy_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_download_for_all_sysmo_users_policy
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -51,8 +51,8 @@ sop_with_all_sysmo_users_policy_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_all_sysmo_users_policy
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -66,8 +66,8 @@ sop_with_custom_permissions_policy_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_custom_permissions_policy
   version: 1
   projects: [other_project] #not linked to any project for now
@@ -81,8 +81,8 @@ private_sop_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: private_sop
   version: 1
   projects: [sysmo_project] # not linked to any project for now
@@ -96,8 +96,8 @@ sop_with_complex_permissions_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_complex_permissions
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -111,8 +111,8 @@ sop_with_private_policy_and_custom_sharing_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_private_policy_and_custom_sharing
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -126,8 +126,8 @@ sop_with_public_download_and_no_custom_sharing_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   version: 1
   sop: sop_with_public_download_and_no_custom_sharing
   projects: [other_project] # not linked to any project for now
@@ -141,8 +141,8 @@ sop_that_uses_allowlist_denylist_and_custom_sharing_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_that_uses_allowlist_denylist_and_custom_sharing
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -156,8 +156,8 @@ sop_for_test_with_workgroups_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_for_test_with_workgroups
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -171,8 +171,8 @@ sop_for_test_with_workgroups_no_custom_sharing_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_for_test_with_workgroups_no_custom_sharing
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -186,8 +186,8 @@ sop_for_test_with_projects_institutions_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_for_test_with_projects_institutions
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -201,8 +201,8 @@ downloadable_sop_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: downloadable_sop
   version: 1
   projects: [sysmo_project]
@@ -216,8 +216,8 @@ downloadable_sop_v2:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: #content_blob_with_little_file2
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: downloadable_sop
   version: 2
   projects: [sysmo_project]
@@ -231,8 +231,8 @@ editable_sop_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: editable_sop
   version: 1
   projects: [sysmo_project]
@@ -246,8 +246,8 @@ sop_with_links_in_description_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_links_in_description
   version: 1
   projects: [sysmo_project]
@@ -260,8 +260,8 @@ sop_with_no_contributor_v1:
   #original_filename: "little_file.txt"
   #content_type: "text/plain"
   #content_blob: content_blob_with_little_file
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   sop: sop_with_no_contributor
   version: 1
   projects: [sysmo_project]

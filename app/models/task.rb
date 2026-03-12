@@ -31,6 +31,10 @@ class Task < ApplicationRecord
     status == STATUS_FAILED
   end
 
+  def waiting?
+    status == STATUS_WAITING
+  end
+
   def start
     return if persisted? && (pending? || in_progress?)
 

@@ -1,7 +1,7 @@
 <%# The study experiment overview table %>
 
 <% study ||= nil %>
-<% valid_study = study&.sample_types&.second %>
+<% valid_study = study&.sample_types&.count == 2 %>
 
 <div style="padding: 0 20px 20px 20px;">
     <div class="row" id="options_container" style="margin-bottom:15px">
@@ -21,18 +21,27 @@
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
-            const ajax = {
+            const options = {
+              config: {
+                registeredSopsEnabled: <%= Seek::Config.sops_enabled %>,
+                registeredDataFilesEnabled: <%= Seek::Config.data_files_enabled %>,
+                registeredOrganismsEnabled: <%= Seek::Config.organisms_enabled %>,
+                idFieldName: "<%= Seek::Config.instance_name %> id"
+              },
+              ajax: {
                 url: dynamicTableDataPath,
-                data: function(d) {
-                    if (studyTableInitialLoad) {
-                        studyTableInitialLoad = false;
-                        return;
-                    }
-                    d.study_id = '<%=study.id%>';
-                    d.rows_pad = "true";
+                data: function (d) {
+                  if (studyTableInitialLoad) {
+                    studyTableInitialLoad = false;
+                    return;
+                  }
+                  d.study_id = '<%=study&.id%>';
+                  d.rows_pad = "true";
                 }
+              },
+              readonly: true
             }
-            studyDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
+            studyDynamicTable.init(dt.rows, dt.columns, options)
             const types = studyDynamicTable.getSampleTypes()
             createSampleTypeOptions(dt.sample_types)
 
@@ -41,10 +50,14 @@
 
         function createSampleTypeOptions(types){
             $j("#options_container").append('<div id="checkbox_group" class="btn-group" data-toggle="buttons"></div>')
-                types.forEach( (t, i) => {
-                    let elem = `<label class="btn btn-default active sp-btn-variant-${i%2}"><input id="checkbox-${t.id}" type="checkbox" checked onchange="toggleSampleType(${t.id}, $j(this))" />${t.title}</label>`
-                    $j("#checkbox_group").append(elem)
-                })
+            let studyTitle = '<%= study&.title || 'Study' %>';
+            let sourceSampleType = types[0];
+            let sampleSampleType = types[1];
+            let source_elem = `<label class="btn btn-default active sp-btn-variant-0"><input id="checkbox-${sourceSampleType.id}" type="checkbox" checked onchange="toggleSampleType(${sourceSampleType.id}, $j(this))" />${studyTitle} - sources</label>`;
+            let sample_elem = `<label class="btn btn-default active sp-btn-variant-1"><input id="checkbox-${sampleSampleType.id}" type="checkbox" checked onchange="toggleSampleType(${sampleSampleType.id}, $j(this))" />${studyTitle} - samples</label>`;
+            [source_elem, sample_elem].forEach((elem) => {
+                $j("#checkbox_group").append(elem);
+            });
         }
 
         function toggleSampleType(sample_type, e){

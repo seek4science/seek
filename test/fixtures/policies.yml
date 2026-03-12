@@ -5,24 +5,24 @@ private_policy_for_asset_of_my_first_sop:
   access_type: <%= Policy::NO_ACCESS %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 private_policy:
   name: "auto"
   access_type: <%= Policy::NO_ACCESS %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 private_policy_using_custom_sharing:
   name: "auto"
   access_type: <%= Policy::NO_ACCESS %>
   use_allowlist: true
   use_denylist: true
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 editing_for_all_sysmo_users_policy:  
@@ -30,24 +30,24 @@ editing_for_all_sysmo_users_policy:
   access_type: <%= Policy::EDITING %>
   use_allowlist: true
   use_denylist: true
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 managing_for_all_sysmo_users_policy:
   name: "auto"
   access_type: <%= Policy::MANAGING %>
   use_allowlist: true
   use_denylist: true
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 sysmo_member_edit:
   name: "auto"
   access_type: <%= Policy::EDITING %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 download_for_all_sysmo_users_policy:
@@ -55,8 +55,8 @@ download_for_all_sysmo_users_policy:
   access_type: <%= Policy::ACCESSIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 fully_public_policy:  
@@ -64,32 +64,32 @@ fully_public_policy:
   access_type: <%= Policy::EDITING %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 public_policy_visible_only:
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 public_policy_access:
   name: "auto"
   access_type: <%= Policy::ACCESSIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 policy_with_complex_permissions:  
   name: "auto"
   access_type: <%= Policy::EDITING %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 private_policy_with_custom_sharing:  
@@ -97,8 +97,8 @@ private_policy_with_custom_sharing:
   access_type: <%= Policy::NO_ACCESS %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 public_download_with_no_custom_sharing:  
@@ -106,8 +106,8 @@ public_download_with_no_custom_sharing:
   access_type: <%= Policy::ACCESSIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 allowlist_denylist_and_custom_sharing:
@@ -115,8 +115,8 @@ allowlist_denylist_and_custom_sharing:
   access_type: <%= Policy::VISIBLE %>
   use_allowlist: true
   use_denylist: true
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 policy_for_worgroup_sharing_tests:  
@@ -124,8 +124,8 @@ policy_for_worgroup_sharing_tests:
   access_type: <%= Policy::VISIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 
 policy_for_worgroup_sharing_tests_no_custom_sharing:  
@@ -133,29 +133,29 @@ policy_for_worgroup_sharing_tests_no_custom_sharing:
   access_type: <%= Policy::VISIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 sysmo_member_download:  
   name: "auto"
   access_type: <%= Policy::ACCESSIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
 
 policy_for_test_with_projects_institutions:  
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>
   
 policy_for_viewable_data_file:  
   name: "auto"
   access_type: <%= Policy::VISIBLE %>
   use_allowlist: false
   use_denylist: false
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
+  created_at: <%= 2.days.ago.to_fs :db %>
+  updated_at: <%= 2.days.ago.to_fs :db %>

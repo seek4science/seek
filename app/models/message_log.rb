@@ -2,7 +2,7 @@
 # subclasses handle specific details and behaviour according to the message log type
 # and this model shouldn't be used directly
 class MessageLog < ApplicationRecord
-  enum message_type: {
+  enum :message_type, {
     project_membership_request: 1,
     contact_request: 2,
     programme_creation_request: 3, # no longer used

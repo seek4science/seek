@@ -34,30 +34,54 @@ class GitRepositoriesControllerTest < ActionController::TestCase
     get :refs, params: { id: repo.id, format: :json }
 
     res = JSON.parse(response.body)
+
     expected = {
       "branches" =>
-        [{ "name" => "main",
+        [{
+           "name" => "main",
            "ref" => "refs/remotes/origin/main",
            "sha" => "94ae9926a824ebe809a9e9103cbdb1d5c5f98608",
+           "time" => "2022-03-14T10:10:03.000+00:00",
            "default" => true },
-         { "name" => "add-license-1",
+         {
+           "name" => "add-license-1",
            "ref" => "refs/remotes/origin/add-license-1",
-           "sha" => "58fe5180070ab7b5387965c5f35b8b5657096c98" },
-         { "name" => "cff",
+           "sha" => "58fe5180070ab7b5387965c5f35b8b5657096c98",
+           "time" => "2021-03-31T14:10:11.000+00:00" },
+         {
+           "name" => "cff",
            "ref" => "refs/remotes/origin/cff",
-           "sha" => "bd67097c20eade0e20d796246fbf4dbaedaf4534"
-         },
-         { "name" => "symlink",
+           "sha" => "bd67097c20eade0e20d796246fbf4dbaedaf4534",
+           "time" => "2022-09-08T09:51:25.000+00:00" },
+         {
+           "name" => "symlink",
            "ref" => "refs/remotes/origin/symlink",
-           "sha" => "728337a507db00b8b8ba9979330a4f53d6d43b18"}],
-      "tags" =>
-        [{ "name" => "v0.02",
-           "ref" => "refs/tags/v0.02",
-           "sha" => "94ae9926a824ebe809a9e9103cbdb1d5c5f98608" },
-         { "name" => "v0.01",
-           "ref" => "refs/tags/v0.01",
-           "sha" => "3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf" }
-        ]}
+           "sha" => "728337a507db00b8b8ba9979330a4f53d6d43b18",
+           "time" => "2022-06-13T14:45:22.000+00:00"
+         }],
+      "tags" => [
+        {
+          "name" => "v0.02",
+          "ref" => "refs/tags/v0.02",
+          "sha" => "94ae9926a824ebe809a9e9103cbdb1d5c5f98608",
+          "time" => "2022-03-14T10:10:03.000+00:00" },
+        {
+          "name" => "v0.01",
+          "ref" => "refs/tags/v0.01",
+          "sha" => "3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf",
+          "time" => "2021-03-31T14:09:02.000+00:00" }
+      ]}
+
+    # Turn dates back into DateTime objects (in UTC) for comparison
+    # (otherwise local machine's timezone/DST may affect test result)
+    ['branches', 'tags'].each do |type|
+      [expected, res].each do |refs|
+        refs[type].map! do |ref|
+          ref['time'] = DateTime.parse(ref['time']).utc
+          ref
+        end
+      end
+    end
 
     assert_equal expected, res
   end

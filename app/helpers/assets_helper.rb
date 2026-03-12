@@ -10,7 +10,7 @@ module AssetsHelper
       options[:preview_permissions] = show_form_manage_specific_attributes?
     end
     options[:button_text] ||= submit_button_text(item)
-    options[:cancel_path] = params[:single_page] ? single_page_path(id: params[:single_page]) : polymorphic_path(item)
+    options[:cancel_path] ||= params[:single_page] ? single_page_path(id: params[:single_page]) : polymorphic_path(item)
     options[:resource_name] = item.class.name.underscore
     options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
 
@@ -214,15 +214,38 @@ module AssetsHelper
     end
   end
 
-  def open_with_copasi_button (asset)
+  def open_with_copasi_js_button
 
-    files =   asset.content_blobs
-    download_path = polymorphic_path([files.first.asset, files.first], action: :download, code: params[:code])
+    tooltip_text = "Simulate model in the browser with javascript library"
+    button_link_to 'Simulate Online', 'copasi', '#', class: 'btn btn-primary btn-block', onclick: 'simulate()', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text)
+
+  end
+
+  def open_with_copasi_ui_button
+
+    blob  =   @display_model.copasi_supported_content_blobs.first
+
+    auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code unless @model.can_download?(nil)
+
+    download_path = polymorphic_path([@model, blob], action: :download, code: auth_code)
+
     copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
 
-    tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
+    tooltip_text_copasi_button = "Simulate your model locally using desk application CopasiUI."
 
-    button= button_link_to('Simulate Model in Copasi', 'copasi', copasi_download_path, class: 'btn btn-default', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+    button= button_link_to('Simulate in CopasiUI', 'copasi', copasi_download_path, class: 'btn btn-primary btn-block', disabled: @blob.nil?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+
+    button
+  end
+
+  def open_with_morpheus_button
+
+    blob  =   @display_model.morpheus_supported_content_blobs.first
+    download_path = polymorphic_path([@model, blob], action: :download)
+    morpheus_download_path =  "morpheus://"+request.host_with_port+download_path
+    tooltip_text_morpheus_button = "Simulate your model locally using desk application MorpheusUI."
+
+    button= button_link_to('Simulate in MorpheusUI', 'morpheus', morpheus_download_path, class: 'btn', 'data-tooltip' => tooltip(tooltip_text_morpheus_button))
 
     button
   end
@@ -339,5 +362,12 @@ module AssetsHelper
       concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-down', 'aria-hidden' => 'true')
       concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-right', 'aria-hidden' => 'true')
     end
+  end
+
+  def attribution_list_item(item, truncate_to)
+    item_type = item.class.name
+    by_text = item.contributor.nil? ? '' : " by #{item.contributor.name}"
+    tooltip_txt = "#{item_type.humanize}: \"#{item.title}\"#{by_text}"
+    list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34)
   end
 end

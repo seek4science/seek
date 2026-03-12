@@ -8,3 +8,21 @@ jws:
 
 matlab:
     title: Matlab
+
+morpheus:
+    title: Morpheus
+
+python:
+    title: Python
+
+r:
+    title: R
+
+docker:
+    title: Docker
+
+julia:
+    title: Julia
+
+jupyter:
+    title: Jupyter Notebook

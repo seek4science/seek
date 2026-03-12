@@ -3,7 +3,6 @@ FactoryBot.define do
   factory(:sample_type) do
     sequence(:title) { |n| "SampleType #{n}" }
     with_project_contributor
-    #projects { [FactoryBot.build(:project)] }
   end
 
   factory(:patient_sample_type, parent: :sample_type) do
@@ -111,6 +110,16 @@ FactoryBot.define do
     end
   end
 
+  factory(:schema_org_sample_type, parent: :sample_type) do
+    title { 'SampleType to test schema.org' }
+    after(:build) do |type|
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'title', pid: 'dc:title', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'description', pid: 'dc:description', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, is_title: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'enzyme', pid: 'http://purl.uniprot.org/core/enzyme', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, is_title: false, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'weight', sample_attribute_type: FactoryBot.create(:weight_sample_attribute_type), unit: Unit.find_or_create_by(symbol: 'g', comment: 'gram'), required: false, is_title: false, sample_type: type)
+    end
+  end
+
   factory(:min_sample_type, parent: :sample_type) do
     title { 'A Minimal SampleType' }
     after(:build) do |type|
@@ -155,6 +164,7 @@ FactoryBot.define do
   # There are tests that rely on having identical Template Attributes
   factory(:isa_source_sample_type, parent: :sample_type) do
     sequence(:title) { |n| "ISA Source #{n}" }
+    isa_template { FactoryBot.build(:isa_source_template) }
     after(:build) do |type|
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Source Name', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true, isa_tag_id: FactoryBot.create(:source_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Source Characteristic 1', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id, sample_type: type)
@@ -170,8 +180,9 @@ FactoryBot.define do
       linked_sample_type { nil }
     end
     sequence(:title) { |n| "ISA sample collection #{n}" }
+    isa_template { FactoryBot.build(:isa_sample_collection_template) }
     after(:build) do |type, eval|
-      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type, isa_tag_id: FactoryBot.create(:input_isa_tag).id)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'sample collection', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'sample collection parameter value 1', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'sample collection parameter value 2', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), sample_type: type)
@@ -190,8 +201,9 @@ FactoryBot.define do
       linked_sample_type { nil }
     end
     sequence(:title) { |n| "ISA Assay #{n}" }
+    isa_template { FactoryBot.build(:isa_assay_material_template) }
     after(:build) do |type, eval|
-      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type, isa_tag_id: FactoryBot.create(:input_isa_tag).id)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Protocol Assay 1', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Assay 1 parameter value 1', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Assay 1 parameter value 2', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), sample_type: type)
@@ -210,8 +222,9 @@ FactoryBot.define do
       linked_sample_type { nil }
     end
     sequence(:title) { |n| "ISA Assay #{n}" }
+    isa_template { FactoryBot.build(:isa_assay_data_file_template) }
     after(:build) do |type, eval|
-      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Input', sample_attribute_type: FactoryBot.create(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type, isa_tag_id: FactoryBot.create(:input_isa_tag).id)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Protocol Assay 2', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:protocol_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Assay 2 parameter value 1', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, title: 'Assay 2 parameter value 2', sample_attribute_type: FactoryBot.create(:controlled_vocab_attribute_type), isa_tag_id: FactoryBot.create(:parameter_value_isa_tag).id, sample_controlled_vocab: FactoryBot.create(:apples_sample_controlled_vocab), sample_type: type)
@@ -225,6 +238,7 @@ FactoryBot.define do
 
   factory(:fairdatastation_virtual_demo_sample_type, parent: :sample_type) do
     title { 'fair data station virtual demo'}
+    association :policy, factory: :public_policy
     after(:build) do |type, eval|
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)
@@ -236,6 +250,20 @@ FactoryBot.define do
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism', pid:'http://purl.uniprot.org/core/organism', sample_type: type)
 
+    end
+  end
+
+  factory(:fairdatastation_test_case_sample_type, parent: :sample_type) do
+    title { 'fair data station test case'}
+    association :policy, factory: :public_policy
+    after(:build) do |type, eval|
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)
+
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Bio safety level', pid:'http://fairbydesign.nl/ontology/biosafety_level', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism ncbi id', pid:'http://purl.uniprot.org/core/organism', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Collection date', pid:'https://w3id.org/mixs/0000011', sample_type: type)
     end
   end
 end

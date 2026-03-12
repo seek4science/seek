@@ -2,7 +2,6 @@ require 'test_helper'
 require 'tmpdir'
 
 class AssayTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'shouldnt edit the assay' do
     non_admin = FactoryBot.create :user
@@ -23,13 +22,15 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 2, assay.assets.size
     rdf = assay.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
-
-      #check includes the data file due to bug OPSK-1919
-      refute_nil reader.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), graph.statements.first.subject
+
+    #check includes the data file due to bug OPSK-1919
+    refute_nil graph.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
+
 
     # try modelling, with tech type nil
     assay = FactoryBot.create :modelling_assay, organisms: [FactoryBot.create(:organism)], technology_type_uri: nil
@@ -40,11 +41,12 @@ class AssayTest < ActiveSupport::TestCase
     suggested_tech_type = FactoryBot.create(:suggested_technology_type)
     assay = FactoryBot.create :experimental_assay, suggested_assay_type: suggested_assay_type, suggested_technology_type: suggested_tech_type
     rdf = assay.to_rdf
-
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      reader.statements.map(&:object).include? suggested_assay_type.ontology_uri
-      reader.statements.map(&:object).include? suggested_tech_type.ontology_uri
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    graph.statements.map(&:object).include? suggested_assay_type.ontology_uri
+    graph.statements.map(&:object).include? suggested_tech_type.ontology_uri
+
   end
 
   test 'is_asset?' do
@@ -762,7 +764,7 @@ class AssayTest < ActiveSupport::TestCase
     assay_stream = FactoryBot.create(:assay_stream, study: isa_json_compliant_study)
     assert assay_stream.is_isa_json_compliant?
 
-    isa_json_compliant_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_json_compliant_study)
+    isa_json_compliant_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_json_compliant_study, linked_sample_type: isa_json_compliant_study.sample_types.second)
     assert isa_json_compliant_assay.is_isa_json_compliant?
   end
 
@@ -788,9 +790,10 @@ class AssayTest < ActiveSupport::TestCase
     def_assay = FactoryBot.create(:assay, study:def_study)
     assert_nil def_assay.previous_linked_sample_type
 
-    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay,
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay,
                                          assay_stream: assay_stream ,
-                                         study: isa_study)
+                                         study: isa_study,
+                                         linked_sample_type: isa_study.sample_types.second)
     assert_equal first_isa_assay.previous_linked_sample_type, isa_study.sample_types.second
 
     data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
@@ -811,7 +814,7 @@ class AssayTest < ActiveSupport::TestCase
     def_assay = FactoryBot.create(:assay, study:def_study)
 
     assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
-    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study)
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_study, linked_sample_type: isa_study.sample_types.second, assay_stream: assay_stream)
     data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: first_isa_assay.sample_type)
     second_isa_assay = FactoryBot.create(:assay,
@@ -832,7 +835,7 @@ class AssayTest < ActiveSupport::TestCase
     def_assay = FactoryBot.create(:assay, study:def_study)
 
     assay_stream = FactoryBot.create(:assay_stream, study: isa_study)
-    first_isa_assay = FactoryBot.create(:isa_json_compliant_assay, study: isa_study, assay_stream: assay_stream )
+    first_isa_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: isa_study, assay_stream: assay_stream, linked_sample_type: isa_study.sample_types.second)
     data_file_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: first_isa_assay.sample_type)
     second_isa_assay = FactoryBot.create(:assay,
@@ -847,4 +850,32 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal first_isa_assay.next_linked_child_assay, second_isa_assay
     assert_nil second_isa_assay.next_linked_child_assay
   end
+
+  test 'observation units' do
+    sample = FactoryBot.create(:sample)
+    assay = FactoryBot.create(:assay, samples: [sample], contributor: sample.contributor)
+    assert_empty assay.observation_units
+
+    obs_unit = FactoryBot.create(:observation_unit, samples:[sample], study: assay.study)
+    assay.reload
+    assert_equal [obs_unit], assay.observation_units
+  end
+
+  test 'validate study matches with observation variables' do
+    contributor = FactoryBot.create(:person)
+    assay = FactoryBot.create(:assay, contributor: contributor)
+    assert assay.valid?
+
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, study: FactoryBot.create(:study, contributor: contributor))
+    sample = FactoryBot.create(:sample, observation_unit:obs_unit, contributor: contributor)
+    assay = FactoryBot.build(:assay, samples: [sample], contributor: contributor)
+    refute_equal assay.study, obs_unit.study
+    refute assay.valid?
+    assert_equal 'Study must match the associated observation unit', assay.errors.full_messages.first
+
+    assay = FactoryBot.build(:assay, samples: [sample], study: obs_unit.study, contributor: contributor)
+    assert_equal assay.study, obs_unit.study
+    assert assay.valid?
+  end
+
 end

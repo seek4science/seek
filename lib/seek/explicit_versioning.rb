@@ -125,6 +125,10 @@ module Seek
             def to_schema_ld
               Seek::BioSchema::Serializer.new(self).json_ld
             end
+
+            def to_pretty_schema_ld
+              Seek::BioSchema::Serializer.new(self).pretty_json_ld
+            end
           end
 
           def schema_org_supported?

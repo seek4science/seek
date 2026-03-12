@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class AdminControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 
@@ -89,7 +88,7 @@ class AdminControllerTest < ActionController::TestCase
       with_config_value(:smtp, { address: '255.255.255.255', 'address' => '0.0.0.0' }) do
         assert_equal 'Hash', Seek::Config.smtp.class.name
 
-        post :update_features_enabled, params: { email_enabled: '1', address: '127.0.0.1', port: '25', domain: 'email.example.com', authentication: 'plain', smtp_user_name: '', smtp_password: '', enable_starttls_auto: '1' }
+        post :update_features_enabled, params: { email_enabled: '1', address: '127.0.0.1', port: '25', domain: 'email.example.com', authentication: 'plain', smtp_user_name: 'fred', smtp_password: 'bbb', enable_starttls_auto: '1' }
 
         assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.smtp.class.name
         assert Seek::Config.email_enabled
@@ -99,9 +98,28 @@ class AdminControllerTest < ActionController::TestCase
         assert_equal '25', mailer_settings[:port]
         assert_equal 'email.example.com', mailer_settings[:domain]
         assert_equal 'plain', mailer_settings[:authentication]
-        assert_nil mailer_settings[:user_name]
-        assert_nil mailer_settings[:password]
+        assert_equal 'fred', mailer_settings[:user_name]
+        assert_equal 'bbb', mailer_settings[:password]
         assert mailer_settings[:enable_starttls_auto]
+      end
+    end
+  end
+
+  test 'update SMTP settings nil authentication details removed' do
+    with_config_value(:email_enabled, false) do
+      with_config_value(:smtp, { address: '255.255.255.255', 'address' => '0.0.0.0' }) do
+        assert_equal 'Hash', Seek::Config.smtp.class.name
+
+        post :update_features_enabled, params: { email_enabled: '1', address: '127.0.0.1', port: '25', domain: 'email.example.com', authentication: '', smtp_user_name: '', smtp_password: '', enable_starttls_auto: '0' }
+
+        mailer_settings = ActionMailer::Base.smtp_settings
+        assert_equal '127.0.0.1', mailer_settings[:address]
+        assert_equal '25', mailer_settings[:port]
+        assert_equal 'email.example.com', mailer_settings[:domain]
+        refute mailer_settings[:enable_starttls_auto]
+        refute mailer_settings.has_key?(:authentication)
+        refute mailer_settings.has_key?(:user_name)
+        refute mailer_settings.has_key?(:password)
       end
     end
   end
@@ -148,7 +166,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'invalid email address' do
-    post :update_settings, params: { pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com' }
+    post :update_settings, params: { pubmed_api_email: 'quentin' }
     refute_nil flash[:error]
   end
 
@@ -177,6 +195,26 @@ class AdminControllerTest < ActionController::TestCase
     refute quentin.is_admin?
     assert aaron.is_admin?
     assert User.current_user.person.is_admin?
+  end
+
+  test 'admin can get profiles with users stats' do
+    user = FactoryBot.create(:admin)
+    login_as(user)
+    person_with_user = user.person
+    person_without_user = FactoryBot.create(:person, user: nil)
+    get :get_stats, xhr: true, params: { page: 'profiles_with_users' }
+    assert_response :success
+    assert_match person_with_user.name, response.body
+    refute_match person_without_user.name, response.body
+  end
+
+  test 'non-admin cannot access profiles with users stats' do
+    user = FactoryBot.create(:user)
+    login_as(user)
+    get :get_stats, xhr: true, params: { page: 'profiles_with_users' }
+    assert_response :redirect
+    assert_redirected_to root_path
+    refute_nil flash[:error]
   end
 
   test 'get project content stats' do

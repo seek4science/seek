@@ -1,0 +1,144 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/91123122/datasets/91123528/reads/metadata/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"seek_metadata_exist"}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '32'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 05 Oct 2022 10:40:19 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '15'
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: '{"state":false}'
+    http_version: 
+  recorded_at: Wed, 05 Oct 2022 10:40:20 GMT
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/91123122/datasets/91123529/reads/metadata/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"seek_metadata_exist"}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '32'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 05 Oct 2022 10:40:19 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '15'
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: '{"state":true}'
+    http_version: 
+  recorded_at: Wed, 05 Oct 2022 10:40:20 GMT
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/91123122/datasets/91123528/analysis/metadata/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"seek_metadata_exist"}'
+    headers:
+      Accept:
+        - "*/*"
+      User-Agent:
+        - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+        - application/json
+      Authorization:
+        - Bearer fake-access-token
+      Content-Length:
+        - '32'
+      Accept-Encoding:
+        - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+        - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+        - Wed, 05 Oct 2022 10:40:19 GMT
+      Server:
+        - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+        - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+        - SAMEORIGIN
+      X-Content-Type-Options:
+        - nosniff
+      Content-Length:
+        - '15'
+      Access-Control-Allow-Origin:
+        - localhost
+      Connection:
+        - close
+    body:
+      encoding: UTF-8
+      string: '{"state":true}'
+    http_version:
+  recorded_at: Wed, 05 Oct 2022 10:40:20 GMT
+recorded_with: VCR 2.9.3

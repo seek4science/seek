@@ -189,6 +189,19 @@ FactoryBot.define do
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'JSON',iri: 'http://edamontology.org/format_3464', parent_iri:'http://edamontology.org/format_1915')
     end
   end
+
+  factory(:disciplines_controlled_vocab, parent: :sample_controlled_vocab) do
+    title { 'Disciplines' }
+    ols_root_term_uris { 'http://edamontology.org/topic_0003' }
+    key { SampleControlledVocab::SystemVocabs.database_key_for_property(:disciplines) }
+    source_ontology { 'edam' }
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Biochemistry, Genetics and Molecular Biology', iri: 'https://openalex.org/fields/13', parent_iri: 'https://openalex.org/domains/1')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Chemistry', iri: 'https://openalex.org/fields/16', parent_iri: 'https://openalex.org/domains/3')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Physics and Astronomy', iri: 'https://openalex.org/fields/31', parent_iri: 'https://openalex.org/domains/3')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'Secret science', iri: '', parent_iri: '')
+    end
+  end
   
   factory(:efo_ontology, class: SampleControlledVocab) do
     sequence(:title) { |n| "EFO ontology #{n}" }
@@ -211,6 +224,23 @@ FactoryBot.define do
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'non specific enzymatic cleavage')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'protease cleavage')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
+    end
+  end
+
+  factory(:sop_types_controlled_vocab, class: SampleControlledVocab) do
+    title { 'Protocol types' }
+    source_ontology { 'OBI' }
+    ols_root_term_uris { 'http://purl.obolibrary.org/obo/OBI_0000272' }
+    key { 'sop_type_annotations' }
+    after(:build) do |vocab|
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'hydrolysis collection protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0010892', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'enrichment protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0009089', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'dissociation protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0009088', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'HCS protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0007570', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'labeling protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0003808', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'sample collection protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0005518', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'nucleic acid library construction protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0004184', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
+
     end
   end
 

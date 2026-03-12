@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'sessions_controller'
 
 # Re-raise errors caught by the controller.
 class SessionsController; def rescue_action(e)
@@ -11,7 +10,6 @@ class SessionsControllerTest < ActionController::TestCase
   # Then, you can remove it from this and the units test.
   include AuthenticatedTestHelper
 
-  fixtures :users, :people
 
   test 'sessions#index redirects to session#new' do
     get :index
@@ -123,18 +121,11 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to register_people_path
   end
 
-  test 'should redirect to root after logging out from the search result page' do
-    login_as :quentin
-    @request.env['HTTP_REFERER'] = search_url
-    get :destroy
-    assert_redirected_to :root
-  end
-
-  test 'should redirect to back after logging out from the page excepting search result page' do
+  test 'should redirect to root after logging out' do
     login_as :quentin
     @request.env['HTTP_REFERER'] = data_files_url
     get :destroy
-    assert_redirected_to data_files_url
+    assert_redirected_to :root
   end
 
   test 'should redirect to root after logging in from the search result page' do
@@ -244,6 +235,73 @@ class SessionsControllerTest < ActionController::TestCase
 
       assert_select '#oidc_login a img.icon', count: 0
       assert_select '#oidc_login a img[src=?]', Seek::Config.omniauth_oidc_image.public_asset_url
+    end
+  end
+
+  test 'should hide standard login if disabled' do
+    with_config_values(standard_login_enabled: true, omniauth_enabled: false,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: false) do
+
+      # enabled, with no omniauth options
+      get :new
+      assert_response :success
+      assert_select 'div.tab-content div#password_login'
+
+      # still shown without omniauth enabled
+      with_config_value(:omniauth_enabled, false) do
+        with_config_value(:omniauth_ldap_enabled, false) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
+      # still shown with omniauth enabled but no auth options setup
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, false) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
+
+      # hidden when disabled and with omniauth options (first check if shown with tab when enabled)
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, true) do
+            get :new
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]', '#password_login'
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]', '#password_login', count: 0
+            assert_select 'div.tab-content div#password_login', count: 0
+          end
+        end
+      end
+
+      # show with special flag
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new, params: { show_standard_login: true }
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]', '#password_login'
+            assert_select 'div.tab-content div#password_login'
+          end
+        end
+      end
     end
   end
 

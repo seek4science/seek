@@ -16,11 +16,14 @@ class HumanDiseasesController < ApplicationController
   include Seek::ExternalServiceWrapper
   include Seek::IndexPager
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def show
     respond_to do |format|
       format.html
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @human_disease}
+      format.jsonld { render body: @human_disease.to_schema_ld }
     end
   end
 

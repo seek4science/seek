@@ -27,7 +27,7 @@ class SampleAttribute < ApplicationRecord
   delegate :ontology_based?, to: :sample_controlled_vocab, allow_nil: true
 
   def input_attribute?
-    isa_tag.nil? && title&.downcase&.include?('input') && seek_sample_multi?
+    isa_tag&.isa_input? && title&.downcase&.include?('input') && seek_sample_multi?
   end
 
   def inherited_from_template_attribute?
@@ -97,9 +97,8 @@ class SampleAttribute < ApplicationRecord
 
   def validate_against_editing_constraints
     c = sample_type.editing_constraints
-    error_message = "cannot be changed (#{title_was})" # Use pre-change title in error message.
-
-    errors.add(:title, error_message) if title_changed? && !c.allow_name_change?(self)
+    attr_title = self.new_record? ? title : title_was
+    error_message = "cannot be changed (#{attr_title})" # Use pre-change title in error message.
 
     unless c.allow_required?(self)
       errors.add(:is_title, error_message) if is_title_changed?

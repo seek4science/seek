@@ -14,7 +14,7 @@ class ProgrammesController < ApplicationController
 
   skip_before_action :project_membership_required
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   respond_to :html, :json
 
@@ -87,10 +87,11 @@ class ProgrammesController < ApplicationController
   end
 
   def show
-    respond_with do |format|
+    respond_to do |format|
       format.html
       format.json {render json: @programme, include: [params[:include]]}
       format.rdf { render template: 'rdf/show' }
+      format.jsonld { render body: @programme.to_schema_ld }
     end
   end
 

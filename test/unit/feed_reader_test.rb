@@ -66,8 +66,6 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
 
   test 'handles error and ignores bad feed' do
-    XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
-
     VCR.use_cassette('feedjira/get_bad_feed') do
       Seek::Config.project_news_feed_urls = "#{bad_feed_url}"
       Seek::Config.project_news_number_of_entries = 5

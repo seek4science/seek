@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class TreeviewBuilderTest < ActionController::TestCase
-  fixtures :all
   include ActionView::Helpers::SanitizeHelper
 
   test 'create node' do

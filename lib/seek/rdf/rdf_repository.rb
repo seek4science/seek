@@ -86,6 +86,15 @@ module Seek
         File.exist?(config_path) && enabled_for_environment?
       end
 
+      # whether the endpoint is available and responds to requests, even if configured
+      def available?
+        select('ask where {?s ?p ?o}')
+        true
+      rescue StandardError => e
+        Rails.logger.error("Error trying a simple query: #{e.message}")
+        false
+      end
+
       # provides the URI's of any items related to the item - discovered by querying the triple store to find both:
       #  <this_item> ?predicate <related_item>
       # or
@@ -137,7 +146,7 @@ module Seek
       def send_statement_to_repository(statement, graph_uri)
         Rails.logger.debug("sending statement #{statement} to graph #{graph_uri}")
         graph = RDF::URI.new graph_uri
-        q = query.insert([statement.subject, statement.predicate, statement.object]).graph(graph)
+        q = query.insert_data([statement.subject, statement.predicate, statement.object]).graph(graph)
         Rails.logger.debug("Insert statement SPARQL: #{q}")
         result = insert(q)
         Rails.logger.debug(result)
@@ -152,7 +161,7 @@ module Seek
       end
 
       def with_statements(item)
-        RDF::Reader.for(:rdfxml).new(item.to_rdf) do |reader|
+        RDF::Reader.for(:ttl).new(item.to_rdf) do |reader|
           reader.each_statement do |statement|
             yield(statement)
           end

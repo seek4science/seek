@@ -145,7 +145,9 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
         get "/#{type_name}/#{item.id}"
 
         assert_response :success, "failed for asset #{type_name}"
-        assert_select 'p > b', text: /Temporary access link:/, count: 1
+        code = item.special_auth_codes.first.code
+        url = polymorphic_url(item, code: code)
+        assert_select '#special-auth-code input[value=?]', url, count: 1
       end
     end
   end

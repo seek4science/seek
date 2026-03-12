@@ -1,0 +1,33 @@
+<% if results.present? && results.first.is_a?(Hash) %>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-condensed">
+      <thead>
+      <tr>
+        <% results.first.keys.each do |column| %>
+          <th><%= column.to_s.humanize %></th>
+        <% end %>
+      </tr>
+      </thead>
+      <tbody>
+      <% results.each do |row| %>
+        <tr>
+          <% row.values.each do |value| %>
+            <td>
+              <% if value.to_s.start_with?('http') %>
+                <%= link_to value, value, class: 'external-link' %>
+              <% else %>
+                <%= value %>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="alert alert-info">
+    <i class="glyphicon glyphicon-info-sign"></i>
+    No tabular data to display.
+  </div>
+<% end %>

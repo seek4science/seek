@@ -1,5 +1,5 @@
-module Jerm
-  class JermException < Exception
+module JERM
+  class JERMException < Exception
     
   end
 end

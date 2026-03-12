@@ -45,7 +45,7 @@ module Seek
         new_hash[key.to_sym] = smtp_hash[key]
       end
 
-      ActionMailer::Base.smtp_settings = new_hash
+      ActionMailer::Base.smtp_settings = new_hash.compact
     end
 
     def bioportal_api_key_propagate
@@ -107,28 +107,32 @@ module Seek
 
     def configure_exception_notification
       if exception_notification_enabled && Rails.env.production?
-        SEEK::Application.config.middleware.use ExceptionNotification::Rack,
-                                                ignore_exceptions: ['ActionDispatch::Http::Parameters::ParseError',
-                                                                    'ActionController::InvalidAuthenticityToken',
-                                                                    'ActionController::UnknownHttpMethod',
-                                                                    'ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
-                                                email: {
-                                                  sender_address: [noreply_sender],
-                                                  email_prefix: "[ #{instance_name} ERROR ] ",
-                                                  exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
-                                                },
-                                                error_grouping: error_grouping_enabled,
-                                                error_grouping_period: error_grouping_timeout,
-                                                notification_trigger: ->(exception, count) {
-                                                  # Send notifications at count = x^0, x^1, x^3, x^4... where
-                                                  # x = error_grouping_log_base
-                                                  (Math.log(count,error_grouping_log_base) % 1).zero?
-                                                }
+        ExceptionNotification.configure do |config|
+          config.ignored_exceptions = ['ActionDispatch::Http::Parameters::ParseError',
+                                      'ActionController::InvalidAuthenticityToken',
+                                      'ActionController::UnknownHttpMethod',
+                                      'ActionController::BadRequest'] | ExceptionNotifier.ignored_exceptions
+          config.error_grouping = error_grouping_enabled
+          config.error_grouping_period = error_grouping_timeout
+          config.error_grouping_cache = Rails.cache
+          config.notification_trigger = ->(exception, count) {
+            # Send notifications at count = x^0, x^1, x^3, x^4... where
+            # x = error_grouping_log_base
+            (Math.log(count, error_grouping_log_base) % 1).zero?
+          }
+          config.register_exception_notifier :email, {
+            sender_address: [noreply_sender],
+            email_prefix: "[ #{instance_name} ERROR ] ",
+            exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
+          }
+        end
       else
-        SEEK::Application.config.middleware.delete ExceptionNotifier
+        ExceptionNotification.configure do |config|
+          config.unregister_exception_notifier :email
+        end
       end
     rescue RuntimeError => e
-      Rails.logger.warn('Cannot update middleware with exception notification changes, server needs restarting')
+      Rails.logger.warn('Cannot update exception notification changes, server needs restarting')
     end
 
     def solr_enabled_propagate
@@ -136,7 +140,8 @@ module Seek
     end
 
     def pubmed_api_email_propagate
-      Bio::NCBI.default_email = "(#{pubmed_api_email})"
+      Bio::NCBI.default_email = pubmed_api_email
+      Bio::NCBI.default_tool = 'SEEK'
     end
 
     def propagate_all
@@ -308,6 +313,16 @@ module Seek
       }
     end
 
+    # url to the NeLS StoreBioinfo, derived from the api url. Returns nil if not set or invalid.
+    def nels_sbi_url
+      return nil if Seek::Config.nels_api_url.blank?
+      uri = URI.parse(nels_api_url)
+      base = "#{uri.scheme}://#{uri.host}"
+      URI.join(base, 'nels-web/#/sbi-storage').to_s
+    rescue URI::InvalidURIError
+      nil
+    end
+
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'wb') do |f|
         f << SecureRandom.random_bytes(32)
@@ -338,10 +353,6 @@ module Seek
 
     def strains_enabled
       organisms_enabled
-    end
-
-    def observation_units_enabled
-      fair_data_station_enabled
     end
 
     def omniauth_elixir_aai_config
@@ -490,7 +501,12 @@ module Seek
       def get_value(setting, conversion = nil)
         val = Settings.defaults[setting.to_s]
         if Thread.current[:use_settings_cache]
-          result = settings_cache[setting]
+          begin
+            result = settings_cache[setting]
+          rescue Errno::ENOENT => e
+            Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
+            result = Settings.global.fetch(setting)
+          end
         else
           result = Settings.global.fetch(setting)
         end
@@ -622,7 +638,7 @@ module Seek
 
     def self.settings_cache
       RequestStore.fetch(:config_cache) do
-        Rails.cache.fetch(cache_key, expires_in: 1.week) do
+        cache_store.fetch(cache_key, expires_in: 1.week) do
           cache_setting = Thread.current[:use_settings_cache]
           begin
             hash = {}
@@ -637,11 +653,16 @@ module Seek
     end
 
     def self.clear_cache
-      Rails.cache.delete(cache_key)
+      RequestStore.delete(:config_cache)
+      cache_store.delete(cache_key)
     end
 
     def self.cache_key
       'seek_config'
+    end
+
+    def self.cache_store
+      Rails.application.config.settings_cache_store
     end
   end
 end

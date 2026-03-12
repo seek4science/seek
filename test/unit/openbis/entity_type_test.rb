@@ -22,25 +22,13 @@ class EntityTypeTest < ActiveSupport::TestCase
     @openbis_endpoint.clear_metadata_store
   end
 
-  def test_warn_on_mocked_tests
-    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
-    assert true
-  end
-
-  # test 'check if mock present' do
-  #  skip 'only to check if the mocked? implementation works'
-  #  refute self.class.mocked?
-  #  mock_openbis_calls
-  #  assert self.class.mocked?
-  # end
-
   test 'setup work' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
     assert @openbis_endpoint.test_authentication
   end
 
   test 'SampleType by code' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     code = 'EXPERIMENTAL_STEP'
     type = Seek::Openbis::EntityType.SampleType(@openbis_endpoint, code, true)
@@ -51,7 +39,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'SampleType all' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     types = Seek::Openbis::EntityType.SampleType(@openbis_endpoint).all(true)
     assert types
@@ -62,7 +50,6 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'SampleType by semantic annotation' do
-    return if EntityTypeTest.mocked?
     skip 'Semantic annotations are not currently available in OBIS production releases'
     semantic = Seek::Openbis::SemanticAnnotation.new
 
@@ -94,7 +81,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'Samples can be found by types codes' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     codes = ['EXPERIMENTAL_STEP']
 
@@ -114,7 +101,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'All samples can be found' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
     assert zamples
@@ -122,7 +109,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'DataSetType by code' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     code = 'RAW_DATA'
     type = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint, code, true)
@@ -133,7 +120,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'DatasetType all' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     types = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint).all(true)
     assert types
@@ -144,7 +131,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'DataSets can be found by types codes' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     codes = ['RAW_DATA']
 
@@ -164,7 +151,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'ExperimentType by code' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     code = 'DEFAULT_EXPERIMENT'
     type = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint, code, true)
@@ -175,7 +162,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'ExperimentType all' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     types = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint).all(true)
     assert types
@@ -186,7 +173,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'ExperimentType by codes' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     codes = %w[DEFAULT_EXPERIMENT MATERIALS]
     types = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint).find_by_codes(codes, true)
@@ -198,7 +185,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'Experiment can be found by types codes' do
-    return if EntityTypeTest.mocked?
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
 
     codes = ['DEFAULT_EXPERIMENT']
 

@@ -1,0 +1,1 @@
+<a name="downloadGitBlob"></a>Download the content of the identified Git blob (file)

@@ -18,15 +18,13 @@
     </div>
 
     <%= render partial: "projects/project_selector", locals: { resource: @sample_type } -%>
-
+    <%= render partial: 'assets/manage_specific_attributes', locals: {f: f} if show_form_manage_specific_attributes? %>
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
         <div class="form-group">
           <%= f.label :tags -%>
           <%= tags_input('sample_type[tags]', @sample_type.tags, typeahead: {type: 'sample_type_tag'}, class:'form-control') %>
         </div>
-
-        <%= render partial: "assets/author_form", locals: { form: f } -%>
 
         <h3>Attributes</h3>
         <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
@@ -51,7 +49,7 @@
                                                                            display_isa_tag: false } %>
           <% end %>
 
-          <% unless @sample_type.uploaded_template? || !@sample_type.editing_constraints.allow_new_attribute? %>
+          <% unless @sample_type.uploaded_template? %>
               <tr id="add-attribute-row">
                 <td colspan="6">
                   <%= button_link_to('Add new attribute', 'add', '#', id: 'add-attribute') %>
@@ -65,10 +63,17 @@
       <% if @sample_type.new_record? %>
           <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-template' -%>" id="from-template">
             <div class="form-group">
-              <label class="required">File to upload</label>
-              <%= file_field_tag "content_blobs[][data]", { "data-batch-upload": false } -%>
+              <label class="required">Excel file to upload</label>
+              <%= file_field_tag "content_blobs[][data]", "data-batch-upload": false, class: 'form-control'  -%>
             </div>
           </div>
+
+        <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-fair-ds-ttl' -%>" id="from-fair-ds-ttl">
+          <div class="form-group">
+            <label class="required"><%= t('fair_data_station.upload_file_label') %></label>
+            <%= file_field_tag "content_blobs[][data]", accept: '.ttl', "data-batch-upload": false, class: 'form-control'  -%>
+          </div>
+        </div>
       <% end %>
     </div>
 

@@ -15,6 +15,8 @@
 
     <%= render partial: 'associate_workflow', locals: {:f=>f, :resource => @data_file } if Seek::Config.workflows_enabled %>
 
+    <%= render partial: 'associate_observation_units', locals: {f: f, resource: @data_file} if Seek::Config.observation_units_enabled %>
+
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
       <%= multi_step_back_button %>

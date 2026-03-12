@@ -26,7 +26,7 @@ module Seek
 
                 data_files.each do |data_file|
                   data_file_content_blob = ContentBlob.new
-                  file_path = "#{tmp_file_path}#{data_file.title}"
+                  file_path = Dir["#{tmp_file_path}/**/#{data_file.title}"][0]
 
                   File.open(file_path) do |file|
                     data_file_content_blob.tmp_io_object = file

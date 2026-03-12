@@ -15,7 +15,6 @@ instance_link:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:
-crossref_api_email:
 site_base_host:
 copyright_addendum_enabled:
 copyright_addendum_content:
@@ -57,6 +56,7 @@ jerm_enabled:
 email_enabled:
 jws_enabled:
 copasi_enabled:
+morpheus_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
 piwik_analytics_tracking_notice:
@@ -205,6 +205,7 @@ data_files_enabled:
 documents_enabled:
 events_enabled:
 isa_enabled:
+observation_units_enabled:
 models_enabled:
 organisms_enabled:
 programmes_enabled:
@@ -217,6 +218,8 @@ workflows_enabled:
 collections_enabled:
 file_templates_enabled:
 placeholders_enabled:
+# Standard login panel
+standard_login_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:
@@ -270,3 +273,11 @@ regular_job_offset:
 auto_activate_programmes:
 auto_activate_site_managed_projects:
 fair_data_station_enabled:
+sandbox_instance_url:
+sandbox_instance_name:
+scraper_config:
+max_filters:
+  convert: :to_i
+reindex_all_batch_size:
+  convert: :to_i
+default_citation_style:

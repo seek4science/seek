@@ -1,6 +1,6 @@
 module Seek
   module WorkflowExtractors
-    class CwlDotGenerator
+    class CWLDotGenerator
       def initialize(writer = STDOUT)
         @writer = writer
       end

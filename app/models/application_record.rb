@@ -12,7 +12,6 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::UniquelyIdentifiable
   include Seek::ActsAsYellowPages
   include Seek::GroupedPagination
-  include Seek::TitleTrimmer
   include Seek::ActsAsAsset
   include Seek::ActsAsISA
   include HasExtendedMetadata
@@ -26,6 +25,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::RelatedItems
   include HasTasks
   include HasControlledVocabularyAnnotations
+  include HasExternalIdentifier
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource

@@ -19,9 +19,9 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
   test 'should not delete investigation with studies' do
     inv = FactoryBot.create(:max_investigation)
     assert_no_difference('Investigation.count') do
-      delete "/#{plural_name}/#{inv.id}.json"
+      delete member_url(inv), headers: { 'Authorization' => write_access_auth }
       assert_response :forbidden
-      validate_json response.body, '#/components/schemas/forbiddenResponse'
+      assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
     end
   end
 
@@ -35,7 +35,7 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Investigation.count', -1) do
-        delete "/#{plural_name}/#{inv.id}.json"
+        delete member_url(inv), headers: { 'Authorization' => write_access_auth }
       end
     end
   end
@@ -48,14 +48,14 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
     user_login(person)
 
     # first check it's present
-    get "/#{plural_name}/#{investigation.id}.json"
+    get member_url(investigation), headers: { 'Authorization' => read_access_auth }
     assert_response :success
     json = JSON.parse(response.body)
     assert_equal emt.id.to_s, json.dig('data','attributes','extended_attributes','extended_metadata_type_id')
 
     # now without
     emt.update_column(:enabled, false)
-    get "/#{plural_name}/#{investigation.id}.json"
+    get member_url(investigation), headers: { 'Authorization' => read_access_auth }
     assert_response :success
     json = JSON.parse(response.body)
     refute_nil attributes = json.dig('data','attributes')

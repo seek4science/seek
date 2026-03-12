@@ -1,0 +1,233 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/1125299/datasets/1124840/analysis/data/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"initiate_upload","payload":{"location_in_sub_type":"","file_name":"little_file.txt"}}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '96'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 13 Oct 2022 15:50:22 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '99'
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: '{"url":"https://test-fe.cbu.uib.no/nels-upload2/68164592-6813-4f9e-952f-d4a9986e133f","jobId":6573}'
+    http_version: 
+  recorded_at: Thu, 13 Oct 2022 15:50:23 GMT
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-upload2/68164592-6813-4f9e-952f-d4a9986e133f
+    body:
+      encoding: ASCII-8BIT
+      string: "------RubyFormBoundaryGaeKY8hYw61CuYre\r\nContent-Disposition: form-data;
+        name=\"file\"; filename=\"little_file.txt\"\r\nContent-Type: text/plain\r\n\r\nlittle
+        file\r\n------RubyFormBoundaryGaeKY8hYw61CuYre--\r\n"
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Length:
+      - '196'
+      Content-Type:
+      - multipart/form-data; boundary=----RubyFormBoundaryGaeKY8hYw61CuYre
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 204
+      message: OK
+    headers:
+      Date:
+      - Thu, 13 Oct 2022 15:50:22 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '0'
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    http_version: 
+  recorded_at: Thu, 13 Oct 2022 15:50:23 GMT
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/1125299/datasets/1124840/analysis/data/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"upload_done","payload":{"job_id":6573}}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '50'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Date:
+      - Thu, 13 Oct 2022 15:50:23 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 13 Oct 2022 15:50:23 GMT
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/1125299/datasets/1124840/analysis/data/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"job_state","payload":{"job_id":6573}}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '48'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 13 Oct 2022 15:50:23 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '31'
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: '{"state_id":103,"completion":0}'
+    http_version: 
+  recorded_at: Thu, 13 Oct 2022 15:50:23 GMT
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/seek/sbi/projects/1125299/datasets/1124840/analysis/data/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"job_state","payload":{"job_id":6573}}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.6p219
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '48'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - test-fe.cbu.uib.no
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 13 Oct 2022 15:50:25 GMT
+      Server:
+      - Apache/2.4.6 (CentOS)
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Content-Length:
+      - '33'
+      Access-Control-Allow-Origin:
+      - localhost
+      Connection:
+      - close
+    body:
+      encoding: UTF-8
+      string: '{"state_id":101,"completion":100}'
+    http_version: 
+  recorded_at: Thu, 13 Oct 2022 15:50:26 GMT
+recorded_with: VCR 2.9.3

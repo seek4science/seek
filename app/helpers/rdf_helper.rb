@@ -12,7 +12,7 @@ module RdfHelper
     if resource.respond_to?(:schema_org_supported?) && resource&.schema_org_supported?
       begin
         content_tag :script, type: 'application/ld+json' do
-          resource.to_schema_ld.html_safe
+          resource.to_pretty_schema_ld.html_safe
         end
       rescue StandardError => e
         raise e if Rails.env.development?

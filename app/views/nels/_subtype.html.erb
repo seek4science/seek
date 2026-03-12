@@ -1,0 +1,74 @@
+
+<h2>
+  <span class="<%= nels_subtype_glyph %>"/>
+  &nbsp;
+  Subtype: <%= @subtype_name -%><br/>
+
+</h2>
+
+<p>
+  <label>Associated NeLS Project:</label>
+  <%= link_to(@project['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"project#{@project['id']}"}) %>
+</p>
+<p>
+  <label>Associated Dataset:</label>
+  <%= link_to(@dataset['name'], '#', {'data-role':'nels-tree-node-link', 'data-tree-node-id':"dataset#{@dataset['id']}"}) %>
+  <%= nels_locked_dataset_icon if is_nels_dataset_locked?(@dataset, @project) %>
+</p>
+
+<style>
+table, th, td {
+  border:1px solid black;
+  border-collapse: collapse;
+}
+</style>
+
+<p>
+  <% disabled_reason = 'The Dataset is locked' if is_nels_dataset_locked?(@dataset, @project) %>
+  <%= button_link_to('Upload a file', 'arrow_up', nil, { id: :upload_file, class: :upload_file, disabled_reason:disabled_reason } ) %>
+  <%= button_link_to('Create a folder', 'add', nil, { id: :create_folder, class: :create_folder, disabled_reason:disabled_reason } ) %>
+  <%= button_link_to('Add metadata', 'add', nil, { id: :add_metadata, 'data-project-id':@project_id, 'data-dataset-id':@dataset_id, 'data-subtype-name':@subtype_name, class: :add_metadata } ) %>
+
+  <% if @subtype_metadata %>
+    <%= button_link_to('Download metadata', 'download', {action: :get_metadata,
+                                                         project_id: @project_id,
+                                                         dataset_id: @dataset_id,
+                                                         subtype_name: @subtype_name},
+                       method: :get) %>
+    <% if @assay && params[:assay_id]%>
+      <%= button_link_to('Register metadata', 'add', nil, class: 'btn btn-primary', id: 'register-nels-metadata-button') %>
+      <%= form_tag(register_nels_path(assay_id: params[:assay_id]), method: :post, id: 'register-nels-metadata') do %>
+        <%= hidden_field_tag('project_id', @project_id) %>
+        <%= hidden_field_tag('dataset_id', @dataset_id) %>
+        <%= hidden_field_tag('subtype_name', @subtype_name) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</p>
+
+<%= render partial: 'upload_metadata_dialog' %>
+<%= render partial: 'upload_file_dialog', locals:{subtype_path: @subtype_path, path: @path, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype_name} %>
+<%= render partial: 'create_folder_dialog', locals:{path: @path, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype_name } %>
+
+<%= render partial: 'subtype_file_listing' %>
+
+<%= content_tag(:script, nels_file_details_json(@file_list, @project['name'], @dataset['name'], @subtype_name).to_json.html_safe, type: 'application/json', id: 'file-items-json') %>
+
+<script type="text/javascript">
+
+    $j(document).ready(function () {
+
+        bindTooltips('#nels-browser');
+
+        NelsBrowser.storeCurrentFileFolder('<%= @path %>');
+
+        $j('#register-nels-metadata-button').click(function () {
+            $j('#register-nels-metadata').submit();
+        })
+
+        NelsBrowser.bindSubtypeEvents();
+
+        NelsBrowser.bindNelsTreeNodeLinks();
+    });
+
+</script>

@@ -12,7 +12,7 @@ class PresentationsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 

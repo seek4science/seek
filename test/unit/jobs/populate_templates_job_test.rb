@@ -4,8 +4,8 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
   def setup
     # Create the SampleAttributeTypes
     # The title MUST be set manually!
-    FactoryBot.create(:string_sample_attribute_type, title: 'String attribute type 1')
-    FactoryBot.create(:sample_multi_sample_attribute_type, title: 'Sample multi attribute type 1')
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') if SampleAttributeType.find_by(title: 'String').nil?
+    FactoryBot.create(:sample_multi_sample_attribute_type, title: 'Registered Sample List') if SampleAttributeType.find_by(title: 'Registered Sample List').nil?
 
     # Create the ISA Tags
     %i[source_isa_tag sample_isa_tag protocol_isa_tag source_characteristic_isa_tag sample_characteristic_isa_tag 
@@ -16,6 +16,7 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
 
     # Set isa_json_compliance_enabled to true
     Seek::Config.isa_json_compliance_enabled = true
+    @admin = FactoryBot.create(:admin)
   end
 
   def teardown
@@ -31,7 +32,7 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
 
     assert_nothing_raised do
       assert_difference('Template.count', 4) do
-        PopulateTemplatesJob.perform_now
+        PopulateTemplatesJob.perform_now(@admin)
       end
     end
   end
@@ -44,8 +45,8 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
 
     assert_no_difference('Template.count') do
       assert_raises(RuntimeError, 
-'<ul><li>The property \'#/data/0/data/1/dataType\' value \"Invalid String attribute type 1\" did not match one of the following values: String attribute type 1, Sample multi attribute type 1 in schema file:///home/kepel/projects/seek/lib/seek/isa_templates/template_attributes_schema_test.json#</li><li>Could not find a Sample Attribute Type named \'Invalid String attribute type 1\'</li></ul>') do
-        PopulateTemplatesJob.perform_now
+'<ul><li>The property \'#/data/0/data/1/dataType\' value \"Invalid String attribute type 1\" did not match one of the following values: ') do
+        PopulateTemplatesJob.perform_now(@admin)
       end
     end
   end

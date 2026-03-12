@@ -1,6 +1,6 @@
 require 'rest-client'
 
-module DataCite
+module Datacite
   class Client
     ENDPOINT = 'https://mds.datacite.org'.freeze
     TEST_ENDPOINT = 'https://mds.test.datacite.org'.freeze

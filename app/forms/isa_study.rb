@@ -1,4 +1,4 @@
-class IsaStudy
+class ISAStudy
   include ActiveModel::Model
 
   attr_accessor :study, :source_sample_type, :sample_collection_sample_type

@@ -68,6 +68,12 @@
                   <%= label_tag 'Title' %><span class="required">*</span>
                   <%= text_field_tag 'institution[title]',@institution.title, class:'form-control' %>
 
+                  <%= label_tag 'ROR ID','ROR ID' %>
+                  <%= text_field_tag 'institution[ror_id]',@institution.ror_id, class:'form-control' %>
+
+                  <%= label_tag 'Department' %>
+                  <%= text_field_tag 'institution[department]',@institution.department, class:'form-control' %>
+
                   <%= label_tag 'Website' %>
                   <%= text_field_tag 'institution[web_page]',@institution.web_page, class:'form-control' %>
 
@@ -75,7 +81,8 @@
                   <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
 
                   <%= label_tag 'Country' %>
-                  <%= country_select 'institution', 'country', { include_blank: 'Select a country' }, {class:'form-control'} %>
+                  <%= country_select 'institution', 'country', { include_blank: 'Select a country' }, { class:'form-control'} %>
+            ´
                 </div>
               </div>
             <% else %>

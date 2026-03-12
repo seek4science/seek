@@ -1,0 +1,107 @@
+<% content_for(:buttons) { button_link_to("Back to #{t('model')}", 'back', model_path(version: @display_model.version, code: params[:code])) } %>
+<%= render partial: "general/item_title",locals: {item: @model, title_postfix: " - Copasi #{t('model')} Simulation"} %>
+
+<div class="container-fluid">
+  <div id="simulation_error" class="alert alert-danger" role="alert" hidden=""></div>
+  <div id="simulation_info" class="alert alert-info" role="alert" hidden="">
+    <div id="model_name"></div>
+    <div id="copasi_version"></div>
+  </div>
+  <div id="chart"></div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-2">
+          <%= label_tag :start_time, "Start Time" %>
+          <%= number_field_tag :start_time, 0, class: "form-control", placeholder: "Enter start time", id: "startTime" %>
+        </div>
+        <div class="col-sm-2">
+          <%= label_tag :end_time, "End Time:" %>
+          <%= number_field_tag :end_time, 10, class: "form-control", placeholder: "Enter end time", id: "endTime" %>
+        </div>
+        <div class="col-sm-2">
+          <%= label_tag :num_points, "Number of Points:" %>
+          <%= number_field_tag :num_points, 101, class: "form-control", placeholder: "Enter number of points", id: "numPoints" %>
+        </div>
+        <div class="col-sm-3">
+          <%= label_tag :simulate_js, "&nbsp;".html_safe %>
+          <%= open_with_copasi_js_button %>
+        </div>
+        <div class="col-sm-3">
+          <label for="simulate_ui"> &nbsp;</label>
+          <%= open_with_copasi_ui_button %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-3">
+          <%= label_tag :auto_step_size, "Automatic Step Size:" %>
+          <%= check_box_tag :auto_step_size, 1, false, onclick: "automaticChanged()", id: "autoStepSize" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item active in">
+        <a class="nav-link" data-toggle="tab" href="#cps_form" role="tab" aria-controls="cps_form" aria-selected="true">CPS Model</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#yaml_form" role="tab" aria-controls="yaml_form" aria-selected="false">YAML</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#data_form" role="tab" aria-controls="data_form" aria-selected="false">Data</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade active in" id="cps_form" role="tabpanel">
+        <div class="form-group">
+          <%= label_tag :cps, "CPS Model:" %>
+          <%= text_area_tag :cps, nil, class: "form-control", id: "cps", rows: 150 %>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="yaml_form" role="tabpanel">
+        <div class="form-group">
+          <%= label_tag :yaml, "Processing: " %>
+          <small>
+            Changes for processing in yaml for the problem:
+            <pre>{"problem":{"Duration": 100, "StepNumber": 100, "StepSize": 0.1}}</pre> or
+            <pre>{"method": {"name": "Stochastic (Gibson + Bruck)"}}</pre> or for changes of
+            initial values in the form of display names. So:
+            <ul>
+              <li>
+                <pre>[A]_0</pre> for initial concentration of species A
+              </li>
+              <li>
+                <pre>Values[t].InitialValue</pre> for initial value of parameter t
+              </li>
+              <li>
+                <pre>(r1).k</pre> for the value of k of reaction r1.
+              </li>
+            </ul>
+            <pre>{"initial_values": {"[A]_0": 10.0, "Values[t].InitialValue": 0.1, "(r1).k": 0.1}}</pre>
+          </small>
+          <%= text_area_tag :yaml, "{}", class: "form-control", id: "yaml", rows: 8 %>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="data_form" role="tabpanel">
+        <div class="form-group">
+          <%= label_tag :data, "Data Yaml:" %>
+          <%= text_area_tag :data, nil, class: "form-control", id: "data", rows: 8 %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    $j(document).ready(function () {
+        createCpsModule().then(module => {
+            copasi = new COPASI(module);
+            console.log(copasi.version);
+        });
+
+        <% if @blob %>
+          $j('#cps').val("<%= escape_javascript @blob.html_safe %>");
+        <% end %>
+    });
+</script>

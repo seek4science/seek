@@ -1,0 +1,7 @@
+<h1>Edit <%= t('snapshot') %></h1>
+
+<%= form_for [@parent_resource, @snapshot] do |f| %>
+    <%= render partial: 'form', locals: { f: f, action: :edit } -%>
+
+    or <%= cancel_button polymorphic_path([@parent_resource, @snapshot]) -%>
+<% end -%>

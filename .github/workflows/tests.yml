@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   tests:
     name: Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       RAILS_ENV: test
       TERM: dumb-color
@@ -19,7 +19,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       mysql:
-        image: mysql:5.7
+        image: mysql:8.4
         env:
           MYSQL_USER: seek
           MYSQL_PASSWORD: test
@@ -29,7 +29,7 @@ jobs:
           - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       virtuoso:
-        image: tenforce/virtuoso
+        image: openlink/virtuoso-opensource-7:7.2.15
         env:
           DBA_PASSWORD: tester
           SPARQL_UPDATE: true
@@ -53,8 +53,6 @@ jobs:
           - rake db:migrate
           - rake seek:upgrade
         include:
-          - database: postgres
-            suite: rails test test/unit
           - database: sqlite3
             suite: rails test test/unit
     steps:
@@ -63,12 +61,12 @@ jobs:
           sudo apt install -y software-properties-common
           sudo add-apt-repository ppa:deadsnakes/ppa
           sudo apt update
-          sudo apt install -y graphicsmagick graphviz libcurl4-gnutls-dev libreoffice poppler-utils build-essential \
+          sudo apt install -y libmagick++-dev graphviz libcurl4-gnutls-dev libreoffice poppler-utils build-essential \
             git imagemagick libgmp-dev python3.9-dev python3.9-distutils python3-pip
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '11' # The JDK version to make available on the path.
@@ -77,7 +75,7 @@ jobs:
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
@@ -88,6 +86,7 @@ jobs:
             ${{ runner.os }}-
       - name: Install Python dependencies
         run: |
+          python3.9 -m pip install --upgrade pip
           python3.9 -m pip install setuptools==58
           python3.9 -m pip install -r requirements.txt
       - name: Create test database
@@ -102,8 +101,15 @@ jobs:
         run: |
           git fetch origin ${{ github.event.before }}
           git checkout ${{ github.event.before }} -- db/schema.rb
+          mv db/migrate db/migrate.bkp
+          git checkout ${{ github.event.before }} -- db/migrate
       - name: Load test database schema
         run: bundle exec rake db:schema:load
+      - name: Restore migrations
+        if: github.event_name == 'push' && matrix.suite == 'rake db:migrate' && github.event.before != '0000000000000000000000000000000000000000'
+        run: |
+          rm -rf db/migrate
+          mv db/migrate.bkp db/migrate
       - name: Seed database
         if: matrix.suite == 'rake seek:upgrade'
         run: bundle exec rake db:seed

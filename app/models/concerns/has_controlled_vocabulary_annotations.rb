@@ -92,6 +92,7 @@ module HasControlledVocabularyAnnotations
       vocab = annotation_controlled_vocab(property)
       values = Array(vals.split(',').flatten).map do |value|
         value = value.strip
+        next if value.blank?
         vocab.sample_controlled_vocab_terms.find_by_label(value) ||
           vocab.sample_controlled_vocab_terms.find_by_iri(value)
       end.compact.uniq

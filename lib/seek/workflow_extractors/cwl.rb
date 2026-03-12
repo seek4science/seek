@@ -26,7 +26,7 @@ module Seek
         begin
           f = Tempfile.new('diagram.dot')
           wf = WorkflowInternals::Structure.new(metadata[:internals])
-          Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
+          Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
           f.rewind
           out = ''
           err = ''
@@ -100,7 +100,7 @@ module Seek
           existing_metadata[:description] = cwl['doc']
         end
         if cwl.key?('s:license')
-          existing_metadata[:license] = cwl['s:license']
+          existing_metadata[:license] = Seek::License.normalize(cwl['s:license'])
         end
 
         existing_metadata[:internals] = {
@@ -190,7 +190,7 @@ module Seek
                 f << (value.is_a?(String) ? { 'type' => value } : value).merge('name' => name)
               end
             end
-            t['fields'] = f.map { |fi| normalise_type(fi['type'], tabs + ' ') }
+            t['fields'] = f.flat_map { |fi| normalise_type(fi['type'], tabs + ' ') }
           end
 
           t

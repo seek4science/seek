@@ -3,24 +3,27 @@
 require 'rubygems'
 require 'rake'
 
-
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    decouple_extracted_samples_policies
-    decouple_extracted_samples_projects
-    link_sample_datafile_attributes
-    db:seed:007_sample_attribute_types
-    db:seed:001_create_controlled_vocabs
+    db:seed:011_topics_controlled_vocab
+    db:seed:012_operations_controlled_vocab
+    db:seed:013_data_formats_controlled_vocab
+    db:seed:014_data_types_controlled_vocab
+    db:seed:003_model_formats
+    db:seed:004_model_recommended_environments
+    db:seed:004_model_types
+    db:seed:005_publication_types
+    update_rdf
+    update_morpheus_model
+    db:seed:018_discipline_vocab
+    strip_publication_abstracts
+    db:seed:015_isa_tags
+    assign_isa_tag_id_to_sample_attributes
+    assign_isa_tag_id_to_template_attributes
     db:seed:017_minimal_starter_isa_templates
-    recognise_isa_json_compliant_items
-    implement_assay_streams_for_isa_assays
-    set_ls_login_legacy_mode
-    rename_custom_metadata_legacy_supported_type
-    seek_rdf:generate
-    update_observation_unit_policies
-    fix_xlsx_marked_as_zip
+    db:seed:019_sop_type_controlled_vocab
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -55,184 +58,96 @@ namespace :seek do
     end
   end
 
-  task(decouple_extracted_samples_policies: [:environment]) do
-    puts '..... creating independent policies for extracted samples (this can take a while if there are many samples) ...'
-    affected_samples = []
-
-    Policy.skip_callback :commit, :after, :queue_update_auth_table
-    Policy.skip_callback :commit, :after, :queue_rdf_generation_job
-    Permission.skip_callback :commit, :after, :queue_update_auth_table
-    Permission.skip_callback :commit, :after, :queue_rdf_generation_job
-
-    disable_authorization_checks do
-      Sample.includes(:originating_data_file).in_batches(of: 250) do |batch|
-        batch.each do |sample|
-          # check if the sample was extracted from a datafile and their policies are linked
-          if sample.extracted? && sample.policy_id == sample.originating_data_file&.policy_id
-            policy = sample.policy.deep_copy
-            policy.save
-            sample.update_column(:policy_id, policy.id)
-            affected_samples << sample
-          end
-        end
-        putc('.')
-      end
-    end
-    puts "..... finished creating independent policies of #{affected_samples.count} extracted samples"
-  ensure
-    Policy.set_callback :commit, :after, :queue_update_auth_table
-    Policy.set_callback :commit, :after, :queue_rdf_generation_job
-    Permission.set_callback :commit, :after, :queue_update_auth_table
-    Permission.set_callback :commit, :after, :queue_rdf_generation_job
-  end
-
-  task(update_observation_unit_policies: [:environment]) do
-    puts '..... creating observation unit policies ...'
-    affected_obs_units = []
-    ObservationUnit.where.missing(:policy).includes(:study).in_batches(of: 25) do |batch|
-      batch.each do |obs_unit|
-        policy = obs_unit.study.policy || Policy.default
-        policy = policy.deep_copy
-        policy.save
-        obs_unit.update_column(:policy_id, policy.id)
-        affected_obs_units << obs_unit
-      end
-      putc('.')
-    end
-    AuthLookupUpdateQueue.enqueue(affected_obs_units)
-    RdfGenerationQueue.enqueue(affected_obs_units)
-    puts "..... finished updating policies for #{affected_obs_units.count} observation units"
-  end
-
-  task(decouple_extracted_samples_projects: [:environment]) do
-    puts '..... copying project ids for extracted samples...'
-    decoupled_count = 0
-    hash_array = []
-    disable_authorization_checks do
-      Sample.includes(:originating_data_file).where.missing(:projects).in_batches(of: 250) do |batch|
-        batch.each do |sample|
-          # check if the sample was extracted from a datafile and their projects are linked
-          if sample.extracted? && sample.project_ids.empty?
-            sample.originating_data_file.project_ids.each do |project_id|
-              hash_array << { project_id: project_id, sample_id: sample.id }
-            end
-            decoupled_count += 1
-          end
-        end
-        putc('.')
-      end
-      unless hash_array.empty?
-        class ProjectsSample < ActiveRecord::Base; end;
-        ProjectsSample.insert_all(hash_array)
-      end
-    end
-    puts " ... finished copying project ids of #{decoupled_count.to_s} extracted samples"
-  end
-
-  task(link_sample_datafile_attributes: [:environment]) do
-    puts '... updating sample_resource_links for samples with data_file attributes...'
-    samples_updated = 0
-    disable_authorization_checks do
-      df_attrs = SampleAttribute.joins(:sample_attribute_type).where('sample_attribute_types.base_type' => Seek::Samples::BaseType::SEEK_DATA_FILE).pluck(:id)
-      samples = Sample.joins(sample_type: :sample_attributes).where('sample_attributes.id' => df_attrs)
-      samples.each do |sample|
-        if sample.sample_resource_links.where(resource_type: 'DataFile').empty?
-          sample.send(:update_sample_resource_links)
-          samples_updated += 1
+  # if rdf repository enabled then generate jobs, otherwise just clear the cache. Only runs once
+  task(update_rdf: [:environment]) do
+    only_once('seek:update_rdf 1.17.0') do
+      if Seek::Rdf::RdfRepository.instance&.configured?
+        puts '... triggering rdf generation jobs'
+        Rake::Task['seek_rdf:generate'].invoke
+      else
+        path = Seek::Config.rdf_filestore_path
+        unless Dir.empty?(path)
+          puts "... clearing rdf cache at #{path}"
+          FileUtils.rm_rf(path, secure: true)
         end
       end
     end
-    puts " ... finished updating sample_resource_links of #{samples_updated.to_s} samples with data_file attributes"
   end
 
-  task(recognise_isa_json_compliant_items: [:environment]) do
-    puts '... searching for ISA compliant investigations'
-    investigations_updated = 0
-    disable_authorization_checks do
-      investigations_to_update = Study.joins(:investigation)
-                                   .where('investigations.is_isa_json_compliant IS NULL OR investigations.is_isa_json_compliant = ?', false)
-                                      .select { |study| study.sample_types.any? }
-                                      .map(&:investigation)
-                                      .compact
-                                      .uniq
+  task(update_morpheus_model: [:environment]) do
+    puts '... updating morpheus model'
+    affected_models = []
+    errors = []
+    Model.find_each do |model|
+      next unless model.is_morpheus_supported?
 
-      investigations_to_update.each do |inv|
-        inv.update_column(:is_isa_json_compliant, true)
-        investigations_updated += 1
-      end
-    end
-    puts "...Updated #{investigations_updated.to_s} investigations"
-  end
-
-  task(implement_assay_streams_for_isa_assays: [:environment]) do
-    puts '... Organising isa json compliant assays in assay streams'
-    assay_streams_created = 0
-    disable_authorization_checks do
-      # find assays linked to a study through their sample_types
-      # Should be isa json compliant
-      # Shouldn't already have an assay stream (don't update assays that have been updated already)
-      # Previous ST should be second ST of study
-      first_assays_in_stream = Assay.joins(:sample_type, study: :investigation)
-                                    .where(assay_stream_id: nil, investigation: { is_isa_json_compliant: true })
-                                 .select { |a| a.sample_type.previous_linked_sample_type == a.study.sample_types.second }
-
-      first_assays_in_stream.map do |fas|
-        stream_name = "Assay Stream - #{UUID.generate}"
-        assay_stream = Assay.create(title: stream_name,
-                                    study_id: fas.study_id,
-                                    assay_class_id: AssayClass.assay_stream.id,
-                                    contributor: fas.contributor,
-                                    position: 0)
-
-        # Transfer extended metadata from first assay to newly created assay stream
-        unless fas.extended_metadata.nil?
-          em = ExtendedMetadata.find_by(item_id: fas.id)
-          em.update_column(:item_id, assay_stream.id)
+      begin
+        model.model_format = ModelFormat.find_by!(title: 'Morpheus') unless model.model_format
+        unless model.recommended_environment
+          model.recommended_environment = RecommendedModelEnvironment.find_by!(title: 'Morpheus')
         end
+      rescue ActiveRecord::RecordNotFound => e
+        error_message = "Error: #{e.message}. Ensure that the required 'Morpheus' records exist in the database."
+        puts error_message
+        errors << error_message
+        next
+      end
+      model.update_columns(model_format_id: model.model_format_id,
+                           recommended_environment_id: model.recommended_environment_id)
+      affected_models << model
+    end
+    ReindexingQueue.enqueue(affected_models)
+    puts "... reindexing job triggered for #{affected_models.count} models"
+    unless errors.empty?
+      puts 'The following errors were encountered during the update:'
+      errors.each { |error| puts error }
+    end
+  end
 
-        assay_position = 1
-        current_assay = fas
-        while current_assay
-          current_assay.update_column(:position, assay_position)
-          current_assay.update_column(:assay_stream_id, assay_stream.id)
-
-          assay_position += 1
-          current_assay = if current_assay.sample_type.nil?
-                            nil
-                          else
-                            current_assay.sample_type.next_linked_sample_types.first&.assays&.first
-                          end
+  task(strip_publication_abstracts: [:environment]) do
+    puts 'Stripping publication abstracts...'
+    updated_count = 0
+    Publication.select(:id, :abstract).find_each do |publication|
+      if publication.abstract.present?
+        stripped = publication.abstract.strip
+        if stripped.length != publication.abstract.length
+          publication.update_column(:abstract, stripped)
+          updated_count += 1
         end
-        assay_streams_created += 1
       end
     end
-
-    puts "...Created #{assay_streams_created} new assay streams"
+    puts "... updated #{updated_count} publications"
   end
 
-  task(set_ls_login_legacy_mode: [:environment]) do
-    only_once('ls_login_legacy') do
-      if Seek::Config.omniauth_elixir_aai_enabled
-        puts "Enabling LS Login legacy mode"
-        Seek::Config.omniauth_elixir_aai_legacy_mode = true
-      end
+  task(assign_isa_tag_id_to_sample_attributes: [:environment]) do
+    puts 'Assigning isa tags to input sample attributes...'
+    updated_count = 0
+    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
+    SampleAttribute.joins(:sample_type)
+                   .where(isa_tag_id: nil)
+                   .where.not(linked_sample_type_id: nil)
+                   .find_each(batch_size: 1000) do |sa|
+      next unless sa.sample_type.is_isa_json_compliant? && sa.seek_sample_multi?
+
+      sa.update_column(:isa_tag_id, input_isa_tag_id)
+      updated_count += 1
+      puts '.'
     end
+    puts "... #{updated_count} input sample attributes were updated."
   end
 
-  task(rename_custom_metadata_legacy_supported_type: [:environment]) do
-    if ExtendedMetadataType.where(supported_type: 'CustomMetadata').any?
-      puts "... Renaming ExtendedMetadata supported_type from Custom to ExtendedMetadata"
-      ExtendedMetadataType.where(supported_type: 'CustomMetadata').update_all(supported_type: 'ExtendedMetadata')
-    end
-  end
+  task(assign_isa_tag_id_to_template_attributes: [:environment]) do
+    puts 'Assigning isa tags to input template attributes...'
+    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
+    updated_count = 0
+    TemplateAttribute.where(isa_tag_id: nil).find_each(batch_size: 1000) do |ta|
+      next unless ta.seek_sample_multi?
 
-  task(fix_xlsx_marked_as_zip: [:environment]) do
-    blobs = ContentBlob.where('original_filename LIKE ?','%.xlsx').where(content_type: 'application/zip')
-    if blobs.any?
-      n = blobs.count
-      blobs.update_all(content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      puts "... fixed #{n} XLSX blobs with zip content type"
+      ta.update_column(:isa_tag_id, input_isa_tag_id)
+      updated_count += 1
+      puts '.'
     end
+    puts "... #{updated_count} input template attributes were updated."
   end
 
   private

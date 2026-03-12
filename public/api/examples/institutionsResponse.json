@@ -1,33 +1,33 @@
 {
   "data": [
     {
-      "id": "615",
-      "type": "institutions",
-      "attributes": {
-        "title": "A Maximal Institution"
-      },
-      "links": {
-        "self": "/institutions/615"
-      }
-    },
-    {
-      "id": "613",
+      "id": "980192423",
       "type": "institutions",
       "attributes": {
         "title": "A Minimal Institution"
       },
       "links": {
-        "self": "/institutions/613"
+        "self": "/institutions/980192423"
       }
     },
     {
-      "id": "614",
+      "id": "980192424",
       "type": "institutions",
       "attributes": {
-        "title": "An Institution: 606"
+        "title": "An Institution: 90"
       },
       "links": {
-        "self": "/institutions/614"
+        "self": "/institutions/980192424"
+      }
+    },
+    {
+      "id": "980192425",
+      "type": "institutions",
+      "attributes": {
+        "title": "University of Manchester"
+      },
+      "links": {
+        "self": "/institutions/980192425"
       }
     }
   ],

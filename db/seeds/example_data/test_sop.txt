@@ -1,0 +1,79 @@
+Standard Operating Procedure: Reconstituted Enzyme System for Gluconeogenesis Studies
+Version 1.0
+Date: 2024
+
+1. OBJECTIVE
+This SOP describes the standardized protocol for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study carbon metabolism efficiency at high temperatures.
+
+2. SAFETY CONSIDERATIONS
+- Handle all enzymes and chemicals in appropriate laboratory conditions
+- Use heat-resistant equipment for high-temperature incubations
+- Follow institutional safety guidelines for biochemical assays
+- Ensure proper ventilation when working with volatile compounds
+
+3. MATERIALS AND EQUIPMENT
+3.1 Purified Enzymes:
+- Phosphoglycerate kinase (PGK)
+- Glyceraldehyde 3-phosphate dehydrogenase (GAPDH)
+- Triose phosphate isomerase (TPI)
+- Fructose 1,6-bisphosphate aldolase/phosphatase (FBPAase)
+
+3.2 Substrates and Cofactors:
+- 3-Phosphoglycerate (3PG) - starting substrate
+- ATP and NADPH for cofactor regeneration
+- Pyruvate kinase and glucose dehydrogenase for regeneration system
+- Assay buffer (pH optimized for thermostable enzymes)
+
+3.3 Equipment:
+- High-temperature water bath or incubator (70C)
+- Spectrophotometer for kinetic measurements
+- Temperature-controlled cuvettes
+- Precision pipettes and tips
+
+4. PROCEDURE
+4.1 Enzyme Preparation:
+1. Thaw purified enzymes on ice
+2. Determine protein concentrations using Bradford assay
+3. Prepare enzyme stock solutions in assay buffer
+4. Adjust enzyme ratios for optimal pathway flux
+
+4.2 Assay Setup:
+1. Pre-warm assay buffer to 70C
+2. Add cofactors (ATP, NADPH) to reaction mixture
+3. Include cofactor regeneration system (pyruvate kinase, glucose dehydrogenase)
+4. Add substrate (3PG) to initiate reaction
+
+4.3 Kinetic Measurements:
+1. Monitor 3PG consumption over time
+2. Measure F6P (fructose 6-phosphate) production
+3. Track intermediate concentrations (GAP, DHAP)
+4. Record temperature stability throughout 1-hour incubation period
+5. Document any intermediate degradation due to thermolability
+
+5. DATA COLLECTION
+- Record initial substrate and product concentrations
+- Monitor reaction progress at 5-minute intervals
+- Calculate conversion efficiency and carbon loss
+- Document pathway flux rates under different enzyme ratios
+
+6. QUALITY CONTROL
+- Verify enzyme activity before each experiment
+- Include negative controls (no enzyme, no substrate)
+- Monitor reaction pH throughout incubation
+- Check for non-specific product formation
+
+7. EXPECTED RESULTS
+- Constant consumption rate of 3PG over 1-hour period
+- Steady production of F6P as final product
+- Measurable concentrations of GAP and DHAP intermediates
+- Approximately 50% carbon loss due to intermediate instability at high temperature
+
+8. DATA ANALYSIS
+- Plot substrate consumption and product formation over time
+- Calculate pathway efficiency and intermediate stability
+- Compare experimental results with mathematical model predictions
+- Analyze the impact of temperature on pathway performance
+
+9. REFERENCES
+- Kouril, T. et al. Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus. FEBS J. 2015;687:100-108.
+- Standard protocols for thermostable enzyme kinetics

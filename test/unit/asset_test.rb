@@ -2,7 +2,6 @@ require 'test_helper'
 
 class AssetTest < ActiveSupport::TestCase
 
-  fixtures :all
   include ApplicationHelper
 
   test 'can create' do
@@ -346,7 +345,7 @@ class AssetTest < ActiveSupport::TestCase
   end
 
   test 'has deleted contributor?' do
-    assets = [:data_file,:sop, :model, :presentation,:document, :event, :workflow, :publication, :collection,
+    assets = [:data_file,:sop, :model, :presentation,:document, :event, :workflow, :publication, :collection, :placeholder, :file_template, :template, :sample,
               :data_file_version,:sop_version, :model_version, :presentation_version, :document_version, :workflow_version, :publication_version]
     assets.each do |asset_type|
       item = FactoryBot.create(asset_type,deleted_contributor:'Person:99')

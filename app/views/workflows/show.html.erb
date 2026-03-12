@@ -4,7 +4,7 @@
 
 <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
-<%= render partial: 'general/show_page_tab_definitions', locals: { versioned_resource: @display_workflow } %>
+<%= render partial: 'general/show_page_tab_definitions', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
 
 <div class="tab-content">
   <%= tab_pane('overview') do %>
@@ -29,11 +29,12 @@
 
         <% begin %>
           <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
+            <% diagram_path = diagram_workflow_path(@workflow, version: @display_workflow.version) %>
+            <% is_svg = @display_workflow&.diagram&.extension == 'svg' %>
             <div class="row">
               <div class="col-md-12">
                 <div class="workflow-diagram">
-                  <% diagram_path = diagram_workflow_path(@workflow, version: @display_workflow.version) %>
-                  <% if @display_workflow&.diagram.extension == 'svg' %>
+                  <% if is_svg %>
                     <%= content_tag(:embed, '', type: 'image/svg+xml', src: diagram_path, class: 'svg-pan-zoom', width: 1000, height: 500)  %>
                     <p class="help-block">Click and drag the diagram to pan, double click or use the controls to zoom.</p>
                   <% else %>
@@ -44,7 +45,7 @@
             </div>
           <% end %>
         <% rescue StandardError => e %>
-          <% raise e if Rails.env.development? %>
+          <% raise e unless Rails.env.production? %>
           <% Rails.logger.error(e.inspect) %>
           <% Rails.logger.error(e.backtrace.join("\n")) %>
           <div class="alert alert-warning">Could not render the workflow diagram.</div>
@@ -84,7 +85,7 @@
     </div>
   <% end %>
 
-  <% if @display_workflow.is_git_versioned? && @display_workflow.can_download? %>
+  <% if @display_workflow.is_git_versioned? && can_download_asset?(@workflow, params[:code]) %>
     <%= tab_pane('files') do %>
       <%= render partial: 'git/files', locals: { resource: @workflow, git_version: @display_workflow } %>
     <% end %>

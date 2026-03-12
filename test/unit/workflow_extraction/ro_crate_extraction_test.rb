@@ -126,4 +126,45 @@ class RoCrateExtractionTest < ActiveSupport::TestCase
 
     assert_equal 'Apache-2.0', metadata[:license]
   end
+
+  test 'extracts and normalizes URI license from ro-crate-metadata, and ignores Licensee "other" license file' do
+    # Checks 2 things:
+    # 1. A URI license, e.g. https://opensource.org/licenses/MIT, is normalized to its SPDX ID
+    #   (which means the correct license will be selected in the dropdown).
+    # 2. The SPDX ID `NOASSERTION`, returned by Licensee (which flags the file `not_a_license.py` as potentially containing a license),
+    #    is ignored in favour of the MIT license from the RO-Crate metadata.
+
+    wf = open_fixture_file('workflows/ro-crate-with-other-license-file.crate.zip')
+    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    metadata = extractor.metadata
+
+    assert_equal 'MIT', metadata[:license]
+  end
+
+  test 'extracts author with affiliation as array' do
+    # Also note that the following is just a regular RO-Crate, not a Workflow RO-Crate
+    wf = open_fixture_file('ro_crates/affiliation_array.crate.zip')
+    extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
+    metadata = extractor.metadata
+
+    assert_equal 'The Secret Club, University of Manchester', metadata[:assets_creators_attributes]['0'][:affiliation]
+  end
+
+  test 'ignores remote author reference' do
+    roc = ROCrate::Crate.new
+    roc.author = roc.add_person('#joe', 'name' => 'Joe')
+    roc['author'] = [roc['author'], { '@id' => 'https://orcid.org/0000-0002-1825-0097' }]
+    tf = Tempfile.new('test.crate.zip')
+    tf.binmode
+    ROCrate::Writer.new(roc).write_zip(tf)
+    tf.close
+
+    extractor = Seek::WorkflowExtractors::ROCrate.new(tf)
+    metadata = extractor.metadata
+
+    assert_equal 1, metadata[:assets_creators_attributes].values.length
+    assert_equal 'Joe', metadata[:assets_creators_attributes]['0'][:given_name]
+  ensure
+    tf.unlink
+  end
 end

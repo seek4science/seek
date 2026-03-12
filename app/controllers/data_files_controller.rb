@@ -30,7 +30,7 @@ class DataFilesController < ApplicationController
 
   include Seek::Doi::Minting
 
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -145,15 +145,23 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def samples_table
+  def extracted_samples
+    @samples = @data_file.extracted_samples.includes(:sample_type).authorized_for(:view)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def extracted_samples_table
+    samples = @data_file.extracted_samples.includes(:sample_type).authorized_for(:view)
     respond_to do |format|
       format.html do
         render(partial: 'samples/table_view', locals: {
-                 samples: @data_file.extracted_samples.includes(:sample_type),
-                 source_url: samples_table_data_file_path(@data_file)
+                 samples: samples,
+                 source_url: extracted_samples_table_data_file_path(@data_file)
                })
       end
-      format.json { @samples = @data_file.extracted_samples.select([:id, :title, :json_metadata]) }
+      format.json { @samples = samples }
     end
   end
 
@@ -286,7 +294,7 @@ class DataFilesController < ApplicationController
         end
       end
     rescue RestClient::Unauthorized
-      redirect_to @oauth_client.authorize_url
+      redirect_to @oauth_client.authorize_url, allow_other_host: true
     rescue RestClient::ResourceNotFound
       flash[:error] = 'No sample metadata available.'
 
@@ -400,6 +408,7 @@ class DataFilesController < ApplicationController
 
     update_sharing_policies(@data_file)
     update_annotations(params[:tag_list], @data_file)
+    update_relationships(@data_file, params)
 
     @assay = Assay.new(assay_params)
     if sop_id
@@ -430,10 +439,6 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
-
-      update_relationships(@data_file, params)      
-      
-
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         # parse the data file if it is with sample data
@@ -534,7 +539,7 @@ class DataFilesController < ApplicationController
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       :file_template_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
-                                      { publication_ids: [] }, { workflow_ids: [] },
+                                      { publication_ids: [] }, { workflow_ids: [] },{ observation_unit_ids: [] },
                                       { extended_metadata_attributes: determine_extended_metadata_keys },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
@@ -553,7 +558,7 @@ class DataFilesController < ApplicationController
 
   def nels_oauth_session
     @oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first
-    redirect_to @oauth_client.authorize_url if !@oauth_session || @oauth_session.expired?
+    redirect_to(@oauth_client.authorize_url, allow_other_host: true) if !@oauth_session || @oauth_session.expired?
   end
 
   def rest_client

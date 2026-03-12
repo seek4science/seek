@@ -3,6 +3,7 @@ require 'test_helper'
 class SampleTypesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include SharingFormTestHelper
 
   setup do
     FactoryBot.create(:person) # to prevent person being first person and therefore admin
@@ -11,10 +12,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     @project_ids = [@project.id]
     refute_nil @project
     login_as(@person)
-    @sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    @sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @int_type = FactoryBot.create(:integer_sample_attribute_type)
     @controlled_vocab_type = FactoryBot.create(:controlled_vocab_attribute_type)
+  end
+
+  teardown do
+    Rails.cache.clear
   end
 
   test 'should get index' do
@@ -23,20 +28,37 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil assigns(:sample_types)
   end
 
-  test 'should get new' do
-    get :new
+  test 'should get new fair data station enabled shows tab' do
+    with_config_value(:fair_data_station_enabled, true) do
+      get :new
+    end
     assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 3
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl'
+    end
+  end
+
+  test 'should get new fair data station disabled no tab' do
+    with_config_value(:fair_data_station_enabled, false) do
+      get :new
+    end
+    assert_response :success
+    assert_select 'ul#sample-type-tabs' do
+      assert_select 'li', count: 2
+      assert_select 'li a[href=?]', '#from-fair-ds-ttl', count: 0
+    end
   end
 
   test 'should create sample_type' do
     FactoryBot.create :annotation, attribute_name: 'sample_type_tag', source: @person.user,
-                         annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
-
+                                   annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
     assert_enqueued_with(job: SampleTemplateGeneratorJob) do
       assert_enqueued_with(job: SampleTypeUpdateJob) do
         assert_difference('ActivityLog.count') do
           assert_difference('SampleType.count') do
-            assert_difference('Task.count') do
+            assert_difference('Task.where(key: "template_generation").count') do
               post :create, params: { sample_type: { title: 'Hello!',
                                                      project_ids: @project_ids,
                                                      description: 'The description!!',
@@ -53,34 +75,41 @@ class SampleTypesControllerTest < ActionController::TestCase
 
                                                        }
                                                      },
-                                                     tags: ['fish','golf'] } }
+                                                     tags: ['fish', 'golf'] },
+                                      policy_attributes: policy_attributes}
             end
           end
         end
       end
     end
 
-    refute_nil type = assigns(:sample_type)
-    assert_redirected_to sample_type_path(type)
+    refute_nil sample_type = assigns(:sample_type)
+    assert_redirected_to sample_type_path(sample_type)
 
-    assert_equal @person, type.contributor
-    assert_equal 'Hello!', type.title
-    assert_equal 'The description!!', type.description
-    assert_equal @project_ids.sort, type.project_ids.sort
-    assert_equal 2, type.sample_attributes.size
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+    assert_equal 'The description!!', sample_type.description
+    assert_equal @project_ids.sort, sample_type.project_ids.sort
+    assert_equal 2, sample_type.sample_attributes.size
 
-    assert_equal 'a string', type.sample_attributes.title_attributes.first.title
-    assert_nil type.sample_attributes.first.description
-    assert_nil type.sample_attributes.first.pid
-    assert_equal 'a number', type.sample_attributes.second.title
-    assert_equal 'this is a number', type.sample_attributes.second.description
-    assert_equal 'scheme:id', type.sample_attributes.second.pid
+    assert_equal 'a string', sample_type.sample_attributes.title_attributes.first.title
+    assert_nil sample_type.sample_attributes.first.description
+    assert_nil sample_type.sample_attributes.first.pid
+    assert_equal 'a number', sample_type.sample_attributes.second.title
+    assert_equal 'this is a number', sample_type.sample_attributes.second.description
+    assert_equal 'scheme:id', sample_type.sample_attributes.second.pid
 
-    assert_equal [@project], type.projects
-    refute type.uploaded_template?
-    assert_equal %w[fish golf], type.tags.sort
+    assert_equal [@project], sample_type.projects
+    refute sample_type.uploaded_template?
+    assert_equal %w[fish golf], sample_type.tags.sort
 
-    assert_equal type, ActivityLog.last.activity_loggable
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'create', ActivityLog.last.action
     assert_equal @person.user, ActivityLog.last.culprit
     assert_equal 'Hello!', ActivityLog.last.data
@@ -203,11 +232,12 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should update sample_type' do
     sample_type = nil
     perform_enqueued_jobs(only: [SampleTemplateGeneratorJob, SampleTypeUpdateJob]) do
-      sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids)
+      sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person)
     end
     assert_empty sample_type.tags
 
-    golf = FactoryBot.create :tag, source: @person.user, annotatable: FactoryBot.create(:simple_sample_type), value: 'golf'
+    golf = FactoryBot.create :tag, source: @person.user, annotatable: FactoryBot.create(:simple_sample_type),
+                                   value: 'golf'
 
     sample_attributes_fields = sample_type.sample_attributes.map do |attribute|
       { pos: attribute.pos, title: attribute.title,
@@ -225,13 +255,16 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert sample_type.template_generation_task.reload.completed?
 
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
+
     assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
       assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample_type, true]) do
         assert_difference('ActivityLog.count', 1) do
           assert_difference('SampleAttribute.count', -1) do
             put :update, params: { id: sample_type, sample_type: { title: 'Hello!',
                                                                    sample_attributes_attributes: sample_attributes_fields,
-                                                                   tags: ['fish',golf.value.text] } }
+                                                                   tags: ['fish',golf.value.text] },
+                                   policy_attributes: policy_attributes }
 
             assert sample_type.template_generation_task.reload.pending?
           end
@@ -240,18 +273,51 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
     assert_redirected_to sample_type_path(assigns(:sample_type))
 
-    assert_equal sample_attributes_fields.keys.size - 1, assigns(:sample_type).sample_attributes.size
-    assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
-    refute assigns(:sample_type).sample_attributes[0].is_title?
-    assert assigns(:sample_type).sample_attributes[1].is_title?
-    assert_equal %w[fish golf], assigns(:sample_type).tags.sort
+    sample_type.reload
+    assert_equal sample_attributes_fields.keys.size - 1, sample_type.sample_attributes.size
+    assert_includes sample_type.sample_attributes.map(&:title), 'hello'
+    refute sample_type.sample_attributes[0].is_title?
+    assert sample_type.sample_attributes[1].is_title?
+    assert_equal %w[fish golf], sample_type.tags.sort
+
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
 
     assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'update', ActivityLog.last.action
   end
 
+  test 'template download link visibility' do
+    person = FactoryBot.create(:person)
+    sample_type = SampleType.new title: 'testing download',
+                                 uploaded_template: true,
+                                 project_ids: person.projects.collect(&:id),
+                                 contributor: person,
+                                 content_blob: FactoryBot.create(:sample_type_template_content_blob),
+                                 policy: FactoryBot.create(:publicly_viewable_policy)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    assert sample_type.can_view?
+    assert sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text: 'Download'
+
+    logout
+
+    assert sample_type.can_view?
+    refute sample_type.can_download?
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download', count:0
+  end
+
   test 'update changing from a CV attribute' do
-    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:apples_controlled_vocab_sample_type, project_ids: @project_ids,
+                                                                          contributor: @person)
     assert sample_type.valid?
     assert sample_type.can_edit?
     assert_equal 1, sample_type.sample_attributes.count
@@ -278,7 +344,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'update changing from a Sample Type attribute' do
-    sample_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids)
+    sample_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)
     assert sample_type.valid?
     assert sample_type.can_edit?
     assert_equal 2, sample_type.sample_attributes.count
@@ -313,7 +379,8 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'other project member cannot update sample type' do
-    sample_type = FactoryBot.create(:patient_sample_type, project_ids: [FactoryBot.create(:project).id], title: 'should not change')
+    sample_type = FactoryBot.create(:patient_sample_type, project_ids: [FactoryBot.create(:project).id],
+                                                          title: 'should not change')
     refute sample_type.can_edit?
 
     assert_no_difference('ActivityLog.count') do
@@ -364,20 +431,34 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'create from template' do
     blob = { data: template_for_upload }
 
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
+
     assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
         assert_difference('ContentBlob.count', 1) do
           post :create_from_template,
-               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+               params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
+                         content_blobs: [blob],
+                         policy_attributes: policy_attributes }
+
         end
       end
     end
 
-    assert_redirected_to edit_sample_type_path(assigns(:sample_type))
-    assert_empty assigns(:sample_type).errors
-    assert assigns(:sample_type).uploaded_template?
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    assert sample_type.uploaded_template?
 
-    assert_equal assigns(:sample_type), ActivityLog.last.activity_loggable
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal %w[fish golf], sample_type.tags.sort
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'create', ActivityLog.last.action
   end
 
@@ -407,11 +488,141 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
 
     assert_template :new
-    assert_not_empty assigns(:sample_type).errors
+    refute_empty assigns(:sample_type).errors
   end
 
+  test 'create from fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
+                           content_blobs: [blob],
+                           policy_attributes: policy_attributes}
+          end
+        end
+      end
+    end
+
+    sample_type = assigns(:sample_type)
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+    assert_equal @person.user, ActivityLog.last.culprit
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    refute sample_type.uploaded_template?
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal %w[fish golf], sample_type.tags.sort
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+
+    assert_equal 6, sample_type.sample_attributes.count
+
+    expected = ["http://schema.org/name", "http://schema.org/description", "http://fairbydesign.nl/ontology/biosafety_level", "http://gbol.life/0.1/scientificName", "http://purl.uniprot.org/core/organism", "https://w3id.org/mixs/0000011"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:pid).sort
+
+    expected = ["Title", "Description", "biosafety level", "scientific name", "ncbi taxonomy id", "collection date"].sort
+    assert_equal expected, sample_type.sample_attributes.collect(&:title).sort
+  end
+
+  test 'create from fair data station ttl but exact match exists' do
+    original_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, contributor: @person)
+    assert original_sample_type.can_view?
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    existing_sample_type = assigns(:existing_sample_type)
+    assert_redirected_to sample_type_path(existing_sample_type)
+    assert_equal 'An exact matching Sample type already exists, and now shown.', flash[:error]
+  end
+
+  test 'create from fair data station ttl ignore private exact match' do
+    private_matching_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type, policy: FactoryBot.create(:private_policy))
+    refute private_matching_sample_type.can_view?
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_difference('ActivityLog.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    refute sample_type.uploaded_template?
+    assert_equal @person, sample_type.contributor
+    assert_equal 'Hello!', sample_type.title
+  end
+
+  test 'create from empty fair data station ttl' do
+    blob = { data: fixture_file_upload('fair_data_station/empty.ttl', 'text/turtle') }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, true) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    assert_template :new
+    assert_equal 'No Sample type metadata could be found.', flash.now[:error]
+    refute_empty assigns(:sample_type).errors
+  end
+
+  test 'cannot create from fair data station ttl if disabled' do
+    blob = { data: fixture_file_upload('fair_data_station/seek-fair-data-station-test-case-irregular.ttl', 'text/turtle') }
+    FactoryBot.create(:string_sample_attribute_type, title: 'String') unless SampleAttributeType.where(title: 'String').any?
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('SampleType.count') do
+        assert_no_difference('ContentBlob.count') do
+          with_config_value(:fair_data_station_enabled, false) do
+            post :create_from_fair_ds_ttl,
+                 params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal 'Fair data station are disabled', flash[:error]
+  end
+
+
   test 'should show link to sample type for linked attribute' do
-    linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids)
+    linked_type = FactoryBot.create(:linked_sample_type, project_ids: @project_ids, contributor: @person)
     linked_attribute = linked_type.sample_attributes.last
 
     assert linked_attribute.sample_attribute_type.seek_sample?
@@ -430,22 +641,12 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'add attribute button' do
-    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids)
+    type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
     assert_empty type.samples
     login_as(@person)
     get :edit, params: { id: type.id }
     assert_response :success
     assert_select 'a#add-attribute', count: 1
-
-    sample = FactoryBot.create(:patient_sample, contributor: @person,
-                                      sample_type: FactoryBot.create(:patient_sample_type, project_ids: @project_ids))
-    type = sample.sample_type
-    refute_empty type.samples
-    assert type.can_edit?
-
-    get :edit, params: { id: type.id }
-    assert_response :success
-    assert_select 'a#add-attribute', count: 0
   end
 
   test 'cannot access when disabled' do
@@ -482,10 +683,31 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'filter for select authorization' do
+    visible_type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy), contributor: FactoryBot.create(:person))
+    hidden_type = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:private_policy), contributor: FactoryBot.create(:person))
+    assert visible_type.can_view?
+    refute hidden_type.can_view?
+
+    projects = (visible_type.projects | hidden_type.projects).collect(&:id)
+
+    get :filter_for_select, params: { projects: projects }
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_includes assigns(:sample_types), visible_type
+    refute_includes assigns(:sample_types), hidden_type
+
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(visible_type), text:visible_type.title
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(hidden_type), text:hidden_type.title, count: 0
+    end
+
+  end
+
   test 'filter for select' do
-    st1 = FactoryBot.create(:patient_sample_type)
-    st2 = FactoryBot.create(:patient_sample_type)
-    st3 = FactoryBot.create(:simple_sample_type)
+    st1 = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
+    st2 = FactoryBot.create(:patient_sample_type, policy: FactoryBot.create(:public_policy))
+    st3 = FactoryBot.create(:simple_sample_type, policy: FactoryBot.create(:public_policy))
     st3.tags = 'fred,mary'
     st1.tags = 'monkey'
     st3.save!
@@ -526,9 +748,9 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'filter for select exclusive tags' do
-    st1 = FactoryBot.create(:simple_sample_type, projects: [@project])
-    st2 = FactoryBot.create(:simple_sample_type, projects: [@project])
-    st3 = FactoryBot.create(:simple_sample_type, projects: [@project])
+    st1 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
+    st2 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
+    st3 = FactoryBot.create(:simple_sample_type, projects: [@project], policy: FactoryBot.create(:public_policy))
     st1.tags = 'fred,mary'
     st2.tags = 'fred,bob,jane'
     st3.tags = 'frank,john,jane,peter'
@@ -643,9 +865,9 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'only visible sample types are listed' do
     person = FactoryBot.create(:person)
-    st1 = FactoryBot.create(:simple_sample_type, projects: person.projects)
+    st1 = FactoryBot.create(:simple_sample_type, projects: person.projects, contributor: person)
     st2 = FactoryBot.create(:simple_sample_type)
-    st3 = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy)).sample_type # type with a public sample associated
+    st3 = FactoryBot.create(:simple_sample_type, projects: person.projects, policy: FactoryBot.create(:public_policy))
     login_as(person.user)
 
     assert st1.can_view?
@@ -672,56 +894,9 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select 'h2.forbidden', text: /The Sample type is not visible to you/
   end
 
-  test 'visible with referring sample' do
-    person = FactoryBot.create(:person)
-    sample = FactoryBot.create(:sample,
-                     policy: FactoryBot.create(:private_policy,
-                                     permissions: [FactoryBot.create(:permission, contributor: person,
-                                                                        access_type: Policy::VISIBLE)]))
-    sample_type = sample.sample_type
-    login_as(person.user)
-
-    assert sample.can_view?
-    refute sample_type.can_view?
-    assert sample_type.can_view?(person.user, sample)
-
-    get :show, params: { id: sample_type.id }
-    assert_response :forbidden
-
-    get :show, params: { id: sample_type.id, referring_sample_id: sample.id }
-    assert_response :success
-
-    # sample type must match
-    get :show, params: { id: FactoryBot.create(:simple_sample_type).id, referring_sample_id: sample.id }
-    assert_response :forbidden
-  end
-
-  # test 'display sample type with related templates' do
-  #   person = FactoryBot.create(:person)
-  #
-  #   template = FactoryBot.create(:min_template, contributor: person, title:'related template')
-  #   template2 = FactoryBot.create(:min_template, contributor: person, title:'unrelated template')
-  #
-  #   # must be associated with a spreadsheet template
-  #   sample_type = FactoryBot.create(:strain_sample_type, isa_template: template, contributor: person)
-  #
-  #   assert_equal template, sample_type.isa_template
-  #   refute_nil sample_type.template
-  #
-  #   login_as(person.user)
-  #
-  #   get :show, params: { id: sample_type.id }
-  #   assert_response :success
-  #
-  #   assert_select 'div.related-items div#templates' do
-  #     assert_select 'a[href=?]', template_path(template), text: template.title
-  #     assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
-  #   end
-  # end
-
   test 'filter sample types with template when advanced single page is enabled' do
     project = FactoryBot.create(:project)
-    FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project])
+    FactoryBot.create(:simple_sample_type, template_id: 1, projects: [project], policy: FactoryBot.create(:public_policy))
     params = { projects: [project.id]}
     get :filter_for_select, params: params
     assert_equal assigns(:sample_types).length, 1
@@ -731,21 +906,189 @@ class SampleTypesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'validates changes against editing constraints' do
-    @sample_type.samples.create!(data: { the_title: 'yes' }, sample_type: @sample_type, project_ids: @project_ids)
 
-    assert_no_difference('ActivityLog.count') do
-      put :update, params: { id: @sample_type, sample_type: {
+  test 'Should not be allowed to show the manage page of ISA-JSON compliant sample type' do
+    with_config_value(:isa_json_compliance_enabled, true) do
+      person = FactoryBot.create(:person)
+
+      investigation = FactoryBot.create(:investigation, contributor: person, policy: FactoryBot.create(:public_policy),
+                                                        is_isa_json_compliant: true)
+      study = FactoryBot.create(:isa_json_compliant_study, investigation: investigation , contributor: person,
+                                                           policy: FactoryBot.create(:public_policy))
+      source_sample_type = study.sample_types.first
+
+      project_sample_type = FactoryBot.create(:simple_sample_type, projects: study.projects, contributor: person)
+
+      login_as(person)
+      assert source_sample_type.is_isa_json_compliant?
+      get :manage, params: { id: source_sample_type }
+      assert_redirected_to sample_type_path
+
+      refute project_sample_type.is_isa_json_compliant?
+      get :manage, params: { id: project_sample_type }
+      assert_response :success
+    end
+  end
+
+  test 'Should be able to manage if permitted' do
+    creator = FactoryBot.create(:person)
+    authorized_person = FactoryBot.create(:person)
+    unauthorized_person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:simple_sample_type, projects: creator.projects, contributor: creator,
+                                                         policy: FactoryBot.create(:private_policy,
+                                                                                   permissions: [FactoryBot.create(:permission, contributor: authorized_person, access_type: Policy::MANAGING),
+                                                                                                 FactoryBot.create(:permission, contributor: unauthorized_person, access_type: Policy::EDITING)])
+    )
+    assert sample_type.can_manage?(creator)
+    assert sample_type.can_manage?(authorized_person)
+    refute sample_type.can_manage?(unauthorized_person)
+
+    login_as(creator)
+    get :manage, params: { id: sample_type }
+    assert_response :success
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a', text: 'Manage Sample Type'
+
+    login_as(authorized_person)
+    get :manage, params: { id: sample_type }
+    assert_response :success
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a', text: 'Manage Sample Type'
+
+    login_as(unauthorized_person)
+    get :manage, params: { id: sample_type }
+    assert_redirected_to sample_type_path(sample_type)
+    assert_equal flash[:error], 'You are not authorized to manage this Sample type.'
+    get :show, params: { id: sample_type }
+    assert_response :success
+    assert_select 'a', text: 'Manage Sample Type', count: 0
+  end
+
+  test 'add new attribute to an existing sample type populated with samples' do
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    (1..10).map do |_i|
+      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type: sample_type)
+    end
+    refute_empty sample_type.samples
+    login_as(@person)
+    get :edit, params: { id: sample_type.id }
+    assert_response :success
+    assert_select 'a#add-attribute', count: 1
+
+    # Should be able to add an optional new attribute to a sample type with samples
+    assert_difference('SampleAttribute.count', 1) do
+      patch :update, params: { id: sample_type.id, sample_type: {
         sample_attributes_attributes: {
-          '0' => { id: @sample_type.sample_attributes.first.id, pos: '1', title: 'banana', required: '1' }
+          '1': { title: 'new optional attribute', sample_attribute_type_id: @string_type.id, required: '0' }
+        }
+      } }
+    end
+    assert_redirected_to sample_type_path(sample_type)
+    sample_type.reload
+    assert_equal 'new optional attribute', sample_type.sample_attributes.last.title
+
+    # Should not be able to add a mandatory new attribute to a sample type with samples
+    assert_no_difference('SampleAttribute.count') do
+      patch :update, params: { id: sample_type.id, sample_type: {
+        sample_attributes_attributes: {
+          '2': { title: 'new mandatory attribute', sample_attribute_type_id: @string_type.id, required: '1' }
         }
       } }
     end
 
-    assert_response :unprocessable_entity
-    assert_select 'div#error_explanation' do
-      assert_select 'ul > li', text: 'Sample attributes title cannot be changed (the_title)'
+  end
+
+  test 'check if sample type is locked' do
+    refute @sample_type.locked?
+
+    login_as(@person)
+
+    %i[edit manage].each do |action|
+      get action, params: { id: @sample_type.id }
+      assert_nil flash[:error]
+      assert_response :success
     end
+
+    # lock the sample type by adding a fake update task
+    UpdateSampleMetadataJob.perform_later(@sample_type, @person.user, [])
+    assert @sample_type.locked?
+
+    %i[edit manage].each do |action|
+      get action, params: { id: @sample_type.id }
+      assert_redirected_to sample_type_path(@sample_type)
+      assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
+    end
+  end
+
+  test 'update a locked sample type' do
+    other_person = FactoryBot.create(:person)
+    sample_type = FactoryBot.create(:simple_sample_type, project_ids: @project_ids, contributor: @person)
+    sample_type.policy.permissions << FactoryBot.create(:permission, contributor: other_person, access_type: Policy::MANAGING)
+
+    (1..10).map do |_i|
+      FactoryBot.create(:sample, contributor: @person, project_ids: @project_ids, sample_type: sample_type)
+    end
+
+    login_as(@person)
+
+    refute @sample_type.locked?
+
+    patch :update, params: { id: sample_type.id, sample_type: {
+      sample_attributes_attributes: {
+        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
+      }
+    } }
+    assert_nil flash[:error]
+    assert_redirected_to sample_type_path(sample_type)
+    sample_type.reload
+    assert sample_type.locked?
+
+    login_as(other_person)
+
+    patch :update, params: { id: sample_type.id, sample_type: {
+      sample_attributes_attributes: {
+        '0': { id: sample_type.sample_attributes.detect(&:is_title), title: 'new title' }
+      }
+    } }
+    sample_type.reload
+    sample_type.errors.added?(:base, 'This sample type is locked and cannot be edited right now.')
+
+    assert_redirected_to sample_type_path(sample_type)
+    assert(sample_type.locked?)
+    assert_equal flash[:error], 'This sample type is locked and cannot be edited right now.'
+  end
+
+  test 'redirect download to content blob download' do
+    sample_type_with_blob = FactoryBot.create(:strain_sample_type, contributor: @person)
+
+    login_as @person
+    assert sample_type_with_blob.can_view?
+    refute sample_type_with_blob.content_blob.blank?
+
+    get :download, params: { id: sample_type_with_blob }
+    assert_redirected_to download_sample_type_content_blob_path(sample_type_with_blob, sample_type_with_blob.content_blob)
+
+    get :download, params: { id: sample_type_with_blob }, as: :json
+    assert_response :see_other
+
+    get :download, params: { id: @sample_type }
+    assert_redirected_to sample_type_path(@sample_type)
+    assert_equal flash[:error], "No downloadable content found for this Sample type."
+
+    get :download, params: { id: @sample_type }, as: :json
+    assert_response :not_found
+    assert_equal response.body, { error: "No downloadable content found for this Sample type." }.to_json
+
+    unauthorized_person = FactoryBot.create(:person)
+    login_as unauthorized_person
+    get :download, params: { id: sample_type_with_blob }
+    assert_equal flash[:error], "You are not authorized to download this Sample type."
+    assert_redirected_to sample_type_path(sample_type_with_blob)
+
+    get :download, params: { id: sample_type_with_blob }, as: :json
+    assert_response :forbidden
   end
 
   private

@@ -3,7 +3,7 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Event
       class Event < Thing
-        EVENT_PROFILE = 'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/'.freeze
+        EVENT_PROFILE = 'https://bioschemas.org/profiles/Event/0.3-DRAFT'.freeze
 
         associated_items contact: :contributors,
                          host_institution: :projects,

@@ -165,11 +165,19 @@ class PersonTest < ActiveSupport::TestCase
     end
     object.reload
     rdf = object.to_rdf
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
+    end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), graph.statements.first.subject
+    assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::Vocab::FOAF.mbox_sha1sum, 'b507549e01d249ee5ed98bd40e4d86d1470a13b8']
+    assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::Vocab::FOAF.homepage, RDF::Literal::AnyURI.new('http://google.com')]
 
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), reader.statements.first.subject
-      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::Vocab::FOAF.mbox_sha1sum, 'b507549e01d249ee5ed98bd40e4d86d1470a13b8']
+    #none rdf supported created items are filtered out
+    assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/assays/#{assay.id}"]
+    assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/sops/#{sop.id}"]
+    refute graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/documents/#{doc.id}"]
+    refute graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/presentations/#{presentation.id}"]
 
       #none rdf supported created items are filtered out
       assert reader.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/assays/#{assay.id}"]
@@ -1743,4 +1751,21 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes merge_log.data, "#{person_to_keep.id}."
   end
 
+  test 'selected avatar id is nullified when avatar deleted' do
+    person = FactoryBot.create(:person)
+    disable_authorization_checks do
+      FactoryBot.build(:avatar, owner: person).save!
+    end
+    avatar = person.reload.avatar
+    assert avatar
+    assert person.avatar_selected?
+
+    assert_difference('Avatar.count', -1) do
+      avatar.destroy!
+    end
+
+    assert_nil person.reload.avatar_id
+    assert_nil person.avatar
+    refute person.avatar_selected?
+  end
 end

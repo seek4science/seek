@@ -16,9 +16,11 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_for_this_study, only: %i[update]
 
+  before_action :set_isa_json_compliance, only: :manage
+
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
-  include Seek::IsaGraphExtensions
+  include Seek::ISAGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -40,8 +42,12 @@ class StudiesController < ApplicationController
 
   def edit
     @study = Study.find(params[:id])
-    respond_to do |format|
-      format.html
+    if @study.is_isa_json_compliant?
+      redirect_to edit_isa_study_path(@study)
+    else
+      respond_to do |format|
+        format.html
+      end
     end
   end
 
@@ -354,6 +360,11 @@ class StudiesController < ApplicationController
   end
 
   private
+
+  def set_isa_json_compliance
+    @isa_json_compliant = @study.is_isa_json_compliant?
+  end
+
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { publication_ids: [] },

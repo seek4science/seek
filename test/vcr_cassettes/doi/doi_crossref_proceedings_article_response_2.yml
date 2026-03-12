@@ -1,0 +1,147 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://doi.org/ra/10.1145/3292500.3330675
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 30 Oct 2025 20:16:42 GMT
+      Content-Type:
+      - application/json;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Server:
+      - cloudflare
+      Vary:
+      - Origin
+      - accept-encoding
+      Permissions-Policy:
+      - interest-cohort=(),browsing-topics=()
+      Cf-Cache-Status:
+      - DYNAMIC
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=K0mmh6ghNypyaqNBHeRnj1kSolUAtGwe97H9twcoatrh9fG7%2FcZpqjX%2F3j7NMjV2sxvI8Se6%2Bzeig9pmQbvspbrLiWmVRdlhh9Fc6gaUJd0o7w%3D%3D"}]}'
+      Cf-Ray:
+      - 996d9786496dd351-FRA
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |-
+        [
+          {
+            "DOI": "10.1145/3292500.3330675",
+            "RA": "Crossref"
+          }
+        ]
+  recorded_at: Thu, 30 Oct 2025 20:16:42 GMT
+- request:
+    method: get
+    uri: https://api.crossref.org/works/10.1145/3292500.3330675
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - application/json
+      User-Agent:
+      - Ruby
+      Host:
+      - api.crossref.org
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 30 Oct 2025 20:16:42 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '7001'
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - Link
+      Access-Control-Allow-Headers:
+      - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+        Accept-Ranges, Cache-Control
+      Access-Control-Allow-Origin:
+      - "*"
+      Vary:
+      - Accept-Encoding
+      Server:
+      - Jetty(9.4.40.v20210413)
+      X-Rate-Limit-Limit:
+      - '50'
+      X-Rate-Limit-Interval:
+      - 1s
+      X-Api-Pool:
+      - public
+      Permissions-Policy:
+      - interest-cohort=()
+    body:
+      encoding: ASCII-8BIT
+      string: '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,6,18]],"date-time":"2025-06-18T04:32:00Z","timestamp":1750221120476,"version":"3.41.0"},"publisher-location":"New
+        York, NY, USA","reference-count":29,"publisher":"ACM","license":[{"start":{"date-parts":[[2019,7,25]],"date-time":"2019-07-25T00:00:00Z","timestamp":1564012800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.acm.org\/publications\/policies\/copyright_policy#Background"}],"content-domain":{"domain":["dl.acm.org"],"crossmark-restriction":true},"short-container-title":[],"published-print":{"date-parts":[[2019,7,25]]},"DOI":"10.1145\/3292500.3330675","type":"proceedings-article","created":{"date-parts":[[2019,7,26]],"date-time":"2019-07-26T13:17:26Z","timestamp":1564147046000},"page":"3153-3161","update-policy":"https:\/\/doi.org\/10.1145\/crossmark-policy","source":"Crossref","is-referenced-by-count":12,"title":["Whole
+        Page Optimization with Global Constraints"],"prefix":"10.1145","author":[{"given":"Weicong","family":"Ding","sequence":"first","affiliation":[{"name":"Amazon.com,
+        Seattle, WA, USA"}]},{"given":"Dinesh","family":"Govindaraj","sequence":"additional","affiliation":[{"name":"Amazon.com,
+        Seattle, WA, USA"}]},{"given":"S V N","family":"Vishwanathan","sequence":"additional","affiliation":[{"name":"Amazon.com,
+        Seattle, WA, USA"}]}],"member":"320","published-online":{"date-parts":[[2019,7,25]]},"reference":[{"doi-asserted-by":"publisher","key":"e_1_3_2_1_1_1","DOI":"10.1145\/2740908.2745398"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_2_1","DOI":"10.1145\/1526709.1526713"},{"unstructured":"Shipra
+        Agrawal and Nikhil Devanur. 2016. Linear contextual bandits with knapsacks.
+        In Advances in Neural Information Processing Systems. 3450--3458.   Shipra
+        Agrawal and Nikhil Devanur. 2016. Linear contextual bandits with knapsacks.
+        In Advances in Neural Information Processing Systems. 3450--3458.","key":"e_1_3_2_1_3_1"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_4_1","DOI":"10.1145\/2124295.2124337"},{"volume-title":"Constrained
+        Multi-Slot Optimization for Ranking Recommendations. arXiv preprint arXiv:1602.04391","year":"2016","author":"Basu
+        Kinjal","key":"e_1_3_2_1_5_1"},{"unstructured":"Kinjal Basu Ankan Saha and
+        Shaunak Chatterjee. 2017. Large-Scale Quadratically Constrained Quadratic
+        Program via Low-Discrepancy Sequences. In Advances in Neural Information Processing
+        Systems. 2297--2307.   Kinjal Basu Ankan Saha and Shaunak Chatterjee. 2017.
+        Large-Scale Quadratically Constrained Quadratic Program via Low-Discrepancy
+        Sequences. In Advances in Neural Information Processing Systems. 2297--2307.","key":"e_1_3_2_1_6_1"},{"unstructured":"Laming
+        Chen Guoxin Zhang and Hanning Zhou. 2018. Improving the Diversity of Top-N
+        Recommendation via Determinantal Point Process. In Advances in Neural Information
+        Processing Systems.  Laming Chen Guoxin Zhang and Hanning Zhou. 2018. Improving
+        the Diversity of Top-N Recommendation via Determinantal Point Process. In
+        Advances in Neural Information Processing Systems.","key":"e_1_3_2_1_7_1"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_8_1","DOI":"10.1145\/2487575.2488197"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_9_1","DOI":"10.1145\/3132847.3133034"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_10_1","DOI":"10.1145\/1390334.1390446"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_11_1","DOI":"10.1145\/2959100.2959190"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_12_1","DOI":"10.1145\/1242572.1242610"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_13_1","DOI":"10.5555\/3174304.3175454"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_14_1","DOI":"10.1145\/2892563"},{"volume-title":"Proceedings
+        of International Conference on Machine Learning","year":"2010","author":"Graepel
+        Thore","key":"e_1_3_2_1_15_1"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_16_1","DOI":"10.1145\/2939672.2939692"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_17_1","DOI":"10.1145\/2648584.2648589"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_18_1","DOI":"10.1145\/3097983.3098184"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_19_1","DOI":"10.1145\/2939672.2939691"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_20_1","DOI":"10.1145\/1944339.1944341"},{"volume-title":"Adaptive
+        Algorithms for Online Convex Optimization with Long-term Constraints. In International
+        Conference on Machine Learning. 402--411","year":"2016","author":"Jenatton
+        Rodolphe","key":"e_1_3_2_1_21_1"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_22_1","DOI":"10.5555\/2503308.2503322"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_23_1","DOI":"10.1145\/3219819.3220072"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_24_1","DOI":"10.1145\/3097983.3098025"},{"volume-title":"Safety-Aware
+        Algorithms for Adversarial Contextual Bandit. In International Conference
+        on Machine Learning. 3280--3288","year":"2017","author":"Sun Wen","key":"e_1_3_2_1_25_1"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_26_1","DOI":"10.1145\/2959100.2959171"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_27_1","DOI":"10.1145\/2835776.2835824"},{"doi-asserted-by":"publisher","key":"e_1_3_2_1_28_1","DOI":"10.1145\/3269206.3272018"},{"unstructured":"Hao
+        Yu Michael Neely and Xiaohan Wei. 2017. Online Convex Optimization with Stochastic
+        Constraints. In Advances in Neural Information Processing Systems. 1427--1437.   Hao
+        Yu Michael Neely and Xiaohan Wei. 2017. Online Convex Optimization with Stochastic
+        Constraints. In Advances in Neural Information Processing Systems. 1427--1437.","key":"e_1_3_2_1_29_1"}],"event":{"sponsor":["SIGMOD
+        ACM Special Interest Group on Management of Data","SIGKDD ACM Special Interest
+        Group on Knowledge Discovery in Data"],"acronym":"KDD ''19","name":"KDD ''19:
+        The 25th ACM SIGKDD Conference on Knowledge Discovery and Data Mining","location":"Anchorage
+        AK USA"},"container-title":["Proceedings of the 25th ACM SIGKDD International
+        Conference on Knowledge Discovery &amp; Data Mining"],"original-title":[],"link":[{"URL":"https:\/\/dl.acm.org\/doi\/10.1145\/3292500.3330675","content-type":"unspecified","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/dl.acm.org\/doi\/pdf\/10.1145\/3292500.3330675","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2025,6,18]],"date-time":"2025-06-18T01:02:09Z","timestamp":1750208529000},"score":1,"resource":{"primary":{"URL":"https:\/\/dl.acm.org\/doi\/10.1145\/3292500.3330675"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2019,7,25]]},"references-count":29,"alternative-id":["10.1145\/3292500.3330675","10.1145\/3292500"],"URL":"https:\/\/doi.org\/10.1145\/3292500.3330675","relation":{},"subject":[],"published":{"date-parts":[[2019,7,25]]},"assertion":[{"value":"2019-07-25","order":2,"name":"published","label":"Published","group":{"name":"publication_history","label":"Publication
+        History"}}]}}'
+  recorded_at: Thu, 30 Oct 2025 20:16:42 GMT
+recorded_with: VCR 6.3.1

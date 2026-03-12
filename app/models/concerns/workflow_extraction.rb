@@ -57,13 +57,13 @@ module WorkflowExtraction
 
   delegate :inputs, :outputs, :steps, to: :structure
 
-  def can_run?
-    can_download?(nil) && workflow_class&.executable? && run_url.present?
+  def can_run?(execution_base_url = nil)
+    can_download?(nil) && workflow_class&.executable? && run_url(execution_base_url).present?
   end
 
-  def run_url
+  def run_url(execution_base_url = nil)
     if workflow_class&.key == 'galaxy'
-      base = execution_instance_url || Seek::Config.galaxy_instance_default
+      base = execution_base_url || execution_instance_url || Seek::Config.galaxy_instance_default
       return if base.nil?
 
       parent_id = is_a_version? ? parent.id : id
@@ -133,6 +133,8 @@ module WorkflowExtraction
       remotes.each do |path, url|
         crate.add_external_file(url)
       end
+
+      crate['datePublished'] = git_version.commit_object&.time
     else
       unless crate.main_workflow
         crate.main_workflow = ROCrate::Workflow.new(crate, content_blob.filepath, content_blob.original_filename, contentSize: content_blob.file_size)
@@ -149,13 +151,14 @@ module WorkflowExtraction
     others = other_creators&.split(',')&.collect(&:strip)&.compact || []
     authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
     crate.author = authors
-    crate.license = license
+    crate.license = Seek::License.find(license)&.url
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
 
     merge_entities(crate, self)
 
     crate['isBasedOn'] = source_link_url if source_link_url && !crate['isBasedOn']
+    crate['datePublished'] = Time.now unless crate['datePublished']
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 

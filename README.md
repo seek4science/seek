@@ -5,7 +5,7 @@
 
 ## License
 
-Copyright © 2009-2023, University of Manchester and HITS gGmbH
+Copyright © 2009-2026, University of Manchester and HITS gGmbH
 
 [BSD 3-clause](BSD-LICENSE)
 
@@ -18,7 +18,13 @@ FAIRDOM-SEEK is incorporating semantic technology allowing sophisticated queries
 
 For an example of FAIRDOM-SEEK please visit our [Demo](http://demo.seek4science.org/).
 
-To see FAIRDOM-SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOMHub](http://fairdomhub.org)
+To see FAIRDOM-SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOMHub](http://fairdomhub.org). Examples include: 
+
+- [FAIRDOMHub](https://fairdomhub.org/)
+- [WorkflowHub](https://workflowhub.eu/)
+- [DataHub](https://datahub.elixir-belgium.org/)
+- [IBISBAKHub](https://hub.ibisba.eu/)
+- [NextSEEK](https://fair-dom.org/fairdom-in-use/nextseek)
 
 For more information please visit: [SEEK for Science](http://www.seek4science.org/)
 
@@ -33,16 +39,16 @@ For more information please visit: [FAIRDOM](http://fair-dom.org).
 We recommend installing FAIRDOM-SEEK on Debian or Ubuntu.
 
 To install the latest release please visit:
-[SEEK install guide](http://docs.seek4science.org/tech/install.html)
+[SEEK install guide](http://docs.seek4science.org/tech/install)
 
-For details about other distributions and installing on Mac OS X please visit:
-[Other distributions guide](http://docs.seek4science.org/tech/other-distributions.html)
+For details about other distributions and installing on macOS please visit:
+[Other distributions guide](http://docs.seek4science.org/tech/other-distributions)
 
-The documentation is available on the *ghpages* branch.
+The documentation is available in its own repository: [seek-documentation](https://github.com/seek4science/seek-documentation).
 
 ## Contacting Us
 
-For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://docs.seek4science.org/contacting_us.html)
+For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://docs.seek4science.org/contacting_us)
 
 ## Contributing to FAIRDOM-SEEK
 
@@ -54,7 +60,7 @@ In general :
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
-For more details on how and what you can contribute to SEEK please visit [Contributing](http://docs.seek4science.org/contributing.html)
+For more details on how and what you can contribute to SEEK please visit [Contributing](http://docs.seek4science.org/contributing)
 
 
 

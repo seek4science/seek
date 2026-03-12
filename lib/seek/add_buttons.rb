@@ -21,7 +21,8 @@ module Seek
         [Workflow, 'workflow[project_ids][]']
       ],
       'Investigation' => [[Study, 'study[investigation_id]']],
-      'Study' => [[Assay, 'assay[study_id]']],
+      'Study' => [[Assay, 'assay[study_id]'],
+                  [ObservationUnit, 'observation_unit[study_id]']],
       'Modelling Analysis' => [[DataFile, 'data_file[assay_assets_attributes[][assay_id]]'],
                                [Document, 'document[assay_assets_attributes[][assay_id]]'],
                                [Sop, 'sop[assay_assets_attributes[][assay_id]]'],

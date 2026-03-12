@@ -8,7 +8,9 @@ changes = {
     "Field Modelling Markup Language (FieldML)" => "FieldML",
     "KEGG Markup Language (KGML)" => "KGML",
     "VCell" => "Virtual Cell Markup Language (VCML)",
-    "MathML/Smile" => "MathML"
+    "MathML/Smile" => "MathML",
+    "Matlab package" => "Matlab code",
+    "R package" => "R code"
 }
 
 changes.keys.each do |change|

@@ -6,9 +6,6 @@ class JermVocabularyTest < ActiveSupport::TestCase
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#'), Seek::Rdf::JERMVocab
   end
 
-  test 'properties' do
-  end
-
   test 'classes' do
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Seek::Rdf::JERMVocab.Data
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Seek::Rdf::JERMVocab.Model

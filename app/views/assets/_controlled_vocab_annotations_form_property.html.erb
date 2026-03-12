@@ -4,13 +4,15 @@
   annotations_accessor = "#{property.to_s.singularize}_annotation_values"
   vocab = resource.annotation_controlled_vocab(property)
   return unless vocab
+  allow_custom = allow_new || false
   values = resource.send(annotations_accessor).pluck(:label)
   title = resource.class.human_attribute_name(annotations_accessor)
+  limit = limit || 10
   %>
 
 <% if vocab %>
   <div class="form-group">
     <label><%= title -%></label>
-    <%= controlled_vocab_form_field(vocab, "#{resource.class.model_name.singular}[#{param_key}]", values, false, 10 ) -%>
+    <%= controlled_vocab_form_field(vocab, "#{resource.class.model_name.singular}[#{param_key}]", values, allow_custom, limit ) -%>
   </div>
 <% end %>

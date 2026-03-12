@@ -1,0 +1,26 @@
+<% if @example_queries.present? %>
+  <% @example_queries.each_slice(2) do |queries_pair| %>
+    <div class="row">
+      <% queries_pair.each do |query_key, query_data| %>
+        <div class="col-md-6">
+          <div class="example-query">
+            <div class="query-title">
+              <strong><%= query_data['title'] %></strong>
+              <span class="label label-info">Example</span>
+            </div>
+            <% if query_data['description'].present? %>
+              <p class="text-muted"><%= query_data['description'] %></p>
+            <% end %>
+            <pre class="query-code"><%= h(query_data['query'].strip) %></pre>
+            <button class="btn btn-sm btn-default use-query" data-query="<%= h(query_data['query'].strip) %>">Use this query</button>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <div class="alert alert-info">
+    <i class="glyphicon glyphicon-info-sign"></i>
+    No example queries available.
+  </div>
+<% end %>

@@ -414,6 +414,10 @@
     min-height: 50em;
 }
 
+#right-pane {
+    overflow: auto;
+}
+
 .highlight {
     max-height: 200px;
     overflow-y: auto;

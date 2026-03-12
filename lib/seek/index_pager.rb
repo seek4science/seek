@@ -33,6 +33,15 @@ module Seek
             end
           end
         end
+        if controller_model == Publication
+          format.any(*Publication::EXPORT_TYPES.keys) do
+            send_data(
+              instance_variable_get("@#{controller_name}").collect { |publication| publication.export(request.format.to_sym) }.join("\n\n"),
+              type: request.format.to_sym,
+              filename: "publications.#{request.format.to_sym}"
+            )
+          end
+        end
       end
     end
 
@@ -149,8 +158,21 @@ module Seek
 
       # Filters
       @filters = page_and_sort_params[:filter].to_h
+      @filters = remove_excess_filters(@filters) unless json_api_request? || User.logged_in_and_registered?
       @active_filters = {}
       @available_filters = {}
+    end
+
+    def remove_excess_filters(filters)
+      # remove the last value from the last key, removing the key if empty, until the limit is met
+      while filters.values.flatten.length > Seek::Config.max_filters
+        key = filters.keys.last
+        value = Array(filters[key])
+        value.pop
+        filters[key] = value
+        filters.compact_blank!
+      end
+      filters
     end
 
     def json_api_links

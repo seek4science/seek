@@ -1,4 +1,11 @@
-class IsaTag < ApplicationRecord
+class ISATag < ApplicationRecord
+
+  if Seek::Config.solr_enabled
+    searchable(auto_index: false) do
+      text :title
+    end
+  end
+
   validates :title, presence: true
 
   has_many :template_attributes, inverse_of: :isa_tag
@@ -44,6 +51,10 @@ class IsaTag < ApplicationRecord
     title == Seek::ISA::TagType::PARAMETER_VALUE
   end
 
+  def isa_input?
+    title == Seek::ISA::TagType::INPUT
+  end
+
   def self.allowed_isa_tags_for_level(level)
     tags = case level
     when 'study source'
@@ -58,6 +69,6 @@ class IsaTag < ApplicationRecord
       Seek::ISA::TagType::ALL_TYPES
     end
 
-    tags.map { |tag| IsaTag.find_by(title: tag) }
+    tags.map { |tag| ISATag.find_by(title: tag) }
   end
 end

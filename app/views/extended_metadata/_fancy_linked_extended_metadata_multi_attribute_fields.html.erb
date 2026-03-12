@@ -5,7 +5,7 @@
   <% index = 0 %>
 <% end %>
 
-<% prefix = element_name.split(/\[|\]/).reject(&:empty?).join("_") %>
+<% prefix = element_name.parameterize  %>
 
   <div id="<%= key %>">
     <div class="table linked_extended_metdata_odd" id="<%= key.singularize %>-table">

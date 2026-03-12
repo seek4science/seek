@@ -22,7 +22,11 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     assert pres.can_edit?(@current_user)
 
     original_md5 = pres.content_blob.md5sum
-    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put presentation_content_blob_path(pres, pres.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :success
     blob = pres.content_blob.reload
@@ -38,10 +42,14 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     assert pres.can_download?(@current_user)
     refute pres.can_edit?(@current_user)
 
-    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
+    put presentation_content_blob_path(pres, pres.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :forbidden
-    validate_json response.body, '#/components/schemas/forbiddenResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
     blob = pres.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -55,10 +63,14 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     assert pres.can_edit?(@current_user)
 
     original_md5 = pres.content_blob.md5sum
-    put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
+    put presentation_content_blob_path(pres, pres.content_blob), headers: {
+      'Accept' => 'application/json',
+      'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')),
+      'Authorization' => write_access_auth
+    }
 
     assert_response :bad_request
-    validate_json response.body, '#/components/schemas/badRequestResponse'
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/badRequestResponse') }
     blob = pres.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -78,7 +90,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     to_post = load_template('post_bad_presentation.json.erb')
 
     assert_no_difference(-> { model.count }) do
-      post "/#{plural_name}.json", params: to_post
+      post collection_url, params: to_post, headers: { 'Authorization' => write_access_auth }
       # assert_response :unprocessable_entity
       # validate_json response.body, '#/components/schemas/errors'
     end

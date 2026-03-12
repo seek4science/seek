@@ -8,9 +8,6 @@
     <%= admin_text_setting(:pubmed_api_email, Seek::Config.pubmed_api_email,
                            'Pubmed API email', 'When adding a publication from PubMed, an email address is required to use the API. No registration is required.') %>
 
-    <%= admin_text_setting(:crossref_api_email, Seek::Config.crossref_api_email,
-                           'CrossRef API email', "When adding a publication from a DOI, an email address is required to use the API. The email address needs registering at #{link_to 'http://www.crossref.org/', 'http://www.crossref.org/',:target=>:_blank}") %>
-
     <%= admin_checkbox_setting(:allow_publications_fulltext, 1, Seek::Config.allow_publications_fulltext,
                              "Allow uploading FullTexts", "Allow the registered users to upload Fulltext (pdf) for publications. They can also be made public. Please makes sure it is allowed first.") %>
     <%= admin_checkbox_setting(:allow_edit_of_registered_publ, 1, Seek::Config.allow_edit_of_registered_publ,
@@ -38,6 +35,10 @@
                              :onkeypress => "javascript: return onlyNumbers(event);") %>
     </div>
 
+    <%= admin_text_setting(:sandbox_instance_url, Seek::Config.sandbox_instance_url,
+                           'Sandbox instance URL', "A URL of an instance of SEEK to be used for testing/development. Users will be directed here if they attempt to create a #{t('project')} or #{t('programme')} with a name including \"test\".") %>
+    <%= admin_text_setting(:sandbox_instance_name, Seek::Config.sandbox_instance_name,
+                           'Sandbox instance name', "The name of the testing/sandbox instance.") %>
     <h2>Policy and license settings</h2>
     <%= access_type_options = [Policy::PRIVATE, Policy::VISIBLE, Policy::ACCESSIBLE]
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
@@ -62,7 +63,7 @@
 
     <%= admin_setting_block('Recommended data licenses', "The licenses to recommend when data, such as a #{t('data_file')} or #{t('document')}, is registered.") do %>
       <%= associations_list('recommended-data-licenses', 'associations/general',
-                            Seek::Config.recommended_data_licenses.map { |id| { id: id, title: Seek::License.find(id).title } }.to_json,
+                            Seek::Config.recommended_data_licenses.map { |id| { id: id, title: Seek::License.find(id).full_display_title } }.to_json,
                             'data-field-name' => 'recommended_data_licenses',
                             empty_text: 'No recommended licenses') %>
       <%= license_select(:_recommended_data_license_select, nil, prompt: 'Select a license to add it to the list...', class: 'form-control') %>
@@ -70,7 +71,7 @@
 
     <%= admin_setting_block('Recommended software licenses', "The licenses to recommend when software, such as a #{t('workflow')}, is registered.") do %>
       <%= associations_list('recommended-software-licenses', 'associations/general',
-                            Seek::Config.recommended_software_licenses.map { |id| { id: id, title: Seek::License.find(id).title } }.to_json,
+                            Seek::Config.recommended_software_licenses.map { |id| { id: id, title: Seek::License.find(id).full_display_title } }.to_json,
                             'data-field-name' => 'recommended_software_licenses',
                             empty_text: 'No recommended licenses') %>
       <%= license_select(:_recommended_software_license_select, nil, prompt: 'Select a license to add it to the list...', class: 'form-control') %>

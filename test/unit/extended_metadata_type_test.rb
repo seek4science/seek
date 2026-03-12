@@ -98,4 +98,16 @@ class ExtendedMetadataTypeTest < ActiveSupport::TestCase
     assert_equal [cmt,cmt2], ExtendedMetadataType.all.order(:id)
     assert_equal [cmt], ExtendedMetadataType.enabled.order(:id)
   end
+
+  test 'linked by metadata attributes' do
+    cmt1 = FactoryBot.create(:study_extended_metadata_type_with_cv_and_cv_list_type)
+    refute cmt1.linked_metadata_attributes.any?
+
+    cmt2 = FactoryBot.create(:role_extended_metadata_type)
+    linked_cmt2 = cmt2.extended_metadata_attributes.last.linked_extended_metadata_type
+    assert linked_cmt2.extended_type?
+    assert linked_cmt2.linked_metadata_attributes.any?
+    assert_equal 1, linked_cmt2.linked_metadata_attributes.count
+  end
+
 end

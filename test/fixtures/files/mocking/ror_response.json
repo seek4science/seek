@@ -1,0 +1,200 @@
+{
+  "admin": {
+    "created": {
+      "date": "2018-11-14",
+      "schema_version": "1.0"
+    },
+    "last_modified": {
+      "date": "2025-05-05",
+      "schema_version": "2.1"
+    }
+  },
+  "domains": [],
+  "established": 1824,
+  "external_ids": [
+    {
+      "all": [
+        "501100000770",
+        "100007545",
+        "100007546",
+        "501100000584",
+        "501100006628",
+        "100012371",
+        "501100009148",
+        "501100014814",
+        "501100020358",
+        "501100024330"
+      ],
+      "preferred": "501100000770",
+      "type": "fundref"
+    },
+    {
+      "all": [
+        "grid.5379.8"
+      ],
+      "preferred": "grid.5379.8",
+      "type": "grid"
+    },
+    {
+      "all": [
+        "0000 0001 2166 2407"
+      ],
+      "preferred": null,
+      "type": "isni"
+    },
+    {
+      "all": [
+        "Q230899"
+      ],
+      "preferred": null,
+      "type": "wikidata"
+    }
+  ],
+  "id": "https://ror.org/027m9bs27",
+  "links": [
+    {
+      "type": "website",
+      "value": "http://www.manchester.ac.uk/"
+    },
+    {
+      "type": "wikipedia",
+      "value": "http://en.wikipedia.org/wiki/University_of_Manchester"
+    }
+  ],
+  "locations": [
+    {
+      "geonames_details": {
+        "continent_code": "EU",
+        "continent_name": "Europe",
+        "country_code": "GB",
+        "country_name": "United Kingdom",
+        "country_subdivision_code": "ENG",
+        "country_subdivision_name": "England",
+        "lat": 53.48095,
+        "lng": -2.23743,
+        "name": "Manchester"
+      },
+      "geonames_id": 2643123
+    }
+  ],
+  "names": [
+    {
+      "lang": "en",
+      "types": [
+        "alias"
+      ],
+      "value": "Manchester University"
+    },
+    {
+      "lang": "cy",
+      "types": [
+        "label"
+      ],
+      "value": "Prifysgol Manceinion"
+    },
+    {
+      "lang": "en",
+      "types": [
+        "ror_display",
+        "label"
+      ],
+      "value": "University of Manchester"
+    },
+    {
+      "lang": "en",
+      "types": [
+        "alias"
+      ],
+      "value": "University of Manchester Institute of Science and Technology"
+    },
+    {
+      "lang": "en",
+      "types": [
+        "alias"
+      ],
+      "value": "Victoria University of Manchester"
+    }
+  ],
+  "relationships": [
+    {
+      "label": "Manchester School of Architecture",
+      "type": "child",
+      "id": "https://ror.org/03xxxrq06"
+    },
+    {
+      "label": "Wellcome Centre for Cell-Matrix Research",
+      "type": "child",
+      "id": "https://ror.org/0094tm228"
+    },
+    {
+      "label": "Centre for Epidemiology Versus Arthritis",
+      "type": "child",
+      "id": "https://ror.org/05eev2q71"
+    },
+    {
+      "label": "Cancer Research UK Manchester Centre",
+      "type": "child",
+      "id": "https://ror.org/033svsm10"
+    },
+    {
+      "label": "Cancer Imaging Centre",
+      "type": "child",
+      "id": "https://ror.org/023a2er20"
+    },
+    {
+      "label": "Lancashire Teaching Hospitals NHS Foundation Trust",
+      "type": "related",
+      "id": "https://ror.org/02j7n9748"
+    },
+    {
+      "label": "Manchester Royal Eye Hospital",
+      "type": "related",
+      "id": "https://ror.org/04xtpk854"
+    },
+    {
+      "label": "Manchester Royal Infirmary",
+      "type": "related",
+      "id": "https://ror.org/03kr30n36"
+    },
+    {
+      "label": "Manchester University NHS Foundation Trust",
+      "type": "related",
+      "id": "https://ror.org/00he80998"
+    },
+    {
+      "label": "North Manchester General Hospital",
+      "type": "related",
+      "id": "https://ror.org/02xesw687"
+    },
+    {
+      "label": "Royal Manchester Children's Hospital",
+      "type": "related",
+      "id": "https://ror.org/052vjje65"
+    },
+    {
+      "label": "Salford Royal Hospital",
+      "type": "related",
+      "id": "https://ror.org/027rkpb34"
+    },
+    {
+      "label": "Trafford General Hospital",
+      "type": "related",
+      "id": "https://ror.org/02snwfx66"
+    },
+    {
+      "label": "University Dental Hospital of Manchester",
+      "type": "related",
+      "id": "https://ror.org/019bxes45"
+    },
+    {
+      "label": "In-Service Aircraft for a Global Observing System",
+      "type": "related",
+      "id": "https://ror.org/033zfn006"
+    }
+  ],
+  "status": "active",
+  "types": [
+    "education",
+    "funder"
+  ]
+}

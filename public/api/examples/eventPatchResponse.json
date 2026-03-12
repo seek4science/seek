@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "99",
+    "id": "101",
     "type": "events",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1030",
+              "id": "2030",
               "type": "projects"
             },
             "access": "edit"
@@ -28,7 +28,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1013",
+            "id": "2144",
             "type": "people"
           }
         ]
@@ -36,7 +36,7 @@
       "projects": {
         "data": [
           {
-            "id": "1030",
+            "id": "2030",
             "type": "projects"
           }
         ]
@@ -44,7 +44,7 @@
       "data_files": {
         "data": [
           {
-            "id": "39",
+            "id": "175",
             "type": "data_files"
           }
         ]
@@ -52,7 +52,7 @@
       "publications": {
         "data": [
           {
-            "id": "101",
+            "id": "132",
             "type": "publications"
           }
         ]
@@ -60,21 +60,21 @@
       "presentations": {
         "data": [
           {
-            "id": "76",
+            "id": "60",
             "type": "presentations"
           }
         ]
       }
     },
     "links": {
-      "self": "/events/99"
+      "self": "/events/101"
     },
     "meta": {
-      "created": "2024-07-03T13:45:59.000Z",
-      "modified": "2024-07-03T13:45:59.000Z",
+      "created": "2024-11-20T10:15:47.000Z",
+      "modified": "2024-11-20T10:15:47.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "810dd620-1b70-013d-1ffe-0a81884ed284"
+      "uuid": "55968390-8956-013d-24a2-0a81884ed284"
     }
   },
   "jsonapi": {

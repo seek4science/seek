@@ -1,0 +1,16 @@
+{
+  "title": "publication",
+  "supported_type": "Publication",
+  "enabled": true,
+  "attributes": [
+    {
+      "title": "title",
+      "type": "String",
+      "required": true
+    },
+    {
+      "title": "DOI",
+      "type": "DOI"
+    }
+  ]
+}

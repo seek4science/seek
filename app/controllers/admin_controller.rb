@@ -75,6 +75,7 @@ class AdminController < ApplicationController
     end
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
+    Seek::Config.standard_login_enabled = string_to_boolean params[:standard_login_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
     Seek::Config.omniauth_ldap_enabled = string_to_boolean params[:omniauth_ldap_enabled]
@@ -106,6 +107,7 @@ class AdminController < ApplicationController
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
+    Seek::Config.max_filters = params[:max_filters]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root = params[:jws_online_root]
 
@@ -121,6 +123,8 @@ class AdminController < ApplicationController
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
+    Seek::Config.observation_units_enabled = string_to_boolean params[:observation_units_enabled]
+    Seek::Config.fair_data_station_enabled = string_to_boolean params[:fair_data_station_enabled]
     Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
@@ -164,6 +168,7 @@ class AdminController < ApplicationController
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
+    Seek::Config.morpheus_enabled = string_to_boolean(params[:morpheus_enabled])
     Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
     Seek::Config.isa_json_compliance_enabled = string_to_boolean(params[:isa_json_compliance_enabled])
     Seek::Config.project_single_page_folders_enabled= string_to_boolean(params[:project_single_page_folders_enabled])
@@ -311,12 +316,9 @@ class AdminController < ApplicationController
     # check valid email
     pubmed_email = params[:pubmed_api_email]
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
-    crossref_email = params[:crossref_api_email]
-    crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
     Seek::Config.allow_publications_fulltext = string_to_boolean params[:allow_publications_fulltext]
     Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
-    Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
     if params[:session_store_timeout]
       mins = params[:session_store_timeout].to_i
@@ -350,7 +352,9 @@ class AdminController < ApplicationController
     Seek::Config.metadata_license = params[:metadata_license]
     Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]&.compact_blank
     Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]&.compact_blank
-    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
+    Seek::Config.sandbox_instance_url = params[:sandbox_instance_url]
+    Seek::Config.sandbox_instance_name = params[:sandbox_instance_name]
+    update_flag = (pubmed_email == '' || pubmed_email_valid)
     update_redirect_to update_flag, 'settings'
   end
 
@@ -361,19 +365,9 @@ class AdminController < ApplicationController
   end
 
   def restart_delayed_job
-    error = nil
-    unless Rails.env.test?
-      begin
-        Seek::Workers.restart
-        wait_for_delayed_job_to_start
-      rescue SystemExit => e
-        Rails.logger.info("Exit code #{e.status}")
-      rescue => e
-        Seek::Errors::ExceptionForwarder.send_notification(e, data:{message:'Problem restarting delayed job'})
-      end
-    end
-
-    redirect_with_status(error, 'background tasks')
+    command = "bundle exec rake seek:workers:restart"
+    error = execute_command(command)
+    redirect_with_status(error, 'background job workers')
   end
 
   def clear_cache
@@ -517,6 +511,10 @@ class AdminController < ApplicationController
       partial = 'user_stats_list'
       collection = Person.pals
       title = 'List of PALs'
+    when 'profiles_with_users'
+      partial = 'user_stats_list'
+      collection  = Person.registered
+      title = 'Profiles with users'
     when 'none'
       partial = 'none'
     end
@@ -535,11 +533,11 @@ class AdminController < ApplicationController
     smtp_hash_new = { address: params[:address],
                       enable_starttls_auto: params[:enable_starttls_auto] == '1',
                       domain: params[:domain],
-                      authentication: params[:authentication],
-                      user_name: (params[:smtp_user_name].blank? ? nil : params[:smtp_user_name]),
-                      password: (params[:smtp_password].blank? ? nil : params[:smtp_password]) }
+                      authentication: params[:authentication].presence,
+                      user_name: params[:smtp_user_name].presence,
+                      password: params[:smtp_password].presence }
     smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
-    ActionMailer::Base.smtp_settings = smtp_hash_new
+    ActionMailer::Base.smtp_settings = smtp_hash_new.compact
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin
@@ -693,22 +691,25 @@ class AdminController < ApplicationController
   def execute_command(command)
     return nil if Rails.env.test?
     begin
+      Rails.logger.info("executing admin shell command '#{command}'")
       cl = Terrapin::CommandLine.new(command)
       cl.run
+      Rails.logger.info('admin shell command successfully executed!')
       return nil
     rescue Terrapin::CommandNotFoundError => e
-      return 'The command to restart the background tasks could not be found!'
+      return 'The command could not be found!'
     rescue => e
       error = e.message
+      Rails.logger.error("Error executing admin shell command: #{error}")
       return error
     end
   end
 
   def redirect_with_status(error, process)
     if error.blank?
-      flash[:notice] = "The #{process} was restarted"
+      flash[:notice] = "Successfully restarted the #{process}"
     else
-      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
+      flash[:error] = "There was a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
     end
     redirect_to action: :show
   end

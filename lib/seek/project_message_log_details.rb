@@ -26,7 +26,7 @@ module Seek
 
     REQUIRED_ATTRIBUTES = {
       Project => %w[id title description web_page programme_id],
-      Institution => %w[id title city country web_page],
+      Institution => %w[id title city country web_page ror_id department],
       Person => %w[id first_name last_name email],
       Programme => %w[id title description]
     }.freeze
@@ -65,7 +65,6 @@ module Seek
         details[:programme] = programme.attributes.slice(*REQUIRED_ATTRIBUTES[Programme]) if programme
         details[:people] = people.map { |person| person.attributes.slice(*REQUIRED_ATTRIBUTES[Person]) } if people
         details[:comments] = comments if comments
-
         details.to_json
       end
     end

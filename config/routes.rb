@@ -81,7 +81,7 @@ SEEK::Application.routes.draw do
   end
 
   concern :has_snapshots do
-    resources :snapshots, only: [:show, :new, :create, :destroy], concerns: [:has_doi] do
+    resources :snapshots, concerns: [:has_doi] do
       member do
         get :download
         get :export, action: :export_preview
@@ -207,6 +207,9 @@ SEEK::Application.routes.draw do
     collection do
       get :form_fields
       get :administer
+      post :create
+      post :create_from_fair_ds_ttl
+      post :submit_jsons
     end
     member do
       put :administer_update
@@ -333,7 +336,7 @@ SEEK::Application.routes.draw do
       get :project_join_requests
       get :project_creation_requests
       get :project_importation_requests
-      get  :typeahead
+      get :typeahead
     end
     member do
       get :asset_report
@@ -350,8 +353,11 @@ SEEK::Application.routes.draw do
       post :respond_join_request
       get :guided_join
       get :import_from_fairdata_station
+      get :fair_data_station_import_status
+      post :hide_fair_data_station_import_status
       post :submit_fairdata_station
       post :update_annotations_ajax
+      get :default_data
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :observation_units, :presentations,
               :publications, :events, :sample_types, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
@@ -407,6 +413,7 @@ SEEK::Application.routes.draw do
       get :request_all
       get :request_all_sharing_form
       get  :typeahead
+      get  :ror_search
     end
     resources :people, :programmes, :projects, :specimens, only: [:index]
   end
@@ -414,14 +421,18 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
       get :export_isa, action: :export_isa
       get :manage
       get :order_studies
       patch :manage_update
+      get :update_from_fairdata_station
+      post :submit_fairdata_station
+      get :fair_data_station_update_status
+      post :hide_fair_data_station_update_status
     end
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, :samples, only: [:index]
   end
 
   resources :studies, concerns: [:publishable, :has_snapshots, :isa] do
@@ -454,19 +465,31 @@ SEEK::Application.routes.draw do
       get :order_assays
       patch :manage_update
     end
-    resources :people, :programmes, :projects, :sample_types, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, only: [:index]
+    resources :people, :programmes, :projects, :sample_types, :samples, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, :observation_units, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :nels, only: [:index] do
-      collection do
-        get :projects
-        get :datasets
-        get :dataset
-        post :register
-      end
-    end
-    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
+    resources :nels, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :sample_types, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :observation_units, :placeholders, only: [:index]
+  end
+
+  resources :nels do
+    collection do
+      get :projects
+      get :project
+      get :datasets
+      get :dataset
+      get :subtype
+      get :download_file
+      get :fetch_file
+      get :new_dataset
+      get :get_metadata
+      post :register
+      post :create_dataset
+      post :add_metadata
+      post :upload_file
+      post :create_folder
+    end  
   end
 
   # to be removed as STI does not work in too many places
@@ -489,7 +512,8 @@ SEEK::Application.routes.draw do
       post :create_metadata
     end
     member do
-      get :samples_table
+      get :extracted_samples_table
+      get :extracted_samples
       get :select_sample_type
       get :confirm_extraction
       get :extraction_status
@@ -521,12 +545,16 @@ SEEK::Application.routes.draw do
       post :execute
       get :simulate
       post :simulate
+      get :copasi_simulate
     end
     resources :model_images, only: [:show]
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, :organisms, :human_diseases, only: [:index]
   end
 
   resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :explorable_spreadsheet] do
+    collection do
+      get :dynamic_table_typeahead
+    end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
@@ -551,6 +579,7 @@ SEEK::Application.routes.draw do
       get :new_git_version
       post :create_version_metadata
       post :create_version_from_git
+      post :create_version_from_ro_crate
       get :edit_paths
       patch :update_paths
       post :run
@@ -598,15 +627,14 @@ SEEK::Application.routes.draw do
       get :reject_activation_confirmation
       get :storage_report
     end
-    resources :people, :projects, :institutions, :investigations, :studies, :assays, :samples,
+    resources :people, :projects, :institutions, :investigations, :studies, :assays, :observation_units, :samples,
               :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
     concerns :has_dashboard, controller: :programme_stats
   end
 
   resources :publications, concerns: [:asset, :has_content_blobs] do
     collection do
-      get :query_authors
-      get :query_authors_typeahead
+      get :typeahead_publication_authors
       get :export
       post :fetch_preview
       post :update_metadata
@@ -694,23 +722,26 @@ SEEK::Application.routes.draw do
 
   ### SAMPLE TYPES ###
   #
-  resources :sample_types do
+  resources :sample_types, concerns: %i[asset] do
     collection do
       post :create_from_template
+      post :create_from_fair_ds_ttl
       get :select
       get :filter_for_select
     end
     member do
       get :template_details
       get :batch_upload
+      get :download
+      post :update_annotations_ajax
     end
-    resources :samples
     resources :content_blobs do
       member do
         get :download
       end
     end
-    resources :projects, :programmes, :templates, :studies, :assays, only: [:index]
+    resources :samples
+    resources :investigations, :people, :collections, :publications, :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
@@ -811,8 +842,19 @@ SEEK::Application.routes.draw do
 
   resources :observation_units, concerns:[:asset] do
 
-    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :publications, :collections
+    resources :projects, :people, :programmes, :samples, :assays, :studies, :investigations, :data_files, :sops, :publications, :collections
   end
+
+  ### SPARQL ###
+  resources :sparql, only: [:index] do
+    collection do
+      post :query
+    end
+  end
+
+  ### ISA Tags ###
+
+  resources :isa_tags, only: [:index, :show]
 
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search
@@ -855,6 +897,9 @@ SEEK::Application.routes.draw do
   # feedback
   get '/home/feedback' => 'homes#feedback', as: :feedback
 
+  # Healthcheck
+  get "up" => "rails/health#show", as: :rails_health_check
+
   # error rendering
   get '/404' => 'errors#error_404'
   get '/406' => 'errors#error_406'
@@ -875,6 +920,6 @@ SEEK::Application.routes.draw do
   get 'cookies/consent' => 'cookies#consent'
   post 'cookies/consent' => 'cookies#set_consent'
 
-  # for the api docs under production, avoids special rewrite rules
-  get 'api', to: static("api/index.html") if Rails.env.production?
+  # for the api docs avoids special rewrite rules
+  get 'api' => 'homes#api_docs'
 end

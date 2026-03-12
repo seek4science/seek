@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class InvestigationTest < ActiveSupport::TestCase
-  fixtures :investigations, :projects, :studies, :assays, :assay_assets, :permissions, :policies
 
   test 'associations' do
     inv = investigations(:metabolomics_investigation)
@@ -45,10 +44,12 @@ class InvestigationTest < ActiveSupport::TestCase
     object = FactoryBot.create(:investigation, description: 'Big investigation')
     FactoryBot.create_list(:study, 2, contributor: object.contributor, investigation: object)
     rdf = object.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), reader.statements.first.subject
+    graph = RDF::Graph.new do |graph|
+      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
     end
+    assert graph.statements.count > 1
+    assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), graph.statements.first.subject
+
   end
 
   test 'to_isatab' do
@@ -65,7 +66,7 @@ class InvestigationTest < ActiveSupport::TestCase
       assay.save!
     end
 
-    the_hash = IsaTabConverter.convert_investigation(object)
+    the_hash = ISATabConverter.convert_investigation(object)
     json = JSON.pretty_generate(the_hash)
 
     # write out to a temporary file
@@ -78,8 +79,7 @@ class InvestigationTest < ActiveSupport::TestCase
     assert result.blank?, "check-isa.py result was not blank, returned: #{result}"
   end
 
-# the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
-  test 'title trimmed' do
+  test 'title stripped' do
     inv = FactoryBot.create(:investigation, title: ' Test')
     assert_equal 'Test', inv.title
   end
@@ -155,7 +155,7 @@ class InvestigationTest < ActiveSupport::TestCase
     end
 
     assert_equal 1, investigation.snapshots.count
-    assert_equal investigation.title, snapshot.title
+    assert_equal investigation.title, snapshot.metadata['title']
   end
 
   test 'clone with associations' do
@@ -234,6 +234,52 @@ class InvestigationTest < ActiveSupport::TestCase
     assay = FactoryBot.create(:assay, study: study)
     assay_sop = FactoryBot.create(:sop, assays: [assay])
     assert_equal investigation.related_sop_ids.sort, (study.sop_ids << assay_sop.id).sort
+  end
+
+  test 'observation units' do
+    obs_unit = FactoryBot.create(:observation_unit)
+    investigation = obs_unit.study.investigation
+    assert_equal [obs_unit], investigation.observation_units
+  end
+
+  test 'related data files' do
+    contributor = FactoryBot.create(:person)
+    df1 = FactoryBot.create(:data_file, contributor: contributor)
+    df2 = FactoryBot.create(:data_file, contributor: contributor)
+
+    # related just through an assay
+    assay = FactoryBot.create(:assay, data_files:[df1], contributor: contributor)
+    investigation = assay.study.investigation
+    assert_equal [df1], investigation.related_data_files
+
+    # related just through an observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, data_files: [df2])
+    assert_equal [df2], obs_unit.study.investigation.related_data_files
+
+    # related through both an assay and observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, data_files: [df2], study: investigation.studies.first)
+    investigation.reload
+    assert_equal [df1, df2].sort, investigation.related_data_files.sort
+  end
+
+  test 'related samples' do
+    contributor = FactoryBot.create(:person)
+    sample1 = FactoryBot.create(:sample, contributor: contributor)
+    sample2 = FactoryBot.create(:sample, contributor: contributor)
+
+    # related just through an assay
+    assay = FactoryBot.create(:assay, samples: [sample1], contributor: contributor)
+    investigation = assay.study.investigation
+    assert_equal [sample1], investigation.related_samples
+
+    # related just through an observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, samples: [sample2])
+    assert_equal [sample2], obs_unit.study.investigation.related_samples
+
+    # related through both an assay and observation unit
+    obs_unit = FactoryBot.create(:observation_unit, contributor: contributor, samples:[sample2], study: investigation.studies.first)
+    investigation.reload
+    assert_equal [sample1, sample2].sort, investigation.related_samples.sort
   end
 
 end

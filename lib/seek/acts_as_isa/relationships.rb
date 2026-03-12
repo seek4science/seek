@@ -20,6 +20,10 @@ module Seek
         def related_sops
           Sop.where(id: related_sop_ids)
         end
+
+        def related_data_files
+          DataFile.where(id: related_data_file_ids)
+        end
       end
 
       module Associations

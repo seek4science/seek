@@ -3,7 +3,7 @@ module Seek
     module Extract
       # Base class for handling of extracting and interpreting metadata from within a Rightfield Template
       class RightfieldExtractor
-        include RightField
+        include Rightfield::Rightfield
 
         attr_reader :current_user
 
@@ -63,7 +63,7 @@ module Seek
 
         def seek_id_uris
           values_for_property(:seekID, :literal).select do |uri|
-            valid = uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
+            valid = uri =~ URI::ABS_URI
             add_warning(:id_not_a_valid_uri, uri) unless valid || uri.blank?
             valid
           end
