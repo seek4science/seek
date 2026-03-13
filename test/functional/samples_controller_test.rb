@@ -1221,7 +1221,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal response_body['status'], 'unprocessable_entity'
     assert_equal 1, response_body['errors'].length
     error = response_body['errors'][0]
-    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => 'You cannot delete a hidden sample!' }
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => 'You cannot delete a hidden sample!', 'level' => 'Sample' }
   end
 
   test 'batch delete inexisting samples' do
@@ -1246,7 +1246,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal response_body['status'], 'unprocessable_entity'
     assert_equal 1, response_body['errors'].length
     error = response_body['errors'][0]
-    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Sample with id '#{random_id}' not found." }
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Sample with id '#{random_id}' not found.", 'level' => 'Sample' }
   end
 
   test 'batch delete unauthorized samples' do
@@ -1272,7 +1272,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal response_body['status'], 'unprocessable_entity'
     assert_equal 1, response_body['errors'].length
     error = response_body['errors'][0]
-    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Unauthorized to delete Sample with id '#{unauthorized_sample.id}'." }
+    assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => "Unauthorized to delete Sample with id '#{unauthorized_sample.id}'.", 'level' => 'Sample' }
   end
 
   test 'JS request does not raise CORS error' do
