@@ -636,7 +636,7 @@ function selectAll(e, includeHidden = false) {
   const dtName = $j(dtTbl).data("dtname")
   const visibleRows = window[dtName].table.rows().data().toArray().filter((array) => {
     return !array
-      .filter((v) => ![null, true, false].includes(v)) // Filter out all null, undefined or boolean values
+      .filter((v) => ![null, undefined, true, false].includes(v)) // Filter out all null, undefined or boolean values
       .every((v) => v === '#HIDDEN')
   });
   const count = visibleRows.length;
@@ -815,6 +815,18 @@ const handleFailure = (table, res) => {
           if (hasObjectDetails) $j(this.node()).attr("title", errorDetails[colTitle]);
         }
       });
+      // Handle 'base' errors for SampleAttribute level so they are not dropped
+      if (hasObjectDetails && errorColNames.includes("base")) {
+        const baseError = errorDetails["base"];
+        if (baseError != null) {
+          errors.add(baseError);
+          const row = $j(table.row(rowId).node());
+          row.find('td').each((index, element) => {
+            $j(element).removeClass(dtSuccessClass).addClass(dtErrClass);
+          });
+          row.attr("title", baseError);
+        }
+      }
     } else if (errorColNames.includes("base") && hasObjectDetails) {
       errors.add(errorDetails["base"]);
     } else if (errorDetails != null) {

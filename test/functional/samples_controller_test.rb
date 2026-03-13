@@ -1224,7 +1224,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal error, { 'ex_id' => "#{sample_type.id}-#{1}", 'error' => 'You cannot delete a hidden sample!', 'level' => 'Sample' }
   end
 
-  test 'batch delete inexisting samples' do
+  test 'batch delete nonexistent samples' do
     person = FactoryBot.create(:person)
     project = person.projects.first
     sample_type = FactoryBot.create(:min_sample_type, contributor: person, projects: [project])
