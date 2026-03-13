@@ -793,16 +793,18 @@ const handleFailure = (table, res) => {
   const errors = new Set();
   res.errors.forEach((error) => {
     const [rowId, sampleTypeId] = error.ex_id.split("-");
-    const errorColNames = Object.keys(error.error);
+    const errorDetails = error.error;
+    const hasObjectDetails = errorDetails && typeof errorDetails === 'object' && !Array.isArray(errorDetails);
+    const errorColNames = hasObjectDetails ? Object.keys(errorDetails) : [];
     const level = error.level;
 
     // If it is a 'Sample' level error,
     // deal with this row and go to next iteration.
-    if (level === 'Sample') {
-      errors.add(error.error);
+    if (level === 'Sample' && errorDetails != null) {
+      errors.add(errorDetails);
       const row = $j(table.row(rowId).node());
       row.find('td').each((index, element) => {$j(element).removeClass(dtRowDelete).removeClass(dtSuccessClass).addClass(dtErrClass)});
-      row.attr("title", error.error);
+      row.attr("title", errorDetails);
     } else if (level === 'SampleAttribute') {
       table.cells(rowId, `${sampleTypeId}:name`).every(function () {
         const idx = this.index().column;
@@ -810,13 +812,13 @@ const handleFailure = (table, res) => {
         if (errorColNames.includes(colTitle)) {
           errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
           $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
-          $j(this.node()).attr("title", error.error[colTitle]);
+          if (hasObjectDetails) $j(this.node()).attr("title", errorDetails[colTitle]);
         }
       });
-    } else if (errorColNames.includes("base")) {
-      errors.add(error.error["base"]);
-    } else {
-      errors.add(error.error);
+    } else if (errorColNames.includes("base") && hasObjectDetails) {
+      errors.add(errorDetails["base"]);
+    } else if (errorDetails != null) {
+      errors.add(errorDetails);
     }
   });
   alert([...errors].reverse().join("\n"));
