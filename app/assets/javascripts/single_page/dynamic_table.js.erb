@@ -223,7 +223,7 @@ const handleSelect = (e) => {
       this.table = this.table.DataTable({
         colReorder: true,
         keys: {
-          // This will make the first 2 VISIBLE colums selectable
+          // This will make the first 2 VISIBLE columns selectable
           // Changing the 'Column visibility' breaks this.
           blurable: false,
           columns: ':not(:first-child):not(:nth-child(2))'
@@ -761,19 +761,30 @@ const handleFailure = (table, res) => {
   res.errors.forEach((error) => {
     const [rowId, sampleTypeId] = error.ex_id.split("-");
     const errorColNames = Object.keys(error.error);
-    if (errorColNames.includes("base")) errors.add(error.error["base"]);
-    table.cells(rowId, `${sampleTypeId}:name`).every(function () {
-      const idx = this.index().column;
-      const colTitle = $j(table.column(idx).header()).text().replace("*", "");
-      if (errorColNames.includes(colTitle)) {
-        errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
-        $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
-        $j(this.node()).attr("title", error.error[colTitle]);
-      } else {
-        $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
-        errors.add(`Row ${parseInt(rowId)+ 1}: ${error.error}`);
-      }
-    });
+    const level = error.level;
+
+    // If it is a 'Sample' level error,
+    // deal with this row and go to next iteration.
+    if (level === 'Sample') {
+      errors.add(error.error);
+      const row = $j(table.row(rowId).node());
+      row.find('td').each((index, element) => {$j(element).removeClass(dtRowDelete).addClass(dtErrClass)});
+      row.attr("title", error.error);
+    } else if (level === 'SampleAttribute') {
+      table.cells(rowId, `${sampleTypeId}:name`).every(function () {
+        const idx = this.index().column;
+        const colTitle = $j(table.column(idx).header()).text().replace("*", "");
+        if (errorColNames.includes(colTitle)) {
+          errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
+          $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
+          $j(this.node()).attr("title", error.error[colTitle]);
+        }
+      });
+    } else if (errorColNames.includes("base")) {
+      errors.add(error.error["base"]);
+    } else {
+      errors.add(error.error);
+    }
   });
   alert([...errors].reverse().join("\n"));
 };
