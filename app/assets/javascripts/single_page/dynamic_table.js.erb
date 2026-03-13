@@ -223,8 +223,10 @@ const handleSelect = (e) => {
       this.table = this.table.DataTable({
         colReorder: true,
         keys: {
+          // This will make the first 2 VISIBLE colums selectable
+          // Changing the 'Column visibility' breaks this.
           blurable: false,
-          columns: ':not(:first-child):not(:nth-child(2)):not(:nth-child(3))'
+          columns: ':not(:first-child):not(:nth-child(2))'
         },
         columnDefs,
         columns,
