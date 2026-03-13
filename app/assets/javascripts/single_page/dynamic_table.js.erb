@@ -15,7 +15,12 @@ const defaultCols = [{
   width: "10px",
   className: "text-center",
   mRender: function (data, type, full) {
-    return "<td><input class='row-select' type='checkbox' onClick='handleSelect($j(this))'/></td>";
+    const isHiddenSample = full.filter((val) => val).every((val) => val === '#HIDDEN')
+    if (isHiddenSample) {
+      return "<td><input class='row-select disabled' type='checkbox' onClick='handleSelect($j(this))'/></td>";
+    } else {
+      return "<td><input class='row-select' type='checkbox' onClick='handleSelect($j(this))'/></td>";
+    }
   }
 }];
 
