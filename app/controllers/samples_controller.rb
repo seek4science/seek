@@ -210,8 +210,14 @@ class SamplesController < ApplicationController
           else
             errors.push({ ex_id: par[:ex_id], error: "Sample with id '#{par[:id]}' not found.", level: 'Sample' })
           end
-        rescue
-          errors.push({ ex_id: par[:ex_id], error: sample&.errors&.messages, level: 'Sample' })
+        rescue StandardError => e
+          message =
+            if sample && sample.errors.present?
+              sample.errors.full_messages.join(', ')
+            else
+              e.message
+            end
+          errors.push({ ex_id: par[:ex_id], error: message, level: 'Sample' })
         end
       end
       raise ActiveRecord::Rollback if errors.any?
