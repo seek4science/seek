@@ -293,8 +293,8 @@ const handleSelect = (e) => {
         const table = this.table;
         const context = this;
         this.table.on("click", "tbody td:not(:has(input))", function () {
-          // Makes all cells editable, except column 2 & 3 => Fairdom-seek ID + UUID
-          if (![2, 3].includes(this._DT_CellIndex.column)) {
+          // Makes all cells editable, except column 1, 2 & 3 => status + Fairdom-seek ID + UUID
+          if (![1, 2, 3].includes(this._DT_CellIndex.column)) {
             editor($j(this), table, context);
           }
         });
