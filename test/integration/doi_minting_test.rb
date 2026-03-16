@@ -4,7 +4,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   include MockHelper
 
   # Only test the versioned types. Types with snapshots are tested separately.
-  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.select { |type| type.method_defined?(:versions) }.collect { |type| type.name.underscore }
+  DOIABLE_VERSIONED_ASSETS = Seek::Util.doiable_asset_types.select { |type| type.method_defined?(:versions) }.collect { |type| type.name.underscore }
 
   setup do
     @user = FactoryBot.create(:user, login: 'test')
@@ -12,12 +12,12 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     doi_citation_mock
   end
 
-  test 'doiable assets' do
-    assert_equal %w(data_file document file_template model sop workflow), DOIABLE_ASSETS
+  test 'doiable versioned assets' do
+    assert_equal %w(data_file document file_template model presentation sop workflow), DOIABLE_VERSIONED_ASSETS
   end
 
   test 'mint a DOI button' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       assert asset.find_version(1).can_mint_doi?
 
@@ -31,7 +31,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'hidden version can not mint a DOI' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       assert asset.find_version(1).can_mint_doi?
       login_as(asset.contributor.user)
@@ -48,7 +48,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'get mint_doi_confirm' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       assert asset.is_published?
       assert asset.can_manage?
@@ -67,7 +67,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'authorization for mint_doi_confirm' do
     a_user = User.current_user = FactoryBot.create(:user, login: 'a_user')
 
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       login_as(@user)
       asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       refute asset.is_published?
@@ -93,7 +93,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'mint_doi' do
     mock_datacite_request
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       post "/#{type.pluralize}/#{asset.id}/mint_doi"
@@ -141,7 +141,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'handle error when mint_doi' do
     mock_datacite_request
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       with_config_value :datacite_username, 'invalid' do
@@ -154,7 +154,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show doi attribute for asset which doi is minted' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       doi = '10.5072/my_test'
       version = asset.latest_version
@@ -169,7 +169,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show doi attribute on minted version' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       asset.save_as_new_version
@@ -197,7 +197,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'should log doi after doi is minted' do
     mock_datacite_request
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       post "/#{type.pluralize}/#{asset.id}/mint_doi"
@@ -215,7 +215,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'after DOI is minted, the -Upload new version- button is not disabled' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -230,7 +230,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'after DOI is minted, the -Delete- button is disabled' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -244,7 +244,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'can not delete asset after DOI is minted' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -261,7 +261,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'after DOI is minted, disable the sharing_form options to unpublish the asset' do
     skip 'This test no longer works with the dynamic permissions form'
 
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -275,7 +275,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'can not unpublish asset after DOI is minted' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
