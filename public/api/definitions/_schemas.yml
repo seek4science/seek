@@ -4500,6 +4500,8 @@ publicationResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             publication_type:
               $ref: "#/components/schemas/nonEmptyString"
+            registered_mode:
+              $ref: "#/components/schemas/nonEmptyString"
             authors:
               $ref: "#/components/schemas/nonEmptyStringList"
             content_blobs:
@@ -4539,6 +4541,7 @@ publicationResponse:
             - pubmed_id
             - citation
             - publication_type
+            - registered_mode
             - link_to_pub
           additionalProperties: false
         relationships:
