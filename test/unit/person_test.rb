@@ -144,7 +144,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = FactoryBot.create :person, skype_name: 'skypee', email: 'sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com', web_page:'http://google.com'
+    object = FactoryBot.create :person, email: 'sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com', web_page:'http://google.com'
     FactoryBot.create(:study, contributor: object)
     FactoryBot.create(:investigation, contributor: object)
     FactoryBot.create(:assay, contributor: object)

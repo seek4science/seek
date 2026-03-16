@@ -1333,7 +1333,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.string "last_name"
     t.string "email"
     t.string "phone"
-    t.string "skype_name"
     t.text "web_page"
     t.text "description"
     t.integer "avatar_id"
