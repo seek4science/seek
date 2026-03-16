@@ -21,7 +21,7 @@ class PublicationSerializer < ContributedResourceSerializer
   end
 
   attribute :registered_mode do
-    publication_registered_mode(object.registered_mode) if object.registered_mode
+    publication_registered_mode(object.registered_mode)&.presence || 'Not specified'
   end
 
   attribute :authors do
