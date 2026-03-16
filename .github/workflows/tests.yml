@@ -78,6 +78,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           cache: 'pip' # caching pip dependencies
+          pip-install: -r requirements.txt
       - name: Create test database
         run: |
           cp test/config/database.github.${{ matrix.database }}.yml config/database.yml
