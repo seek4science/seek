@@ -242,7 +242,7 @@ module Seek
         respond_to do |format|
           format.html do
             flash.now[:error] = 'Data upload is not allowed. Please provide a URL to the data instead.'
-            render action: :new
+            redirect_to polymorphic_path(controller_name)
           end
           format.json { render json: { error: 'Data upload is not allowed. Please provide a URL to the data instead.' }, status: 403 }
         end
