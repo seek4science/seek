@@ -4,8 +4,11 @@ module Seek
       include Seek::UploadHandling::ParameterHandling
       include Seek::UploadHandling::ContentInspection
 
+      class Seek::UploadHandling::DataUpload::UploadBlockedException < StandardError; end
+
       def handle_upload_data(new_version = false)
         blob_params = params[:content_blobs]
+        check_for_blocked_uploads(blob_params)
 
         allow_empty_content_blob = model_image_present? || json_api_request?
 
@@ -217,6 +220,19 @@ module Seek
       def render_new?
         action_name == 'create'
       end
+
+      # raises UploadBlockedException if data upload params are present for any blob params
+      def check_for_blocked_uploads(blob_params)
+        return unless Seek::Config.block_file_uploads
+
+        blob_params.each do |params|
+          if check_for_data_upload_params(params)
+            raise UploadBlockedException, 'Data upload is not allowed. Please provide a URL to the data instead.'
+          end
+        end
+      end
+
     end
+
   end
 end
