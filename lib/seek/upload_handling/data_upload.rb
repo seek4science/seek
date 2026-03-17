@@ -1,10 +1,16 @@
 module Seek
   module UploadHandling
     module DataUpload
+      extend ActiveSupport::Concern
+
       include Seek::UploadHandling::ParameterHandling
       include Seek::UploadHandling::ContentInspection
 
-      class Seek::UploadHandling::DataUpload::UploadBlockedException < StandardError; end
+      class UploadBlockedException < StandardError; end
+
+      included do
+        rescue_from Seek::UploadHandling::DataUpload::UploadBlockedException, with: :handle_upload_blocked_exception
+      end
 
       def handle_upload_data(new_version = false)
         blob_params = params[:content_blobs]
@@ -221,7 +227,7 @@ module Seek
         action_name == 'create'
       end
 
-      # raises UploadBlockedException if data upload params are present for any blob params
+      # raises UploadBlockedException if data upload params are present for any blob params whilst Seek::Config.block_file_uploads is true
       def check_for_blocked_uploads(blob_params)
         return unless Seek::Config.block_file_uploads
 
@@ -229,6 +235,16 @@ module Seek
           if check_for_data_upload_params(params)
             raise UploadBlockedException, 'Data upload is not allowed. Please provide a URL to the data instead.'
           end
+        end
+      end
+
+      def handle_upload_blocked_exception
+        respond_to do |format|
+          format.html do
+            flash.now[:error] = 'Data upload is not allowed. Please provide a URL to the data instead.'
+            render action: :new
+          end
+          format.json { render json: { error: 'Data upload is not allowed. Please provide a URL to the data instead.' }, status: 403 }
         end
       end
 
