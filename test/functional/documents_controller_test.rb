@@ -188,7 +188,33 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_equal 2, assigns(:document).versions.count
       assert_equal 'new version!', assigns(:document).latest_version.revision_comments
     end
+  end
 
+  test 'local upload option removed with blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+
+      get :new
+
+      assert_response :success
+
+      assert_select 'div[role=?]', 'tabpanel' do
+        assert_select 'ul[role=?]', 'tablist' do
+          assert_select 'a[data-tab-target=?]', 'local-file', count: 0
+          assert_select 'li.upload-field-tab.active' do
+            assert_select 'a[data-tab-target=?]', 'remote-url', count: 1
+          end
+        end
+        assert_select '.tab-content' do
+          assert_select 'div[data-tab-id=?]', 'local-file', count: 0
+          assert_select 'input[type=file]', count: 0
+          assert_select 'div[data-tab-id=?]', 'remote-url', count: 1
+          assert_select 'input[name="content_blobs[][data_url]"]', count: 1
+        end
+      end
+
+    end
   end
 
   test 'create, update and show a document with extended metadata' do
