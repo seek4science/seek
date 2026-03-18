@@ -43,7 +43,7 @@
     <% end %>
 
     <% unless hide_remote %>
-      <div role="tabpanel" class="tab-pane" data-role="seek-upload-field-tab-pane" data-tab-id="remote-url">
+      <div role="tabpanel" class="tab-pane <%= hide_local ? 'active' : '' %>" data-role="seek-upload-field-tab-pane" data-tab-id="remote-url">
         <div class="form-group">
           <div class="row">
             <div class="col-sm-8">
