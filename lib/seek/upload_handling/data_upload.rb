@@ -238,13 +238,13 @@ module Seek
         end
       end
 
-      def handle_upload_blocked_exception
+      def handle_upload_blocked_exception(exception)
         respond_to do |format|
           format.html do
             flash.now[:error] = 'Data upload is not allowed. Please provide a URL to the data instead.'
             redirect_to polymorphic_path(controller_name)
           end
-          format.json { render json: { error: 'Data upload is not allowed. Please provide a URL to the data instead.' }, status: 403 }
+          format.json { render json: { error: exception.message }, status: :forbidden }
         end
       end
 
