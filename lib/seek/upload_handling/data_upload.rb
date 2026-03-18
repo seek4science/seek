@@ -9,7 +9,7 @@ module Seek
       class UploadBlockedException < StandardError; end
 
       included do
-        rescue_from Seek::UploadHandling::DataUpload::UploadBlockedException, with: :handle_upload_blocked_exception
+        rescue_from UploadBlockedException, with: :handle_upload_blocked_exception
       end
 
       def handle_upload_data(new_version = false)
