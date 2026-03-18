@@ -14,6 +14,10 @@ $j(document).ready(function () {
 
         // Tabs
         var activateTab = function (id) {
+            // only continue if the tab to activate exists
+            if ($j('[data-role="seek-upload-field-tab"][data-tab-target="' + id + '"]').length == 0) {
+                return;
+            }
             $j('[data-role="seek-upload-field-tab"]', field).closest('li').removeClass('active');
             $j('[data-role="seek-upload-field-tab"][data-tab-target="' + id + '"]', field).closest('li').addClass('active');
             $j('[data-role="seek-upload-field-tab-pane"]', field).removeClass('active');

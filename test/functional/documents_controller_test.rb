@@ -209,7 +209,7 @@ class DocumentsControllerTest < ActionController::TestCase
         assert_select '.tab-content' do
           assert_select 'div[data-tab-id=?]', 'local-file', count: 0
           assert_select 'input[type=file]', count: 0
-          assert_select 'div[data-tab-id=?]', 'remote-url', count: 1
+          assert_select 'div[data-tab-id=?].active', 'remote-url', count: 1
           assert_select 'input[name="content_blobs[][data_url]"]', count: 1
         end
       end
