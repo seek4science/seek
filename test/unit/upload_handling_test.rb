@@ -5,6 +5,7 @@ require 'seek/upload_handling/examine_url'
 
 class UploadHandingTest < ActiveSupport::TestCase
 
+  include ActiveSupport::Rescuable
   include Seek::UploadHandling::DataUpload
   include Seek::UrlValidation
 
