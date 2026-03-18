@@ -6,6 +6,7 @@
   action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
   extra_content ||= nil
   hide_remote ||= false
+  hide_local = Seek::Config.block_file_uploads if hide_local.nil?
 %>
 <%= panel(title, id: id) do %>
   <div>
@@ -21,9 +22,10 @@
   </div>
 
   <% if !resource.nil? && Seek::Util.is_multi_file_asset_type?(resource.class) %>
-    <%= render partial: 'assets/upload', locals: { existing_objects: resource.content_blobs, batch: true, hide_remote: hide_remote } -%>
+    <%= render partial: 'assets/upload', locals: { existing_objects: resource.content_blobs, batch: true,
+                                                   hide_remote: hide_remote, hide_local: hide_local } -%>
   <% else %>
-    <%= render partial: 'assets/upload', locals: { hide_remote: hide_remote } -%>
+    <%= render partial: 'assets/upload', locals: { hide_remote: hide_remote, hide_local: hide_local } -%>
   <% end %>
 
   <%= extra_content if extra_content %>
