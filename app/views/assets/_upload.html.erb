@@ -67,6 +67,10 @@
           and so only a link to the file will be stored.
         </div>
 
+        <div style="display: none;" data-role="seek-url-checker-msg-blocked-uploads">
+          Copies are unavailable as file uploads are disabled, and so only a link to the file will be stored.
+        </div>
+
         <div style="display: none;" data-role="seek-url-checker-msg-success">
           <p>
             You can either upload this file to <%= Seek::Config.instance_name %> using this URL, or you can register a link to the file.
@@ -90,6 +94,7 @@
               <strong>Fetch a copy</strong>
             </label>
           </div>
+
         </div>
 
         <% if batch %>

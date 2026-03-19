@@ -213,7 +213,17 @@ class DocumentsControllerTest < ActionController::TestCase
           assert_select 'input[name="content_blobs[][data_url]"]', count: 1
         end
       end
+    end
+  end
 
+  test 'make local copy not available with blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+
+      get :new
+      assert_select 'input#content_blobs__make_local_copy', count: 1
+      assert_select 'input#content_blobs__make_local_copy[checked]', count: 0
     end
   end
 
