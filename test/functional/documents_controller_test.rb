@@ -79,7 +79,8 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_difference('Document.count') do
         assert_difference('Document::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
+            post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]},
+                                    content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
           end
         end
       end
@@ -114,16 +115,25 @@ class DocumentsControllerTest < ActionController::TestCase
       person = FactoryBot.create(:person)
       login_as(person)
 
+      blob = valid_url_content_blob
+
+      # ensure these are ignored and forced to not make a copy
+      blob[:make_local_copy] = '1'
+
       assert_difference('ActivityLog.count') do
         assert_difference('Document.count') do
           assert_difference('Document::Version.count') do
             assert_difference('ContentBlob.count') do
-              post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]}, content_blobs: [valid_url_content_blob], policy_attributes: valid_sharing }
+              post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]}, content_blobs: [blob], policy_attributes: valid_sharing }
             end
           end
         end
       end
-      assert_redirected_to document_path(assigns(:document))
+      document = assigns(:document)
+      assert_redirected_to document_path(document)
+
+      # these are always the case if uploads are blocked
+      refute document.content_blob.make_local_copy?
     end
   end
 
@@ -213,17 +223,6 @@ class DocumentsControllerTest < ActionController::TestCase
           assert_select 'input[name="content_blobs[][data_url]"]', count: 1
         end
       end
-    end
-  end
-
-  test 'make local copy not available with blocked file uploads' do
-    with_config_value(:block_file_uploads, true) do
-      person = FactoryBot.create(:person)
-      login_as(person)
-
-      get :new
-      assert_select 'input#content_blobs__make_local_copy', count: 1
-      assert_select 'input#content_blobs__make_local_copy[checked]', count: 0
     end
   end
 
