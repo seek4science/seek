@@ -9,13 +9,13 @@
     "relationships": {
       "collection": {
         "data": {
-          "id": "72",
+          "id": "64",
           "type": "collections"
         }
       },
       "asset": {
         "data": {
-          "id": "185",
+          "id": "120",
           "type": "sops"
         },
         "meta": {
@@ -24,11 +24,11 @@
       }
     },
     "links": {
-      "self": "/collections/72/items/50"
+      "self": "/collections/64/items/50"
     },
     "meta": {
-      "created": "2024-11-20T10:19:21.000Z",
-      "modified": "2024-11-20T10:19:21.000Z",
+      "created": "2026-03-19T16:42:15.796Z",
+      "modified": "2026-03-19T16:42:15.796Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000"
     }
