@@ -15,6 +15,7 @@ module Seek
       def handle_upload_data(new_version = false)
         blob_params = params[:content_blobs]
         check_for_blocked_uploads(blob_params)
+        prevent_local_copy_for_blocked_uploads(blob_params)
 
         allow_empty_content_blob = model_image_present? || json_api_request?
 
@@ -227,6 +228,15 @@ module Seek
         action_name == 'create'
       end
 
+      # forces params to prevent local copies to be made from urls if Seek::Config.block_file_uploads is true
+      def prevent_local_copy_for_blocked_uploads(blob_params)
+        return unless Seek::Config.block_file_uploads
+
+        blob_params.each do |params|
+          params[:make_local_copy] = '0'
+        end
+      end
+
       # raises UploadBlockedException if data upload params are present for any blob params whilst Seek::Config.block_file_uploads is true
       def check_for_blocked_uploads(blob_params)
         return unless Seek::Config.block_file_uploads
@@ -241,7 +251,7 @@ module Seek
       def handle_upload_blocked_exception(exception)
         respond_to do |format|
           format.html do
-            flash.now[:error] = 'Data upload is not allowed. Please provide a URL to the data instead.'
+            flash.now[:error] = exception.message
             redirect_to polymorphic_path(controller_name)
           end
           format.json { render json: { error: exception.message }, status: :forbidden }
