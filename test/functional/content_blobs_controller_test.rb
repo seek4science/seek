@@ -56,8 +56,23 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
     assert_response :success
     assert_equal 200, assigns(:info)[:code]
+    assert assigns(:info)[:allow_copy]
+    refute assigns(:info)[:blocked_file_uploads]
     assert !@response.body.include?('Webpage Link')
     assert_equal 'file', assigns(:type)
+  end
+
+  test 'examine url to file blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      stub_request(:head, 'http://mockedlocation.com/a-piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
+      get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
+      assert_response :success
+      assert_equal 200, assigns(:info)[:code]
+      refute assigns(:info)[:allow_copy]
+      assert assigns(:info)[:blocked_file_uploads]
+      assert !@response.body.include?('Webpage Link')
+      assert_equal 'file', assigns(:type)
+    end
   end
 
   test 'examine url to webpage' do
@@ -66,6 +81,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'http://somewhere.com' }
     assert_response :success
     assert_equal 200, assigns(:info)[:code]
+    assert assigns(:info)[:allow_copy]
+    refute assigns(:info)[:blocked_file_uploads]
     assert @response.body.include?('Webpage Link')
     assert_equal 'webpage', assigns(:type)
   end
