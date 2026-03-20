@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "studies",
-    "id": "764",
+    "id": "68",
     "attributes": {
       "title": "A Maximal Study",
       "description": "The Study of many things",
@@ -12,7 +12,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "4828",
+              "id": "197",
               "type": "projects"
             },
             "access": "view"
@@ -20,7 +20,7 @@
         ]
       },
       "extended_attributes": {
-        "extended_metadata_type_id": "447",
+        "extended_metadata_type_id": "30",
         "attribute_map": {
           "name": "Fred Bloggs",
           "age": 44,
@@ -31,14 +31,14 @@
     "relationships": {
       "investigation": {
         "data": {
-          "id": "861",
+          "id": "89",
           "type": "investigations"
         }
       },
       "publications": {
         "data": [
           {
-            "id": "331",
+            "id": "30",
             "type": "publications"
           }
         ]
@@ -46,7 +46,7 @@
       "creators": {
         "data": [
           {
-            "id": "4902",
+            "id": "197",
             "type": "people"
           }
         ]

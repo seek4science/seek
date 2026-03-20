@@ -21,7 +21,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2558",
+              "id": "2537",
               "type": "projects"
             },
             "access": "edit"
@@ -33,7 +33,7 @@
       "creators": {
         "data": [
           {
-            "id": "2605",
+            "id": "2494",
             "type": "people"
           }
         ]
@@ -41,7 +41,7 @@
       "projects": {
         "data": [
           {
-            "id": "2558",
+            "id": "2537",
             "type": "projects"
           }
         ]
@@ -57,7 +57,7 @@
       "workflows": {
         "data": [
           {
-            "id": "124",
+            "id": "73",
             "type": "workflows"
           }
         ]

@@ -950,9 +950,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'contact details only visible for programme' do
-    person1 = FactoryBot.create(:person, email: 'fish@email.com', skype_name: 'fish')
-    person2 = FactoryBot.create(:person, email: 'monkey@email.com', skype_name: 'monkey')
-    person3 = FactoryBot.create(:person, email: 'parrot@email.com', skype_name: 'parrot')
+    person1 = FactoryBot.create(:person, email: 'fish@email.com')
+    person2 = FactoryBot.create(:person, email: 'monkey@email.com')
+    person3 = FactoryBot.create(:person, email: 'parrot@email.com')
 
     prog1 = FactoryBot.create :programme, projects: (person1.projects | person2.projects)
     prog2 = FactoryBot.create :programme, projects: person3.projects
@@ -967,13 +967,11 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, params: { id: person2 }
     assert_select 'div#contact_details', count: 1
     assert_select 'div#email', text: /monkey@email.com/, count: 1
-    assert_select 'div#skype', text: /monkey/, count: 1
 
     # should not see for person3 in different programme
     get :show, params: { id: person3 }
     assert_select 'div#contact_details', count: 0
     assert_select 'div#email', text: /parrot@email.com/, count: 0
-    assert_select 'div#skype', text: /parrot/, count: 0
   end
 
   test 'is this you? page for register with matching email' do
