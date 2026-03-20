@@ -8,10 +8,11 @@ module Seek
         include ActionView::Helpers::SanitizeHelper
         include Seek::Util.routes
 
-        attr_reader :resource
+        attr_reader :resource, :additional_context
 
         def initialize(resource)
           @resource = resource
+          @additional_context = {}
         end
 
         def mappings
@@ -26,7 +27,10 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          Seek::BioSchema::Serializer::SCHEMA_ORG
+          {
+            '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+            dct: Seek::BioSchema::Serializer::DCT
+          }
         end
 
         # The schema.org @type .
@@ -78,10 +82,14 @@ module Seek
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
+          # Also adds to the additional_context the context for each item in the associated resources
           def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
-                mini_definitions(send(collection)) if respond_to?(collection)
+                return unless respond_to?(collection)
+
+                @additional_context.merge!(additional_contexts(send(collection)))
+                mini_definitions(send(collection))
               end
             end
           end
@@ -114,6 +122,19 @@ module Seek
             mini_col << Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
           mini_col
+        end
+
+        def additional_contexts(collection)
+          return {} if collection.empty?
+
+          ctx = {}
+          collection.each do |item|
+            next if item.respond_to?(:public?) && !item.public?
+
+            decorator = Seek::BioSchema::ResourceDecorators::Factory.instance.get(item)
+            ctx.merge!(decorator.context)
+          end
+          ctx
         end
 
         def respond_to_missing?(name, include_private = false)
