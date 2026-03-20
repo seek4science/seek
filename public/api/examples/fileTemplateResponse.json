@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "66",
+          "id": "232",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -37,8 +37,8 @@
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-11-20T10:14:59.000Z",
-      "updated_at": "2024-11-20T10:14:59.000Z",
+      "created_at": "2026-03-19T16:48:32.975Z",
+      "updated_at": "2026-03-19T16:48:32.975Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +47,13 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/40/content_blobs/474",
+          "link": "http://localhost:3000/file_templates/40/content_blobs/1228",
           "size": 8
         }
       ],
       "creators": [
         {
-          "profile": "/people/1786",
+          "profile": "/people/4509",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -78,7 +78,7 @@
       "creators": {
         "data": [
           {
-            "id": "1786",
+            "id": "4509",
             "type": "people"
           }
         ]
@@ -86,7 +86,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1787",
+            "id": "4510",
             "type": "people"
           }
         ]
@@ -94,11 +94,11 @@
       "people": {
         "data": [
           {
-            "id": "1786",
+            "id": "4509",
             "type": "people"
           },
           {
-            "id": "1787",
+            "id": "4510",
             "type": "people"
           }
         ]
@@ -106,7 +106,7 @@
       "projects": {
         "data": [
           {
-            "id": "1617",
+            "id": "4513",
             "type": "projects"
           }
         ]
@@ -126,11 +126,11 @@
       "self": "/file_templates/40?version=1"
     },
     "meta": {
-      "created": "2024-11-20T10:14:59.000Z",
-      "modified": "2024-11-20T10:14:59.000Z",
+      "created": "2026-03-19T16:48:32.954Z",
+      "modified": "2026-03-19T16:48:32.975Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "391f9080-8956-013d-24a2-0a81884ed284"
+      "uuid": "63987230-05e1-013f-f2a8-00155d52079b"
     }
   },
   "jsonapi": {
