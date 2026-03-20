@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "746",
+    "id": "50",
     "type": "studies",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "4779",
+              "id": "148",
               "type": "projects"
             },
             "access": "view"
@@ -19,7 +19,7 @@
 
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "442",
+        "extended_metadata_type_id": "25",
         "attribute_map": {
           "age": 44,
           "name": "Fred Bloggs",
@@ -36,10 +36,10 @@
       "position": null,
       "creators": [
         {
-          "profile": "/people/4853",
+          "profile": "/people/148",
           "family_name": "Last",
-          "given_name": "Person4105",
-          "affiliation": "An Institution: 4925",
+          "given_name": "Person120",
+          "affiliation": "An Institution: 148",
           "orcid": null
         }
       ]
@@ -48,7 +48,7 @@
       "creators": {
         "data": [
           {
-            "id": "4853",
+            "id": "148",
             "type": "people"
           }
         ]
@@ -56,7 +56,7 @@
       "submitter": {
         "data": [
           {
-            "id": "4853",
+            "id": "148",
             "type": "people"
           }
         ]
@@ -64,7 +64,7 @@
       "people": {
         "data": [
           {
-            "id": "4853",
+            "id": "148",
             "type": "people"
           }
         ]
@@ -72,14 +72,14 @@
       "projects": {
         "data": [
           {
-            "id": "4779",
+            "id": "148",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "840",
+          "id": "68",
           "type": "investigations"
         }
       },
@@ -106,7 +106,7 @@
       "publications": {
         "data": [
           {
-            "id": "326",
+            "id": "25",
             "type": "publications"
           }
         ]
@@ -118,14 +118,14 @@
       }
     },
     "links": {
-      "self": "/studies/746"
+      "self": "/studies/50"
     },
     "meta": {
-      "created": "2024-11-20T10:22:10.000Z",
-      "modified": "2024-11-20T10:22:10.000Z",
+      "created": "2026-03-19T16:35:28.334Z",
+      "modified": "2026-03-19T16:35:28.299Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "39bc7630-8957-013d-24a2-0a81884ed284"
+      "uuid": "8feb9520-05df-013f-f2a8-00155d52079b"
     }
   },
   "jsonapi": {
