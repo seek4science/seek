@@ -377,13 +377,13 @@ class DynamicTableHelperTest < ActionView::TestCase
       end
 
       # In total, the sample type has 105 samples
-      assert_equal @source_sample_type.samples.count, 105
+      assert_equal 105, @source_sample_type.samples.count
 
       sample_collection_colums = dt_cols(@sample_collection_sample_type)
       input_column = sample_collection_colums.detect { |col| col[:title] == "Input" }
 
       # Only 55 have viewing permission and should be retrieved by @person
-      assert_equal input_column[:linked_samples].count, 55
+      assert_equal 55, input_column[:linked_samples].count
     end
   end
 end
