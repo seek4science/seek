@@ -37,7 +37,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential cmake \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
     libsqlite3-dev libssl-dev libxml++2.6-dev libxslt1-dev libyaml-dev \
-    python3.13-dev python3-setuptools python3-pip python3.13-venv && \
+    python3.13-dev python3-pip python3.13-venv && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
     locale-gen en_US.UTF-8
 
@@ -85,7 +85,6 @@ RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh
 
 # Python dependencies from requirements.txt
 RUN python3.13 -m pip install --upgrade pip
-RUN python3.13 -m pip install setuptools==58
 RUN python3.13 -m pip install -r requirements.txt
 
 USER www-data
