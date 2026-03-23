@@ -84,7 +84,7 @@ RUN chown -R www-data:www-data /var/www config docker db/schema.rb public solr s
 RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh
 
 # Python dependencies from requirements.txt
-RUN python3.13 -m pip install --upgrade pip
+RUN python3.13 -m ensurepip --upgrade --default-pip
 RUN python3.13 -m pip install -r requirements.txt
 
 USER www-data
