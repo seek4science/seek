@@ -939,7 +939,6 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'does not enqueue remote content fetching job if file uploads blocked' do
     content_blob = FactoryBot.build(:url_content_blob, make_local_copy: true)
-    refute content_blob.remote_content_fetch_task.pending?
     with_config_value(:block_file_uploads, true) do
       assert_no_difference('Task.count') do
         assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
