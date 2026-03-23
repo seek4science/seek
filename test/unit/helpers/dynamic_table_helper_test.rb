@@ -383,7 +383,8 @@ class DynamicTableHelperTest < ActionView::TestCase
       input_column = sample_collection_columns.detect { |col| col[:title] == "Input" }
 
       # Only 55 have viewing permission and should be retrieved by @person
-      assert_equal 55, input_column[:linked_samples].count
+      assert input_column.key?(:linked_sample_ids)
+      assert_equal 55, input_column[:linked_sample_ids].count
     end
   end
 end
