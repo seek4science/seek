@@ -210,8 +210,6 @@ module DynamicTableHelper
     end
   end
 
-  private
-
   def dt_linked_samples(attribute)
     unless attribute && attribute.linked_sample_type&.samples&.count&.positive?
       return []
