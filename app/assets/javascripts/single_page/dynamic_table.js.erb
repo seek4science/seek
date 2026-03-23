@@ -110,9 +110,7 @@ const handleSelect = (e) => {
 
         if (isRegisteredSample) {
           linkedSamplesUrl = typeaheadSamplesUrl.replace("_LINKED_", c.linked_sample_type);
-          const n = Number(c.linked_sample_count);
-          const limit = Number.isInteger(n) && n > 0 ? n : 100;
-          const linkedSamples = retrieveLinkedSamples(linkedSamplesUrl, limit);
+          const linkedSamples = c.linked_samples ? c.linked_samples : [];
           c.linkedSampleIds = linkedSamples.map((ls) => ls.id);
         }
 
@@ -681,26 +679,6 @@ function performSelect(dtName, select) {
       $j(node).find(".row-select").prop("checked", select)
     }
   });
-}
-
-function retrieveLinkedSamples(url, limit) {
-  let linkedSamples;
-  $j.ajax({
-    async: false,
-    method: "GET",
-    url: url,
-    data: {limit: limit},
-    contentType: "application/json",
-    success: function (data) {
-      linkedSamples = data.results;
-    },
-    error: function (xhr, status) {
-      linkedSamples = []
-      console.log(status);
-      console.log(xhr.responseText);
-    }
-  });
-  return linkedSamples;
 }
 
 function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
