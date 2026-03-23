@@ -138,7 +138,7 @@ module DynamicTableHelper
       end
 
       if a.sample_attribute_type&.seek_sample_multi? || a.sample_attribute_type&.seek_sample?
-        attribute.merge!(linked_sample_type: a.linked_sample_type_id)
+        attribute.merge!({ linked_sample_type: a.linked_sample_type_id, linked_sample_count: a.linked_sample_type&.samples&.count })
       end
 
       if a.input_attribute?

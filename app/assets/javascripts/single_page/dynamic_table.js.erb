@@ -110,7 +110,9 @@ const handleSelect = (e) => {
 
         if (isRegisteredSample) {
           linkedSamplesUrl = typeaheadSamplesUrl.replace("_LINKED_", c.linked_sample_type);
-          const linkedSamples = retrieveLinkedSamples(linkedSamplesUrl);
+          const n = Number(c.linked_sample_count);
+          const limit = Number.isInteger(n) && n > 0 ? n : 100;
+          const linkedSamples = retrieveLinkedSamples(linkedSamplesUrl, limit);
           c.linkedSampleIds = linkedSamples.map((ls) => ls.id);
         }
 
@@ -681,11 +683,13 @@ function performSelect(dtName, select) {
   });
 }
 
-function retrieveLinkedSamples(url) {
+function retrieveLinkedSamples(url, limit) {
   let linkedSamples;
   $j.ajax({
     async: false,
+    method: "GET",
     url: url,
+    data: {limit: limit},
     contentType: "application/json",
     success: function (data) {
       linkedSamples = data.results;
