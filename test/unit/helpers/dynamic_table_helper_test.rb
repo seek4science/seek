@@ -365,7 +365,7 @@ class DynamicTableHelperTest < ActionView::TestCase
 
   end
 
-  test 'Should return the linked sample type\'s sample count' do
+  test 'Should return the linked sample type\'s authorized samples' do
     User.with_current_user(@person.user) do
       (1..55).each do |i|
         FactoryBot.create(:isa_source, title: "Source #{i}", sample_type: @source_sample_type, contributor: @person)
@@ -379,8 +379,8 @@ class DynamicTableHelperTest < ActionView::TestCase
       # In total, the sample type has 105 samples
       assert_equal 105, @source_sample_type.samples.count
 
-      sample_collection_colums = dt_cols(@sample_collection_sample_type)
-      input_column = sample_collection_colums.detect { |col| col[:title] == "Input" }
+      sample_collection_columns = dt_cols(@sample_collection_sample_type)
+      input_column = sample_collection_columns.detect { |col| col[:title] == "Input" }
 
       # Only 55 have viewing permission and should be retrieved by @person
       assert_equal 55, input_column[:linked_samples].count
