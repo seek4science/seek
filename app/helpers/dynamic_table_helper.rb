@@ -138,7 +138,7 @@ module DynamicTableHelper
       end
 
       if a.sample_attribute_type&.seek_sample_multi? || a.sample_attribute_type&.seek_sample?
-        attribute.merge!({ linked_sample_type: a.linked_sample_type_id, linked_samples: dt_linked_samples(a) })
+        attribute.merge!({ linked_sample_type: a.linked_sample_type_id, linked_sample_ids: dt_linked_sample_ids(a) })
       end
 
       if a.input_attribute?
@@ -210,13 +210,12 @@ module DynamicTableHelper
     end
   end
 
-  def dt_linked_samples(attribute)
+  def dt_linked_sample_ids(attribute)
     linked_samples = attribute&.linked_sample_type&.samples
     return [] if linked_samples.blank?
 
     linked_samples
       .authorized_for(:view)
-      .pluck(:id, :title)
-      .map { |id, title| { id: id, text: title } }
+      .pluck(:id)
   end
 end
