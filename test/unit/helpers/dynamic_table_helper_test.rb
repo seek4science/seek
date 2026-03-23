@@ -364,4 +364,15 @@ class DynamicTableHelperTest < ActionView::TestCase
     end
 
   end
+
+  test 'Should return the linked sample type\'s sample count' do
+    (1..105).each do |i|
+      FactoryBot.create(:isa_source, title: "Source #{i}", sample_type: @source_sample_type, contributor: @person)
+    end
+    assert_equal @source_sample_type.samples.count, 105
+
+    sample_collection_colums = dt_cols(@sample_collection_sample_type)
+    input_column = sample_collection_colums.detect { |col| col[:title] == "Input" }
+    assert_equal input_column[:linked_sample_count], 105
+  end
 end
