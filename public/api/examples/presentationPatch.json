@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "presentations",
-    "id": "109",
+    "id": "45",
     "attributes": {
       "title": "A Maximally Patched Presentation",
       "description": "Presenting the research about the thing",
@@ -17,7 +17,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2808",
+              "id": "649",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
       "creators": {
         "data": [
           {
-            "id": "2933",
+            "id": "673",
             "type": "people"
           }
         ]
@@ -37,7 +37,7 @@
       "projects": {
         "data": [
           {
-            "id": "2808",
+            "id": "649",
             "type": "projects"
           }
         ]
@@ -45,7 +45,7 @@
       "publications": {
         "data": [
           {
-            "id": "183",
+            "id": "69",
             "type": "publications"
           }
         ]
@@ -53,7 +53,7 @@
       "events": {
         "data": [
           {
-            "id": "140",
+            "id": "35",
             "type": "events"
           }
         ]
@@ -61,7 +61,7 @@
       "workflows": {
         "data": [
           {
-            "id": "162",
+            "id": "35",
             "type": "workflows"
           }
         ]

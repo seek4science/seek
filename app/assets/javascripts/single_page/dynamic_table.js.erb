@@ -57,16 +57,17 @@ const typeaheadSopsUrl = "<%= dynamic_table_typeahead_sops_path(study_id: '__STU
 const typeaheadDataFilesUrl = "<%= typeahead_data_files_path %>";
 const typeaheadStrainsUrl = "<%= typeahead_strains_path %>";
 
-// Checking if settings are enabled
-const registeredSopsEnabled = <%= Seek::Config.sops_enabled %>;
-const registeredDataFilesEnabled = <%= Seek::Config.data_files_enabled %>;
-const registeredOrganismsEnabled = <%= Seek::Config.organisms_enabled %>;
-const idFieldName = window.instanceName + " id";
 const handleSelect = (e) => {
-  $j(e).parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked")
-  if (!e.is(":checked")) {
-    // Hide DT Select all button
-    const dtSelectAll = $j(e).parents("#study-samples-table_wrapper, #source-material-table_wrapper, #assay-samples-table_wrapper").find(".dt_select_all");
+  const row = $j(e).parents("table").DataTable().row(e.closest("tr")).data();
+  const isHiddenSample = row.filter((val) => val).every((val) => val === '#HIDDEN');
+
+  if (isHiddenSample) e.prop('checked', false);
+
+  row[0] = e.is(":checked")
+
+  // Hide DT Select all button
+  const dtSelectAll = $j(e).parents("#study-samples-table_wrapper, #source-material-table_wrapper, #assay-samples-table_wrapper").find(".dt_select_all");
+  if (dtSelectAll.is(":checked")) {
     dtSelectAll.html("Select all rows")
     dtSelectAll.css("display", "none")
   }
@@ -80,8 +81,11 @@ const handleSelect = (e) => {
   };
   $j.dynamicTable.prototype = {
     init: function (rows, columns, options = {}) {
-      const studyId = options.studyId;
-      const assayId = options.assayId;
+      // Checking if settings in SEEK config are enabled
+      const registeredSopsEnabled = options.config.registeredSopsEnabled;
+      const registeredDataFilesEnabled = options.config.registeredDataFilesEnabled;
+      const registeredOrganismsEnabled = options.config.registeredOrganismsEnabled;
+      const idFieldName = options.config.idFieldName;
 
       columns.forEach((c) => {
         let linkedSamplesUrl;
@@ -225,8 +229,10 @@ const handleSelect = (e) => {
       this.table = this.table.DataTable({
         colReorder: true,
         keys: {
+          // This will make the first 2 VISIBLE columns selectable
+          // Changing the 'Column visibility' breaks this.
           blurable: false,
-          columns: ':not(:first-child):not(:nth-child(2)):not(:nth-child(3))'
+          columns: ':not(:first-child):not(:nth-child(2))'
         },
         columnDefs,
         columns,
@@ -293,8 +299,8 @@ const handleSelect = (e) => {
         const table = this.table;
         const context = this;
         this.table.on("click", "tbody td:not(:has(input))", function () {
-          // Makes all cells editable, except column 2 & 3 => Fairdom-seek ID + UUID
-          if (![2, 3].includes(this._DT_CellIndex.column)) {
+          // Makes all cells editable, except column 1, 2 & 3 => status + Fairdom-seek ID + UUID
+          if (![1, 2, 3].includes(this._DT_CellIndex.column)) {
             editor($j(this), table, context);
           }
         });
@@ -330,10 +336,19 @@ const handleSelect = (e) => {
         .header()
         .each((x, i) => {
           const unit = colsWithUnits.find(c => c.colNr === i);
-          if (i == 0 && !this.options.readonly) $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`);
+
+          // Very first column in the checkbox column
+          // This is not rendered in the read-only 'Experiment overview'
+          if (i === 0 && !this.options.readonly){
+            $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`);
+          }
+
+          // Add '*' to required columns
           if (requiredCols.includes(i)) {
             $j(x).append("<span class='required-attribute'>*</span>");
           }
+
+          // Add units between parentheses to the column headers
           if (unit) {
             $j(x).append(`<span>( ${unit.symbol} )</span>`);
           }
@@ -619,7 +634,12 @@ function selectAll(e, includeHidden = false) {
   const tblWrapper = $j(e).parents("#study-samples-table_wrapper, #source-material-table_wrapper, #assay-samples-table_wrapper")
   const dtTbl = tblWrapper.find("table")[1]
   const dtName = $j(dtTbl).data("dtname")
-  const count = window[dtName].table.rows().count()
+  const visibleRows = window[dtName].table.rows().data().toArray().filter((array) => {
+    return !array
+      .filter((v) => ![null, undefined, true, false].includes(v)) // Filter out all null, undefined or boolean values
+      .every((v) => v === '#HIDDEN')
+  });
+  const count = visibleRows.length;
 
   if (includeHidden) {
     // This will select all rows containing hidden rows
@@ -630,7 +650,15 @@ function selectAll(e, includeHidden = false) {
     const checked = $j(e).prop("checked");
     const checkBoxes = $j(e).closest(".dt-scroll").find(".row-select");
     const dtSelectAll = tblWrapper.find(".dt_select_all");
-    dtSelectAll.css("display", checked && count > 0 ? "block" : "none")
+
+    // If select all is checked => Show 'Select all' link
+    // Else => Restore text and hide 'Select all' link
+    if (checked && count > 0) {
+      dtSelectAll.css("display", "block")
+    } else {
+      dtSelectAll.html("Select all rows")
+      dtSelectAll.css("display", "none")
+    }
 
     if (!checked) performSelect(dtName, false)
 
@@ -643,8 +671,13 @@ function selectAll(e, includeHidden = false) {
 
 function performSelect(dtName, select) {
   window[dtName].table.rows(function (idx, data, node) {
-    data[0] = select;
-    $j(node).find(".row-select").prop("checked", select)
+    if (data.filter((v) => v).every((v) => v === '#HIDDEN')) {
+      data[0] = false;
+      $j(node).find(".row-select").prop("checked", false)
+    } else {
+      data[0] = select;
+      $j(node).find(".row-select").prop("checked", select)
+    }
   });
 }
 
@@ -758,22 +791,47 @@ function simpleObjectsInput(column, data, options, url, multiInput) {
 
 const handleFailure = (table, res) => {
   const errors = new Set();
-  errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
   res.errors.forEach((error) => {
     const [rowId, sampleTypeId] = error.ex_id.split("-");
-    const errorColNames = Object.keys(error.error);
-    if (errorColNames.includes("base")) errors.add(error.error["base"]);
-    table.cells(rowId, `${sampleTypeId}:name`).every(function () {
-      const idx = this.index().column;
-      const colTitle = $j(table.column(idx).header()).text().replace("*", "");
-      if (errorColNames.includes(colTitle)) {
-        $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
-        $j(this.node()).attr("title", error.error[colTitle]);
-      } else if (['You are not allowed to edit this sample.', 'Can not be deleted.'].includes(error.error)) {
-        $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
-        errors.add(error.error);
+    const errorDetails = error.error;
+    const hasObjectDetails = errorDetails && typeof errorDetails === 'object' && !Array.isArray(errorDetails);
+    const errorColNames = hasObjectDetails ? Object.keys(errorDetails) : [];
+    const level = error.level;
+
+    // If it is a 'Sample' level error,
+    // deal with this row and go to next iteration.
+    if (level === 'Sample' && errorDetails != null) {
+      errors.add(errorDetails);
+      const row = $j(table.row(rowId).node());
+      row.find('td').each((index, element) => {$j(element).removeClass(dtRowDelete).removeClass(dtSuccessClass).addClass(dtErrClass)});
+      row.attr("title", errorDetails);
+    } else if (level === 'SampleAttribute') {
+      table.cells(rowId, `${sampleTypeId}:name`).every(function () {
+        const idx = this.index().column;
+        const colTitle = $j(table.column(idx).header()).text().replace("*", "");
+        if (errorColNames.includes(colTitle)) {
+          errors.add("The operation can not be performed for one or some samples. The red cells indicate unacceptable values.");
+          $j(this.node()).removeClass(dtSuccessClass).addClass(dtErrClass);
+          if (hasObjectDetails) $j(this.node()).attr("title", errorDetails[colTitle]);
+        }
+      });
+      // Handle 'base' errors for SampleAttribute level so they are not dropped
+      if (hasObjectDetails && errorColNames.includes("base")) {
+        const baseError = errorDetails["base"];
+        if (baseError != null) {
+          errors.add(baseError);
+          const row = $j(table.row(rowId).node());
+          row.find('td').each((index, element) => {
+            $j(element).removeClass(dtSuccessClass).addClass(dtErrClass);
+          });
+          row.attr("title", baseError);
+        }
       }
-    });
+    } else if (errorColNames.includes("base") && hasObjectDetails) {
+      errors.add(errorDetails["base"]);
+    } else if (errorDetails != null) {
+      errors.add(errorDetails);
+    }
   });
   alert([...errors].reverse().join("\n"));
 };

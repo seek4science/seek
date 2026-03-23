@@ -9,7 +9,7 @@
     "relationships": {
       "asset": {
         "data": {
-          "id": "188",
+          "id": "123",
           "type": "sops"
         }
       }

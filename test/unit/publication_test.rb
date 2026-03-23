@@ -300,6 +300,17 @@ class PublicationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'export throws correct Publication::NoEmailConfiguredException when no email configured' do
+    project = FactoryBot.create :project
+    journal = FactoryBot.create :journal
+    pub = Publication.new(title: 'test1', pubmed_id: '1234', projects: [project],publication_type_id: journal.id)
+    with_config_value(:pubmed_api_email, '') do
+      error = assert_raises(Publication::NoEmailConfiguredException) do
+        pub.export(:enw)
+      end
+      assert_equal 'An email address must be configured to use the PubMed API', error.message
+    end
+  end
 
   test 'model and datafile association' do
     publication = FactoryBot.create(:publication)
