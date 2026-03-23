@@ -211,11 +211,12 @@ module DynamicTableHelper
   end
 
   def dt_linked_samples(attribute)
-    unless attribute && attribute.linked_sample_type&.samples&.count&.positive?
-      return []
-    end
+    linked_samples = attribute&.linked_sample_type&.samples
+    return [] if linked_samples.blank?
 
-    assets = attribute.linked_sample_type&.samples&.authorized_for(:view) || []
-    assets.map { |sample| { id: sample.id, text: sample.title } }
+    linked_samples
+      .authorized_for(:view)
+      .pluck(:id, :title)
+      .map { |id, title| { id: id, text: title } }
   end
 end
