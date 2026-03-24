@@ -110,8 +110,6 @@ const handleSelect = (e) => {
 
         if (isRegisteredSample) {
           linkedSamplesUrl = typeaheadSamplesUrl.replace("_LINKED_", c.linked_sample_type);
-          const linkedSamples = retrieveLinkedSamples(linkedSamplesUrl);
-          c.linkedSampleIds = linkedSamples.map((ls) => ls.id);
         }
 
         if (isControlledVocabulary && 'cv_id' in c) {
@@ -681,24 +679,6 @@ function performSelect(dtName, select) {
   });
 }
 
-function retrieveLinkedSamples(url) {
-  let linkedSamples;
-  $j.ajax({
-    async: false,
-    url: url,
-    contentType: "application/json",
-    success: function (data) {
-      linkedSamples = data.results;
-    },
-    error: function (xhr, status) {
-      linkedSamples = []
-      console.log(status);
-      console.log(xhr.responseText);
-    }
-  });
-  return linkedSamples;
-}
-
 function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
   const existingOptions = data.map((e) => {
     const isHiddenInput = (e.title === '#HIDDEN');
@@ -715,7 +695,7 @@ function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
     const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
 
     const unLinkedSamples = data.reduce(function (filtered, sample) {
-      if (!column.linkedSampleIds.includes(parseInt(sample.id)) && sample.title !== '#HIDDEN') {
+      if (!column.linked_sample_ids.includes(parseInt(sample.id)) && sample.title !== '#HIDDEN') {
         filtered.push(sample);
       }
       return filtered;
