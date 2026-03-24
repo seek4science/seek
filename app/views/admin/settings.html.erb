@@ -25,6 +25,9 @@
                            'Session store timeout', 'The length of time, in MINUTES, that the server session store is active until it expires. (Requires a restart after changing)') %>
 
   <h2>File handling settings</h2>
+  <%= admin_checkbox_setting(:show_as_external_link_enabled, 1, Seek::Config.show_as_external_link_enabled,
+                             "Always show external links", "Items registered as a URL will always show the external link. When disabled, items are downloaded through SEEK as a proxy.") %>
+
   <%= admin_checkbox_setting(:block_file_uploads, 1, Seek::Config.block_file_uploads,
                              "Prevent file uploads", "If this setting is enabled, SEEK will block the ability to upload files for assets, and registering a URL will only be possible.
                              Caching of remote files will also be prevented, even if enabled.", onchange: toggle_appear_javascript('remote-cache-settings-block', reverse: true)) %>
