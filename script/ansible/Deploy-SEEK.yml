@@ -165,7 +165,7 @@
 
     ########## Install python tools
 
-    - name: Add repository to install python3.9
+    - name: Add repository to install python3.13
       become: true
       become_user: root
       ansible.builtin.apt_repository:
@@ -181,10 +181,9 @@
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - python3.9-dev
-        - python3.9-distutils
+        - python3.13-dev
         - python3-pip
-        - python3-pymysql
+        - python3.13-venv
       tags:
         - python
         - packages
@@ -192,9 +191,8 @@
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
-        - python3.9 -m pip install --upgrade pip
-        - python3.9 -m pip install setuptools==58
-        - python3.9 -m pip install -r requirements.txt
+        - python3.13 -m ensurepip --upgrade --default-pip
+        - python3.13 -m pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
       tags:

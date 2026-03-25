@@ -154,7 +154,11 @@ module Seek
     end
 
     def self.python_exec(cmd)
-      "python3.9 #{cmd}"
+      "python#{python_version} #{cmd}"
+    end
+
+    def self.python_version
+      @python_version ||= Rails.root.join('.python-version').read.chomp
     end
 
     def self.lookup_class(class_name, raise: true)
