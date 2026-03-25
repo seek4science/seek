@@ -208,19 +208,51 @@ class DocumentsControllerTest < ActionController::TestCase
       get :new
 
       assert_response :success
-
-      assert_select 'div[role=?]', 'tabpanel' do
-        assert_select 'ul[role=?]', 'tablist' do
-          assert_select 'a[data-tab-target=?]', 'local-file', count: 0
-          assert_select 'li.upload-field-tab.active' do
-            assert_select 'a[data-tab-target=?]', 'remote-url', count: 1
+      assert_select '.panel-body' do
+        expected = 'You can register a Document by registering a URL to a remote file or web page.'
+        assert_select 'p', text: expected
+        assert_select 'div[role=?]', 'tabpanel' do
+          assert_select 'ul[role=?]', 'tablist' do
+            assert_select 'a[data-tab-target=?]', 'local-file', count: 0
+            assert_select 'li.upload-field-tab.active' do
+              assert_select 'a[data-tab-target=?]', 'remote-url', count: 1
+            end
+          end
+          assert_select '.tab-content' do
+            assert_select 'div[data-tab-id=?]', 'local-file', count: 0
+            assert_select 'input[type=file]', count: 0
+            assert_select 'div[data-tab-id=?].active', 'remote-url', count: 1
+            assert_select 'input[name="content_blobs[][data_url]"]', count: 1
           end
         end
-        assert_select '.tab-content' do
-          assert_select 'div[data-tab-id=?]', 'local-file', count: 0
-          assert_select 'input[type=file]', count: 0
-          assert_select 'div[data-tab-id=?].active', 'remote-url', count: 1
-          assert_select 'input[name="content_blobs[][data_url]"]', count: 1
+      end
+    end
+  end
+
+  test 'local upload option available without blocked file uploads' do
+    with_config_value(:block_file_uploads, false) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+
+      get :new
+
+      assert_response :success
+      assert_select '.panel-body' do
+        expected='You can register a Document by either directly uploading a file, or registering a URL to a remote file or web page.'
+        assert_select 'p', text: expected
+        assert_select 'div[role=?]', 'tabpanel' do
+          assert_select 'ul[role=?]', 'tablist' do
+            assert_select 'a[data-tab-target=?]', 'local-file', count: 1
+            assert_select 'li.upload-field-tab' do
+              assert_select 'a[data-tab-target=?]', 'remote-url', count: 1
+            end
+          end
+          assert_select '.tab-content' do
+            assert_select 'div[data-tab-id=?]', 'local-file', count: 1
+            assert_select 'input[type=file]', count: 1
+            assert_select 'div[data-tab-id=?]', 'remote-url', count: 1
+            assert_select 'input[name="content_blobs[][data_url]"]', count: 1
+          end
         end
       end
     end
