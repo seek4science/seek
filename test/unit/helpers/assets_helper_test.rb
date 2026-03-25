@@ -198,6 +198,24 @@ class AssetsHelperTest < ActionView::TestCase
     end
   end
 
+  test 'upload_box_text' do
+    assert_equal 'You can register a Data file by selecting a file.',
+                 upload_box_text('DataFile', 'register a Data file', true, false)
+    assert_equal 'You can register an Assay by selecting a file.',
+                 upload_box_text('Assay', nil, true, false)
+    assert_equal 'You can register a Data file by registering a URL to a remote file or web page.',
+                 upload_box_text('Data file', nil, false, true)
+    assert_equal 'You can register an Assay by registering a URL to a remote file or web page.',
+                 upload_box_text('Assay', nil, false, true)
+    assert_equal 'You can register an Assay by either directly uploading a file, or registering a URL to a remote file or web page.',
+                 upload_box_text('Assay', nil, false, false)
+    assert_equal 'You can register a Data file by either directly uploading a file or zipped folder, or registering a URL to a remote file or web page.',
+                 upload_box_text('Data file', nil, false, false)
+    assert_raise StandardError, match:/cannot hide both remote and local options/i do
+      upload_box_text('Data file', nil, true, true)
+    end
+  end
+
   private
 
   def update_lookup_tables

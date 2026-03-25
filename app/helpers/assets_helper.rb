@@ -370,4 +370,16 @@ module AssetsHelper
     tooltip_txt = "#{item_type.humanize}: \"#{item.title}\"#{by_text}"
     list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34)
   end
+
+  def upload_box_text(asset_name, action_text, hide_remote, hide_local)
+    raise 'cannot hide both remote and local options' if hide_remote && hide_local
+    action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
+    if hide_remote
+      "You can #{action_text} by selecting a file."
+    elsif hide_local
+      "You can register #{asset_name.indefinite_article} #{asset_name} by registering a URL to a remote file or web page."
+    else
+      "You can register #{asset_name.indefinite_article} #{asset_name} by either directly uploading a file#{' or zipped folder' if asset_name == 'Data file'}, or registering a URL to a remote file or web page."
+    end
+  end
 end

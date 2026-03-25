@@ -11,12 +11,8 @@
 <%= panel(title, id: id) do %>
   <div>
     <p>
-      <% unless hide_remote %>
-        You can register a <%= asset_name -%> by either directly uploading a file<%= ' or zipped folder' if asset_name == 'Data file' %>,
-      	or registering a URL to a remote file or web page.
-      <% else %>
-        You can <%= action_text -%> by selecting a file.
-      <% end %>
+      <%= upload_box_text(asset_name, action_text, hide_remote, hide_local) %>
+
 
     </p>
   </div>
