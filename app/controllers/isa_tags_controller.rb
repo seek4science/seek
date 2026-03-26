@@ -36,7 +36,7 @@ class ISATagsController < ApplicationController
 
   def isa_tag_options_for_attributes
     level = params[:level]
-    allowed_isa_tags = ISATag.allowed_isa_tags_for_level(level)
+    allowed_isa_tags = ISATag.allowed_isa_tags_for_level(level).to_a.compact
     isa_tags_options = allowed_isa_tags.map { |it| { text: it.title, value: it.id } }
 
     render json: { result: isa_tags_options }
