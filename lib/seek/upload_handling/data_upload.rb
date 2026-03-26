@@ -12,10 +12,12 @@ module Seek
         rescue_from UploadBlockedException, with: :handle_upload_blocked_exception
       end
 
-      def handle_upload_data(new_version = false)
+      def handle_upload_data(new_version = false, always_allow_uploads = false)
         blob_params = params[:content_blobs]
-        check_for_blocked_uploads(blob_params)
-        prevent_local_copy_for_blocked_uploads(blob_params)
+        unless always_allow_uploads
+          check_for_blocked_uploads(blob_params)
+          prevent_local_copy_for_blocked_uploads(blob_params)
+        end
 
         allow_empty_content_blob = model_image_present? || json_api_request?
 
