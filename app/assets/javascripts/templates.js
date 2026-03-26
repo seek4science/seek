@@ -235,7 +235,7 @@ const applyTemplate = () => {
     const isInputRow =
         row[7] === "Registered Sample List" &&
         row[1].includes("Input") &&
-        row[11] === null;
+        row[12] === 'input';
     const isRequired = row[0] ? "checked" : "";
     newRow = $j(newRow.replace(/replace-me/g, index));
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
