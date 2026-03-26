@@ -224,6 +224,15 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert assigns(:error_msg)
   end
 
+  test 'examine url no host' do
+    get :examine_url, xhr: true, params: { data_url: 'http://' }
+    assert_response 400
+    assert @response.body.include?('The URL appears to be invalid')
+    assert @response.body.include?('I understand the risks and want to override URL validation')
+    assert_equal 'override', assigns(:type)
+    assert assigns(:error_msg)
+  end
+
   test 'examine url unrecognized scheme' do
     get :examine_url, xhr: true, params: { data_url: 'fish://tuna:1525125151' }
     assert_response :success
