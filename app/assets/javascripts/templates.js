@@ -168,11 +168,12 @@ function loadFilterSelectors(data) {
 function get_filtered_isa_tags(level) {
   var result;
   $j.ajax({
-    type: 'POST',
+    type: 'GET',
     async: false,
-    url: '/templates/filter_isa_tags_by_level',
+    url: '/isa_tags/isa_tag_options_for_attributes',
     data: {level: level},
     dataType: 'json',
+    headers: {Accept: 'application/json'},
     success: function(res) {
       result = res.result;
     },
@@ -235,7 +236,7 @@ const applyTemplate = () => {
     const isInputRow =
         row[7] === "Registered Sample List" &&
         row[1].includes("Input") &&
-        row[11] === null;
+        row[12] === 'input';
     const isRequired = row[0] ? "checked" : "";
     newRow = $j(newRow.replace(/replace-me/g, index));
     $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
