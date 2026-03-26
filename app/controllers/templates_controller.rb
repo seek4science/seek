@@ -124,28 +124,9 @@ class TemplatesController < ApplicationController
 
   def filter_isa_tags_by_level
     level = params[:level]
-    all_isa_tags_options = ISATag.all.map { |it| { text: it.title, value: it.id } }
+    allowed_isa_tags = ISATag.allowed_isa_tags_for_level(level)
+    isa_tags_options = allowed_isa_tags.map { |it| { text: it.title, value: it.id } }
 
-    case level
-    when 'study source'
-      isa_tags_options = all_isa_tags_options.select { |tag| %w[source source_characteristic].include?(tag[:text]) }
-    when 'study sample'
-      isa_tags_options = all_isa_tags_options.select do |tag|
-        %w[protocol sample sample_characteristic parameter_value].include?(tag[:text])
-      end
-    when 'assay - material'
-      isa_tags_options = all_isa_tags_options.select do |tag|
-        %w[protocol other_material other_material_characteristic parameter_value].include?(tag[:text])
-      end
-    when 'assay - data file'
-      isa_tags_options = all_isa_tags_options.select do |tag|
-        %w[protocol data_file data_file_comment parameter_value].include?(tag[:text])
-      end
-    else
-      isa_tags_options = all_isa_tags_options
-    end
-
-    puts "ISA Tags: #{isa_tags_options}"
     render json: { result: isa_tags_options }
   end
 
