@@ -26,7 +26,7 @@ module Seek
             @type = 'warning'
             @warning_msg = "Unhandled URL scheme: #{uri.scheme}. The given URL will be presented as a clickable link."
           end
-        rescue URI::InvalidURIError
+        rescue URI::InvalidURIError, ArgumentError
           @type = 'override'
           @error_msg = 'The URL appears to be invalid.'
         rescue OpenSSL::OpenSSLError

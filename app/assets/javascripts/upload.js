@@ -153,7 +153,7 @@ $j(document).ready(function () {
                 if (lastTestedUrl !== input.val()) { // Prevent double query, 1 from keypress and 1 from text box losing focus.
                     submitUrl();
                 }
-            }, 100);
+            }, 700);
             return true;
         });
 
