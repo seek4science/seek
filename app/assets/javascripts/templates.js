@@ -173,7 +173,7 @@ function get_filtered_isa_tags(level) {
     url: '/isa_tags/isa_tag_options_for_attributes',
     data: {level: level},
     dataType: 'json',
-    accept: 'application/json',
+    headers: {Accept: 'application/json'},
     success: function(res) {
       result = res.result;
     },
