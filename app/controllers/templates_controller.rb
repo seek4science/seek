@@ -122,14 +122,6 @@ class TemplatesController < ApplicationController
     end
   end
 
-  def filter_isa_tags_by_level
-    level = params[:level]
-    allowed_isa_tags = ISATag.allowed_isa_tags_for_level(level)
-    isa_tags_options = allowed_isa_tags.map { |it| { text: it.title, value: it.id } }
-
-    render json: { result: isa_tags_options }
-  end
-
   private
 
   def template_params

@@ -791,7 +791,6 @@ SEEK::Application.routes.draw do
       post :template_attributes
     end
     collection do
-      post :filter_isa_tags_by_level
       get :task_status
       get :default_templates
       post :populate_template
@@ -854,7 +853,11 @@ SEEK::Application.routes.draw do
 
   ### ISA Tags ###
 
-  resources :isa_tags, only: [:index, :show]
+  resources :isa_tags, only: [:index, :show] do
+    collection do
+      get :isa_tag_options_for_attributes
+    end
+  end
 
   ### MISC MATCHES ###
   get '/search/' => 'search#index', as: :search
