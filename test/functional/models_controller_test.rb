@@ -362,9 +362,31 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
+        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }],
+                                policy_attributes: valid_sharing,
+                                model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
+      end
+    end
+
+    model = assigns(:model)
+    assert_equal 'file_picture.png', model.model_image.original_filename
+    assert_equal 'image/png', model.model_image.content_type
+  end
+
+  test 'should create model with image even with blocked file uploads' do
+    stub_request(:head, 'http://somehwere/model.sbml').to_return(status: 200, headers: { 'Content-Type' => 'text/xml' })
+    with_config_value(:block_file_uploads, true) do
+      login_as(:model_owner)
+      assert_difference('Model.count') do
+        assert_difference('ModelImage.count') do
+          post :create, params: { model: valid_model, content_blobs: [{ data_url: 'http://somehwere/model.sbml' }],
+                                  policy_attributes: valid_sharing,
+                                  model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
+
+          assert_redirected_to model_path(assigns(:model))
+        end
       end
     end
 
