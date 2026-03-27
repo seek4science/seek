@@ -323,10 +323,10 @@ module ISAExporter
       ontology = get_ontology_details(protocol_attrbute, protocol_attrbute.title, false)
 
       # If a registered SOP was used that has sop_type_annotation_values,
-      # the protocolType
-      sop_type = sop.sop_type_annotation_values&.first
-
-      if sop_type
+      # the protocolType gets the values from the sop_type
+      # else it will revert to the 'old' way of dealing with protocol types
+      if sop.is_a? Sop
+        sop_type = sop.sop_type_annotation_values&.first
         isa_protocol[:protocolType] = {
           annotationValue: sop_type&.label,
           termAccession: sop_type&.iri,
