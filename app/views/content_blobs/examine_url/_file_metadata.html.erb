@@ -14,5 +14,5 @@
 </ul>
 
 <%= content_tag :script,
-                @info.to_json.html_safe,
+                ERB::Util.json_escape(@info.to_json),
                 type: 'application/json' %>
