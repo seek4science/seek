@@ -141,7 +141,10 @@ module AssetsHelper
 
   def show_resource_path(resource)
     path_options = {}
-    path_options[:code] = params[:code] if params[:code].present?
+    # Only include code parameter on show pages, not on index/list pages
+    # Check if we're on an index action - if so, don't include code
+    is_index_page = defined?(action_name) && action_name == 'index'
+    path_options[:code] = params[:code] if params[:code].present? && !is_index_page
 
     if resource.is_a_version?
       polymorphic_path(resource.parent, { version: resource.version }.merge(path_options))
@@ -191,6 +194,55 @@ module AssetsHelper
   # code is for authorization of temporary link
   def can_view_asset?(asset, code = params[:code], can_view = asset.can_view?)
     can_view || (code && asset.auth_by_code?(code))
+  end
+
+  # Determines if code should be included for ISA hierarchy navigation
+  # Code only propagates DOWNWARD (to children), not UPWARD (to parents)
+  def should_include_code_for_isa_link?(target_resource)
+    return false unless params[:code].present?
+
+    # Don't include code on index/list pages
+    return false if defined?(action_name) && action_name == 'index'
+
+    return true unless defined?(controller_name) && defined?(instance_variable_get)
+
+    # Get the current resource being viewed
+    current_resource = case controller_name
+                       when 'investigations'
+                         instance_variable_get('@investigation')
+                       when 'studies'
+                         instance_variable_get('@study')
+                       when 'assays'
+                         instance_variable_get('@assay')
+                       else
+                         nil
+                       end
+
+    return true if current_resource.nil?
+
+    # Determine if target is a parent (don't include code) or child/sibling (include code)
+    is_parent_of_current?(target_resource, current_resource) ? false : true
+  end
+
+  # Check if target_resource is a parent of current_resource in ISA hierarchy
+  def is_parent_of_current?(target, current)
+    return false if target.nil? || current.nil?
+
+    # If current is a Study, check if target is its Investigation
+    if current.is_a?(Study) && target.is_a?(Investigation)
+      return current.investigation == target
+    end
+
+    # If current is an Assay, check if target is its Study or Investigation
+    if current.is_a?(Assay)
+      if target.is_a?(Study)
+        return current.study == target
+      elsif target.is_a?(Investigation)
+        return current.investigation == target
+      end
+    end
+
+    false
   end
 
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})

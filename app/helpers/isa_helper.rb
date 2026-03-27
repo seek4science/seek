@@ -85,8 +85,12 @@ module ISAHelper
         data['fullName'] = item.title
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
-        # Include code parameter for temporary link access
-        url_options = params[:code].present? ? { code: params[:code] } : {}
+        # Include code parameter for temporary link access - only for children, not parents
+        url_options = if params[:code].present? && should_include_code_for_isa_link?(item)
+                        { code: params[:code] }
+                      else
+                        {}
+                      end
         data['url'] = if item.is_a?(Seek::ObjectAggregation)
                         polymorphic_path([item.object, item.type.to_sym], url_options)
                       else
