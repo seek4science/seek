@@ -140,12 +140,15 @@ module AssetsHelper
   end
 
   def show_resource_path(resource)
+    path_options = {}
+    path_options[:code] = params[:code] if params[:code].present?
+
     if resource.is_a_version?
-      polymorphic_path(resource.parent, version: resource.version)
+      polymorphic_path(resource.parent, { version: resource.version }.merge(path_options))
     elsif resource.is_a?(Snapshot)
-      polymorphic_path([resource.resource, resource])
+      polymorphic_path([resource.resource, resource], path_options)
     else
-      polymorphic_path(resource)
+      polymorphic_path(resource, path_options)
     end
   end
 
