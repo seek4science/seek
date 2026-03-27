@@ -2,7 +2,19 @@
 <% if f.object.can_manage? %>
 
   <% title_and_help = capture do %>
-        <%= help_icon("Here you can create a temporary access link for reviewing this asset. The reviewers with this link can view/download this asset with no login") %>
+        <%
+          # Generate contextual help text based on resource type
+          help_text = if f.object.is_a?(Investigation)
+            "Here you can create a temporary access link for reviewing this #{t('investigation')}. The reviewers with this link can view this #{t('investigation')}, all associated #{t('study').pluralize}, #{t('assays.assay').pluralize}, and download all associated assets (#{t('data_file').pluralize}, #{t('sop').pluralize}, #{t('model').pluralize}, etc.) with no login required."
+          elsif f.object.is_a?(Study)
+            "Here you can create a temporary access link for reviewing this #{t('study')}. The reviewers with this link can view this #{t('study')}, all associated #{t('assays.assay').pluralize}, and download all associated assets (#{t('data_file').pluralize}, #{t('sop').pluralize}, #{t('model').pluralize}, etc.) with no login required."
+          elsif f.object.is_a?(Assay)
+            "Here you can create a temporary access link for reviewing this #{t('assays.assay')}. The reviewers with this link can view this #{t('assays.assay')} and download all associated assets (#{t('data_file').pluralize}, #{t('sop').pluralize}, #{t('model').pluralize}, #{t('document').pluralize}, etc.) with no login required."
+          else
+            "Here you can create a temporary access link for reviewing this asset. The reviewers with this link can view/download this asset with no login required."
+          end
+        %>
+        <%= help_icon(help_text) %>
         Sharing Link
   <% end %>
 
@@ -21,7 +33,19 @@
                     </span>
                   </span>
                 </div>
-                <p class='help-block'>This link will not be active until you click 'Update'.</p>
+                <%
+                  # Generate contextual help text for the link activation notice
+                  link_scope_text = if f.object.is_a?(Investigation)
+                    "This link will grant access to view this #{t('investigation')}, its #{t('study').pluralize}, #{t('assays.assay').pluralize}, and download associated assets. The link will not be active until you click 'Update'."
+                  elsif f.object.is_a?(Study)
+                    "This link will grant access to view this #{t('study')}, its #{t('assays.assay').pluralize}, and download associated assets. The link will not be active until you click 'Update'."
+                  elsif f.object.is_a?(Assay)
+                    "This link will grant access to view this #{t('assays.assay')} and download its associated assets. The link will not be active until you click 'Update'."
+                  else
+                    "This link will not be active until you click 'Update'."
+                  end
+                %>
+                <p class='help-block'><%= link_scope_text %></p>
                 <%= sub_form.hidden_field :code %>
               </div>
 
