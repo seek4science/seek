@@ -8,6 +8,7 @@ x-shared:
       RAILS_ENV: production
       SOLR_PORT: 8983
       SOLR_HOST: solr
+      REDIS_URL: redis://redis:6379/0
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
     env_file:
       - docker/db.env
@@ -18,6 +19,8 @@ x-shared:
       db:
         condition: service_healthy
       solr:
+        condition: service_started
+      redis:
         condition: service_started
 
 
@@ -59,7 +62,7 @@ services:
       start_period: 20s
 
   seek_workers:
-    # The SEEK delayed job workers
+    # The SEEK background job workers (Sidekiq)
     <<: *seek_base
     container_name: seek-workers
     environment:
@@ -84,12 +87,21 @@ services:
       - seek
       - /opt/solr/server/solr/configsets/seek_config
 
+  redis:
+    image: redis:7-alpine
+    container_name: seek-redis
+    restart: always
+    volumes:
+      - seek-redis-data:/data
+
 volumes:
   seek-filestore:
     external: true
   seek-mysql-db:
     external: true
   seek-solr-data:
+    external: true
+  seek-redis-data:
     external: true
   seek-cache:
     external: true
