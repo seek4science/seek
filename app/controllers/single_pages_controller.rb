@@ -82,7 +82,7 @@ class SinglePagesController < ApplicationController
 
     notice_message << '</ul>'
     flash[:notice] = notice_message.html_safe
-    render xlsx: 'download_samples_excel', filename: helpers.sanitized_text(spreadsheet_name), disposition: 'inline'
+    render xlsx: 'download_samples_spreadsheet', filename: helpers.sanitized_text(spreadsheet_name), disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
