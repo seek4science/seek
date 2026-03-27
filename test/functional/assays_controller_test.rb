@@ -1773,8 +1773,7 @@ class AssaysControllerTest < ActionController::TestCase
     # check sharing form exists
     assert_select 'div#sharing_form', count:1
 
-    #no sharing link, not for Investigation, Study and Assay
-    assert_select 'div#temporary_links', count:0
+    assert_select 'div#temporary_links', count:1
 
     assert_select 'div#author-form', count:1
   end
@@ -2384,6 +2383,152 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     get :edit, params: { id: assay.id }
     assert_response :success
+  end
+
+  # Tests for temporary link (special auth code) functionality
+
+  test 'should create temporary link for assay' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, contributor: User.current_user.person)
+
+    assert_difference('SpecialAuthCode.count', 1) do
+      post :manage_update, params: {
+        id: assay.id,
+        assay: {
+          title: assay.title,
+          study_id: study.id,
+          assay_class_id: assay.assay_class_id,
+          special_auth_codes_attributes: {
+            '0' => {
+              code: SecureRandom.base64(30),
+              expiration_date: (Date.today + 7.days).to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    assert_redirected_to assay_path(assay)
+
+    assay.reload
+    assert_equal 1, assay.special_auth_codes.count
+
+    code = assay.special_auth_codes.first
+    assert_not_nil code.code
+    assert_equal 40, code.code.length
+    assert code.expiration_date > Date.today
+  end
+
+  test 'should update existing temporary link for assay' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, contributor: User.current_user.person)
+
+    initial_code = nil
+    disable_authorization_checks do
+      initial_code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    new_expiration = Date.today + 14.days
+
+    assert_no_difference('SpecialAuthCode.count') do
+      post :manage_update, params: {
+        id: assay.id,
+        assay: {
+          title: assay.title,
+          study_id: study.id,
+          assay_class_id: assay.assay_class_id,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: initial_code.id,
+              code: initial_code.code,
+              expiration_date: new_expiration.to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    initial_code.reload
+    assert_equal new_expiration, initial_code.expiration_date
+  end
+
+  test 'should revoke temporary link for assay' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, contributor: User.current_user.person)
+
+    code = nil
+    disable_authorization_checks do
+      code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert_difference('SpecialAuthCode.count', -1) do
+      post :manage_update, params: {
+        id: assay.id,
+        assay: {
+          title: assay.title,
+          study_id: study.id,
+          assay_class_id: assay.assay_class_id,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: code.id,
+              _destroy: '1'
+            }
+          }
+        }
+      }
+    end
+
+    assay.reload
+    assert_equal 0, assay.special_auth_codes.count
+  end
+
+  test 'temporary link code is saved to database for assay with correct attributes' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, contributor: User.current_user.person)
+
+    expiration_date = Date.today + 10.days
+
+    post :manage_update, params: {
+      id: assay.id,
+      assay: {
+        title: assay.title,
+        study_id: study.id,
+        assay_class_id: assay.assay_class_id,
+        special_auth_codes_attributes: {
+          '0' => {
+            code: SecureRandom.base64(30),
+            expiration_date: expiration_date.to_s,
+            _destroy: '0'
+          }
+        }
+      }
+    }
+
+    # Query database directly
+    code = SpecialAuthCode.where(
+      asset_type: 'Assay',
+      asset_id: assay.id
+    ).first
+
+    assert_not_nil code
+    assert_equal 'Assay', code.asset_type
+    assert_equal assay.id, code.asset_id
+    assert_equal expiration_date, code.expiration_date
+    assert_equal 40, code.code.length
   end
 
 end
