@@ -2,7 +2,8 @@ module InvestigationsHelper
   def investigation_link(investigation)
     unless investigation.nil?
       if investigation.can_view?
-        link_to investigation.title, investigation_path(investigation, code: params[:code])
+        code_param = should_include_code_for_isa_link?(investigation) ? params[:code] : nil
+        link_to investigation.title, investigation_path(investigation, code: code_param)
       else
         hidden_items_html [investigation]
       end
