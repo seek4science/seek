@@ -253,7 +253,7 @@ module Seek
       def handle_upload_blocked_exception(exception)
         respond_to do |format|
           format.html do
-            flash.now[:error] = exception.message
+            flash[:error] = exception.message
             redirect_to polymorphic_path(controller_name)
           end
           format.json { render json: { error: exception.message }, status: :forbidden }

@@ -48,7 +48,7 @@ module Seek
 
       def allow_copy?(info)
         allow_copy = !Seek::Config.block_file_uploads
-        allow_copy = allow_copy & (info[:file_size].blank? || (info[:file_size] <= Seek::Config.hard_max_cachable_size))
+        allow_copy = allow_copy && (info[:file_size].blank? || (info[:file_size] <= Seek::Config.hard_max_cachable_size))
         info.merge!(allow_copy: allow_copy)
         info.merge!(blocked_file_uploads: Seek::Config.block_file_uploads)
         info

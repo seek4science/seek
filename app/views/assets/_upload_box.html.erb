@@ -6,7 +6,7 @@
   action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
   extra_content ||= nil
   hide_remote ||= false
-  hide_local = Seek::Config.block_file_uploads if hide_local.nil?
+  hide_local = Seek::Config.block_file_uploads unless local_assigns.key?(:hide_local)
 %>
 <%= panel(title, id: id) do %>
   <div>
