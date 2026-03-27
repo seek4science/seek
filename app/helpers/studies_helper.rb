@@ -24,6 +24,8 @@ module StudiesHelper
   end
 
   def show_batch_miappe_button?
+    return false if Seek::Config.block_file_uploads
+
     ExtendedMetadataType.where(supported_type: 'Study', title: ExtendedMetadataType::MIAPPE_TITLE, enabled: true).any?
   end
 

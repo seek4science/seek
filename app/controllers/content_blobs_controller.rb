@@ -12,6 +12,10 @@ class ContentBlobsController < ApplicationController
   api_actions :show, :update, :download
 
   def update
+    if Seek::Config.block_file_uploads
+      raise Seek::UploadHandling::DataUpload::UploadBlockedException, 'Data upload is not allowed.'
+    end
+
     if @content_blob.no_content?
       @content_blob.tmp_io_object = get_request_payload
       @content_blob.save
@@ -235,6 +239,12 @@ class ContentBlobsController < ApplicationController
       params.values.detect { |v| v.is_a?(ActionDispatch::Http::UploadedFile) }
     else
       request.body
+    end
+  end
+  # overrides from DataUpload module
+  def handle_upload_blocked_exception(exception)
+    respond_to do |format|
+      format.all { render plain: exception.message, status: :forbidden }
     end
   end
 end

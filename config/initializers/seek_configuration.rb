@@ -201,6 +201,7 @@ def load_seek_config_defaults!
   Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
 
   Seek::Config.default :allow_private_address_access, false
+  Seek::Config.default :block_file_uploads, false
   Seek::Config.default :cache_remote_files, true
   Seek::Config.default :max_cachable_size, 20 * 1024 * 1024
   Seek::Config.default :hard_max_cachable_size, 100 * 1024 * 1024

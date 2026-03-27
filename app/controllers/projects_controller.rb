@@ -391,14 +391,14 @@ class ProjectsController < ApplicationController
 
     unless file.has_key?('dmp')
       flash[:error] = 'Invalid file format, missing top-level "dmp" tag'
-      redirect_back fallback_location: import_projects_path
+      redirect_back fallback_location: guided_import_projects_path
       return
     end
     dmp = file['dmp']
 
     unless dmp.has_key?('project')
       flash[:error] = 'Invalid file format, missing project properties'
-      redirect_back fallback_location: import_projects_path
+      redirect_back fallback_location: guided_import_projects_path
       return
     end
     project_data = dmp['project'][0]

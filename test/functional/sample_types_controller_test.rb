@@ -440,7 +440,46 @@ class SampleTypesControllerTest < ActionController::TestCase
                params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
                          content_blobs: [blob],
                          policy_attributes: policy_attributes }
+          assert_redirected_to edit_sample_type_path(assigns(:sample_type))
+        end
+      end
+    end
 
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    assert sample_type.uploaded_template?
+
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal %w[fish golf], sample_type.tags.sort
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+  end
+
+  test 'create from template even with file uploads blocked' do
+    blob = { data: template_for_upload }
+
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
+
+    with_config_value(:block_file_uploads, true) do
+      assert_difference('ActivityLog.count', 1) do
+        assert_difference('SampleType.count', 1) do
+          assert_difference('ContentBlob.count', 1) do
+            assert_nothing_raised do
+              post :create_from_template,
+                   params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
+                             content_blobs: [blob],
+                             policy_attributes: policy_attributes }
+              refute_nil assigns(:sample_type)
+              assert_redirected_to edit_sample_type_path(assigns(:sample_type))
+            end
+          end
         end
       end
     end

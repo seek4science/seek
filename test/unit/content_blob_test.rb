@@ -937,6 +937,18 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'does not enqueue remote content fetching job if file uploads blocked' do
+    content_blob = FactoryBot.build(:url_content_blob, make_local_copy: true)
+    with_config_value(:block_file_uploads, true) do
+      assert_no_difference('Task.count') do
+        assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
+          content_blob.save!
+          refute content_blob.remote_content_fetch_task.pending?
+        end
+      end
+    end
+  end
+
   test 'does not enqueue remote content fetching job for local content blob' do
     content_blob = FactoryBot.build(:content_blob)
     assert_no_difference('Task.count') do
@@ -957,5 +969,15 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert FactoryBot.create(:image_content_blob).is_image_convertable?
     refute FactoryBot.create(:svg_content_blob).is_image_convertable?
     refute FactoryBot.create(:pdf_content_blob).is_image_convertable?
+  end
+
+  test 'not cachable if file uploads blocked' do
+    blob = FactoryBot.build(:url_content_blob, make_local_copy: true, file_size: 12)
+    with_config_value(:block_file_uploads, false) do
+      assert blob.cachable?
+    end
+    with_config_value(:block_file_uploads, true) do
+      refute blob.cachable?
+    end
   end
 end

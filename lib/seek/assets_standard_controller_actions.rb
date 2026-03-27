@@ -2,6 +2,8 @@ module Seek
   # The standard basic actions for assets - currently show, new, create, edit, destroy. THe intention is to support all methods for all asset types.
   # DataFile is currently not fully supported due to biosample complications which are intended to be revisited.
   module AssetsStandardControllerActions
+    extend ActiveSupport::Concern
+
     include Seek::DestroyHandling
     include Seek::UploadHandling::DataUpload
 
