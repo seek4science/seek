@@ -1,0 +1,66 @@
+#####################################
+debug = ENV.fetch('RAILS_ENV') == "development"
+#####################################
+
+secret_pwd = debug ? 'seek' : UUID.new.generate
+
+xlsx_package = Axlsx::Package.new
+workbook = xlsx_package.workbook
+
+# Prevents formula injections
+Axlsx.escape_formulas = true
+
+######################
+# Styles
+######################
+# Colors
+# TODO: Make the colors depend on the type of branding instead of hard-coded colors
+# REQUIREMENT: branding configuration in seek
+header_fg_color = '486273'
+header_bg_color = 'F2b035'
+
+# Cell Styles
+unlocked_style = workbook.styles.add_style locked: false
+locked_style = workbook.styles.add_style locked: true
+header_one_style = workbook.styles.add_style(
+  bg_color: header_bg_color,
+  fg_color: header_fg_color,
+  b: true,
+  u: true,
+  sz: 18,
+  locked: true
+)
+header_two_style = workbook.styles.add_style(b: true, u: true, locked: true)
+
+styles = { unlocked_style:, locked_style:, header_one_style:, header_two_style: }
+######################
+# End Styles
+######################
+
+
+# Get Sample data
+sample_data = @samples.map do |sample|
+  { 'id': sample.id }.merge({ 'uuid': sample.uuid }, JSON.parse(sample[:json_metadata]))
+end
+
+# Sample attribute data
+sample_attributes = @sample_type.sample_attributes
+sample_attribute_value_map = {}
+sample_attributes.each do |sample_attribute|
+  attribute_values = get_values_for_attribute(sample_attribute)
+  sample_attribute_value_map[sample_attribute.title] = attribute_values
+end
+
+render partial: 'metadata_sheet', locals: { workbook: workbook, styles: styles, secret_pwd: secret_pwd }
+
+render partial: 'controlled_vocabs_sheet', locals: { workbook: workbook,
+                                                     styles: styles,
+                                                     secret_pwd: secret_pwd,
+                                                     sample_attribute_value_map: sample_attribute_value_map }
+
+render partial: 'samples_sheet', locals: { workbook: workbook,
+                                           styles: styles,
+                                           secret_pwd: secret_pwd,
+                                           sample_data: sample_data,
+                                           sample_attribute_value_map: sample_attribute_value_map,
+                                           sample_attributes: sample_attributes }
