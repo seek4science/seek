@@ -372,9 +372,10 @@ module AssetsHelper
   end
 
   def upload_box_text(asset_name, action_text, hide_remote, hide_local)
-    raise 'cannot hide both remote and local options' if hide_remote && hide_local
-    action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
-    if hide_remote
+    if hide_remote && hide_local
+      'Both uploading a file or registering a URL to a remote file or web page are currently unavailable.'
+    elsif hide_remote
+      action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
       "You can #{action_text} by selecting a file."
     elsif hide_local
       "You can register #{asset_name.indefinite_article} #{asset_name} by registering a URL to a remote file or web page."
