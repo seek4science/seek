@@ -53,11 +53,18 @@ end
 
 render partial: 'metadata_sheet', locals: { workbook: workbook, styles: styles, secret_pwd: secret_pwd }
 
+# Extended metadata
+emt = @assay? @assay&.assay_stream&.extended_metadata : @study.extended_metadata
+
+render partial: 'extended_metadata_sheet', locals: { workbook: workbook, styles: styles, extended_metadata: emt } if emt
+
+# Sample Controlled vocabs
 render partial: 'controlled_vocabs_sheet', locals: { workbook: workbook,
                                                      styles: styles,
                                                      secret_pwd: secret_pwd,
                                                      sample_attribute_value_map: sample_attribute_value_map }
 
+# Sample metadata
 render partial: 'samples_sheet', locals: { workbook: workbook,
                                            styles: styles,
                                            secret_pwd: secret_pwd,
