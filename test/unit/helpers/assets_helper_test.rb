@@ -211,9 +211,8 @@ class AssetsHelperTest < ActionView::TestCase
                  upload_box_text('Assay', nil, false, false)
     assert_equal 'You can register a Data file by either directly uploading a file or zipped folder, or registering a URL to a remote file or web page.',
                  upload_box_text('Data file', nil, false, false)
-    assert_raise StandardError, match:/cannot hide both remote and local options/i do
-      upload_box_text('Data file', nil, true, true)
-    end
+    assert_equal 'Both uploading a file or registering a URL to a remote file or web page are currently unavailable.',
+                 upload_box_text('Data file', nil, true, true)
   end
 
   private
