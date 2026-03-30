@@ -9,6 +9,7 @@ module Seek
       class UploadBlockedException < StandardError; end
 
       included do
+        # this concern is for controllers only, otherwise the following line will throw an exception
         rescue_from UploadBlockedException, with: :handle_upload_blocked_exception
       end
 
