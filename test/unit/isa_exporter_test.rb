@@ -9,7 +9,6 @@ class ISAExporterTest < ActionController::TestCase
   end
 
   test 'find sample origin' do
-    @person = User.current_user.person
     controller = ISAExporter::Exporter.new(FactoryBot.create(:investigation), @person)
     project = @person.projects.first
 

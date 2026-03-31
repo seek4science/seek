@@ -376,7 +376,7 @@ class SopTest < ActiveSupport::TestCase
 
     sop.save!
 
-    assert_equal sop.sop_type_annotations, [sop_type1.iri]
+    assert_equal [sop_type1.iri], sop.sop_type_annotations
   end
 
 end

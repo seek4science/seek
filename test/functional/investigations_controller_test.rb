@@ -1187,8 +1187,8 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_equal protocols_json.length, 3
       sops_with_sop_type_annotations = protocols_json.select { |protocol| !protocol["protocolType"]["termAccession"].blank? }
       assert_equal sops_with_sop_type_annotations.length, 1
-      assert_equal sops_with_sop_type_annotations.first["protocolType"]["termAccession"], study_sop.sop_type_annotations.first
-      assert_equal sops_with_sop_type_annotations.first["protocolType"]["termSource"], study_sop.sop_type_annotation_values.first.sample_controlled_vocab.source_ontology
+      assert_equal study_sop.sop_type_annotations.first, sops_with_sop_type_annotations.first["protocolType"]["termAccession"]
+      assert_equal study_sop.sop_type_annotation_values.first.sample_controlled_vocab.source_ontology, sops_with_sop_type_annotations.first["protocolType"]["termSource"]
       assay_json = study_json['assays'].first
 
       # Check otherMaterials

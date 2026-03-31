@@ -240,7 +240,6 @@ FactoryBot.define do
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'labeling protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0003808', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'sample collection protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0005518', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
       vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'nucleic acid library construction protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0004184', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
-      vocab.sample_controlled_vocab_terms << FactoryBot.build(:sample_controlled_vocab_term, label: 'enrichment protocol', iri: 'http://www.ebi.ac.uk/efo/EFO_0009089', parent_iri: 'http://purl.obolibrary.org/obo/OBI_0000272')
     end
   end
 
