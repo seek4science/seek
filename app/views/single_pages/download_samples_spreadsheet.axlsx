@@ -54,9 +54,11 @@ end
 render partial: 'metadata_sheet', locals: { workbook: workbook, styles: styles, secret_pwd: secret_pwd }
 
 # Extended metadata
-emt = @assay? @assay&.assay_stream&.extended_metadata : @study.extended_metadata
+study_emt = @study.extended_metadata
+assay_emt = @assay&.assay_stream&.extended_metadata
 
-render partial: 'extended_metadata_sheet', locals: { workbook: workbook, styles: styles, extended_metadata: emt } if emt
+render partial: 'extended_metadata_sheet', locals: { workbook: workbook, secret_pwd: secret_pwd, sheet_name: "Assay Extended Metadata", styles: styles, extended_metadata: assay_emt } if assay_emt
+render partial: 'extended_metadata_sheet', locals: { workbook: workbook, secret_pwd: secret_pwd, sheet_name: "Study Extended Metadata", styles: styles, extended_metadata: study_emt } if study_emt
 
 # Sample Controlled vocabs
 render partial: 'controlled_vocabs_sheet', locals: { workbook: workbook,
