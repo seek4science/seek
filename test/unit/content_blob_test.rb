@@ -712,6 +712,16 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute blob.file_exists?
   end
 
+  test "won't follow redirect and fetch local file" do
+    stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'file:///etc/passwd' }, status: 302)
+    blob = FactoryBot.create(:url_content_blob)
+    refute blob.file_exists?
+    assert_raise Addressable::URI::InvalidURIError do
+      blob.retrieve
+    end
+    refute blob.file_exists?
+  end
+
   test 'raises exception on bad response code when downloading remote content' do
     stub_request(:head, 'http://www.abc.com').to_return(
       headers: { content_length: 500, content_type: 'text/plain' }, status: 200
