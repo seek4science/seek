@@ -1887,7 +1887,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert blob.remote_content_fetch_task&.pending?
   end
 
-  test 'should create cache job for small file if uploads are blocked' do
+  test 'should not create cache job for file if uploads are blocked' do
     mock_http
     params = { data_file: {
       title: 'Small File',
