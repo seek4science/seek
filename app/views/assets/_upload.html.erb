@@ -106,7 +106,7 @@
             <%= button_link_to 'Add', 'new', '#', 'data-role' => 'seek-upload-field-add-remote' %>
           </div>
           <%= content_tag :script,
-                          existing_objects.map { |o| { text: "#{o.url.blank? ? o.original_filename : o.url} (original)", id: o.id } }.to_json.html_safe,
+                          json_escape(existing_objects.map { |o| { text: "#{o.url.blank? ? o.original_filename : o.url} (original)", id: o.id } }.to_json),
                           type: 'application/json',
                           'data-role' => 'seek-upload-field-existing' %>
         <% end %>

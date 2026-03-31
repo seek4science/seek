@@ -14,7 +14,7 @@ module Seek
       end
 
       def handle_upload_data(new_version = false, always_allow_uploads = false)
-        blob_params = params[:content_blobs]
+        blob_params = params[:content_blobs] || []
         unless always_allow_uploads
           check_for_blocked_uploads(blob_params)
           prevent_local_copy_for_blocked_uploads(blob_params)
@@ -23,8 +23,7 @@ module Seek
         allow_empty_content_blob = model_image_present? || json_api_request?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?
-          if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
-
+          if blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
             flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
           end
