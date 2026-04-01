@@ -184,6 +184,7 @@
         - python3.13-dev
         - python3-pip
         - python3.13-venv
+        - python3-pymysql
       tags:
         - python
         - packages
