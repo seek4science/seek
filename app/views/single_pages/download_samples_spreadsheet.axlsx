@@ -37,14 +37,15 @@ styles = { unlocked_style:, locked_style:, header_one_style:, header_two_style: 
 # End Styles
 ######################
 
+sample_attributes = @sample_type.sample_attributes
 
 # Get Sample data
 sample_data = @samples.map do |sample|
-  { 'id': sample.id }.merge({ 'uuid': sample.uuid }, JSON.parse(sample[:json_metadata]))
+  sample_metadata = get_sample_metadata_for_spreadsheet(sample, sample_attributes)
+  { 'id': sample.id }.merge({ 'uuid': sample.uuid }, sample_metadata)
 end
 
 # Sample attribute data
-sample_attributes = @sample_type.sample_attributes
 sample_attribute_value_map = {}
 sample_attributes.each do |sample_attribute|
   attribute_values = get_values_for_attribute(sample_attribute)

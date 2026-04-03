@@ -20,8 +20,51 @@ module SinglePagesHelper
     Seek::Samples::BaseType::SEEK_SOP,
   ]
 
+  REGISTERED_ASSET_TYPE_ATTRIBUTES = [
+    Seek::Samples::BaseType::SEEK_SAMPLE,
+    Seek::Samples::BaseType::SEEK_DATA_FILE,
+    Seek::Samples::BaseType::SEEK_STRAIN,
+    Seek::Samples::BaseType::SEEK_SOP,
+  ]
+
   def requires_data_validation?(sample_attribute)
     ATTRIBUTES_WITH_DATA_VALIDATION.include?(sample_attribute.sample_attribute_type.base_type)
+  end
+
+  def is_registered_asset_type_attribute?(sample_attribute)
+    REGISTERED_ASSET_TYPE_ATTRIBUTES.include?(sample_attribute.sample_attribute_type.base_type)
+  end
+
+  def get_sample_metadata_for_spreadsheet(sample, sample_attributes)
+    sample_metadata = {}
+    sample_attributes.each do |attribute|
+      attribute_value = sample.get_attribute_value(attribute)
+      sample_metadata[attribute.accessor_name] = format_attribute_value_for_spreadsheet(attribute_value, attribute)
+    end
+    sample_metadata
+  end
+
+  # Filters out all 'blank' type of values like
+  # "", [], [nil], [""], {id => nil...}, {id => ""...}, [{id => ""...}], [{id => nil...}]
+  # and returns `nil` if no meaningful value is found for that attribute
+  def format_attribute_value_for_spreadsheet(value, attribute)
+    if attribute.sample_attribute_type.seek_cv_list?
+      unless value.blank?
+        non_blank_values = value.compact_blank
+        non_blank_values unless non_blank_values.blank?
+      end
+    elsif attribute.sample_attribute_type.seek_sample_multi?
+      unless value.blank?
+        non_blank_values = value.map do |v|
+          v unless v[:id].blank?
+        end.compact
+        non_blank_values unless non_blank_values.blank?
+      end
+    elsif is_registered_asset_type_attribute?(attribute)
+      value unless value[:id].blank?
+    else
+      value unless value.blank?
+    end
   end
 
   def get_values_for_attribute(attribute)
