@@ -92,6 +92,9 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
         FactoryBot.create(:min_sop, assays: [@assay], title: "Assay SOP #{i}", projects: [person.projects.first], contributor: person)
       end
     end
+
+    # Set Current user to Tom
+    User.current_user = @person.user
   end
 
   test 'should require (excel) data validation' do
@@ -148,14 +151,11 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
     data_files = DataFile.where(contributor_id: [@person.id, @other_person.id])
     assert_equal 6, data_files.count
 
-    # Set Current user to Tom
-    User.current_user = @person
-
     # Registered Data File attribute is of type Seek Data File
     reg_data_file_values = get_values_for_datafiles.map { |rdfv| JSON.parse(rdfv) }.pluck("id")
     authorized_data_file_ids = data_files.authorized_for(:view).pluck(:id)
     assert authorized_data_file_ids.all? { |data_file_id| reg_data_file_values.include?(data_file_id) }
-    unauthorized_data_file_ids = data_files.authorized_for(:view, @other_person).pluck(:id)
+    unauthorized_data_file_ids = data_files.authorized_for(:view, @other_person.user).pluck(:id)
     assert unauthorized_data_file_ids.none? { |data_file_id| reg_data_file_values.include?(data_file_id) }
   end
 
@@ -165,14 +165,11 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
     strains = Strain.where(contributor_id: [@person.id, @other_person.id])
     assert_equal 6, strains.count
 
-    # Set Current user to Tom
-    User.current_user = @person
-
     # Registered Strain attribute is of type Seek Strain
     strain_value_ids = get_values_for_strains.map { |strain| JSON.parse(strain) }.pluck("id")
     authorized_strain_ids = strains.authorized_for(:view).pluck(:id)
     assert authorized_strain_ids.all? { |strain_id| strain_value_ids.include?(strain_id) }
-    unauthorized_strain_ids = strains.authorized_for(:view, @other_person).pluck(:id)
+    unauthorized_strain_ids = strains.authorized_for(:view, @other_person.user).pluck(:id)
     assert unauthorized_strain_ids.none? { |strain_id| strain_value_ids.include?(strain_id) }
   end
 
