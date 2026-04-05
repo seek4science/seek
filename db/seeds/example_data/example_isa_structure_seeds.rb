@@ -3,16 +3,19 @@ investigation = Investigation.new(title: 'Central Carbon Metabolism of Sulfolobu
                                   description: 'An investigation in the CCM of S. solfataricus with a focus on the unique temperature adaptations and regulation; using a combined modelling and experimental approach.')
 investigation.projects = [$project]
 investigation.contributor = $guest_person
+investigation.creators = [$admin_person]
+investigation.other_creators = ['Person A', 'Person B']
 investigation.policy = Policy.create(name: 'default policy', access_type: 1)
-investigation.annotate_with(['metabolism', 'thermophile'], 'tag', $guest_person)
+User.with_current_user($guest_user) { investigation.annotate_with(['metabolism', 'thermophile'], 'tag', $guest_person) }
 investigation.save
 puts 'Seeded 1 investigation.'
 
 study = Study.new(title: 'Carbon loss at high T')
+study.description = 'The carbon loss at high T description will be here but I am currently not imaginative enough.'
 study.contributor = $guest_person
 study.policy = Policy.create(name: 'default policy', access_type: 1)
 study.investigation = investigation
-study.annotate_with(['thermophile', 'high temperature'], 'tag', $guest_person)
+User.with_current_user($guest_user) { study.annotate_with(['thermophile', 'high temperature'], 'tag', $guest_person) }
 study.save
 puts 'Seeded 1 study.'
 
@@ -22,7 +25,7 @@ observation_unit.description = 'A large scale bioreactor with a 1000 mL reservoi
 observation_unit.other_creators = [$admin_person.name, 'Jane Doe']
 observation_unit.contributor = $guest_person
 observation_unit.policy = Policy.create(name: 'default policy', access_type: 1)
-observation_unit.annotate_with(['bioreactor'], 'tag', $guest_person)
+User.with_current_user($guest_user) { observation_unit.annotate_with(['bioreactor'], 'tag', $guest_person) }
 observation_unit.study = study
 disable_authorization_checks { observation_unit.save }
 puts 'Seeded 1 observation unit'

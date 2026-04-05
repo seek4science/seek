@@ -2,7 +2,7 @@
 
 # publication
 publication = Publication.new(
-  publication_type_id: PublicationType.where(title:"Journal").first.id,
+  publication_type_id: PublicationType.where(title: 'Journal').first_or_create!(title: 'Journal').id,
   pubmed_id: '23865479',
   title: 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus',
   abstract: "Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus were purified and kinetically characterized. The enzymes were reconstituted in vitro to quantify the contribution of temperature instability of the pathway intermediates to carbon loss from the system.
@@ -17,7 +17,7 @@ publication = Publication.new(
 # Set contributor and projects
 publication.contributor = $guest_person
 publication.projects << $project
-
+publication.registered_mode = 2
 # Build policy through the association
 publication.build_policy(name: 'default policy', access_type: 1)
 # Publication date
@@ -33,10 +33,11 @@ authors = [
 ]
 # Citation
 publication.citation = "Kouril, T. et al. Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus. FEBS J. 2015;687:100-108."
-
 authors.each do |author_attrs|
   publication.publication_authors.build(author_attrs)
 end
+# Tags
+User.with_current_user($guest_user) { publication.annotate_with(['metabolism', 'thermophile'], 'tag', $guest_person) }
 
 # Save publication with all associations
 disable_authorization_checks do
@@ -60,10 +61,10 @@ presentation.projects = [$project]
 presentation.contributor = $guest_person
 presentation.policy = Policy.create(name: 'default policy', access_type: 1)
 presentation.content_blob = ContentBlob.new(original_filename: 'presentation.pptx', content_type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
+disable_authorization_checks { presentation.save! }
 AssetsCreator.create(asset_id: presentation.id, creator_id: $guest_person.id, asset_type: presentation.class.name)
-FileUtils.cp File.dirname(__FILE__) + '/' + presentation.content_blob.original_filename, presentation.content_blob.filepath # TODO results in "This version is not available"
-presentation.version = 1
-presentation.save!
+FileUtils.cp File.dirname(__FILE__) + '/presentation.pptx', presentation.content_blob.filepath
+disable_authorization_checks { presentation.content_blob.save }
 puts 'Seeded 1 presentation.'
 
 # Create an event
@@ -71,7 +72,7 @@ event = Event.new(title: 'Event for publication', description: 'Event for public
 event.projects = [$project]
 event.contributor = $guest_person
 event.policy = Policy.create(name: 'default policy', access_type: 1)
-# event.website = 'http://www.seek4science.org'
+event.url = 'http://www.seek4science.org'
 event.city = 'London'
 event.country = 'United Kingdom'
 event.address = 'Dunmore Terrace 123'
@@ -79,7 +80,50 @@ event.address = 'Dunmore Terrace 123'
 event.save!
 puts 'Seeded 1 event.'
 
+# Document
+document = Document.new(
+  title: 'Experimental setup for the reconstituted gluconeogenic enzyme system',
+  description: 'This document describes the experimental setup and procedures used for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus.'
+)
+document.projects = [$project]
+document.contributor = $guest_person
+document.license = 'CC-BY-4.0'
+document.policy = Policy.create(name: 'default policy', access_type: 1)
+document.content_blob = ContentBlob.new(original_filename: 'example_document.txt', content_type: 'text/plain')
+User.with_current_user($guest_user) { document.annotate_with(['gluconeogenesis', 'protocol', 'thermophile'], 'tag', $guest_person) }
+disable_authorization_checks { document.save! }
+AssetsCreator.create(asset_id: document.id, creator_id: $admin_person.id, asset_type: document.class.name)
+FileUtils.cp File.dirname(__FILE__) + '/example_document.txt', document.content_blob.filepath
+disable_authorization_checks { document.content_blob.save }
+puts 'Seeded 1 document.'
+
+# Collection
+collection = Collection.new(
+  title: 'Gluconeogenesis in Sulfolobus solfataricus',
+  description: 'A collection of data files, models, SOPs and publications related to the reconstituted gluconeogenic enzyme system from Sulfolobus solfataricus.'
+)
+collection.projects = [$project]
+collection.contributor = $guest_person
+collection.license = 'CC-BY-4.0'
+collection.policy = Policy.create(name: 'default policy', access_type: 1)
+User.with_current_user($guest_user) { collection.annotate_with(['gluconeogenesis', 'thermophile', 'metabolism'], 'tag', $guest_person) }
+disable_authorization_checks { collection.save! }
+[
+  { asset: $data_file1,   comment: 'Metabolite concentration data', order: 1 },
+  { asset: $data_file2,   comment: 'Model simulation vs experimental data plot', order: 2 },
+  { asset: $model,        comment: 'Mathematical model of the four-enzyme system', order: 3 },
+  { asset: $sop,          comment: 'Protocol for reconstituting the enzyme system', order: 4 },
+  { asset: document,      comment: 'Experimental setup description', order: 5 },
+  { asset: publication,   comment: 'Key publication for this work', order: 6 },
+  { asset: presentation,  comment: 'Conference presentation', order: 7 },
+].each do |item|
+  CollectionItem.create!(collection: collection, asset: item[:asset], comment: item[:comment], order: item[:order])
+end
+puts 'Seeded 1 collection.'
+
 # Store references for other seed files
 $publication = publication
 $presentation = presentation
 $event = event
+$document = document
+$collection = collection

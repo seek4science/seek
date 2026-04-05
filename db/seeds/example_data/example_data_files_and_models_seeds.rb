@@ -22,6 +22,7 @@ puts 'Seeded data file 1.'
 data_file2 = DataFile.new(title: 'Model simulation and Exp data for reconstituted system',
                           description: 'Experimental data for the reconstituted system are plotted together with the model prediction.')
 data_file2.contributor = $guest_person
+data_file2.license = 'CC-BY-SA-4.0'
 data_file2.projects = [$project]
 data_file2.policy = Policy.create(name: 'default policy', access_type: 1)
 data_file2.content_blob = ContentBlob.new(original_filename: 'combinedPlot.jpg',
@@ -32,7 +33,11 @@ disable_authorization_checks do
   $model_assay.associate(data_file2, relationship: relationship)
 end
 
-AssetsCreator.create(asset_id: data_file2.id, creator_id: $guest_user.id, asset_type: data_file2.class.name)
+AssetsCreator.create(asset_id: data_file2.id, creator_id: $admin_person.id, asset_type: data_file2.class.name)
+data_file2.other_creators = 'Person A, Person B'
+disable_authorization_checks { data_file2.save }
+User.with_current_user($guest_user) { data_file2.annotate_with(['metabolism', 'modelling', 'gluconeogenesis'], 'tag', $guest_person) }
+disable_authorization_checks { data_file2.save }
 # copy file
 FileUtils.cp File.dirname(__FILE__) + '/' + data_file2.content_blob.original_filename, data_file2.content_blob.filepath
 disable_authorization_checks { data_file2.content_blob.save }
@@ -77,6 +82,7 @@ sop = Sop.new(title: 'Reconstituted Enzyme System Protocol',
               description: 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.')
 sop.contributor = $guest_person
 sop.projects = [$project]
+sop.license = 'CC-BY-SA-4.0'
 sop.assays = [$exp_assay, $model_assay]
 sop.policy = Policy.create(name: 'default policy', access_type: 1)
 sop.content_blob = ContentBlob.new(original_filename: 'test_sop.txt',
@@ -84,8 +90,8 @@ sop.content_blob = ContentBlob.new(original_filename: 'test_sop.txt',
 AssetsCreator.create(asset_id: sop.id, creator_id: $guest_person.id, asset_type: sop.class.name)
 FileUtils.cp File.dirname(__FILE__) + '/' + sop.content_blob.original_filename, sop.content_blob.filepath
 
-disable_authorization_checks {sop.save!}
-sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', $guest_person)
+User.with_current_user($guest_user) { sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', $guest_person) }
+disable_authorization_checks { sop.save! }
 puts 'Seeded 1 SOP.'
 
 # Store references for other seed files

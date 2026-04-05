@@ -1,6 +1,7 @@
 # Project, Institution, Workgroup, Program, Strains, Organisms
-program = Programme.where(title: 'Default Programme').first_or_create(web_page: 'http://www.seek4science.org', funding_details: 'Funding H2020X01Y001', description: 'This is a test programme for the SEEK sandbox.')
-project = Project.where(title: 'Default Project').first_or_create(:programme_id => program.id, description: 'A description for the default project') # TODO this link is not working
+program = Programme.where(title: 'Default Programme').first_or_create(web_page: 'http://www.seek4science.org',
+                                                                      funding_details: 'Funding H2020X01Y001', description: 'This is a test programme for the SEEK sandbox.')
+project = Project.where(title: 'Default Project').first_or_create(programme_id: program.id, description: 'A description for the default project') # TODO: this link is not working
 institution = Institution.where(title: 'Default Institution').first_or_create(country: 'United Kingdom')
 workgroup = WorkGroup.where(project_id: project.id, institution_id: institution.id).first_or_create
 
@@ -18,6 +19,7 @@ puts 'Seeded 1 strain.'
 
 # Create an organism
 organism = Organism.where(title: 'Sulfolobus solfataricus').first_or_create
+organism.concept_uri = '2287'
 organism.projects = [project]
 organism.strains = [strain]
 organism.save!

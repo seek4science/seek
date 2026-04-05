@@ -61,8 +61,8 @@ culture_sample_type.sample_attributes.build(
   description: 'Whether the culture has reached stationary phase'
 )
 
+User.with_current_user($guest_user) { culture_sample_type.annotate_with(['bacterial culture', 'thermophile', 'microbiology'], 'tag', $guest_person) }
 disable_authorization_checks { culture_sample_type.save! }
-culture_sample_type.annotate_with(['bacterial culture', 'thermophile', 'microbiology'], 'tag', $guest_person)
 puts 'Seeded bacterial culture sample type.'
 
 # Create a sample type for enzyme preparations
@@ -120,8 +120,8 @@ enzyme_sample_type.sample_attributes.build(
   description: 'Number of purification steps performed'
 )
 
+User.with_current_user($guest_user) { enzyme_sample_type.annotate_with(['enzyme', 'protein', 'purification'], 'tag', $guest_person) }
 disable_authorization_checks { enzyme_sample_type.save! }
-enzyme_sample_type.annotate_with(['enzyme', 'protein', 'purification'], 'tag', $guest_person)
 puts 'Seeded enzyme preparation sample type.'
 
 # Now create actual samples
