@@ -268,7 +268,7 @@ VCR.configure do |config|
   # ignore sparql requests, for some of the RDF integration tests
   # fixme: in the future it would be good to make the sparql data consistent enough to work with VCR
   config.ignore_request do |request|
-    request.uri =~ /sparql-auth/
+    request.uri =~ /sparql-auth/ || request.uri =~ /localhost:8890/
   end
 
   # Disable VCR recording when running in CI to detect missing cassettes and avoid making live requests.
