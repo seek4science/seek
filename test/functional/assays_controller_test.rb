@@ -2531,4 +2531,103 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 40, code.code.length
   end
 
+  test 'assay accessible with valid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    auth_code = nil
+    disable_authorization_checks do
+      auth_code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: assay.id, code: auth_code.code }
+    assert_response :success
+    assert_select 'h1', text: assay.title
+  end
+
+  test 'assay accessible with parent study code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    study_code = nil
+    disable_authorization_checks do
+      study_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: assay.id, code: study_code.code }
+    assert_response :success
+    assert_select 'h1', text: assay.title
+  end
+
+  test 'assay accessible with grandparent investigation code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    inv_code = nil
+    disable_authorization_checks do
+      inv_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: assay.id, code: inv_code.code }
+    assert_response :success
+    assert_select 'h1', text: assay.title
+  end
+
+  test 'assay not accessible with invalid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    logout
+
+    get :show, params: { id: assay.id, code: 'invalid_code' }
+    assert_response :forbidden
+  end
+
+  test 'assay code grants access to associated data file' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, contributor: User.current_user.person)
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    disable_authorization_checks do
+      assay.assay_assets.create(asset: data_file)
+    end
+
+    assay_code = nil
+    disable_authorization_checks do
+      assay_code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    # Verify data file is accessible with assay code
+    assert data_file.auth_by_code?(assay_code.code), 'DataFile should be accessible with Assay code'
+  end
+
 end

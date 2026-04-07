@@ -2279,4 +2279,79 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal expiration_date, code.expiration_date
     assert_equal 40, code.code.length
   end
+
+  # ===============================================
+  # Code-Based Authorization Controller Tests
+  # ===============================================
+
+  test 'study accessible with valid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    auth_code = nil
+    disable_authorization_checks do
+      auth_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: study.id, code: auth_code.code }
+    assert_response :success
+    assert_select 'h1', text: study.title
+  end
+
+  test 'study accessible with parent investigation code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    inv_code = nil
+    disable_authorization_checks do
+      inv_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: study.id, code: inv_code.code }
+    assert_response :success
+    assert_select 'h1', text: study.title
+  end
+
+  test 'study not accessible with child assay code - no upward propagation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    assay_code = nil
+    disable_authorization_checks do
+      assay_code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    # Try to access study with assay code - should fail
+    get :show, params: { id: study.id, code: assay_code.code }
+    assert_response :forbidden
+  end
+
+  test 'study not accessible with invalid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    logout
+
+    get :show, params: { id: study.id, code: 'invalid_code' }
+    assert_response :forbidden
+  end
 end
