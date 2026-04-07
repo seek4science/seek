@@ -36,8 +36,8 @@ module ISAHelper
   FILL_COLOURS = NEW_FILL_COLOURS
   FILL_COLOURS.default = '#8EE5EE' # cadetblue2
 
-  def cytoscape_elements(elements_hash)
-    cytoscape_edge_elements(elements_hash) + cytoscape_node_elements(elements_hash)
+  def cytoscape_elements(elements_hash, code = nil)
+    cytoscape_edge_elements(elements_hash) + cytoscape_node_elements(elements_hash, code)
     # aggregate_hidden_nodes(elements)
   rescue Exception => e
     raise e if Rails.env.development?
@@ -62,14 +62,27 @@ module ISAHelper
     end
   end
 
-  def cytoscape_node_elements(hash)
+  def cytoscape_node_elements(hash, code = nil)
     elements = []
     hash[:nodes].each do |node|
       item = node.object
       item_type = item.is_a?(Seek::ObjectAggregation) ? "#{item.type} collection" : item.class.name
       data = { id: node_id(item) }
 
+      # Determine if code should be included for this item (for URLs only, not seek_id)
+      # Code is included ONLY for Navigation Down (children), NOT for Navigation Up (parents)
+      include_code = false
+      if code.present?
+        # Check if item is accessible via code OR hierarchical navigation rules apply
+        # This ensures code only propagates downward, not upward
+        if can_view_asset?(item, code) || should_include_code_for_isa_link?(item)
+          include_code = true
+        end
+      end
+
+      # seek_id is the RDF resource identifier - always clean, no code parameter
       data['seek_id'] = item.rdf_resource.to_s if item.respond_to?(:rdf_resource)
+
       if node.can_view?
         data['description'] = if item.respond_to?(:description)
                                 truncate(item.description, length: 500)
@@ -85,12 +98,11 @@ module ISAHelper
         data['fullName'] = item.title
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
-        # Include code parameter for temporary link access - only for children, not parents
-        url_options = if params[:code].present? && should_include_code_for_isa_link?(item)
-                        { code: params[:code] }
-                      else
-                        {}
-                      end
+
+        # Build URL with code parameter if applicable (same logic as seek_id)
+        url_options = {}
+        url_options[:code] = code if include_code
+
         data['url'] = if item.is_a?(Seek::ObjectAggregation)
                         polymorphic_path([item.object, item.type.to_sym], url_options)
                       else

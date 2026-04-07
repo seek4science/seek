@@ -1,8 +1,9 @@
 <%
   return if !display_isa_graph?
   options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
+  options[:code] = params[:code] if params[:code].present?
   hash = Seek::ISAGraphGenerator.new(root_item).generate(**options)
-  elements = cytoscape_elements(hash)
+  elements = cytoscape_elements(hash, params[:code])
   default_view ||= 'tree'
   only_tree ||= false
   view = params[:graph_view] || default_view
