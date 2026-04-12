@@ -32,9 +32,12 @@
                 <%= collection_select :publication, :publication_type_id,
                       PublicationType.order(:title),
                       :id, :title,
-                      { include_blank: "Please select a type ..." },
+                      { include_blank: "Auto-detect from DOI (optional)" },
                       { class: "form-control" } %>
               </span>
+              <div id="publication_type_warning" class="alert alert-warning" style="display:none; margin-top: 5px;">
+                Publication type could not be automatically detected. Please select one before registering.
+              </div>
             </div>
           </div>
         </div>
@@ -266,5 +269,14 @@
 
         $j('#retrieve_from_crossref').on('click', retrieveFromCrossref);
         $j('#retrieve_from_pubmed').on('click', retrieveFromPubmed);
+
+        // Sync Register tab publication_type dropdown → preview hidden field
+        $j('#Register #publication_publication_type_id').on('change', function() {
+            $j('#publication_preview_container input[name="publication[publication_type_id]"]').val($j(this).val());
+            if ($j(this).val()) $j('#publication_type_warning').hide();
+        });
     });
+
+    // Key → DB id map for publication types (used by client-side DOI/PubMed fill)
+    var SEEK_PUB_TYPE_KEY_TO_ID = <%= PublicationType.all.each_with_object({}) { |t, h| h[t.key] = t.id }.to_json.html_safe %>;
 </script>

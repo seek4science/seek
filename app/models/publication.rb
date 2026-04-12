@@ -237,6 +237,11 @@ class Publication < ApplicationRecord
     self.publisher = doi_record.publisher
     self.booktitle = doi_record.booktitle
     self.editor = doi_record.editors
+    # Always override publication type from the API response when a mapping exists
+    if doi_record.type.present?
+      detected = PublicationType.from_doi_type(doi_record.type)
+      self.publication_type = detected if detected
+    end
   end
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
