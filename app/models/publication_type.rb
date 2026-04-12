@@ -2,6 +2,52 @@ class PublicationType < ActiveRecord::Base
   has_many :publications
 
 
+  # Map Crossref API type strings → SEEK publication type keys
+  CROSSREF_TYPE_TO_KEY = {
+    'journal-article' => 'journalarticle',
+    'book-chapter' => 'bookchapter',
+    'book' => 'book',
+    'edited-book' => 'book',
+    'monograph' => 'book',
+    'proceedings-article' => 'conferencepaper',
+    'proceedings' => 'conferenceproceeding',
+    'posted-content' => 'preprint',
+    'report' => 'report',
+    'dataset' => 'dataset',
+    'software' => 'software',
+    'standard' => 'standard',
+  }.freeze
+
+  # Map DataCite resourceTypeGeneral strings → SEEK publication type keys
+  DATACITE_TYPE_TO_KEY = {
+    'ConferencePaper' => 'conferencepaper',
+    'Dataset' => 'dataset',
+    'Software' => 'software',
+    'Audiovisual' => 'audiovisual',
+    'Image' => 'image',
+    'Sound' => 'sound',
+    'ComputationalNotebook' => 'computationalnotebook',
+    'Workflow' => 'workflow',
+    'DataPaper' => 'datapaper',
+    'PeerReview' => 'peerreview',
+    'Event' => 'event',
+    'Award' => 'award',
+    'Project' => 'project',
+    'Service' => 'service',
+    'InteractiveResource' => 'interactiveresource',
+    'PhysicalObject' => 'physicalobject',
+    'OutputManagementPlan' => 'outputmanagementplan',
+    'Standard' => 'standard',
+    'StudyRegistration' => 'studyregistration',
+    'Collection' => 'collection',
+    'Model' => 'model',
+    'Instrument' => 'instrument',
+    'Text' => 'text',
+    'Book' => 'book',
+    'BookChapter' => 'bookchapter',
+    'Preprint' => 'preprint',
+  }.freeze
+
   # Map BibTeX keys → DataCite keys
   BIBTEX_TO_DATACITE_KEY = {
     'article' => 'journalarticle',
@@ -170,6 +216,13 @@ class PublicationType < ActiveRecord::Base
   end
 
   
+  # Look up a PublicationType from a raw DOI API type string (Crossref or DataCite)
+  def self.from_doi_type(doi_type)
+    return nil if doi_type.blank?
+    key = CROSSREF_TYPE_TO_KEY[doi_type] || DATACITE_TYPE_TO_KEY[doi_type]
+    find_by(key: key) if key
+  end
+
   # Extract publication type from BibTeX record
   def self.get_publication_type_id(bibtex_record)
     # Extract the BibTeX entry type, e.g. article, inbook, misc...
