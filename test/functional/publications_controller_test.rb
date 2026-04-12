@@ -1303,6 +1303,29 @@ class PublicationsControllerTest < ActionController::TestCase
     assert response.body.include?('FAIRDOMHub: a repository')
   end
 
+  test 'should fetch doi preview without pre-selecting publication type' do
+    VCR.use_cassette('doi/doi_crossref_journal_article_response_1') do
+      post :fetch_preview, xhr: true, params: {
+        key: '10.1038/s41586-020-2649-2',
+        protocol: 'doi',
+        publication: { project_ids: [User.current_user.person.projects.first.id] }
+      }
+    end
+    assert_response :success
+  end
+
+  test 'fetch_preview auto-detects publication type and hides warning' do
+    VCR.use_cassette('doi/doi_crossref_journal_article_response_1') do
+      post :fetch_preview, xhr: true, params: {
+        key: '10.1038/s41586-020-2649-2',
+        protocol: 'doi',
+        publication: { project_ids: [User.current_user.person.projects.first.id] }
+      }
+    end
+    assert_response :success
+    assert_match /publication_type_warning.*hide/, response.body
+  end
+
   test 'show original author name for associated person' do
     #show the original name and formatting, but with link to associated person
     registered_author = FactoryBot.create(:registered_publication_author)

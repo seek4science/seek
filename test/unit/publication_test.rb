@@ -3,6 +3,7 @@ require 'minitest/mock'
 
 class PublicationTest < ActiveSupport::TestCase
   include MockHelper
+  fixtures :publication_types
 
 
   test 'title validation allows long titles' do
@@ -78,6 +79,31 @@ class PublicationTest < ActiveSupport::TestCase
       assert_nil publication.doi
       assert_equal Publication::REGISTRATION_BY_DOI, publication.registered_mode
     end
+  end
+
+  test 'extract_doi_metadata sets publication_type from DOI API type' do
+    parsed_record = OpenStruct.new(
+      title: 'Test Publication', abstract: nil, journal: 'Nature',
+      date_published: nil, doi: '10.1234/test', citation: nil,
+      publisher: nil, booktitle: nil, editors: nil, type: 'journal-article'
+    )
+    publication = Publication.new
+    publication.extract_doi_metadata(parsed_record)
+    assert_not_nil publication.publication_type
+    assert publication.publication_type.journalarticle?
+  end
+
+
+
+  test 'extract_doi_metadata does not set publication_type when API type is blank' do
+    parsed_record = OpenStruct.new(
+      title: 'Test', abstract: nil, journal: nil, date_published: nil,
+      doi: '10.1234/test', citation: nil, publisher: nil,
+      booktitle: nil, editors: nil, type: nil
+    )
+    publication = Publication.new
+    publication.extract_doi_metadata(parsed_record)
+    assert_nil publication.publication_type
   end
 
   test 'create publication from metadata pubmed' do
