@@ -1,0 +1,11 @@
+<div class="landing_page">
+  <h1>410</h1>
+  <% asset_type = t("#{controller_name.singularize}") %>
+  <h2>The requested <%= asset_type %> does not exist anymore.</h2>
+
+  <p>The <%= asset_type %> with identifier <%= doi_link(retract_log[:doi]) %> has been retracted.</p>
+  <% if retract_log[:comment].present? %>
+    <p>The authors have left the following reason for retracting this <%= asset_type %>:</p>
+    <p class="comment text-center"><%= sanitize(retract_log[:comment]) %></p>
+  <% end %>
+</div>

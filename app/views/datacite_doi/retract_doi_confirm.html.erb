@@ -1,0 +1,36 @@
+<% type_text = text_for_resource(@asset) %>
+
+<div class="row">
+  <div class="col-md-8 col-md-push-2">
+    <%= panel("Confirmation") do %>
+        <%= form_tag(polymorphic_path(@asset, action: :retract_doi), method: :post) do -%>
+            <%= image_tag('logos/doi_logo.svg', class: 'mint-doi') %>
+
+            <p>
+              You are about to retract a Digital Object Identifier (DOI). This will mark the DOI as no longer findable, and will delete the <%= type_text %>. The DOI will still exist and will resolve to a placeholder page indicating the reason for the retraction.
+            </p>
+
+            The DOIs that will be retracted will be:
+            <ul>
+                <% @asset.doi_identifiers.each do |doi| -%>
+                    <li>
+                        <pre><%= doi %></pre>
+                    </li>
+                <% end %>
+            </ul>
+
+            <div class="form-group">
+              <%= label_tag :retraction_reason, 'Reason for retraction (optional)' %>
+              <%= text_area_tag :retraction_reason, nil, rows: 4, class: 'form-control', placeholder: 'Explain why this DOI is being retracted' %>
+            </div>
+
+            <hr/>
+
+            <p class="text-center">
+              <%= submit_tag 'Retract DOI', class: 'btn btn-primary' %>
+              <%= cancel_button(polymorphic_path(@asset)) %>
+            </p>
+        <% end %>
+    <% end %>
+  </div>
+</div>

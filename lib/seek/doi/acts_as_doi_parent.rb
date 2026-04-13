@@ -40,6 +40,14 @@ module Seek
           latest_citable_resource.present?
         end
 
+        def can_retract_doi?
+          latest_citable_resource.can_retract_doi? if has_doi?
+        end
+
+        def retract_dois(retraction_reason = nil)
+          doi_children.select(&:has_doi?).all? { |child| child.inactivate_doi(retraction_reason) }
+        end
+
         def dois
           doi_children.map(&:doi).compact
         end
@@ -49,7 +57,8 @@ module Seek
         end
 
         def state_allows_delete?(*args)
-          !has_doi? && super(*args)
+          allows_delete_after_retract = AssetDoiLog.where(asset_type: self.class.name, asset_id: id, action: AssetDoiLog::RETRACT).exists?
+          (allows_delete_after_retract || !has_doi?) && super(*args)
         end
 
         private
