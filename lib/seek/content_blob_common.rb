@@ -77,9 +77,10 @@ module Seek
         content_type = model_image.content_type
       end
       asset_version.content_blobs.each do |content_blob|
-        next unless File.exist? content_blob.filepath
+        next unless content_blob.file_exists?
         filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
-        files_to_download[filename.to_s] = content_blob.filepath
+        local_path = content_blob.storage_adapter.full_path(content_blob.storage_key) || content_blob.make_temp_copy
+        files_to_download[filename.to_s] = local_path
         content_type = content_blob.content_type
       end
 
@@ -128,13 +129,16 @@ module Seek
           @content_blob.resize_image(image_size)
           filepath = @content_blob.full_cache_path(image_size)
           headers['Content-Length'] = File.size(filepath).to_s
+          send_file filepath,
+                    filename: @content_blob.original_filename,
+                    type: @content_blob.content_type || 'application/octet-stream',
+                    disposition: disposition
         else
-          filepath = @content_blob.filepath
           # added for the benefit of the tests after rails3 upgrade - but doubt it is required
           headers['Content-Length'] = @content_blob.file_size.to_s
           headers['Content-MD5'] = @content_blob.md5sum if @content_blob.md5sum
+          serve_blob_file(@content_blob, disposition: disposition)
         end
-        send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
       elsif @content_blob.url.present?
         begin
           if jerm_generated
@@ -170,10 +174,7 @@ module Seek
       rescue Seek::DownloadException, JERM::JERMException, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => de
         Rails.logger.info("Unable to fetch from remote: #{de.message}")
         if @content_blob.file_exists?
-          send_file @content_blob.filepath,
-                    filename: @content_blob.original_filename,
-                    type: @content_blob.content_type,
-                    disposition: 'attachment'
+          serve_blob_file(@content_blob, disposition: 'attachment')
         else
           raise de
         end
@@ -225,10 +226,26 @@ module Seek
 
     def return_file_or_redirect_to(redirected_url = nil, error_message = nil)
       if @content_blob.file_exists?
-        send_file @content_blob.filepath, filename: @content_blob.original_filename, type: @content_blob.content_type, disposition: 'attachment'
+        serve_blob_file(@content_blob, disposition: 'attachment')
       else
         flash[:error] = error_message if error_message
         redirect_to redirected_url, allow_other_host: true
+      end
+    end
+
+    # Send a content blob's file to the browser, routing through the storage adapter.
+    # LocalAdapter: uses send_file with the on-disk path.
+    # S3Adapter: redirects to a presigned URL (full_path returns nil).
+    def serve_blob_file(content_blob, disposition: 'attachment')
+      local_path = content_blob.storage_adapter.full_path(content_blob.storage_key)
+      if local_path
+        send_file local_path,
+                  filename: content_blob.original_filename,
+                  type: content_blob.content_type || 'application/octet-stream',
+                  disposition: disposition
+      else
+        url = content_blob.storage_adapter.presigned_url(content_blob.storage_key, expires_in: 300)
+        redirect_to url, allow_other_host: true
       end
     end
 

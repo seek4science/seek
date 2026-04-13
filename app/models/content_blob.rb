@@ -40,7 +40,7 @@ class ContentBlob < ApplicationRecord
 
   validate :original_filename_or_url
 
-  delegate :read, :close, :rewind, :path, to: :file
+  delegate :read, :close, :rewind, to: :file
 
   include Seek::Data::Checksums
 
@@ -93,9 +93,15 @@ class ContentBlob < ApplicationRecord
   end
 
   def make_temp_copy
-    temp_name = Time.now.strftime('%Y%m%d%H%M%S%L') + '-' + original_filename
+    temp_name = "#{Time.now.strftime('%Y%m%d%H%M%S%L')}-#{original_filename}"
     temp_path = File.join(Seek::Config.temporary_filestore_path, temp_name).to_s
-    FileUtils.cp(storage_adapter.full_path(storage_key), temp_path)
+    local = storage_adapter.full_path(storage_key)
+    if local
+      FileUtils.cp(local, temp_path)
+    else
+      io = storage_adapter.open(storage_key)
+      File.open(temp_path, 'wb') { |f| IO.copy_stream(io, f) }
+    end
     temp_path
   end
 
@@ -180,7 +186,11 @@ class ContentBlob < ApplicationRecord
   end
 
   def file
-    @file ||= File.open(filepath)
+    @file ||= storage_adapter.open(storage_key)
+  end
+
+  def path
+    storage_adapter.full_path(storage_key)
   end
 
   def retrieve

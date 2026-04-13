@@ -36,7 +36,8 @@ class ContentBlobsController < ApplicationController
     if @content_blob.no_content?
       render plain: 'No content, Content blob does not have content', content_type: 'text/csv', status: :not_found
     elsif @content_blob.is_csv?
-        render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/csv'
+      render plain: @content_blob.file.read.encode('utf-8', 'iso-8859-1', invalid: :replace, undef: :replace),
+             layout: false, content_type: 'text/csv'
     elsif @content_blob.is_excel?
       sheet = params[:sheet] || 1
       trim = params[:trim] || false

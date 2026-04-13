@@ -35,11 +35,14 @@ module Seek
 
       # calculate the checksum for the file, using the digest type, which could be :md5 or :sha1
       def calculate_checksum(digest_type)
-        if file_exists?
-          digest = "Digest::#{digest_type.upcase}".constantize.new
-          digest.file(filepath)
-          send("#{digest_type.to_s.downcase}sum=", digest.hexdigest)
+        return unless file_exists?
+
+        digest = "Digest::#{digest_type.upcase}".constantize.new
+        io = storage_adapter.open(storage_key)
+        while (chunk = io.read(1_048_576))
+          digest.update(chunk)
         end
+        send("#{digest_type.to_s.downcase}sum=", digest.hexdigest)
       end
     end
   end
