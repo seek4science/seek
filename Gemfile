@@ -11,6 +11,7 @@ gem 'addressable'
 gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b' #necessary for newer hashie dependency, original api_smith is no longer active
 gem 'attr_encrypted'
 gem 'auto_strip_attributes'
+gem 'aws-sdk-s3', require: false
 gem 'bibtex-ruby'
 gem 'bio'
 gem 'bioportal', git: 'https://github.com/SysMO-DB/bioportal.git'
