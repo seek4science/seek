@@ -1,0 +1,19 @@
+default: &default
+  backend: local
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
+  # To switch to S3-compatible storage, uncomment and fill in:
+  # backend: s3
+  # bucket: my-seek-bucket
+  # region: us-east-1
+  # access_key_id: AKIAIOSFODNN7EXAMPLE
+  # secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  # endpoint: https://minio.example.com   # omit for AWS S3
+  # force_path_style: true                # required for MinIO
