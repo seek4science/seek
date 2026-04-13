@@ -27,7 +27,7 @@ class SampleAttribute < ApplicationRecord
   delegate :ontology_based?, to: :sample_controlled_vocab, allow_nil: true
 
   def input_attribute?
-    isa_tag.nil? && title&.downcase&.include?('input') && seek_sample_multi?
+    isa_tag&.isa_input? && title&.downcase&.include?('input') && seek_sample_multi?
   end
 
   def inherited_from_template_attribute?

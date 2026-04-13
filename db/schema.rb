@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -1333,7 +1333,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "last_name"
     t.string "email"
     t.string "phone"
-    t.string "skype_name"
     t.text "web_page"
     t.text "description"
     t.integer "avatar_id"
@@ -1442,6 +1441,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "license"
     t.string "deleted_contributor"
     t.integer "visibility"
+    t.string "doi"
   end
 
   create_table "presentation_versions_projects", id: false, force: :cascade do |t|
@@ -1463,6 +1463,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "license"
     t.string "deleted_contributor"
     t.string "external_identifier", limit: 2048
+    t.string "doi"
   end
 
   create_table "presentations_projects", id: false, force: :cascade do |t|

@@ -59,7 +59,7 @@
 					"description": "Registered Samples in the platform used as input for this protocol.",
 					"dataType": "Registered Sample List",
 					"required": true,
-					"isaTag": null
+					"isaTag": "input"
 				},
 				{
 					"iri": null,
@@ -124,7 +124,7 @@
 					"description": "Registered Samples in the platform used as input for this protocol.",
 					"dataType": "Registered Sample List",
 					"required": true,
-					"isaTag": null
+					"isaTag": "input"
 				},
 				{
 					"iri": null,
@@ -189,7 +189,7 @@
 					"description": "Registered Samples in the platform used as input for this protocol.",
 					"dataType": "Registered Sample List",
 					"required": true,
-					"isaTag": null
+					"isaTag": "input"
 				},
 				{
 					"iri": null,

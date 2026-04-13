@@ -19,5 +19,7 @@ data_file_comment = ISATag.find_or_initialize_by(title: 'data_file_comment')
 data_file_comment.save
 parameter_value = ISATag.find_or_initialize_by(title: 'parameter_value')
 parameter_value.save
+input = ISATag.find_or_initialize_by(title: 'input')
+input.save
 
 puts 'Seeded isa tags'

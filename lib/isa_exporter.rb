@@ -322,11 +322,24 @@ module ISAExporter
 
       ontology = get_ontology_details(protocol_attrbute, protocol_attrbute.title, false)
 
-      isa_protocol[:protocolType] = {
-        annotationValue: protocol_attrbute.title,
-        termAccession: ontology[:termAccession],
-        termSource: ontology[:termSource]
-      }
+      # If a registered SOP was used that has sop_type_annotation_values,
+      # the protocolType gets the values from the sop_type
+      # else it will revert to the 'old' way of dealing with protocol types
+      sop_type = sop.sop_type_annotation_values&.first if sop.is_a? Sop
+      if sop_type
+        isa_protocol[:protocolType] = {
+          annotationValue: sop_type&.label,
+          termAccession: sop_type&.iri,
+          termSource: sop_type&.sample_controlled_vocab&.source_ontology,
+        }
+      else
+        isa_protocol[:protocolType] = {
+          annotationValue: protocol_attrbute.title,
+          termAccession: ontology[:termAccession],
+          termSource: ontology[:termSource]
+        }
+      end
+
       isa_protocol[:description] = sop[:description] || ''
       isa_protocol[:uri] = ontology[:termAccession]
       isa_protocol[:version] = ''
@@ -449,9 +462,9 @@ module ISAExporter
       return '' unless sample.can_view?(@current_user)
 
       if attribute.sample_attribute_type.seek_sample? || attribute.sample_attribute_type.seek_sample_multi? || attribute.sample_attribute_type.seek_strain? || attribute.sample_attribute_type.seek_data_file? || attribute.sample_attribute_type.seek_sop?
-        sample.get_attribute_value(attribute).to_json || ''
+        sample.get_attribute_value(attribute)&.to_json || ''
       elsif attribute.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
-        sample.get_attribute_value(attribute).join(', ')
+        sample.get_attribute_value(attribute)&.join(', ') || ''
       else
         sample.get_attribute_value(attribute) || ''
       end

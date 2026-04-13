@@ -9,7 +9,8 @@ class InvestigationsController < ApplicationController
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: [:edit, :manage, :update, :manage_update, :destroy, :show,
                                                            :update_from_fairdata_station, :submit_fairdata_station, :fair_data_station_update_status,
-                                                           :hide_fair_data_station_update_status, :new_object_based_on_existing_one]
+                                                           :hide_fair_data_station_update_status, :new_object_based_on_existing_one,
+                                                           :export_isa, :export_isatab_json]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   #defined in the application controller
@@ -114,12 +115,12 @@ class InvestigationsController < ApplicationController
   end
 
   def export_isatab_json
-    the_hash = ISATabConverter.convert_investigation(Investigation.find(params[:id]))
+    the_hash = ISATabConverter.convert_investigation(@investigation)
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
   def export_isa
-    isa = ISAExporter::Exporter.new(Investigation.find(params[:id]), current_user).export
+    isa = ISAExporter::Exporter.new(@investigation, current_user).export
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
     respond_to do |format|

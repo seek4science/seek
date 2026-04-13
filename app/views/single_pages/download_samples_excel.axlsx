@@ -1,17 +1,16 @@
-require 'caxlsx'
-require 'uuid'
-
 #####################################
 debug = false
 #####################################
 
 if debug
-  secret_pwd = 'florakevinrafael'
+  secret_pwd = 'seek'
 else
   secret_pwd = UUID.new.generate
 end
 
+xlsx_package = Axlsx::Package.new
 workbook = xlsx_package.workbook
+
 # Prevents formula injections
 Axlsx.escape_formulas = true
 
@@ -23,136 +22,201 @@ end
 # Colors
 # TODO: Make the colors depend on the type of branding instead of hard-coded colors
 # REQUIREMENT: branding configuration in seek
-datahub_blue = '486273'
-datahub_yellow = 'F2b035'
+header_fg_color = '486273'
+header_bg_color = 'F2b035'
 
 # Cell Styles
-unlocked = workbook.styles.add_style locked: false
-locked = workbook.styles.add_style locked: true
-title_style = workbook.styles.add_style(bg_color: datahub_yellow,
-                                        fg_color: datahub_blue,
-                                        b: true,
-                                        u: true,
-                                        sz: 18)
+unlocked_style = workbook.styles.add_style locked: false
+locked_style = workbook.styles.add_style locked: true
+header_one_style = workbook.styles.add_style(
+  bg_color: header_bg_color,
+  fg_color: header_fg_color,
+  b: true,
+  u: true,
+  sz: 18,
+  locked: true
+)
 
-workbook.add_worksheet(name: 'Metadata') do |sheet|
-  sheet.add_row ['Study:'], style: title_style
-  sheet.add_row ['Fairdom ID:', @study.id]
-  sheet.add_row ['UUID:', @study.uuid]
+header_two_style = workbook.styles.add_style(b:true, u: true, locked: true)
 
-  sheet.add_row ['Sample Type:'], style: title_style
-  sheet.add_row ['Fairdom ID:', @sample_type.id]
-  sheet.add_row ['UUID:', @sample_type.uuid]
+########################################################################################################################
+# Adding the Sample Type metadata sheet
+########################################################################################################################
 
-  sheet.add_row ['Template:'], style: title_style
-  sheet.add_row ['Fairdom ID:', @template.id]
-  sheet.add_row ['UUID:', @template.uuid]
+workbook.add_worksheet(name: 'Sample Type Metadata') do |sheet|
+  sheet.add_row ['Sample Type:'], style: header_one_style
+  sheet.add_row ['Fairdom ID:', @sample_type.id], style: [header_two_style, nil]
+  sheet.add_row ['Title:', @sample_type.title], style: [header_two_style, nil]
+  sheet.add_row ['UUID:', @sample_type.uuid], style: [header_two_style, nil]
+
+  sheet.add_row ['Template:'], style: header_one_style
+  sheet.add_row ['Fairdom ID:', @template.id], style: [header_two_style, nil]
+  sheet.add_row ['Title:', @template.title], style: [header_two_style, nil]
+  sheet.add_row ['UUID:', @template.uuid], style: [header_two_style, nil]
+
+  sheet.add_row ['Study:'], style: header_one_style
+  sheet.add_row ['Fairdom ID:', @study.id], style: [header_two_style, nil]
+  sheet.add_row ['Title:', @study.title], style: [header_two_style, nil]
+  sheet.add_row ['UUID:', @study.uuid], style: [header_two_style, nil]
 
   if @assay
-    sheet.add_row ['Assay:'], style: title_style
-    sheet.add_row ['Fairdom ID:', @assay.id]
-    sheet.add_row ['UUID:', @assay.uuid]
+    sheet.add_row ['Assay:'], style: header_one_style
+    sheet.add_row ['Fairdom ID:', @assay&.id], style: [header_two_style, nil]
+    sheet.add_row ['Title:', @assay&.title], style: [header_two_style, nil]
+    sheet.add_row ['UUID:', @assay&.uuid], style: [header_two_style, nil]
   end
 
   sheet.sheet_protection.password = secret_pwd
 end
 
-# CV / Ontologies sheet
-## Function to get a fixed size matrix
-def transposed_filled_arrays(arrays)
-  raise 'Input is no array' unless arrays.is_a?(Array)
-
-  size = 0
-  arrays.map { |array| size = array.size if array.size > size }
-
-  filled_arrays = []
-  arrays.map { |array| filled_arrays.push(Array.new(size) { |i| array[i] }) }
-
-  filled_arrays.transpose
+sample_attributes = @sample_type.sample_attributes
+sample_attribute_value_map = {}
+sample_attributes.each do |sample_attribute|
+  attribute_values = get_values_for_attribute(sample_attribute)
+  sample_attribute_value_map[sample_attribute.title] = attribute_values
 end
 
-## Populate and protect CV / Ontologies sheet
-workbook.add_worksheet name: 'cv_ontology', state: :hidden do |sheet|
-  rows = []
-  @sa_cv_terms.map do |cv|
-    row = [cv[:name]]
+########################################################################################################################
+# Adding the Sample sheet
+########################################################################################################################
 
-    if cv[:has_cv]
-      cv[:data]&.map do |val|
-        row.push val
-      end
-    end
-    rows.push(row)
-  end
-  tfs_rows = transposed_filled_arrays(rows)
-  tfs_rows.map do |tfs_row|
-    sheet.add_row tfs_row
-  end
-  sheet.sheet_protection.password = secret_pwd
-end
-
-# Sample sheet
 workbook.add_worksheet(name: 'Samples') do |sheet|
   ## Adding the header cells
-  header_row = @sa_cv_terms.map do |sa_cv_term|
-    sa_cv_term[:required] ? "#{sa_cv_term[:name]} *" : sa_cv_term[:name]
-  end
-  sheet.add_row header_row
+  header_row = %w[id uuid]
+  header_row.concat(
+    sample_attributes.map do |attribute|
+      attribute.required ? "#{attribute.title} *" : attribute.title
+    end
+  )
+  sheet.add_row header_row, style: header_one_style
 
   ## populating the sheet with the data
   unless sample_data.none?
     sample_data.each do |item|
       row = item.collect { |_key, val| val }
-      sheet.add_row row, style: unlocked
+
+      # Lock only first two cells => id and uuid
+      current_row_style = row.each_with_index.map do |_cell, i|
+        i < 2 ? locked_style : unlocked_style
+      end
+
+      # Add styled row
+      sheet.add_row row, style: current_row_style
     end
   end
 
-  ## Adding extra empty rows so new samples can be added to the table
-  1000.times do
-    sheet.add_row Array::new(header_row.size), style: unlocked
+  ## Adding 10000 extra empty rows with correct styling
+  10000.times do
+    cell_values = Array.new(header_row.length, "")
+    current_row_style = (0..header_row.length - 1).map do |cell_idx|
+      cell_idx < 2 ? locked_style : unlocked_style
+    end
+    sheet.add_row cell_values, style: current_row_style
   end
-
-  ## styling
-  [0, 1].each { |col_index| sheet.col_style(col_index, locked) }
-  sheet.row_style(0, title_style)
 
   ## filtering
   sheet.auto_filter = "#{sheet.cells.first.r}:#{sheet.cells.last.r}"
+end
 
-  ## Data Validation
-  # https://github.com/caxlsx/caxlsx/blob/master/examples/list_validation_example.md
-  attribute_size = @sa_cv_terms.size - 1
-  (0..attribute_size).map do |col_nr|
+########################################################################################################################
+# Adding Controlled vocabularies sheet for registered assets
+########################################################################################################################
+workbook.add_worksheet name: 'Controlled Vocabularies' do |sheet|
 
-    # If the has_cv field is false, it should skip this iteration and not apply the data validation
-    next unless @sa_cv_terms[col_nr][:has_cv]
+  # Get the rows for the CV sheet
+  # [<Attribute Title>, *<Values>]
+  rows = sample_attribute_value_map.map do |key, values|
+    [key].concat(values)
+  end.unshift(["id"], ["uuid"]) # Adds the ID and UUID column
+
+  # Transpose the rows into columns
+  tfs_rows = transposed_filled_arrays(rows)
+
+  # Add rows to sheet and lock the rows
+  tfs_rows.each_with_index do |tfs_row, i|
+    if i.zero?
+      sheet.add_row tfs_row, style: header_one_style
+    else
+      sheet.add_row tfs_row, style: locked_style
+    end
+  end
+
+  # Hide ID and UUID columns
+  sheet.column_info[0..1].each { |col| col.hidden = true }
+
+  # Hide columns that do not have CV
+  # column index < 2 => ID and UUID column, already hidden
+  # No values means no CV
+  sample_attribute_value_map.each.with_index(2) do |(_key, values), i|
+    if values.empty?
+      sheet.column_info[i].hidden = true
+    end
+  end
+
+  # Add sheet protection
+  sheet.sheet_protection.password = secret_pwd
+end
+
+########################################################################################################################
+# Apply Data Validation for the attributes that require data validation in the 'Samples' sheet
+# https://github.com/caxlsx/caxlsx/blob/master/examples/list_validation_example.md
+########################################################################################################################
+
+workbook.worksheets.find { |sheet| sheet.name == 'Samples' }.tap do |sheet|
+  sample_attributes.each_with_index do |attribute, i|
+
+    # Columns 1 and 2 are ID and UUID columns
+    col_nr = i + 2
 
     # Get sa_cv_terms_length
-    sa_cv_terms_size = @sa_cv_terms[col_nr][:data].size
+    terms = sample_attribute_value_map[attribute.title]
+    sa_terms_size = terms.size
 
-    if @sa_cv_terms[col_nr][:is_cv_list]
-      terms = @sa_cv_terms[col_nr][:data]
-      prompt_text = "Any combination of these terms between are accepted: #{terms.join(', ')}. E.g. [''#{terms.first}'', ''#{terms.last}''].\n\r#{(@sa_cv_terms[col_nr][:required] ? 'This field is REQUIRED!' : 'This field is optional.')}"
-    else
-      prompt_text = "Choose a valid option. #{(@sa_cv_terms[col_nr][:required] ? 'This field is REQUIRED!' : 'This field is optional.')}"
+    # Prepare a different prompt text for these types of attributes:
+    # - List attributes
+    # - Attributes that require data validation in the spreadsheet
+    # - Other attributes
+    # All prompts will have the description of the attribute
+    prompt_text = attribute.description.blank? ? "" : attribute.description.concat("\n\r")
+
+    if attribute.sample_attribute_type.seek_cv_list? || attribute.sample_attribute_type.seek_sample_multi?
+      prompt_text << "Any valid combination of the terms on sheet 'Controlled Vocabularies'#{attribute.allow_cv_free_text ? ', as well as free text,' : ''} are accepted.\n\r"
     end
 
+    # if attribute.sample_attribute_type.seek_cv_list? || attribute.sample_attribute_type.seek_sample_multi?
+    #   prompt_text << "Any valid combination of the terms on sheet 'Controlled Vocabularies'#{attribute.allow_cv_free_text ? ', as well as free text,' : ''} are accepted. E.g. [#{terms.first}, #{terms.last}#{attribute.allow_cv_free_text ? ', My custom term' : ''}].\n\r"
+    # end
+    #
+    if requires_data_validation?(attribute)
+      prompt_text << "Choose a valid option from the 'Controlled Vocabularies' sheet #{attribute.allow_cv_free_text ? 'or add free text' : ''}.\n\r"
+    end
+
+    if attribute.required
+      prompt_text << "This field is REQUIRED!"
+    else
+      prompt_text << "This field is optional."
+    end
+
+    # Apply the Data Validation on the attribute from row 2 until 100000
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}1000000"
     sheet.add_data_validation(dv_range,
                               type: :list,
-                              formula1: "'cv_ontology'!$#{col_ref}$2:$#{col_ref}$#{sa_cv_terms_size + 1}",
-                              hideDropDown: @sa_cv_terms[col_nr][:is_cv_list], # CV lists should not have dropdown
-                              showErrorMessage: !@sa_cv_terms[col_nr][:allows_custom_input] && !@sa_cv_terms[col_nr][:is_cv_list], # CV Lists must have free text input
+                              formula1: "'Controlled Vocabularies'!$#{col_ref}$2:$#{col_ref}$#{sa_terms_size + 1}",
+                              # Field that do not require data validation should not have dropdown
+                              hideDropDown: !requires_data_validation?(attribute),
+                              # If the attribute requires data validation, show Error message
+                              # If attribute does not allow free text for CVs, Error message
+                              showErrorMessage: !attribute.allow_cv_free_text && requires_data_validation?(attribute),
                               errorTitle: 'Input Error!',
                               error: 'Please select one of the available options',
                               errorStyle: :stop, # options here are: 'information', 'stop', 'warning'
                               showInputMessage: true,
-                              promptTitle: @sa_cv_terms[col_nr][:name],
+                              promptTitle: attribute.title,
                               prompt: prompt_text)
   end
 
-  ## Password protections Samples sheet
+  # Password protections Samples sheet
   sheet.sheet_protection.password = secret_pwd
   sheet.sheet_protection.format_cells = false
   sheet.sheet_protection.format_columns = false

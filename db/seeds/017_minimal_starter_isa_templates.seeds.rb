@@ -58,7 +58,8 @@ sample_temp_attributes << upsert_template_attribute('Input',
                                                     description: 'Registered Samples in the platform used as input for this protocol.',
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                     is_title: false,
-                                                    required: true)
+                                                    required: true,
+                                                    isa_tag: ISATag.all.detect { |tag| tag.isa_input? })
 
 sample_temp_attributes << upsert_template_attribute('Name of a protocol with samples as outputs',
                                                     sample_template.id,
@@ -119,7 +120,8 @@ material_temp_attributes << upsert_template_attribute('Input',
                                                       description: 'Registered Samples in the platform used as input for this protocol.',
                                                       sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                       is_title: false,
-                                                      required: true)
+                                                      required: true,
+                                                      isa_tag: ISATag.find_by(title: 'input'))
 
 material_temp_attributes << upsert_template_attribute('Name of a protocol with material output',
                                                       material_template.id,
@@ -180,7 +182,8 @@ data_file_temp_attributes << upsert_template_attribute('Input',
                                                        description: 'Registered Samples in the platform used as input for this protocol.',
                                                        sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                        is_title: false,
-                                                       required: true)
+                                                       required: true,
+                                                       isa_tag: ISATag.find_by(title: 'input'))
 
 data_file_temp_attributes << upsert_template_attribute('Name of a protocol with data file output',
                                                        data_file_template.id,

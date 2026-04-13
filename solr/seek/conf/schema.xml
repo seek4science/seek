@@ -63,11 +63,27 @@
       <analyzer type="index">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="true" />
+        <filter class="solr.WordDelimiterGraphFilterFactory"
+                generateWordParts="1"
+                generateNumberParts="1"
+                catenateWords="1"
+                catenateNumbers="1"
+                catenateAll="1"
+                preserveOriginal="1"
+                splitOnCaseChange="0"/>
         <filter class="solr.LowerCaseFilterFactory"/>        
         <filter class="solr.EdgeNGramFilterFactory" minGramSize="2" maxGramSize="50"/>
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.WordDelimiterGraphFilterFactory"
+                generateWordParts="1"
+                generateNumberParts="1"
+                catenateWords="1"
+                catenateNumbers="1"
+                catenateAll="1"
+                preserveOriginal="1"
+                splitOnCaseChange="0"/>
         <filter class="solr.LowerCaseFilterFactory"/>        
       </analyzer>
     </fieldType>

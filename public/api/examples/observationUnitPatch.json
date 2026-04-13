@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "191",
+              "id": "3053",
               "type": "projects"
             },
             "access": "edit"
@@ -23,7 +23,7 @@
         "tag3"
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "26",
+        "extended_metadata_type_id": "316",
         "attribute_map": {
           "name": "unit 2",
           "strain": "strain 2"
@@ -40,21 +40,21 @@
       "creators": {
         "data": [
           {
-            "id": "193",
+            "id": "3016",
             "type": "people"
           }
         ]
       },
       "study": {
         "data": {
-          "id": "50",
+          "id": "462",
           "type": "studies"
         }
       },
       "samples": {
         "data": [
           {
-            "id": "34",
+            "id": "198",
             "type": "samples"
           }
         ]
@@ -62,7 +62,7 @@
       "data_files": {
         "data": [
           {
-            "id": "34",
+            "id": "174",
             "type": "data_files"
           }
         ]

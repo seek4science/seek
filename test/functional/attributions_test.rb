@@ -146,7 +146,7 @@ class AttributionsTest < ActionController::TestCase
     assert_response :success
     assert_select 'div.panel' do
       assert_select 'div.panel-heading', text: /Attributions/
-      assert_select 'ul.list' do
+      assert_select 'ul.attributions_list' do
         assert_select 'li' do
           assert_select 'a[href=?]', sop_path(sop2), text: /#{sop2.title}/
         end

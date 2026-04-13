@@ -6,7 +6,6 @@
 <% pid = template_attribute ? template_attribute.pid : '' %>
 <% pos = template_attribute ? template_attribute.pos : '' %>
 <% required = template_attribute ? template_attribute.required : false %>
-<% allow_attribute_removal = !required  %>
 <% attribute_type_id = template_attribute ? template_attribute.sample_attribute_type_id : nil %>
 <% sample_controlled_vocab_id = template_attribute ? template_attribute.sample_controlled_vocab_id : nil %>
 <% unit_id = template_attribute ? template_attribute.unit_id : nil %>
@@ -17,10 +16,9 @@
 <% level = template&.level %>
 <% isa_tag_options = ISATag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } %>
 <% isa_tag_id = template_attribute&.isa_tag_id %>
-<% isa_tag_title = template_attribute&.isa_tag&.title %>
 <% allow_cv_free_text = template_attribute&.allow_cv_free_text || false %>
 <% parent_attribute_id = template_attribute&.parent_attribute_id %>
-<% allow_isa_tag_change = template_attribute ? template_attribute&.allow_isa_tag_change? : true %>
+<% allow_isa_tag_change = template_attribute ? template_attribute.allow_isa_tag_change? : true %>
 <% hide_seek_sample_multi = template_attribute&.input_attribute? %>
 
 <tr class="sample-attribute <%= 'success' if template_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
@@ -54,7 +52,7 @@
                    end, attribute_type_id),
                    class: 'form-control sample-type-attribute-type', data: {attr: "type"} %>
 
-    <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) || template_attribute.try(:seek_cv_list?) %>">
+    <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                      options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable': scv.can_edit?}] },

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '7.2.2.2'
+gem 'rails', '7.2.3.1'
 
 gem 'abbrev'
 gem 'active_model_serializers'
@@ -137,7 +137,7 @@ end
 
 group :test do
   gem 'database_cleaner'
-  gem 'minitest'
+  gem 'minitest', '~> 5.4'
   gem 'minitest-reporters'
   gem 'rails-controller-testing'
   gem 'rails-perftest'

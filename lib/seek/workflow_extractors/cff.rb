@@ -39,7 +39,7 @@ module Seek
         metadata[:other_creators] = other_creators.join(', ')
 
         metadata[:title] = cff.title if cff.title.present?
-        metadata[:license] = cff.license if cff.license.present?
+        metadata[:license] = Seek::License.normalize(cff.license) if cff.license.present?
         metadata[:tags] = cff.keywords.map(&:strip) if cff.keywords.present?
         metadata[:doi] = cff.doi if cff.doi.present?
         metadata[:source_link_url] = cff.url if cff.url.present?

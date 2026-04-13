@@ -19,6 +19,7 @@
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
+<% allow_unit_change = constraints.allow_unit_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <% display_isa_tag ||= false %>
@@ -64,7 +65,7 @@
                    end , attribute_type_id),
                    class: 'form-control sample-type-attribute-type',
                    disabled: !allow_type_change, data: { attr: "type" } %>
-    <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) || sample_attribute.try(:seek_cv_list?) %>">
+    <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                      options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable': scv.can_edit?}] },
@@ -131,7 +132,9 @@
                                       unit_id),
                    include_blank: true,
                    class: 'form-control',
-                   data: { attr: "unit" } %>
+                   data: { attr: "unit" },
+                   disabled: !allow_unit_change
+    %>
   </td>
 
 

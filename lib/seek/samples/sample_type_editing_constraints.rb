@@ -84,6 +84,21 @@ module Seek
         end
       end
 
+      # Unit may be changed as long as the attribute does not have values for any samples
+      def allow_unit_change?(attr)
+        if attr.is_a?(SampleAttribute)
+          return true if attr.new_record?
+
+          attr = attr.accessor_name
+        end
+
+        if attr
+          all_blank?(attr)
+        else
+          true
+        end
+      end
+
       def refresh_cache
         do_analysis
       end

@@ -13,7 +13,6 @@ FactoryBot.define do
     orcid { "https://orcid.org/0000-0001-9842-9718" }
     email { "maximal_person@email.com" }
     phone { "34-167-552266" }
-    skype_name { "myskypename" }
     association :user, factory: :activated_user, login: 'max_person_user'
     group_memberships { [FactoryBot.build(:group_membership)] }
     avatar
