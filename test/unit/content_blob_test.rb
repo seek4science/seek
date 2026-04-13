@@ -958,4 +958,77 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute FactoryBot.create(:svg_content_blob).is_image_convertable?
     refute FactoryBot.create(:pdf_content_blob).is_image_convertable?
   end
+
+  # --- Storage adapter characterisation tests ---
+  # These lock down the exact file I/O behaviour before we introduce the
+  # storage adapter abstraction. They act as a regression suite for later cycles.
+
+  test 'storage_filename returns uuid.dat by default' do
+    blob = FactoryBot.create(:content_blob)
+    assert_equal "#{blob.uuid}.dat", blob.storage_filename
+    assert_equal "#{blob.uuid}.pdf", blob.storage_filename('pdf')
+    assert_equal "#{blob.uuid}.txt", blob.storage_filename('txt')
+  end
+
+  test 'dump_data_object_to_file writes data to the expected filepath' do
+    data = 'hello storage'
+    blob = ContentBlob.new(data: data, original_filename: 'hello.txt')
+    blob.save!
+    assert File.exist?(blob.filepath), 'Expected file to exist on disk after save'
+    assert_equal data, File.read(blob.filepath)
+  end
+
+  test 'dump_tmp_io_object_to_file with Tempfile (has path) copies file to filepath' do
+    tmp = Tempfile.new('seek-storage-test')
+    tmp.write('tempfile content')
+    tmp.flush
+    blob = ContentBlob.new(tmp_io_object: tmp, original_filename: 'temp.txt')
+    blob.save!
+    assert File.exist?(blob.filepath), 'Expected file to exist on disk after save'
+    assert_equal 'tempfile content', File.read(blob.filepath)
+  end
+
+  test 'dump_tmp_io_object_to_file with StringIO (no path) writes chunks to filepath' do
+    blob = ContentBlob.new(tmp_io_object: StringIO.new('stringio content'), original_filename: 'str.txt')
+    blob.save!
+    assert File.exist?(blob.filepath), 'Expected file to exist on disk after save'
+    assert_equal 'stringio content', File.read(blob.filepath)
+  end
+
+  test 'delete_converted_files removes pdf and txt converted files when they exist' do
+    blob = FactoryBot.create(:pdf_content_blob)
+    pdf_path = blob.filepath('pdf')
+    txt_path = blob.filepath('txt')
+    FileUtils.cp(blob.filepath, pdf_path)
+    File.write(txt_path, 'extracted text')
+    assert File.exist?(pdf_path)
+    assert File.exist?(txt_path)
+    blob.send(:delete_converted_files)
+    refute File.exist?(pdf_path), 'Expected pdf converted file to be deleted'
+    refute File.exist?(txt_path), 'Expected txt converted file to be deleted'
+  end
+
+  test 'delete_converted_files is safe when no converted files exist' do
+    blob = FactoryBot.create(:content_blob)
+    refute File.exist?(blob.filepath('pdf'))
+    refute File.exist?(blob.filepath('txt'))
+    assert_nothing_raised { blob.send(:delete_converted_files) }
+  end
+
+  test 'make_temp_copy creates a copy of the file at a new path' do
+    blob = FactoryBot.create(:content_blob, data: 'copy me')
+    copy_path = blob.make_temp_copy
+    assert File.exist?(copy_path), 'Expected temp copy to exist'
+    assert_not_equal blob.filepath, copy_path
+    assert_equal 'copy me', File.read(copy_path)
+  ensure
+    FileUtils.rm_f(copy_path) if copy_path
+  end
+
+  test 'calculate_file_size sets file_size from disk after save' do
+    data = 'filesize test data'
+    blob = ContentBlob.new(data: data, original_filename: 'size.txt')
+    blob.save!
+    assert_equal data.bytesize, blob.file_size
+  end
 end
