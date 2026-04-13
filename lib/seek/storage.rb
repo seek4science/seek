@@ -25,7 +25,7 @@ module Seek
         when 's3'
           require 'seek/storage/s3_adapter'
           prefix = adapter_key == :dat ? 'assets' : 'converted'
-          S3Adapter.new(cfg.merge(prefix: prefix))
+          S3Adapter.new(**cfg.merge(prefix: prefix))
         else
           base = adapter_key == :dat ? Seek::Config.asset_filestore_path
                                      : Seek::Config.converted_filestore_path

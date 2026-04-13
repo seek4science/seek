@@ -2,7 +2,13 @@ default: &default
   backend: local
 
 development:
-  <<: *default
+  backend: s3
+  bucket: seek-dev
+  region: us-east-1
+  access_key_id: seek
+  secret_access_key: seek1234
+  endpoint: http://localhost:9000
+  force_path_style: true
 
 test:
   <<: *default
