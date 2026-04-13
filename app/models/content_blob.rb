@@ -150,8 +150,12 @@ class ContentBlob < ApplicationRecord
   # Returns a LocalAdapter scoped to the correct base directory for the given format.
   # dat files live in asset_filestore_path; pdf/txt live in converted_filestore_path.
   def storage_adapter(format = 'dat')
-    base = format == 'dat' ? data_storage_directory : converted_storage_directory
-    Seek::Storage::LocalAdapter.new(base_path: base)
+    adapter_key = format == 'dat' ? :dat : :converted
+    @storage_adapters ||= {}
+    @storage_adapters[adapter_key] ||= begin
+      base = format == 'dat' ? data_storage_directory : converted_storage_directory
+      Seek::Storage::LocalAdapter.new(base_path: base)
+    end
   end
 
   def filepath(format = 'dat', uuid_to_use = nil)
