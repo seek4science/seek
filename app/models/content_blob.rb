@@ -95,7 +95,7 @@ class ContentBlob < ApplicationRecord
   def make_temp_copy
     temp_name = Time.now.strftime('%Y%m%d%H%M%S%L') + '-' + original_filename
     temp_path = File.join(Seek::Config.temporary_filestore_path, temp_name).to_s
-    FileUtils.cp(filepath, temp_path)
+    FileUtils.cp(storage_adapter.full_path(storage_key), temp_path)
     temp_path
   end
 
@@ -128,17 +128,30 @@ class ContentBlob < ApplicationRecord
   def data_io_object
     return @tmp_io_object unless @tmp_io_object.nil?
     return StringIO.new(@data) unless @data.nil?
-    return File.open(filepath, 'rb') if file_exists?
+    return storage_adapter.open(storage_key) if file_exists?
     nil
   end
 
   def file_exists?(format = 'dat')
-    File.exist?(filepath(format))
+    storage_adapter(format).exist?(storage_key(format))
   end
 
   def storage_filename(format = 'dat', uuid_to_use = nil)
     uuid_to_use ||= uuid
     "#{uuid_to_use}.#{format}"
+  end
+
+  # Returns the storage key for this blob — a simple filename like "uuid.dat".
+  # This is the identifier used by the storage adapter layer.
+  def storage_key(format = 'dat')
+    storage_filename(format)
+  end
+
+  # Returns a LocalAdapter scoped to the correct base directory for the given format.
+  # dat files live in asset_filestore_path; pdf/txt live in converted_filestore_path.
+  def storage_adapter(format = 'dat')
+    base = format == 'dat' ? data_storage_directory : converted_storage_directory
+    Seek::Storage::LocalAdapter.new(base_path: base)
   end
 
   def filepath(format = 'dat', uuid_to_use = nil)
@@ -265,13 +278,7 @@ class ContentBlob < ApplicationRecord
   end
 
   def dump_data_object_to_file
-    data_to_save = @data
-
-    unless data_to_save.nil?
-      File.open(filepath, 'wb+') do |f|
-        f.write(data_to_save)
-      end
-    end
+    storage_adapter.write(storage_key, @data) unless @data.nil?
   end
 
   def dump_tmp_io_object_to_file
@@ -281,7 +288,7 @@ class ContentBlob < ApplicationRecord
     if @tmp_io_object.respond_to?(:path) && File.exist?(@tmp_io_object.path)
       @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
       if @tmp_io_object.path
-        FileUtils.cp @tmp_io_object.path, filepath
+        storage_adapter.copy_from_path(@tmp_io_object.path, storage_key)
 
         # only clean up if object is within the temp (/tmp/) directory, otherwise the original file should be kept
         if @tmp_io_object.path.start_with?("#{Dir.tmpdir}#{File::SEPARATOR}")
@@ -289,12 +296,7 @@ class ContentBlob < ApplicationRecord
         end
       end
     else
-      @tmp_io_object.rewind
-      File.open(filepath, 'wb+') do |f|
-        until (chunk = @tmp_io_object.read(CHUNK_SIZE)).nil?
-          f.write(chunk)
-        end
-      end
+      storage_adapter.write(storage_key, @tmp_io_object)
     end
 
     @tmp_io_object = nil
@@ -302,7 +304,7 @@ class ContentBlob < ApplicationRecord
 
   def calculate_file_size
     self.file_size = if file_exists?
-                       File.size(filepath)
+                       storage_adapter.size(storage_key)
                      elsif url
                        remote_headers[:file_size]
                      end
@@ -322,8 +324,7 @@ class ContentBlob < ApplicationRecord
   def delete_converted_files
     return unless self[:uuid].present?
     %w[pdf txt].each do |format|
-      path = filepath(format)
-      FileUtils.rm(path) if File.exist?(path)
+      storage_adapter(format).delete(storage_key(format))
     end
   end
 
