@@ -83,6 +83,22 @@ class ContentBlob < ApplicationRecord
     end
   end
 
+  # Yields a guaranteed local filesystem path to a converted derivative (e.g. 'pdf', 'txt').
+  # For local storage: yields the on-disk path directly (no copy).
+  # For S3: streams the object to a Tempfile, yields the path, then cleans up.
+  def with_temporary_copy_of_converted(format)
+    local = storage_adapter(format).full_path(storage_key(format))
+    if local
+      yield local
+    else
+      Tempfile.create(["converted-#{format}", ".#{format}"]) do |tmp|
+        IO.copy_stream(storage_adapter(format).open(storage_key(format)), tmp)
+        tmp.flush
+        yield tmp.path
+      end
+    end
+  end
+
   def file_extension
     split_filename = original_filename&.split('.')
     if split_filename && split_filename.length > 2

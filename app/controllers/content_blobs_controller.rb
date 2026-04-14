@@ -111,25 +111,37 @@ class ContentBlobsController < ApplicationController
     polymorphic_path([@asset, @content_blob], action: 'download', intent: :inline_view, format: 'pdf', code: params[:code])
   end
 
-  # check whether the file is pdf, otherwise convert to pdf
-  # then return the pdf file
-  def pdf_or_convert(filepath = @content_blob.filepath)
+  # Converts the blob to PDF if necessary, then serves it via the storage adapter.
+  # LocalAdapter: send_file with the on-disk path.
+  # S3Adapter: redirect to a presigned URL.
+  def pdf_or_convert
     if @content_blob.is_pdf?
-      pdf_filepath = @content_blob.filepath
+      # The dat file itself is the PDF — serve it directly via the dat adapter.
       pdf_filename = @content_blob.original_filename
+      adapter = @content_blob.storage_adapter
+      key = @content_blob.storage_key
     else
-      pdf_filepath = @content_blob.filepath('pdf')
-      unless File.exist?(pdf_filepath)
-        @content_blob.convert_to_pdf(filepath, pdf_filepath)
-        raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
-      end
+      # Convert (adapter-aware, no-ops if pdf key already exists).
+      @content_blob.convert_to_pdf
+      raise "Couldn't find converted PDF file." unless @content_blob.file_exists?('pdf')
 
-      pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
+      pdf_filename = "#{File.basename(@content_blob.original_filename, '.*')}.pdf"
+      adapter = @content_blob.storage_adapter('pdf')
+      key = @content_blob.storage_key('pdf')
     end
 
-    send_file pdf_filepath, filename: pdf_filename, type: 'application/pdf', disposition: 'attachment'
+    serve_pdf(adapter, key, pdf_filename)
+  end
 
-    headers['Content-Length'] = File.size(pdf_filepath).to_s
+
+  def serve_pdf(adapter, key, filename)
+    local_path = adapter.full_path(key)
+    if local_path
+      send_file local_path, filename: filename, type: 'application/pdf', disposition: 'attachment'
+      headers['Content-Length'] = File.size(local_path).to_s
+    else
+      redirect_to adapter.presigned_url(key, expires_in: 300), allow_other_host: true
+    end
   end
 
   def get_file_from_jerm
