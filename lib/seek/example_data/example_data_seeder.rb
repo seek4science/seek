@@ -93,7 +93,7 @@ module Seek
 
       def seed_publications_and_presentations
         seeder = Seek::ExampleData::PublicationsSeeder.new(
-          @project, @guest_person, @guest_user, @exp_assay, @model_assay, @seed_data_dir
+          @project, @guest_person, @exp_assay, @model_assay, @seed_data_dir
         )
         result = seeder.seed
 
