@@ -74,4 +74,27 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
                     ssolfGluconeogenesisAnn.xml ssolfGluconeogenesisClosed.xml ssolfGluconeogenesis.xml]
     assert_equal file_names, model.content_blobs.map(&:original_filename)
   end
+
+  test 'seeds SOP' do
+    seeder = Seek::ExampleData::DataFilesAndModelsSeeder.new(
+      @project, @guest_person, @admin_person, @exp_assay, @model_assay, @seed_data_dir
+    )
+    result = nil
+    assert_difference('Sop.count', 1) do
+      result = seeder.seed
+      assert_includes result.keys, :sop
+      assert_not_nil result[:sop]
+    end
+    sop = result[:sop]
+
+    assert_equal 'Reconstituted Enzyme System Protocol', sop.title
+    assert_equal 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.',
+                 sop.description
+    assert_equal @project, sop.projects.first
+    assert_equal @guest_person, sop.contributor
+    assert_equal 'test_sop.txt', sop.content_blob.original_filename
+    assert_equal ['protocol', 'enzymology', 'thermophile'], sop.tags
+    assert_equal 'CC-BY-SA-4.0', sop.license
+  end
+
 end

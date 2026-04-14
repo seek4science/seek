@@ -44,6 +44,7 @@ module Seek
         )
         disable_authorization_checks {
           data_file2.annotate_with(['metabolism', 'modelling', 'gluconeogenesis'], 'tag', @guest_person)
+          data_file2.save!
         }
         
         disable_authorization_checks do
@@ -81,13 +82,13 @@ module Seek
         )
 
         data_file.other_creators = other_creators
-        disable_authorization_checks { data_file.save }
+        disable_authorization_checks { data_file.save! }
         AssetsCreator.create(asset_id: data_file.id, creator_id: creator.id, asset_type: data_file.class.name)
         
         # Copy file
         source_path = File.join(@seed_data_dir, filename)
         FileUtils.cp(source_path, data_file.content_blob.filepath)
-        disable_authorization_checks { data_file.content_blob.save }
+        disable_authorization_checks { data_file.content_blob.save! }
         
         data_file
       end
@@ -123,14 +124,14 @@ module Seek
         end
         
         model.content_blobs = content_blobs
-        disable_authorization_checks { model.save }
+        disable_authorization_checks { model.save! }
         AssetsCreator.create(asset_id: model.id, creator_id: @guest_person.id, asset_type: model.class.name)
         
         # Copy files
         model.content_blobs.each do |blob|
           source_path = File.join(@seed_data_dir, blob.original_filename)
           FileUtils.cp(source_path, blob.filepath)
-          blob.save
+          blob.save!
         end
         
         model
@@ -139,7 +140,8 @@ module Seek
       def create_sop
         sop = Sop.new(
           title: 'Reconstituted Enzyme System Protocol',
-          description: 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.'
+          description: 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.',
+          license: 'CC-BY-SA-4.0'
         )
         sop.contributor = @guest_person
         sop.projects = [@project]
