@@ -19,12 +19,24 @@ module Seek
           password_confirmation: 'adminadmin'
         )
         admin_user.activate
-        admin_user.build_person(first_name: 'Admin', last_name: 'User', email: 'admin@test1000.com') unless admin_user.person
+        unless admin_user.person
+          admin_user.build_person(first_name: 'Admin',
+                                  last_name: 'User',
+                                  email: 'admin@test1000.com',
+                                  orcid: '0000-0002-1825-0097',
+                                  web_page: 'https://example.org',
+                                  phone: '00-0000-0000-0000')
+        end
+
         admin_user.save!
         admin_user.person.work_groups << @workgroup unless admin_user.person.work_groups.include?(@workgroup)
         admin_person = admin_user.person
-        #admin_person.is_admin = true
-        disable_authorization_checks{ admin_person.save! }
+        disable_authorization_checks do
+          admin_person.save!
+          admin_person.add_annotations(['administration', 'data management'], 'expertise', admin_person)
+          admin_person.add_annotations(['SEEK', 'Ruby on Rails'], 'tool', admin_person)
+          admin_person.save!
+        end
 
         puts 'Seeded 1 admin.'
         

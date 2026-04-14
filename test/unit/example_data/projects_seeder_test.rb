@@ -41,12 +41,15 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     project = result[:project].reload
     assert_equal 'Default Project', project.title
     assert_equal 'A description for the default project', project.description
+    assert_equal 'http://www.seek4science.org', project.web_page
+    assert_equal 'http://www.wiki.org/', project.wiki_page
     assert_equal program, project.programme
     
     # Verify institution attributes
     institution = result[:institution].reload
     assert_equal 'Default Institution', institution.title
     assert_equal 'GB', institution.country
+    assert_equal 'Manchester', institution.city
     
     # Verify strain attributes
     strain = result[:strain].reload

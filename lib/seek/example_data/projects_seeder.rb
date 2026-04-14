@@ -16,13 +16,16 @@ module Seek
         # Project
         project = Project.where(title: 'Default Project').first_or_create(
           programme_id: program.id,
-          description: 'A description for the default project'
+          description: 'A description for the default project',
+          web_page: 'http://www.seek4science.org',
+          wiki_page: 'http://www.wiki.org/'
         )
         disable_authorization_checks{ project.save! }
         
         # Institution
         institution = Institution.where(title: 'Default Institution').first_or_create(
-          country: 'United Kingdom'
+          country: 'United Kingdom',
+          city: 'Manchester'
         )
 
         disable_authorization_checks{ institution.save! }
