@@ -6,6 +6,10 @@
   <%= render partial: 'admin/general' %>
 <% end %>
 
+<%= folding_panel('Storage backend', false) do %>
+  <%= render partial: 'admin/storage_status' %>
+<% end %>
+
 <%= folding_panel('Status and statistics', false) do %>
   <%= render partial: 'admin/stats' %>
 <% end %>

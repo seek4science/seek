@@ -1,0 +1,35 @@
+<% status = Seek::Storage.status %>
+<div class="admin_tasks">
+  <div class="row">
+    <div class="col-sm-8">
+      <dl class="dl-horizontal">
+        <dt>Backend</dt>
+        <dd><code><%= status[:backend] %></code></dd>
+
+        <% if status[:backend] == 's3' %>
+          <dt>Bucket</dt>
+          <dd><code><%= status[:bucket] %></code></dd>
+
+          <dt>Region</dt>
+          <dd><code><%= status[:region] %></code></dd>
+
+          <% if status[:endpoint] %>
+            <dt>Endpoint</dt>
+            <dd><code><%= status[:endpoint] %></code></dd>
+          <% end %>
+
+          <% if status[:force_path_style] %>
+            <dt>Path style</dt>
+            <dd><code>forced</code> <span class="subtle">(required for MinIO and most S3-compatible services)</span></dd>
+          <% end %>
+        <% end %>
+      </dl>
+
+      <% if status[:backend] == 'local' %>
+        <p class="subtle">Files are stored on the local filesystem. To switch to S3, configure <code>config/seek_storage.yml</code> and restart.</p>
+      <% else %>
+        <p class="subtle">Credentials are not displayed. Use <code>rake seek:storage:test</code> to verify connectivity.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
