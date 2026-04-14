@@ -3,9 +3,9 @@ require 'test_helper'
 class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
   def setup
     User.current_user = nil
+    @admin_person = FactoryBot.create(:admin, first_name: 'Admin', last_name: 'Person')
     @guest_person = FactoryBot.create(:person, first_name: 'Guest', last_name: 'User')
     @project = @guest_person.projects.first
-    @guest_user = @guest_person.user
     @exp_assay = FactoryBot.create(:experimental_assay, contributor: @guest_person)
     @model_assay = FactoryBot.create(:modelling_assay, contributor: @guest_person)
     @seed_data_dir = File.join(Rails.root, 'db', 'seeds', 'example_data')
@@ -17,7 +17,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
 
   test 'seeds data files' do
     seeder = Seek::ExampleData::DataFilesAndModelsSeeder.new(
-      @project, @guest_person, @guest_user, @exp_assay, @model_assay, @seed_data_dir
+      @project, @guest_person, @admin_person, @exp_assay, @model_assay, @seed_data_dir
     )
     result = nil
     assert_difference('DataFile.count', 2) do
@@ -35,6 +35,9 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     assert_equal @project, df1.projects.first
     assert_equal @guest_person, df1.contributor
     assert_nil df1.license
+    assert_equal [@guest_person], df1.creators
+    assert_nil df1.other_creators
+    assert_empty df1.tags
 
     df2 = result[:data_file2]
     assert_equal 'combinedPlot.jpg', df2.content_blob.original_filename
@@ -44,11 +47,14 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     assert_equal @project, df2.projects.first
     assert_equal @guest_person, df2.contributor
     assert_equal 'CC-BY-SA-4.0', df2.license
+    assert_equal [@admin_person], df2.creators
+    assert_equal 'Person A, Person B', df2.other_creators
+    assert_equal %w[metabolism modelling gluconeogenesis], df2.tags
   end
 
   test 'seeds model' do
     seeder = Seek::ExampleData::DataFilesAndModelsSeeder.new(
-      @project, @guest_person, @guest_user, @exp_assay, @model_assay, @seed_data_dir
+      @project, @guest_person, @admin_person, @exp_assay, @model_assay, @seed_data_dir
     )
     result = nil
     assert_difference('Model.count', 1) do

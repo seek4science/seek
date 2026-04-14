@@ -2,10 +2,10 @@
 module Seek
   module ExampleData
     class DataFilesAndModelsSeeder
-      def initialize(project, guest_person, guest_user, exp_assay, model_assay, seed_data_dir)
+      def initialize(project, guest_person, admin_person, exp_assay, model_assay, seed_data_dir)
         @project = project
         @guest_person = guest_person
-        @guest_user = guest_user
+        @admin_person = admin_person
         @exp_assay = exp_assay
         @model_assay = model_assay
         @seed_data_dir = seed_data_dir
@@ -18,6 +18,8 @@ module Seek
         data_file1 = create_data_file(
           'Metabolite concentrations during reconstituted enzyme incubation',
           'The purified enzymes, PGK, GAPDH, TPI and FBPAase were incubated at 70 C en conversion of 3PG to F6P was followed.',
+          nil,
+          @guest_person,
           nil,
           'ValidationReference.xlsx',
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -35,9 +37,14 @@ module Seek
           'Model simulation and Exp data for reconstituted system',
           'Experimental data for the reconstituted system are plotted together with the model prediction.',
           'CC-BY-SA-4.0',
+          @admin_person,
+          'Person A, Person B',
           'combinedPlot.jpg',
           'image/jpeg'
         )
+        disable_authorization_checks {
+          data_file2.annotate_with(['metabolism', 'modelling', 'gluconeogenesis'], 'tag', @guest_person)
+        }
         
         disable_authorization_checks do
           @exp_assay.associate(data_file2)
@@ -63,7 +70,7 @@ module Seek
       
       private
       
-      def create_data_file(title, description, license, filename, content_type)
+      def create_data_file(title, description, license, creator, other_creators, filename, content_type)
         data_file = DataFile.new(title: title, description: description, license: license)
         data_file.contributor = @guest_person
         data_file.projects = [@project]
@@ -72,9 +79,10 @@ module Seek
           original_filename: filename,
           content_type: content_type
         )
-        
+
+        data_file.other_creators = other_creators
         disable_authorization_checks { data_file.save }
-        AssetsCreator.create(asset_id: data_file.id, creator_id: @guest_user.id, asset_type: data_file.class.name)
+        AssetsCreator.create(asset_id: data_file.id, creator_id: creator.id, asset_type: data_file.class.name)
         
         # Copy file
         source_path = File.join(@seed_data_dir, filename)

@@ -81,7 +81,7 @@ module Seek
 
       def seed_data_files_and_models
         seeder = Seek::ExampleData::DataFilesAndModelsSeeder.new(
-          @project, @guest_person, @guest_user, @exp_assay, @model_assay, @seed_data_dir
+          @project, @guest_person, @admin_person, @exp_assay, @model_assay, @seed_data_dir
         )
         result = seeder.seed
 
