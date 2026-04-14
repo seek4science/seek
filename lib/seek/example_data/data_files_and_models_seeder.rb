@@ -42,15 +42,14 @@ module Seek
           'combinedPlot.jpg',
           'image/jpeg'
         )
-        disable_authorization_checks {
+
+        disable_authorization_checks do
           data_file2.annotate_with(['metabolism', 'modelling', 'gluconeogenesis'], 'tag', @guest_person)
           data_file2.save!
-        }
-        
-        disable_authorization_checks do
           @exp_assay.associate(data_file2)
           @model_assay.associate(data_file2, relationship: relationship)
         end
+
         puts 'Seeded data file 2.'
         
         # Model
@@ -157,8 +156,11 @@ module Seek
         source_path = File.join(@seed_data_dir, sop.content_blob.original_filename)
         FileUtils.cp(source_path, sop.content_blob.filepath)
         
-        disable_authorization_checks { sop.save! }
-        sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', @guest_person)
+        disable_authorization_checks do
+          sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', @guest_person)
+          sop.save!
+        end
+
         
         sop
       end

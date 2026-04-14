@@ -47,7 +47,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_includes result.keys, :assay_stream
     
     # Check investigation
-    investigation = result[:investigation]
+    investigation = result[:investigation].reload
     assert_not_nil investigation
     assert_equal 'Central Carbon Metabolism of Sulfolobus solfataricus', investigation.title
     assert_includes investigation.projects, @project
@@ -57,7 +57,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal %w[metabolism thermophile], investigation.tags
     
     # Check study
-    study = result[:study]
+    study = result[:study].reload
     assert_not_nil study
     assert_equal 'Carbon loss at high T', study.title
     assert_equal 'The carbon loss at high T description will be here but I am currently not imaginative enough.', study.description
@@ -66,7 +66,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal @guest_person, study.contributor
     
     # Check observation unit
-    observation_unit = result[:observation_unit]
+    observation_unit = result[:observation_unit].reload
     assert_not_nil observation_unit
     assert_equal 'Large scale bioreactor', observation_unit.title
     assert_equal study, observation_unit.study
@@ -74,7 +74,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal ['bioreactor'], observation_unit.tags
     
     # Check experimental assay
-    exp_assay = result[:exp_assay]
+    exp_assay = result[:exp_assay].reload
     assert_not_nil exp_assay
     assert_equal 'Reconstituted system reference state', exp_assay.title
     assert_equal study, exp_assay.study
@@ -83,7 +83,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal @guest_person, exp_assay.contributor
     
     # Check modelling assay
-    model_assay = result[:model_assay]
+    model_assay = result[:model_assay].reload
     assert_not_nil model_assay
     assert_equal 'Model reconstituted system', model_assay.title
     assert_equal study, model_assay.study
@@ -91,7 +91,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal @guest_person, model_assay.contributor
     
     # Check assay stream
-    assay_stream = result[:assay_stream]
+    assay_stream = result[:assay_stream].reload
     assert_not_nil assay_stream
     assert_equal 'Assay stream', assay_stream.title
     assert_equal AssayClass.assay_stream, assay_stream.assay_class

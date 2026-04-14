@@ -27,7 +27,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
       assert_not_nil result[:data_file1]
       assert_not_nil result[:data_file2]
     end
-    df1 = result[:data_file1]
+    df1 = result[:data_file1].reload
     assert_equal 'ValidationReference.xlsx', df1.content_blob.original_filename
     assert_equal 'Metabolite concentrations during reconstituted enzyme incubation', df1.title
     assert_equal 'The purified enzymes, PGK, GAPDH, TPI and FBPAase were incubated at 70 C en conversion of 3PG to F6P was followed.',
@@ -39,7 +39,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     assert_nil df1.other_creators
     assert_empty df1.tags
 
-    df2 = result[:data_file2]
+    df2 = result[:data_file2].reload
     assert_equal 'combinedPlot.jpg', df2.content_blob.original_filename
     assert_equal 'Model simulation and Exp data for reconstituted system', df2.title
     assert_equal 'Experimental data for the reconstituted system are plotted together with the model prediction.',
@@ -62,7 +62,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
       assert_includes result.keys, :model
       assert_not_nil result[:model]
     end
-    model = result[:model]
+    model = result[:model].reload
 
     assert_equal 'Mathematical model for the combined four enzyme system', model.title
     assert_equal 'The PGK, GAPDH, TPI and FBPAase were modelled together using the individual rate equations. Closed system.',
@@ -85,7 +85,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
       assert_includes result.keys, :sop
       assert_not_nil result[:sop]
     end
-    sop = result[:sop]
+    sop = result[:sop].reload
 
     assert_equal 'Reconstituted Enzyme System Protocol', sop.title
     assert_equal 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.',

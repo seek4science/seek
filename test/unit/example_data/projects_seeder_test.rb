@@ -31,30 +31,30 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     assert_not_nil result[:organism]
     
     # Verify program attributes
-    program = result[:program]
+    program = result[:program].reload
     assert_equal 'Default Programme', program.title
     assert_equal 'http://www.seek4science.org', program.web_page
     assert_equal 'This is a test programme for the SEEK sandbox.', program.description
     assert_equal 'Funding H2020X01Y001', program.funding_details
     
     # Verify project attributes
-    project = result[:project]
+    project = result[:project].reload
     assert_equal 'Default Project', project.title
     assert_equal 'A description for the default project', project.description
     assert_equal program, project.programme
     
     # Verify institution attributes
-    institution = result[:institution]
+    institution = result[:institution].reload
     assert_equal 'Default Institution', institution.title
     assert_equal 'GB', institution.country
     
     # Verify strain attributes
-    strain = result[:strain]
+    strain = result[:strain].reload
     assert_equal 'Sulfolobus solfataricus strain 98/2', strain.title
     assert_includes strain.projects, project
     
     # Verify organism attributes
-    organism = result[:organism]
+    organism = result[:organism].reload
     assert_equal 'Sulfolobus solfataricus', organism.title
     assert_includes organism.projects, project
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2287', organism.concept_uri

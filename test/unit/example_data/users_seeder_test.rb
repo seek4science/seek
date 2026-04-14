@@ -30,7 +30,7 @@ class UsersSeederTest < ActiveSupport::TestCase
     assert_not_nil result[:guest_user]
     
     # Verify admin user
-    admin_user = result[:admin_user]
+    admin_user = result[:admin_user].reload
     assert_equal 'admin', admin_user.login
     assert admin_user.active?
     assert_not_nil admin_user.person
@@ -38,7 +38,7 @@ class UsersSeederTest < ActiveSupport::TestCase
     assert admin_user.is_admin?
     
     # Verify guest user
-    guest_user = result[:guest_user]
+    guest_user = result[:guest_user].reload
     assert_equal 'guest', guest_user.login
     assert guest_user.active?
     assert_not_nil guest_user.person

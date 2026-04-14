@@ -19,6 +19,7 @@ class SamplesSeederTest < ActiveSupport::TestCase
     @isa_seeder = Seek::ExampleData::ISAStructureSeeder.new(
       @base_data[:project],
       @user_data[:guest_person],
+      @user_data[:guest_person],
       @base_data[:organism]
     )
     @isa_data = @isa_seeder.seed
@@ -26,8 +27,7 @@ class SamplesSeederTest < ActiveSupport::TestCase
 
 
   test 'seeds sample types and samples' do
-    initial_sample_type_count = SampleType.count
-    initial_sample_count = Sample.count
+
     
     seeder = Seek::ExampleData::SamplesSeeder.new(
       @base_data[:project],
@@ -51,11 +51,11 @@ class SamplesSeederTest < ActiveSupport::TestCase
     assert_not_nil result[:culture_sample_type]
     assert_not_nil result[:enzyme_sample_type]
     
-    culture_sample_type = result[:culture_sample_type]
+    culture_sample_type = result[:culture_sample_type].reload
     assert_equal 'Bacterial Culture', culture_sample_type.title
     assert_includes culture_sample_type.projects, @base_data[:project]
     
-    enzyme_sample_type = result[:enzyme_sample_type]
+    enzyme_sample_type = result[:enzyme_sample_type].reload
     assert_equal 'Enzyme Preparation', enzyme_sample_type.title
     assert_includes enzyme_sample_type.projects, @base_data[:project]
     
@@ -68,12 +68,12 @@ class SamplesSeederTest < ActiveSupport::TestCase
     assert_not_nil result[:enzyme4]
     
     # Verify culture sample
-    culture1 = result[:culture1]
+    culture1 = result[:culture1].reload
     assert_equal 'S. solfataricus Culture #1', culture1.title
     assert_equal culture_sample_type, culture1.sample_type
     
     # Verify enzyme sample
-    enzyme1 = result[:enzyme1]
+    enzyme1 = result[:enzyme1].reload
     assert_equal 'Phosphoglycerate Kinase', enzyme1.title
     assert_equal enzyme_sample_type, enzyme1.sample_type
     
