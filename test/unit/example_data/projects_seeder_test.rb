@@ -10,11 +10,6 @@ class ProjectsSeederTest < ActiveSupport::TestCase
   end
 
   test 'seeds projects and basic setup' do
-    initial_program_count = Programme.count
-    initial_project_count = Project.count
-    initial_institution_count = Institution.count
-    initial_strain_count = Strain.count
-    initial_organism_count = Organism.count
     
     seeder = Seek::ExampleData::ProjectsSeeder.new
     result = seeder.seed
@@ -39,11 +34,14 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     program = result[:program]
     assert_equal 'Default Programme', program.title
     assert_equal 'http://www.seek4science.org', program.web_page
+    assert_equal 'This is a test programme for the SEEK sandbox.', program.description
+    assert_equal 'Funding H2020X01Y001', program.funding_details
     
     # Verify project attributes
     project = result[:project]
     assert_equal 'Default Project', project.title
-    assert_equal program.id, project.programme_id
+    assert_equal 'A description for the default project', project.description
+    assert_equal program, project.programme
     
     # Verify institution attributes
     institution = result[:institution]
@@ -59,6 +57,7 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     organism = result[:organism]
     assert_equal 'Sulfolobus solfataricus', organism.title
     assert_includes organism.projects, project
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2287', organism.concept_uri
     assert_includes organism.strains, strain
   end
 

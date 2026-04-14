@@ -89,7 +89,7 @@ class ExampleDataSeederTest < ActiveSupport::TestCase
         end
       end
     end
-    
+
     # Check that project-related data is populated
     assert_not_nil seeder.project
     assert_not_nil seeder.program

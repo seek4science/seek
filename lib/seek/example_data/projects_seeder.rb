@@ -49,6 +49,7 @@ module Seek
         # Organism
         organism = Organism.where(title: 'Sulfolobus solfataricus').first_or_create
         organism.projects = [project]
+        organism.concept_uri = '2287'
         organism.strains = [strain]
         disable_authorization_checks do
           organism.save!
