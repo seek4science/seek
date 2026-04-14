@@ -1,0 +1,30 @@
+# Storage backend configuration for FAIRDOM-SEEK.
+#
+# Copy this file to config/seek_storage.yml and edit as needed.
+# NEVER commit seek_storage.yml with real credentials — add it to .gitignore.
+#
+# Two backends are supported:
+#   local  — files are stored on the local filesystem (default, no extra config needed)
+#   s3     — files are stored on AWS S3 or any S3-compatible service (MinIO, Ceph, etc.)
+
+default: &default
+  backend: local
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
+
+  # To switch to S3-compatible storage, replace the block above with:
+  #
+  # backend: s3
+  # bucket: my-seek-bucket
+  # region: us-east-1
+  # access_key_id: AKIAIOSFODNN7EXAMPLE        # required
+  # secret_access_key: wJalrXUtnFEMI/K7MDENG   # required — never commit real values
+  # endpoint: https://minio.example.com         # omit for AWS S3; required for MinIO etc.
+  # force_path_style: true                      # required for MinIO; omit for AWS S3
