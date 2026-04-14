@@ -9,18 +9,10 @@ module Seek
     #   assets/uuid.dat        (prefix: 'assets')
     #   converted/uuid.pdf     (prefix: 'converted')
     class S3Adapter
-      def initialize(bucket:, prefix:, region: 'us-east-1',
-                     access_key_id: nil, secret_access_key: nil,
-                     endpoint: nil, force_path_style: false, **_rest)
+      def initialize(bucket:, prefix:, **s3_options)
         @bucket = bucket
         @prefix = prefix
-        @client = Aws::S3::Client.new(
-          region: region,
-          access_key_id: access_key_id,
-          secret_access_key: secret_access_key,
-          endpoint: endpoint,
-          force_path_style: force_path_style
-        )
+        @client = build_client(s3_options)
       end
 
       # Write String or IO content to S3 under the given key.
@@ -56,6 +48,7 @@ module Seek
         false
       rescue Aws::S3::Errors::ServiceError => e
         raise unless e.context.http_response.status_code == 404
+
         false
       end
 
@@ -76,6 +69,22 @@ module Seek
         nil
       end
 
+      # Performs a read-only connectivity check against the configured bucket.
+      # Returns { success: true/false, message: String }.
+      # Never raises — all errors are captured in the returned hash.
+      def test_connection
+        @client.list_objects_v2(bucket: @bucket, max_keys: 1)
+        { success: true, message: "Successfully connected to bucket '#{@bucket}'" }
+      rescue Aws::S3::Errors::NoSuchBucket
+        { success: false, message: "Bucket '#{@bucket}' does not exist" }
+      rescue Aws::S3::Errors::AccessDenied, Aws::S3::Errors::InvalidAccessKeyId
+        { success: false, message: "Access denied to bucket '#{@bucket}'. Check access_key_id and secret_access_key." }
+      rescue Aws::S3::Errors::ServiceError => e
+        { success: false, message: "S3 service error: #{e.message}" }
+      rescue SocketError, Errno::ECONNREFUSED => e
+        { success: false, message: "Cannot connect to S3 endpoint: #{e.message}" }
+      end
+
       # Returns a presigned GET URL for the object, valid for expires_in seconds.
       def presigned_url(key, expires_in: 300)
         presigner = Aws::S3::Presigner.new(client: @client)
@@ -86,6 +95,16 @@ module Seek
       end
 
       private
+
+      def build_client(opts)
+        Aws::S3::Client.new(
+          region: opts.fetch(:region, 'us-east-1'),
+          access_key_id: opts[:access_key_id],
+          secret_access_key: opts[:secret_access_key],
+          endpoint: opts[:endpoint],
+          force_path_style: opts.fetch(:force_path_style, false)
+        )
+      end
 
       def object_key(key)
         "#{@prefix}/#{key}"

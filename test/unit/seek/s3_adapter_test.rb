@@ -2,9 +2,9 @@ require 'test_helper'
 require 'aws-sdk-s3'
 
 class S3AdapterTest < ActiveSupport::TestCase
-  BUCKET = 'test-bucket'
-  PREFIX = 'assets'
-  KEY    = 'abc123.dat'
+  BUCKET = 'test-bucket'.freeze
+  PREFIX = 'assets'.freeze
+  KEY    = 'abc123.dat'.freeze
 
   def setup
     Aws.config.update(stub_responses: true)
@@ -113,6 +113,23 @@ class S3AdapterTest < ActiveSupport::TestCase
     url = @adapter.presigned_url(KEY, expires_in: 60)
     assert_kind_of String, url
     assert_includes url, "#{PREFIX}/#{KEY}"
+  end
+
+  test 'test_connection returns success when list_objects_v2 succeeds' do
+    client.stub_responses(:list_objects_v2, { contents: [] })
+    assert @adapter.test_connection[:success]
+  end
+
+  test 'test_connection returns failure hash when NoSuchBucket' do
+    client.stub_responses(:list_objects_v2, 'NoSuchBucket')
+    assert_not @adapter.test_connection[:success]
+  end
+
+  test 'test_connection returns failure hash when AccessDenied' do
+    client.stub_responses(:list_objects_v2, 'AccessDenied')
+    result = @adapter.test_connection
+    assert_not result[:success]
+    assert_includes result[:message], 'access_key_id'
   end
 
   private
