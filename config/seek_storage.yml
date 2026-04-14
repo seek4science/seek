@@ -2,6 +2,7 @@ default: &default
   backend: local
 
 development:
+#  <<: *default
   backend: s3
   bucket: seek-dev
   region: us-east-1
@@ -23,3 +24,5 @@ production:
   # secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   # endpoint: https://minio.example.com   # omit for AWS S3
   # force_path_style: true                # required for MinIO
+
+
