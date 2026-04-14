@@ -12,3 +12,7 @@ Style/FrozenStringLiteralComment:
 
 Style/HashSyntax:
   EnforcedShorthandSyntax: never
+
+Metrics/BlockLength:
+  Exclude:
+    - lib/tasks/**/*.rake
