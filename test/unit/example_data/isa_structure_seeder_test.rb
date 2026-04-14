@@ -5,28 +5,38 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:modelling_assay_class)
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
-    @base_data = @projects_seeder.seed
+    base_data = @projects_seeder.seed
+    @project = base_data[:project]
+    @organism = base_data[:organism]
     
     @users_seeder = Seek::ExampleData::UsersSeeder.new(
-      @base_data[:workgroup],
-      @base_data[:project],
-      @base_data[:institution]
+      base_data[:workgroup],
+      base_data[:project],
+      base_data[:institution]
     )
-    @user_data = @users_seeder.seed
+    user_data = @users_seeder.seed
+    @guest_person = user_data[:guest_person]
+    @admin_person = user_data[:admin_person]
   end
 
-
   test 'seeds ISA structure' do
-    initial_investigation_count = Investigation.count
-    initial_study_count = Study.count
-    initial_assay_count = Assay.count
     
     seeder = Seek::ExampleData::ISAStructureSeeder.new(
-      @base_data[:project],
-      @user_data[:guest_person],
-      @base_data[:organism]
+      @project,
+      @guest_person,
+      @admin_person,
+      @organism
     )
-    result = seeder.seed
+    result = nil
+    assert_difference('Assay.count', 3) do
+      assert_difference('Study.count', 1) do
+        assert_difference('ObservationUnit.count', 1) do
+          assert_difference('Investigation.count', 1) do
+            result = seeder.seed
+          end
+        end
+      end
+    end
     
     # Check that result hash has expected keys
     assert_includes result.keys, :investigation
@@ -40,19 +50,28 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     investigation = result[:investigation]
     assert_not_nil investigation
     assert_equal 'Central Carbon Metabolism of Sulfolobus solfataricus', investigation.title
-    assert_includes investigation.projects, @base_data[:project]
+    assert_includes investigation.projects, @project
+    assert_equal @guest_person, investigation.contributor
+    assert_equal [@admin_person], investigation.creators
+    assert_equal 'Person A, Person B', investigation.other_creators
+    assert_equal %w[metabolism thermophile], investigation.tags
     
     # Check study
     study = result[:study]
     assert_not_nil study
     assert_equal 'Carbon loss at high T', study.title
+    assert_equal 'The carbon loss at high T description will be here but I am currently not imaginative enough.', study.description
+    assert_equal ['thermophile', 'high temperature'], study.tags
     assert_equal investigation, study.investigation
+    assert_equal @guest_person, study.contributor
     
     # Check observation unit
     observation_unit = result[:observation_unit]
     assert_not_nil observation_unit
     assert_equal 'Large scale bioreactor', observation_unit.title
     assert_equal study, observation_unit.study
+    assert_equal @guest_person, observation_unit.contributor
+    assert_equal ['bioreactor'], observation_unit.tags
     
     # Check experimental assay
     exp_assay = result[:exp_assay]
@@ -60,7 +79,8 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal 'Reconstituted system reference state', exp_assay.title
     assert_equal study, exp_assay.study
     assert_equal AssayClass.experimental, exp_assay.assay_class
-    assert_includes exp_assay.organisms, @base_data[:organism]
+    assert_includes exp_assay.organisms, @organism
+    assert_equal @guest_person, exp_assay.contributor
     
     # Check modelling assay
     model_assay = result[:model_assay]
@@ -68,6 +88,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal 'Model reconstituted system', model_assay.title
     assert_equal study, model_assay.study
     assert_equal AssayClass.modelling, model_assay.assay_class
+    assert_equal @guest_person, model_assay.contributor
     
     # Check assay stream
     assay_stream = result[:assay_stream]

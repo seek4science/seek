@@ -2,9 +2,10 @@
 module Seek
   module ExampleData
     class ISAStructureSeeder
-      def initialize(project, guest_person, organism)
+      def initialize(project, guest_person, admin_person, organism)
         @project = project
         @guest_person = guest_person
+        @admin_person = admin_person
         @organism = organism
       end
       
@@ -18,13 +19,18 @@ module Seek
         )
         investigation.projects = [@project]
         investigation.contributor = @guest_person
+        investigation.creators = [@admin_person]
+        investigation.other_creators = 'Person A, Person B'
         investigation.policy = Policy.create(name: 'default policy', access_type: 1)
         investigation.annotate_with(['metabolism', 'thermophile'], 'tag', @guest_person)
         investigation.save
         puts 'Seeded 1 investigation.'
         
         # Study
-        study = Study.new(title: 'Carbon loss at high T')
+        study = Study.new(
+          title: 'Carbon loss at high T',
+          description: 'The carbon loss at high T description will be here but I am currently not imaginative enough.'
+        )
         study.contributor = @guest_person
         study.policy = Policy.create(name: 'default policy', access_type: 1)
         study.investigation = investigation
