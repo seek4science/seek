@@ -29,6 +29,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     end
     df1 = result[:data_file1].reload
     assert_equal 'ValidationReference.xlsx', df1.content_blob.original_filename
+    assert df1.content_blob.file_exists?
     assert_equal 'Metabolite concentrations during reconstituted enzyme incubation', df1.title
     assert_equal 'The purified enzymes, PGK, GAPDH, TPI and FBPAase were incubated at 70 C en conversion of 3PG to F6P was followed.',
                  df1.description
@@ -41,6 +42,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
 
     df2 = result[:data_file2].reload
     assert_equal 'combinedPlot.jpg', df2.content_blob.original_filename
+    assert df2.content_blob.file_exists?
     assert_equal 'Model simulation and Exp data for reconstituted system', df2.title
     assert_equal 'Experimental data for the reconstituted system are plotted together with the model prediction.',
                  df2.description
@@ -73,6 +75,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     file_names = %w[ssolfGluconeogenesisOpenAnn.dat ssolfGluconeogenesisOpenAnn.xml ssolfGluconeogenesisOpenAnn.xml
                     ssolfGluconeogenesisAnn.xml ssolfGluconeogenesisClosed.xml ssolfGluconeogenesis.xml]
     assert_equal file_names, model.content_blobs.map(&:original_filename)
+    assert model.content_blobs.all?(&:file_exists?)
   end
 
   test 'seeds SOP' do
@@ -93,6 +96,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     assert_equal @project, sop.projects.first
     assert_equal @guest_person, sop.contributor
     assert_equal 'test_sop.txt', sop.content_blob.original_filename
+    assert sop.content_blob.file_exists?
     assert_equal ['protocol', 'enzymology', 'thermophile'], sop.tags
     assert_equal 'CC-BY-SA-4.0', sop.license
   end
