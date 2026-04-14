@@ -54,10 +54,12 @@ class SamplesSeederTest < ActiveSupport::TestCase
     culture_sample_type = result[:culture_sample_type].reload
     assert_equal 'Bacterial Culture', culture_sample_type.title
     assert_includes culture_sample_type.projects, @base_data[:project]
+    assert_equal ['bacterial culture', 'thermophile', 'microbiology'], culture_sample_type.tags
     
     enzyme_sample_type = result[:enzyme_sample_type].reload
     assert_equal 'Enzyme Preparation', enzyme_sample_type.title
     assert_includes enzyme_sample_type.projects, @base_data[:project]
+    assert_equal ['enzyme', 'protein', 'purification'], enzyme_sample_type.tags
     
     # Check samples were created
     assert_not_nil result[:culture1]
