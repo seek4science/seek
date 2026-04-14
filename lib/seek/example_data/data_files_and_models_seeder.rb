@@ -18,6 +18,7 @@ module Seek
         data_file1 = create_data_file(
           'Metabolite concentrations during reconstituted enzyme incubation',
           'The purified enzymes, PGK, GAPDH, TPI and FBPAase were incubated at 70 C en conversion of 3PG to F6P was followed.',
+          nil,
           'ValidationReference.xlsx',
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
@@ -33,6 +34,7 @@ module Seek
         data_file2 = create_data_file(
           'Model simulation and Exp data for reconstituted system',
           'Experimental data for the reconstituted system are plotted together with the model prediction.',
+          'CC-BY-SA-4.0',
           'combinedPlot.jpg',
           'image/jpeg'
         )
@@ -61,8 +63,8 @@ module Seek
       
       private
       
-      def create_data_file(title, description, filename, content_type)
-        data_file = DataFile.new(title: title, description: description)
+      def create_data_file(title, description, license, filename, content_type)
+        data_file = DataFile.new(title: title, description: description, license: license)
         data_file.contributor = @guest_person
         data_file.projects = [@project]
         data_file.policy = Policy.create(name: 'default policy', access_type: 1)

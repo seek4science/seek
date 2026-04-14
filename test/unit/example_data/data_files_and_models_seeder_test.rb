@@ -34,6 +34,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
                  df1.description
     assert_equal @project, df1.projects.first
     assert_equal @guest_person, df1.contributor
+    assert_nil df1.license
 
     df2 = result[:data_file2]
     assert_equal 'combinedPlot.jpg', df2.content_blob.original_filename
@@ -42,6 +43,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
                  df2.description
     assert_equal @project, df2.projects.first
     assert_equal @guest_person, df2.contributor
+    assert_equal 'CC-BY-SA-4.0', df2.license
   end
 
   test 'seeds model' do
