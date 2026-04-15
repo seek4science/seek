@@ -25,7 +25,8 @@ class DocumentsSeederTest < ActiveSupport::TestCase
 
     doc = result[:document].reload
     assert_equal 'Experimental setup for the reconstituted gluconeogenic enzyme system', doc.title
-    assert_equal 'This document describes the experimental setup and procedures used for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus.', doc.description
+    assert_equal 'This document describes the experimental setup and procedures used for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus.',
+                 doc.description
     assert_equal @project, doc.projects.first
     assert_equal @guest_person, doc.contributor
     assert_equal 'example_document.txt', doc.content_blob.original_filename
@@ -35,5 +36,4 @@ class DocumentsSeederTest < ActiveSupport::TestCase
     assert_nil doc.other_creators
     assert_equal %w[gluconeogenesis protocol thermophile], doc.tags
   end
-
 end

@@ -18,10 +18,11 @@ module Seek
         collection.policy = Policy.create(name: 'default policy', access_type: 1)
 
         disable_authorization_checks do
-          collection.annotate_with(['gluconeogenesis', 'thermophile', 'metabolism'], 'tag', @guest_person)
+          collection.annotate_with(%w[gluconeogenesis thermophile metabolism], 'tag', @guest_person)
           collection.save!
           @content_hash.each do |item|
-            CollectionItem.create!(collection: collection, asset: item[:asset], comment: item[:comment], order: item[:order])
+            CollectionItem.create!(collection: collection, asset: item[:asset], comment: item[:comment],
+                                   order: item[:order])
           end
         end
 

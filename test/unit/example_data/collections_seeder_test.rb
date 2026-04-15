@@ -33,7 +33,8 @@ class CollectionsSeederTest < ActiveSupport::TestCase
 
     collection = result[:collection].reload
     assert_equal 'Gluconeogenesis in Sulfolobus solfataricus', collection.title
-    assert_equal 'A collection of data files, models, SOPs and publications related to the reconstituted gluconeogenic enzyme system from Sulfolobus solfataricus.', collection.description
+    assert_equal 'A collection of data files, models, SOPs and publications related to the reconstituted gluconeogenic enzyme system from Sulfolobus solfataricus.',
+                 collection.description
     assert_equal [@project], collection.projects
     assert_equal @guest_person, collection.contributor
     assert_equal 'CC-BY-4.0', collection.license

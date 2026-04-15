@@ -57,7 +57,6 @@ module Seek
 
         document
       end
-
     end
   end
 end

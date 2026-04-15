@@ -97,8 +97,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     assert_equal @guest_person, sop.contributor
     assert_equal 'test_sop.txt', sop.content_blob.original_filename
     assert sop.content_blob.file_exists?
-    assert_equal ['protocol', 'enzymology', 'thermophile'], sop.tags
+    assert_equal %w[protocol enzymology thermophile], sop.tags
     assert_equal 'CC-BY-SA-4.0', sop.license
   end
-
 end

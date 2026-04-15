@@ -1,6 +1,5 @@
 require 'test_helper'
 
-
 class PublicationsSeederTest < ActiveSupport::TestCase
   def setup
     User.current_user = nil
@@ -14,7 +13,6 @@ class PublicationsSeederTest < ActiveSupport::TestCase
   end
 
   test 'seeded publication' do
-
     seeder = Seek::ExampleData::PublicationsSeeder.new(
       @project, @guest_person, @exp_assay, @model_assay, @seed_data_dir
     )
@@ -26,17 +24,17 @@ class PublicationsSeederTest < ActiveSupport::TestCase
     end
 
     pub = result[:publication].reload
-    assert_equal 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus', pub.title
-    assert_match /Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus/, pub.abstract
-    assert_equal 23865479, pub.pubmed_id
+    assert_equal 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus',
+                 pub.title
+    assert_match(/Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus/, pub.abstract)
+    assert_equal 23_865_479, pub.pubmed_id
     assert_equal [@project], pub.projects
     assert_equal @guest_person, pub.contributor
     assert_equal 6, pub.publication_authors.size
     assert_equal @publication_type, pub.publication_type
     refute_nil pub.citation
     assert_equal Publication::REGISTRATION_BY_PUBMED, pub.registered_mode
-    assert_equal ['metabolism', 'thermophile'], pub.tags
-
+    assert_equal %w[metabolism thermophile], pub.tags
   end
 
   test 'seeded presentation' do
@@ -51,14 +49,15 @@ class PublicationsSeederTest < ActiveSupport::TestCase
     end
 
     presentation = result[:presentation].reload
-    assert_equal 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus', presentation.title
-    assert_equal 'Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus were purified and kinetically characterized. The enzymes were reconstituted in vitro to quantify the contribution of temperature instability of the pathway intermediates to carbon loss from the system. The reconstituted system, consisting of phosphoglycerate kinase, glyceraldehyde 3-phosphate dehydrogenase, triose phosphate isomerase and the fructose 1,6-bisphosphate aldolase/phosphatase, maintained a constant consumption rate of 3-phosphoglycerate and production of', presentation.description
+    assert_equal 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus',
+                 presentation.title
+    assert_equal 'Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus were purified and kinetically characterized. The enzymes were reconstituted in vitro to quantify the contribution of temperature instability of the pathway intermediates to carbon loss from the system. The reconstituted system, consisting of phosphoglycerate kinase, glyceraldehyde 3-phosphate dehydrogenase, triose phosphate isomerase and the fructose 1,6-bisphosphate aldolase/phosphatase, maintained a constant consumption rate of 3-phosphoglycerate and production of',
+                 presentation.description
     assert_equal [@project], presentation.projects
     assert_equal @guest_person, presentation.contributor
     assert_equal 'presentation.pptx', presentation.content_blob.original_filename
     assert presentation.content_blob.file_exists?
     assert_equal [@guest_person], presentation.creators
-
   end
 
   test 'seeded event' do
@@ -82,5 +81,4 @@ class PublicationsSeederTest < ActiveSupport::TestCase
     assert_equal 'Dunmore Terrace 123', event.address
     assert_equal 'http://www.seek4science.org', event.url
   end
-
 end
