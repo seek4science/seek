@@ -16,16 +16,20 @@ ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.
 # need to set the locale, otherwise some gems file to install
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
 
-# Install base dependencies
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    curl default-mysql-client gettext git graphviz libjemalloc2 libreoffice libvips links locales \
-    nodejs openjdk-21-jre poppler-utils postgresql-client python3.13 shared-mime-info sqlite3 telnet vim-tiny zip
-
 # Prepare app directory
 RUN mkdir -p $APP_DIR
 RUN chown www-data:www-data $APP_DIR
 WORKDIR $APP_DIR
+
+# Copy python version file so the correct Python version can be installed
+COPY .python-version .python-version
+
+# Install base dependencies
+RUN PYTHON_VERSION=$(cat .python-version) && \
+    apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    curl default-mysql-client gettext git graphviz libjemalloc2 libreoffice libvips links locales \
+    nodejs openjdk-21-jre poppler-utils postgresql-client python${PYTHON_VERSION} shared-mime-info sqlite3 telnet vim-tiny zip
 
 # Disable ssl from the mysql client
 RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
@@ -33,16 +37,17 @@ RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
 FROM base AS builder
 
 # Install build dependencies
-RUN apt-get update -qq && \
+RUN PYTHON_VERSION=$(cat .python-version) && \
+    apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential cmake \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
     libsqlite3-dev libssl-dev libxml++2.6-dev libxslt1-dev libyaml-dev \
-    python3.13-dev python3-pip python3.13-venv && \
+    python${PYTHON_VERSION}-dev python3-pip python${PYTHON_VERSION}-venv && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
     locale-gen en_US.UTF-8
 
 # create and use a dedicated python virtualenv
-RUN python3.13 -m venv /opt/venv
+RUN PYTHON_VERSION=$(cat .python-version) && python${PYTHON_VERSION} -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy over App code from local filesystem
@@ -84,8 +89,9 @@ RUN chown -R www-data:www-data /var/www config docker db/schema.rb public solr s
 RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh
 
 # Python dependencies from requirements.txt
-RUN python3.13 -m ensurepip --upgrade --default-pip
-RUN python3.13 -m pip install -r requirements.txt
+RUN PYTHON_VERSION=$(cat .python-version) && \
+    python${PYTHON_VERSION} -m ensurepip --upgrade --default-pip && \
+    python${PYTHON_VERSION} -m pip install -r requirements.txt
 
 USER www-data
 
