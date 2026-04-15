@@ -1,5 +1,5 @@
 require 'test_helper'
-class DocumentSeederTest < ActiveSupport::TestCase
+class DocumentsSeederTest < ActiveSupport::TestCase
   def setup
     User.current_user = nil
     @admin_person = FactoryBot.create(:admin, first_name: 'Admin', last_name: 'Person')
@@ -13,7 +13,7 @@ class DocumentSeederTest < ActiveSupport::TestCase
   end
 
   test 'seed document' do
-    seeder = Seek::ExampleData::DocumentSeeder.new(
+    seeder = Seek::ExampleData::DocumentsSeeder.new(
       @project, @guest_person, @admin_person, @seed_data_dir
     )
     result = nil

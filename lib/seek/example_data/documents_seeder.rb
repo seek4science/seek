@@ -1,6 +1,6 @@
 module Seek
   module ExampleData
-    class DocumentSeeder
+    class DocumentsSeeder
       def initialize(project, guest_person, admin_person, seed_data_dir)
         @project = project
         @guest_person = guest_person

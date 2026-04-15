@@ -53,6 +53,7 @@ class ExampleDataSeederTest < ActiveSupport::TestCase
     assert_respond_to seeder, :sop
     assert_respond_to seeder, :publication
     assert_respond_to seeder, :document
+    assert_respond_to seeder, :collection
   end
 
   test 'seed_all method populates all content' do
@@ -74,7 +75,11 @@ class ExampleDataSeederTest < ActiveSupport::TestCase
                                 assert_difference('Sop.count', 1) do
                                   assert_difference('Publication.count', 1) do
                                     assert_difference('Document.count', 1) do
-                                      seeder.seed_all
+                                      assert_difference('Collection.count', 1) do
+                                        assert_difference('CollectionItem.count', 7) do
+                                          seeder.seed_all
+                                        end
+                                      end
                                     end
                                   end
                                 end
@@ -129,5 +134,6 @@ class ExampleDataSeederTest < ActiveSupport::TestCase
     assert_not_nil seeder.sop
     assert_not_nil seeder.publication
     assert_not_nil seeder.document
+    assert_not_nil seeder.collection
   end
 end
