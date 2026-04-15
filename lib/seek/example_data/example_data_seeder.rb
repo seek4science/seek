@@ -7,7 +7,7 @@ module Seek
       attr_reader :investigation, :study, :observation_unit, :exp_assay, :model_assay, :assay_stream
       attr_reader :culture_sample_type, :enzyme_sample_type
       attr_reader :culture1, :culture2, :enzyme1, :enzyme2, :enzyme3, :enzyme4
-      attr_reader :data_file1, :data_file2, :model, :sop
+      attr_reader :data_file1, :data_file2, :model, :sop, :document
       attr_reader :publication, :presentation, :event
 
       def initialize
@@ -23,6 +23,7 @@ module Seek
         seed_isa_structure
         seed_samples
         seed_data_files_and_models
+        seed_documents
         seed_publications_and_presentations
         seed_configuration
 
@@ -90,6 +91,15 @@ module Seek
         @model = result[:model]
         @sop = result[:sop]
       end
+
+      def seed_documents
+        seeder = Seek::ExampleData::DocumentSeeder.new(
+          @project, @guest_person, @admin_person, @seed_data_dir
+        )
+        result = seeder.seed
+        @document = result[:document]
+      end
+
 
       def seed_publications_and_presentations
         seeder = Seek::ExampleData::PublicationsSeeder.new(
