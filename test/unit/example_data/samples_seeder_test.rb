@@ -20,7 +20,7 @@ class SamplesSeederTest < ActiveSupport::TestCase
     @isa_seeder = Seek::ExampleData::ISAStructureSeeder.new(
       @base_data[:project],
       @user_data[:guest_person],
-      @user_data[:guest_person],
+      @user_data[:admin_person],
       @base_data[:organism]
     )
     @isa_data = @isa_seeder.seed
@@ -64,7 +64,7 @@ class SamplesSeederTest < ActiveSupport::TestCase
     enzyme_sample_type = result[:enzyme_sample_type].reload
     assert_equal 'Enzyme Preparation', enzyme_sample_type.title
     assert_includes enzyme_sample_type.projects, @base_data[:project]
-    assert_equal ['enzyme', 'protein', 'purification'], enzyme_sample_type.tags
+    assert_equal %w[enzyme protein purification].sort, enzyme_sample_type.tags.sort
     
     # Check samples were created
     assert_not_nil result[:culture1]

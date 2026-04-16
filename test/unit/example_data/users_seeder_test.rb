@@ -58,7 +58,7 @@ class UsersSeederTest < ActiveSupport::TestCase
     assert_equal 'https://example.org', admin_person.web_page
     assert_equal '00-0000-0000-0000', admin_person.phone
     assert_equal ['administration', 'data management'], admin_person.expertise
-    assert_equal ['SEEK', 'Ruby on Rails'], admin_person.tools
+    assert_equal ['SEEK', 'Ruby on Rails'].sort, admin_person.tools.sort
 
     guest_person = result[:guest_person].reload
     assert_equal 'Guest', guest_person.first_name

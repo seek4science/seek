@@ -66,7 +66,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_not_nil study
     assert_equal 'Carbon loss at high T', study.title
     assert_equal 'The carbon loss at high T description will be here but I am currently not imaginative enough.', study.description
-    assert_equal ['thermophile', 'high temperature'], study.tags
+    assert_equal ['thermophile', 'high temperature'].sort, study.tags.sort
     assert_equal investigation, study.investigation
     assert_equal @guest_person, study.contributor
     

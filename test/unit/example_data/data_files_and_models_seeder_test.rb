@@ -53,7 +53,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     assert_equal 'CC-BY-SA-4.0', df2.license
     assert_equal [@admin_person], df2.creators
     assert_equal 'Person A, Person B', df2.other_creators
-    assert_equal %w[metabolism modelling gluconeogenesis], df2.tags
+    assert_equal %w[metabolism modelling gluconeogenesis].sort, df2.tags.sort
   end
 
   test 'seeds model' do
@@ -97,6 +97,7 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
                  sop.description
     assert_equal @project, sop.projects.first
     assert_equal @guest_person, sop.contributor
+    assert_equal [@guest_person], sop.creators
     assert_equal 'test_sop.txt', sop.content_blob.original_filename
     assert sop.content_blob.file_exists?
     assert_equal %w[protocol enzymology thermophile], sop.tags

@@ -159,6 +159,7 @@ module Seek
         disable_authorization_checks do
           sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', @guest_person)
           sop.save!
+          AssetsCreator.create(asset: sop, creator: @guest_person, asset_type: sop.class.name)
         end
 
         
