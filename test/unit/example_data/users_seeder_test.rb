@@ -4,11 +4,16 @@ class UsersSeederTest < ActiveSupport::TestCase
   def setup
     User.delete_all
     Person.delete_all
+    disable_std_output
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
     base_data = @projects_seeder.seed
     @workgroup = base_data[:workgroup]
     @project = base_data[:project]
     @institution = base_data[:institution]
+  end
+
+  def teardown
+    enable_std_output
   end
 
   test 'seeds users and people' do

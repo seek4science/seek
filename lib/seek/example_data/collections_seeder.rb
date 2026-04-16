@@ -8,6 +8,8 @@ module Seek
       end
 
       def seed
+        puts "Seeding collections..."
+
         collection = Collection.new(
           title: 'Gluconeogenesis in Sulfolobus solfataricus',
           description: 'A collection of data files, models, SOPs and publications related to the reconstituted gluconeogenic enzyme system from Sulfolobus solfataricus.'
@@ -25,6 +27,8 @@ module Seek
                                    order: item[:order])
           end
         end
+
+        puts "seeded 1 collection with #{@content_hash.size} items."
 
         { collection: collection }
       end

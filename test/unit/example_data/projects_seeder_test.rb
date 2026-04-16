@@ -3,10 +3,12 @@ require 'test_helper'
 class ProjectsSeederTest < ActiveSupport::TestCase
   def setup
     User.current_user = nil
+    disable_std_output
   end
 
   def teardown
     User.current_user = nil
+    enable_std_output
   end
 
   test 'seeds projects and basic setup' do

@@ -10,6 +10,11 @@ class PublicationsSeederTest < ActiveSupport::TestCase
     @model_assay = FactoryBot.create(:modelling_assay, contributor: @guest_person)
     @seed_data_dir = File.join(Rails.root, 'db', 'seeds', 'example_data')
     @publication_type = PublicationType.where(key: 'journalarticle').first || FactoryBot.create(:journal)
+    disable_std_output
+  end
+
+  def teardown
+    enable_std_output
   end
 
   test 'seeded publication' do

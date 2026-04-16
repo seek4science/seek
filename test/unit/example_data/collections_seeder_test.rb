@@ -8,10 +8,12 @@ class CollectionsSeederTest < ActiveSupport::TestCase
     @model = FactoryBot.create(:model, contributor: @guest_person, projects: [@project])
     @sop = FactoryBot.create(:sop, contributor: @guest_person, projects: [@project])
     @publication = FactoryBot.create(:publication, contributor: @guest_person, projects: [@project])
+    disable_std_output
   end
 
   def teardown
     User.current_user = nil
+    enable_std_output
   end
 
   test 'seed collections' do

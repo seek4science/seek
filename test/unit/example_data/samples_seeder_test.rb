@@ -4,6 +4,7 @@ class SamplesSeederTest < ActiveSupport::TestCase
   def setup
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:modelling_assay_class)
+    disable_std_output
     
     # Set up base data
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
@@ -23,6 +24,10 @@ class SamplesSeederTest < ActiveSupport::TestCase
       @base_data[:organism]
     )
     @isa_data = @isa_seeder.seed
+  end
+
+  def teardown
+    enable_std_output
   end
 
 

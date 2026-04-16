@@ -4,6 +4,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
   def setup
     FactoryBot.create(:experimental_assay_class)
     FactoryBot.create(:modelling_assay_class)
+    disable_std_output
     @projects_seeder = Seek::ExampleData::ProjectsSeeder.new
     base_data = @projects_seeder.seed
     @project = base_data[:project]
@@ -17,6 +18,10 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     user_data = @users_seeder.seed
     @guest_person = user_data[:guest_person]
     @admin_person = user_data[:admin_person]
+  end
+
+  def teardown
+    enable_std_output
   end
 
   test 'seeds ISA structure' do

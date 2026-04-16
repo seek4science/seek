@@ -9,10 +9,12 @@ class DataFilesAndModelsSeederTest < ActiveSupport::TestCase
     @exp_assay = FactoryBot.create(:experimental_assay, contributor: @guest_person)
     @model_assay = FactoryBot.create(:modelling_assay, contributor: @guest_person)
     @seed_data_dir = File.join(Rails.root, 'db', 'seeds', 'example_data')
+    disable_std_output
   end
 
   def teardown
     User.current_user = nil
+    enable_std_output
   end
 
   test 'seeds data files' do

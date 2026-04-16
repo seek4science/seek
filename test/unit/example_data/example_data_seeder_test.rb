@@ -5,6 +5,11 @@ class ExampleDataSeederTest < ActiveSupport::TestCase
     User.delete_all
     Person.delete_all
     FactoryBot.create(:journal)
+    disable_std_output
+  end
+
+  def teardown
+    enable_std_output
   end
 
   test 'can create ExampleDataSeeder instance' do

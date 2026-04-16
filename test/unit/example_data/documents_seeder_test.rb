@@ -6,10 +6,12 @@ class DocumentsSeederTest < ActiveSupport::TestCase
     @guest_person = FactoryBot.create(:person, first_name: 'Guest', last_name: 'User')
     @project = @guest_person.projects.first
     @seed_data_dir = File.join(Rails.root, 'db', 'seeds', 'example_data')
+    disable_std_output
   end
 
   def teardown
     User.current_user = nil
+    enable_std_output
   end
 
   test 'seed document' do
