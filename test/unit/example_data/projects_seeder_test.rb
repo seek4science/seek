@@ -43,8 +43,8 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     project = result[:project].reload
     assert_equal 'Default Project', project.title
     assert_equal 'A description for the default project', project.description
-    assert_equal 'http://www.seek4science.org', project.web_page
-    assert_equal 'http://www.wiki.org/', project.wiki_page
+    assert_equal 'https://www.seek4science.org', project.web_page
+    assert_equal 'https://www.wiki.org', project.wiki_page
     assert_equal program, project.programme
     
     # Verify institution attributes
@@ -52,6 +52,7 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     assert_equal 'Default Institution', institution.title
     assert_equal 'GB', institution.country
     assert_equal 'Manchester', institution.city
+    assert_equal '10 Downing Street', institution.address
     
     # Verify strain attributes
     strain = result[:strain].reload
@@ -64,6 +65,42 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     assert_includes organism.projects, project
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2287', organism.concept_uri
     assert_includes organism.strains, strain
+  end
+
+  test 'seed with existing default project, programme and institution' do
+    project = FactoryBot.create(:project, title: 'Default Project')
+    programme = FactoryBot.create(:programme, title: 'Default Programme')
+    institution = FactoryBot.create(:institution, title: 'Default Institution')
+    seeder = Seek::ExampleData::ProjectsSeeder.new
+    result = nil
+    assert_no_difference('Project.count') do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Institution.count') do
+          result = seeder.seed
+        end
+      end
+    end
+    # Verify program attributes
+    program = result[:program].reload
+    assert_equal 'Default Programme', program.title
+    assert_equal 'http://www.seek4science.org', program.web_page
+    assert_equal 'This is a test programme for the SEEK sandbox.', program.description
+    assert_equal 'Funding H2020X01Y001', program.funding_details
+
+    # Verify project attributes
+    project = result[:project].reload
+    assert_equal 'Default Project', project.title
+    assert_equal 'A description for the default project', project.description
+    assert_equal 'https://www.seek4science.org', project.web_page
+    assert_equal 'https://www.wiki.org', project.wiki_page
+    assert_equal program, project.programme
+
+    # Verify institution attributes
+    institution = result[:institution].reload
+    assert_equal 'Default Institution', institution.title
+    assert_equal 'GB', institution.country
+    assert_equal 'Manchester', institution.city
+    assert_equal '10 Downing Street', institution.address
   end
 
   test 'is idempotent - can run multiple times' do

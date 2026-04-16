@@ -77,6 +77,7 @@ class ISAStructureSeederTest < ActiveSupport::TestCase
     assert_equal study, observation_unit.study
     assert_equal @guest_person, observation_unit.contributor
     assert_equal ['bioreactor'], observation_unit.tags
+    assert_equal 'Guest User, Jane Doe', observation_unit.other_creators
     
     # Check experimental assay
     exp_assay = result[:exp_assay].reload

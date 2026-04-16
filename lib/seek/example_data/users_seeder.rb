@@ -58,23 +58,10 @@ module Seek
         
         # Update project
         disable_authorization_checks do
-          @project.description = 'This is a test project for the SEEK sandbox.'
-          @project.web_page = 'http://www.seek4science.org'
           @project.pals = [guest_person]
           @project.save!
-          puts 'Seeded 1 project.'
         end
-        
-        # Update institution
-        disable_authorization_checks do
-          @institution.country = 'United Kingdom'
-          @institution.city = 'Manchester'
-          @institution.web_page = 'http://www.seek4science.org'
-          @institution.address = '10 Downing Street'
-          @institution.department = 'Department of SEEK for Science'
-          @institution.save!
-          puts 'Seeded 1 institution.'
-        end
+
         
         {
           admin_user: admin_user,

@@ -41,7 +41,7 @@ module Seek
         # Observation unit
         observation_unit = ObservationUnit.new(title: 'Large scale bioreactor')
         observation_unit.description = 'A large scale bioreactor with a 1000 mL reservoir.'
-        observation_unit.other_creators = [@guest_person.name, 'Jane Doe']
+        observation_unit.other_creators = "#{@guest_person.name}, Jane Doe"
         observation_unit.contributor = @guest_person
         observation_unit.policy = Policy.create(name: 'default policy', access_type: 1)
         observation_unit.annotate_with(['bioreactor'], 'tag', @guest_person)
