@@ -605,7 +605,7 @@ class StudiesControllerTest < ActionController::TestCase
     # check sharing form exists
     assert_select 'div#sharing_form', count:1
 
-    #no sharing link, not for Investigation, Study and Assay
+    # check temporary sharing links section exists
     assert_select 'div#temporary_links', count:1
 
     assert_select 'div#author-form', count:1

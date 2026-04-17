@@ -2,35 +2,35 @@ require 'tempfile'
 
 module ISAHelper
   OLD_FILL_COLOURS = {
-      'Sop' => '#7AC5CD', # cadetblue3
-      'Model' => '#CDCD00', # yellow3
-      'DataFile' => '#EEC591', # burlywood2
-      'Investigation' => '#E6E600',
-      'Study' => '#B8E62E',
-      'Assay' =>'#64B466',
-      'Publication' => '#84B5FD',
-      'Presentation' => '#8EE5EE', # cadetblue2
-      'HiddenItem' => '#D3D3D3'
-  } # lightgray
+    'Sop' => '#7AC5CD', # cadetblue3
+    'Model' => '#CDCD00', # yellow3
+    'DataFile' => '#EEC591', # burlywood2
+    'Investigation' => '#E6E600',
+    'Study' => '#B8E62E',
+    'Assay' => '#64B466',
+    'Publication' => '#84B5FD',
+    'Presentation' => '#8EE5EE', # cadetblue2
+    'HiddenItem' => '#D3D3D3'
+  }.freeze # lightgray
 
   NEW_FILL_COLOURS = {
-      'Programme' => '#90A8FF',
-      'Project' => '#85D6FF',
-      'Investigation' => '#D6FF00',
-      'Study' => '#96ED29',
-      'Assay' =>'#52D155',
-      'ObservationUnit' => '#40A040',
-      'Publication' => '#CBB8FF',
-      'DataFile' => '#FFC382',
-      'Document' => '#D5C8A8',
-      'Model' => '#F9EB57',
-      'Sop' => '#CCE5FF',
-      'Sample' => '#FFF2D5',
-      'Presentation' => '#FFB2E4',
-      'Event' => '#FF918E',
-      'Workflow' => '#ADCDDC',
-      'Collection' => '#ABEACB',
-      'HiddenItem' => '#D3D3D3'
+    'Programme' => '#90A8FF',
+    'Project' => '#85D6FF',
+    'Investigation' => '#D6FF00',
+    'Study' => '#96ED29',
+    'Assay' => '#52D155',
+    'ObservationUnit' => '#40A040',
+    'Publication' => '#CBB8FF',
+    'DataFile' => '#FFC382',
+    'Document' => '#D5C8A8',
+    'Model' => '#F9EB57',
+    'Sop' => '#CCE5FF',
+    'Sample' => '#FFF2D5',
+    'Presentation' => '#FFB2E4',
+    'Event' => '#FF918E',
+    'Workflow' => '#ADCDDC',
+    'Collection' => '#ABEACB',
+    'HiddenItem' => '#D3D3D3'
   }
 
   FILL_COLOURS = NEW_FILL_COLOURS
@@ -41,24 +41,25 @@ module ISAHelper
     # aggregate_hidden_nodes(elements)
   rescue Exception => e
     raise e if Rails.env.development?
+
     Rails.logger.error("Error generating nodes and edges for the graph - #{e.message}")
     { error: 'error' }
   end
 
-  def modal_isa_png()
-    modal_options = {id: 'modal-exported-png', size: 'xl', 'data-role' => 'modal-isa-graph-png'}
+  def modal_isa_png
+    modal_options = { id: 'modal-exported-png', size: 'xl', 'data-role' => 'modal-isa-graph-png' }
 
     modal_title = 'Export PNG'
 
     modal(modal_options) do
       modal_header(modal_title) +
-          modal_body do
-            #content_tag(:button, 'save',id:'save-exported-png') +
-            content_tag(:p,'Click below to download a copy of the image') +
-            button_link_to('Download', 'download', '#', id:'save-exported-png') +
+        modal_body do
+          # content_tag(:button, 'save',id:'save-exported-png') +
+          content_tag(:p, 'Click below to download a copy of the image') +
+            button_link_to('Download', 'download', '#', id: 'save-exported-png') +
             content_tag(:br) +
-            content_tag(:img, '',id: 'exported-png', style:'max-width:1200px')
-          end
+            content_tag(:img, '', id: 'exported-png', style: 'max-width:1200px')
+        end
     end
   end
 
@@ -73,9 +74,8 @@ module ISAHelper
       # Code is included ONLY for Navigation Down (children), NOT for Navigation Up (parents)
       include_code = false
       if code.present?
-        # Check if item is accessible via code OR hierarchical navigation rules apply
-        # This ensures code only propagates downward, not upward
-        if can_view_asset?(item, code) || should_include_code_for_isa_link?(item)
+        can_check_code_access = item.respond_to?(:can_view?) && item.respond_to?(:auth_by_code?)
+        if (can_check_code_access && can_view_asset?(item, code)) || should_include_code_for_isa_link?(item)
           include_code = true
         end
       end
@@ -109,7 +109,8 @@ module ISAHelper
                         polymorphic_path(item, url_options)
                       end
         data['type'] = item.is_a?(Assay) ? item.assay_class.title : item_type.humanize
-        data['faveColor'] = FILL_COLOURS[item.is_a?(Seek::ObjectAggregation) ? item.type.to_s.singularize.capitalize : item.class.name] || FILL_COLOURS.default
+        data['faveColor'] =
+          FILL_COLOURS[item.is_a?(Seek::ObjectAggregation) ? item.type.to_s.singularize.capitalize : item.class.name] || FILL_COLOURS.default
       else
         data['name'] = 'Hidden item'
         data['fullName'] = data['name']
@@ -123,8 +124,6 @@ module ISAHelper
                   else
                     { group: 'nodes', data: data, classes: 'resource resource-small' }
                   end
-
-
     end
 
     elements
@@ -136,7 +135,7 @@ module ISAHelper
       source_item, target_item = edge
       source = node_id(source_item)
       target = node_id(target_item)
-      target_type = target_item.class.name
+      target_item.class.name
       e_id = edge_id(source_item, target_item)
       name = edge_label(source_item, target_item)
 
@@ -167,7 +166,7 @@ module ISAHelper
     target_id = target.id
 
     label_data = []
-    if source_type == 'Assay' && (target_type == 'DataFile' || target_type == 'Sample')
+    if source_type == 'Assay' && %w[DataFile Sample].include?(target_type)
       assay_asset = AssayAsset.where(['assay_id=? AND asset_id=?', source_id, target_id]).first
       if assay_asset
         label_data << assay_asset.relationship_type.title if assay_asset.relationship_type
@@ -175,9 +174,7 @@ module ISAHelper
       end
     elsif source_type == 'Sample' && target_type == 'Assay'
       assay_asset = AssayAsset.where(['assay_id=? AND asset_id=?', target_id, source_id]).first
-      if assay_asset
-        label_data << direction_name(assay_asset.direction) if assay_asset.direction && assay_asset.direction != 0
-      end
+      label_data << direction_name(assay_asset.direction) if assay_asset&.direction && assay_asset.direction != 0
     end
     label_data.join(', ')
   end
@@ -211,7 +208,8 @@ module ISAHelper
 
     if node.can_view?
       entry[:text] = object.title
-      entry[:icon] = asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
+      entry[:icon] =
+        asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
       entry[:li_attr][:title] = object.class.name
     else
       entry[:text] = 'Hidden item'
@@ -220,22 +218,18 @@ module ISAHelper
 
     entry[:children] += child_edges.map { |c| tree_node(hash, c[1], root_item) }
 
-    if node.child_count > 0
-      if node.child_count > child_edges.count
-        entry[:children] << {
-          id: unique_child_count_id(object),
-          parent: entry[:id],
-          text: "Show #{node.child_count - child_edges.count} more",
-          a_attr: { class: 'child-count-leaf' },
-          li_attr: { 'data-node-id' => child_count_id(object) },
-          data: { child_count: true }
-        }
-      end
-
-      entry[:state] = { opened: false }
-    else
-      entry[:state] = { opened: false }
+    if node.child_count.positive? && (node.child_count > child_edges.count)
+      entry[:children] << {
+        id: unique_child_count_id(object),
+        parent: entry[:id],
+        text: "Show #{node.child_count - child_edges.count} more",
+        a_attr: { class: 'child-count-leaf' },
+        li_attr: { 'data-node-id' => child_count_id(object) },
+        data: { child_count: true }
+      }
     end
+
+    entry[:state] = { opened: false }
 
     entry
   end
@@ -245,16 +239,26 @@ module ISAHelper
     edges = elements.select { |e| e[:group] == 'edges' }
 
     hidden_nodes = nodes.select { |n| n[:data]['type'] == 'Hidden' } # Get hidden nodes
-    hidden_nodes.select! { |n| edges.none? { |e| e[:data][:source] == n[:data][:id] } } # Filter out ones that have children
-    hidden_nodes.select! { |n| edges.count { |e| e[:data][:target] == n[:data][:id] } == 1 } # Filter out ones that have multiple parents
-
+    # Filter out ones that have children
+    hidden_nodes.select! do |n|
+      edges.none? do |e|
+        e[:data][:source] == n[:data][:id]
+      end
+    end
+    # Filter out ones that have multiple parents
+    hidden_nodes.select! do |n|
+      edges.count do |e|
+        e[:data][:target] == n[:data][:id]
+      end == 1
+    end
     # Group the nodes by their parent
     groups = hidden_nodes.group_by do |n|
       edges.detect { |e| e[:data][:target] == n[:data][:id] }[:data][:source]
     end
 
-    groups.each do |_group, node_list|
+    groups.each_value do |node_list|
       next unless node_list.length > 1
+
       aggregate = node_list.pop
       aggregate[:data]['name'] = "#{node_list.length + 1} hidden items"
       node_ids = node_list.map { |n| n[:data][:id] }

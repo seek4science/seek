@@ -1955,24 +1955,4 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
-  test 'investigation code grants access to child study' do
-    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
-    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
-
-    inv_code = nil
-    disable_authorization_checks do
-      inv_code = SpecialAuthCode.create!(
-        asset: investigation,
-        code: SecureRandom.base64(30),
-        expiration_date: Date.today + 7.days
-      )
-    end
-
-    logout
-
-    # Access study with investigation code - should succeed
-    get :show, params: { id: study.id, code: inv_code.code }, session: { controller: 'studies' }
-    # This is an investigation controller test, but we're verifying the authorization logic works
-    # The actual study access would be tested in studies_controller_test.rb
-  end
 end
