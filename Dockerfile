@@ -25,11 +25,10 @@ WORKDIR $APP_DIR
 COPY .python-version .python-version
 
 # Install base dependencies
-RUN PYTHON_VERSION=$(cat .python-version) && \
-    apt-get update -qq && \
+RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     curl default-mysql-client gettext git graphviz libjemalloc2 libreoffice libvips links locales \
-    nodejs openjdk-21-jre poppler-utils postgresql-client python${PYTHON_VERSION} shared-mime-info sqlite3 telnet vim-tiny zip
+    nodejs openjdk-21-jre poppler-utils postgresql-client shared-mime-info sqlite3 telnet vim-tiny zip
 
 # Disable ssl from the mysql client
 RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
@@ -37,17 +36,21 @@ RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
 FROM base AS builder
 
 # Install build dependencies
-RUN PYTHON_VERSION=$(cat .python-version) && \
-    apt-get update -qq && \
+RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential cmake \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
-    libsqlite3-dev libssl-dev libxml++2.6-dev libxslt1-dev libyaml-dev \
-    python${PYTHON_VERSION}-dev python3-pip python${PYTHON_VERSION}-venv && \
+    libsqlite3-dev libssl-dev libxml++2.6-dev libxslt1-dev libyaml-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
     locale-gen en_US.UTF-8
 
-# create and use a dedicated python virtualenv
-RUN PYTHON_VERSION=$(cat .python-version) && python${PYTHON_VERSION} -m venv /opt/venv
+# Install uv for Python management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+ENV UV_PYTHON_INSTALL_DIR=/opt/uv-python
+
+# Install Python and create a dedicated virtualenv
+RUN uv python install $(cat .python-version) && \
+    uv venv /opt/venv --python $(cat .python-version)
+ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy over App code from local filesystem
@@ -89,9 +92,7 @@ RUN chown -R www-data:www-data /var/www config docker db/schema.rb public solr s
 RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh
 
 # Python dependencies from requirements.txt
-RUN PYTHON_VERSION=$(cat .python-version) && \
-    python${PYTHON_VERSION} -m ensurepip --upgrade --default-pip && \
-    python${PYTHON_VERSION} -m pip install -r requirements.txt
+RUN uv pip install -r requirements.txt
 
 USER www-data
 
@@ -116,6 +117,7 @@ RUN apt-get update -qq && \
 # Bring over build time dependencies
 COPY --from=builder "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=builder $APP_DIR $APP_DIR
+COPY --from=builder /opt/uv-python /opt/uv-python
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /usr/local/bin/supercronic /usr/local/bin/supercronic
 

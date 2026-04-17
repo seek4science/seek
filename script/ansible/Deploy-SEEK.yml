@@ -176,40 +176,48 @@
         python_version: "{{ python_version_file.content | b64decode | trim }}"
       tags: python
 
-    - name: Add repository to install python
-      become: true
-      become_user: root
-      ansible.builtin.apt_repository:
-        repo: ppa:deadsnakes/ppa
-      tags: python
-
-    - name: Reset connection 2  #To allow user changes to affect 'current login user'
-      meta: reset_connection
-      tags: python
-
-    - name: Install python tools
+    - name: Install python3-pymysql
       become: true
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - python{{ python_version }}-dev
-        - python3-pip
-        - python{{ python_version }}-venv
         - python3-pymysql
       tags:
         - python
         - packages
 
+    - name: Install uv
+      become: true
+      become_user: root
+      ansible.builtin.shell:
+        cmd: curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
+        executable: /bin/bash
+        creates: /usr/local/bin/uv
+      tags: python
+
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
-        - python{{ python_version }} -m ensurepip --upgrade --default-pip
-        - python{{ python_version }} -m pip install -r requirements.txt
+        - uv python install {{ python_version }}
+        - uv venv /opt/venv --python {{ python_version }}
+        - uv pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
+      environment:
+        UV_PYTHON_INSTALL_DIR: /opt/uv-python
+        VIRTUAL_ENV: /opt/venv
       tags:
         - seek
         - python
+
+    - name: Add Python venv to PATH
+      become: true
+      become_user: root
+      ansible.builtin.copy:
+        content: 'export PATH="/opt/venv/bin:$PATH"'
+        dest: /etc/profile.d/seek-python.sh
+        mode: '0644'
+      tags: python
 
 
     ########## Configure database
