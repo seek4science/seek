@@ -57,7 +57,7 @@ module Seek
         end
 
         def state_allows_delete?(*args)
-          allows_delete_after_retract = AssetDoiLog.where(asset_type: self.class.name, asset_id: id, action: AssetDoiLog::RETRACT).exists?
+          allows_delete_after_retract = AssetDoiLog.where(asset_type: self.class.name, asset_id: id, action: AssetDoiLog::DELETE).exists?
           (allows_delete_after_retract || !has_doi?) && super(*args)
         end
 

@@ -7,7 +7,6 @@ class AssetDoiLog < ApplicationRecord
   MINT = 1
   DELETE = 2
   UNPUBLISH = 3
-  RETRACT = 4
 
   def self.was_doi_minted_for?(asset_type, asset_id, asset_version)
     !AssetDoiLog.where(asset_type: asset_type, asset_id: asset_id, asset_version: asset_version, action: AssetDoiLog::MINT).empty?
@@ -23,9 +22,5 @@ class AssetDoiLog < ApplicationRecord
 
   def self.unpublished
     where(action: UNPUBLISH)
-  end
-
-  def self.retracted
-    where(action: RETRACT)
   end
 end

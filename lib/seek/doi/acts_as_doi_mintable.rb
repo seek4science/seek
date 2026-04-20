@@ -176,7 +176,7 @@ module Seek
 
         def retract_log(retraction_reason = nil)
           AssetDoiLog.create(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix,
-                             doi: suggested_doi, action: AssetDoiLog::RETRACT, user_id: User.current_user.try(:id), comment: retraction_reason)
+                             doi: suggested_doi, action: AssetDoiLog::DELETE, user_id: User.current_user.try(:id), comment: retraction_reason)
         end
       end
     end
