@@ -1845,7 +1845,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'landing page for deleted private_item which DOI was minted' do
-    comment = 'the paper was restracted'
+    comment = 'the paper was retracted'
     klass = 'DataFile'
     id = 123
     version = 1
@@ -1853,8 +1853,8 @@ class DataFilesControllerTest < ActionController::TestCase
     AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::DELETE, comment: comment)
     assert AssetDoiLog.was_doi_minted_for?(klass, id, version)
     get :show, params: { id: id, version: version }
-    assert_response :not_found
-    assert_select 'p[class=comment]', text: /#{comment}/
+    assert_response :gone
+    assert_select 'p.comment', text: /#{comment}/
   end
 
   test 'should create cache job for small file' do
