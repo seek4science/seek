@@ -32,8 +32,6 @@ class SamplesSeederTest < ActiveSupport::TestCase
 
 
   test 'seeds sample types and samples' do
-
-    
     seeder = Seek::ExampleData::SamplesSeeder.new(
       @base_data[:project],
       @user_data[:guest_person],
@@ -59,7 +57,7 @@ class SamplesSeederTest < ActiveSupport::TestCase
     culture_sample_type = result[:culture_sample_type].reload
     assert_equal 'Bacterial Culture', culture_sample_type.title
     assert_includes culture_sample_type.projects, @base_data[:project]
-    assert_equal ['bacterial culture', 'thermophile', 'microbiology'], culture_sample_type.tags
+    assert_equal ['bacterial culture', 'thermophile', 'microbiology'].sort, culture_sample_type.tags.sort
     
     enzyme_sample_type = result[:enzyme_sample_type].reload
     assert_equal 'Enzyme Preparation', enzyme_sample_type.title
