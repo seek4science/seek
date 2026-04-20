@@ -1029,7 +1029,7 @@ GEM
     yaml_db (0.7.0)
       rails (>= 3.0)
       rake (>= 0.8.7)
-    yard (0.9.37)
+    yard (0.9.42)
     zeitwerk (2.7.2)
     zip-container (4.0.2)
       rubyzip (~> 2.0.0)
