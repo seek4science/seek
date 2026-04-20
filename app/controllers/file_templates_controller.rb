@@ -17,7 +17,6 @@ class FileTemplatesController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   include Seek::Doi::Minting
-  include Seek::Doi::Retracting
 
   include Seek::ISAGraphExtensions
 

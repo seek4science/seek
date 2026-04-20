@@ -17,7 +17,6 @@ class ModelsController < ApplicationController
 
   include Bives
   include Seek::Doi::Minting
-  include Seek::Doi::Retracting
 
   include Seek::ISAGraphExtensions
 
