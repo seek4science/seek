@@ -1,4 +1,5 @@
 require 'libxml'
+require 'libxml'
 require 'seek/doi/base_exception'
 
 class Publication < ApplicationRecord
@@ -217,11 +218,12 @@ class Publication < ApplicationRecord
     self.pubmed_id = reference.pubmed
     self.published_date = reference.published_date
     self.citation = reference.citation
-    #currently the metadata fetched by pubmed id doesn't contain the following items.
-    # TODO
     self.publisher = nil
     self.booktitle = nil
     self.editor = nil
+    detected = PublicationType.from_pubmed_types(@pubmed_publication_types)
+    self.publication_type = detected if detected
+    @pubmed_publication_types = nil
   end
 
   # @param doi_record DOI::Record
@@ -422,7 +424,9 @@ class Publication < ApplicationRecord
     @error = nil
     if !pubmed_id.blank?
       begin
-        result = Bio::MEDLINE.new(pubmed_entry(pubmed_id)).reference
+        medline = Bio::MEDLINE.new(pubmed_entry(pubmed_id))
+        @pubmed_publication_types = medline.publication_type
+        result = medline.reference
         @error = result.error
       rescue => exception
         result ||= Bio::Reference.new({})
