@@ -86,7 +86,7 @@ module Seek
             end
           end
 
-          # used to define the mapping between the method to be call, and the property
+          # used to define the mapping between the method to be called, and the property
           # for e.g
           #   schema_mappings doi: :identifier
           # calls the method 'doi' on the decorator, and then the value will be used with the schema.org property

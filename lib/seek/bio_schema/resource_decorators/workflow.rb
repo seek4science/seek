@@ -10,10 +10,16 @@ module Seek
         schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
                         outputs: :output,
-                        sd_publisher: :sdPublisher
+                        sd_publisher: :sdPublisher,
+                        maturity: :creativeWorkStatus
+
 
         def contributors
           [contributor]
+        end
+
+        def maturity
+          I18n.t("maturity_level.#{resource.maturity_level}")
         end
 
         def conformance

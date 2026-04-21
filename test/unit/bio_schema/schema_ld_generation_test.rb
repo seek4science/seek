@@ -465,6 +465,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
                          contributor: @person,
+                         maturity_level: :released,
                          license: 'APSL-2.0', doi: '10.10.10.10/test.1')
 
       workflow.assets_creators.create!(creator: @person, pos: 1)
@@ -493,6 +494,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/workflows/#{workflow.id}",
       'keywords' => 'wibble',
       'license' => Seek::License.find('APSL-2.0')&.url,
+      'creativeWorkStatus' => 'Stable',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'creator' => [
         { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
