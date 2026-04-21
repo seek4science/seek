@@ -2,10 +2,9 @@
 module Seek
   module ExampleData
     class PublicationsSeeder
-      def initialize(project, guest_person, guest_user, exp_assay, model_assay, seed_data_dir)
+      def initialize(project, guest_person, exp_assay, model_assay, seed_data_dir)
         @project = project
         @guest_person = guest_person
-        @guest_user = guest_user
         @exp_assay = exp_assay
         @model_assay = model_assay
         @seed_data_dir = seed_data_dir
@@ -36,12 +35,12 @@ module Seek
       private
       
       def create_publication
+        pub_type = PublicationType.where(key: "journalarticle").first || PublicationType.create(key: "journalarticle", title: "Journal Article")
         publication = Publication.new(
-          publication_type_id: PublicationType.where(title: "Journal").first.id,
+          publication_type_id: pub_type.id,
           pubmed_id: '23865479',
           title: 'Intermediate instability at high temperature leads to low pathway efficiency for an in vitro reconstituted system of gluconeogenesis in Sulfolobus solfataricus',
           abstract: "Four enzymes of the gluconeogenic pathway in Sulfolobus solfataricus were purified and kinetically characterized. The enzymes were reconstituted in vitro to quantify the contribution of temperature instability of the pathway intermediates to carbon loss from the system. The reconstituted system, consisting of phosphoglycerate kinase, glyceraldehyde 3-phosphate dehydrogenase, triose phosphate isomerase and the fructose 1,6-bisphosphate aldolase/phosphatase, maintained a constant consumption rate of 3-phosphoglycerate and production of fructose 6-phosphate over a 1-h period. Cofactors ATP and NADPH were regenerated via pyruvate kinase and glucose dehydrogenase. A mathematical model was constructed on the basis of the kinetics of the purified enzymes and the measured half-life times of the pathway intermediates. The model quantitatively predicted the system fluxes and metabolite concentrations. Relative enzyme concentrations were chosen such that half the carbon in the system was lost due to degradation of the thermolabile intermediates dihydroxyacetone phosphate, glyceraldehyde 3-phosphate and 1,3-bisphosphoglycerate, indicating that intermediate instability at high temperature can significantly affect pathway efficiency.",
-          published_date: '2015',
           journal: 'FEBS J'
         )
         
@@ -49,6 +48,7 @@ module Seek
         publication.projects << @project
         publication.build_policy(name: 'default policy', access_type: 1)
         publication.published_date = Date.today.to_s
+        publication.registered_mode = Publication::REGISTRATION_BY_PUBMED
         
         # Build publication authors
         authors = [
@@ -67,6 +67,7 @@ module Seek
         end
         
         disable_authorization_checks do
+          publication.annotate_with(['metabolism', 'thermophile'], 'tag', @guest_person)
           publication.save!
           publication.associate(@exp_assay)
           publication.associate(@model_assay)
@@ -89,15 +90,16 @@ module Seek
           original_filename: 'presentation.pptx',
           content_type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
         )
-        
-        AssetsCreator.create(asset_id: presentation.id, creator_id: @guest_person.id, asset_type: presentation.class.name)
-        
+
         source_path = File.join(@seed_data_dir, presentation.content_blob.original_filename)
         FileUtils.cp(source_path, presentation.content_blob.filepath)
         
         presentation.version = 1
-        presentation.save!
-        
+        disable_authorization_checks do
+          presentation.save!
+          AssetsCreator.create(asset_id: presentation.id, creator_id: @guest_person.id, asset_type: presentation.class.name)
+        end
+
         presentation
       end
       
@@ -114,6 +116,7 @@ module Seek
         event.city = 'London'
         event.country = 'United Kingdom'
         event.address = 'Dunmore Terrace 123'
+        event.url = 'http://www.seek4science.org'
         event.save!
         
         event

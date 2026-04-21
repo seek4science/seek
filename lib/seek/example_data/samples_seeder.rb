@@ -122,8 +122,10 @@ module Seek
           description: 'Whether the culture has reached stationary phase'
         )
         
-        disable_authorization_checks { sample_type.save! }
-        sample_type.annotate_with(['bacterial culture', 'thermophile', 'microbiology'], 'tag', @guest_person)
+        disable_authorization_checks do
+          sample_type.annotate_with(['bacterial culture', 'thermophile', 'microbiology'], 'sample_type_tag', @guest_person)
+          sample_type.save!
+        end
         puts 'Seeded bacterial culture sample type.'
         
         sample_type
@@ -184,8 +186,11 @@ module Seek
           description: 'Number of purification steps performed'
         )
         
-        disable_authorization_checks { sample_type.save! }
-        sample_type.annotate_with(['enzyme', 'protein', 'purification'], 'tag', @guest_person)
+        disable_authorization_checks do
+          sample_type.annotate_with(['enzyme', 'protein', 'purification'], 'sample_type_tag', @guest_person)
+          sample_type.save!
+        end
+
         puts 'Seeded enzyme preparation sample type.'
         
         sample_type

@@ -2,10 +2,10 @@
 module Seek
   module ExampleData
     class DataFilesAndModelsSeeder
-      def initialize(project, guest_person, guest_user, exp_assay, model_assay, seed_data_dir)
+      def initialize(project, guest_person, admin_person, exp_assay, model_assay, seed_data_dir)
         @project = project
         @guest_person = guest_person
-        @guest_user = guest_user
+        @admin_person = admin_person
         @exp_assay = exp_assay
         @model_assay = model_assay
         @seed_data_dir = seed_data_dir
@@ -18,6 +18,9 @@ module Seek
         data_file1 = create_data_file(
           'Metabolite concentrations during reconstituted enzyme incubation',
           'The purified enzymes, PGK, GAPDH, TPI and FBPAase were incubated at 70 C en conversion of 3PG to F6P was followed.',
+          nil,
+          @guest_person,
+          nil,
           'ValidationReference.xlsx',
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
@@ -33,14 +36,20 @@ module Seek
         data_file2 = create_data_file(
           'Model simulation and Exp data for reconstituted system',
           'Experimental data for the reconstituted system are plotted together with the model prediction.',
+          'CC-BY-SA-4.0',
+          @admin_person,
+          'Person A, Person B',
           'combinedPlot.jpg',
           'image/jpeg'
         )
-        
+
         disable_authorization_checks do
+          data_file2.annotate_with(['metabolism', 'modelling', 'gluconeogenesis'], 'tag', @guest_person)
+          data_file2.save!
           @exp_assay.associate(data_file2)
           @model_assay.associate(data_file2, relationship: relationship)
         end
+
         puts 'Seeded data file 2.'
         
         # Model
@@ -61,8 +70,8 @@ module Seek
       
       private
       
-      def create_data_file(title, description, filename, content_type)
-        data_file = DataFile.new(title: title, description: description)
+      def create_data_file(title, description, license, creator, other_creators, filename, content_type)
+        data_file = DataFile.new(title: title, description: description, license: license)
         data_file.contributor = @guest_person
         data_file.projects = [@project]
         data_file.policy = Policy.create(name: 'default policy', access_type: 1)
@@ -70,14 +79,15 @@ module Seek
           original_filename: filename,
           content_type: content_type
         )
-        
-        disable_authorization_checks { data_file.save }
-        AssetsCreator.create(asset_id: data_file.id, creator_id: @guest_user.id, asset_type: data_file.class.name)
+
+        data_file.other_creators = other_creators
+        disable_authorization_checks { data_file.save! }
+        AssetsCreator.create(asset_id: data_file.id, creator_id: creator.id, asset_type: data_file.class.name)
         
         # Copy file
         source_path = File.join(@seed_data_dir, filename)
         FileUtils.cp(source_path, data_file.content_blob.filepath)
-        disable_authorization_checks { data_file.content_blob.save }
+        disable_authorization_checks { data_file.content_blob.save! }
         
         data_file
       end
@@ -113,14 +123,14 @@ module Seek
         end
         
         model.content_blobs = content_blobs
-        disable_authorization_checks { model.save }
+        disable_authorization_checks { model.save! }
         AssetsCreator.create(asset_id: model.id, creator_id: @guest_person.id, asset_type: model.class.name)
         
         # Copy files
         model.content_blobs.each do |blob|
           source_path = File.join(@seed_data_dir, blob.original_filename)
           FileUtils.cp(source_path, blob.filepath)
-          blob.save
+          blob.save!
         end
         
         model
@@ -129,7 +139,8 @@ module Seek
       def create_sop
         sop = Sop.new(
           title: 'Reconstituted Enzyme System Protocol',
-          description: 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.'
+          description: 'Standard operating procedure for reconstituting the gluconeogenic enzyme system from Sulfolobus solfataricus to study metabolic pathway efficiency at high temperatures.',
+          license: 'CC-BY-SA-4.0'
         )
         sop.contributor = @guest_person
         sop.projects = [@project]
@@ -145,8 +156,12 @@ module Seek
         source_path = File.join(@seed_data_dir, sop.content_blob.original_filename)
         FileUtils.cp(source_path, sop.content_blob.filepath)
         
-        disable_authorization_checks { sop.save! }
-        sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', @guest_person)
+        disable_authorization_checks do
+          sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', @guest_person)
+          sop.save!
+          AssetsCreator.create(asset: sop, creator: @guest_person, asset_type: sop.class.name)
+        end
+
         
         sop
       end

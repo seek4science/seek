@@ -6,7 +6,8 @@ module Seek
         puts "Seeding projects and basic setup..."
         
         # Programme
-        program = Programme.where(title: 'Default Programme').first_or_create(
+        program = Programme.find_or_initialize_by(title: 'Default Programme')
+        program.update(
           web_page: 'http://www.seek4science.org',
           funding_details: 'Funding H2020X01Y001',
           description: 'This is a test programme for the SEEK sandbox.'
@@ -14,15 +15,21 @@ module Seek
         disable_authorization_checks{ program.save! }
         
         # Project
-        project = Project.where(title: 'Default Project').first_or_create(
+        project = Project.find_or_initialize_by(title: 'Default Project')
+        project.update(
           programme_id: program.id,
-          description: 'A description for the default project'
+          description: 'A description for the default project',
+          web_page: 'https://www.seek4science.org',
+          wiki_page: 'https://www.wiki.org'
         )
         disable_authorization_checks{ project.save! }
         
         # Institution
-        institution = Institution.where(title: 'Default Institution').first_or_create(
-          country: 'United Kingdom'
+        institution = Institution.find_or_initialize_by(title: 'Default Institution')
+        institution.update(
+          country: 'United Kingdom',
+          city: 'Manchester',
+          address: '10 Downing Street'
         )
 
         disable_authorization_checks{ institution.save! }
@@ -49,6 +56,7 @@ module Seek
         # Organism
         organism = Organism.where(title: 'Sulfolobus solfataricus').first_or_create
         organism.projects = [project]
+        organism.concept_uri = '2287'
         organism.strains = [strain]
         disable_authorization_checks do
           organism.save!

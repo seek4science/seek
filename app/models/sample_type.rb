@@ -18,8 +18,6 @@ class SampleType < ApplicationRecord
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
 
-  include Seek::Annotatable
-
   include Seek::Permissions::SpecialContributors
 
   acts_as_uniquely_identifiable
@@ -28,6 +26,7 @@ class SampleType < ApplicationRecord
   has_external_identifier # to be replaced with acts_as_asset when sharing permissions are adding in upcoming pull request
 
   acts_as_asset
+  has_annotation_type :sample_type_tag, method_name: :tags
 
   has_many :samples, inverse_of: :sample_type
 
@@ -61,8 +60,6 @@ class SampleType < ApplicationRecord
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
   grouped_pagination
-
-  has_annotation_type :sample_type_tag, method_name: :tags
 
   has_task :sample_metadata_update
   def investigations
