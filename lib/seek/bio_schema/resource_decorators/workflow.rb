@@ -19,6 +19,8 @@ module Seek
         end
 
         def maturity
+          return nil unless resource.maturity_level.present?
+
           I18n.t("maturity_level.#{resource.maturity_level}")
         end
 
