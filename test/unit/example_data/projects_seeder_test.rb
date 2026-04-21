@@ -3,18 +3,15 @@ require 'test_helper'
 class ProjectsSeederTest < ActiveSupport::TestCase
   def setup
     User.current_user = nil
+    disable_std_output
   end
 
   def teardown
     User.current_user = nil
+    enable_std_output
   end
 
   test 'seeds projects and basic setup' do
-    initial_program_count = Programme.count
-    initial_project_count = Project.count
-    initial_institution_count = Institution.count
-    initial_strain_count = Strain.count
-    initial_organism_count = Organism.count
     
     seeder = Seek::ExampleData::ProjectsSeeder.new
     result = seeder.seed
@@ -36,30 +33,74 @@ class ProjectsSeederTest < ActiveSupport::TestCase
     assert_not_nil result[:organism]
     
     # Verify program attributes
-    program = result[:program]
+    program = result[:program].reload
     assert_equal 'Default Programme', program.title
     assert_equal 'http://www.seek4science.org', program.web_page
+    assert_equal 'This is a test programme for the SEEK sandbox.', program.description
+    assert_equal 'Funding H2020X01Y001', program.funding_details
     
     # Verify project attributes
-    project = result[:project]
+    project = result[:project].reload
     assert_equal 'Default Project', project.title
-    assert_equal program.id, project.programme_id
+    assert_equal 'A description for the default project', project.description
+    assert_equal 'https://www.seek4science.org', project.web_page
+    assert_equal 'https://www.wiki.org', project.wiki_page
+    assert_equal program, project.programme
     
     # Verify institution attributes
-    institution = result[:institution]
+    institution = result[:institution].reload
     assert_equal 'Default Institution', institution.title
     assert_equal 'GB', institution.country
+    assert_equal 'Manchester', institution.city
+    assert_equal '10 Downing Street', institution.address
     
     # Verify strain attributes
-    strain = result[:strain]
+    strain = result[:strain].reload
     assert_equal 'Sulfolobus solfataricus strain 98/2', strain.title
     assert_includes strain.projects, project
     
     # Verify organism attributes
-    organism = result[:organism]
+    organism = result[:organism].reload
     assert_equal 'Sulfolobus solfataricus', organism.title
     assert_includes organism.projects, project
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2287', organism.concept_uri
     assert_includes organism.strains, strain
+  end
+
+  test 'seed with existing default project, programme and institution' do
+    project = FactoryBot.create(:project, title: 'Default Project')
+    programme = FactoryBot.create(:programme, title: 'Default Programme')
+    institution = FactoryBot.create(:institution, title: 'Default Institution')
+    seeder = Seek::ExampleData::ProjectsSeeder.new
+    result = nil
+    assert_no_difference('Project.count') do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Institution.count') do
+          result = seeder.seed
+        end
+      end
+    end
+    # Verify program attributes
+    program = result[:program].reload
+    assert_equal 'Default Programme', program.title
+    assert_equal 'http://www.seek4science.org', program.web_page
+    assert_equal 'This is a test programme for the SEEK sandbox.', program.description
+    assert_equal 'Funding H2020X01Y001', program.funding_details
+
+    # Verify project attributes
+    project = result[:project].reload
+    assert_equal 'Default Project', project.title
+    assert_equal 'A description for the default project', project.description
+    assert_equal 'https://www.seek4science.org', project.web_page
+    assert_equal 'https://www.wiki.org', project.wiki_page
+    assert_equal program, project.programme
+
+    # Verify institution attributes
+    institution = result[:institution].reload
+    assert_equal 'Default Institution', institution.title
+    assert_equal 'GB', institution.country
+    assert_equal 'Manchester', institution.city
+    assert_equal '10 Downing Street', institution.address
   end
 
   test 'is idempotent - can run multiple times' do

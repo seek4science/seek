@@ -256,6 +256,15 @@ class ActiveSupport::TestCase
   def open_fixture_file(path)
     File.open(File.join(Rails.root, 'test', 'fixtures', 'files', *path.split('/')))
   end
+
+  def disable_std_output
+    @original_std_out = $stdout
+    $stdout = File.open(File::NULL, 'w')
+  end
+
+  def enable_std_output
+    $stdout = @original_std_out
+  end
 end
 
 # Load seed data
