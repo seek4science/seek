@@ -73,15 +73,20 @@ module Seek
           private
 
           # to be used to easily define a method that relates to a property and handles a collection.
-          # To be used within the Decorator class to define the method name, and the collection to be used.
+          # To be used within the Decorator class to define the method name (or methods if expressed as an array), and the collection to be used.
           # This results in an array of Hash objects containing the minimal definition JSON. For example
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
+          #   returns nil if no methods match, otherwise returns an array even if empty
           def associated_items(**pairs)
-            pairs.each do |method, collection|
+            pairs.each do |method, collections|
               define_method(method) do
-                mini_definitions(send(collection)) if respond_to?(collection)
+                valid_methods = Array(collections).select{ |c| respond_to?(c) }
+                return nil if valid_methods.empty?
+                valid_methods.map do |collection|
+                  mini_definitions(send(collection))
+                end.flatten.compact
               end
             end
           end
