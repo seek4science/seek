@@ -50,21 +50,6 @@ function transferProjectIds() {
 }
 
 
-var CROSSREF_TYPE_TO_PUB_KEY = {
-    'journal-article':     'journalarticle',
-    'book-chapter':        'bookchapter',
-    'book':                'book',
-    'edited-book':         'book',
-    'monograph':           'book',
-    'proceedings-article': 'conferencepaper',
-    'proceedings':         'conferenceproceeding',
-    'posted-content':      'preprint',
-    'report':              'report',
-    'dataset':             'dataset',
-    'software':            'software',
-    'standard':            'standard'
-};
-
 function setPubTypeInCreateTab(key) {
     if (key && typeof SEEK_PUB_TYPE_KEY_TO_ID !== 'undefined' && SEEK_PUB_TYPE_KEY_TO_ID[key]) {
         $j('#Create #publication_publication_type_id').val(SEEK_PUB_TYPE_KEY_TO_ID[key]);
