@@ -191,7 +191,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(df.latest_version, expected)
   end
 
@@ -241,7 +241,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(df.latest_version, expected)
   end
 
@@ -290,7 +290,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(df.latest_version, expected)
   end
 
@@ -422,7 +422,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(document.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(document.latest_version, expected)
   end
 
@@ -454,19 +454,23 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(presentation.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(presentation.latest_version, expected)
   end
 
   test 'workflow' do
     creator2 = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
+    document = FactoryBot.create(:document, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
     workflow = travel_to(@current_time) do
       workflow = FactoryBot.create(:cwl_packed_workflow,
-                         title: 'This workflow',
-                         description: 'This is a test workflow for bioschema generation',
-                         contributor: @person,
-                         maturity_level: :released,
-                         license: 'APSL-2.0', doi: '10.10.10.10/test.1')
+                                   title: 'This workflow',
+                                   description: 'This is a test workflow for bioschema generation',
+                                   contributor: @person,
+                                   maturity_level: :released,
+                                   documents: [document],
+                                   sops: [sop],
+                                   license: 'APSL-2.0', doi: '10.10.10.10/test.1')
 
       workflow.assets_creators.create!(creator: @person, pos: 1)
       workflow.assets_creators.create!(creator: creator2, pos: 2)
@@ -481,6 +485,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       disable_authorization_checks { workflow.save! }
       workflow
     end
+
+    assert_equal [sop], workflow.sops
+    assert_equal [document], workflow.documents
 
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
@@ -506,6 +513,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title }
+      ],
+      'documentation' => [
+        { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{document.id}", 'name' => document.title },
+        { '@type' => 'LabProtocol', '@id' => "http://localhost:3000/sops/#{sop.id}", 'name' => sop.title }
       ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
@@ -835,9 +846,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.find_version(1).to_schema_ld)
-    assert_equal v1_expected, json
+    fine_json_comparison v1_expected, json
     json = JSON.parse(df.find_version(2).to_schema_ld)
-    assert_equal v2_expected, json
+    fine_json_comparison v2_expected, json
   end
 
   test 'dataset without data dump' do
@@ -939,7 +950,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(sop.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
+    check_version(sop.latest_version, expected)
   end
 
   private

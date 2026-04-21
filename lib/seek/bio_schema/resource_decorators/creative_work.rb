@@ -5,7 +5,8 @@ module Seek
       class CreativeWork < Thing
         associated_items producer: :projects,
                          part_of: :collections,
-                         subject_of: :events
+                         subject_of: :events,
+                         docs_and_sops: %i[documents sops]
 
         schema_mappings version: :version,
                         license: :license,
@@ -17,7 +18,9 @@ module Seek
                         subject_of: :subjectOf,
                         part_of: :isPartOf,
                         doi: :identifier,
-                        previous_version_url: :isBasedOn
+                        previous_version_url: :isBasedOn,
+                        docs_and_sops: :documentation
+
 
         def doi
           "https://doi.org/#{resource.doi}" if resource.try(:doi).present?
@@ -44,7 +47,6 @@ module Seek
 
           all
         end
-
 
         def previous_version_url
           return unless respond_to?(:previous_version) && resource.previous_version
