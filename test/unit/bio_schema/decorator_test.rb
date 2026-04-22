@@ -22,7 +22,6 @@ class DecoratorTest < ActiveSupport::TestCase
     document = FactoryBot.create(:document, events: [event], license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)], doi: '10.10.10.10/test.1')
     document.add_annotations('yellow, lorry', 'tag', User.first)
     disable_authorization_checks { document.save! }
-    published_date = Time.now + 1.day
     doi_log = travel_to(Time.now + 1.day) do
       AssetDoiLog.create!(asset: document, doi: '10.10.10.10/test.1', asset_version: document.version,
                           action: AssetDoiLog::MINT, user: document.contributor.user)

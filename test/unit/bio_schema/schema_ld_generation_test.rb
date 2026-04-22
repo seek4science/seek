@@ -133,7 +133,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'ResearchOrganization', '@id' => "http://localhost:3000/institutions/#{institution.id}",
           'name' => institution.title }
       ],
-      'orcid' => 'https://orcid.org/0000-0001-9842-9718'
+      'identifier' => 'https://orcid.org/0000-0001-9842-9718'
     }
 
     json = JSON.parse(@person.to_schema_ld)
