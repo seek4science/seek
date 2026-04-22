@@ -470,7 +470,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                                    maturity_level: :released,
                                    documents: [document],
                                    sops: [sop],
-                                   license: 'APSL-2.0', doi: '10.10.10.10/test.1')
+                                   license: 'APSL-2.0',
+                                   doi: '10.10.10.10/test.1')
 
       workflow.assets_creators.create!(creator: @person, pos: 1)
       workflow.assets_creators.create!(creator: creator2, pos: 2)
@@ -485,6 +486,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       disable_authorization_checks { workflow.save! }
       workflow
     end
+    travel_to(@current_time + 1.day) do
+      AssetDoiLog.create!(asset: workflow, doi: '10.10.10.10/test.1', asset_version: workflow.version,
+                          action: AssetDoiLog::MINT, user: @person.user)
+    end
+    workflow.latest_version.update_column(:doi, '10.10.10.10/test.1')
 
     assert_equal [sop], workflow.sops
     assert_equal [document], workflow.documents
@@ -520,6 +526,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
+      'datePublished' => (@current_time + 1.day).iso8601,
       'encodingFormat' => 'application/x-yaml',
       'sdPublisher' => {
         '@type' => 'Organization',

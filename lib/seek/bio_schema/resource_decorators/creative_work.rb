@@ -19,11 +19,22 @@ module Seek
                         part_of: :isPartOf,
                         doi: :identifier,
                         previous_version_url: :isBasedOn,
-                        docs_and_sops: :documentation
+                        docs_and_sops: :documentation,
+                        date_published: :datePublished
 
 
         def doi
           "https://doi.org/#{resource.doi}" if resource.try(:doi).present?
+        end
+
+        # If a DOI has been minted, use the date of minting as the publication date
+        def date_published
+          parent = resource.is_a_version? ? resource.parent : resource
+
+          return unless parent.supports_doi? && parent.has_doi?
+          return unless AssetDoiLog.was_doi_minted_for?(parent.class.name, parent.id, resource.version)
+
+          AssetDoiLog.minted.where(asset: parent, asset_version: resource.version).order(:created_at).last&.created_at&.iso8601
         end
 
         def content_type
