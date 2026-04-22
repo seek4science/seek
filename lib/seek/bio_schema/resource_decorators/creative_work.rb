@@ -5,8 +5,7 @@ module Seek
       class CreativeWork < Thing
         associated_items producer: :projects,
                          part_of: :collections,
-                         subject_of: :events,
-                         docs_and_sops: %i[documents sops]
+                         subject_of: :events
 
         schema_mappings version: :version,
                         license: :license,
@@ -19,7 +18,6 @@ module Seek
                         part_of: :isPartOf,
                         doi: :identifier,
                         previous_version_url: :isBasedOn,
-                        docs_and_sops: :documentation,
                         date_published: :datePublished
 
 
