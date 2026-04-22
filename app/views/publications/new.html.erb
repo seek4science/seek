@@ -278,6 +278,6 @@
     });
 
     // Key → DB id map for publication types (used by client-side DOI/PubMed fill)
-    var SEEK_PUB_TYPE_KEY_TO_ID = <%= PublicationType.all.each_with_object({}) { |t, h| h[t.key] = t.id }.to_json.html_safe %>;
+    var SEEK_PUB_TYPE_KEY_TO_ID = <%= PublicationType.pluck(:key, :id).to_h.to_json.html_safe %>;
     var CROSSREF_TYPE_TO_PUB_KEY = <%= PublicationType::CROSSREF_TYPE_TO_KEY.to_json.html_safe %>;
 </script>

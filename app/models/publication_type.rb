@@ -12,6 +12,7 @@ class PublicationType < ActiveRecord::Base
     'proceedings-article' => 'conferencepaper',
     'proceedings' => 'conferenceproceeding',
     'posted-content' => 'preprint',
+    'peer-review' => 'peerreview',
     'report' => 'report',
     'dataset' => 'dataset',
     'software' => 'software',
