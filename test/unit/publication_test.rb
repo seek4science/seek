@@ -3,8 +3,6 @@ require 'minitest/mock'
 
 class PublicationTest < ActiveSupport::TestCase
   include MockHelper
-  fixtures :publication_types
-
 
   test 'title validation allows long titles' do
     long_title = ('a' * 65536).freeze
