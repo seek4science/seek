@@ -281,9 +281,11 @@ var ISA = {
 
     visitNode: function (node) {
         if (node != ISA.originNode && node.data('url')) {
-            var url = node.data('url') + '?graph_view=' + ISA.view.current;
+            var baseUrl = node.data('url');
+            var separator = baseUrl.indexOf('?') !== -1 ? '&' : '?';
+            var url = baseUrl + separator + 'graph_view=' + ISA.view.current;
             if (ISA.isFullscreen()) {
-                url = url + "&fullscreen";
+                url = url + '&fullscreen';
             }
             window.location = url;
         }
