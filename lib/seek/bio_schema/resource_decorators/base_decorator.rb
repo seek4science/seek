@@ -8,10 +8,12 @@ module Seek
         include ActionView::Helpers::SanitizeHelper
         include Seek::Util.routes
 
-        attr_reader :resource
+        attr_reader :resource, :parent_resource
 
         def initialize(resource)
           @resource = resource
+          # ensures the parent resource, whether the resource is a version or already the current parent
+          @parent_resource = resource.is_a_version? ? resource.parent : resource
         end
 
         def mappings

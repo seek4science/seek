@@ -151,6 +151,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     assert df.can_download?
     refute df.content_blob.show_as_external_link?
+    publication = df.publications.first
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -181,6 +182,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           'name' => df.events.first.title }
       ],
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'distribution' => {
         '@type' => 'DataDownload',
         'contentSize' => '8.62 KB',
@@ -210,6 +214,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     df.reload
     assert_nil df.content_blob
 
+    publication = df.publications.first
+
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
@@ -234,6 +240,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601,
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
@@ -257,6 +266,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     assert df.can_download?
     assert df.content_blob.show_as_external_link?
+    publication = df.publications.first
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -283,6 +293,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
@@ -418,6 +431,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       ],
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
+      'citation' => [],
       'subjectOf' => []
     }
 
@@ -450,6 +464,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ],
       'isPartOf' => [],
+      'citation' => [],
       'subjectOf' => []
     }
 
@@ -462,6 +477,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     creator2 = FactoryBot.create(:person)
     sop = FactoryBot.create(:sop, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
     document = FactoryBot.create(:document, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
+    publication = FactoryBot.create(:publication, contributor: @person, projects: [@project])
     workflow = travel_to(@current_time) do
       workflow = FactoryBot.create(:cwl_packed_workflow,
                                    title: 'This workflow',
@@ -470,6 +486,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                                    maturity_level: :released,
                                    documents: [document],
                                    sops: [sop],
+                                   publications: [publication],
                                    license: 'APSL-2.0',
                                    doi: '10.10.10.10/test.1')
 
@@ -523,6 +540,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'documentation' => [
         { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{document.id}", 'name' => document.title },
         { '@type' => 'LabProtocol', '@id' => "http://localhost:3000/sops/#{sop.id}", 'name' => sop.title }
+      ],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
       ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
@@ -612,6 +632,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     project = collection.projects.first
+    publication = collection.publications.first
     sel_assets = []
     collection.assets.each do |a|
       next if a.blank?
@@ -649,6 +670,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'hasPart' => [
         { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{doc1.id}",
           'name' => doc1.title.to_s },
@@ -774,6 +798,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     assert df.can_download?
     refute df.content_blob.show_as_external_link?
+    publication = df.publications.first
 
     v1_expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -799,6 +824,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'application/pdf',
       'version' => 1,
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       # 'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -837,6 +865,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'image/png',
       'version' => 2,
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'identifier' => 'https://doi.org/10.10.10.10/test.2', # This DOI was added to the version itself
       'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'subjectOf' => [
@@ -936,6 +967,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       sop
     end
 
+    publication = sop.publications.first
+
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'LabProtocol',
@@ -953,6 +986,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'isPartOf' => [{ '@type' => 'Collection', '@id' => "http://localhost:3000/collections/#{collection.id}", 'name' => 'A collection' }],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'computationalTool' => [{ '@type' => %w[SoftwareSourceCode ComputationalWorkflow], '@id' => "http://localhost:3000/workflows/#{sop.workflows.first.id}", 'name' => 'This Workflow' }]
     }
 
