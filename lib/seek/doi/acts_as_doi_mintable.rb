@@ -81,9 +81,10 @@ module Seek
           end
 
           endpoint = datacite_client
+          metadata = endpoint.metadata(doi).to_s
           endpoint.inactivate(doi)
 
-          retract_log(retraction_reason)
+          retract_log(retraction_reason, metadata)
 
           suggested_doi
         end
@@ -174,9 +175,9 @@ module Seek
                              doi: suggested_doi, action: AssetDoiLog::MINT, user_id: User.current_user.try(:id))
         end
 
-        def retract_log(retraction_reason = nil)
+        def retract_log(retraction_reason = nil, metadata = nil)
           AssetDoiLog.create(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix,
-                             doi: suggested_doi, action: AssetDoiLog::DELETE, user_id: User.current_user.try(:id), comment: retraction_reason)
+                             doi: suggested_doi, action: AssetDoiLog::DELETE, user_id: User.current_user.try(:id), comment: retraction_reason, datacite_metadata: metadata)
         end
       end
     end

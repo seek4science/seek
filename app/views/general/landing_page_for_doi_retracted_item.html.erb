@@ -4,6 +4,7 @@
   <h2>The requested <%= asset_type %> does not exist anymore.</h2>
 
   <p>The <%= asset_type %> with identifier <%= doi_link(retract_log[:doi]) %> has been retracted.</p>
+  <p><%= render_doi_citation(retract_log[:doi], selected_citation_style) %></p>
   <% if retract_log[:comment].present? %>
     <p>The authors have left the following reason for retracting this <%= asset_type %>:</p>
     <p class="comment text-center"><%= sanitize(retract_log[:comment]) %></p>

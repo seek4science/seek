@@ -459,6 +459,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       delete_doi_log = AssetDoiLog.where(asset_type: asset.class.name, asset_id: asset.id, asset_version: asset.version, action: AssetDoiLog::DELETE).last
       assert_not_nil delete_doi_log
       assert_equal 'test reason', delete_doi_log.comment
+      assert_not_nil delete_doi_log.datacite_metadata
 
       assert_not asset.class.exists?(asset.id)
       assert_raises(ActiveRecord::RecordNotFound) { asset.reload }
@@ -556,6 +557,8 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
     stub_request(:post, 'https://mds.test.datacite.org/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
     stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['invalid', 'test']).to_return(body: '401 Bad credentials', status: 401)
+    stub_request(:get, 'https://mds.test.datacite.org/metadata/10.5072/my_test').with(basic_auth: ['test', 'test']).to_return(body: File.new("#{Rails.root}/test/fixtures/files/doi_metadata.xml"), status: 200)
+    stub_request(:get, 'https://mds.test.datacite.org/metadata/10.5072/my_test_2').with(basic_auth: ['test', 'test']).to_return(body: File.new("#{Rails.root}/test/fixtures/files/doi_metadata.xml"), status: 200)
     stub_request(:delete, 'https://mds.test.datacite.org/metadata/10.5072/my_test').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 200)
     stub_request(:delete, 'https://mds.test.datacite.org/metadata/10.5072/my_test_2').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 200)
   end
