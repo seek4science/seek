@@ -24,7 +24,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_22_131727) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
