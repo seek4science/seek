@@ -477,16 +477,22 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     creator2 = FactoryBot.create(:person)
     sop = FactoryBot.create(:sop, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
     document = FactoryBot.create(:document, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
-    publication = FactoryBot.create(:publication, contributor: @person, projects: [@project])
+    publication = FactoryBot.create(:publication, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
+
+    # some private ones that shouldn't show up
+    private_sop = FactoryBot.create(:sop, contributor: @person, projects: [@project], policy: FactoryBot.create(:private_policy))
+    private_document = FactoryBot.create(:document, contributor: @person, projects: [@project], policy: FactoryBot.create(:private_policy))
+    private_publication = FactoryBot.create(:publication, contributor: @person, projects: [@project], policy: FactoryBot.create(:private_policy))
+
     workflow = travel_to(@current_time) do
       workflow = FactoryBot.create(:cwl_packed_workflow,
                                    title: 'This workflow',
                                    description: 'This is a test workflow for bioschema generation',
                                    contributor: @person,
                                    maturity_level: :released,
-                                   documents: [document],
-                                   sops: [sop],
-                                   publications: [publication],
+                                   documents: [document, private_document],
+                                   sops: [sop, private_sop],
+                                   publications: [publication, private_publication],
                                    license: 'APSL-2.0',
                                    doi: '10.10.10.10/test.1')
 
@@ -509,8 +515,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
     workflow.latest_version.update_column(:doi, '10.10.10.10/test.1')
 
-    assert_equal [sop], workflow.sops
-    assert_equal [document], workflow.documents
+    assert_equal [sop, private_sop].sort, workflow.sops.sort
+    assert_equal [document, private_document].sort, workflow.documents.sort
+    assert_equal [publication, private_publication].sort, workflow.publications.sort
 
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
