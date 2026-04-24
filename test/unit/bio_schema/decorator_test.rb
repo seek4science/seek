@@ -31,7 +31,7 @@ class DecoratorTest < ActiveSupport::TestCase
     end
     document.latest_version.update_column(:doi, '10.10.10.10/test.1')
 
-    decorator = Seek::BioSchema::ResourceDecorators::Document.new(document)
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(document)
     identifier = "http://localhost:3000/documents/#{document.id}"
     assert_equal identifier, decorator.identifier
     assert_equal %w[lorry yellow], decorator.keywords.split(',').collect(&:strip).sort
@@ -50,6 +50,28 @@ class DecoratorTest < ActiveSupport::TestCase
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
     assert_equal %w[@id citation creator dateCreated dateModified datePublished description encodingFormat identifier image isBasedOn isPartOf keywords license name producer subjectOf url version], properties
+  end
+
+  test 'CreativeWork uses the last published version for datePublished' do
+    publication = FactoryBot.create(:publication, policy: FactoryBot.create(:public_policy))
+    sop = FactoryBot.create(:sop, license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)],
+                                  doi: '10.10.10.10/test.1', publications: [publication])
+    doi_log = travel_to(Time.now + 1.day) do
+      AssetDoiLog.create!(asset: sop, doi: '10.10.10.10/test.1', asset_version: sop.version,
+                          action: AssetDoiLog::MINT, user: sop.contributor.user)
+    end
+    sop.latest_version.update_column(:doi, '10.10.10.10/test.1')
+    disable_authorization_checks do
+      sop.save_as_new_version
+      sop.update(description: 'version 2 description', title: 'version 2 title')
+    end
+    assert_equal 2, sop.versions.count
+    assert_nil sop.latest_version.doi
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(sop)
+    assert_equal doi_log.created_at.iso8601, decorator.date_published
+
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(sop.latest_version)
+    assert_nil decorator.date_published
   end
 
   test 'Dataset pads or truncates description' do

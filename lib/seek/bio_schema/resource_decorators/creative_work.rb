@@ -21,8 +21,6 @@ module Seek
                         date_published: :datePublished,
                         publications: :citation
 
-
-
         def doi
           "https://doi.org/#{resource.doi}" if resource.try(:doi).present?
         end
@@ -30,9 +28,11 @@ module Seek
         # If a DOI has been minted, use the date of minting as the publication date
         def date_published
           return unless parent_resource.supports_doi? && parent_resource.has_doi?
-          return unless AssetDoiLog.was_doi_minted_for?(parent_resource.class.name, parent_resource.id, resource.version)
 
-          AssetDoiLog.minted.where(asset: parent_resource, asset_version: resource.version).order(:created_at).last&.created_at&.iso8601
+          version = doi_resource_version
+          return unless version
+
+          AssetDoiLog.minted.where(asset: parent_resource, asset_version: version).order(:created_at).last&.created_at&.iso8601
         end
 
         def content_type
@@ -72,6 +72,17 @@ module Seek
               '@id' => publication.rdf_resource.to_s,
               'name' => publication.title
             }
+          end
+        end
+
+        # Resolve the version associated with the DOI/mint log for this decorated resource.
+        # For a versioned resource, use its own version; for a parent resource, use the
+        # latest citable child version that would carry the DOI.
+        def doi_resource_version
+          if resource.is_a_version?
+            resource.version
+          else
+            parent_resource.latest_citable_resource&.version
           end
         end
 
