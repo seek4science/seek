@@ -49,7 +49,7 @@ module Seek
 
         def all_creators
           # This should be greatly improved but would rely on SEEK being changed
-          others = other_creators&.split(',')&.collect(&:strip)&.compact || []
+          others = other_creators&.split(',')&.map(&:strip)&.compact || []
           others = others.collect { |name| { "@type": 'Person',"@id": "##{ROCrate::Entity.format_id(name)}", "name": name } }
           all = mini_definitions(assets_creators) + others
           return if all.empty?
@@ -66,7 +66,7 @@ module Seek
         def publications
           return unless parent_resource.respond_to?(:publications)
 
-          parent_resource.publications.map do |publication|
+          parent_resource.publications.select(&:public?).map do |publication|
             {
               '@type' => 'ScholarlyArticle',
               '@id' => publication.rdf_resource.to_s,
