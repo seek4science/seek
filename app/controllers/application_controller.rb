@@ -287,7 +287,11 @@ class ApplicationController < ActionController::Base
           klass = controller_name.singularize.camelize
           version = params[:version]
 
-          retract_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], asset_version: version, action: AssetDoiLog::DELETE).last
+          if version.nil?
+            retract_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], action: AssetDoiLog::DELETE).last
+          else
+            retract_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], asset_version: version, action: AssetDoiLog::DELETE).last
+          end
           if retract_log.present?
             render template: 'general/landing_page_for_doi_retracted_item', status: :gone, locals: { retract_log: retract_log }
           else

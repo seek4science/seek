@@ -547,7 +547,8 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert_includes response.body, 'test retraction reason'
 
       get "/#{type.pluralize}/#{asset.id}/"
-      assert_response :not_found
+      assert_response :gone
+      assert_includes response.body, 'test retraction reason'
     end
   end
 
