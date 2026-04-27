@@ -1,3 +1,5 @@
 require 'rightfield/rightfield'
 require 'rdf/rdfxml'
 require 'rdf/vocab'
+require 'seek/rdf/vocabularies/health_dcat'
+require 'seek/rdf/vocabularies/seek_health'
