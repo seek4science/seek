@@ -80,6 +80,7 @@
       "url": null,
       "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
       "publication_type": "Journal",
+      "registered_mode": "by DOI",
       "authors": [
         "Author_non_registered LastNonReg",
         "Author_registered LastReg"

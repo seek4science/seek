@@ -2,6 +2,53 @@ class PublicationType < ActiveRecord::Base
   has_many :publications
 
 
+  # Map Crossref API type strings → SEEK publication type keys
+  CROSSREF_TYPE_TO_KEY = {
+    'journal-article' => 'journalarticle',
+    'book-chapter' => 'bookchapter',
+    'book' => 'book',
+    'edited-book' => 'book',
+    'monograph' => 'book',
+    'proceedings-article' => 'conferencepaper',
+    'proceedings' => 'conferenceproceeding',
+    'posted-content' => 'preprint',
+    'peer-review' => 'peerreview',
+    'report' => 'report',
+    'dataset' => 'dataset',
+    'software' => 'software',
+    'standard' => 'standard',
+  }.freeze
+
+  # Map DataCite resourceTypeGeneral strings → SEEK publication type keys
+  DATACITE_TYPE_TO_KEY = {
+    'ConferencePaper' => 'conferencepaper',
+    'Dataset' => 'dataset',
+    'Software' => 'software',
+    'Audiovisual' => 'audiovisual',
+    'Image' => 'image',
+    'Sound' => 'sound',
+    'ComputationalNotebook' => 'computationalnotebook',
+    'Workflow' => 'workflow',
+    'DataPaper' => 'datapaper',
+    'PeerReview' => 'peerreview',
+    'Event' => 'event',
+    'Award' => 'award',
+    'Project' => 'project',
+    'Service' => 'service',
+    'InteractiveResource' => 'interactiveresource',
+    'PhysicalObject' => 'physicalobject',
+    'OutputManagementPlan' => 'outputmanagementplan',
+    'Standard' => 'standard',
+    'StudyRegistration' => 'studyregistration',
+    'Collection' => 'collection',
+    'Model' => 'model',
+    'Instrument' => 'instrument',
+    'Text' => 'text',
+    'Book' => 'book',
+    'BookChapter' => 'bookchapter',
+    'Preprint' => 'preprint',
+  }.freeze
+
   # Map BibTeX keys → DataCite keys
   BIBTEX_TO_DATACITE_KEY = {
     'article' => 'journalarticle',
@@ -169,7 +216,56 @@ class PublicationType < ActiveRecord::Base
     key == 'projectdeliverable'
   end
 
-  
+  # Map MEDLINE/PubMed PT field values → SEEK publication type keys.
+  # An entry can have multiple PT values (e.g. ["Journal Article", "Clinical Trial"]);
+  # the first match in this map wins. Entries with no match fall back to journalarticle
+  # because PubMed indexes almost exclusively journal literature.
+  # Full type list: https://www.nlm.nih.gov/mesh/pubtypes.html
+  PUBMED_TYPE_TO_KEY = {
+    'Journal Article' => 'journalarticle',
+    'Review' => 'journalarticle',
+    'Systematic Review' => 'journalarticle',
+    'Meta-Analysis' => 'journalarticle',
+    'Clinical Trial' => 'journalarticle',
+    'Randomized Controlled Trial' => 'journalarticle',
+    'Case Reports' => 'journalarticle',
+    'Letter' => 'journalarticle',
+    'Editorial' => 'journalarticle',
+    'Comment' => 'journalarticle',
+    'News' => 'journalarticle',
+    'Biography' => 'journalarticle',
+    'Historical Article' => 'journalarticle',
+    'Retraction of Publication' => 'journalarticle',
+    'Preprint' => 'preprint',
+    'Dataset' => 'dataset',
+    'Software' => 'software',
+    'Book' => 'book',
+    'Book Chapter' => 'bookchapter',
+    'Congress' => 'conferenceproceeding',
+    'Technical Report' => 'report',
+    'Guideline' => 'report',
+    'Government Document' => 'report'
+  }.freeze
+
+  # Look up a PublicationType from a raw DOI API type string (Crossref or DataCite)
+  def self.from_doi_type(doi_type)
+    return nil if doi_type.blank?
+
+    key = CROSSREF_TYPE_TO_KEY[doi_type] || DATACITE_TYPE_TO_KEY[doi_type]
+    find_by(key: key) if key
+  end
+
+  # Look up a PublicationType from an array of MEDLINE PT field values.
+  # Returns the first specific match, or journalarticle as a fallback (since
+  # PubMed indexes almost exclusively journal literature).
+  def self.from_pubmed_types(pub_types)
+    return nil if pub_types.blank?
+
+    key = pub_types.filter_map { |t| PUBMED_TYPE_TO_KEY[t] }.first
+    key ||= 'journalarticle'
+    find_by(key: key)
+  end
+
   # Extract publication type from BibTeX record
   def self.get_publication_type_id(bibtex_record)
     # Extract the BibTeX entry type, e.g. article, inbook, misc...

@@ -2133,8 +2133,6 @@ personPost:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
               $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
-              $ref: "#/components/schemas/nullableNonEmptyString"
           required:
             - first_name
             - last_name
@@ -2179,8 +2177,6 @@ personPatch:
             tools:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
-              $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
               $ref: "#/components/schemas/nullableNonEmptyString"
           additionalProperties: false
       required:
@@ -4122,8 +4118,6 @@ personResponse:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
               $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
-              $ref: "#/components/schemas/nullableNonEmptyString"
             login:
               $ref: "#/components/schemas/nullableNonEmptyString"
           required:
@@ -4527,6 +4521,8 @@ publicationResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             publication_type:
               $ref: "#/components/schemas/nonEmptyString"
+            registered_mode:
+              $ref: "#/components/schemas/nonEmptyString"
             authors:
               $ref: "#/components/schemas/nonEmptyStringList"
             content_blobs:
@@ -4566,6 +4562,7 @@ publicationResponse:
             - pubmed_id
             - citation
             - publication_type
+            - registered_mode
             - link_to_pub
           additionalProperties: false
         relationships:

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "218",
+    "id": "227",
     "type": "sample_types",
     "attributes": {
       "policy": {
@@ -16,13 +16,13 @@
       "description": "A very new research",
       "sample_attributes": [
         {
-          "id": "1078",
+          "id": "1087",
           "title": "full name",
           "description": null,
           "pid": null,
           "sample_attribute_type": {
-            "id": "1127",
-            "title": "String attribute type 113",
+            "id": "1495",
+            "title": "String attribute type 306",
             "base_type": "String",
             "regexp": ".*"
           },
@@ -42,7 +42,7 @@
       "projects": {
         "data": [
           {
-            "id": "1277",
+            "id": "2063",
             "type": "projects"
           }
         ]
@@ -55,7 +55,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1441",
+            "id": "2021",
             "type": "people"
           }
         ]
@@ -63,21 +63,21 @@
       "assays": {
         "data": [
           {
-            "id": "183",
+            "id": "243",
             "type": "assays"
           }
         ]
       }
     },
     "links": {
-      "self": "/sample_types/218"
+      "self": "/sample_types/227"
     },
     "meta": {
-      "created": "2024-11-20T10:14:21.000Z",
-      "modified": "2024-11-20T10:14:21.000Z",
+      "created": "2026-03-19T16:41:31.704Z",
+      "modified": "2026-03-19T16:41:31.704Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "227bc620-8956-013d-24a2-0a81884ed284"
+      "uuid": "688127d0-05e0-013f-f2a8-00155d52079b"
     }
   },
   "jsonapi": {

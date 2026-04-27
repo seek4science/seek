@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "980192435",
+    "id": "4672",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
@@ -29,14 +29,14 @@
       }
     },
     "links": {
-      "self": "/institutions/980192435"
+      "self": "/institutions/4672"
     },
     "meta": {
-      "created": "2025-05-12T10:01:49.310Z",
-      "modified": "2025-05-12T10:01:49.326Z",
+      "created": "2026-03-19T16:48:44.054Z",
+      "modified": "2026-03-19T16:48:44.100Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "0b6c3040-1146-013e-72d8-7efdca78d793"
+      "uuid": "6a363c90-05e1-013f-f2a8-00155d52079b"
     }
   },
   "jsonapi": {

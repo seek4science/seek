@@ -363,4 +363,11 @@ module AssetsHelper
       concat content_tag(:span, '', class: 'glyphicon glyphicon-menu-right', 'aria-hidden' => 'true')
     end
   end
+
+  def attribution_list_item(item, truncate_to)
+    item_type = item.class.name
+    by_text = item.contributor.nil? ? '' : " by #{item.contributor.name}"
+    tooltip_txt = "#{item_type.humanize}: \"#{item.title}\"#{by_text}"
+    list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34)
+  end
 end

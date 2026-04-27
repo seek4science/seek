@@ -193,6 +193,43 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c_inherited.allow_isa_tag_change?(extra_source_characteristic)
   end
 
+  test 'allow editing unit' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    # Create sample type
+    # 'weight' attribute has a unit with symbol 'g'
+    sample_type = FactoryBot.create(:patient_sample_type,
+                                    projects: [project],
+                                    contributor: person)
+    weight_attribute = sample_type.sample_attributes.detect { |sa| sa.title == 'weight' }
+
+    # Allow attribute unit to change when there are no samples
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    assert c.allow_isa_tag_change?(weight_attribute)
+
+    # Adding samples that have no value for the weight attribute should still allow users to change the attribute's unit
+    sample_no_weight = Sample.new(sample_type: sample_type, projects: [project], contributor: person)
+    sample_no_weight.set_attribute_value('full name', 'Anakin Skywalker')
+    sample_no_weight.set_attribute_value(:age, 49)
+    sample_no_weight.save
+    assert sample_no_weight.valid?
+    assert_equal sample_type.samples.count, 1
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    assert c.allow_unit_change?(weight_attribute)
+
+    # Adding samples that do have a value for the weight attribute should prevent users to change the attribute's unit
+    sample_with_weight = Sample.new(sample_type: sample_type, projects: [project], contributor: person)
+    sample_with_weight.set_attribute_value('full name', 'Luke Skywalker')
+    sample_with_weight.set_attribute_value(:age, 25)
+    sample_with_weight.set_attribute_value(:weight, 75111.1)
+    sample_with_weight.save
+    assert sample_with_weight.valid?
+    assert_equal sample_type.samples.count, 2
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    refute c.allow_unit_change?(weight_attribute)
+  end
+
   private
 
   # sample type with 3 samples
