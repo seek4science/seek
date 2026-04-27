@@ -1845,12 +1845,13 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'landing page for deleted private_item which DOI was minted' do
+    doi_citation_mock
     comment = 'the paper was retracted'
     klass = 'DataFile'
     id = 123
     version = 1
     AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::MINT)
-    AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::DELETE, comment: comment)
+    AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::DELETE, comment: comment, doi: '10.5072/test')
     assert AssetDoiLog.was_doi_minted_for?(klass, id, version)
     get :show, params: { id: id, version: version }
     assert_response :gone
