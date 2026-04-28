@@ -41,6 +41,7 @@ module Seek
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
+        rdf_graph = dcat_type_triples rdf_graph
         rdf_graph = extended_metadata_triples rdf_graph
         rdf_graph = sample_metadata_triples(rdf_graph) if is_a?(Sample)
         rdf_graph
@@ -68,6 +69,10 @@ module Seek
         rdf_graph << [rdf_resource, JERMVocab.hasFormat, JERMVocab.SBML_format] if is_a?(Model) && contains_sbml?
 
         rdf_graph
+      end
+
+      def dcat_type_triples(rdf_graph)
+        Seek::Rdf::DcatEmitter.new(self, rdf_graph).emit
       end
 
       def extended_metadata_triples(rdf_graph)
@@ -124,6 +129,7 @@ module Seek
           'dcat' => RDF::Vocab::DCAT.to_uri.to_s,
           'healthdcatap' => HDCATVocab.to_uri.to_s,
           'seekh' => SEEKHVocab.to_uri.to_s,
+          'dpv' => DPVVocab.to_uri.to_s,
           'owl' => RDF::Vocab::OWL.to_uri.to_s,
           'foaf' => RDF::Vocab::FOAF.to_uri.to_s,
           'sioc' => RDF::Vocab::SIOC.to_uri.to_s,
@@ -161,6 +167,7 @@ module Seek
                      presentations organisms strains]
         methods.each do |method|
           next unless respond_to?(method)
+
           deps = Array(send(method))
           # resolve User back to Person
           deps = deps.collect { |dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
