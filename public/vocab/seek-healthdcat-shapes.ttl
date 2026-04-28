@@ -1,0 +1,233 @@
+# SEEK HealthDCAT-AP SHACL Shapes
+# Profile: SEEK-HealthDCAT-AP v1.0
+# Based on: HealthDCAT-AP Release 6 + DCAT-AP 3.0
+#
+# Validate with:
+#   bundle exec rake rdf:validate[path/to/data.ttl]
+#   bundle exec rake rdf:validate_fixtures
+
+@prefix sh:           <http://www.w3.org/ns/shacl#> .
+@prefix dcat:         <http://www.w3.org/ns/dcat#> .
+@prefix dct:          <http://purl.org/dc/terms/> .
+@prefix healthdcatap: <http://healthdataportal.eu/ns/health#> .
+@prefix dpv:          <https://w3id.org/dpv#> .
+@prefix foaf:         <http://xmlns.com/foaf/0.1/> .
+@prefix vcard:        <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:         <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema:       <https://schema.org/> .
+
+# ---------------------------------------------------------------------------
+# Dataset shape
+# ---------------------------------------------------------------------------
+<#DatasetShape>
+  a sh:NodeShape ;
+  sh:name "SEEK-HealthDCAT-AP Dataset" ;
+  sh:description "SHACL constraints for a SEEK DataFile or Assay exported as dcat:Dataset with HealthDCAT-AP enrichment." ;
+  sh:targetClass dcat:Dataset ;
+
+  # --- Mandatory DCAT-AP properties ---
+
+  sh:property [
+    sh:path dct:title ;
+    sh:name "title" ;
+    sh:description "A human-readable name for the dataset." ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:severity sh:Violation ;
+  ] ;
+
+  sh:property [
+    sh:path dct:description ;
+    sh:name "description" ;
+    sh:description "A free-text account of the dataset." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:string ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path dct:license ;
+    sh:name "license" ;
+    sh:description "A legal document under which the dataset is made available." ;
+    sh:minCount 0 ;
+    sh:nodeKind sh:IRI ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path dct:accessRights ;
+    sh:name "accessRights" ;
+    sh:description "Information about who can access the resource." ;
+    sh:minCount 0 ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  # --- Recommended DCAT-AP properties ---
+
+  sh:property [
+    sh:path dcat:keyword ;
+    sh:name "keyword" ;
+    sh:description "A keyword or tag describing the dataset." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:string ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path dcat:contactPoint ;
+    sh:name "contactPoint" ;
+    sh:description "Relevant contact information for the dataset." ;
+    sh:minCount 0 ;
+    sh:class vcard:Kind ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path dcat:distribution ;
+    sh:name "distribution" ;
+    sh:description "An available distribution of the dataset." ;
+    sh:minCount 0 ;
+    sh:class dcat:Distribution ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  # --- Mandatory HealthDCAT-AP properties ---
+
+  sh:property [
+    sh:path healthdcatap:healthCategory ;
+    sh:name "healthCategory" ;
+    sh:description "The health domain category of the dataset (IRI from health-categories authority table)." ;
+    sh:minCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:severity sh:Violation ;
+  ] ;
+
+  # --- Optional HealthDCAT-AP properties ---
+
+  sh:property [
+    sh:path healthdcatap:populationCoverage ;
+    sh:name "populationCoverage" ;
+    sh:description "Description of the population covered by the dataset." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:string ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path healthdcatap:minimumTypicalAge ;
+    sh:name "minimumTypicalAge" ;
+    sh:description "Minimum typical age of subjects in the dataset." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:integer ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path healthdcatap:maximumTypicalAge ;
+    sh:name "maximumTypicalAge" ;
+    sh:description "Maximum typical age of subjects in the dataset." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:integer ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path healthdcatap:numberOfUniqueIndividuals ;
+    sh:name "numberOfUniqueIndividuals" ;
+    sh:description "Number of unique individuals in the dataset." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:nonNegativeInteger ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path healthdcatap:numberOfRecords ;
+    sh:name "numberOfRecords" ;
+    sh:description "Number of records in the dataset." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:nonNegativeInteger ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path healthdcatap:trusteddataholder ;
+    sh:name "trustedDataHolder" ;
+    sh:description "Whether this is a trusted data holder under EHDS." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:boolean ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path healthdcatap:retentionPeriod ;
+    sh:name "retentionPeriod" ;
+    sh:description "The period during which the data is retained." ;
+    sh:minCount 0 ;
+    sh:class dct:PeriodOfTime ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  # --- DPV personal data & legal basis (not healthdcatap namespace) ---
+
+  sh:property [
+    sh:path dpv:hasPersonalData ;
+    sh:name "hasPersonalData" ;
+    sh:description "Categories of personal data (dpv-pd: IRIs)." ;
+    sh:minCount 0 ;
+    sh:nodeKind sh:IRI ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path dpv:hasLegalBasis ;
+    sh:name "hasLegalBasis" ;
+    sh:description "The legal basis for processing personal data." ;
+    sh:minCount 0 ;
+    sh:severity sh:Warning ;
+  ] .
+
+# ---------------------------------------------------------------------------
+# Distribution shape
+# ---------------------------------------------------------------------------
+<#DistributionShape>
+  a sh:NodeShape ;
+  sh:name "SEEK-HealthDCAT-AP Distribution" ;
+  sh:description "SHACL constraints for a dcat:Distribution emitted by the SEEK DCAT exporter." ;
+  sh:targetClass dcat:Distribution ;
+
+  sh:property [
+    sh:path dcat:accessURL ;
+    sh:name "accessURL" ;
+    sh:description "A URL of the resource that gives access to a distribution of the dataset." ;
+    sh:minCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:severity sh:Violation ;
+  ] ;
+
+  sh:property [
+    sh:path dcat:downloadURL ;
+    sh:name "downloadURL" ;
+    sh:description "The URL of the downloadable file in a given format." ;
+    sh:minCount 0 ;
+    sh:nodeKind sh:IRI ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path dct:format ;
+    sh:name "format" ;
+    sh:description "The file format of the distribution." ;
+    sh:minCount 0 ;
+    sh:severity sh:Warning ;
+  ] ;
+
+  sh:property [
+    sh:path dcat:byteSize ;
+    sh:name "byteSize" ;
+    sh:description "The size of a distribution in bytes." ;
+    sh:minCount 0 ;
+    sh:datatype xsd:decimal ;
+    sh:severity sh:Warning ;
+  ] .
+
