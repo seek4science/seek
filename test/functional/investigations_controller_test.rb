@@ -504,8 +504,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     # check the project form exists, studies and assays don't have this
     assert_select 'div#add_projects_form', count:1
 
-    #no sharing link, not for Investigation, Study and Assay
-    assert_select 'div#temporary_links', count:0
+    assert_select 'div#temporary_links', count:1
 
     assert_select 'div#author-form', count:1
   end
@@ -1730,4 +1729,230 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal 'seek-test-investigation', investigation.external_identifier
     investigation
   end
+
+  # Tests for temporary link (special auth code) functionality
+
+  test 'should create temporary link for investigation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    assert_difference('SpecialAuthCode.count', 1) do
+      post :manage_update, params: {
+        id: investigation.id,
+        investigation: {
+          title: investigation.title,
+          special_auth_codes_attributes: {
+            '0' => {
+              code: SecureRandom.base64(30),
+              expiration_date: (Date.today + 7.days).to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    assert_redirected_to investigation_path(investigation)
+
+    investigation.reload
+    assert_equal 1, investigation.special_auth_codes.count
+
+    code = investigation.special_auth_codes.first
+    assert_not_nil code.code
+    assert_equal 40, code.code.length
+    assert code.expiration_date > Date.today
+  end
+
+  test 'should update existing temporary link for investigation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    # Create initial code
+    initial_code = nil
+    disable_authorization_checks do
+      initial_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    new_expiration = Date.today + 14.days
+
+    assert_no_difference('SpecialAuthCode.count') do
+      post :manage_update, params: {
+        id: investigation.id,
+        investigation: {
+          title: investigation.title,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: initial_code.id,
+              code: initial_code.code,
+              expiration_date: new_expiration.to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    initial_code.reload
+    assert_equal new_expiration, initial_code.expiration_date
+  end
+
+  test 'should revoke temporary link for investigation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    code = nil
+    disable_authorization_checks do
+      code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert_difference('SpecialAuthCode.count', -1) do
+      post :manage_update, params: {
+        id: investigation.id,
+        investigation: {
+          title: investigation.title,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: code.id,
+              _destroy: '1'
+            }
+          }
+        }
+      }
+    end
+
+    investigation.reload
+    assert_equal 0, investigation.special_auth_codes.count
+  end
+
+  test 'temporary link persists across page loads' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    # Create code
+    post :manage_update, params: {
+      id: investigation.id,
+      investigation: {
+        title: investigation.title,
+        special_auth_codes_attributes: {
+          '0' => {
+            code: SecureRandom.base64(30),
+            expiration_date: (Date.today + 7.days).to_s,
+            _destroy: '0'
+          }
+        }
+      }
+    }
+
+    # Load manage page again
+    get :manage, params: { id: investigation.id }
+    assert_response :success
+
+    # Verify code still exists in database
+    investigation.reload
+    assert_equal 1, investigation.special_auth_codes.count
+  end
+
+  test 'temporary link code is saved to database with correct attributes' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    expiration_date = Date.today + 10.days
+
+    post :manage_update, params: {
+      id: investigation.id,
+      investigation: {
+        title: investigation.title,
+        special_auth_codes_attributes: {
+          '0' => {
+            code: SecureRandom.base64(30),
+            expiration_date: expiration_date.to_s,
+            _destroy: '0'
+          }
+        }
+      }
+    }
+
+    # Query database directly
+    code = SpecialAuthCode.where(
+      asset_type: 'Investigation',
+      asset_id: investigation.id
+    ).first
+
+    assert_not_nil code
+    assert_equal 'Investigation', code.asset_type
+    assert_equal investigation.id, code.asset_id
+    assert_equal expiration_date, code.expiration_date
+    assert_equal 40, code.code.length
+  end
+
+
+  test 'investigation accessible with valid code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    auth_code = nil
+    disable_authorization_checks do
+      auth_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: investigation.id, code: auth_code.code }
+    assert_response :success
+    assert_select 'h1', text: investigation.title
+  end
+
+  test 'investigation not accessible with invalid code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    logout
+
+    get :show, params: { id: investigation.id, code: 'invalid_code' }
+    assert_response :forbidden
+  end
+
+  test 'investigation not accessible with expired code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    expired_code = nil
+    disable_authorization_checks do
+      expired_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.yesterday
+      )
+    end
+
+    logout
+
+    get :show, params: { id: investigation.id, code: expired_code.code }
+    assert_response :forbidden
+  end
+
+  test 'child study not accessible with investigation code - no upward propagation' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    study_code = nil
+    disable_authorization_checks do
+      study_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    # Try to access investigation with study code - should fail
+    get :show, params: { id: investigation.id, code: study_code.code }
+    assert_response :forbidden
+  end
+
 end

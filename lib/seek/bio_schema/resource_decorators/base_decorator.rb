@@ -8,11 +8,13 @@ module Seek
         include ActionView::Helpers::SanitizeHelper
         include Seek::Util.routes
 
-        attr_reader :resource, :additional_context
+        attr_reader :resource, :additional_context, :parent_resource
 
         def initialize(resource)
           @resource = resource
           @additional_context = {}
+          # ensures the parent resource, whether the resource is a version or already the current parent
+          @parent_resource = resource.is_a_version? ? resource.parent : resource
         end
 
         def mappings
@@ -77,24 +79,27 @@ module Seek
           private
 
           # to be used to easily define a method that relates to a property and handles a collection.
-          # To be used within the Decorator class to define the method name, and the collection to be used.
+          # To be used within the Decorator class to define the method name (or methods if expressed as an array), and the collection to be used.
           # This results in an array of Hash objects containing the minimal definition JSON. For example
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
+          #   returns nil if no methods match, otherwise returns an array even if empty
           # Also adds to the additional_context the context for each item in the associated resources
           def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
-                return unless respond_to?(collection)
-
-                @additional_context.merge!(additional_contexts(send(collection)))
-                mini_definitions(send(collection))
+                valid_methods = Array(collections).select{ |c| respond_to?(c) }
+                return nil if valid_methods.empty?
+                valid_methods.map do |collection|
+                  @additional_context.merge!(additional_contexts(send(collection)))
+                  mini_definitions(send(collection))
+                end.flatten.compact
               end
             end
           end
 
-          # used to define the mapping between the method to be call, and the property
+          # used to define the mapping between the method to be called, and the property
           # for e.g
           #   schema_mappings doi: :identifier
           # calls the method 'doi' on the decorator, and then the value will be used with the schema.org property

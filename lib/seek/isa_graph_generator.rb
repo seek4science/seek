@@ -61,8 +61,10 @@ module Seek
     # parent_depth: number of levels of parent resources to show (0 = none, nil = all)
     # sibling_depth: number of levels of sibling resources (other children of immediate parent)to show (0 = none, nil = all)
     # include_self: include the root resource in the tree?
-    def generate(depth: 1, parent_depth: nil, sibling_depth: nil, include_self: true, auth: true)
+    # code: temporary link code for authorization checking
+    def generate(depth: 1, parent_depth: nil, sibling_depth: nil, include_self: true, auth: true, code: nil)
       @auth = auth
+      @code = code
       hash = { nodes: [], edges: [] }
 
       if sibling_depth != 0 # Need to include parents to show siblings
@@ -116,7 +118,11 @@ module Seek
 
     def traverse(method, object, max_depth = nil, depth = 0)
       node = Seek::ISAGraphNode.new(object)
-      node.can_view = object.can_view? if @auth
+
+      # Check authorization: normal permissions OR code-based access
+      if @auth
+        node.can_view = object.can_view? || (@code && object.respond_to?(:auth_by_code?) && object.auth_by_code?(@code))
+      end
 
       children = send(method, object)
       node.child_count = children.count if method == :children

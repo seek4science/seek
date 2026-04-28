@@ -10,10 +10,14 @@ module Seek
         INPUT_PROPERTY = 'https://bioschemas.org/terms/input'.freeze
         OUTPUT_PROPERTY = 'https://bioschemas.org/terms/output'.freeze
 
+        associated_items docs_and_sops: %i[documents sops]
+
         schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
                         outputs: :output,
-                        sd_publisher: :sdPublisher
+                        sd_publisher: :sdPublisher,
+                        maturity: :creativeWorkStatus,
+                        docs_and_sops: :documentation
 
         def context
           super.merge(
@@ -26,6 +30,12 @@ module Seek
 
         def contributors
           [contributor]
+        end
+
+        def maturity
+          return nil unless resource.maturity_level.present?
+
+          I18n.t("maturity_level.#{resource.maturity_level}")
         end
 
         def conformance

@@ -23,11 +23,19 @@ class DecoratorTest < ActiveSupport::TestCase
 
   test 'CreativeWork' do
     event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
-    document = FactoryBot.create(:document, events: [event], license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)], doi: '10.10.10.10/test.1')
+    publication = FactoryBot.create(:publication, policy: FactoryBot.create(:public_policy))
+    document = FactoryBot.create(:document, events: [event],
+                                            license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)],
+                                            doi: '10.10.10.10/test.1', publications: [publication])
     document.add_annotations('yellow, lorry', 'tag', User.first)
     disable_authorization_checks { document.save! }
+    doi_log = travel_to(Time.now + 1.day) do
+      AssetDoiLog.create!(asset: document, doi: '10.10.10.10/test.1', asset_version: document.version,
+                          action: AssetDoiLog::MINT, user: document.contributor.user)
+    end
+    document.latest_version.update_column(:doi, '10.10.10.10/test.1')
 
-    decorator = Seek::BioSchema::ResourceDecorators::Document.new(document)
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(document)
     identifier = "http://localhost:3000/documents/#{document.id}"
     assert_equal identifier, decorator.identifier
     assert_equal %w[lorry yellow], decorator.keywords.split(',').collect(&:strip).sort
@@ -39,9 +47,35 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal [{ :@type => 'Event', :@id => "http://localhost:3000/events/#{event.id}", :name => event.title }], decorator.subject_of
     assert_equal [{ :@type => ['Project','Organization'], :@id => "http://localhost:3000/projects/#{project.id}", :name => project.title }], decorator.producer
     assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.all_creators
+    assert_equal doi_log.created_at.iso8601, decorator.date_published
+    assert_equal [ { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title } ],
+                      decorator.publications
+    
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal %w[@id creator dateCreated dateModified description encodingFormat identifier image isBasedOn isPartOf keywords license name producer subjectOf url version], properties
+    assert_equal %w[@id citation creator dateCreated dateModified datePublished description encodingFormat identifier image isBasedOn isPartOf keywords license name producer subjectOf url version], properties
+  end
+
+  test 'CreativeWork uses the last published version for datePublished' do
+    publication = FactoryBot.create(:publication, policy: FactoryBot.create(:public_policy))
+    sop = FactoryBot.create(:sop, license: 'CC-BY-4.0', creators: [FactoryBot.create(:person)],
+                                  doi: '10.10.10.10/test.1', publications: [publication])
+    doi_log = travel_to(Time.now + 1.day) do
+      AssetDoiLog.create!(asset: sop, doi: '10.10.10.10/test.1', asset_version: sop.version,
+                          action: AssetDoiLog::MINT, user: sop.contributor.user)
+    end
+    sop.latest_version.update_column(:doi, '10.10.10.10/test.1')
+    disable_authorization_checks do
+      sop.save_as_new_version
+      sop.update(description: 'version 2 description', title: 'version 2 title')
+    end
+    assert_equal 2, sop.versions.count
+    assert_nil sop.latest_version.doi
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(sop)
+    assert_equal doi_log.created_at.iso8601, decorator.date_published
+
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(sop.latest_version)
+    assert_nil decorator.date_published
   end
 
   test 'Dataset pads or truncates description' do

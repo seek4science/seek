@@ -47,6 +47,7 @@ module Seek
         def keywords
           []
         end
+
       end
     end
   end
