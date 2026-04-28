@@ -87,10 +87,11 @@ module Seek
           #   returns nil if no methods match, otherwise returns an array even if empty
           # Also adds to the additional_context the context for each item in the associated resources
           def associated_items(**pairs)
-            pairs.each do |method, collection|
+            pairs.each do |method, collections|
               define_method(method) do
                 valid_methods = Array(collections).select{ |c| respond_to?(c) }
                 return nil if valid_methods.empty?
+
                 valid_methods.map do |collection|
                   @additional_context.merge!(additional_contexts(send(collection)))
                   mini_definitions(send(collection))

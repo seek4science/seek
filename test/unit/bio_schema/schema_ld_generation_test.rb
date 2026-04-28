@@ -588,7 +588,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'input' => Seek::BioSchema::ResourceDecorators::Workflow::INPUT_PROPERTY,
         'output' => Seek::BioSchema::ResourceDecorators::Workflow::OUTPUT_PROPERTY,
         'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE,
-        'FormalParameter' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_TYPE
+        'FormalParameter' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_TYPE,
+        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE,
+        'computationalTool' => Seek::BioSchema::ResourceDecorators::Sop::COMPUTATIONAL_TOOL_PROPERTY
       },
       '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
       '@id' => "http://localhost:3000/workflows/#{workflow.id}",
