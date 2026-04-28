@@ -129,7 +129,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       },
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
-      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE },
       'name' => @person.name,
       'givenName' => @person.first_name,
       'familyName' => @person.last_name,
