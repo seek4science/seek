@@ -8,7 +8,7 @@ module Seek
       include CSVMappingsHandling
 
       def self.included(base)
-        base.after_commit :queue_rdf_generation, on: [:create, :update]
+        base.after_commit :queue_rdf_generation, on: %i[create update]
         base.before_destroy :remove_rdf
       end
 
@@ -42,7 +42,7 @@ module Seek
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
         rdf_graph = extended_metadata_triples rdf_graph
-        rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
+        rdf_graph = sample_metadata_triples(rdf_graph) if is_a?(Sample)
         rdf_graph
       end
 
@@ -65,29 +65,21 @@ module Seek
 
       # extra steps that cannot be easily handled by the csv template
       def additional_triples(rdf_graph)
-        if is_a?(Model) && contains_sbml?
-          rdf_graph << [rdf_resource, JERMVocab.hasFormat, JERMVocab.SBML_format]
-        end
+        rdf_graph << [rdf_resource, JERMVocab.hasFormat, JERMVocab.SBML_format] if is_a?(Model) && contains_sbml?
 
         rdf_graph
       end
 
       def extended_metadata_triples(rdf_graph)
-        return rdf_graph unless supports_extended_metadata? && extended_metadata&.extended_metadata_type
-        attributes = extended_metadata.extended_metadata_type.extended_metadata_attributes.select{|at| at.pid.present?}
-        resource = rdf_resource
-        attributes.each do |attribute|
-          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(extended_metadata.get_attribute_value(attribute))]
-        end
-        rdf_graph
+        Seek::Rdf::ExtendedMetadataEmitter.new(self, rdf_graph).emit
       end
 
       def sample_metadata_triples(rdf_graph)
-
-        attributes = sample_type.sample_attributes.select{|at| at.pid.present?}
-        resource = rdf_resource
-        attributes.each do |attribute|
-          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(get_attribute_value(attribute))]
+        subject = rdf_resource
+        sample_type.sample_attributes.select { |at| at.pid.present? }.each do |attribute|
+          mapping    = Seek::Rdf::RdfMapping.from_attribute(attribute)
+          rdf_object = mapping.build_rdf_object(get_attribute_value(attribute))
+          rdf_graph << [subject, RDF::URI(attribute.pid), rdf_object] if rdf_object
         end
         rdf_graph
       end
@@ -100,8 +92,8 @@ module Seek
         rdf_graph
       end
 
-      # this is what is needed for the SEEK_ID term from JERM. It is essentially the same as the resource, but this method
-      # make the mappings clearer
+      # this is what is needed for the SEEK_ID term from JERM. It is essentially the same as the resource,
+      # but this method makes the mappings clearer
       def rdf_seek_id
         rdf_resource.to_s
       end
@@ -143,9 +135,9 @@ module Seek
       end
 
       def queue_rdf_generation(force = false, refresh_dependents = true)
-        unless !force && (saved_changes.keys - ['updated_at']).empty?
-          RdfGenerationQueue.enqueue(self, refresh_dependents: refresh_dependents)
-        end
+        return if !force && (saved_changes.keys - ['updated_at']).empty?
+
+        RdfGenerationQueue.enqueue(self, refresh_dependents: refresh_dependents)
       end
 
       def remove_rdf
@@ -165,7 +157,8 @@ module Seek
                      data_file_masters sop_masters model_masters
                      assets
                      assays studies investigations observation_units
-                     institutions creators owners owner contributors contributor projects events presentations organisms strains]
+                     institutions creators owners owner contributors contributor projects events
+                     presentations organisms strains]
         methods.each do |method|
           next unless respond_to?(method)
           deps = Array(send(method))
