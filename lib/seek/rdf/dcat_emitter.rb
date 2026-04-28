@@ -34,7 +34,7 @@ module Seek
       def distribution_applicable?
         @resource.respond_to?(:content_blob) &&
           @resource.content_blob.present? &&
-          !@resource.content_blob.empty_file?
+          !@resource.content_blob.no_content?
       end
 
       def emit_distribution
