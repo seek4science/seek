@@ -1,4 +1,5 @@
 class SampleAttributeType < ApplicationRecord
+  RDF_VALUE_TYPES = %w[literal iri typed_literal lang_literal].freeze
 
   validates :title, :base_type, :regexp, presence: true
   validate :validate_allowed_type, :validate_regular_expression, :validate_resolution
@@ -13,9 +14,9 @@ class SampleAttributeType < ApplicationRecord
   scope :primitive_string_types, -> { where(base_type: 'String', regexp: '.*') }
 
   def validate_allowed_type
-    unless Seek::Samples::BaseType.valid?(base_type)
-      errors.add(:base_type, 'Not a valid base type')
-    end
+    return if Seek::Samples::BaseType.valid?(base_type)
+
+    errors.add(:base_type, 'Not a valid base type')
   end
 
   def self.allowed_base_types
@@ -69,7 +70,8 @@ class SampleAttributeType < ApplicationRecord
   end
 
   def linked_extended_metadata_or_multi?
-    [Seek::Samples::BaseType::LINKED_EXTENDED_METADATA, Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI].include?(base_type)
+    [Seek::Samples::BaseType::LINKED_EXTENDED_METADATA,
+     Seek::Samples::BaseType::LINKED_EXTENDED_METADATA_MULTI].include?(base_type)
   end
 
   def seek_sample?
@@ -92,4 +94,11 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_SOP
   end
 
+  def rdf_effective_value_type
+    RDF_VALUE_TYPES.include?(rdf_value_type) ? rdf_value_type : 'literal'
+  end
+
+  def rdf_iri?
+    rdf_value_type == 'iri'
+  end
 end

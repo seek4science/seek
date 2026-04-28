@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_28_083807) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -1777,6 +1777,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.string "placeholder"
     t.text "description"
     t.string "resolution"
+    t.string "rdf_value_type"
+    t.string "rdf_datatype"
   end
 
   create_table "sample_attributes", id: :integer, force: :cascade do |t|
