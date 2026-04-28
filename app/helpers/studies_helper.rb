@@ -13,7 +13,8 @@ module StudiesHelper
     if study.nil?
       "<span class='none_text'>Not associated with a Study</span>".html_safe
     elsif study.can_view?
-      link_to study.title, study
+      code_param = should_include_code_for_isa_link?(study) ? params[:code] : nil
+      link_to study.title, study_path(study, code: code_param)
     else
       hidden_items_html [study]
     end

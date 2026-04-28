@@ -369,6 +369,7 @@ class StudiesController < ApplicationController
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
+                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { extended_metadata_attributes: determine_extended_metadata_keys })
   end
 end

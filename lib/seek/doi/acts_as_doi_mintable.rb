@@ -140,7 +140,7 @@ module Seek
         end
 
         def doi_resource_suffix
-          version if respond_to?(:version) && !version.nil?
+          version if respond_to?(:version)
         end
 
         def create_log

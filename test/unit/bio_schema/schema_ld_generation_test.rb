@@ -133,7 +133,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'ResearchOrganization', '@id' => "http://localhost:3000/institutions/#{institution.id}",
           'name' => institution.title }
       ],
-      'orcid' => 'https://orcid.org/0000-0001-9842-9718'
+      'identifier' => 'https://orcid.org/0000-0001-9842-9718'
     }
 
     json = JSON.parse(@person.to_schema_ld)
@@ -151,6 +151,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     assert df.can_download?
     refute df.content_blob.show_as_external_link?
+    publication = df.publications.first
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -181,6 +182,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           'name' => df.events.first.title }
       ],
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'distribution' => {
         '@type' => 'DataDownload',
         'contentSize' => '8.62 KB',
@@ -191,7 +195,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(df.latest_version, expected)
   end
 
@@ -209,6 +213,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     df.reload
     assert_nil df.content_blob
+
+    publication = df.publications.first
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -234,6 +240,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601,
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
@@ -241,7 +250,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(df.latest_version, expected)
   end
 
@@ -257,6 +266,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     assert df.can_download?
     assert df.content_blob.show_as_external_link?
+    publication = df.publications.first
 
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -283,6 +293,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
@@ -290,7 +303,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(df.latest_version, expected)
   end
 
@@ -418,11 +431,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       ],
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
+      'citation' => [],
       'subjectOf' => []
     }
 
     json = JSON.parse(document.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(document.latest_version, expected)
   end
 
@@ -450,22 +464,37 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ],
       'isPartOf' => [],
+      'citation' => [],
       'subjectOf' => []
     }
 
     json = JSON.parse(presentation.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
     check_version(presentation.latest_version, expected)
   end
 
   test 'workflow' do
     creator2 = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
+    document = FactoryBot.create(:document, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
+    publication = FactoryBot.create(:publication, contributor: @person, projects: [@project], policy: FactoryBot.create(:public_policy))
+
+    # some private ones that shouldn't show up
+    private_sop = FactoryBot.create(:sop, contributor: @person, projects: [@project], policy: FactoryBot.create(:private_policy))
+    private_document = FactoryBot.create(:document, contributor: @person, projects: [@project], policy: FactoryBot.create(:private_policy))
+    private_publication = FactoryBot.create(:publication, contributor: @person, projects: [@project], policy: FactoryBot.create(:private_policy))
+
     workflow = travel_to(@current_time) do
       workflow = FactoryBot.create(:cwl_packed_workflow,
-                         title: 'This workflow',
-                         description: 'This is a test workflow for bioschema generation',
-                         contributor: @person,
-                         license: 'APSL-2.0', doi: '10.10.10.10/test.1')
+                                   title: 'This workflow',
+                                   description: 'This is a test workflow for bioschema generation',
+                                   contributor: @person,
+                                   maturity_level: :released,
+                                   documents: [document, private_document],
+                                   sops: [sop, private_sop],
+                                   publications: [publication, private_publication],
+                                   license: 'APSL-2.0',
+                                   doi: '10.10.10.10/test.1')
 
       workflow.assets_creators.create!(creator: @person, pos: 1)
       workflow.assets_creators.create!(creator: creator2, pos: 2)
@@ -480,6 +509,15 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       disable_authorization_checks { workflow.save! }
       workflow
     end
+    travel_to(@current_time + 1.day) do
+      AssetDoiLog.create!(asset: workflow, doi: '10.10.10.10/test.1', asset_version: workflow.version,
+                          action: AssetDoiLog::MINT, user: @person.user)
+    end
+    workflow.latest_version.update_column(:doi, '10.10.10.10/test.1')
+
+    assert_equal [sop, private_sop].sort, workflow.sops.sort
+    assert_equal [document, private_document].sort, workflow.documents.sort
+    assert_equal [publication, private_publication].sort, workflow.publications.sort
 
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
@@ -493,6 +531,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/workflows/#{workflow.id}",
       'keywords' => 'wibble',
       'license' => Seek::License.find('APSL-2.0')&.url,
+      'creativeWorkStatus' => 'Stable',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'creator' => [
         { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
@@ -505,8 +544,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title }
       ],
+      'documentation' => [
+        { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{document.id}", 'name' => document.title },
+        { '@type' => 'LabProtocol', '@id' => "http://localhost:3000/sops/#{sop.id}", 'name' => sop.title }
+      ],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
+      'datePublished' => (@current_time + 1.day).iso8601,
       'encodingFormat' => 'application/x-yaml',
       'sdPublisher' => {
         '@type' => 'Organization',
@@ -592,6 +639,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     project = collection.projects.first
+    publication = collection.publications.first
     sel_assets = []
     collection.assets.each do |a|
       next if a.blank?
@@ -629,6 +677,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'hasPart' => [
         { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{doc1.id}",
           'name' => doc1.title.to_s },
@@ -754,6 +805,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     assert df.can_download?
     refute df.content_blob.show_as_external_link?
+    publication = df.publications.first
 
     v1_expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
@@ -779,6 +831,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'application/pdf',
       'version' => 1,
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       # 'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
       'subjectOf' => [
         { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -817,6 +872,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'image/png',
       'version' => 2,
       'isPartOf' => [],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'identifier' => 'https://doi.org/10.10.10.10/test.2', # This DOI was added to the version itself
       'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'subjectOf' => [
@@ -833,9 +891,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.find_version(1).to_schema_ld)
-    assert_equal v1_expected, json
+    fine_json_comparison v1_expected, json
     json = JSON.parse(df.find_version(2).to_schema_ld)
-    assert_equal v2_expected, json
+    fine_json_comparison v2_expected, json
   end
 
   test 'dataset without data dump' do
@@ -916,6 +974,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       sop
     end
 
+    publication = sop.publications.first
+
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'LabProtocol',
@@ -933,11 +993,15 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'isPartOf' => [{ '@type' => 'Collection', '@id' => "http://localhost:3000/collections/#{collection.id}", 'name' => 'A collection' }],
+      'citation' => [
+        { '@type' => 'ScholarlyArticle', '@id' => "http://localhost:3000/publications/#{publication.id}", 'name' => publication.title }
+      ],
       'computationalTool' => [{ '@type' => %w[SoftwareSourceCode ComputationalWorkflow], '@id' => "http://localhost:3000/workflows/#{sop.workflows.first.id}", 'name' => 'This Workflow' }]
     }
 
     json = JSON.parse(sop.to_schema_ld)
-    assert_equal expected, json
+    fine_json_comparison expected, json
+    check_version(sop.latest_version, expected)
   end
 
   private

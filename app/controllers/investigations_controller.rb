@@ -232,6 +232,7 @@ class InvestigationsController < ApplicationController
                                           :position, { publication_ids: [] },
                                           :is_isa_json_compliant,
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
+                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                           { extended_metadata_attributes: determine_extended_metadata_keys })
   end
 
