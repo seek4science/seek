@@ -107,6 +107,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :manage
       patch :manage_update
+      get :dcat
     end
   end
 
@@ -120,6 +121,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
       get :new_object_based_on_existing_one
+      get :dcat
     end
   end
 
@@ -148,6 +150,10 @@ SEEK::Application.routes.draw do
       end
     end
   end
+
+  ### VOCAB NAMESPACE ROUTES ###
+
+  get '/vocab/seekh', to: redirect('/vocab/seekh.ttl')
 
   ### GENERAL PAGES ###
 

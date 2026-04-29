@@ -24,6 +24,19 @@ module Seek
       end
     end
 
+    def dcat
+      asset = resource_for_controller || controller_model.find(params[:id])
+      return unless is_auth?(asset, :view)
+
+      instance_variable_set("@#{controller_name.singularize}", asset) if resource_for_controller.nil?
+      return if asset.respond_to?(:latest_version) && !find_display_asset(asset)
+
+      respond_to do |format|
+        format.rdf    { render plain: asset.to_rdf, content_type: 'text/turtle' }
+        format.jsonld { render body: asset.to_json_ld, content_type: 'application/ld+json' }
+      end
+    end
+
     def explore
       asset = resource_for_controller
       #drop invalid explore params
