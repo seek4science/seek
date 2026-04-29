@@ -29,6 +29,10 @@ module Seek
       def is_a_version?
         false
       end
+      def supports_doi?
+        false
+      end
+
     end
   end
 end
