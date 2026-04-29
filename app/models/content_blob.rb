@@ -56,6 +56,8 @@ class ContentBlob < ApplicationRecord
 
   acts_as_fleximage_extension
 
+  has_task :remote_content_fetch
+
   # This overrides the method from acts_as_fleximage so that the original image is read from the default SEEK filestore
   #  rather than the special `image_directory` specified above. Resized images will still go in there, though.
   def file_path
@@ -177,10 +179,10 @@ class ContentBlob < ApplicationRecord
   end
 
   def cachable?
-    Seek::Config.cache_remote_files &&
-      !is_webpage? &&
-      file_size &&
-      file_size < Seek::Config.max_cachable_size
+    return false if Seek::Config.block_file_uploads
+    return false unless Seek::Config.cache_remote_files
+
+    !is_webpage? && file_size && file_size < Seek::Config.max_cachable_size
   end
 
   def search_terms
@@ -247,8 +249,6 @@ class ContentBlob < ApplicationRecord
     self.class.valid_url?(url)
   end
 
-  has_task :remote_content_fetch
-
   def content_path(opts = {})
     opts.reverse_merge!(action: 'download')
     Seek::Util.routes.polymorphic_path([asset, self], opts)
@@ -309,7 +309,10 @@ class ContentBlob < ApplicationRecord
   end
 
   def create_retrieval_job
-    if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
+    return if Seek::Config.block_file_uploads
+    return unless Seek::Config.cache_remote_files
+
+    if  !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
       RemoteContentFetchingJob.perform_later(self)
     end
   end

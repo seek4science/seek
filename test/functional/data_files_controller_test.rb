@@ -1887,6 +1887,38 @@ class DataFilesControllerTest < ActionController::TestCase
     assert blob.remote_content_fetch_task&.pending?
   end
 
+  test 'should not create cache job for file if uploads are blocked' do
+    mock_http
+    params = { data_file: {
+      title: 'Small File',
+      project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                 data_url: 'http://mockedlocation.com/small.txt',
+                                 make_local_copy: '0'
+                               }],
+               policy_attributes: valid_sharing }
+
+    with_config_value(:block_file_uploads, true) do
+      assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
+        assert_difference('DataFile.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params: params
+          end
+        end
+      end
+
+      assert_redirected_to data_file_path(assigns(:data_file))
+      blob = assigns(:data_file).content_blob
+      refute blob.cachable?
+      refute blob.url.blank?
+      assert_equal 'small.txt', blob.original_filename
+      assert_equal 'text/plain', blob.content_type
+      assert_equal 100, blob.file_size
+      refute blob.remote_content_fetch_task&.pending?
+    end
+  end
+
   test 'should not create cache job if setting disabled' do
     mock_http
     params = { data_file: {

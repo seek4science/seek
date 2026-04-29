@@ -23,17 +23,28 @@
 
     <%= admin_text_setting(:session_store_timeout, Seek::Config.session_store_timeout.to_i / 60,
                            'Session store timeout', 'The length of time, in MINUTES, that the server session store is active until it expires. (Requires a restart after changing)') %>
+
+  <h2>File handling settings</h2>
+  <%= admin_checkbox_setting(:show_as_external_link_enabled, 1, Seek::Config.show_as_external_link_enabled,
+                             "Always show external links", "Items registered as a URL will always show the external link. When disabled, items are downloaded through SEEK as a proxy.") %>
+
+  <%= admin_checkbox_setting(:block_file_uploads, 1, Seek::Config.block_file_uploads,
+                             "Prevent file uploads", "If this setting is enabled, SEEK will block the ability to upload files for assets, and registering a URL will only be possible.
+                             Caching of remote files will also be prevented, even if enabled.", onchange: toggle_appear_javascript('remote-cache-settings-block', reverse: true)) %>
+  <div id='remote-cache-settings-block' style="<%= show_or_hide_block !Seek::Config.block_file_uploads -%>">
     <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
-                               "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
-                               onchange: toggle_appear_javascript('cache_remote_block')) %>
-    <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
-      <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
-                             'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
-                             :onkeypress => "javascript: return onlyNumbers(event);") %>
-      <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
-                             'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
-                             :onkeypress => "javascript: return onlyNumbers(event);") %>
-    </div>
+                                 "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
+                                 onchange: toggle_appear_javascript('cache_remote_block')) %>
+      <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
+        <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
+                               'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
+                               :onkeypress => "javascript: return onlyNumbers(event);") %>
+        <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
+                               'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
+                               :onkeypress => "javascript: return onlyNumbers(event);") %>
+      </div>
+  </div>
+  <h2>Sandbox settings</h2>
 
     <%= admin_text_setting(:sandbox_instance_url, Seek::Config.sandbox_instance_url,
                            'Sandbox instance URL', "A URL of an instance of SEEK to be used for testing/development. Users will be directed here if they attempt to create a #{t('project')} or #{t('programme')} with a name including \"test\".") %>

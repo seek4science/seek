@@ -712,6 +712,16 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute blob.file_exists?
   end
 
+  test "won't follow redirect and fetch local file" do
+    stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'file:///etc/passwd' }, status: 302)
+    blob = FactoryBot.create(:url_content_blob)
+    refute blob.file_exists?
+    assert_raise Addressable::URI::InvalidURIError do
+      blob.retrieve
+    end
+    refute blob.file_exists?
+  end
+
   test 'raises exception on bad response code when downloading remote content' do
     stub_request(:head, 'http://www.abc.com').to_return(
       headers: { content_length: 500, content_type: 'text/plain' }, status: 200
@@ -937,6 +947,18 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'does not enqueue remote content fetching job if file uploads blocked' do
+    content_blob = FactoryBot.build(:url_content_blob, make_local_copy: true)
+    with_config_value(:block_file_uploads, true) do
+      assert_no_difference('Task.count') do
+        assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
+          content_blob.save!
+          refute content_blob.remote_content_fetch_task.pending?
+        end
+      end
+    end
+  end
+
   test 'does not enqueue remote content fetching job for local content blob' do
     content_blob = FactoryBot.build(:content_blob)
     assert_no_difference('Task.count') do
@@ -957,5 +979,15 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert FactoryBot.create(:image_content_blob).is_image_convertable?
     refute FactoryBot.create(:svg_content_blob).is_image_convertable?
     refute FactoryBot.create(:pdf_content_blob).is_image_convertable?
+  end
+
+  test 'not cachable if file uploads blocked' do
+    blob = FactoryBot.build(:url_content_blob, make_local_copy: true, file_size: 12)
+    with_config_value(:block_file_uploads, false) do
+      assert blob.cachable?
+    end
+    with_config_value(:block_file_uploads, true) do
+      refute blob.cachable?
+    end
   end
 end
