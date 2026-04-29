@@ -1,0 +1,38 @@
+########################################################################################################################
+# Adding Controlled vocabularies sheet for registered assets
+########################################################################################################################
+workbook.add_worksheet name: 'Controlled Vocabularies' do |sheet|
+
+  # Get the rows for the CV sheet
+  # [<Attribute Title>, *<Values>]
+  rows = sample_attribute_value_map.map do |key, values|
+    [key].concat(values)
+  end.unshift(["id"], ["uuid"]) # Adds the ID and UUID column
+
+  # Transpose the rows into columns
+  tfs_rows = transposed_filled_arrays(rows)
+
+  # Add rows to sheet and lock the rows
+  tfs_rows.each_with_index do |tfs_row, i|
+    if i.zero?
+      sheet.add_row tfs_row, style: styles[:header_one_style]
+    else
+      sheet.add_row tfs_row, style: styles[:locked_style]
+    end
+  end
+
+  # Hide ID and UUID columns
+  sheet.column_info[0..1].each { |col| col.hidden = true }
+
+  # Hide columns that do not have CV
+  # column index < 2 => ID and UUID column, already hidden
+  # No values means no CV
+  sample_attribute_value_map.each.with_index(2) do |(_key, values), i|
+    if values.empty?
+      sheet.column_info[i].hidden = true
+    end
+  end
+
+  # Add sheet protection
+  sheet.sheet_protection.password = secret_pwd
+end

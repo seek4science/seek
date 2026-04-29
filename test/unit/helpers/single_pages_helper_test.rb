@@ -8,7 +8,8 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
   include SinglePagesHelper
 
   def setup
-    @person = FactoryBot.create(:person)
+    @person = FactoryBot.create(:person, first_name: 'Tom')
+    @other_person = FactoryBot.create(:person, first_name: 'Ben')
     @project = @person.projects.first
     @investigation = FactoryBot.create(:investigation, projects: [@project], is_isa_json_compliant: true, contributor: @person)
     @study = FactoryBot.create(:isa_json_compliant_study, investigation: @investigation, contributor: @person)
@@ -83,13 +84,17 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
     @assay = FactoryBot.create(:assay, study: @study, contributor: @person, sample_type: @assay_sample_type)
 
     organism = FactoryBot.create(:organism, title: "E. coli", projects: [@project])
-    (1..3).each do |i|
-      FactoryBot.create(:min_sop, title: "Assay SOP #{i}", projects: [@project], contributor: @person)
-      FactoryBot.create(:data_file, title: "Data File #{i}", projects: [@project], contributor: @person)
-      FactoryBot.create(:strain, title: "E. coli strain #{i}", organism: organism, projects: [@project], contributor: @person)
+    [@person, @other_person].each do |person|
+      (1..3).each do |i|
+        FactoryBot.create(:min_sop, title: "Assay SOP #{i}", projects: [person.projects.first], contributor: person)
+        FactoryBot.create(:private_data_file, title: "#{person.first_name}'s Data File #{i}", projects: [person.projects.first], contributor: person)
+        FactoryBot.create(:strain, title: "E. coli strain #{i}", organism: organism, projects: [person.projects.first], contributor: person, policy: FactoryBot.create(:private_policy))
+        FactoryBot.create(:min_sop, assays: [@assay], title: "Assay SOP #{i}", projects: [person.projects.first], contributor: person)
+      end
     end
 
-    (1..3).each { |i| FactoryBot.create(:min_sop, assays: [@assay], title: "Assay SOP #{i}", projects: [@project], contributor: @person) }
+    # Set Current user to Tom
+    User.current_user = @person.user
   end
 
   test 'should require (excel) data validation' do
@@ -141,19 +146,31 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
   end
 
   test 'should get sample values for Seek Data File attributes' do
+    # Fetch registered data files that do not originate from a fixture
+    # In this case those are data files from Ben or Tom. In total 6 Data Files (3 each).
+    data_files = DataFile.where(contributor_id: [@person.id, @other_person.id])
+    assert_equal 6, data_files.count
+
     # Registered Data File attribute is of type Seek Data File
-    reg_data_file_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered Data File" }
-    reg_data_file_values = get_values_for_datafiles(reg_data_file_attr).map { |rdfv| JSON.parse(rdfv) }
-    data_file_ids = @project.data_files.pluck(:id)
-    assert reg_data_file_values.all? { |data_file| data_file_ids.include?(data_file['id']) }
+    reg_data_file_values = get_values_for_datafiles.map { |rdfv| JSON.parse(rdfv) }.pluck("id")
+    authorized_data_file_ids = data_files.authorized_for(:view).pluck(:id)
+    assert authorized_data_file_ids.all? { |data_file_id| reg_data_file_values.include?(data_file_id) }
+    unauthorized_data_file_ids = data_files.authorized_for(:view, @other_person.user).pluck(:id)
+    assert unauthorized_data_file_ids.none? { |data_file_id| reg_data_file_values.include?(data_file_id) }
   end
 
   test 'should get sample values for Seek Strain attributes' do
+    # Fetch registered data files that do not originate from a fixture
+    # In this case those are data files from Ben or Tom. In total 6 strains (3 each).
+    strains = Strain.where(contributor_id: [@person.id, @other_person.id])
+    assert_equal 6, strains.count
+
     # Registered Strain attribute is of type Seek Strain
-    strain_attr = @assay_sample_type.sample_attributes.detect { |sa| sa.title == "Registered Strain" }
-    strain_values = get_values_for_strains(strain_attr).map { |strain| JSON.parse(strain) }
-    strain_ids = @project.strains.pluck(:id)
-    assert strain_values.all? { |sv| strain_ids.include?(sv['id']) }
+    strain_value_ids = get_values_for_strains.map { |strain| JSON.parse(strain) }.pluck("id")
+    authorized_strain_ids = strains.authorized_for(:view).pluck(:id)
+    assert authorized_strain_ids.all? { |strain_id| strain_value_ids.include?(strain_id) }
+    unauthorized_strain_ids = strains.authorized_for(:view, @other_person.user).pluck(:id)
+    assert unauthorized_strain_ids.none? { |strain_id| strain_value_ids.include?(strain_id) }
   end
 
   test 'should get sample values for Seek SOP attributes' do

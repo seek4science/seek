@@ -1,0 +1,13 @@
+########################################################################################################################
+# Adding the extended metadata sheet
+########################################################################################################################
+
+emt_values = JSON.parse(extended_metadata.json_metadata)
+
+workbook.add_worksheet(name: sheet_name) do |sheet|
+  emt_values.each do |key, val|
+    sheet.add_row [key, val], style: [styles[:header_two_style], nil]
+  end
+
+  sheet.sheet_protection.password = secret_pwd
+end
