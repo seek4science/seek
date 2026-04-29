@@ -119,6 +119,58 @@ class RdfResponseTest < ActionDispatch::IntegrationTest
            "Expected @type to include Dataset, got: #{types.inspect}")
   end
 
+  # ---------------------------------------------------------------------------
+  # /dcat endpoint (Cycle 9.5)
+  # ---------------------------------------------------------------------------
+
+  test '/dcat endpoint returns turtle with dcat:Dataset type' do
+    data_file = FactoryBot.create(:public_data_file)
+
+    get dcat_data_file_url(data_file), headers: { 'Accept' => 'text/turtle' }
+
+    assert_response :success
+    assert_equal 'text/turtle', @response.media_type
+    graph = parse_turtle(@response.body)
+    types = graph.query([RDF::URI(data_file_url(data_file)), RDF.type, nil]).map { |s| s.object.to_s }
+    assert_includes types, 'http://www.w3.org/ns/dcat#Dataset'
+  end
+
+  test '/dcat endpoint returns DCAT JSON-LD with jerm and dcat context keys' do
+    data_file = FactoryBot.create(:public_data_file)
+
+    get dcat_data_file_url(data_file), headers: { 'Accept' => 'application/ld+json' }
+
+    assert_response :success
+    assert_equal 'application/ld+json', @response.media_type
+    body = JSON.parse(@response.body)
+    context = body['@context']
+    assert context.is_a?(Hash), 'Expected DCAT JSON-LD @context to be a namespace hash, not a schema.org string'
+    assert context.key?('dcat'),  'Expected dcat key in @context'
+    assert context.key?('jerm'),  'Expected jerm key in @context'
+  end
+
+  test 'show action application/ld+json still returns bioschemas format' do
+    data_file = FactoryBot.create(:public_data_file)
+
+    get data_file_url(data_file), headers: { 'Accept' => 'application/ld+json' }
+
+    assert_response :success
+    body    = JSON.parse(@response.body)
+    context = body['@context']
+    assert_equal 'https://schema.org', context, 'Expected show action to still return Schema.org Bioschemas format'
+  end
+
+  test '/dcat endpoint for assay returns turtle with dcat:Dataset type' do
+    assay = FactoryBot.create(:public_assay)
+
+    get dcat_assay_url(assay), headers: { 'Accept' => 'text/turtle' }
+
+    assert_response :success
+    graph = parse_turtle(@response.body)
+    types = graph.query([RDF::URI(assay_url(assay)), RDF.type, nil]).map { |s| s.object.to_s }
+    assert_includes types, 'http://www.w3.org/ns/dcat#Dataset'
+  end
+
   private
 
   def parse_turtle(body)
