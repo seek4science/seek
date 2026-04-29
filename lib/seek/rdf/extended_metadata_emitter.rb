@@ -60,7 +60,9 @@ module Seek
       end
 
       def emit_blank_node(subject, predicate, attr, data)
-        return unless data.is_a?(Seek::JSONMetadata::Data)
+        data = data.data if data.respond_to?(:data)
+        data = data.to_h if data.is_a?(Seek::JSONMetadata::Data)
+        return unless data.is_a?(Hash) && data.any?
 
         nested = collect_nested_triples(attr.linked_extended_metadata_type, data)
         return if nested.empty?
