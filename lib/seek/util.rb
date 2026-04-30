@@ -140,12 +140,13 @@ module Seek
       ActiveRecord::Base.connection.instance_values['config'][:adapter]
     end
 
+    def self.background_job_pids
+      Seek::Workers.pids
+    end
+
+    # Alias for backwards compatibility
     def self.delayed_job_pids
-      directory = "#{Rails.root}/tmp/pids"
-      Daemons::PidFile.find_files(directory, 'delayed_job', false, '').collect do |path|
-        file = path.sub("#{directory}/", '').sub('.pid', '')
-        Daemons::PidFile.new(directory, file)
-      end
+      background_job_pids
     end
 
     # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed

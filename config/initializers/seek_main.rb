@@ -44,14 +44,5 @@ Rails.configuration.after_initialize do
     Annotations::Config.versioning_enabled = false
 
     ENV['LANG'] = 'en_US.UTF-8'
-
-    begin
-      if ActiveRecord::Base.connection.data_source_exists?'delayed_jobs'
-        # OpenbisFakeJob.create_initial_jobs
-        # OpenbisGarbageJob.create_initial_jobs
-      end
-    rescue Exception=>e
-      Rails.logger.error "Error creating default delayed jobs - #{e.message}"
-    end
   end
 end
