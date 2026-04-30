@@ -199,7 +199,24 @@ module Seek
             append_emt_blank_node(rdf_graph, subject, predicate, attribute.linked_extended_metadata_type, item)
           end
         else
-          rdf_graph << [subject, predicate, RDF::Literal(value)]
+          rdf_graph << [subject, predicate, typed_rdf_literal(attribute, value)]
+        end
+      end
+
+      def typed_rdf_literal(attribute, value)
+        case attribute.sample_attribute_type&.base_type
+        when Seek::Samples::BaseType::DATE
+          RDF::Literal(value.to_s, datatype: RDF::XSD.date)
+        when Seek::Samples::BaseType::DATE_TIME
+          RDF::Literal(value.to_s, datatype: RDF::XSD.dateTime)
+        when Seek::Samples::BaseType::INTEGER
+          RDF::Literal(value.to_i, datatype: RDF::XSD.integer)
+        when Seek::Samples::BaseType::FLOAT
+          RDF::Literal(value.to_f, datatype: RDF::XSD.double)
+        when Seek::Samples::BaseType::BOOLEAN
+          RDF::Literal(value, datatype: RDF::XSD.boolean)
+        else
+          RDF::Literal(value)
         end
       end
 
