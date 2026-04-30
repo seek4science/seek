@@ -9,15 +9,27 @@
       <%= f.error_messages %>
 
       <div class="form-group">
+        <label class="required">Title</label>
+        <%= f.text_field :title, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :description %>
+        <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" %>
+      </div>
+
+      <div class="form-group">
         <div class="row">
           <div class="col-md-6 col-xs-12">
             <%= f.label :event_type_id, "#{t('event')} type" %>
-            <%= f.collection_select :event_type_id,
-                                    EventType.order(:title),
-                                    :id,
-                                    :title,
-                                    { include_blank: 'Not specified' },
-                                    class: 'form-control' %>
+            <% event_type_options = EventType.order(:title).map do |et|
+              tooltip_attributes = et.description.present? ? { title: et.description } : {}
+              [et.title, et.id, tooltip_attributes]
+            end %>
+            <%= f.select :event_type_id,
+                         options_for_select(event_type_options, f.object.event_type_id),
+                         { include_blank: 'Not specified' },
+                         class: 'form-control' %>
           </div>
           <div class="col-md-6 col-xs-12">
             <%= f.label :location_type, "Location type" %>
@@ -27,17 +39,6 @@
                          { class: 'form-control' } %>
           </div>
         </div>
-
-      </div>
-
-      <div class="form-group">
-        <label class="required">Title</label>
-        <%= f.text_field :title, :class=>"form-control" -%>
-      </div>
-
-      <div class="form-group">
-        <%= f.label :description %>
-        <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" %>
       </div>
 
       <div id="event-dates">
