@@ -600,5 +600,89 @@ FactoryBot.define do
                                                           linked_extended_metadata_type: FactoryBot.create(:deep_nested_study_child_extended_metadata_type))
     end
   end
-end
 
+  # Factories for RDF nested extended metadata export tests
+
+  factory(:rdf_test_nested_period_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_nested_period' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
+                                                          title: 'start_date', pid: 'http://example.org/startDate')
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
+                                                          title: 'end_date', pid: 'http://example.org/endDate')
+    end
+  end
+
+  factory(:rdf_test_contact_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_contact' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
+                                                          pid: 'http://xmlns.com/foaf/0.1/name')
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
+                                                          title: 'email', pid: 'http://xmlns.com/foaf/0.1/mbox')
+    end
+  end
+
+  factory(:rdf_test_partial_pid_nested_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_partial_pid_nested' }
+    supported_type { 'ExtendedMetadata' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
+                                                          title: 'start_date', pid: 'http://example.org/startDate')
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title: 'end_date')
+    end
+  end
+
+  factory(:rdf_test_data_file_single_nested_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_df_single_nested' }
+    supported_type { 'DataFile' }
+    after(:build) do |a|
+      nested = FactoryBot.create(:rdf_test_nested_period_emt)
+      sat = FactoryBot.create(:extended_metadata_sample_attribute_type)
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute,
+                                                          title: 'retention_period',
+                                                          pid: 'http://example.org/retentionPeriod',
+                                                          sample_attribute_type: sat,
+                                                          linked_extended_metadata_type: nested)
+    end
+  end
+
+  factory(:rdf_test_data_file_multi_nested_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_df_multi_nested' }
+    supported_type { 'DataFile' }
+    after(:build) do |a|
+      nested = FactoryBot.create(:rdf_test_contact_emt)
+      sat = FactoryBot.create(:extended_metadata_multi_sample_attribute_type)
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute,
+                                                          title: 'contact_points',
+                                                          pid: 'http://example.org/contactPoint',
+                                                          sample_attribute_type: sat,
+                                                          linked_extended_metadata_type: nested)
+    end
+  end
+
+  factory(:rdf_test_data_file_partial_pid_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_df_partial_pid' }
+    supported_type { 'DataFile' }
+    after(:build) do |a|
+      nested = FactoryBot.create(:rdf_test_partial_pid_nested_emt)
+      sat = FactoryBot.create(:extended_metadata_sample_attribute_type)
+      a.extended_metadata_attributes << FactoryBot.create(:extended_metadata_attribute,
+                                                          title: 'period',
+                                                          pid: 'http://example.org/period',
+                                                          sample_attribute_type: sat,
+                                                          linked_extended_metadata_type: nested)
+    end
+  end
+
+  factory(:rdf_test_data_file_flat_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_df_flat' }
+    supported_type { 'DataFile' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
+                                                          title: 'population', pid: 'http://example.org/population')
+    end
+  end
+end
