@@ -18,6 +18,29 @@
         <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" %>
       </div>
 
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-6 col-xs-12">
+            <%= f.label :event_type_id, "#{t('event')} type" %>
+            <% event_type_options = EventType.order(:title).map do |et|
+              tooltip_attributes = et.description.present? ? { title: et.description } : {}
+              [et.title, et.id, tooltip_attributes]
+            end %>
+            <%= f.select :event_type_id,
+                         options_for_select(event_type_options, f.object.event_type_id),
+                         { include_blank: 'Not specified' },
+                         class: 'form-control' %>
+          </div>
+          <div class="col-md-6 col-xs-12">
+            <%= f.label :location_type, "Location type" %>
+            <%= f.select :location_type,
+                         Event.location_types.keys.map { |k| [k.humanize, k] },
+                         { include_blank: 'Not specified' },
+                         { class: 'form-control' } %>
+          </div>
+        </div>
+      </div>
+
       <div id="event-dates">
         <div class="form-group">
           <div class="row">
