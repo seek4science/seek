@@ -197,4 +197,113 @@ class RDFGenerationTest < ActiveSupport::TestCase
     refute FactoryBot.create(:document).rdf_supported?
   end
 
+  # ---------------------------------------------------------------------------
+  # Nested extended metadata
+  # ---------------------------------------------------------------------------
+
+  test 'linked extended metadata single emits blank node with nested triples' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_single_nested_emt))
+    em.set_attribute_value('retention_period', { 'start_date' => '2020-01-01', 'end_date' => '2030-12-31' })
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    outer = graph.query([sub, RDF::URI('http://example.org/retentionPeriod'), nil]).to_a
+    assert_equal 1, outer.size, 'Expected one retentionPeriod triple'
+    blank = outer.first.object
+    assert blank.node?, "Expected a blank node for retentionPeriod, got: #{blank.inspect}"
+    starts = graph.query([blank, RDF::URI('http://example.org/startDate'), nil]).map { |s| s.object.to_s }
+    assert_equal ['2020-01-01'], starts
+    ends = graph.query([blank, RDF::URI('http://example.org/endDate'), nil]).map { |s| s.object.to_s }
+    assert_equal ['2030-12-31'], ends
+  end
+
+  test 'linked extended metadata multi emits one blank node per item' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_multi_nested_emt))
+    contacts = [{ 'name' => 'Alice', 'email' => 'alice@example.org' },
+                { 'name' => 'Bob', 'email' => 'bob@example.org' }]
+    em.set_attribute_value('contact_points', contacts)
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    blanks = graph.query([sub, RDF::URI('http://example.org/contactPoint'), nil]).map(&:object)
+    assert_equal 2, blanks.size, 'Expected two contactPoint blank nodes'
+    blanks.each { |b| assert b.node?, "Expected blank node, got: #{b.inspect}" }
+    names = blanks.flat_map { |b| graph.query([b, RDF::URI('http://xmlns.com/foaf/0.1/name'), nil]).map { |s| s.object.to_s } }
+    assert_equal %w[Alice Bob].sort, names.sort
+  end
+
+  test 'nested attribute without pid is silently skipped in rdf export' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_partial_pid_emt))
+    em.set_attribute_value('period', { 'start_date' => '2020-01-01', 'end_date' => '2030-12-31' })
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    blank = graph.query([sub, RDF::URI('http://example.org/period'), nil]).first.object
+    assert_equal 1, graph.query([blank, RDF::URI('http://example.org/startDate'), nil]).to_a.size
+    assert_empty graph.query([blank, RDF::URI('http://example.org/endDate'), nil]).to_a,
+                 'end_date (no pid) must not appear in RDF'
+  end
+
+  test 'flat extended metadata attribute still emits plain literal triple' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_flat_emt))
+    em.set_attribute_value('population', 'adults only')
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    objects = graph.query([sub, RDF::URI('http://example.org/population'), nil]).map(&:object)
+    assert_equal 1, objects.size
+    assert objects.first.literal?, 'Expected a plain literal, not a blank node'
+    assert_equal 'adults only', objects.first.to_s
+  end
+
+  test 'extended metadata attributes emit correctly typed XSD literals for all scalar base types' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_all_types_emt))
+    em.set_attribute_value('str_field', 'hello')
+    em.set_attribute_value('text_field', 'some long text')
+    em.set_attribute_value('int_field', 42)
+    em.set_attribute_value('float_field', 3.14)
+    em.set_attribute_value('bool_field', true)
+    em.set_attribute_value('date_field', '2024-06-01')
+    em.set_attribute_value('datetime_field', '2024-06-01T12:00:00')
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    str = graph.query([sub, RDF::URI('http://example.org/strField'), nil]).first&.object
+    assert str&.literal?, 'String must emit a literal'
+    assert_equal 'hello', str.to_s
+
+    text = graph.query([sub, RDF::URI('http://example.org/textField'), nil]).first&.object
+    assert text&.literal?, 'Text must emit a literal'
+    assert_equal 'some long text', text.to_s
+
+    int = graph.query([sub, RDF::URI('http://example.org/intField'), nil]).first&.object
+    assert_equal RDF::XSD.integer.to_s, int.datatype.to_s, 'Integer must carry xsd:integer'
+    assert_equal '42', int.to_s
+
+    float = graph.query([sub, RDF::URI('http://example.org/floatField'), nil]).first&.object
+    assert_equal RDF::XSD.double.to_s, float.datatype.to_s, 'Float must carry xsd:double'
+
+    bool = graph.query([sub, RDF::URI('http://example.org/boolField'), nil]).first&.object
+    assert_equal RDF::XSD.boolean.to_s, bool.datatype.to_s, 'Boolean must carry xsd:boolean'
+    assert_equal 'true', bool.to_s
+
+    date = graph.query([sub, RDF::URI('http://example.org/dateField'), nil]).first&.object
+    assert_equal RDF::XSD.date.to_s, date.datatype.to_s, 'Date must carry xsd:date'
+    assert_equal '2024-06-01', date.to_s
+
+    dt = graph.query([sub, RDF::URI('http://example.org/datetimeField'), nil]).first&.object
+    assert_equal RDF::XSD.dateTime.to_s, dt.datatype.to_s, 'DateTime must carry xsd:dateTime'
+    assert_equal '2024-06-01T12:00:00', dt.to_s
+  end
+
+  private
+
+  def parse_rdf(ttl)
+    RDF::Graph.new { |g| RDF::Reader.for(:ttl).new(ttl) { |r| g << r } }
+  end
 end

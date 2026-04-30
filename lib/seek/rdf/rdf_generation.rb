@@ -74,11 +74,8 @@ module Seek
 
       def extended_metadata_triples(rdf_graph)
         return rdf_graph unless supports_extended_metadata? && extended_metadata&.extended_metadata_type
-        attributes = extended_metadata.extended_metadata_type.extended_metadata_attributes.select{|at| at.pid.present?}
-        resource = rdf_resource
-        attributes.each do |attribute|
-          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(extended_metadata.get_attribute_value(attribute))]
-        end
+
+        emit_emt_attributes(rdf_graph, rdf_resource, extended_metadata.extended_metadata_type, extended_metadata.data)
         rdf_graph
       end
 
@@ -178,6 +175,55 @@ module Seek
 
       def refresh_rdf
         queue_rdf_generation(true, false)
+      end
+
+      private
+
+      def emit_emt_attributes(rdf_graph, subject, emt_type, data)
+        emt_type.extended_metadata_attributes.each do |attribute|
+          next unless attribute.pid.present?
+
+          value = data[attribute.accessor_name]
+          next if value.nil?
+
+          emit_emt_attribute(rdf_graph, subject, attribute, value)
+        end
+      end
+
+      def emit_emt_attribute(rdf_graph, subject, attribute, value)
+        predicate = RDF::URI(attribute.pid)
+        if attribute.linked_extended_metadata?
+          append_emt_blank_node(rdf_graph, subject, predicate, attribute.linked_extended_metadata_type, value)
+        elsif attribute.linked_extended_metadata_multi?
+          Array(value).each do |item|
+            append_emt_blank_node(rdf_graph, subject, predicate, attribute.linked_extended_metadata_type, item)
+          end
+        else
+          rdf_graph << [subject, predicate, typed_rdf_literal(attribute, value)]
+        end
+      end
+
+      def typed_rdf_literal(attribute, value)
+        case attribute.sample_attribute_type&.base_type
+        when Seek::Samples::BaseType::DATE
+          RDF::Literal(value.to_s, datatype: RDF::XSD.date)
+        when Seek::Samples::BaseType::DATE_TIME
+          RDF::Literal(value.to_s, datatype: RDF::XSD.dateTime)
+        when Seek::Samples::BaseType::INTEGER
+          RDF::Literal(value.to_i, datatype: RDF::XSD.integer)
+        when Seek::Samples::BaseType::FLOAT
+          RDF::Literal(value.to_f, datatype: RDF::XSD.double)
+        when Seek::Samples::BaseType::BOOLEAN
+          RDF::Literal(value, datatype: RDF::XSD.boolean)
+        else
+          RDF::Literal(value)
+        end
+      end
+
+      def append_emt_blank_node(rdf_graph, subject, predicate, nested_type, data)
+        blank = RDF::Node.new
+        rdf_graph << [subject, predicate, blank]
+        emit_emt_attributes(rdf_graph, blank, nested_type, data)
       end
     end
   end

@@ -56,9 +56,10 @@ class StudyTest < ActiveSupport::TestCase
     statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_alias")}
     assert_equal RDF::Literal('the submission alias'), statement.object
 
-    statement = graph.statements.detect{|s| s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_lab_name")}
-    assert_equal RDF::Literal(''), statement.object
-
+    statement = graph.statements.detect { |s|
+      s.subject == RDF::URI.new("http://localhost:3000/studies/#{object.id}") && s.predicate == RDF::URI("http://fairbydesign.nl/ontology/submission_lab_name")
+    }
+    assert_nil statement, 'nil values should not produce triples'
   end
 
   # only authorized people can delete a study, and a study must have no assays
