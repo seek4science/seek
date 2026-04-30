@@ -16,9 +16,24 @@ FactoryBot.define do
     association :sample_attribute_type, factory: :string_sample_attribute_type
   end
 
-  factory(:datetime_extended_metadata_attribute,class:ExtendedMetadataAttribute) do
+  factory(:datetime_extended_metadata_attribute, class: ExtendedMetadataAttribute) do
     title { 'date' }
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
+  end
+
+  factory(:float_extended_metadata_attribute, class: ExtendedMetadataAttribute) do
+    title { 'score' }
+    association :sample_attribute_type, factory: :float_sample_attribute_type
+  end
+
+  factory(:text_extended_metadata_attribute, class: ExtendedMetadataAttribute) do
+    title { 'description' }
+    association :sample_attribute_type, factory: :text_sample_attribute_type
+  end
+
+  factory(:boolean_extended_metadata_attribute, class: ExtendedMetadataAttribute) do
+    title { 'flag' }
+    association :sample_attribute_type, factory: :boolean_sample_attribute_type
   end
 
   factory(:data_file_extended_metadata_attribute,class:ExtendedMetadataAttribute) do
@@ -683,6 +698,50 @@ FactoryBot.define do
     after(:build) do |a|
       a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
                                                           title: 'population', pid: 'http://example.org/population')
+    end
+  end
+
+  factory(:date_extended_metadata_attribute, class: ExtendedMetadataAttribute) do
+    title { 'event_date' }
+    association :sample_attribute_type, factory: :date_sample_attribute_type
+  end
+
+  factory(:rdf_test_data_file_date_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_df_date' }
+    supported_type { 'DataFile' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:date_extended_metadata_attribute,
+                                                          title: 'start_date', pid: 'http://example.org/startDate')
+      a.extended_metadata_attributes << FactoryBot.create(:datetime_extended_metadata_attribute,
+                                                          title: 'created_at', pid: 'http://example.org/createdAt')
+    end
+  end
+
+  factory(:rdf_test_data_file_all_types_emt, class: ExtendedMetadataType) do
+    title { 'rdf_test_df_all_types' }
+    supported_type { 'DataFile' }
+    after(:build) do |a|
+      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute,
+                                                          title: 'str_field',
+                                                          pid: 'http://example.org/strField')
+      a.extended_metadata_attributes << FactoryBot.create(:text_extended_metadata_attribute,
+                                                          title: 'text_field',
+                                                          pid: 'http://example.org/textField')
+      a.extended_metadata_attributes << FactoryBot.create(:age_extended_metadata_attribute,
+                                                          title: 'int_field',
+                                                          pid: 'http://example.org/intField')
+      a.extended_metadata_attributes << FactoryBot.create(:float_extended_metadata_attribute,
+                                                          title: 'float_field',
+                                                          pid: 'http://example.org/floatField')
+      a.extended_metadata_attributes << FactoryBot.create(:boolean_extended_metadata_attribute,
+                                                          title: 'bool_field',
+                                                          pid: 'http://example.org/boolField')
+      a.extended_metadata_attributes << FactoryBot.create(:date_extended_metadata_attribute,
+                                                          title: 'date_field',
+                                                          pid: 'http://example.org/dateField')
+      a.extended_metadata_attributes << FactoryBot.create(:datetime_extended_metadata_attribute,
+                                                          title: 'datetime_field',
+                                                          pid: 'http://example.org/datetimeField')
     end
   end
 end

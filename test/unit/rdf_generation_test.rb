@@ -260,6 +260,47 @@ class RDFGenerationTest < ActiveSupport::TestCase
     assert_equal 'adults only', objects.first.to_s
   end
 
+  test 'extended metadata attributes emit correctly typed XSD literals for all scalar base types' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_all_types_emt))
+    em.set_attribute_value('str_field', 'hello')
+    em.set_attribute_value('text_field', 'some long text')
+    em.set_attribute_value('int_field', 42)
+    em.set_attribute_value('float_field', 3.14)
+    em.set_attribute_value('bool_field', true)
+    em.set_attribute_value('date_field', '2024-06-01')
+    em.set_attribute_value('datetime_field', '2024-06-01T12:00:00')
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    str = graph.query([sub, RDF::URI('http://example.org/strField'), nil]).first&.object
+    assert str&.literal?, 'String must emit a literal'
+    assert_equal 'hello', str.to_s
+
+    text = graph.query([sub, RDF::URI('http://example.org/textField'), nil]).first&.object
+    assert text&.literal?, 'Text must emit a literal'
+    assert_equal 'some long text', text.to_s
+
+    int = graph.query([sub, RDF::URI('http://example.org/intField'), nil]).first&.object
+    assert_equal RDF::XSD.integer.to_s, int.datatype.to_s, 'Integer must carry xsd:integer'
+    assert_equal '42', int.to_s
+
+    float = graph.query([sub, RDF::URI('http://example.org/floatField'), nil]).first&.object
+    assert_equal RDF::XSD.double.to_s, float.datatype.to_s, 'Float must carry xsd:double'
+
+    bool = graph.query([sub, RDF::URI('http://example.org/boolField'), nil]).first&.object
+    assert_equal RDF::XSD.boolean.to_s, bool.datatype.to_s, 'Boolean must carry xsd:boolean'
+    assert_equal 'true', bool.to_s
+
+    date = graph.query([sub, RDF::URI('http://example.org/dateField'), nil]).first&.object
+    assert_equal RDF::XSD.date.to_s, date.datatype.to_s, 'Date must carry xsd:date'
+    assert_equal '2024-06-01', date.to_s
+
+    dt = graph.query([sub, RDF::URI('http://example.org/datetimeField'), nil]).first&.object
+    assert_equal RDF::XSD.dateTime.to_s, dt.datatype.to_s, 'DateTime must carry xsd:dateTime'
+    assert_equal '2024-06-01T12:00:00', dt.to_s
+  end
+
   private
 
   def parse_rdf(ttl)
