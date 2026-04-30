@@ -15,6 +15,6 @@ class ExtendedMetadataAttribute < ApplicationRecord
   end
 
   def label
-    super || title&.humanize
+    read_attribute(:label).presence || title&.humanize
   end
 end
