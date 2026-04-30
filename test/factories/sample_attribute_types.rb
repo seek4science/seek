@@ -19,6 +19,11 @@ FactoryBot.define do
     base_type { Seek::Samples::BaseType::FLOAT }
   end
   
+  factory(:date_sample_attribute_type, class: SampleAttributeType) do
+    sequence(:title) { |n| "Date attribute type #{n}" }
+    base_type { Seek::Samples::BaseType::DATE }
+  end
+
   factory(:datetime_sample_attribute_type, class: SampleAttributeType) do
     sequence(:title) { |n| "DateTime attribute type #{n}" }
     base_type { Seek::Samples::BaseType::DATE_TIME }
