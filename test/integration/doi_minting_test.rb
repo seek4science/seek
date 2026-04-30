@@ -459,7 +459,18 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       delete_doi_log = AssetDoiLog.where(asset_type: asset.class.name, asset_id: asset.id, asset_version: asset.version, action: AssetDoiLog::DELETE).last
       assert_not_nil delete_doi_log
       assert_equal 'test reason', delete_doi_log.comment
+
+      # Should store metadata in the log to display on the retracted page after the asset is deleted
       assert_not_nil delete_doi_log.datacite_metadata
+      parsed_metadata = JSON.parse(delete_doi_log.datacite_metadata)
+      assert_equal 'test title', parsed_metadata['title']
+      assert_equal 'Fairdom', parsed_metadata['publisher']
+      assert_equal 'Dataset', parsed_metadata['resource_type'][0]
+      assert_equal 'Last1', parsed_metadata['creators'][0]['last_name']
+      assert_equal 'First1', parsed_metadata['creators'][0]['first_name']
+      assert_equal 'Last2', parsed_metadata['creators'][1]['last_name']
+      assert_equal 'First2', parsed_metadata['creators'][1]['first_name']
+      assert_equal 2014, parsed_metadata['year']
 
       assert_not asset.class.exists?(asset.id)
       assert_raises(ActiveRecord::RecordNotFound) { asset.reload }
@@ -549,6 +560,10 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       get "/#{type.pluralize}/#{asset.id}/"
       assert_response :gone
       assert_includes response.body, 'test retraction reason'
+
+      # The retracted page should show metadata
+      assert_includes response.body, 'test title'
+      assert_includes response.body, 'Fairdom'
     end
   end
 

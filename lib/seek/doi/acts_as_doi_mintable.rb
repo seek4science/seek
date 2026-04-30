@@ -81,10 +81,10 @@ module Seek
           end
 
           endpoint = datacite_client
-          metadata = endpoint.metadata(doi).to_s
+          metadata = Datacite::MetadataReader.new(endpoint.metadata(doi)).parse
           endpoint.inactivate(doi)
 
-          retract_log(retraction_reason, metadata)
+          retract_log(retraction_reason, metadata.to_json)
 
           suggested_doi
         end
