@@ -38,9 +38,13 @@ module Seek
       end
 
       def retract_doi
-        asset_path = polymorphic_path(@asset)
         retraction_reason = params[:retraction_reason].to_s.strip.presence
+        unless retraction_reason
+          flash[:error] = 'A retraction reason is required'
+          redirect_to polymorphic_path(@asset, action: :retract_doi_confirm) and return
+        end
 
+        asset_path = polymorphic_path(@asset)
         wrap_service('DataCite', asset_path) do
           if @asset.retract_dois(retraction_reason) && @asset.destroy
             flash[:notice] = 'DOI successfully retracted'

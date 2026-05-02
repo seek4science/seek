@@ -84,7 +84,7 @@ module Seek
           metadata = Datacite::MetadataReader.new(endpoint.metadata(doi)).parse
           endpoint.inactivate(doi)
 
-          retract_log(retraction_reason, metadata.to_json)
+          retract_log(retraction_reason, metadata)
 
           suggested_doi
         end
@@ -133,7 +133,7 @@ module Seek
         end
 
         def can_retract_doi?
-          Seek::Config.doi_minting_enabled && has_doi? && visible?(nil)
+          Seek::Config.doi_minting_enabled && has_doi?
         end
 
         def doi_time_locked?
@@ -172,12 +172,12 @@ module Seek
 
         def create_log
           AssetDoiLog.create(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix,
-                             doi: suggested_doi, action: AssetDoiLog::MINT, user_id: User.current_user.try(:id))
+                             doi: suggested_doi, action: AssetDoiLog::MINT, user: User.current_user)
         end
 
         def retract_log(retraction_reason = nil, metadata = nil)
           AssetDoiLog.create(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix,
-                             doi: suggested_doi, action: AssetDoiLog::DELETE, user_id: User.current_user.try(:id), comment: retraction_reason, datacite_metadata: metadata)
+                             doi: suggested_doi, action: AssetDoiLog::DELETE, user: User.current_user, comment: retraction_reason, metadata: metadata)
         end
       end
     end

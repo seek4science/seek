@@ -437,7 +437,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert_response :redirect
       assert_not_nil flash[:error]
 
-      post "/#{type.pluralize}/#{asset.id}/retract_doi"
+      post "/#{type.pluralize}/#{asset.id}/retract_doi", params: { retraction_reason: 'test retraction reason' }
       assert_response :redirect
       assert_not_nil flash[:error]
     end
@@ -477,7 +477,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'reason is optional when retracting DOI' do
+  test 'reason is required when retracting DOI' do
     mock_datacite_request
     DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
@@ -487,11 +487,11 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert latest_version.has_doi?
 
       post "/#{type.pluralize}/#{asset.id}/retract_doi"
-      assert_redirected_to root_path
-      assert_not_nil flash[:notice]
+      assert_redirected_to polymorphic_path(asset, action: :retract_doi_confirm)
+      assert_not_nil flash[:error]
 
       delete_doi_log = AssetDoiLog.where(asset_type: asset.class.name, asset_id: asset.id, asset_version: asset.version, action: AssetDoiLog::DELETE).last
-      assert_not_nil delete_doi_log
+      assert_nil delete_doi_log
     end
   end
 
@@ -513,7 +513,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert versioned_asset_2.save
       assert versioned_asset_2.has_doi?
 
-      post "/#{type.pluralize}/#{asset.id}/retract_doi"
+      post "/#{type.pluralize}/#{asset.id}/retract_doi", params: { retraction_reason: 'test retraction reason' }
       assert_redirected_to root_path
       assert_not_nil flash[:notice]
 

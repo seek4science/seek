@@ -20,8 +20,8 @@
             </ul>
 
             <div class="form-group">
-              <%= label_tag :retraction_reason, 'Reason for retraction (optional)' %>
-              <%= text_area_tag :retraction_reason, nil, rows: 4, class: 'form-control', placeholder: 'Explain why this DOI is being retracted' %>
+              <%= label_tag :retraction_reason, 'Reason for retraction' %>
+              <%= text_area_tag :retraction_reason, nil, rows: 4, class: 'form-control', placeholder: 'Explain why this DOI is being retracted', required: true %>
             </div>
 
             <hr/>

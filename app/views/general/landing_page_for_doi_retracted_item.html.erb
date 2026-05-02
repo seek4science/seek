@@ -4,13 +4,13 @@
   <h2>The requested <%= asset_type %> does not exist anymore.</h2>
 
   <p>The <%= asset_type %> with identifier <%= doi_link(retract_log[:doi]) %> has been retracted.</p>
-  <% if metadata.present? %>
+  <% if retract_log.metadata.present? %>
     <p>
-      <i><%= metadata['title'] if metadata['title'].present? %></i>
-      <% names = Array(metadata['creators']).filter_map { |c| c['last_name'].presence || c['first_name'].presence } %>
+      <i><%= retract_log.metadata['title'] if retract_log.metadata['title'].present? %></i>
+      <% names = Array(retract_log.metadata['creators']).filter_map { |c| c['last_name'].presence || c['first_name'].presence } %>
       <%= names.join(', ') if names.any? %>
-      <%= metadata['year'] if metadata['year'].present? %>
-      <%= metadata['publisher'] if metadata['publisher'].present? %>
+      <%= retract_log.metadata['year'] if retract_log.metadata['year'].present? %>
+      <%= retract_log.metadata['publisher'] if retract_log.metadata['publisher'].present? %>
     </p>
   <% end %>
   <% if retract_log[:comment].present? %>
