@@ -6,6 +6,7 @@
 <% show_explore_btn = display_asset && explorable_spreadsheet && display_asset.supported_spreadsheet_format? %>
 <% show_view_content_btn = display_asset&.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
+<% show_retract_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && asset.can_retract_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
 <% show_cancel_publishing_request_button = (asset.is_waiting_approval? || asset.is_rejected?) && asset.can_manage? %>
 
@@ -143,5 +144,9 @@
 
   <% if show_doi_button %>
     <li><%= image_tag_for_key('doi', polymorphic_path(asset, action: 'mint_doi_confirm', version: display_asset.version), nil, {}, "Generate a DOI") -%></li>
+  <% end %>
+
+  <% if show_retract_button %>
+    <li><%= image_tag_for_key('doi', polymorphic_path(asset, action: 'retract_doi_confirm'), nil, {}, "Retract DOI") -%></li>
   <% end %>
 <% end %>

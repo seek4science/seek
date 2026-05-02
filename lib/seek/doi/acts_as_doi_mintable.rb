@@ -48,11 +48,7 @@ module Seek
             return false
           end
 
-          username = Seek::Config.datacite_username
-          password = Seek::Config.datacite_password
-          url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
-          endpoint = Datacite::Client.new(username, password, url)
-
+          endpoint = datacite_client
           endpoint.upload_metadata(datacite_metadata.to_s)
           endpoint.mint(suggested_doi, doi_target_url)
 
@@ -62,6 +58,33 @@ module Seek
 
           # Update the parent resource's index with the new DOI
           doi_resource.reload.index! if Seek::Config.solr_enabled && doi_resource.respond_to?(:index!)
+
+          suggested_doi
+        end
+
+        def datacite_client
+          username = Seek::Config.datacite_username
+          password = Seek::Config.datacite_password
+          url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
+          Datacite::Client.new(username, password, url)
+        end
+
+        def inactivate_doi(retraction_reason = nil)
+          unless has_doi?
+            errors.add(:base, 'No DOI to inactivate')
+            return false
+          end
+
+          unless Seek::Config.doi_minting_enabled
+            errors.add(:base, 'DOI minting is not enabled')
+            return false
+          end
+
+          endpoint = datacite_client
+          metadata = Datacite::MetadataReader.new(endpoint.metadata(doi)).parse
+          endpoint.inactivate(doi)
+
+          retract_log(retraction_reason, metadata)
 
           suggested_doi
         end
@@ -109,6 +132,10 @@ module Seek
           Seek::Config.doi_minting_enabled && !doi_time_locked? && !has_doi? && visible?(nil)
         end
 
+        def can_retract_doi?
+          Seek::Config.doi_minting_enabled && has_doi?
+        end
+
         def doi_time_locked?
           doi_time_lock_end > Time.now
         end
@@ -145,7 +172,12 @@ module Seek
 
         def create_log
           AssetDoiLog.create(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix,
-                             doi: suggested_doi, action: AssetDoiLog::MINT, user_id: User.current_user.try(:id))
+                             doi: suggested_doi, action: AssetDoiLog::MINT, user: User.current_user)
+        end
+
+        def retract_log(retraction_reason = nil, metadata = nil)
+          AssetDoiLog.create(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix,
+                             doi: suggested_doi, action: AssetDoiLog::DELETE, user: User.current_user, comment: retraction_reason, metadata: metadata)
         end
       end
     end
