@@ -73,7 +73,7 @@ module BootstrapHelper
     content_tag(:div, heading_options) do # The panel title
       title_html = ''.html_safe
       if (help_text = options.delete(:help_text))
-        title_html << "#{help_icon(help_text)} ".html_safe
+        title_html << help_icon(help_text) << ' '
       end
       title_html << title
       title_html

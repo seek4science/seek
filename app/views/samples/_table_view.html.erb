@@ -49,7 +49,7 @@
                             <%# Wrapping <div> needed for popover to display properly %>
                             <%= content_tag(:div, data: {
                                 toggle: 'popover',
-                                content: errors.map { |e| "#{h(attribute.title)} #{e}<br/>" }.join.html_safe }) do %>
+                                content: errors.map { |e| "#{h(attribute.title)} #{h(e)}<br/>" }.join.html_safe }) do %>
                                 <%= text_or_not_specified(sample.get_attribute_value(attribute), auto_link: link) %>
                             <% end %>
                           </td>
