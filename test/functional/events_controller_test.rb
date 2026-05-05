@@ -448,4 +448,19 @@ class EventsControllerTest < ActionController::TestCase
     assert_select 'p.event_type', text: /Not specified/
   end
 
+  test 'filter by event type' do
+    event_type = FactoryBot.create(:event_type, title: 'Filterable Type')
+    event = FactoryBot.create(:event, event_type: event_type, policy: FactoryBot.create(:public_policy))
+    other_event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
+
+    get :index, params: { filter: { event_type: event_type.id } }
+    assert_response :success
+
+    assert_equal [event], assigns(:events).to_a, 'Should only return events of the specified type'
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', event_path(event), text: event.title
+      assert_select 'a[href=?]', event_path(other_event), text: other_event.title, count: 0
+    end
+  end
+
 end
