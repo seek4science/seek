@@ -39,6 +39,15 @@
                            'Sandbox instance URL', "A URL of an instance of SEEK to be used for testing/development. Users will be directed here if they attempt to create a #{t('project')} or #{t('programme')} with a name including \"test\".") %>
     <%= admin_text_setting(:sandbox_instance_name, Seek::Config.sandbox_instance_name,
                            'Sandbox instance name', "The name of the testing/sandbox instance.") %>
+    <h2>External search adaptors</h2>
+    <p>Toggle which external search adaptors should be active. These toggles override the 'enabled' flag in each adaptor's YAML file.</p>
+    <% adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) } %>
+    <% current = Seek::Config.external_search_adaptors || {} %>
+    <% adaptor_files.each do |adaptor| %>
+      <% key = adaptor['adaptor_class_name'] %>
+      <% enabled = if current.respond_to?(:key?) && current.key?(key) then current[key] else adaptor['enabled'] end %>
+      <%= admin_checkbox_setting("external_search_adaptors[#{key}]", 1, enabled, adaptor['name'], adaptor['partial_path']) %>
+    <% end %>
     <h2>Policy and license settings</h2>
     <%= access_type_options = [Policy::PRIVATE, Policy::VISIBLE, Policy::ACCESSIBLE]
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.

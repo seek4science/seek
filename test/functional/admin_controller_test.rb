@@ -701,4 +701,105 @@ class AdminControllerTest < ActionController::TestCase
 
     assert flash[:error].blank?
   end
+
+  test 'should update external search adaptors settings' do
+    # Get available adaptors from YAML files
+    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    skip 'No adaptors configured' if adaptor_files.empty?
+
+    # Build params to disable all adaptors
+    adaptors_params = {}
+    adaptor_files.each do |adaptor|
+      adaptors_params[adaptor['adaptor_class_name']] = '0' # Disabled
+    end
+
+    with_config_value(:external_search_adaptors, {}) do
+      post :update_settings, params: adaptors_params
+
+      # Verify settings were saved
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, _value|
+        # The controller converts '0' to false and '1' to true
+        assert_equal false, saved_config[key], "Adaptor #{key} should be disabled"
+      end
+    end
+  end
+
+  test 'should enable external search adaptors via update_settings' do
+    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    skip 'No adaptors configured' if adaptor_files.empty?
+
+    # Build params to enable all adaptors
+    adaptors_params = {}
+    adaptor_files.each do |adaptor|
+      adaptors_params[adaptor['adaptor_class_name']] = '1' # Enabled
+    end
+
+    with_config_value(:external_search_adaptors, {}) do
+      post :update_settings, params: adaptors_params
+
+      # Verify settings were saved
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, _value|
+        assert_equal true, saved_config[key], "Adaptor #{key} should be enabled"
+      end
+    end
+  end
+
+  test 'should handle mixed enabled/disabled adaptors in update_settings' do
+    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    skip 'No adaptors configured' if adaptor_files.empty?
+
+    adaptors_params = {}
+    adaptor_files.each_with_index do |adaptor, idx|
+      adaptors_params[adaptor['adaptor_class_name']] = idx.even? ? '1' : '0'
+    end
+
+    with_config_value(:external_search_adaptors, {}) do
+      post :update_settings, params: adaptors_params
+
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, value|
+        expected = value == '1'
+        assert_equal expected, saved_config[key], "Adaptor #{key} should be #{expected ? 'enabled' : 'disabled'}"
+      end
+    end
+  end
+
+  test 'settings page displays external search adaptors' do
+    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    skip 'No adaptors configured' if adaptor_files.empty?
+
+    get :settings
+    assert_response :success
+
+    # Verify page mentions adaptors
+    assert_includes @response.body, 'External search adaptors'.downcase, 'Settings page should mention external search adaptors'
+
+    # Verify each adaptor name appears on the page
+    adaptor_files.each do |adaptor|
+      assert_includes @response.body.downcase, adaptor['name'].downcase, "Adaptor #{adaptor['name']} should be displayed on settings page"
+    end
+  end
+
+  test 'external search adaptors are respected by ExternalSearch' do
+    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    skip 'No adaptors configured' if adaptor_files.empty?
+
+    first_adaptor_key = adaptor_files.first['adaptor_class_name']
+
+    with_config_values({ external_search_enabled: true, external_search_adaptors: { first_adaptor_key => false } }) do
+      # All adaptors should be disabled
+      adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
+      adaptor_names = adaptors.map { |a| a.class.name }
+      refute_includes adaptor_names, adaptor_files.first['adaptor_class_name'], 'Disabled adaptor should not be instantiated'
+    end
+
+    # Re-enable and verify it appears
+    with_config_values({ external_search_enabled: true, external_search_adaptors: { first_adaptor_key => true } }) do
+      adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
+      adaptor_names = adaptors.map { |a| a.class.name }
+      assert_includes adaptor_names, adaptor_files.first['adaptor_class_name'], 'Enabled adaptor should be instantiated'
+    end
+  end
 end

@@ -58,6 +58,7 @@ jws_enabled:
 copasi_enabled:
 morpheus_enabled:
 external_search_enabled:
+external_search_adaptors:
 piwik_analytics_enabled:
 piwik_analytics_tracking_notice:
 custom_analytics_snippet_enabled:
