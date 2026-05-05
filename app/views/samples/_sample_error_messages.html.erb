@@ -4,7 +4,7 @@
       <p>There were problems with the following fields:</p>
       <ul>
         <% object.errors.each do |error| %>
-          <li><%= error.full_message.html_safe %></li>
+          <li><%= error.full_message %></li>
         <% end %>
       </ul>
     </div>

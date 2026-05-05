@@ -51,7 +51,7 @@ module SamplesHelper
 
     attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
       attr_element_name = "#{element_name}[#{attr.title}]"
-      html += '<div class="form-group"><label>'+attr.label+'</label>'
+      html += '<div class="form-group"><label>'+h(attr.label)+'</label>'
       html +=  required_span if attr.required?
       v = value ? value[attr.title] : nil
       if attr.linked_extended_metadata?
@@ -104,16 +104,16 @@ module SamplesHelper
   end
 
   def sample_attribute_display_title(attribute)
-    title = attribute.title
+    title = h(attribute.title)
     if (unit = attribute.unit) && !unit.dimensionless?
-      title += " ( #{unit} )"
+      title += h(" ( #{unit} )")
     end
     unless attribute.pid.blank?
       title += content_tag(:small, 'data-tooltip'=>attribute.pid) do
-        " [ "+attribute.short_pid+ " ]"
-      end.html_safe
+        (" [ "+h(attribute.short_pid)+ " ]").html_safe
+      end
     end
-    title.html_safe
+    title
   end
 
   def display_attribute(resource, attribute, options = {})
@@ -194,12 +194,12 @@ module SamplesHelper
       html += '<li>'
       if attr.linked_extended_metadata? || attr.linked_extended_metadata_multi?
         html += content_tag(:span, class: 'linked_extended_metdata_display') do
-          folding_panel(attr.label, true, id:attr.title) do
+          folding_panel(h(attr.label), true, id:attr.title) do
             display_attribute_value(v, attr)
           end
         end
       else
-        html += '<label>'+attr.title+'</label>'+' : '
+        html += '<label>'+h(attr.title)+'</label>'+' : '
         html += display_attribute_value(v, attr)
       end
       html += '</li>'

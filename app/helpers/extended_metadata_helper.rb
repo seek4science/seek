@@ -12,7 +12,7 @@ module ExtendedMetadataHelper
 
     if attribute.linked_extended_metadata? || attribute.linked_extended_metadata_multi?
       content_tag(:span, class: 'linked_extended_metdata') do
-        folding_panel(attribute.label, false, id:attribute.title) do
+        folding_panel(h(attribute.label), false, id:attribute.title) do
             attribute_form_element(attribute, resource.extended_metadata.get_attribute_value(attribute.title), element_name, element_class)
         end
       end
@@ -23,10 +23,9 @@ module ExtendedMetadataHelper
   end
 
   def extended_metadata_attribute_description(description)
-    html = '<p class="help-block">'
-    html += '<small>'+description+'</small>'
-    html += '</p>'
-    html.html_safe
+    content_tag(:p, class: 'help-block') do
+      content_tag(:small, description)
+    end
   end
 
   def render_extended_metadata_value(attribute, resource)
@@ -38,7 +37,7 @@ module ExtendedMetadataHelper
     content_tag(:div, class: 'extended_metadata') do
       if attribute.linked_extended_metadata? || attribute.linked_extended_metadata_multi?
         content_tag(:span, class: 'linked_extended_metdata_display') do
-          folding_panel(attribute.label, false, id: attribute.title) do
+          folding_panel(h(attribute.label), false, id: attribute.title) do
             display_attribute(resource.extended_metadata, attribute, link: true)
           end
         end
