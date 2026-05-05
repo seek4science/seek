@@ -50,7 +50,7 @@ module SamplesHelper
 
     attribute.linked_extended_metadata_type.extended_metadata_attributes.each do |attr|
       attr_element_name = "#{element_name}[#{attr.title}]"
-      html += "<div class=\"form-group\"><label>#{attr.label}</label>"
+      html += "<div class=\"form-group\"><label>#{h(attr.label)}</label>"
       html += required_span if attr.required?
       v = value ? value[attr.title] : nil
       if attr.linked_extended_metadata?
@@ -197,7 +197,7 @@ module SamplesHelper
           end
         end
       else
-        html += "<label>#{attr.label}</label> : "
+        html += "<label>#{h(attr.label)}</label> : "
         html += display_attribute_value(v, attr)
       end
       html += '</li>'
