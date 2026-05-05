@@ -109,7 +109,7 @@ module SamplesHelper
       title << ' ( ' << h(unit) << ' )'
     end
     unless attribute.pid.blank?
-      title += content_tag(:small, " [ #{attribute.short_pid} ]", 'data-tooltip' => attribute.pid)
+      title << content_tag(:small, " [ #{attribute.short_pid} ]", 'data-tooltip' => attribute.pid)
     end
     title
   end
