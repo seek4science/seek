@@ -93,7 +93,7 @@ module Seek
           slug = attr.title.to_s.parameterize(separator: '_')
           Rails.logger.warn "[ExtendedMetadataEmitter] Attribute '#{attr.title}' has no pid — " \
                              "emitting as seekh:#{slug}"
-          SEEKHVocab[slug]
+          SeekHealth[slug]
         end
       end
     end

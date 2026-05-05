@@ -4,24 +4,24 @@ class VocabulariesTest < ActiveSupport::TestCase
   HDCAT_BASE = 'http://healthdataportal.eu/ns/health#'.freeze
   SEEKH_BASE = 'https://seek4science.org/vocab/seekh#'.freeze
 
-  # --- HDCATVocab ---
+  # --- HealthDcat ---
 
-  test 'HDCATVocab base URI is correct' do
-    assert_equal HDCAT_BASE, Seek::Rdf::HDCATVocab.to_uri.to_s
+  test 'HealthDcat base URI is correct' do
+    assert_equal HDCAT_BASE, Seek::Rdf::HealthDcat.to_uri.to_s
   end
 
-  test 'HDCATVocab mandatory properties resolve to correct IRIs' do
+  test 'HealthDcat mandatory properties resolve to correct IRIs' do
     {
       healthCategory: 'healthCategory',
       hdab: 'hdab'
     }.each do |method, fragment|
       assert_equal "#{HDCAT_BASE}#{fragment}",
-                   Seek::Rdf::HDCATVocab.send(method).to_s,
-                   "Expected HDCATVocab.#{method} to resolve correctly"
+                   Seek::Rdf::HealthDcat.send(method).to_s,
+                   "Expected HealthDcat.#{method} to resolve correctly"
     end
   end
 
-  test 'HDCATVocab optional dataset properties resolve to correct IRIs' do
+  test 'HealthDcat optional dataset properties resolve to correct IRIs' do
     {
       healthTheme: 'healthTheme',
       populationCoverage: 'populationCoverage',
@@ -38,14 +38,14 @@ class VocabulariesTest < ActiveSupport::TestCase
       trusteddataholder: 'trusteddataholder'
     }.each do |method, fragment|
       assert_equal "#{HDCAT_BASE}#{fragment}",
-                   Seek::Rdf::HDCATVocab.send(method).to_s,
-                   "Expected HDCATVocab.#{method} to resolve correctly"
+                   Seek::Rdf::HealthDcat.send(method).to_s,
+                   "Expected HealthDcat.#{method} to resolve correctly"
     end
   end
 
-  test 'HDCATVocab properties are RDF::URI instances' do
-    assert_kind_of RDF::URI, Seek::Rdf::HDCATVocab.healthCategory
-    assert_kind_of RDF::URI, Seek::Rdf::HDCATVocab.retentionPeriod
+  test 'HealthDcat properties are RDF::URI instances' do
+    assert_kind_of RDF::URI, Seek::Rdf::HealthDcat.healthCategory
+    assert_kind_of RDF::URI, Seek::Rdf::HealthDcat.retentionPeriod
   end
 
   test 'personal data uses dpv:hasPersonalData not a healthdcatap property' do
@@ -56,19 +56,19 @@ class VocabulariesTest < ActiveSupport::TestCase
                  RDF::URI('https://w3id.org/dpv#hasPersonalData').to_s
   end
 
-  # --- SEEKHVocab ---
+  # --- SeekHealth ---
 
-  test 'SEEKHVocab base URI is correct' do
-    assert_equal SEEKH_BASE, Seek::Rdf::SEEKHVocab.to_uri.to_s
+  test 'SeekHealth base URI is correct' do
+    assert_equal SEEKH_BASE, Seek::Rdf::SeekHealth.to_uri.to_s
   end
 
-  test 'SEEKHVocab arbitrary term resolves to correct IRI' do
+  test 'SeekHealth arbitrary term resolves to correct IRI' do
     assert_equal "#{SEEKH_BASE}someExtendedField",
-                 Seek::Rdf::SEEKHVocab[:someExtendedField].to_s
+                 Seek::Rdf::SeekHealth[:someExtendedField].to_s
   end
 
-  test 'SEEKHVocab terms are RDF::URI instances' do
-    assert_kind_of RDF::URI, Seek::Rdf::SEEKHVocab[:anyTerm]
+  test 'SeekHealth terms are RDF::URI instances' do
+    assert_kind_of RDF::URI, Seek::Rdf::SeekHealth[:anyTerm]
   end
 
   # --- ns_prefixes ---

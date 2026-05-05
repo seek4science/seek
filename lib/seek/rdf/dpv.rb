@@ -3,7 +3,7 @@ module Seek
     # W3C Data Privacy Vocabulary (DPV) — https://w3id.org/dpv
     # Not available in rdf-vocab gem; defined manually.
     # Used for personal data categories, legal basis, and processing purpose.
-    class DPVVocab < RDF::Vocabulary('https://w3id.org/dpv#')
+    class Dpv < RDF::Vocabulary('https://w3id.org/dpv#')
       property :hasPersonalData
       property :hasLegalBasis
       property :hasPurpose

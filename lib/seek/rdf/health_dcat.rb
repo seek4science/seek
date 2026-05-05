@@ -8,7 +8,7 @@ module Seek
     # Properties verified against official TTL example files from the repository.
     # Privacy properties (personal data, legal basis, purpose) are in the DPV vocabulary —
     # use dpv:hasPersonalData, dpv:hasLegalBasis, dpv:hasPurpose (https://w3id.org/dpv#).
-    class HDCATVocab < RDF::Vocabulary('http://healthdataportal.eu/ns/health#')
+    class HealthDcat < RDF::Vocabulary('http://healthdataportal.eu/ns/health#')
       # --- Mandatory dataset properties ---
       # healthdcataphealthCategory.ttl  → IRI (skos:Concept from health categories authority table)
       property :healthCategory
