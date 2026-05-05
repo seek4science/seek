@@ -55,7 +55,7 @@
     <!-- End Custom snippet -->
   <% end %>
   <% if Seek::Config.google_analytics_enabled %>
-    <script id="ga-script"/> <!-- so we can check if the ga-script is here -->
+    <script id="ga-script" nonce="<%= content_security_policy_nonce %>"/> <!-- so we can check if the ga-script is here -->
     <%= analytics_init  %>
   <% end %>
 <% end %>

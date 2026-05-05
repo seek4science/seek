@@ -1,4 +1,8 @@
 SEEK::Application.routes.draw do
+  # Content Security Policy violation reporting endpoint
+  # Browsers POST JSON reports here when CSP violations are detected (report-only or enforced).
+  post '/csp-violation-report', to: 'csp_reports#create'
+
   resources :observed_variable_sets
   resources :observed_variables
   use_doorkeeper do
