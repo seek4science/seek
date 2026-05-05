@@ -50,6 +50,8 @@ def load_seek_config_defaults!
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :external_search_enabled, true
+  # per-adaptor enabled/disabled map, keys are adaptor_class_name, values are booleans
+  Seek::Config.default :external_search_adaptors, {}
   Seek::Config.default :project_single_page_enabled, false
   Seek::Config.default :isa_json_compliance_enabled, false
   Seek::Config.default :project_single_page_folders_enabled, false

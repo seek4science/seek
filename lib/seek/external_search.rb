@@ -5,7 +5,7 @@ module Seek
     include Singleton
 
     def initialize
-      @adaptors = {}
+      #@adaptors = {}
     end
 
     def supported?(type = 'all')
@@ -14,7 +14,7 @@ module Seek
 
     # returns an array of instantiated search adaptors that match the appropriate search type, or for any search type if 'all' or nothing is specified.
     def search_adaptors(type = 'all')
-      @adaptors[type] ||= search_adaptor_files(type).collect do |file|
+      search_adaptor_files(type).collect do |file|
         file['adaptor_class_name'].constantize.new(file)
       end
     end
@@ -24,8 +24,32 @@ module Seek
       files = file_names.collect { |filename| YAML.load_file(filename) }
 
       files = files.select { |f| f['search_type'] == type } unless type == 'all'
-      files.select { |f| f['enabled'] == true }
+      # Respect admin-configured adaptor toggles (stored in Seek::Config.external_search_adaptors)
+      files.select { |f| adaptor_enabled?(f) }
     end
+
+    private
+
+    # Determine whether an adaptor file should be considered enabled.
+    # Preference order:
+    # 1) If an entry exists in Seek::Config.external_search_adaptors for the adaptor_class_name, use that
+    # 2) Otherwise fall back to the 'enabled' flag defined in the adaptor YAML file
+    def adaptor_enabled?(file)
+      begin
+        settings = Seek::Config.external_search_adaptors || {}
+      rescue StandardError
+        settings = {}
+      end
+
+      key = file['adaptor_class_name']
+      if settings.respond_to?(:key?) && settings.key?(key)
+        settings[key] == true || settings[key] == 'true' || settings[key] == 1
+      else
+        file['enabled'] == true
+      end
+    end
+
+    public
 
     def search_adaptor_names(type = 'all')
       search_adaptor_files(type).collect { |f| f['name'] }
