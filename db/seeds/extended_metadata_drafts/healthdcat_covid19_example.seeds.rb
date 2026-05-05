@@ -23,10 +23,12 @@ text_type = SampleAttributeType.find_or_initialize_by(title: 'Text')
 text_type.update(base_type: Seek::Samples::BaseType::TEXT)
 
 int_type = SampleAttributeType.find_or_initialize_by(title: 'Integer')
-int_type.update(base_type: Seek::Samples::BaseType::INTEGER, placeholder: '1')
+int_type.update(base_type: Seek::Samples::BaseType::INTEGER, placeholder: '1',
+                rdf_value_type: 'typed_literal', rdf_datatype: 'http://www.w3.org/2001/XMLSchema#integer')
 
 boolean_type = SampleAttributeType.find_or_initialize_by(title: 'Boolean')
-boolean_type.update(base_type: Seek::Samples::BaseType::BOOLEAN)
+boolean_type.update(base_type: Seek::Samples::BaseType::BOOLEAN,
+                    rdf_value_type: 'typed_literal', rdf_datatype: 'http://www.w3.org/2001/XMLSchema#boolean')
 
 linked_emt_type = SampleAttributeType.find_or_initialize_by(title: 'Linked Extended Metadata')
 linked_emt_type.update(base_type: Seek::Samples::BaseType::LINKED_EXTENDED_METADATA)
