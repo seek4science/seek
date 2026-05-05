@@ -29,7 +29,7 @@ module BootstrapHelper
 
   # A collapsible panel
   def folding_panel(title = nil, collapsed = false, options = {}, &block)
-    title = h(title) unless title.nil? || title.html_safe?
+    title = h(title) unless title.nil?
     title += " <span class=\"#{collapsed ? 'caret' : 'caret-up'}\"></span>".html_safe
 
     options[:collapsible] = true

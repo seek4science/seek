@@ -106,12 +106,10 @@ module SamplesHelper
   def sample_attribute_display_title(attribute)
     title = h(attribute.title)
     if (unit = attribute.unit) && !unit.dimensionless?
-      title += h(" ( #{unit} )")
+      title += " ( #{h(unit)} )".html_safe
     end
     unless attribute.pid.blank?
-      title += content_tag(:small, 'data-tooltip'=>attribute.pid) do
-        (" [ "+h(attribute.short_pid)+ " ]").html_safe
-      end
+      title += content_tag(:small, " [ #{attribute.short_pid} ]", 'data-tooltip' => attribute.pid)
     end
     title
   end
