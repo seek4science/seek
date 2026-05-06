@@ -16,17 +16,17 @@ end
 
 namespace :db do
   namespace :sessions do
-    desc 'Trims sessions in batches according to env vars \'BATCH_SIZE\' and \'DAYS_OLD\'. Defaults: BATCH_SIZE=1000, DAYS_OLD=7).'
+    desc 'Trims sessions in batches according to env vars \'SESSION_TRIM_BATCH_SIZE\' and \'SESSION_DAYS_TRIM_THRESHOLD\'. Defaults: SESSION_TRIM_BATCH_SIZE=1000, SESSION_DAYS_TRIM_THRESHOLD=30).'
     task(batch_trim: :environment) do
-      batch_size = ENV.fetch('BATCH_SIZE', '1000').to_i
-      days_old = ENV.fetch('DAYS_OLD', '7').to_i
+      batch_size = ENV.fetch('SESSION_TRIM_BATCH_SIZE', '1000').to_i
+      days_old = ENV.fetch('SESSION_DAYS_TRIM_THRESHOLD', '30').to_i
 
       if batch_size <= 0
-        abort "BATCH_SIZE must be a positive integer"
+        abort "SESSION_TRIM_BATCH_SIZE must be a positive integer"
       end
 
       if days_old <= 0
-        abort "DAYS_OLD must be a positive integer"
+        abort "SESSION_DAYS_TRIM_THRESHOLD must be a positive integer"
       end
 
       cutoff_date = days_old.days.ago
