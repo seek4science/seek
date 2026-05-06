@@ -719,7 +719,7 @@ class AdminControllerTest < ActionController::TestCase
       Seek::ExternalSearch.instance.clear_cached
       refute Seek::ExternalSearch.instance.search_adaptors.empty?
 
-      post :update_settings, params: { external_search_adaptors: adaptors_params }
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
 
       # Verify settings were saved
       saved_config = Seek::Config.external_search_adaptors
@@ -749,7 +749,7 @@ class AdminControllerTest < ActionController::TestCase
       Seek::ExternalSearch.instance.clear_cached
       assert Seek::ExternalSearch.instance.search_adaptors.empty?
 
-      post :update_settings, params: { external_search_adaptors: adaptors_params }
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
 
       # Verify settings were saved
       saved_config = Seek::Config.external_search_adaptors
@@ -772,7 +772,7 @@ class AdminControllerTest < ActionController::TestCase
 
     with_config_value(:external_search_adaptors, {}) do
       Seek::ExternalSearch.instance.clear_cached
-      post :update_settings, params: { external_search_adaptors: adaptors_params }
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
 
       saved_config = Seek::Config.external_search_adaptors
       adaptors_params.each do |key, value|

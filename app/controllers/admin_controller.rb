@@ -106,6 +106,15 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
+    # Per-adaptor external search toggles (map: key => boolean)
+    if params.key?(:external_search_adaptors)
+      adaptor_settings = {}
+      params[:external_search_adaptors].each do |k, v|
+        adaptor_settings[k] = (v == '1' || v == 'true' || v == true)
+      end
+      Seek::Config.external_search_adaptors = adaptor_settings
+      Seek::ExternalSearch.instance.clear_cached
+    end
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
     Seek::Config.max_filters = params[:max_filters]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
@@ -341,16 +350,6 @@ class AdminController < ApplicationController
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
-
-    # Per-adaptor external search toggles (map: key => boolean)
-    if params.key?(:external_search_adaptors)
-      adaptor_settings = {}
-      params[:external_search_adaptors].each do |k, v|
-        adaptor_settings[k] = (v == '1' || v == 'true' || v == true)
-      end
-      Seek::Config.external_search_adaptors = adaptor_settings
-      Seek::ExternalSearch.instance.clear_cached
-    end
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
     Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
