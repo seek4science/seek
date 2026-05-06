@@ -714,7 +714,7 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     with_config_value(:external_search_adaptors, {}) do
-      post :update_settings, params: adaptors_params
+      post :update_settings, params: { external_search_adaptors: adaptors_params }
 
       # Verify settings were saved
       saved_config = Seek::Config.external_search_adaptors
@@ -736,7 +736,7 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     with_config_value(:external_search_adaptors, {}) do
-      post :update_settings, params: adaptors_params
+      post :update_settings, params: { external_search_adaptors: adaptors_params }
 
       # Verify settings were saved
       saved_config = Seek::Config.external_search_adaptors
@@ -756,7 +756,7 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     with_config_value(:external_search_adaptors, {}) do
-      post :update_settings, params: adaptors_params
+      post :update_settings, params: { external_search_adaptors: adaptors_params }
 
       saved_config = Seek::Config.external_search_adaptors
       adaptors_params.each do |key, value|

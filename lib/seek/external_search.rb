@@ -1,12 +1,6 @@
-
 module Seek
   class ExternalSearch
-
     include Singleton
-
-    def initialize
-      #@adaptors = {}
-    end
 
     def supported?(type = 'all')
       Seek::Config.external_search_enabled && search_adaptors(type).select(&:supported?).any?
@@ -43,7 +37,7 @@ module Seek
 
       key = file['adaptor_class_name']
       if settings.respond_to?(:key?) && settings.key?(key)
-        settings[key] == true || settings[key] == 'true' || settings[key] == 1
+        [true, 'true', 1].include?(settings[key])
       else
         file['enabled'] == true
       end
@@ -57,25 +51,19 @@ module Seek
 
     def external_item(item_id, type = 'all')
       search_adaptors(type).collect do |adaptor|
-        begin
-          adaptor.get_item item_id
-        rescue Exception => e
-          Rails.logger.error("Error getting external item #{item_id} with #{adaptor} - #{e.class.name}:#{e.message}")
-          []
-          raise e if Rails.env.development?
-        end
+        adaptor.get_item item_id
+      rescue Exception => e
+        Rails.logger.error("Error getting external item #{item_id} with #{adaptor} - #{e.class.name}:#{e.message}")
+        raise e if Rails.env.development?
       end.flatten.uniq
     end
 
     def external_search(query, type = 'all')
       search_adaptors(type).collect do |adaptor|
-        begin
-          adaptor.search query
-        rescue Exception => e
-          Rails.logger.error("Error performing external search with #{adaptor} - #{e.class.name}:#{e.message}")
-          []
-          raise e unless Rails.env.production?
-        end
+        adaptor.search query
+      rescue Exception => e
+        Rails.logger.error("Error performing external search with #{adaptor} - #{e.class.name}:#{e.message}")
+        raise e unless Rails.env.production?
       end.flatten.uniq
     end
 
