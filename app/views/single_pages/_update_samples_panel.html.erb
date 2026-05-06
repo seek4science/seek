@@ -67,14 +67,18 @@
               <% unless key == 'uuid' %>
                 <% if @registered_sample_multi_fields.include?(key) %>
                   <td>
-                    <% val.each do |sub_sample| %>
-                      <span class="badge" title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                    <% unless val.blank? %>
+                      <% val.each do |sub_sample| %>
+                        <span class="badge" title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <% end %>
                     <% end %>
                   </td>
                 <% elsif @cv_list_fields.include?(key) %>
                   <td>
-                    <% val.each do |cv_term| %>
-                      <span class="label label-default" title='<%= cv_term %>'><%= cv_term %></span>
+                    <% unless val.blank? %>
+                      <% val.each do |cv_term| %>
+                        <span class="label label-default" title='<%= cv_term %>'><%= cv_term %></span>
+                      <% end %>
                     <% end %>
                   </td>
                 <% elsif @registered_sample_fields.include?(key) %>

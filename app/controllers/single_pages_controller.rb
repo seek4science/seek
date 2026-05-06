@@ -349,27 +349,31 @@ class SinglePagesController < ApplicationController
   def sample_type_samples(sample_type, authorization_method = nil)
     if authorization_method
       sample_type.samples&.authorized_for(authorization_method)&.map do |sample|
-        attributes =
+        sample_metadata =
           begin
             JSON.parse(sample[:json_metadata])
           rescue JSON::ParserError
             {}
           end
 
+        remove_nil_assets!(sample_metadata)
+
         { 'id' => sample.id,
-          'uuid' => sample.uuid }.merge(attributes)
+          'uuid' => sample.uuid }.merge(sample_metadata)
       end
     else
       sample_type.samples&.map do |sample|
-        attributes =
+        sample_metadata =
           begin
             JSON.parse(sample[:json_metadata])
           rescue JSON::ParserError
             {}
           end
 
+        remove_nil_assets!(sample_metadata)
+
         { 'id' => sample.id,
-          'uuid' => sample.uuid }.merge(attributes)
+          'uuid' => sample.uuid }.merge(sample_metadata)
       end
     end
   end
@@ -388,8 +392,8 @@ class SinglePagesController < ApplicationController
       is_changed = false
 
       db_sample.map do |k, v|
-        unless ees[k] == v || %w[id uuid].include?(k)
-          is_changed = true
+        unless %w[id uuid].include?(k)
+          is_changed = compare_fields(ees[k], v)
           break
         end
       end
@@ -438,6 +442,43 @@ class SinglePagesController < ApplicationController
     ["Sample Type Metadata", "Samples", "Controlled Vocabularies"].all? do |expected_sheet|
       workbook.sheet_names.include? expected_sheet
     end
+  end
+
+  def remove_nil_assets!(metadata)
+    metadata.each do |key, value|
+      if value.blank?
+        metadata[key] = nil
+      end
+
+      if value.is_a? Hash
+        if value.keys.include?('id') && !value['id'].present?
+          metadata[key] = nil
+        end
+      end
+
+      if value.is_a? Array
+        value = value.map do |subvalue|
+          if subvalue.is_a? Hash
+            if subvalue.keys.include?('id') && !subvalue['id'].present?
+              nil
+            else
+              subvalue
+            end
+          else
+            subvalue
+          end
+        end.compact
+
+        if value.blank?
+          metadata[key] = nil
+        end
+      end
+    end
+    # metadata
+  end
+
+  def compare_fields(incoming_value, reference_value)
+    incoming_value == reference_value
   end
 
   def set_up_instance_variable
