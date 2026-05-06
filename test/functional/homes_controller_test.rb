@@ -805,4 +805,16 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should mention metadata license in footer' do
+    with_config_value(:metadata_license, nil) do
+      get :index
+      assert_select '.ft-info', text: /Metadata is licensed/, count: 0
+    end
+
+    with_config_value(:metadata_license, 'CC0-1.0') do
+      get :index
+      assert_select '.ft-info', text: /Metadata is licensed under Creative Commons Zero v1.0 Universal \(CC0-1.0\)/
+    end
+  end
+
 end
