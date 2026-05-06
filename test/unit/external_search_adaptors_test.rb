@@ -4,6 +4,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
   def setup
     # Clear cache before each test
     Seek::Util.clear_cached
+    Seek::ExternalSearch.instance.clear_cached
     # Reset external search adaptors config to defaults
     Seek::Config.external_search_adaptors = {}
     @config_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect do |fn|
@@ -133,6 +134,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     Seek::Config.external_search_adaptors = setting
     Seek::Util.clear_cached
 
+    Seek::ExternalSearch.instance.clear_cached
     adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
     assert_equal 1, adaptors.count, 'Should have exactly one adaptor when only one is enabled'
   end

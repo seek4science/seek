@@ -2,13 +2,21 @@ module Seek
   class ExternalSearch
     include Singleton
 
+    def initialize
+      clear_cached # Cache for instantiated adaptors by type
+    end
+
+    def clear_cached
+      @adaptors = {}
+    end
+
     def supported?(type = 'all')
       Seek::Config.external_search_enabled && search_adaptors(type).select(&:supported?).any?
     end
 
     # returns an array of instantiated search adaptors that match the appropriate search type, or for any search type if 'all' or nothing is specified.
     def search_adaptors(type = 'all')
-      search_adaptor_files(type).collect do |file|
+      @adaptors[type] ||= search_adaptor_files(type).collect do |file|
         file['adaptor_class_name'].constantize.new(file)
       end
     end
