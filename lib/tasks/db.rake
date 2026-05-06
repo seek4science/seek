@@ -7,7 +7,7 @@ require 'terrapin'
 Rake::Task['db:schema:dump'].enhance do
   begin
     cmd = Terrapin::CommandLine.new("sed -e 's/charset: \"[^\"]*\", //' -e 's/collation: \"[^\"]*\", //' db/schema.rb > db/schema2.rb " \
-      '&& mv db/schema2.rb db/schema.rb')
+                                      '&& mv db/schema2.rb db/schema.rb')
     cmd.run
   rescue StandardError => e
     puts "Failed to convert schema.rb to db agnostic - #{e.message}"
@@ -16,22 +16,42 @@ end
 
 namespace :db do
   namespace :sessions do
-    desc 'Trims sessions in batches according to env vars \'BATCH_SIZE\' and \'DAYS_OLD\' (Defaults => BATCH_SIZE: 1000, DAYS_OLD: 7).'
+    desc 'Trims sessions in batches according to env vars \'BATCH_SIZE\' and \'DAYS_OLD\'. Defaults: BATCH_SIZE=1000, DAYS_OLD=7).'
     task(batch_trim: :environment) do
-      batch_size = ENV['BATCH_SIZE']&.to_i || 1_000
-      days_old = ENV['DAYS_OLD']&.to_i || 7
-      cutoff_date = days_old.days.ago
+      batch_size = ENV.fetch('BATCH_SIZE', '1000').to_i
+      days_old = ENV.fetch('DAYS_OLD', '7').to_i
 
+      if batch_size <= 0
+        abort "BATCH_SIZE must be a positive integer"
+      end
+
+      if days_old <= 0
+        abort "DAYS_OLD must be a positive integer"
+      end
+
+      cutoff_date = days_old.days.ago
       deleted_total = 0
+
+
+      puts "Deleting sessions older than #{days_old} days in batches of #{batch_size}..."
+      puts "Cutoff: #{cutoff_date}"
+
       loop do
-        delete_ids = ActiveRecord::SessionStore::Session.where('updated_at < ?',
-                                                               cutoff_date).limit(batch_size).pluck(:id)
-        deleted_count = delete_ids.count
-        ActiveRecord::SessionStore::Session.where(id: delete_ids).delete_all
+        delete_ids = ActiveRecord::SessionStore::Session
+                       .where('updated_at < ?', cutoff_date)
+                       .order(:updated_at, :id)
+                       .limit(batch_size)
+                       .pluck(:id)
+
+        break if delete_ids.empty?
+
+        deleted_count = ActiveRecord::SessionStore::Session
+                          .where(id: delete_ids)
+                          .delete_all
+
         deleted_total += deleted_count
 
         puts "Deleted #{deleted_count} sessions (Total: #{deleted_total})"
-        break if delete_ids.empty?
 
         sleep(1) # Wait longer between batches to release locks
       end
