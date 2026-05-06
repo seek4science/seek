@@ -26,7 +26,7 @@ module Seek
 
     # Determine whether an adaptor file should be considered enabled.
     # Preference order:
-    # 1) If an entry exists in Seek::Config.external_search_adaptors for the adaptor_class_name, use that
+    # 1) If an entry exists in Seek::Config.external_search_adaptors for the key, use that
     # 2) Otherwise fall back to the 'enabled' flag defined in the adaptor YAML file
     def adaptor_enabled?(file)
       begin
@@ -35,7 +35,7 @@ module Seek
         settings = {}
       end
 
-      key = file['adaptor_class_name']
+      key = file['key']
       if settings.respond_to?(:key?) && settings.key?(key)
         [true, 'true', 1].include?(settings[key])
       else

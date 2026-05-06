@@ -1,5 +1,6 @@
 name: ELIXIR TeSS Events
 adaptor_class_name: Seek::TessSearch::SearchTessAdaptor
+key: tess
 search_type: events
 enabled: true
 legal: "Please retain original author attributes"

@@ -710,7 +710,7 @@ class AdminControllerTest < ActionController::TestCase
     # Build params to disable all adaptors
     adaptors_params = {}
     adaptor_files.each do |adaptor|
-      adaptors_params[adaptor['adaptor_class_name']] = '0' # Disabled
+      adaptors_params[adaptor['key']] = '0' # Disabled
     end
 
     with_config_value(:external_search_adaptors, {}) do
@@ -732,7 +732,7 @@ class AdminControllerTest < ActionController::TestCase
     # Build params to enable all adaptors
     adaptors_params = {}
     adaptor_files.each do |adaptor|
-      adaptors_params[adaptor['adaptor_class_name']] = '1' # Enabled
+      adaptors_params[adaptor['key']] = '1' # Enabled
     end
 
     with_config_value(:external_search_adaptors, {}) do
@@ -752,7 +752,7 @@ class AdminControllerTest < ActionController::TestCase
 
     adaptors_params = {}
     adaptor_files.each_with_index do |adaptor, idx|
-      adaptors_params[adaptor['adaptor_class_name']] = idx.even? ? '1' : '0'
+      adaptors_params[adaptor['key']] = idx.even? ? '1' : '0'
     end
 
     with_config_value(:external_search_adaptors, {}) do
@@ -786,7 +786,7 @@ class AdminControllerTest < ActionController::TestCase
     adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
     skip 'No adaptors configured' if adaptor_files.empty?
 
-    first_adaptor_key = adaptor_files.first['adaptor_class_name']
+    first_adaptor_key = adaptor_files.first['key']
 
     with_config_values({ external_search_enabled: true, external_search_adaptors: { first_adaptor_key => false } }) do
       # All adaptors should be disabled

@@ -342,7 +342,7 @@ class AdminController < ApplicationController
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
 
-    # Per-adaptor external search toggles (map: adaptor_class_name => boolean)
+    # Per-adaptor external search toggles (map: key => boolean)
     if params.key?(:external_search_adaptors)
       adaptor_settings = {}
       params[:external_search_adaptors].each do |k, v|
