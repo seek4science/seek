@@ -24,7 +24,7 @@
                       onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>>
               </button>
             </td>
-            <% update_sample.map do |update_sample_key, update_sample_val| %>
+            <% update_sample.each do |update_sample_key, update_sample_val| %>
               <% unless update_sample_key == 'uuid' %>
                 <% if @registered_sample_multi_fields.include?(update_sample_key) %>
                   <td class='<%= (update_sample_val != db_sample[update_sample_key]) ? "warning" : "default" %>' id='<%= "update-sample-#{update_sample['id']}[#{update_sample_key}]" %>'>

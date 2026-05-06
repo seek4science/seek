@@ -2,7 +2,12 @@
 # Adding the extended metadata sheet
 ########################################################################################################################
 
-emt_values = JSON.parse(extended_metadata.json_metadata)
+emt_values =
+  begin
+    extended_metadata.json_metadata.present? ? JSON.parse(extended_metadata.json_metadata) : {}
+  rescue JSON::ParserError
+    {}
+  end
 
 workbook.add_worksheet(name: sheet_name) do |sheet|
   emt_values.each do |key, val|

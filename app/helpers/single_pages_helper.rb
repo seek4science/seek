@@ -61,7 +61,9 @@ module SinglePagesHelper
         non_blank_values unless non_blank_values.blank?
       end
     elsif is_registered_asset_type_attribute?(attribute)
-      value unless value[:id].blank?
+      unless value.blank?
+        value unless value[:id].blank?
+      end
     else
       value unless value.blank?
     end

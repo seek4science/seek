@@ -22,7 +22,7 @@
               style="background-color:#d9534f;color:white;"
               onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button>
             </td>
-            <% new_sample.map do |new_sample_key, new_sample_val| %>
+            <% new_sample.each do |new_sample_key, new_sample_val| %>
               <% new_sample_val = '<new>' if new_sample_key == 'id' %>
               <% unless new_sample_key == 'uuid' %>
                 <% if @registered_sample_multi_fields.include?(new_sample_key) %>

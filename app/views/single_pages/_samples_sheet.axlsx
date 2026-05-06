@@ -81,11 +81,12 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
     # Apply the Data Validation on the attribute from row 2 until 100000
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')
     dv_range = "#{col_ref}2:#{col_ref}100000"
+    hide_drop_down = !requires_data_validation?(attribute) || sa_terms_size.zero? || false
     sheet.add_data_validation(dv_range,
                               type: :list,
                               formula1: "'Controlled Vocabularies'!$#{col_ref}$2:$#{col_ref}$#{sa_terms_size + 1}",
                               # Field that do not require data validation should not have dropdown
-                              hideDropDown: !requires_data_validation?(attribute),
+                              hideDropDown: hide_drop_down,
                               # If the attribute requires data validation, show Error message
                               # If attribute does not allow free text for CVs, Error message
                               showErrorMessage: !attribute.allow_cv_free_text && requires_data_validation?(attribute),
