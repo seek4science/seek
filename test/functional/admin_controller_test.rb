@@ -705,7 +705,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'should update external search adaptors settings' do
     # Get available adaptors from YAML files
     adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
-    skip 'No adaptors configured' if adaptor_files.empty?
+    fail 'No adaptors configured' if adaptor_files.empty?
 
     # Build params to disable all adaptors
     adaptors_params = {}
@@ -735,7 +735,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'should enable external search adaptors via update_settings' do
     adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
-    skip 'No adaptors configured' if adaptor_files.empty?
+    fail 'No adaptors configured' if adaptor_files.empty?
 
     # Build params to enable all adaptors
     adaptors_params = {}
@@ -763,7 +763,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'should handle mixed enabled/disabled adaptors in update_settings' do
     adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
-    skip 'No adaptors configured' if adaptor_files.empty?
+    fail 'No adaptors configured' if adaptor_files.empty?
 
     adaptors_params = {}
     adaptor_files.each_with_index do |adaptor, idx|
@@ -784,7 +784,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'settings page displays external search adaptors' do
     adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
-    skip 'No adaptors configured' if adaptor_files.empty?
+    fail 'No adaptors configured' if adaptor_files.empty?
 
     get :settings
     assert_response :success
@@ -800,7 +800,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'external search adaptors are respected by ExternalSearch' do
     adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
-    skip 'No adaptors configured' if adaptor_files.empty?
+    fail 'No adaptors configured' if adaptor_files.empty?
 
     first_adaptor_key = adaptor_files.first['key']
 
