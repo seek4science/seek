@@ -349,6 +349,7 @@ class AdminController < ApplicationController
         adaptor_settings[k] = (v == '1' || v == 'true' || v == true)
       end
       Seek::Config.external_search_adaptors = adaptor_settings
+      Seek::ExternalSearch.instance.clear_cached
     end
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]

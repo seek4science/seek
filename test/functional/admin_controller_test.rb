@@ -709,11 +709,16 @@ class AdminControllerTest < ActionController::TestCase
 
     # Build params to disable all adaptors
     adaptors_params = {}
+    setting = {}
     adaptor_files.each do |adaptor|
       adaptors_params[adaptor['key']] = '0' # Disabled
+      setting[adaptor['key']] = true
     end
 
-    with_config_value(:external_search_adaptors, {}) do
+    with_config_value(:external_search_adaptors, setting) do
+      Seek::ExternalSearch.instance.clear_cached
+      refute Seek::ExternalSearch.instance.search_adaptors.empty?
+
       post :update_settings, params: { external_search_adaptors: adaptors_params }
 
       # Verify settings were saved
@@ -722,6 +727,9 @@ class AdminControllerTest < ActionController::TestCase
         # The controller converts '0' to false and '1' to true
         assert_equal false, saved_config[key], "Adaptor #{key} should be disabled"
       end
+
+      # checking the caching has been cleared
+      assert Seek::ExternalSearch.instance.search_adaptors.empty?
     end
   end
 
@@ -731,11 +739,16 @@ class AdminControllerTest < ActionController::TestCase
 
     # Build params to enable all adaptors
     adaptors_params = {}
+    setting = {}
     adaptor_files.each do |adaptor|
       adaptors_params[adaptor['key']] = '1' # Enabled
+      setting[adaptor['key']] = false
     end
 
-    with_config_value(:external_search_adaptors, {}) do
+    with_config_value(:external_search_adaptors, setting) do
+      Seek::ExternalSearch.instance.clear_cached
+      assert Seek::ExternalSearch.instance.search_adaptors.empty?
+
       post :update_settings, params: { external_search_adaptors: adaptors_params }
 
       # Verify settings were saved
@@ -743,6 +756,8 @@ class AdminControllerTest < ActionController::TestCase
       adaptors_params.each do |key, _value|
         assert_equal true, saved_config[key], "Adaptor #{key} should be enabled"
       end
+
+      refute Seek::ExternalSearch.instance.search_adaptors.empty?
     end
   end
 
@@ -756,6 +771,7 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     with_config_value(:external_search_adaptors, {}) do
+      Seek::ExternalSearch.instance.clear_cached
       post :update_settings, params: { external_search_adaptors: adaptors_params }
 
       saved_config = Seek::Config.external_search_adaptors
@@ -790,6 +806,7 @@ class AdminControllerTest < ActionController::TestCase
 
     with_config_values({ external_search_enabled: true, external_search_adaptors: { first_adaptor_key => false } }) do
       # All adaptors should be disabled
+      Seek::ExternalSearch.instance.clear_cached
       adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
       adaptor_names = adaptors.map { |a| a.class.name }
       refute_includes adaptor_names, adaptor_files.first['adaptor_class_name'], 'Disabled adaptor should not be instantiated'
@@ -797,6 +814,7 @@ class AdminControllerTest < ActionController::TestCase
 
     # Re-enable and verify it appears
     with_config_values({ external_search_enabled: true, external_search_adaptors: { first_adaptor_key => true } }) do
+      Seek::ExternalSearch.instance.clear_cached
       adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
       adaptor_names = adaptors.map { |a| a.class.name }
       assert_includes adaptor_names, adaptor_files.first['adaptor_class_name'], 'Enabled adaptor should be instantiated'
