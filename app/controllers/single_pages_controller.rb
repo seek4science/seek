@@ -267,7 +267,13 @@ class SinglePagesController < ApplicationController
         validate_cv_terms &&= current_sample_attribute[:required] && !cell_value.blank?
         attr_terms = validate_cv_terms ? cv_sample_attributes.detect { |sa| sa[:title] == sample_fields[i] }[:cv_terms] : []
         if @registered_sample_multi_fields.include?(sample_fields[i])
-          parsed_json = cell_value.nil? ? [] : JSON.parse(cell_value.gsub(/"=>/x, '":'))
+          parsed_json =
+            begin
+              cell_value.nil? ? [] : JSON.parse(cell_value.gsub(/"=>/x, '":'))
+            rescue JSON::ParserError
+              []
+            end
+
           parsed_excel_input_samples = parsed_json.map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
             unless Sample.find(subsample['id'])&.authorized_for_view?
@@ -279,7 +285,13 @@ class SinglePagesController < ApplicationController
           obj.merge!(sample_fields[i] => parsed_excel_input_samples)
         elsif [@registered_sample_fields, @registered_sops_fields, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(sample_fields[i]) }
           unless cell_value.nil?
-            parsed_excel_registered_asset = JSON.parse(cell_value.gsub(/"=>/x, '":'))
+            parsed_excel_registered_asset =
+              begin
+                JSON.parse(cell_value.gsub(/"=>/x, '":'))
+              rescue JSON::ParserError
+                nil
+              end
+
             if @registered_sample_fields.include?(sample_fields[i])
               unless Sample.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
                 raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
@@ -302,7 +314,12 @@ class SinglePagesController < ApplicationController
           end
           obj.merge!(sample_fields[i] => parsed_excel_registered_asset)
         elsif @cv_list_fields.include?(sample_fields[i])
-          parsed_cv_terms = JSON.parse(cell_value)
+          parsed_cv_terms =
+            begin
+              cell_value.blank? ? [] : JSON.parse(cell_value)
+            rescue JSON::ParserError
+              []
+            end
           # CV validation for CV_LIST attributes
           parsed_cv_terms.map do |term|
             if !attr_terms.include?(term) && validate_cv_terms
@@ -332,13 +349,25 @@ class SinglePagesController < ApplicationController
   def sample_type_samples(sample_type, authorization_method = nil)
     if authorization_method
       sample_type.samples&.authorized_for(authorization_method)&.map do |sample|
-        attributes = JSON.parse(sample[:json_metadata])
+        attributes =
+          begin
+            JSON.parse(sample[:json_metadata])
+          rescue JSON::ParserError
+            {}
+          end
+
         { 'id' => sample.id,
           'uuid' => sample.uuid }.merge(attributes)
       end
     else
       sample_type.samples&.map do |sample|
-        attributes = JSON.parse(sample[:json_metadata])
+        attributes =
+          begin
+            JSON.parse(sample[:json_metadata])
+          rescue JSON::ParserError
+            {}
+          end
+
         { 'id' => sample.id,
           'uuid' => sample.uuid }.merge(attributes)
       end
