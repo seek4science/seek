@@ -6,7 +6,7 @@
 # FIXME: Use Seek::Config.session_store_timeout somehow
 SEEK::Application.config.session_store(:redis_session_store,
                                        redis: {
-                                         url: ENV.fetch("REDIS_URL"),
+                                         url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"),
                                          expire_after: 30.minutes,
                                          key_prefix: "session:",
                                          ssl_params: Rails.env.production? ? { verify_mode: OpenSSL::SSL::VERIFY_PEER } : nil
