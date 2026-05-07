@@ -291,44 +291,29 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'should show external search when not logged in' do
     with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, true do
-        get :index
-        assert_response :success
-        assert_select 'div#search_box input#include_external_search', count: 1
-      end
+      get :index
+      assert_response :success
+      assert_select 'div#search_box input#include_external_search', count: 1
     end
   end
 
   test 'should show external search when logged in' do
     login_as FactoryBot.create(:user)
     with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, true do
-        get :index
-        assert_response :success
-        assert_select 'div#search_box input#include_external_search', count: 1
-      end
-    end
-  end
-
-  test 'should not show external search when disabled' do
-    login_as FactoryBot.create(:user)
-    with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, false do
-        get :index
-        assert_response :success
-        assert_select 'div#search_box input#include_external_search', count: 0
-      end
+      get :index
+      assert_response :success
+      assert_select 'div#search_box input#include_external_search', count: 1
     end
   end
 
   test 'should show tag cloud according to config' do
-    get :index
-    assert_select 'div#sidebar_tag_cloud', count: 1
-    with_config_value :tagging_enabled, false do
-      get :index
-      assert_select 'div#sidebar_tag_cloud', count: 0
-    end
-  end
+   get :index
+   assert_select 'div#sidebar_tag_cloud', count: 1
+   with_config_value :tagging_enabled, false do
+     get :index
+     assert_select 'div#sidebar_tag_cloud', count: 0
+   end
+ end
 
   test 'should show tag cloud according to config when logged in' do
     login_as(FactoryBot.create(:person))

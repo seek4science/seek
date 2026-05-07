@@ -804,7 +804,7 @@ class AdminControllerTest < ActionController::TestCase
 
     first_adaptor_key = adaptor_files.first['key']
 
-    with_config_values({ external_search_enabled: true, external_search_adaptors: { first_adaptor_key => false } }) do
+    with_config_values({ external_search_adaptors: { first_adaptor_key => false } }) do
       # All adaptors should be disabled
       Seek::ExternalSearch.instance.clear_cached
       adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
@@ -813,7 +813,7 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     # Re-enable and verify it appears
-    with_config_values({ external_search_enabled: true, external_search_adaptors: { first_adaptor_key => true } }) do
+    with_config_values({ external_search_adaptors: { first_adaptor_key => true } }) do
       Seek::ExternalSearch.instance.clear_cached
       adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
       adaptor_names = adaptors.map { |a| a.class.name }

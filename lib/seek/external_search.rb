@@ -11,7 +11,7 @@ module Seek
     end
 
     def supported?(type = 'all')
-      Seek::Config.external_search_enabled && search_adaptors(type).select(&:supported?).any?
+      search_adaptors(type).select(&:supported?).any?
     end
 
     # returns an array of instantiated search adaptors that match the appropriate search type, or for any search type if 'all' or nothing is specified.
