@@ -3,9 +3,7 @@ require 'test_helper'
 class SearchHelperTest < ActionView::TestCase
 
   test 'external_search_supported' do
-    config_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect do |fn|
-      YAML.load_file(fn)
-    end
+    config_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
 
     # all adaptors turned off
     setting = {}

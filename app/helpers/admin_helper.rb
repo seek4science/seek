@@ -1,4 +1,20 @@
 module AdminHelper
+  def external_search_adaptor_settings
+    adaptor_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
+    current = Seek::Config.external_search_adaptors || {}
+
+    safe_join(adaptor_files.collect do |adaptor|
+      key = adaptor['key']
+      enabled = if current.respond_to?(:key?) && current.key?(key)
+                  current[key]
+                else
+                  adaptor['enabled']
+                end
+      description = "Whether the #{adaptor['name']} external search is active"
+      admin_checkbox_setting("external_search_adaptors[#{key}]", 1, enabled, adaptor['name'], description)
+    end)
+  end
+
   # true for tags with a name longer than 50chars or containing a semi-colon, comma, forward slash, colon or pipe character
   def dubious_tag?(tag)
     tag.text.length > 50 || [';', ',', ':', '/', '|'].detect { |c| tag.text.include?(c) }

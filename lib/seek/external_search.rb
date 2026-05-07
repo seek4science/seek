@@ -21,13 +21,18 @@ module Seek
       end
     end
 
-    def search_adaptor_files(type = 'all')
+    def search_adaptor_files(type = 'all', include_disabled: false)
       file_names = Dir.glob('config/external_search_adaptors/*.yml')
       files = file_names.collect { |filename| YAML.load_file(filename) }
 
       files = files.select { |f| f['search_type'] == type } unless type == 'all'
       # Respect admin-configured adaptor toggles (stored in Seek::Config.external_search_adaptors)
-      files.select { |f| adaptor_enabled?(f) }
+      if include_disabled
+        files
+      else
+        files.select { |f| adaptor_enabled?(f) }
+      end
+
     end
 
     private
