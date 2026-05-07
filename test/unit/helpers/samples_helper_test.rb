@@ -42,6 +42,18 @@ class SamplesHelperTest < ActionView::TestCase
     #pid
     attribute = FactoryBot.create(:sample_sample_attribute, title:'The title',pid:'http://pid.org/attr#title',sample_type: FactoryBot.create(:simple_sample_type))
     assert_equal "The title<small data-tooltip=\"http://pid.org/attr#title\"> [ title ]</small>",sample_attribute_display_title(attribute)
+
+    # XSS: malicious HTML in title should be escaped
+    attribute = FactoryBot.create(:sample_sample_attribute, title:'<script>alert("xss")</script>',sample_type: FactoryBot.create(:simple_sample_type))
+    display = sample_attribute_display_title(attribute)
+    refute display.include?('<script>'), 'Script tags should be escaped'
+    assert display.include?('&lt;script&gt;'), 'Script tags should be HTML-escaped'
+
+    # XSS: malicious HTML in unit should be escaped
+    attribute = FactoryBot.create(:sample_sample_attribute, title:'The title',unit:FactoryBot.create(:unit, symbol:'<img onerror="alert(1)">'),sample_type: FactoryBot.create(:simple_sample_type))
+    display = sample_attribute_display_title(attribute)
+    refute display.include?('onerror='), 'Event handlers should be escaped'
+    assert display.include?('&lt;img'), 'Image tags should be HTML-escaped'
   end
 
   test 'attempt to show sample extract button' do
