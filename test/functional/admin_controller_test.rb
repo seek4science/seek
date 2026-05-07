@@ -716,7 +716,6 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     with_config_value(:external_search_adaptors, setting) do
-      Seek::ExternalSearch.instance.clear_cached
       refute Seek::ExternalSearch.instance.search_adaptors.empty?
 
       post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
@@ -746,7 +745,6 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     with_config_value(:external_search_adaptors, setting) do
-      Seek::ExternalSearch.instance.clear_cached
       assert Seek::ExternalSearch.instance.search_adaptors.empty?
 
       post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
@@ -771,7 +769,6 @@ class AdminControllerTest < ActionController::TestCase
     end
 
     with_config_value(:external_search_adaptors, {}) do
-      Seek::ExternalSearch.instance.clear_cached
       post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
 
       saved_config = Seek::Config.external_search_adaptors
@@ -806,7 +803,6 @@ class AdminControllerTest < ActionController::TestCase
 
     with_config_values({ external_search_adaptors: { first_adaptor_key => false } }) do
       # All adaptors should be disabled
-      Seek::ExternalSearch.instance.clear_cached
       adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
       adaptor_names = adaptors.map { |a| a.class.name }
       refute_includes adaptor_names, adaptor_files.first['adaptor_class_name'], 'Disabled adaptor should not be instantiated'
@@ -814,7 +810,6 @@ class AdminControllerTest < ActionController::TestCase
 
     # Re-enable and verify it appears
     with_config_values({ external_search_adaptors: { first_adaptor_key => true } }) do
-      Seek::ExternalSearch.instance.clear_cached
       adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
       adaptor_names = adaptors.map { |a| a.class.name }
       assert_includes adaptor_names, adaptor_files.first['adaptor_class_name'], 'Enabled adaptor should be instantiated'
