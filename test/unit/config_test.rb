@@ -43,16 +43,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u', Seek::Config.seek_video_link
   end
 
-  test 'external search' do
-    with_config_value :external_search_enabled, true do
-      assert Seek::Config.external_search_enabled
-    end
-
-    with_config_value :external_search_enabled, false do
-      assert !Seek::Config.external_search_enabled
-    end
-  end
-
   test 'denylisted feeds' do
     Seek::Config.denylisted_feeds = { 'http://google.com' => Time.parse('1 Sep 2014'), 'http://fish.com' => Time.parse('1 June 2014') }
     assert_equal Time.parse('1 Sep 2014'), Seek::Config.denylisted_feeds['http://google.com']
