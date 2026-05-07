@@ -1,5 +1,6 @@
 <% unless @new_samples.nil? or @new_samples.compact.none? %>
-  <%= folding_panel("New Samples <span id='new-samples-counter' class='label label-primary'>#{@new_samples.size}</span>", true, :id => "new-samples-panel", :body_options => { :id => "new-samples-panel-content" },
+  <% title = safe_join(['New Samples ', content_tag(:span, @new_samples.size, id: 'new-samples-counter', class: 'label label-primary')]) %>
+  <%= folding_panel(title, true, :id => "new-samples-panel", :body_options => { :id => "new-samples-panel-content" },
                     :help_text => "These samples have been detected as new samples and will be created.") do %>
     <div class="table-responsive">
       <table id="create-samples-table" class="table">
@@ -18,9 +19,8 @@
           <% new_sample_id = UUID.generate %>
           <tr id='<%= "new-sample-#{new_sample_id}" %>'>
             <td>
-              <button id=<%= "remove-#{new_sample_id}" %> class="btn glyphicon glyphicon-trash danger
-              " style="background-color:#d9534f;color:white;"
-              onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button>
+              <button id="<%= "remove-#{new_sample_id}" %>" class="btn glyphicon glyphicon-trash danger" style="background-color:#d9534f;color:white;"
+              onclick="<%= "removeSample('new-sample-#{new_sample_id}')" %>"></button>
             </td>
             <% new_sample.map do |key, val| %>
               <% val = '<new>' if key == 'id' %>

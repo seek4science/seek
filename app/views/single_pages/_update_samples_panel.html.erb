@@ -1,5 +1,6 @@
 <% unless @update_samples.nil? or @update_samples.compact.none? %>
-  <%= folding_panel("Samples to Update <span id='update-samples-counter' class='label label-warning'>#{@update_samples.size}</span>", true, :id => "existing-samples-panel", :body_options => { :id => "existing-samples-panel-content" },
+  <% title = safe_join(['Samples to Update ', content_tag(:span, @update_samples.size, id: 'update-samples-counter', class: 'label label-warning')]) %>
+  <%= folding_panel(title, true, :id => "existing-samples-panel", :body_options => { :id => "existing-samples-panel-content" },
                     :help_text => "These samples were detected existing samples and will be updated.") do %>
     <div class="table-responsive">
       <table id="update-samples-table" class="table">
@@ -17,11 +18,11 @@
         <% for update_sample in @update_samples %>
           <tr id='<%= "update-sample-#{update_sample['id']}-updated" %>'>
             <% db_sample = @authorized_db_samples.select { |s| s['id'] == update_sample['id'] }.first %>
-            <td rowspan=2>
+            <td rowspan="2">
               <button id="<%= "remove-#{update_sample['id']}" %>"
                       class="btn glyphicon glyphicon-trash danger"
                       style="background-color:#d9534f;color:white;"
-                      onclick=<%= "removeSample('update-sample-#{update_sample['id']}')" %>>
+                      onclick="<%= "removeSample('update-sample-#{update_sample['id']}')" %>">
               </button>
             </td>
             <% update_sample.map do |key, val| %>
