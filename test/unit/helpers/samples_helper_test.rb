@@ -52,8 +52,10 @@ class SamplesHelperTest < ActionView::TestCase
     # XSS: malicious HTML in unit should be escaped
     attribute = FactoryBot.create(:sample_sample_attribute, title:'The title',unit:FactoryBot.create(:unit, symbol:'<img onerror="alert(1)">'),sample_type: FactoryBot.create(:simple_sample_type))
     display = sample_attribute_display_title(attribute)
-    refute display.include?('onerror='), 'Event handlers should be escaped'
+    refute display.include?('<img'), 'Image tags should be escaped (angle brackets)'
+    refute display.include?('"alert(1)"'), 'Quoted attribute values should be escaped'
     assert display.include?('&lt;img'), 'Image tags should be HTML-escaped'
+    assert display.include?('&quot;alert(1)&quot;'), 'Attribute quotes should be HTML-escaped'
   end
 
   test 'attempt to show sample extract button' do
