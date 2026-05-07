@@ -704,7 +704,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'should update external search adaptors settings' do
     # Get available adaptors from YAML files
-    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    adaptor_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
     fail 'No adaptors configured' if adaptor_files.empty?
 
     # Build params to disable all adaptors
@@ -733,7 +733,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'should enable external search adaptors via update_settings' do
-    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    adaptor_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
     fail 'No adaptors configured' if adaptor_files.empty?
 
     # Build params to enable all adaptors
@@ -760,7 +760,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'should handle mixed enabled/disabled adaptors in update_settings' do
-    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    adaptor_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
     fail 'No adaptors configured' if adaptor_files.empty?
 
     adaptors_params = {}
@@ -779,24 +779,25 @@ class AdminControllerTest < ActionController::TestCase
     end
   end
 
-  test 'settings page displays external search adaptors' do
-    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+  test 'features enabled page displays external search adaptors' do
+    adaptor_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
     fail 'No adaptors configured' if adaptor_files.empty?
 
-    get :settings
+    get :features_enabled
     assert_response :success
 
     # Verify page mentions adaptors
-    assert_includes @response.body, 'External search adaptors'.downcase, 'Settings page should mention external search adaptors'
-
-    # Verify each adaptor name appears on the page
-    adaptor_files.each do |adaptor|
-      assert_includes @response.body.downcase, adaptor['name'].downcase, "Adaptor #{adaptor['name']} should be displayed on settings page"
+    assert_select 'div#external-search-details' do
+      # Verify each adaptor name appears on the page
+      adaptor_files.each do |adaptor|
+        assert_select 'div.checkbox label.admin-checkbox', text: adaptor['name']
+        assert_select 'p.help-block', text:/Whether the #{adaptor['name']} external search is active/
+      end
     end
   end
 
   test 'external search adaptors are respected by ExternalSearch' do
-    adaptor_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect { |fn| YAML.load_file(fn) }
+    adaptor_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
     fail 'No adaptors configured' if adaptor_files.empty?
 
     first_adaptor_key = adaptor_files.first['key']
