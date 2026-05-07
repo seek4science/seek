@@ -22,30 +22,11 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     files = Seek::ExternalSearch.instance.search_adaptor_files('all')
     assert files.any?, 'Should return at least some adaptors'
     assert files.all? { |f|
-      f['enabled'] == true || Seek::Config.external_search_adaptors.key?(f['key'])
-    },
-           'All returned adaptors should be enabled (either in YAML or config override)'
+      @config_files.find { |cf| cf['key'] == f['key'] }
+    }, 'All returned adaptors should be enabled by default'
   end
 
-  test 'search_adaptor_files respects adaptor_enabled? preference' do
-    # Assume we have at least one adaptor; check first one
-    assert @config_files.any?, 'Test requires at least one adaptor YAML file'
-
-    adaptor = @config_files.first
-    key = adaptor['key']
-
-    # Verify it appears in search_adaptor_files when using the adaptor's YAML 'enabled' setting
-    result_files = Seek::ExternalSearch.instance.search_adaptor_files('all')
-    adaptor_in_result = result_files.any? { |f| f['key'] == key }
-
-    if adaptor['enabled']
-      assert adaptor_in_result, "Adaptor with 'enabled'=>true should appear in search_adaptor_files"
-    else
-      refute adaptor_in_result, "Adaptor with 'enabled'=>false should not appear in search_adaptor_files"
-    end
-  end
-
-  test 'search_adaptor_files uses Seek::Config override when set' do
+  test 'search_adaptor_files uses Seek::Config when set and without include_disabled' do
     adaptor = @config_files.first
     key = adaptor['key']
 
@@ -56,6 +37,11 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     result_files = Seek::ExternalSearch.instance.search_adaptor_files('all')
     adaptor_in_result = result_files.any? { |f| f['key'] == key }
     refute adaptor_in_result, 'Adaptor should be disabled when Seek::Config override is false'
+
+    # include disabled
+    result_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
+    adaptor_in_result = result_files.any? { |f| f['key'] == key }
+    assert adaptor_in_result, 'Adaptor should be disabled when Seek::Config override is false'
 
     # Force adaptor ON via config override (even if YAML says 'enabled'=>false)
     Seek::Config.external_search_adaptors = { key => true }
@@ -148,40 +134,5 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     Seek::Util.clear_cached
 
     refute Seek::ExternalSearch.instance.supported?('all'), 'Should not be supported when all adaptors are disabled'
-  end
-
-  test 'backward compatibility: YAML enabled flag still works when no config override' do
-    # Reset config
-    Seek::Config.external_search_adaptors = {}
-    Seek::Util.clear_cached
-
-    # Get adaptors using only the YAML'enabled' flag (no overrides in config)
-    files = Seek::ExternalSearch.instance.search_adaptor_files('all')
-
-    # Check they match
-    yaml_enabled_names = @config_files.select { |f| f['enabled'] == true }.map { |f| f['name'] }
-    config_enabled_names = files.map { |f| f['name'] }
-
-    assert_equal yaml_enabled_names.sort, config_enabled_names.sort,
-                 'Should respect YAML enabled flags when no config override'
-  end
-
-  test 'config override takes precedence over YAML enabled flag' do
-    adaptor = @config_files.first
-    key = adaptor['key']
-
-    # Set config override to the opposite of YAML's enabled flag
-    override_value = !adaptor['enabled']
-    Seek::Config.external_search_adaptors = { key => override_value }
-    Seek::Util.clear_cached
-
-    result_files = Seek::ExternalSearch.instance.search_adaptor_files('all')
-    adaptor_in_result = result_files.any? { |f| f['key'] == key }
-
-    if override_value
-      assert adaptor_in_result, 'Config override should enable adaptor'
-    else
-      refute adaptor_in_result, 'Config override should disable adaptor'
-    end
   end
 end

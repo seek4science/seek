@@ -32,7 +32,6 @@ module Seek
       else
         files.select { |f| adaptor_enabled?(f) }
       end
-
     end
 
     private
@@ -52,7 +51,7 @@ module Seek
       if settings.respond_to?(:key?) && settings.key?(key)
         [true, 'true', 1].include?(settings[key])
       else
-        file['enabled'] == true
+        true
       end
     end
 
