@@ -20,7 +20,7 @@ x-shared:
         condition: service_healthy
       solr:
         condition: service_started
-      session-store:
+      session_store:
         condition: service_started
 
 services:
