@@ -134,7 +134,6 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     Seek::Config.external_search_adaptors = setting
     Seek::Util.clear_cached
 
-    Seek::ExternalSearch.instance.clear_cached
     adaptors = Seek::ExternalSearch.instance.search_adaptors('all')
     assert_equal 1, adaptors.count, 'Should have exactly one adaptor when only one is enabled'
   end
