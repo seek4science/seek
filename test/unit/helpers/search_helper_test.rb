@@ -1,13 +1,25 @@
 require 'test_helper'
 
 class SearchHelperTest < ActionView::TestCase
+
   test 'external_search_supported' do
-    with_config_value :external_search_enabled, false do
-      refute external_search_supported?
+    config_files = Dir.glob(Rails.root.join('config', 'external_search_adaptors', '*.yml')).collect do |fn|
+      YAML.load_file(fn)
     end
 
-    with_config_value :external_search_enabled, true do
-      assert external_search_supported?
+    # all adaptors turned off
+    setting = {}
+    config_files.each do |f|
+      setting[f['key']] = false
     end
+    Seek::Config.external_search_adaptors = setting
+
+    refute external_search_supported?
+
+    # turn one on
+    setting = {config_files.first['key'] => true}
+    Seek::Config.external_search_adaptors = setting
+
+    assert external_search_supported?
   end
 end

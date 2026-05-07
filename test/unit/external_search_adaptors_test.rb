@@ -148,10 +148,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     Seek::Config.external_search_adaptors = setting
     Seek::Util.clear_cached
 
-    # Also disable external_search globally
-    with_config_value :external_search_enabled, true do
-      refute Seek::ExternalSearch.instance.supported?('all'), 'Should not be supported when all adaptors are disabled'
-    end
+    refute Seek::ExternalSearch.instance.supported?('all'), 'Should not be supported when all adaptors are disabled'
   end
 
   test 'backward compatibility: YAML enabled flag still works when no config override' do
