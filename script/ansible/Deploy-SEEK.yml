@@ -120,6 +120,15 @@
       tags: packages
       update_cache: yes
 
+    - name: Ensure Redis is enabled and started
+      become: true
+      become_user: root
+      ansible.builtin.service:
+        name: redis-server
+        state: started
+        enabled: yes
+      tags: redis
+
     - name: Correct java version selected
       become: true
       become_user: root
