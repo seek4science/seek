@@ -116,6 +116,7 @@
         - openjdk-11-jdk
         - openssh-server
         - poppler-utils
+        - redis-sentinel
         - redis-server
         - redis-tools
         - sqlite3
