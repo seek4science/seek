@@ -79,44 +79,44 @@
         state: latest
       tags: packages
 
-    - name: Install a list of packages
+    - name: Install list of dependencies
       become: true
       become_user: root
       ansible.builtin.apt:
         pkg:
+        - autoconf
+        - automake
+        - bison
         - build-essential
         - cmake
+        - gawk
         - git
         - graphviz
         - imagemagick
         - libcurl4-gnutls-dev
+        - libffi-dev
+        - libgdbm-dev
         - libgmp-dev
         - libmagick++-dev
         - libmysqlclient-dev
+        - libncurses5-dev
         - libpq-dev
         - libreadline-dev
         - libreoffice
+        - libsqlite3-dev
         - libssl-dev
         - libxml++2.6-dev
         - libxslt1-dev
+        - libyaml-dev
         - mysql-server
         - nodejs
         - openjdk-11-jdk
         - openssh-server
         - poppler-utils
-        - zip
-        - autoconf
-        - automake
-        - bison
-        - curl
-        - gawk
-        - libffi-dev
-        - libgdbm-dev
-        - libncurses5-dev
-        - libsqlite3-dev
-        - libyaml-dev
         - sqlite3
+        - zip
       tags: packages
+      update_cache: yes
 
     - name: Correct java version selected
       become: true
