@@ -18,6 +18,58 @@
 
     ########## Update and install dependencies
 
+    - name: Install prerequisites for Redis APT repository
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        name:
+          - lsb-release
+          - curl
+          - gpg
+        state: present
+        update_cache: yes
+      tags: [ packages ]
+
+    - name: Download Redis APT repo GPG key
+      become: true
+      become_user: root
+      ansible.builtin.get_url:
+        url: https://packages.redis.io/gpg
+        dest: /tmp/redis.gpg
+        mode: "0644"
+      tags: redis
+
+    - name: Install Redis APT keyring
+      become: true
+      become_user: root
+      ansible.builtin.command:
+        cmd: gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg /tmp/redis.gpg
+        creates: /usr/share/keyrings/redis-archive-keyring.gpg
+      tags: redis
+
+    - name: Add official Redis APT repository
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb {{ ansible_distribution_release }} main"
+        filename: redis
+        state: present
+      tags: redis
+      # This follows Redis' documented APT repo setup. [1](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/apt/)
+
+    - name: Pin Redis packages to 8.6.x
+      become: true
+      become_user: root
+      ansible.builtin.copy:
+        dest: /etc/apt/preferences.d/redis-8.6
+        mode: "0644"
+        content: |
+          Package: redis redis-server redis-sentinel redis-tools
+          Pin: version 6:8.6.*
+          Pin-Priority: 1001
+      tags: redis
+      # Pinning to a version line via APT preferences is the approach Redis documents. [1](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/apt/)
+
     - name: Update all packages to their latest version
       become: true
       become_user: root
