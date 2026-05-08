@@ -53,6 +53,13 @@ services:
     volumes:
       - seek-session-data:/data
     restart: always
+    healthcheck:
+      test:
+        ["redis-cli ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
 
   seek:
     # The SEEK application
