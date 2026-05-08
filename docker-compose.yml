@@ -9,7 +9,7 @@ x-shared:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-      REDIS_URL: redis://session_store:6379/0
+      REDIS_URL: redis://redis:6379/0
     env_file:
       - docker/db.env
     volumes:
@@ -20,7 +20,7 @@ x-shared:
         condition: service_healthy
       solr:
         condition: service_started
-      session_store:
+      redis:
         condition: service_healthy
 
 services:
@@ -46,12 +46,12 @@ services:
       retries: 5
       start_period: 20s
 
-  session_store:
+  redis:
     image: redis:8.6-alpine
     container_name: seek-session-store
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - seek-session-data:/data
+      - seek-redis-data:/data
     restart: always
     healthcheck:
       test:
@@ -117,5 +117,5 @@ volumes:
     external: true
   seek-cache:
     external: true
-  seek-session-data:
+  seek-redis-data:
     external: true
