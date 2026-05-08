@@ -25,7 +25,7 @@ jobs:
           docker volume create --name=seek-mysql-db
           docker volume create --name=seek-solr-data
           docker volume create --name=seek-cache
-          docker volume create --name=seek-session-data
+          docker volume create --name=seek-redis-data
       - name: Build and run the Docker containers
         run: docker compose --file docker-compose.yml --file docker-compose.build.yml up --build --detach --wait
         continue-on-error: true
