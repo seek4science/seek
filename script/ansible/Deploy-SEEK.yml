@@ -113,6 +113,8 @@
         - openjdk-11-jdk
         - openssh-server
         - poppler-utils
+        - redis-server
+        - redis-tools
         - sqlite3
         - zip
       tags: packages
