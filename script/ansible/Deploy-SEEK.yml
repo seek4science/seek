@@ -116,20 +116,20 @@
         - openjdk-11-jdk
         - openssh-server
         - poppler-utils
-        - redis-sentinel
-        - redis-server
         - redis-tools
         - sqlite3
         - zip
       tags: packages
 
-    - name: Ensure Redis is enabled and started
+    - name: Wait for Redis in service container to respond to PING (localhost:6379)
       become: true
       become_user: root
-      ansible.builtin.service:
-        name: redis-server
-        state: started
-        enabled: yes
+      ansible.builtin.command: redis-cli -h 127.0.0.1 -p 6379 ping
+      register: redis_ping
+      changed_when: false
+      retries: 20
+      delay: 3
+      until: redis_ping.stdout is search("PONG")
       tags: redis
 
     - name: Correct java version selected
