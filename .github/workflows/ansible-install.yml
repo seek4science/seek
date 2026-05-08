@@ -60,7 +60,7 @@ jobs:
       - name: Install SEEK through ansible
         working-directory: /home/runner/work/seek/seek/script/ansible/
         run: |
-          ansible-playbook Deploy-SEEK.yml --skip-tags database
+          ansible-playbook Deploy-SEEK.yml --skip-tags "database,redis-server"
 
       - name: Configures database
         working-directory: /home/runner/work/SEEK
