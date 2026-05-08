@@ -9,23 +9,21 @@ class AbstractSearchAdaptorTest < ActiveSupport::TestCase
   end
 
   test 'reading base config' do
-    adaptor = Seek::AbstractSearchAdaptor.new('enabled' => true, 'partial_path' => 'lib/a-path.erb', 'name' => 'NATure Protocols', 'search_type' => 'sops')
+    adaptor = Seek::AbstractSearchAdaptor.new('partial_path' => 'lib/a-path.erb', 'name' => 'NATure Protocols', 'search_type' => 'sops', 'key' => 'nature')
 
-    assert adaptor.enabled?
     assert_equal 'lib/a-path.erb', adaptor.partial_path
     assert_equal 'NATure Protocols', adaptor.name
     assert_equal 'sops', adaptor.search_type
+    assert_equal 'nature', adaptor.key
 
-    adaptor = Seek::AbstractSearchAdaptor.new('enabled' => false, 'partial_path' => 'lib/a-path.erb')
-    assert !adaptor.enabled?
   end
 
   test 'reading from yaml file' do
     yaml = YAML.load_file("#{Rails.root}/test/fixtures/files/search_adaptor_config")
     adaptor = Seek::AbstractSearchAdaptor.new(yaml)
-    assert !adaptor.enabled?
     assert_equal 'search/partials/biomodels_resource_list_item', adaptor.partial_path
     assert_equal 'BioModels Database', adaptor.name
     assert_equal 'models', adaptor.search_type
+    assert_equal 'biomodels', adaptor.key
   end
 end

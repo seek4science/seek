@@ -1,17 +1,17 @@
 module AdminHelper
   def external_search_adaptor_settings
-    adaptor_files = Seek::ExternalSearch.instance.search_adaptor_files('all', include_disabled: true)
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
     current = Seek::Config.external_search_adaptors || {}
 
-    safe_join(adaptor_files.collect do |adaptor|
-      key = adaptor['key']
-      enabled = if current.respond_to?(:key?) && current.key?(key)
+    safe_join(adaptors.collect do |adaptor|
+      key = adaptor.key
+      enabled = if current.key?(key)
                   current[key]
                 else
-                  adaptor['enabled']
+                  true
                 end
-      description = "Whether the #{adaptor['name']} external search is active"
-      admin_checkbox_setting("external_search_adaptors[#{key}]", 1, enabled, adaptor['name'], description)
+      description = "Whether the #{adaptor.name} external search is active"
+      admin_checkbox_setting("external_search_adaptors[#{key}]", 1, enabled, adaptor.name, description)
     end)
   end
 

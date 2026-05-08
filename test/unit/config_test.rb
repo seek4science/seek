@@ -656,4 +656,13 @@ class ConfigTest < ActiveSupport::TestCase
       assert_nil Seek::Config.nels_sbi_url
     end
   end
+
+  test 'external_search_adaptors' do
+    setting = { 'tess' => false,
+                'biomodels' => true }
+    Seek::Config.external_search_adaptors = setting
+
+    result = Seek::Config.external_search_adaptors
+    assert_equal setting, result
+  end
 end
