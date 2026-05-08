@@ -7,6 +7,15 @@
 
   tasks:
 
+    ########## Initial check for the OS
+
+    - name: Ensure this play runs only on Ubuntu 22.04/24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_release in ["jammy", "noble"]
+        fail_msg: "This Ansible playbook is intended for Ubuntu 22.04 (jammy) or 24.04 (noble)."
+
     ########## Update and install dependencies
 
     - name: Update all packages to their latest version
