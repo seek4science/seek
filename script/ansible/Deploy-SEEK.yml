@@ -30,21 +30,22 @@
         update_cache: yes
       tags: [ packages ]
 
-    - name: Download Redis APT repo GPG key
+    - name: Download Redis APT repo GPG key (armored)
       become: true
       become_user: root
       ansible.builtin.get_url:
         url: https://packages.redis.io/gpg
-        dest: /tmp/redis.gpg
+        dest: /usr/share/keyrings/redis-archive-keyring.gpg.asc
         mode: "0644"
+      register: redis_key_download
       tags: redis
 
-    - name: Install Redis APT keyring
+    - name: Dearmor Redis key into keyring
       become: true
       become_user: root
       ansible.builtin.command:
-        cmd: gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg /tmp/redis.gpg
-        creates: /usr/share/keyrings/redis-archive-keyring.gpg
+        cmd: gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg /usr/share/keyrings/redis-archive-keyring.gpg.asc
+      when: redis_key_download.changed
       tags: redis
 
     - name: Add official Redis APT repository
