@@ -10,7 +10,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
     # test initializer sets the config to 30 minutes (normal defaut is 1 hour)
     # cannot test with `with_config_value` due to being too late after the tests start
 
-    assert_equal 30.minutes, Rails.application.config.session_options[:expire_after]
+    assert_equal 30.minutes, Rails.application.config.session_options[:redis][:expire_after]
     df = FactoryBot.create :data_file, contributor: User.current_user.person
     User.current_user = nil
     get "/data_files/#{df.id}"
