@@ -11,54 +11,23 @@ module Seek
     end
 
     def supported?(type = 'all')
-      search_adaptors(type).select(&:supported?).any?
+      search_adaptors(type).any?
     end
 
     # returns an array of instantiated search adaptors that match the appropriate search type, or for any search type if 'all' or nothing is specified.
-    def search_adaptors(type = 'all')
+    def search_adaptors(type = 'all', include_disabled: false)
       @adaptors[type] ||= search_adaptor_files(type).collect do |file|
         file['adaptor_class_name'].constantize.new(file)
       end
-    end
-
-    def search_adaptor_files(type = 'all', include_disabled: false)
-      file_names = Dir.glob('config/external_search_adaptors/*.yml')
-      files = file_names.collect { |filename| YAML.load_file(filename) }
-
-      files = files.select { |f| f['search_type'] == type } unless type == 'all'
-      # Respect admin-configured adaptor toggles (stored in Seek::Config.external_search_adaptors)
       if include_disabled
-        files
+        @adaptors[type]
       else
-        files.select { |f| adaptor_enabled?(f) }
+        @adaptors[type].select(&:enabled?)
       end
     end
 
-    private
-
-    # Determine whether an adaptor file should be considered enabled.
-    # Preference order:
-    # 1) If an entry exists in Seek::Config.external_search_adaptors for the key, use that
-    # 2) Otherwise fall back to the 'enabled' flag defined in the adaptor YAML file
-    def adaptor_enabled?(file)
-      begin
-        settings = Seek::Config.external_search_adaptors || {}
-      rescue StandardError
-        settings = {}
-      end
-
-      key = file['key']
-      if settings.respond_to?(:key?) && settings.key?(key)
-        [true, 'true', 1].include?(settings[key])
-      else
-        true
-      end
-    end
-
-    public
-
-    def search_adaptor_names(type = 'all')
-      search_adaptor_files(type).collect { |f| f['name'] }
+    def search_adaptor_names(type = 'all', include_disabled: false)
+      search_adaptors(type, include_disabled: include_disabled).collect(&:name)
     end
 
     def external_item(item_id, type = 'all')
@@ -79,18 +48,16 @@ module Seek
       end.flatten.uniq
     end
 
-    # TODO: code to do each search adaptor in parallel - but currently removed due a random set of errors (that I can't now reproduce') - will revisit after holidy
-    # def external_search query,type='all'
-    #  threads = search_adaptors(type).collect do |adaptor|
-    #    Thread.new do
-    #      Thread.current[:result]=adaptor.search query
-    #    end
-    #  end
-    #  threads.each{|thr| thr.join}
-    #  threads.collect do |thread|
-    #    thread[:result]
-    #  end.flatten.uniq
-    # end
+    private
+
+    def search_adaptor_files(type)
+      file_names = Dir.glob('config/external_search_adaptors/*.yml')
+      files = file_names.collect { |filename| YAML.load_file(filename) }
+
+      files.select! { |f| f['search_type'] == type } unless type == 'all'
+      files
+    end
+
   end
 
   module ExternalSearchResult

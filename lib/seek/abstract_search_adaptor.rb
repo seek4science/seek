@@ -1,12 +1,12 @@
 module Seek
   class AbstractSearchAdaptor
-    attr_reader :yaml_config, :partial_path, :name, :search_type
+    attr_reader :yaml_config, :partial_path, :name, :search_type, :key
     def initialize(yaml_config)
       @yaml_config = yaml_config
       @partial_path = @yaml_config['partial_path']
-      @enabled = @yaml_config['enabled']
       @name = @yaml_config['name']
       @search_type = @yaml_config['search_type']
+      @key = @yaml_config['key']
     end
 
     def search(query)
@@ -24,7 +24,12 @@ module Seek
     end
 
     def enabled?
-      @enabled
+      settings = Seek::Config.external_search_adaptors || {}
+      if settings.key?(key)
+        settings[key]
+      else
+        true
+      end
     end
   end
 end
