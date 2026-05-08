@@ -17,14 +17,19 @@ jobs:
 
     services:
       mysql:
-          image: mysql:8.0.21
+          image: mysql:8.4
           env:
               MYSQL_ALLOW_EMPTY_PASSWORD: yes
               MYSQL_ROOT_PASSWORD: ''
               MYSQL_DATABASE: test
           ports:
             - 3306:3306
-          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --restart=always
+          options: >-
+            --health-cmd="mysqladmin ping"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=3
+            --restart=always
 
       redis:
         image: redis:8.6-alpine
