@@ -24,12 +24,11 @@ module Seek
     end
 
     def enabled?
-      settings = Seek::Config.external_search_adaptors || {}
-      if settings.key?(key)
-        settings[key]['enabled']
-      else
-        true
-      end
+      settings = (Seek::Config.external_search_adaptors || {}).with_indifferent_access
+      adaptor_settings = settings[key]
+      return true unless adaptor_settings.is_a?(Hash)
+
+      adaptor_settings.with_indifferent_access.fetch(:enabled, true)
     end
   end
 end

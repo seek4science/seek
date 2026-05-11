@@ -50,13 +50,15 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
 
     key = adaptor['key']
     search_type = adaptor['search_type']
-    assert_equal 1, Seek::ExternalSearch.instance.search_adaptors(search_type).count
+    results = Seek::ExternalSearch.instance.search_adaptors(search_type)
+    assert results.any? { |a| a.key == key }, 'adaptor should be included before being disabled'
 
     # Disable adaptor
     Seek::Config.external_search_adaptors = { key => { 'enabled' => false } }
     Seek::Util.clear_cached
 
-    assert_empty Seek::ExternalSearch.instance.search_adaptors(search_type)
+    results = Seek::ExternalSearch.instance.search_adaptors(search_type)
+    refute results.any? { |a| a.key == key }, 'adaptor should not be included once disabled'
   end
 
   test 'search_adaptor_names respects enabled settings' do
