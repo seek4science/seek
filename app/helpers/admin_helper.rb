@@ -6,12 +6,12 @@ module AdminHelper
     safe_join(adaptors.collect do |adaptor|
       key = adaptor.key
       enabled = if current.key?(key)
-                  current[key]
+                  current[key]['enabled']
                 else
                   true
                 end
       description = "Whether the #{adaptor.name} external search is active"
-      admin_checkbox_setting("external_search_adaptors[#{key}]", 1, enabled, adaptor.name, description)
+      admin_checkbox_setting("external_search_adaptors[#{key}][enabled]", 1, enabled, adaptor.name, description)
     end)
   end
 

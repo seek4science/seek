@@ -26,7 +26,7 @@ module Seek
     def enabled?
       settings = Seek::Config.external_search_adaptors || {}
       if settings.key?(key)
-        settings[key]
+        settings[key]['enabled']
       else
         true
       end

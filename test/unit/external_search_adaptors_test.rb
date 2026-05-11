@@ -24,7 +24,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     key = adaptor['key']
 
     # Force adaptor OFF via config override
-    Seek::Config.external_search_adaptors = { key => false }
+    Seek::Config.external_search_adaptors = { key => { 'enabled' => false } }
     Seek::Util.clear_cached
 
     result_files = Seek::ExternalSearch.instance.search_adaptors('all')
@@ -36,7 +36,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     adaptor_in_result = result_files.any? { |a| a.key == key }
     assert adaptor_in_result, 'disabled adaptor should be included'
 
-    Seek::Config.external_search_adaptors = { key => true }
+    Seek::Config.external_search_adaptors = { key => { 'enabled' => true } }
     Seek::Util.clear_cached
 
     result_files = Seek::ExternalSearch.instance.search_adaptors('all')
@@ -53,7 +53,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     assert_equal 1, Seek::ExternalSearch.instance.search_adaptors(search_type).count
 
     # Disable adaptor
-    Seek::Config.external_search_adaptors = { key => false }
+    Seek::Config.external_search_adaptors = { key => { 'enabled' => false } }
     Seek::Util.clear_cached
 
     assert_empty Seek::ExternalSearch.instance.search_adaptors(search_type)
@@ -66,7 +66,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     # Disable all adaptors
     setting = {}
     @config_files.each do |f|
-      setting[f['key']] = false
+      setting[f['key']] = { 'enabled' => false }
     end
     Seek::Config.external_search_adaptors = setting
     Seek::Util.clear_cached
@@ -79,7 +79,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     assert adaptor_names.include?(adaptor['name']), 'Disabled adaptor should not appear in adaptor_names'
 
     # Re-enable the first adaptor
-    setting[key] = true
+    setting[key] = { 'enabled' => true }
     Seek::Config.external_search_adaptors = setting
     Seek::Util.clear_cached
 
@@ -93,7 +93,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
     # Disable all adaptors via config
     setting = {}
     @config_files.each do |f|
-      setting[f['key']] = false
+      setting[f['key']] = { 'enabled' => false }
     end
     Seek::Config.external_search_adaptors = setting
     Seek::Util.clear_cached
