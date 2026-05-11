@@ -32,10 +32,10 @@ class ExternalSearchTest < ActiveSupport::TestCase
     adaptors = Seek::ExternalSearch.instance.search_adaptors
     biomodels_adaptor = adaptors.find { |a| a.is_a?(Seek::BiomodelsSearch::SearchBiomodelsAdaptor) }
 
-    Seek::Config.external_search_adaptors = { 'biomodels' => true }
+    Seek::Config.external_search_adaptors = { 'biomodels' => { 'enabled' => true } }
     assert biomodels_adaptor.enabled?
 
-    Seek::Config.external_search_adaptors = { 'biomodels' => false }
+    Seek::Config.external_search_adaptors = { 'biomodels' => { 'enabled' => false } }
     refute biomodels_adaptor.enabled?
   end
 
