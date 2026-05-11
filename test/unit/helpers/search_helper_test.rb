@@ -8,14 +8,14 @@ class SearchHelperTest < ActionView::TestCase
     # all adaptors turned off
     setting = {}
     adaptors.each do |adaptor|
-      setting[adaptor.key] = false
+      setting[adaptor.key] = { 'enabled' => false }
     end
     Seek::Config.external_search_adaptors = setting
 
     refute external_search_supported?
 
     # turn one on
-    setting = {adaptors.first.key => true}
+    setting = {adaptors.first.key => { 'enabled' => true} }
     Seek::Config.external_search_adaptors = setting
 
     assert external_search_supported?

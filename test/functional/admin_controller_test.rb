@@ -711,8 +711,8 @@ class AdminControllerTest < ActionController::TestCase
     adaptors_params = {}
     setting = {}
     adaptors.each do |adaptor|
-      adaptors_params[adaptor.key] = '0' # Disabled
-      setting[adaptor.key] = true
+      adaptors_params[adaptor.key] = { 'enabled' => '0' } # Disabled
+      setting[adaptor.key] = { 'enabled' => true }
     end
 
     with_config_value(:external_search_adaptors, setting) do
@@ -724,7 +724,7 @@ class AdminControllerTest < ActionController::TestCase
       saved_config = Seek::Config.external_search_adaptors
       adaptors_params.each do |key, _value|
         # The controller converts '0' to false and '1' to true
-        assert_equal false, saved_config[key], "Adaptor #{key} should be disabled"
+        assert_equal false, saved_config[key]['enabled'], "Adaptor #{key} should be disabled"
       end
 
       # checking the caching has been cleared
@@ -740,8 +740,8 @@ class AdminControllerTest < ActionController::TestCase
     adaptors_params = {}
     setting = {}
     adaptors.each do |adaptor|
-      adaptors_params[adaptor.key] = '1' # Enabled
-      setting[adaptor.key] = false
+      adaptors_params[adaptor.key] = { 'enabled' => '1' } # Enabled
+      setting[adaptor.key] = { 'enabled' => false }
     end
 
     with_config_value(:external_search_adaptors, setting) do
@@ -752,7 +752,7 @@ class AdminControllerTest < ActionController::TestCase
       # Verify settings were saved
       saved_config = Seek::Config.external_search_adaptors
       adaptors_params.each do |key, _value|
-        assert_equal true, saved_config[key], "Adaptor #{key} should be enabled"
+        assert_equal true, saved_config[key]['enabled'], "Adaptor #{key} should be enabled"
       end
 
       refute Seek::ExternalSearch.instance.search_adaptors.empty?
@@ -765,7 +765,7 @@ class AdminControllerTest < ActionController::TestCase
 
     adaptors_params = {}
     adaptors.each_with_index do |adaptor, idx|
-      adaptors_params[adaptor.key] = idx.even? ? '1' : '0'
+      adaptors_params[adaptor.key] = { 'enabled' => idx.even? ? '1' : '0' }
     end
 
     with_config_value(:external_search_adaptors, {}) do
@@ -773,8 +773,8 @@ class AdminControllerTest < ActionController::TestCase
 
       saved_config = Seek::Config.external_search_adaptors
       adaptors_params.each do |key, value|
-        expected = value == '1'
-        assert_equal expected, saved_config[key], "Adaptor #{key} should be #{expected ? 'enabled' : 'disabled'}"
+        expected = value['enabled'] == '1'
+        assert_equal expected, saved_config[key]['enabled'], "Adaptor #{key} should be #{expected ? 'enabled' : 'disabled'}"
       end
     end
   end

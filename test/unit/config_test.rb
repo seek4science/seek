@@ -658,8 +658,8 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'external_search_adaptors' do
-    setting = { 'tess' => false,
-                'biomodels' => true }
+    setting = { 'tess' => { 'enabled' => false },
+                'biomodels' => { 'enabled' => true } }
     Seek::Config.external_search_adaptors = setting
 
     result = Seek::Config.external_search_adaptors

@@ -106,11 +106,11 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
-    # Per-adaptor external search toggles (map: key => boolean)
+    # Per-adaptor external search toggles (map: key => {'enabled' =>boolean})
     if params.key?(:external_search_adaptors)
       adaptor_settings = {}
       params[:external_search_adaptors].each do |k, v|
-        adaptor_settings[k] = (v == '1' || v == 'true' || v == true)
+        adaptor_settings[k] = { 'enabled' => ['1', 'true', true].include?(v['enabled']) }
       end
       Seek::Config.external_search_adaptors = adaptor_settings
     end
