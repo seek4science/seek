@@ -306,14 +306,25 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should not show external search when all external search adaptors are disabled' do
+    with_config_value :solr_enabled, true do
+      settings = { 'biomodels' => { 'enabled' => false }, 'tess' => { 'enabled' => false } }
+      with_config_value :external_search_adaptors, settings do
+        get :index
+        assert_response :success
+        assert_select 'div#search_box input#include_external_search', count: 0
+      end
+    end
+  end
+
   test 'should show tag cloud according to config' do
-   get :index
-   assert_select 'div#sidebar_tag_cloud', count: 1
-   with_config_value :tagging_enabled, false do
-     get :index
-     assert_select 'div#sidebar_tag_cloud', count: 0
-   end
- end
+    get :index
+    assert_select 'div#sidebar_tag_cloud', count: 1
+    with_config_value :tagging_enabled, false do
+      get :index
+      assert_select 'div#sidebar_tag_cloud', count: 0
+    end
+  end
 
   test 'should show tag cloud according to config when logged in' do
     login_as(FactoryBot.create(:person))

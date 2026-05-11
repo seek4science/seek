@@ -41,7 +41,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
 
     result_files = Seek::ExternalSearch.instance.search_adaptors('all')
     adaptor_in_result = result_files.any? { |a| a.key == key }
-    assert adaptor_in_result, 'enabled adaptor should not be included'
+    assert adaptor_in_result, 'enabled adaptor should be included'
   end
 
   test 'search_adaptors by type respects adaptors disabled by config' do
@@ -76,7 +76,7 @@ class ExternalSearchAdaptorsTest < ActiveSupport::TestCase
 
     # include disabled
     adaptor_names = Seek::ExternalSearch.instance.search_adaptor_names('all', include_disabled: true)
-    assert adaptor_names.include?(adaptor['name']), 'Disabled adaptor should not appear in adaptor_names'
+    assert adaptor_names.include?(adaptor['name']), 'Disabled adaptor should appear in adaptor_names because include_disabled is true'
 
     # Re-enable the first adaptor
     setting[key] = { 'enabled' => true }
