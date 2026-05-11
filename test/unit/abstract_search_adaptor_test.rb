@@ -26,4 +26,5 @@ class AbstractSearchAdaptorTest < ActiveSupport::TestCase
     assert_equal 'models', adaptor.search_type
     assert_equal 'biomodels', adaptor.key
   end
+
 end
