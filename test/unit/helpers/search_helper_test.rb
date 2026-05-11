@@ -10,14 +10,17 @@ class SearchHelperTest < ActionView::TestCase
     adaptors.each do |adaptor|
       setting[adaptor.key] = { 'enabled' => false }
     end
-    Seek::Config.external_search_adaptors = setting
-
-    refute external_search_supported?
+    with_config_value(:external_search_adaptors, setting) do
+      refute external_search_supported?
+    end
 
     # turn one on
-    setting = {adaptors.first.key => { 'enabled' => true} }
-    Seek::Config.external_search_adaptors = setting
+    setting = { adaptors.first.key => { 'enabled' => true } }
+    with_config_value(:external_search_adaptors, setting) do
+      assert external_search_supported?
+    end
 
-    assert external_search_supported?
+
+
   end
 end

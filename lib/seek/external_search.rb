@@ -33,18 +33,22 @@ module Seek
     def external_item(item_id, type = 'all')
       search_adaptors(type).collect do |adaptor|
         adaptor.get_item item_id
-      rescue Exception => e
+      rescue StandardError => e
         Rails.logger.error("Error getting external item #{item_id} with #{adaptor} - #{e.class.name}:#{e.message}")
         raise e if Rails.env.development?
+
+        []
       end.flatten.uniq
     end
 
     def external_search(query, type = 'all')
       search_adaptors(type).collect do |adaptor|
         adaptor.search query
-      rescue Exception => e
+      rescue StandardError => e
         Rails.logger.error("Error performing external search with #{adaptor} - #{e.class.name}:#{e.message}")
         raise e unless Rails.env.production?
+
+        []
       end.flatten.uniq
     end
 

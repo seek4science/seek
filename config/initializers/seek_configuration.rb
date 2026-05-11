@@ -49,7 +49,8 @@ def load_seek_config_defaults!
   Seek::Config.default :home_description_position, 'side'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :auth_lookup_enabled,true
-  # per-adaptor enabled/disabled map, keys are adaptor_class_name, values are booleans
+  # per-adaptor settings map, keyed by adaptor `key` values (e.g. 'biomodels', 'tess'),
+  # with nested hashes containing settings such as { 'enabled' => true/false }
   Seek::Config.default :external_search_adaptors, {}
   Seek::Config.default :project_single_page_enabled, false
   Seek::Config.default :isa_json_compliance_enabled, false
