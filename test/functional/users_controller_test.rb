@@ -359,7 +359,7 @@ class UsersControllerTest < ActionController::TestCase
                          omniauth_oidc_enabled: true) do
         get :new
         assert_response :success
-        assert_select 'div.register-terms-and-conds input#tc_agree[type=checkbox]', count: 5
+        assert_select 'div.register-terms-and-conds input[name=tc_agree][type=checkbox]', count: 5
         assert_select 'form.new_user input.btn[type=submit][disabled]', count: 1
         assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 0
         # all the buttons, including 3rd party auth
@@ -379,7 +379,7 @@ class UsersControllerTest < ActionController::TestCase
                          omniauth_oidc_enabled: true) do
         get :new
         assert_response :success
-        assert_select 'div.register-terms-and-conds input#tc_agree[type=checkbox]', count: 0
+        assert_select 'div.register-terms-and-conds input[name=tc_agree][type=checkbox]', count: 0
         assert_select 'form.new_user input.btn[type=submit][disabled]', count: 0
         assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 1
         # all the buttons, including 3rd party auth
@@ -397,7 +397,7 @@ class UsersControllerTest < ActionController::TestCase
                          omniauth_oidc_enabled: true) do
         get :new
         assert_response :success
-        assert_select 'div.register-terms-and-conds input#tc_agree[type=checkbox]', count: 0
+        assert_select 'div.register-terms-and-conds input[name=tc_agree][type=checkbox]', count: 0
         assert_select 'form.new_user input.btn[type=submit][disabled]', count: 0
         assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 1
         # all the buttons, including 3rd party auth
