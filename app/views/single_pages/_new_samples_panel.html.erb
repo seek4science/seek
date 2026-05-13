@@ -6,7 +6,7 @@
         <thead>
         <tr>
           <th></th>
-          <% for key in @new_samples[0].keys %>
+          <% for key in (@new_samples.compact.first&.keys || []) %>
             <% unless key == 'uuid' %>
               <th><%= key %></th>
             <% end %>
@@ -27,13 +27,13 @@
               <% unless new_sample_key == 'uuid' %>
                 <% if @registered_sample_multi_fields.include?(new_sample_key) %>
                   <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
-                    <% new_sample_val.each do |sub_sample| %>
+                    <% Array(new_sample_val).each do |sub_sample| %>
                       <span class="badge" title="ID: <%= sub_sample&.fetch('id', nil) %>" data-attr_type="seek-sample-multi"><%= sub_sample&.fetch('title', nil) %></span>
                     <% end %>
                   </td>
                 <% elsif @cv_list_fields.include?(new_sample_key) %>
                   <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
-                    <% new_sample_val.each do |cv_term| %>
+                    <% Array(new_sample_val).each do |cv_term| %>
                       <span class="label label-default" title="<%= cv_term %>" data-attr_type="cv-list"><%= cv_term %></span>
                     <% end %>
                   </td>
