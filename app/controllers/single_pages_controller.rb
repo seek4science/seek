@@ -10,7 +10,11 @@ class SinglePagesController < ApplicationController
                 only: %i[show index project_folders]
   before_action :isa_json_compliance_enabled?
   before_action :check_user_logged_in,
-                only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
+                only: %i[ batch_sharing_permission_preview
+                          batch_change_permission_for_selected_items
+                          download_samples_excel
+                          export_to_excel
+                          upload_samples ]
   respond_to :html, :js
 
   def show
