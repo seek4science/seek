@@ -120,6 +120,8 @@ class SinglePagesController < ApplicationController
     when 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       spreadsheet_xml = spreadsheet_to_xml(uploaded_file.path, Seek::Config.jvm_memory_allocation)
       wb = parse_spreadsheet_xml(spreadsheet_xml)
+      raise 'Invalid workbook! Cannot process this spreadsheet. Consider first exporting the table as a spreadsheet for the proper format.' unless valid_workbook?(wb)
+
       metadata_sheet = wb.sheet('Sample Type Metadata')
       samples_sheet = wb.sheet('Samples')
     else
@@ -127,10 +129,6 @@ class SinglePagesController < ApplicationController
     end
 
     sample_type_id_ui = params[:sample_type_id].to_i
-
-    unless valid_workbook?(wb)
-      raise 'Invalid workbook! Cannot process this spreadsheet. Consider first exporting the table as a spreadsheet for the proper format.'
-    end
 
     # Extract Samples metadata from spreadsheet
     sample_type_id_spreadsheet = metadata_sheet.cell(2, 2).value.to_i
