@@ -143,8 +143,8 @@ class SinglePagesController < ApplicationController
     @assay = @sample_type.assays.first
 
     # Sample Type validation rules
-    unless sample_type_id_ui == @sample_type&.id
-      raise "Sample Type #{@sample_type&.id} from spreadsheet doesn't match Sample Type #{sample_type_id_ui} from the table. Please upload in the correct table."
+    unless sample_type_id_ui == @sample_type.id
+      raise "Sample Type #{@sample_type.id} from spreadsheet doesn't match Sample Type #{sample_type_id_ui} from the table. Please upload in the correct table."
     end
     unless @study.sample_types.include?(@sample_type) || is_assay
       raise "Sample Type '#{@sample_type.id}' doesn't belong to Study #{@study.id}. Sample Upload aborted."
@@ -262,13 +262,13 @@ class SinglePagesController < ApplicationController
     cv_sample_attributes = sample_type_attributes.select { |sa| sa[:is_cv] && !sa[:allows_custom_input] }
     samples_data.map do |excel_sample|
       obj = {}
-      (0..sample_fields.size - 1).map do |i|
+      sample_fields.each_with_index do |field, i|
         cell_value = excel_sample[i]
-        current_sample_attribute = sample_type_attributes.detect { |sa| sa[:title] == sample_fields[i] }
-        validate_cv_terms = cv_sample_attributes.map{ |cv_sa| cv_sa[:title] }.include?(sample_fields[i])
-        validate_cv_terms &&= current_sample_attribute[:required] && !cell_value.blank?
-        attr_terms = validate_cv_terms ? cv_sample_attributes.detect { |sa| sa[:title] == sample_fields[i] }[:cv_terms] : []
-        if @registered_sample_multi_fields.include?(sample_fields[i])
+        current_sample_attribute = sample_type_attributes.detect { |sa| sa[:title] == field }
+        validate_cv_terms = cv_sample_attributes.any? { |cv_sa| cv_sa[:title] == field }
+        validate_cv_terms &&= !cell_value.blank?
+        attr_terms = validate_cv_terms ? current_sample_attribute&.dig(:cv_terms) || [] : []
+        if @registered_sample_multi_fields.include?(field)
           parsed_json =
             begin
               cell_value.nil? ? [] : JSON.parse(cell_value.gsub(/"=>/x, '":'))
@@ -278,14 +278,14 @@ class SinglePagesController < ApplicationController
 
           parsed_excel_input_samples = parsed_json.map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
-            unless Sample.find(subsample['id'])&.authorized_for_view?
+            unless Sample.find_by(id: subsample['id'])&.authorized_for_view?
               raise "Unauthorized Sample was detected in spreadsheet: #{subsample.inspect}"
             end
 
             subsample
           end
-          obj.merge!(sample_fields[i] => parsed_excel_input_samples)
-        elsif [@registered_sample_fields, @registered_sops_fields, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(sample_fields[i]) }
+          obj[field] = parsed_excel_input_samples
+        elsif [@registered_sample_fields, @registered_sops_fields, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(field) }
           unless cell_value.nil?
             parsed_excel_registered_asset =
               begin
@@ -294,54 +294,45 @@ class SinglePagesController < ApplicationController
                 nil
               end
 
-            if @registered_sample_fields.include?(sample_fields[i])
-              unless Sample.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+            if @registered_sample_fields.include?(field)
+              unless Sample.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
                 raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
-            elsif @registered_sops_fields.include?(sample_fields[i])
-              unless Sop.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+            elsif @registered_sops_fields.include?(field)
+              unless Sop.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
                 raise "Unauthorized Sop was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
-            elsif @registered_data_file_fields.include?(sample_fields[i])
-              unless DataFile.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+            elsif @registered_data_file_fields.include?(field)
+              unless DataFile.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
                 raise "Unauthorized Data File was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
-            elsif @registered_strain_fields.include?(sample_fields[i])
-              unless Strain.find(parsed_excel_registered_asset['id'])&.authorized_for_view?
+            elsif @registered_strain_fields.include?(field)
+              unless Strain.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
                 raise "Unauthorized Strain was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
-            else
-              raise "\"#{parsed_excel_registered_asset["type"]}\" is not a supported type of registered asset."
             end
           end
-          obj.merge!(sample_fields[i] => parsed_excel_registered_asset)
-        elsif @cv_list_fields.include?(sample_fields[i])
+          obj[field] = parsed_excel_registered_asset
+        elsif @cv_list_fields.include?(field)
           parsed_cv_terms =
             begin
               cell_value.blank? ? [] : JSON.parse(cell_value)
             rescue JSON::ParserError
               []
             end
-          # CV validation for CV_LIST attributes
-          parsed_cv_terms.map do |term|
-            if !attr_terms.include?(term) && validate_cv_terms
-              raise "Invalid Controlled vocabulary term detected '#{term}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{parsed_cv_terms.inspect} }"
+          parsed_cv_terms.each do |term|
+            if validate_cv_terms && !attr_terms.include?(term)
+              raise "Invalid Controlled vocabulary term detected '#{term}' in sample ID #{excel_sample[0]}: { #{field}: #{parsed_cv_terms.inspect} }"
             end
           end
-          obj.merge!(sample_fields[i] => parsed_cv_terms)
-        elsif sample_fields[i] == 'id'
-          if cell_value.blank?
-            obj.merge!(sample_fields[i] => nil)
-          else
-            obj.merge!(sample_fields[i] => cell_value&.to_i)
-          end
+          obj[field] = parsed_cv_terms
+        elsif field == 'id'
+          obj[field] = cell_value.blank? ? nil : cell_value.to_i
         else
-          if validate_cv_terms
-            unless attr_terms.include?(cell_value)
-              raise "Invalid Controlled vocabulary term detected '#{cell_value}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{cell_value} }"
-            end
+          if validate_cv_terms && !attr_terms.include?(cell_value)
+            raise "Invalid Controlled vocabulary term detected '#{cell_value}' in sample ID #{excel_sample[0]}: { #{field}: #{cell_value} }"
           end
-          obj.merge!(sample_fields[i] => cell_value)
+          obj[field] = cell_value
         end
       end
       obj
@@ -349,55 +340,34 @@ class SinglePagesController < ApplicationController
   end
 
   def sample_type_samples(sample_type, authorization_method = nil)
-    if authorization_method
-      sample_type.samples&.authorized_for(authorization_method)&.map do |sample|
-        sample_metadata =
-          begin
-            JSON.parse(sample[:json_metadata])
-          rescue JSON::ParserError
-            {}
-          end
+    scope = authorization_method ? sample_type.samples.authorized_for(authorization_method) : sample_type.samples
+    scope.map do |sample|
+      sample_metadata =
+        begin
+          JSON.parse(sample[:json_metadata])
+        rescue JSON::ParserError
+          {}
+        end
 
-        remove_nil_assets!(sample_metadata)
+      remove_nil_assets!(sample_metadata)
 
-        { 'id' => sample.id,
-          'uuid' => sample.uuid }.merge(sample_metadata)
-      end
-    else
-      sample_type.samples&.map do |sample|
-        sample_metadata =
-          begin
-            JSON.parse(sample[:json_metadata])
-          rescue JSON::ParserError
-            {}
-          end
-
-        remove_nil_assets!(sample_metadata)
-
-        { 'id' => sample.id,
-          'uuid' => sample.uuid }.merge(sample_metadata)
-      end
+      { 'id' => sample.id,
+        'uuid' => sample.uuid }.merge(sample_metadata)
     end
   end
 
   def separate_unauthorized_samples(existing_excel_samples, db_samples, authorized_db_samples)
     update_samples = []
     unauthorized_samples = []
-    existing_excel_samples.map do |ees|
-      db_sample = db_samples.select { |s| s['id'] == ees['id'] }.first
+    existing_excel_samples.each do |ees|
+      db_sample = db_samples.detect { |s| s['id'] == ees['id'] }
 
-      # An exception is raised if the ID of an existing Sample cannot be found in the DB
       raise "Sample with id '#{ees['id']}' does not exist in the database. Sample upload was aborted!" if db_sample.nil?
 
-      is_authorized_for_update = authorized_db_samples.select { |s| s['id'] == ees['id'] }.any?
+      is_authorized_for_update = authorized_db_samples.any? { |s| s['id'] == ees['id'] }
 
-      is_changed = false
-
-      db_sample.map do |k, v|
-        unless %w[id uuid].include?(k)
-          is_changed = compare_fields(ees[k], v)
-          break
-        end
+      is_changed = db_sample.any? do |k, v|
+        !%w[id uuid].include?(k) && compare_fields(ees[k], v)
       end
 
       if is_changed
@@ -459,28 +429,22 @@ class SinglePagesController < ApplicationController
       end
 
       if value.is_a? Array
-        value = value.map do |subvalue|
-          if subvalue.is_a? Hash
-            if subvalue.keys.include?('id') && !subvalue['id'].present?
-              nil
-            else
-              subvalue
-            end
+        cleaned = value.map do |subvalue|
+          if subvalue.is_a?(Hash) && subvalue.key?('id') && !subvalue['id'].present?
+            nil
           else
             subvalue
           end
         end.compact
 
-        if value.blank?
-          metadata[key] = nil
-        end
+        metadata[key] = cleaned.blank? ? nil : cleaned
       end
     end
     # metadata
   end
 
   def compare_fields(incoming_value, reference_value)
-    incoming_value == reference_value
+    incoming_value != reference_value
   end
 
   def set_up_instance_variable
