@@ -49,7 +49,7 @@
         <% end %>
         <% metadata_license = Seek::Config.metadata_license.presence %>
         <% unless metadata_license.nil? || metadata_license == Seek::License::NULL_LICENSE %>
-          <br>Metadata is licensed under <%= describe_license(Seek::Config.metadata_license) %>
+          <br>Metadata is licensed under <%= describe_license(metadata_license) %>
         <% end %>
       </div>
     <% end -%>
