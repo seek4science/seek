@@ -1,7 +1,7 @@
 <% if term_and_conditions_required %>
   <div class="register-terms-and-conds text-center">
     <label>
-      <%= check_box_tag "tc_agree", "1", false -%> I have read and agree to the
+      <%= check_box_tag "tc_agree", "1", false, id: nil %> I have read and agree to the
       <%= link_to 'Terms and Conditions and the Data Policy', terms_home_path, 'data-popup': true,
                   onclick: "window.open(this.href,'terms','height=700,width=600,left=500,top=100'); return false;" %>
     </label>

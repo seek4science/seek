@@ -139,9 +139,9 @@
         $j('input[name=tc_agree]').change(function () {
             var pane = $j(this).closest('.tab-pane, .panel-body');
             if ($j(this).is(':checked')) {
-                pane.find("[name=commit]").attr("disabled", false);
+                pane.find("[name=commit]").prop("disabled", false);
             } else {
-                pane.find("[name=commit]").attr("disabled", true);
+                pane.find("[name=commit]").prop("disabled", true);
             }
         });
     });
