@@ -47,7 +47,8 @@
         <% if Seek::Config.copyright_addendum_enabled  %>
           <br><%= Seek::Config.copyright_addendum_content.html_safe %>
         <% end %>
-        <% if Seek::Config.metadata_license %>
+        <% metadata_license = Seek::Config.metadata_license.presence %>
+        <% unless metadata_license.nil? || metadata_license == Seek::License::NULL_LICENSE %>
           <br>Metadata is licensed under <%= describe_license(Seek::Config.metadata_license) %>
         <% end %>
       </div>
