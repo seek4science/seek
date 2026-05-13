@@ -429,15 +429,11 @@ class SinglePagesController < ApplicationController
       end
 
       if value.is_a? Array
-        cleaned = value.map do |subvalue|
-          if subvalue.is_a?(Hash) && subvalue.key?('id') && !subvalue['id'].present?
-            nil
-          else
-            subvalue
-          end
-        end.compact
+        metadata[key] = value.filter_map do |subvalue|
+          next if subvalue.is_a?(Hash) && subvalue.key?('id') && !subvalue['id'].present?
 
-        metadata[key] = cleaned.blank? ? nil : cleaned
+          subvalue
+        end
       end
     end
     # metadata
