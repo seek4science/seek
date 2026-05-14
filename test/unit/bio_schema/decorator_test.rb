@@ -74,6 +74,13 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_nil decorator.date_published
   end
 
+  test 'CreativeWork contributor is nil when resource has no contributor' do
+    document = FactoryBot.create(:document)
+    document.update_column(:contributor_id, nil)
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(document)
+    assert_nil decorator.contributor
+  end
+
   test 'Dataset pads or truncates description' do
     df = FactoryBot.create(:data_file, description:'')
     assert_equal 'Description not specified.........................', Seek::BioSchema::ResourceDecorators::DataFile.new(df).description

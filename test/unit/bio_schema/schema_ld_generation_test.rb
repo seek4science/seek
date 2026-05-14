@@ -444,6 +444,18 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     check_version(document.latest_version, expected)
   end
 
+  test 'document without contributor omits contributor from schema_ld' do
+    document = travel_to(@current_time) do
+      document = FactoryBot.create(:document)
+      disable_authorization_checks { document.save! }
+      document
+    end
+    document.update_column(:contributor_id, nil)
+
+    json = JSON.parse(document.to_schema_ld)
+    assert_not json.key?('contributor'), "expected 'contributor' to be absent from schema_ld output"
+  end
+
   test 'presentation' do
     presentation = travel_to(@current_time) do
       presentation = FactoryBot.create(:presentation, title: 'This presentation', contributor: @person)
