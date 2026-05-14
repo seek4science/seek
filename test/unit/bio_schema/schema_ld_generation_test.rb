@@ -169,6 +169,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title }
@@ -232,6 +233,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title }
@@ -283,6 +285,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'url' => 'http://www.abc.com',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -429,6 +432,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}",
           'name' => document.projects.first.title }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
       'citation' => [],
@@ -463,6 +467,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => %w[Project Organization],
           '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'isPartOf' => [],
       'citation' => [],
       'subjectOf' => []
@@ -540,6 +545,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Person', '@id' => 'https://orcid.org/0000-0002-1694-233X', 'name' => 'Steve Smith' },
         { '@type' => 'Person', '@id' => '#Bob%20Colon:', 'name' => 'Bob Colon:' }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title }
@@ -633,7 +639,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'collection' do
     collection = travel_to(@current_time) do
-      collection = FactoryBot.create(:max_collection)
+      collection = FactoryBot.create(:max_collection, contributor: @person)
       disable_authorization_checks { collection.save! }
       collection
     end
@@ -669,6 +675,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => '#Joe%20Bloggs',
           'name' => 'Joe Bloggs' }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'producer' => [
         { '@type' => %w[Project Organization],
           '@id' => "http://localhost:3000/projects/#{project.id}",
@@ -822,6 +829,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title }
@@ -863,6 +871,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
         { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
       ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title }
@@ -988,6 +997,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'creator' => [{ '@type' => 'Person', '@id' => "http://localhost:3000/people/#{sop.assets_creators.first.creator_id}", 'name' => 'Some One' },
                     { '@type' => 'Person', '@id' => '#Blogs', 'name' => 'Blogs' },
                     { '@type' => 'Person', '@id' => '#Joe', 'name' => 'Joe' }],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{sop.contributor_id}", 'name' => sop.contributor.name },
       'producer' => [{ '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{sop.projects.first.id}", 'name' => 'A Maximal Project' }],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
