@@ -480,5 +480,200 @@ class CodeBasedAuthorizationTest < ActiveSupport::TestCase
     assert assay.auth_by_code?(assay_code.code), 'Assay accessible with its own code'
     assert data_file.auth_by_code?(assay_code.code), 'DataFile accessible with Assay code'
   end
+
+  # ===============================================
+  # ObservationUnit Tests
+  # ===============================================
+
+  test 'observation_unit auth_by_code with own code' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+
+    code = nil
+    disable_authorization_checks do
+      code = SpecialAuthCode.create!(
+        asset: obs_unit,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert obs_unit.auth_by_code?(code.code), 'ObservationUnit should be accessible with its own code'
+  end
+
+  test 'observation_unit auth_by_code with parent study code' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+
+    study_code = nil
+    disable_authorization_checks do
+      study_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert obs_unit.auth_by_code?(study_code.code),
+           'ObservationUnit should be accessible with parent Study code (downward propagation)'
+  end
+
+  test 'observation_unit auth_by_code with grandparent investigation code' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+
+    inv_code = nil
+    disable_authorization_checks do
+      inv_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert obs_unit.auth_by_code?(inv_code.code),
+           'ObservationUnit should be accessible with grandparent Investigation code (downward propagation)'
+  end
+
+  test 'observation_unit code does not grant access upward to study or investigation' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+
+    ou_code = nil
+    disable_authorization_checks do
+      ou_code = SpecialAuthCode.create!(
+        asset: obs_unit,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    refute investigation.auth_by_code?(ou_code.code), 'Investigation NOT accessible with ObservationUnit code'
+    refute study.auth_by_code?(ou_code.code), 'Study NOT accessible with ObservationUnit code'
+    assert obs_unit.auth_by_code?(ou_code.code), 'ObservationUnit accessible with its own code'
+  end
+
+  test 'sample auth_by_code with parent observation_unit code' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+    sample = FactoryBot.create(:sample, contributor: @person)
+
+    disable_authorization_checks do
+      sample.observation_unit = obs_unit
+      sample.save!
+    end
+
+    ou_code = nil
+    disable_authorization_checks do
+      ou_code = SpecialAuthCode.create!(
+        asset: obs_unit,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert sample.auth_by_code?(ou_code.code),
+           'Sample should be accessible with parent ObservationUnit code (downward propagation)'
+  end
+
+  test 'sample auth_by_code with grandparent study code via observation_unit' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+    sample = FactoryBot.create(:sample, contributor: @person)
+
+    disable_authorization_checks do
+      sample.observation_unit = obs_unit
+      sample.save!
+    end
+
+    study_code = nil
+    disable_authorization_checks do
+      study_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert sample.auth_by_code?(study_code.code),
+           'Sample should be accessible with grandparent Study code via ObservationUnit (downward propagation)'
+  end
+
+  test 'data_file auth_by_code with parent observation_unit code' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+    data_file = FactoryBot.create(:data_file, contributor: @person)
+
+    disable_authorization_checks do
+      obs_unit.observation_unit_assets.create!(asset: data_file)
+    end
+
+    ou_code = nil
+    disable_authorization_checks do
+      ou_code = SpecialAuthCode.create!(
+        asset: obs_unit,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert data_file.auth_by_code?(ou_code.code),
+           'DataFile should be accessible with parent ObservationUnit code (downward propagation)'
+  end
+
+  test 'data_file auth_by_code with grandparent study code via observation_unit' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+    data_file = FactoryBot.create(:data_file, contributor: @person)
+
+    disable_authorization_checks do
+      obs_unit.observation_unit_assets.create!(asset: data_file)
+    end
+
+    study_code = nil
+    disable_authorization_checks do
+      study_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert data_file.auth_by_code?(study_code.code),
+           'DataFile should be accessible with grandparent Study code via ObservationUnit (downward propagation)'
+  end
+
+  test 'complete ISA hierarchy with observation_unit - investigation code grants access to all levels' do
+    investigation = FactoryBot.create(:investigation, contributor: @person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person)
+    obs_unit = FactoryBot.create(:observation_unit, study: study, contributor: @person)
+    data_file = FactoryBot.create(:data_file, contributor: @person)
+
+    disable_authorization_checks do
+      obs_unit.observation_unit_assets.create!(asset: data_file)
+    end
+
+    inv_code = nil
+    disable_authorization_checks do
+      inv_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert investigation.auth_by_code?(inv_code.code), 'Investigation accessible with its own code'
+    assert study.auth_by_code?(inv_code.code), 'Study accessible with Investigation code'
+    assert obs_unit.auth_by_code?(inv_code.code), 'ObservationUnit accessible with Investigation code'
+    assert data_file.auth_by_code?(inv_code.code), 'DataFile accessible with Investigation code via ObservationUnit'
+  end
 end
 
