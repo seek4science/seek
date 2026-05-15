@@ -457,7 +457,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
 
     download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, intent: :inline_view)
-    assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
+    assert @response.body.include?("PDFViewerApplicationOptions.set('defaultUrl', '#{download_path}')")
 
     al = ActivityLog.last
     assert_equal 'inline_view', al.action
