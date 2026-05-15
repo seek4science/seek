@@ -13,7 +13,7 @@ Fixes [#2343](https://github.com/seek4science/seek/issues/2343).
 
 ### CSS (`vendor/assets/stylesheets/pdfjs/`)
 
-- **`viewer.css.erb`** — replaced with the v2 stylesheet; `url(images/...)` references rewritten to use Sprockets `asset_path` helpers so images resolve correctly through the asset pipeline
+- **`viewer.css.erb`** — replaced with the v2 stylesheet; `url(images/...)` references rewritten to use Sprockets `asset_path` helpers so images resolve correctly through the asset pipeline; `url(images/FILE)` in the upstream CSS becomes `url("<%= asset_path('pdfjs/FILE') %>")` — the `images/` segment is dropped because Sprockets serves `vendor/assets/images/pdfjs/FILE` as `pdfjs/FILE`
 
 ### Images (`vendor/assets/images/pdfjs/`)
 

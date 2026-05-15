@@ -34,7 +34,7 @@ namespace :pdfjs do
       # Transform url(images/FILE) references to use Sprockets asset_path helpers
       css = File.read("#{dist}/web/viewer.css")
       css.gsub!(/url\("?images\/([^")]+)"?\)/) do
-        %(url("<%= asset_path('pdfjs/images/#{Regexp.last_match(1)}') %>"))
+        %(url("<%= asset_path('pdfjs/#{Regexp.last_match(1)}') %>"))
       end
       File.write(Rails.root.join('vendor/assets/stylesheets/pdfjs/viewer.css.erb'), css)
 
