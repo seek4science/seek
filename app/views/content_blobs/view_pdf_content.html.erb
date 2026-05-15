@@ -36,6 +36,12 @@ See https://github.com/adobe-type-tools/cmap-resources
     <%= stylesheet_link_tag 'pdfjs/viewer' %>
     <%= javascript_include_tag 'pdfjs/pdf' %>
     <%= javascript_include_tag 'pdfjs/viewer' %>
+    <style>
+      #back::before {
+        -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M5 8a1 1 0 0 1 .293-.707l5-5a1 1 0 0 1 1.414 1.414L7.414 8l4.293 4.293a1 1 0 0 1-1.414 1.414l-5-5A1 1 0 0 1 5 8z'/></svg>");
+                mask-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M5 8a1 1 0 0 1 .293-.707l5-5a1 1 0 0 1 1.414 1.414L7.414 8l4.293 4.293a1 1 0 0 1-1.414 1.414l-5-5A1 1 0 0 1 5 8z'/></svg>");
+      }
+    </style>
     <script>
       PDFViewerApplicationOptions.set('workerSrc', '<%= asset_path("pdfjs/pdf.worker.js") %>');
       PDFViewerApplicationOptions.set('defaultUrl', '<%= @pdf_url.html_safe %>');
@@ -465,6 +471,9 @@ See https://github.com/adobe-type-tools/cmap-resources
     <script>
       window.onload = function() {
         document.title = "<%= j(page_title(controller.controller_name, controller.action_name) + ': Viewing ' + @content_blob.original_filename) %>";
+        if (window.self !== window.top) {
+          document.getElementById('back').style.display = 'none';
+        }
       };
 
       function backToItem() {
