@@ -7,7 +7,8 @@
           help_text = if f.object.is_a?(Investigation)
             "Here you can create a temporary access link for reviewing this #{t('investigation')}. The reviewers with this link can view this #{t('investigation')}, all associated #{t('study').pluralize}, #{t('assays.assay').pluralize}, and download all associated assets (#{t('data_file').pluralize}, #{t('sop').pluralize}, #{t('model').pluralize}, etc.) with no login required."
           elsif f.object.is_a?(Study)
-            "Here you can create a temporary access link for reviewing this #{t('study')}. The reviewers with this link can view this #{t('study')}, all associated #{t('assays.assay').pluralize}, and download all associated assets (#{t('data_file').pluralize}, #{t('sop').pluralize}, #{t('model').pluralize}, etc.) with no login required."
+            ou_text = Seek::Config.observation_units_enabled ? ", #{t('observation_unit').pluralize}" : ""
+            "Here you can create a temporary access link for reviewing this #{t('study')}. The reviewers with this link can view this #{t('study')}, all associated #{t('assays.assay').pluralize}#{ou_text}, and download all associated assets (#{t('data_file').pluralize}, #{t('sop').pluralize}, #{t('model').pluralize}, etc.) with no login required."
           elsif f.object.is_a?(ObservationUnit)
             "Here you can create a temporary access link for reviewing this #{t('observation_unit')}. The reviewers with this link can view this #{t('observation_unit')} and all associated samples and #{t('data_file').pluralize} with no login required."
           elsif f.object.is_a?(Assay)
@@ -40,7 +41,8 @@
                   link_scope_text = if f.object.is_a?(Investigation)
                     "This link will grant access to view this #{t('investigation')}, its #{t('study').pluralize}, #{t('assays.assay').pluralize}, and download associated assets. The link will not be active until you click 'Update'."
                   elsif f.object.is_a?(Study)
-                    "This link will grant access to view this #{t('study')}, its #{t('assays.assay').pluralize}, and download associated assets. The link will not be active until you click 'Update'."
+                    ou_text = Seek::Config.observation_units_enabled ? " and #{t('observation_unit').pluralize}" : ""
+                    "This link will grant access to view this #{t('study')}, its #{t('assays.assay').pluralize}#{ou_text}, and download associated assets. The link will not be active until you click 'Update'."
                   elsif f.object.is_a?(ObservationUnit)
                     "This link will grant access to view this #{t('observation_unit')} and its associated samples and #{t('data_file').pluralize}. The link will not be active until you click 'Update'."
                   elsif f.object.is_a?(Assay)
