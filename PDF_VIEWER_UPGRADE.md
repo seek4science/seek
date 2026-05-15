@@ -43,6 +43,22 @@ Fixes [#2343](https://github.com/seek4science/seek/issues/2343).
 - Removed precompile entries for the deleted files (`pdfjs/compatibility`, `pdfjs/debugger`, `pdfjs/l10n`)
 - Added `pdfjs/pdf.worker` so the worker file is fingerprinted and served correctly in production
 
+## Why v3+ is harder to upgrade to
+
+PDF.js v3 (released late 2022) dropped its UMD/CommonJS builds and moved entirely to **native ES modules**. Every file in `pdfjs-dist` v3+ — `pdf.js`, `pdf.worker.js`, and the viewer — uses `import`/`export` syntax and, in the case of the viewer, `<script type="module">`.
+
+This is incompatible with Sprockets, which concatenates and fingerprints JavaScript files but has no understanding of ES module semantics. Sprockets cannot resolve `import` statements, tree-shake, or correctly bundle a module graph, so simply dropping the v3 files into `vendor/assets/javascripts/` would produce a broken page.
+
+To upgrade to v3+ the project would need one of:
+
+- **A JavaScript bundler** (esbuild, webpack via `shakapacker`) wired into the asset pipeline to compile the ES module graph into a Sprockets-compatible bundle before it is served.
+- **Import maps** (`importmap-rails`), which let the browser resolve bare ES module specifiers natively. This requires Rails 7+ and means serving `pdf.js` and `pdf.worker.js` directly from the browser's module loader rather than through Sprockets concatenation — a significant change to how assets are structured.
+- **A CDN-pinned approach**, loading pdfjs from a CDN `<script type="module">` tag and abandoning the vendored-asset model entirely.
+
+The v3 distribution does retain a `legacy/` directory with builds transpiled to ES5, but the viewer application itself still uses ES module imports internally and does not ship a self-contained legacy viewer bundle comparable to v2's `web/viewer.js`. Adapting that into a single Sprockets-servable file would require running it through a bundler manually for each upgrade.
+
+In summary: upgrading to v3+ is not a drop-in vendor file swap — it requires a decision about the project's JavaScript build infrastructure first.
+
 ### Rake task (`lib/tasks/pdfjs.rake`)
 
 Added `rake pdfjs:install` to reproduce the vendor update in future:
