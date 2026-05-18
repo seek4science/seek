@@ -131,21 +131,41 @@ module Seek
     def create_asset_and_respond(item)
       item = create_asset(item)
       if item.save
+        attach_retained_orphaned_content_blobs(item)
         unless return_to_fancy_parent(item)
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
             format.html { redirect_to params[:single_page] ?
-              { controller: :single_pages, action: :show, id: params[:single_page] } 
+              { controller: :single_pages, action: :show, id: params[:single_page] }
               : item }
             format.json { render json: item, include: json_api_include_param }
           end
         end
       else
+        preserve_content_blobs_for_rerender(item)
         respond_to do |format|
           format.html { render action: 'new' }
           format.json { render json: json_api_errors(item), status: :unprocessable_entity }
         end
       end
+    end
+
+    # Saves any unsaved content blobs as orphaned records (no parent asset) so they have database IDs
+    # and their file data is persisted on disk. This allows the re-rendered form to reference them
+    # by ID via retained_content_blob_ids, so they survive a validation error on multi-file assets.
+    def preserve_content_blobs_for_rerender(item)
+      return unless Seek::Util.is_multi_file_asset_type?(item.class)
+      item.content_blobs.select(&:new_record?).each { |blob| blob.save(validate: false) }
+    end
+
+    # After a successful save, updates any orphaned content blobs (saved during a previous failed
+    # validation attempt) to point to the newly created asset. Only applies to multi-file assets.
+    def attach_retained_orphaned_content_blobs(item)
+      return unless Seek::Util.is_multi_file_asset_type?(item.class)
+      ids = retained_content_blob_ids.select(&:positive?)
+      return if ids.blank?
+      ContentBlob.where(id: ids, asset_id: nil)
+                 .update_all(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
     end
 
     # makes sure the asset it only associated with projects that match the current user
