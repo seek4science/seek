@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_22_131727) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_18_123042) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -1906,15 +1906,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_22_131727) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "include_external_search", default: false
-  end
-
-  create_table "sessions", id: :integer, force: :cascade do |t|
-    t.string "session_id", null: false
-    t.text "data", limit: 16777215
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["session_id"], name: "index_sessions_on_session_id"
-    t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
   create_table "settings", id: :integer, force: :cascade do |t|

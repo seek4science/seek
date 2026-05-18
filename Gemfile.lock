@@ -99,12 +99,6 @@ GEM
       timeout (>= 0.4.0)
     activerecord-import (2.1.0)
       activerecord (>= 4.2)
-    activerecord-session_store (2.2.0)
-      actionpack (>= 7.0)
-      activerecord (>= 7.0)
-      cgi (>= 0.3.6)
-      rack (>= 2.0.8, < 4)
-      railties (>= 7.0)
     activestorage (7.2.3.1)
       actionpack (= 7.2.3.1)
       activejob (= 7.2.3.1)
@@ -779,6 +773,13 @@ GEM
     readline (0.0.4)
       reline
     recaptcha (5.19.0)
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
+    redis-client (0.28.0)
+      connection_pool
+    redis-session-store (0.11.6)
+      actionpack (>= 5.2.4.1, < 9)
+      redis (>= 3, < 6)
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
@@ -1045,7 +1046,6 @@ DEPENDENCIES
   abbrev
   active_model_serializers
   activerecord-import
-  activerecord-session_store
   acts-as-taggable-on
   addressable
   api_smith!
@@ -1144,6 +1144,8 @@ DEPENDENCIES
   rdf-virtuoso
   rdoc
   recaptcha
+  redis (~> 5.4)
+  redis-session-store (~> 0.11.6)
   remotipart
   request-log-analyzer
   request_store

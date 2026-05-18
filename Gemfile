@@ -5,7 +5,6 @@ gem 'rails', '7.2.3.1'
 gem 'abbrev'
 gem 'active_model_serializers'
 gem 'activerecord-import'
-gem 'activerecord-session_store'
 gem 'acts-as-taggable-on'
 gem 'addressable'
 gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b' #necessary for newer hashie dependency, original api_smith is no longer active
@@ -160,3 +159,6 @@ gem "minitar"
 gem "bzip2-ffi"
 gem "seven-zip", require: 'seven_zip_ruby'
 gem "ruby-xz", require: 'xz'
+
+gem "redis", "~> 5.4"
+gem "redis-session-store", "~> 0.11.6"

@@ -37,6 +37,16 @@ jobs:
         ports:
           - 8890:8890
           - 1111:1111
+      session-store:
+        image: redis:8.6-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
     strategy:
       fail-fast: false
       matrix:
