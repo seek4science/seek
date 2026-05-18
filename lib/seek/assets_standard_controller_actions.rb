@@ -155,6 +155,7 @@ module Seek
     # by ID via retained_content_blob_ids, so they survive a validation error on multi-file assets.
     def preserve_content_blobs_for_rerender(item)
       return unless Seek::Util.is_multi_file_asset_type?(item.class)
+
       item.content_blobs.select(&:new_record?).each { |blob| blob.save(validate: false) }
     end
 
@@ -162,8 +163,10 @@ module Seek
     # validation attempt) to point to the newly created asset. Only applies to multi-file assets.
     def attach_retained_orphaned_content_blobs(item)
       return unless Seek::Util.is_multi_file_asset_type?(item.class)
+
       ids = retained_content_blob_ids.select(&:positive?)
       return if ids.blank?
+
       ContentBlob.where(id: ids, asset_id: nil)
                  .update_all(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
     end
