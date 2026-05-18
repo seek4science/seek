@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_22_131727) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -204,6 +204,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "doi"
+    t.text "datacite_metadata"
   end
 
   create_table "asset_links", force: :cascade do |t|
