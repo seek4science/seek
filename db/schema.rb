@@ -204,6 +204,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_18_123042) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "doi"
+    t.text "datacite_metadata"
   end
 
   create_table "asset_links", force: :cascade do |t|

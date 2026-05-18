@@ -601,6 +601,11 @@ span.required, label.required::after {
   margin: 0.5em 1em;
 }
 
+.remote-content-preview-result img.preview {
+    max-width: 30em;
+    max-height: 30em;
+}
+
 li.upload-field-tab {
   cursor: pointer;
 }
