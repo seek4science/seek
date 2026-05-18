@@ -25,5 +25,9 @@ module Datacite
     def metadata(doi)
       @endpoint["metadata/#{doi}"].get
     end
+
+    def inactivate(doi)
+      @endpoint["metadata/#{doi}"].delete
+    end
   end
 end

@@ -94,6 +94,8 @@ SEEK::Application.routes.draw do
     member do
       get :mint_doi_confirm
       post :mint_doi
+      get :retract_doi_confirm
+      post :retract_doi
     end
   end
 
