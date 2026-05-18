@@ -134,7 +134,7 @@
     const cells = $j(row).find('td:not(:has(".danger"))').toArray();
     const samplesObj = {};
     cells.map(function(cell){
-      const val = cell.textContent;
+      const val = cell.textContent.trim();
       const key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
       const seekSampleMultiFields = $j(cell).find('span[data-attr_type="seek-sample-multi"]').toArray();
       const cvListFields = $j(cell).find('span[data-attr_type="cv-list"]').toArray();
