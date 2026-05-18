@@ -73,7 +73,8 @@ module Seek
         version += 1 if new_version
 
         unless model_image_present? && params[:content_blobs].blank?
-          content_blobs_params.each do |item_params|
+          (params[:content_blobs] || []).each do |item_params|
+            next if item_params[:tmp_io_object].blank? && item_params[:data_url].blank? && item_params[:base64_data].blank?
             attributes = build_attributes_hash_for_content_blob(item_params, version)
             if asset.respond_to?(:content_blobs)
               asset.content_blobs.build(attributes)
@@ -92,6 +93,7 @@ module Seek
         end
 
         retain_previous_content_blobs(asset, version) if version && version > 1
+        load_orphaned_content_blobs(asset) unless version && version > 1
       end
 
       def build_attributes_hash_for_content_blob(item_params, version)
@@ -113,6 +115,19 @@ module Seek
           retained_blobs.each do |blob|
             copy_blob_to_asset(asset, blob, new_version)
           end
+        end
+      end
+
+      # Loads previously saved orphaned content blobs (from a failed validation attempt) into the
+      # asset's in-memory association, so they appear correctly on re-render and are available for
+      # attachment after a successful save.
+      def load_orphaned_content_blobs(asset)
+        retained_ids = retained_content_blob_ids.select(&:positive?)
+        return if retained_ids.blank?
+        return unless asset.respond_to?(:content_blobs)
+
+        ContentBlob.where(id: retained_ids, asset_id: nil).each do |blob|
+          asset.content_blobs.target.push(blob)
         end
       end
 
