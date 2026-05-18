@@ -1,11 +1,11 @@
 GIT
   remote: https://github.com/ResearchObject/ro-crate-ruby.git
-  revision: 32f81e6f73ae4dedcf4c91ee460f7ddf1db56b85
-  branch: relax-rubyzip-range
+  revision: ad8c6306547ccf9c5ef29f7bd88071da82725329
+  branch: master
   specs:
     ro-crate (0.6.0)
       addressable (>= 2.7, < 3)
-      rubyzip (>= 2.0, < 4)
+      rubyzip (>= 2.3, < 4)
 
 GIT
   remote: https://github.com/SysMO-DB/bioportal.git
@@ -24,6 +24,16 @@ GIT
   revision: 67118b82b57027686ec177132f749f7eca158316
   specs:
     docsplit (0.7.6)
+
+GIT
+  remote: https://github.com/fbacall/ruby-ro-bundle.git
+  revision: 10d1b2101d261f6c84883d758fb4ce88552f8e5a
+  specs:
+    ro-bundle (0.4.0)
+      addressable (>= 2.8.0, < 3.0.0)
+      json (>= 2.3.0, < 3.0.0)
+      ucf (>= 3.0.0, < 4.0.0)
+      uuid (>= 2.3, < 3.0)
 
 GIT
   remote: https://github.com/seek4science/zenodo-client.git
@@ -175,11 +185,11 @@ GEM
       ffi (~> 1.0)
     case_transform (0.2)
       activesupport
-    caxlsx (4.2.0)
+    caxlsx (4.4.2)
       htmlentities (~> 4.3, >= 4.3.4)
       marcel (~> 1.0)
       nokogiri (~> 1.10, >= 1.10.4)
-      rubyzip (>= 1.3.0, < 3)
+      rubyzip (>= 2.4, < 4)
     caxlsx_rails (0.6.4)
       actionpack (>= 3.1)
       caxlsx (>= 3.0)
@@ -187,6 +197,7 @@ GEM
       json_schema (~> 0.20.4)
       language_list (~> 1.2.1)
     cgi (0.4.2)
+    childprocess (4.1.0)
     chronic (0.10.2)
     citeproc (1.1.0)
       date
@@ -811,11 +822,6 @@ GEM
     rmagick (6.1.1)
       observer (~> 0.1)
       pkg-config (~> 1.4)
-    ro-bundle (0.3.0)
-      addressable (~> 2.8.0)
-      json (~> 2.3.0)
-      ucf (~> 2.0.2)
-      uuid (~> 2.3)
     rouge (4.5.1)
     rsolr (2.6.0)
       builder (>= 2.1.2)
@@ -856,7 +862,7 @@ GEM
     ruby-xz (1.0.3)
     rubyntlm (0.6.5)
       base64
-    rubyzip (2.0.0)
+    rubyzip (3.3.0)
     rugged (1.9.0)
     sample-template-generator (0.7.1)
       rdoc (~> 6.0)
@@ -879,10 +885,10 @@ GEM
     securerandom (0.4.1)
     seedbank (0.5.0)
       rake (>= 10.0)
-    selenium-webdriver (4.10.0)
+    selenium-webdriver (4.1.0)
+      childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
-      rubyzip (>= 1.2.2, < 3.0)
-      websocket (~> 1.0)
+      rubyzip (>= 1.2.2)
     selma (0.4.15)
       rb_sys (~> 0.9)
     selma (0.4.15-arm64-darwin)
@@ -981,8 +987,8 @@ GEM
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    ucf (2.0.2)
-      zip-container (~> 4.0.1)
+    ucf (3.0.0)
+      zip-container (~> 6.0)
     unaccent (0.4.0)
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
@@ -1017,7 +1023,6 @@ GEM
       hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.9.1)
     webrobots (0.1.2)
-    websocket (1.2.11)
     websocket-driver (0.7.7)
       base64
       websocket-extensions (>= 0.1.0)
@@ -1037,8 +1042,8 @@ GEM
       rake (>= 0.8.7)
     yard (0.9.42)
     zeitwerk (2.7.2)
-    zip-container (4.0.2)
-      rubyzip (~> 2.0.0)
+    zip-container (6.0.0)
+      rubyzip (~> 3.0)
     zlib (3.0.1)
 
 PLATFORMS
@@ -1157,7 +1162,7 @@ DEPENDENCIES
   rest-client
   rfc-822
   rmagick
-  ro-bundle
+  ro-bundle!
   ro-crate!
   rspec-rails
   rubocop
