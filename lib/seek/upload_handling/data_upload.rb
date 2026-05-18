@@ -74,7 +74,10 @@ module Seek
 
         unless model_image_present? && params[:content_blobs].blank?
           (params[:content_blobs] || []).each do |item_params|
-            next if item_params[:tmp_io_object].blank? && item_params[:data_url].blank? && item_params[:base64_data].blank?
+            next if item_params[:tmp_io_object].blank? &&
+                    item_params[:data_url].blank? &&
+                    item_params[:base64_data].blank?
+
             attributes = build_attributes_hash_for_content_blob(item_params, version)
             if asset.respond_to?(:content_blobs)
               asset.content_blobs.build(attributes)
@@ -92,8 +95,11 @@ module Seek
           raise 'No content-blob defined'
         end
 
-        retain_previous_content_blobs(asset, version) if version && version > 1
-        load_orphaned_content_blobs(asset) unless version && version > 1
+        if version && version > 1
+          retain_previous_content_blobs(asset, version)
+        else
+          load_orphaned_content_blobs(asset)
+        end
       end
 
       def build_attributes_hash_for_content_blob(item_params, version)
