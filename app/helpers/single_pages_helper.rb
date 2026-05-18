@@ -48,24 +48,22 @@ module SinglePagesHelper
   # "", [], [nil], [""], {id => nil...}, {id => ""...}, [{id => ""...}], [{id => nil...}]
   # and returns `nil` if no meaningful value is found for that attribute
   def format_attribute_value_for_spreadsheet(value, attribute)
+    return nil if value.blank?
+
     if attribute.sample_attribute_type.seek_cv_list?
-      unless value.blank?
-        non_blank_values = value.compact_blank
-        non_blank_values unless non_blank_values.blank?
-      end
+      non_blank_values = value.compact_blank
+      return nil if non_blank_values.blank?
+
+      non_blank_values
     elsif attribute.sample_attribute_type.seek_sample_multi?
-      unless value.blank?
-        non_blank_values = value.map do |v|
-          v unless v[:id].blank?
-        end.compact
-        non_blank_values unless non_blank_values.blank?
+      non_blank_values = value.filter_map do |v|
+        v unless v[:id].blank?
       end
+      non_blank_values unless non_blank_values.blank?
     elsif is_registered_asset_type_attribute?(attribute)
-      unless value.blank?
-        value unless value[:id].blank?
-      end
+      value unless value[:id].blank?
     else
-      value unless value.blank?
+      value
     end
   end
 

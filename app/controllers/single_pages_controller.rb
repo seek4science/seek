@@ -294,20 +294,21 @@ class SinglePagesController < ApplicationController
                 nil
               end
 
+            registered_asset_id = parsed_excel_registered_asset.try(:[], 'id')
             if @registered_sample_fields.include?(field)
-              unless Sample.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
+              unless Sample.find_by(id: registered_asset_id)&.authorized_for_view?
                 raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
             elsif @registered_sops_fields.include?(field)
-              unless Sop.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
+              unless Sop.find_by(id: registered_asset_id)&.authorized_for_view?
                 raise "Unauthorized Sop was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
             elsif @registered_data_file_fields.include?(field)
-              unless DataFile.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
+              unless DataFile.find_by(id: registered_asset_id)&.authorized_for_view?
                 raise "Unauthorized Data File was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
             elsif @registered_strain_fields.include?(field)
-              unless Strain.find_by(id: parsed_excel_registered_asset['id'])&.authorized_for_view?
+              unless Strain.find_by(id: registered_asset_id)&.authorized_for_view?
                 raise "Unauthorized Strain was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
               end
             end
@@ -367,7 +368,7 @@ class SinglePagesController < ApplicationController
       is_authorized_for_update = authorized_db_samples.any? { |s| s['id'] == ees['id'] }
 
       is_changed = db_sample.any? do |k, v|
-        !%w[id uuid].include?(k) && compare_fields(ees[k], v)
+        !%w[id uuid].include?(k) && fields_differ?(ees[k], v)
       end
 
       if is_changed
@@ -436,10 +437,9 @@ class SinglePagesController < ApplicationController
         end
       end
     end
-    # metadata
   end
 
-  def compare_fields(incoming_value, reference_value)
+  def fields_differ?(incoming_value, reference_value)
     incoming_value != reference_value
   end
 

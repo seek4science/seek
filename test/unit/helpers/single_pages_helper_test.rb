@@ -160,8 +160,8 @@ class SinglePagesHelperTest < ActiveSupport::TestCase
   end
 
   test 'should get sample values for Seek Strain attributes' do
-    # Fetch registered data files that do not originate from a fixture
-    # In this case those are data files from Ben or Tom. In total 6 strains (3 each).
+    # Fetch registered strains that do not originate from a fixture
+    # In this case those are strains from Ben or Tom. In total 6 strains (3 each).
     strains = Strain.where(contributor_id: [@person.id, @other_person.id])
     assert_equal 6, strains.count
 
