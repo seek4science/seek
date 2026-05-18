@@ -21,9 +21,6 @@ module Seek
         []
       end
 
-      def supported?
-        true
-      end
     end
 
     class TessSearchResult <

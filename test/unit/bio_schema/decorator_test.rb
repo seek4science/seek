@@ -49,7 +49,7 @@ class DecoratorTest < ActiveSupport::TestCase
     
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal %w[@id citation creator dateCreated dateModified datePublished description encodingFormat identifier image isBasedOn isPartOf keywords license name producer subjectOf url version], properties
+    assert_equal %w[@id citation contributor creator dateCreated dateModified datePublished description encodingFormat identifier image isBasedOn isPartOf keywords license name producer subjectOf url version], properties
   end
 
   test 'CreativeWork uses the last published version for datePublished' do
@@ -72,6 +72,13 @@ class DecoratorTest < ActiveSupport::TestCase
 
     decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(sop.latest_version)
     assert_nil decorator.date_published
+  end
+
+  test 'CreativeWork contributor is nil when resource has no contributor' do
+    document = FactoryBot.create(:document)
+    document.update_column(:contributor_id, nil)
+    decorator = Seek::BioSchema::ResourceDecorators::CreativeWork.new(document)
+    assert_nil decorator.contributor
   end
 
   test 'Dataset pads or truncates description' do

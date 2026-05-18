@@ -464,4 +464,10 @@ namespace :seek_dev do
     File.write(filename, JSON.pretty_generate(domains))
     puts "Written to: #{filename}"
   end
+
+  desc 'Fetch SPDX licenses from GitHub'
+  task fetch_spdx: :environment do
+    url = 'https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json'
+    IO.copy_stream(URI.open(url), File.join(Rails.root, 'public', 'spdx_licenses.json'))
+  end
 end
