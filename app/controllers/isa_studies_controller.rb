@@ -8,6 +8,8 @@ class ISAStudiesController < ApplicationController
 
   after_action :update_sample_json_metadata, only: :update
 
+  api_actions :create, :update
+
   def new
     @isa_study = ISAStudy.new({ study: { investigation_id: params[:investigation_id] } })
   end

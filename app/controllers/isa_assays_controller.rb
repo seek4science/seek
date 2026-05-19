@@ -12,6 +12,8 @@ class ISAAssaysController < ApplicationController
   before_action :old_attributes, only: :update
   after_action :update_sample_json_metadata, only: :update
 
+  api_actions :create, :update
+
   def new
     study = Study.find(params[:study_id])
     new_position =
