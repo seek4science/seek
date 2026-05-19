@@ -32,6 +32,14 @@ class ISAStudySerializer < SimpleBaseSerializer
     serialize_isa_sample_type(object.sample_collection)
   end
 
+  def _meta
+    meta = super
+    meta[:uuid] = study&.uuid if study.respond_to?('uuid')
+    meta[:created] = study&.created_at if study.respond_to?('created_at')
+    meta[:modified] = study&.updated_at if study.respond_to?('updated_at')
+    meta
+  end
+
   private
 
   def serialize_isa_sample_type(sample_type)

@@ -43,6 +43,14 @@ class ISAAssaySerializer < SimpleBaseSerializer
     object.input_sample_type_id&.to_s
   end
 
+  def _meta
+    meta = super
+    meta[:uuid] = assay&.uuid if assay.respond_to?('uuid')
+    meta[:created] = assay&.created_at if assay.respond_to?('created_at')
+    meta[:modified] = assay&.updated_at if assay.respond_to?('updated_at')
+    meta
+  end
+
   private
 
   def serialize_isa_sample_type(sample_type)

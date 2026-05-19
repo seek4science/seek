@@ -107,8 +107,11 @@
       }
     },
     "meta": {
+      "created": "2026-03-19T16:35:39.211Z",
+      "modified": "2026-03-19T16:35:39.303Z",
       "api_version": "0.3",
-      "base_url": "http://localhost:3000"
+      "base_url": "http://localhost:3000",
+      "uuid": "96696ec0-05df-013f-f2a8-00155d52079b"
     }
   },
   "jsonapi": {
