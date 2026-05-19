@@ -12,15 +12,15 @@ module Seek
       end
 
       def find_closest_matching_sample_type(person, property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
+        # name/title/description are always populated via core annotation handling even though they're stripped from property_ids
+        always_present_pids = [@schema.name.to_s, @schema.title.to_s, @schema.description.to_s]
         candidates = SampleType.includes(:sample_attributes).authorized_for(:view, person).filter_map do |sample_type|
           sample_type_property_ids = sample_type.sample_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & sample_type_property_ids)
           # skip types with no matching properties
           next if intersection.empty?
           # skip types where any required attribute is absent from the FDS data — they would fail validation
-          # name/title/description are always populated via core annotation handling even though they're stripped from property_ids
           required_pids = sample_type.sample_attributes.select(&:required?).collect(&:pid).compact_blank
-          always_present_pids = [@schema.name.to_s, @schema.title.to_s, @schema.description.to_s]
           next if (required_pids - property_ids - always_present_pids).any?
           difference = (property_ids | sample_type_property_ids) - intersection
           [intersection.length, difference.length, sample_type]
