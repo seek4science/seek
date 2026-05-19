@@ -155,12 +155,13 @@ module Seek
 
       def find_closest_matching_extended_metadata_type(property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
         candidates = ::ExtendedMetadataType.where(supported_type: type_name).enabled.includes(:extended_metadata_attributes).filter_map do |emt|
-          extended_metadata_property_ids = emt.deep_extended_metadata_attributes.collect(&:pid).compact_blank
+          deep_attributes = emt.deep_extended_metadata_attributes
+          extended_metadata_property_ids = deep_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & extended_metadata_property_ids)
           # skip types with no matching properties
           next if intersection.empty?
           # skip types where any required attribute is absent from the FDS data — they would fail validation
-          required_pids = emt.deep_extended_metadata_attributes.select(&:required?).collect(&:pid).compact_blank
+          required_pids = deep_attributes.select(&:required?).collect(&:pid).compact_blank
           next if (required_pids - property_ids).any?
           difference = (property_ids | extended_metadata_property_ids) - intersection
           [intersection.length, difference.length, emt]
