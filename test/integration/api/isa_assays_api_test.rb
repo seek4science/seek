@@ -109,6 +109,35 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test 'update ISA assay' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                                                                   linked_sample_type: @study.sample_types.last)
+    # Ensure the sample type is editable by the current person
+    assay.sample_type.update_column(:contributor_id, current_person.id)
+
+    params = {
+      "data": {
+        "id": assay.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": {
+            "description": "Updated description via API"
+          },
+          "sample_type": {
+            "title": "Updated Sample Type Title"
+          }
+        }
+      }
+    }
+
+    assert_changes -> { assay.reload.description }, to: "Updated description via API" do
+      assert_changes -> { assay.sample_type.reload.title }, to: "Updated Sample Type Title" do
+        patch isa_assay_path(assay.id, format: :json), params: params, as: :json,
+              headers: { "Authorization": write_access_auth }
+      end
+    end
+  end
 end
 
 
