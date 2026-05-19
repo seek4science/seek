@@ -74,7 +74,8 @@ module Seek
 
         unless model_image_present? && params[:content_blobs].blank?
           (params[:content_blobs] || []).each do |item_params|
-            next if item_params[:tmp_io_object].blank? &&
+            next if !json_api_request? &&
+                    item_params[:tmp_io_object].blank? &&
                     item_params[:data_url].blank? &&
                     item_params[:base64_data].blank?
 
