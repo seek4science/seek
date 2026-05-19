@@ -4,8 +4,8 @@
 
 - **Block local file uploads** — Admins can now configure SEEK to prevent users from uploading local files, requiring remote URLs instead. The UI updates dynamically to reflect the restriction (#2286)
 - **DOI support for Presentations** — Presentations can now have DOIs minted and retracted, bringing them in line with other asset types (#2411)
-- **Retract/delete resources with DOIs** — Resources with DOIs can now be deleted; the system handles DOI retraction as part of the process (#2497)
-- **Temporary sharing links for ISA assets** — Investigations, Studies, and Assays can now be shared via temporary links without requiring a login (#758)
+- **Retract/delete resources with DOIs** — Resources with DOIs can now be deleted; the system handles DOI retraction as part of the process, storing the Datacite metadata and displaying a citation on the retraction record (#2497)
+- **Temporary sharing links for ISA assets** — Investigations, Studies, Assays, and Observation Units can now be shared via temporary links without requiring a login (#758, #2554)
 - **Register new Workflow version via RO-Crate upload** — A new version of an existing workflow can now be created by uploading an RO-Crate directly through the UI (#2453)
 - **SOP type field** — SOPs now have a type field, exposed in both the UI and JSON API (#2478)
 - **Event types and hybrid/online/offline location** — Events now support typed categories and a hybrid/online/offline location option (#2413)
@@ -34,6 +34,8 @@
 ## Bug Fixes
 
 - **PDF preview rendering** — Upgraded PDF.js from v0.7.55 to v2.16.105, fixing incomplete PDF rendering in the browser (#2343)
+- **FDS import: required attribute matching** — Sample types and Extended Metadata types with required fields that are absent from the FDS import RDF are now correctly rejected as candidates, preventing incorrect type matches (#2527)
+- **FDS import: core annotation handling** — Core RDF annotations (e.g. `rdf:type`, `rdfs:label`) are now ignored when matching sample types during FDS import (#2587)
 - **Registered sample attribute validation** — Sample attributes of type "Registered sample" no longer incorrectly turn red/invalid for IDs over 100 (#2514)
 - **Batch delete nil error** — Fixed an error that could occur when batch-deleting assets with missing associations (#2459)
 - **Spreadsheet download from default view** — Fixed downloading the DataHub spreadsheet when accessed from the default view (#2470)
@@ -48,6 +50,8 @@
 - Nokogiri security bump
 - net-imap security bump
 - nbconvert security bump
+- jwt bumped to 3.2.0
+- faraday bumped to 2.14.2
 - SPDX licence list updated
 - Example data seeds refactored into library classes
 - Docker base images updated
