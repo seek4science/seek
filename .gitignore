@@ -96,3 +96,4 @@ docker-compose.override.yml
 
 *.ignore
 /tmp/local_secret.txt
+/.claude/

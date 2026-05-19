@@ -12,16 +12,17 @@ module Seek
       end
 
       def find_closest_matching_sample_type(person, property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
-        candidates = SampleType.includes(:sample_attributes).authorized_for(:view, person).collect do |sample_type|
+        candidates = SampleType.includes(:sample_attributes).authorized_for(:view, person).filter_map do |sample_type|
           sample_type_property_ids = sample_type.sample_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & sample_type_property_ids)
+          # skip types with no matching properties
+          next if intersection.empty?
+          # skip types where any required attribute is absent from the FDS data — they would fail validation
+          required_pids = sample_type.sample_attributes.select(&:required?).collect(&:pid).compact_blank
+          next if (required_pids - property_ids).any?
           difference = (property_ids | sample_type_property_ids) - intersection
-          emt = nil if intersection.empty?
           [intersection.length, difference.length, sample_type]
-        end.sort_by do |x|
-          # order by the number of properties matched coming top, but downgraded by the number of differences
-          [-x[0], x[1]]
-        end
+        end.sort_by { |x| [-x[0], x[1]] }
 
         candidates.first&.last
       end
