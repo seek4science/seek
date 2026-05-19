@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'openbis_test_helper'
+require 'minitest/mock'
 
 class DatasetTest < ActiveSupport::TestCase
   def setup
@@ -224,5 +225,37 @@ class DatasetTest < ActiveSupport::TestCase
     refute dataset.json['dataset_files'].empty?
     assert_equal 3, dataset.dataset_files.size
     dataset.json['dataset_files'].each { |f| assert f }
+  end
+
+  test 'download' do
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
+
+    # Mock out OpenBIS download by manually creating some files
+    DummyDownloader = Struct.new(:folder) do
+      def download(*)
+        File.write(File.join(folder, 'test.txt'), 'hello world')
+        File.write(File.join(folder, 'test2.txt'), 'hello world')
+        FileUtils.mkdir_p(File.join(folder, 'dir'))
+        File.write(File.join(folder, 'dir/test.txt'), 'hello world')
+      end
+    end
+
+    Dir.mktmpdir do |dir|
+      dest_folder = File.join(dir, 'dest')
+      Dir.mkdir(dest_folder)
+
+      downloader = DummyDownloader.new(dest_folder)
+      dataset.stub(:datastore_server_download_instance, downloader) do
+        dataset.download(File.join(dir, 'dest'), File.join(dir, 'file.zip'), 'root_dir')
+      end
+
+      zip_file = File.join(dir, 'file.zip')
+      assert File.exist?(zip_file)
+      Zip::File.open(zip_file) do |zipfile|
+        assert zipfile.find_entry('root_dir/test.txt')
+        assert zipfile.find_entry('root_dir/test2.txt')
+        assert zipfile.find_entry('root_dir/dir/test.txt')
+      end
+    end
   end
 end

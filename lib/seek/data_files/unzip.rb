@@ -24,10 +24,15 @@ module Seek
         end
   
         def unzip_zip(tmp_dir)
-          Zip::File.open(content_blob.filepath).entries.each do |file|
-            path = File.join(tmp_dir, file.name)
-            FileUtils.mkdir_p(File.dirname(path))
-            file.extract(path) unless File.exist?(path)
+          Dir.chdir(tmp_dir) do
+            Zip::File.open(content_blob.filepath) do |zipfile|
+              zipfile.each do |entry|
+                unless ::File.exist?(entry.name)
+                  FileUtils::mkdir_p(::File.dirname(entry.name))
+                  zipfile.extract(entry, entry.name)
+                end
+              end
+            end
           end
         end
 
