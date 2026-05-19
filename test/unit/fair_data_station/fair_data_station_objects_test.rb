@@ -220,6 +220,21 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     assert_equal valid_type, sample.find_closest_matching_sample_type(nil)
   end
 
+  test 'find closest matching sample type does not exclude types where only missing required attributes are core annotations' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+
+    # create a type whose Title attribute has pid=schema:name (required) — a core annotation that is stripped from
+    # property_ids before matching, but is always populated via populate_seek_sample
+    type_with_core_required = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    title_attr = type_with_core_required.sample_attributes.find { |a| a.title == 'Title' }
+    title_attr.update!(pid: 'http://schema.org/name', required: true)
+    type_with_core_required.reload
+
+    assert_equal type_with_core_required, sample.find_closest_matching_sample_type(nil)
+  end
+
   test 'find closest matching extended metadata type excludes types with missing required attributes' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first

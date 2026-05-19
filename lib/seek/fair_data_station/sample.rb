@@ -18,8 +18,10 @@ module Seek
           # skip types with no matching properties
           next if intersection.empty?
           # skip types where any required attribute is absent from the FDS data — they would fail validation
+          # name/title/description are always populated via core annotation handling even though they're stripped from property_ids
           required_pids = sample_type.sample_attributes.select(&:required?).collect(&:pid).compact_blank
-          next if (required_pids - property_ids).any?
+          always_present_pids = [@schema.name.to_s, @schema.title.to_s, @schema.description.to_s]
+          next if (required_pids - property_ids - always_present_pids).any?
           difference = (property_ids | sample_type_property_ids) - intersection
           [intersection.length, difference.length, sample_type]
         end.sort_by { |x| [-x[0], x[1]] }
