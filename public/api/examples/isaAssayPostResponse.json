@@ -1,0 +1,106 @@
+{
+  "data": {
+    "id": "120",
+    "type": "isa_assays",
+    "attributes": {
+      "assay": {
+        "id": "120",
+        "title": "A Material ISA Assay",
+        "description": "An ISA assay measuring other material outputs",
+        "other_creators": null,
+        "position": 1,
+        "assay_class": {
+          "title": "Experimental assay",
+          "key": "EXP"
+        },
+        "assay_type": {
+          "label": "Experimental assay type",
+          "uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+        },
+        "technology_type": {
+          "label": "Technology type",
+          "uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
+        }
+      },
+      "sample_type": {
+        "id": "122",
+        "title": "Material Assay Output",
+        "description": "Output sample type for the material assay",
+        "sample_attributes": [
+          {
+            "id": "310",
+            "title": "Input (Sample Name)",
+            "pos": 1,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": null,
+            "sample_attribute_type": {
+              "id": "13",
+              "title": "SEEK Sample Multi"
+            },
+            "linked_sample_type_id": "121",
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "311",
+            "title": "Other Material Name",
+            "pos": 2,
+            "required": true,
+            "is_title": true,
+            "isa_tag_id": "6",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "312",
+            "title": "Processing Protocol",
+            "pos": 3,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": "5",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "313",
+            "title": "Material Characteristic",
+            "pos": 4,
+            "required": false,
+            "is_title": false,
+            "isa_tag_id": "7",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          }
+        ]
+      },
+      "input_sample_type_id": "121"
+    },
+    "meta": {
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

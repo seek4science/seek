@@ -1,0 +1,24 @@
+{
+  "data": {
+    "id": "120",
+    "type": "isa_assays",
+    "attributes": {
+      "assay": {
+        "description": "Updated description for the ISA assay"
+      },
+      "sample_type": {
+        "sample_attributes": [
+          {
+            "id": "313",
+            "title": "Tissue Type",
+            "pos": 4,
+            "required": false,
+            "is_title": false,
+            "sample_attribute_type": { "title": "String" },
+            "isa_tag_id": "7"
+          }
+        ]
+      }
+    }
+  }
+}
