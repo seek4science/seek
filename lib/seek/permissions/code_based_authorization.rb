@@ -33,7 +33,7 @@ module Seek
             return study.investigation.special_auth_codes.unexpired.where(code: code).exists? if study.investigation
           end
         else
-          if respond_to?(:assays) && assays.any?
+          if respond_to?(:assays)
             assays.each do |assay|
               return true if assay.special_auth_codes.unexpired.where(code: code).exists?
 
@@ -55,7 +55,7 @@ module Seek
           end
 
           # Check via observation_units (plural has_many, e.g. DataFile via observation_unit_assets)
-          if respond_to?(:observation_units) && observation_units.any?
+          if respond_to?(:observation_units)
             observation_units.each do |ou|
               return true if ou.special_auth_codes.unexpired.where(code: code).exists?
               if ou.study
