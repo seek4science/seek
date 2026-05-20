@@ -246,7 +246,7 @@ module Seek
         return value if value.is_a?(TrueClass) || value.is_a?(FalseClass)
         return value unless value.is_a?(String)
 
-        { 'true' => true, '1' => true, 'false' => false, '0' => false }.fetch(value.downcase, value)
+        ActiveModel::Type::Boolean.new.cast(value)
       end
 
       def parse_or_value(value)
