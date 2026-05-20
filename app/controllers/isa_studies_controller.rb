@@ -71,12 +71,19 @@ class ISAStudiesController < ApplicationController
     end
 
     if @isa_study.save
-      redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                   item_id: @isa_study.study.id)
+      respond_to do |format|
+        format.html do
+          redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                       item_id: @isa_study.study.id)
+
+        end
+
+        format.json { render json: @isa_study, include: [params[:include]], status: :ok }
+      end
     else
       respond_to do |format|
         format.html { render action: 'edit', status: :unprocessable_entity }
-        format.json { render json: @isa_study.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@isa_study), status: :unprocessable_entity }
       end
     end
   end
@@ -189,12 +196,18 @@ class ISAStudiesController < ApplicationController
     @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} sample collection' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.sample_collection)
 
     if @isa_study.errors.any?
-      error_messages = @isa_study.errors.map do |error|
-        "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
-      end.join('')
-      flash[:error] = "<ul>#{error_messages}</ul>".html_safe
-      redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                   item_id: @isa_study.study)
+      respond_to do |format|
+        format.html do
+          error_messages = @isa_study.errors.map do |error|
+            "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
+          end.join('')
+          flash[:error] = "<ul>#{error_messages}</ul>".html_safe
+          redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                       item_id: @isa_study.study)
+        end
+
+        format.json { render json: @isa_study.errors, status: :unprocessable_entity }
+      end
     end
   end
 end
