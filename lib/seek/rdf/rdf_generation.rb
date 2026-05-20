@@ -225,7 +225,6 @@ module Seek
       # Casts the stored value to the matching Ruby type so RDF::Literal can infer
       # the right XSD datatype (xsd:integer, xsd:double, xsd:boolean, xsd:date,
       # xsd:dateTime). Falls back to the raw value if parsing fails.
-      # TODO: longer term this should live on the base type handlers (or on get_attribute_value via a cast: option) so Sample RDF generation can reuse it.
       def cast_emt_value_for_rdf(attribute, value)
         case attribute.sample_attribute_type&.base_type
         when Seek::Samples::BaseType::INTEGER
