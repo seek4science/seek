@@ -256,7 +256,6 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
   end
 
   test 'find_exact_matching_sample_type does not falsely match when attribute count matches but pids differ' do
-    # Regression test for https://github.com/seek4science/seek/issues/2589
     # A sample type from a different FDS source with the same attribute count but different non-core PIDs
     # was incorrectly detected as an exact match.
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
