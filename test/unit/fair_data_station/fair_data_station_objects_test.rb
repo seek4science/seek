@@ -255,6 +255,24 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     assert_equal valid_type, assay.find_closest_matching_extended_metadata_type
   end
 
+  test 'find_exact_matching_sample_type does not falsely match when attribute count matches but pids differ' do
+    # Regression test for https://github.com/seek4science/seek/issues/2589
+    # A sample type from a different FDS source with the same attribute count but different non-core PIDs
+    # was incorrectly detected as an exact match.
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+    person = FactoryBot.create(:person)
+
+    # Same attribute count as the exact match, but one non-core PID replaced with an unrelated one.
+    wrong_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    attr = wrong_sample_type.sample_attributes.find { |a| a.pid == 'https://w3id.org/mixs/0000011' }
+    attr.update_column(:pid, 'http://example.com/different_prop')
+
+    assert_equal 6, wrong_sample_type.sample_attributes.count
+    assert_nil sample.find_exact_matching_sample_type(person)
+  end
+
   test 'find_exact_matching_sample_type dont pick if private' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
