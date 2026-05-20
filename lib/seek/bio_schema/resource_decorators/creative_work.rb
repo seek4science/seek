@@ -10,6 +10,7 @@ module Seek
         schema_mappings version: :version,
                         license: :license,
                         all_creators: :creator,
+                        contributor: :contributor,
                         producer: :producer,
                         created_at: :dateCreated,
                         updated_at: :dateModified,
@@ -20,6 +21,13 @@ module Seek
                         previous_version_url: :isBasedOn,
                         date_published: :datePublished,
                         publications: :citation
+
+        def contributor
+          person = parent_resource.try(:contributor)
+          return unless person
+
+          Seek::BioSchema::ResourceDecorators::Factory.instance.get(person).mini_definition
+        end
 
         def doi
           "https://doi.org/#{resource.doi}" if resource.try(:doi).present?

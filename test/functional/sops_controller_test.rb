@@ -189,11 +189,13 @@ class SopsControllerTest < ActionController::TestCase
         post :create, params: { sop: sop_details, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
-    assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin).person, assigns(:sop).contributor
-    assert !assigns(:sop).content_blob.url.blank?
-    assert_equal 'sysmo-db-logo-grad2.png', assigns(:sop).content_blob.original_filename
-    assert_equal 'image/png', assigns(:sop).content_blob.content_type
+    sop = assigns(:sop)
+    assert_redirected_to sop_path(sop)
+    assert_equal users(:quentin).person, sop.contributor
+    refute sop.content_blob.url.blank?
+    assert_equal 'sysmo-db-logo-grad2.png', sop.content_blob.original_filename
+    assert_equal 'image/png', sop.content_blob.content_type
+    assert sop.content_blob.make_local_copy?
   end
 
   test 'should show sop' do

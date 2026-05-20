@@ -214,6 +214,8 @@ module AssetsHelper
                          instance_variable_get('@study')
                        when 'assays'
                          instance_variable_get('@assay')
+                       when 'observation_units'
+                         instance_variable_get('@observation_unit')
                        else
                          nil
                        end
@@ -235,6 +237,15 @@ module AssetsHelper
 
     # If current is an Assay, check if target is its Study or Investigation
     if current.is_a?(Assay)
+      if target.is_a?(Study)
+        return current.study == target
+      elsif target.is_a?(Investigation)
+        return current.investigation == target
+      end
+    end
+
+    # If current is an ObservationUnit, check if target is its Study or Investigation
+    if current.is_a?(ObservationUnit)
       if target.is_a?(Study)
         return current.study == target
       elsif target.is_a?(Investigation)
@@ -424,5 +435,18 @@ module AssetsHelper
     by_text = item.contributor.nil? ? '' : " by #{item.contributor.name}"
     tooltip_txt = "#{item_type.humanize}: \"#{item.title}\"#{by_text}"
     list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34)
+  end
+
+  def upload_box_text(asset_name, action_text, hide_remote, hide_local)
+    if hide_remote && hide_local
+      'Both uploading a file or registering a URL to a remote file or web page are currently unavailable.'
+    elsif hide_remote
+      action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
+      "You can #{action_text} by selecting a file."
+    elsif hide_local
+      "You can register #{asset_name.indefinite_article} #{asset_name} by registering a URL to a remote file or web page."
+    else
+      "You can register #{asset_name.indefinite_article} #{asset_name} by either directly uploading a file#{' or zipped folder' if asset_name == 'Data file'}, or registering a URL to a remote file or web page."
+    end
   end
 end

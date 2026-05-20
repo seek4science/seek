@@ -9,9 +9,9 @@
   <!-- Nav tabs -->
   <% subaction = @subaction || 'Register' # default tab is the old Register %>
   <ul class="nav nav-tabs" role="tablist" id="new_publication_tabs" data-subaction="<%= subaction %>">
-    <li role="presentation"><a href="#Register" aria-controls="Register" role="tab" data-toggle="tab">From Identifier</a></li>
+    <li role="presentation"><a href="#Register" aria-controls="Register" role="tab" data-toggle="tab">From identifier</a></li>
     <li role="presentation"><a href="#Create" aria-controls="Create" role="tab" data-toggle="tab">Enter manually</a></li>
-    <li role="presentation"><a href="#Import" aria-controls="Import" role="tab" data-toggle="tab">Import from file</a></li>
+    <li role="presentation"><a href="#Import" aria-controls="Import" role="tab" data-toggle="tab">Import from Bibtex file</a></li>
   </ul>
 
   <!-- Tab panes -->
@@ -228,19 +228,21 @@
             <%= publication_form.file_field :bibtex_file %>
           </div>
         </div>
+        <p>
+          When importing, there is the option either to import the first article, or all of them. Please choose the next step from the options below
+        </p>
         <div class="form-group">
-          <div class="col-sm-5 col-sm-offset-2">
-            <p>On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the first article from the imported file.</p>
-          </div>
-          <div class="col-sm-5">
-            <p>On successful import, all publications will be saved. Any changes will need to be made individually afterwards.</p>
-          </div>
-          <div class="col-sm-5 col-sm-offset-2">
-            <%= publication_form.button 'Import first', :name => "subaction", :value => 'Import', :class => 'btn btn-primary' %>
-          </div>
-          <div class="col-sm-5">
-            <%= publication_form.button 'Import all', :name => "subaction", :value => 'ImportMultiple', :class => 'btn btn-primary' %>
-          </div>
+          <ul class="list-unstyled ml-5 pt-4">
+            <li>
+              <%= publication_form.button 'Import first', :name => "subaction", :value => 'Import', :class => 'btn btn-primary', style:'width: 7em; !important;' %>
+               On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the first article from the imported file.
+            </li>
+            <li>
+              <%= publication_form.button 'Import all', :name => "subaction", :value => 'ImportMultiple', :class => 'btn btn-primary', style:'width: 7em; !important;' %>
+               On successful import, all publications will be saved. Any changes will need to be made individually afterwards.
+            </li>
+          </ul>
+
 
         </div>
       <% end %>

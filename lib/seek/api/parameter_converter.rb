@@ -131,6 +131,10 @@ module Seek
         RecommendedModelEnvironment.find_by_title(value).try(:id)
       end
 
+      convert :event_type, rename: :event_type_id do |value|
+        EventType.find_by_title(value).try(:id)
+      end
+
       convert :data_file_ids, rename: :data_files_attributes, except: [:events, :workflows, :observation_units] do |value|
         value.map { |i| { asset_id: i }.with_indifferent_access }
       end

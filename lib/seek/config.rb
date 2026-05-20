@@ -32,6 +32,10 @@ module Seek
       Rails.application.default_url_options = site_url_options
     end
 
+    def external_search_adaptors_propagate
+      Seek::ExternalSearch.instance.clear_cached
+    end
+
     def smtp_propagate
       smtp_hash = smtp
 

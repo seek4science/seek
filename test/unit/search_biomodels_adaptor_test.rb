@@ -7,10 +7,10 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
   test 'initialize' do
     yaml = YAML.load_file("#{Rails.root}/test/fixtures/files/search_adaptor_config")
     adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new yaml
-    assert !adaptor.enabled?
     assert_equal 'search/partials/biomodels_resource_list_item', adaptor.partial_path
     assert_equal 'BioModels Database', adaptor.name
     assert_equal 'models', adaptor.search_type
+    assert_equal 'biomodels', adaptor.key
   end
 
   test 'search' do

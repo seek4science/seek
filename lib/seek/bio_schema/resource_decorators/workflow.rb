@@ -16,10 +16,6 @@ module Seek
                         maturity: :creativeWorkStatus,
                         docs_and_sops: :documentation
 
-        def contributors
-          [contributor]
-        end
-
         def maturity
           return nil unless resource.maturity_level.present?
 
