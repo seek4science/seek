@@ -136,4 +136,3 @@ disable_authorization_checks do
     puts 'Created study_rdf_example EMT'
   end
 end
-# rubocop:enable Metrics/BlockLength
