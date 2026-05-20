@@ -298,7 +298,45 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
     dt = graph.query([sub, RDF::URI('http://example.org/datetimeField'), nil]).first&.object
     assert_equal RDF::XSD.dateTime.to_s, dt.datatype.to_s, 'DateTime must carry xsd:dateTime'
-    assert_equal '2024-06-01T12:00:00', dt.to_s
+    # The lexical may carry a normalized timezone offset (e.g. "+00:00") added by DateTime parsing.
+    assert_match(/\A2024-06-01T12:00:00(\+\d\d:\d\d|Z)?\z/, dt.to_s)
+  end
+
+  test 'date attributes stored in non-XSD lexical formats are normalized when exported' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_date_emt))
+    em.set_attribute_value('start_date', '2 Feb 2015')
+    em.set_attribute_value('created_at', 'Thu, 11 Feb 2016 15:39:55 +0000')
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    date = graph.query([sub, RDF::URI('http://example.org/startDate'), nil]).first&.object
+    assert_equal RDF::XSD.date.to_s, date.datatype.to_s
+    assert_equal '2015-02-02', date.to_s
+
+    dt = graph.query([sub, RDF::URI('http://example.org/createdAt'), nil]).first&.object
+    assert_equal RDF::XSD.dateTime.to_s, dt.datatype.to_s
+    assert_match(/\A2016-02-11T15:39:55/, dt.to_s)
+  end
+
+  test 'blank scalar extended metadata values are skipped in rdf export' do
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_all_types_emt))
+    em.set_attribute_value('str_field', 'present')
+    em.set_attribute_value('int_field', '')
+    em.set_attribute_value('float_field', '')
+    em.set_attribute_value('bool_field', '')
+    em.set_attribute_value('date_field', '')
+    em.set_attribute_value('datetime_field', '')
+    df = FactoryBot.create(:data_file, extended_metadata: em)
+    graph = parse_rdf(df.to_rdf)
+    sub = RDF::URI(df.rdf_resource.to_s)
+
+    assert_equal 1, graph.query([sub, RDF::URI('http://example.org/strField'), nil]).to_a.size,
+                 'non-blank string should still be emitted'
+    %w[intField floatField boolField dateField datetimeField].each do |fragment|
+      assert_empty graph.query([sub, RDF::URI("http://example.org/#{fragment}"), nil]).to_a,
+                   "blank #{fragment} value must not be emitted"
+    end
   end
 
   private
