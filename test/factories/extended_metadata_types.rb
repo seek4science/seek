@@ -17,7 +17,7 @@ FactoryBot.define do
   end
 
   factory(:datetime_extended_metadata_attribute, class: ExtendedMetadataAttribute) do
-    title { 'date' }
+    title { 'datetime' }
     association :sample_attribute_type, factory: :datetime_sample_attribute_type
   end
 
