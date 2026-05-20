@@ -210,8 +210,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
   end
 
-  test 'content blobs preserved as orphans after validation error, and attached on successful resubmit' do
-    # Submit with valid files but invalid model (no projects) → validation error
+  test 'content blobs preserved as orphans after validation error' do
     invalid_model = { title: 'Test' }
     blob1_params = { data: file_for_upload, data_url: '', original_filename: '', make_local_copy: '0' }
     blob2_params = { data: fixture_file_upload('little_file_v2.txt', 'text/plain'), data_url: '', original_filename: '', make_local_copy: '0' }
@@ -227,13 +226,17 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert assigns(:model).errors.any?
 
-    # Orphaned blobs should be saved to DB with IDs but no parent asset
     orphaned_blobs = ContentBlob.where(asset_id: nil).where.not(id: blobs_before)
     assert_equal 2, orphaned_blobs.count
-    orphan_ids = orphaned_blobs.pluck(:id)
     assert orphaned_blobs.all?(&:file_exists?), 'Orphaned blob files should exist on disk'
+  end
 
-    # Resubmit with fixed model params and retained blob IDs
+  test 'orphaned content blobs attached to model on successful resubmit after validation error' do
+    # Simulate blobs saved as orphans during a prior failed attempt
+    orphan1 = FactoryBot.create(:content_blob, original_filename: 'file1.txt')
+    orphan2 = FactoryBot.create(:content_blob, original_filename: 'file2.txt')
+    orphan_ids = [orphan1.id, orphan2.id]
+
     assert_difference('Model.count', 1) do
       assert_no_difference('ContentBlob.count') do
         post :create, params: {
@@ -248,10 +251,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to model_path(assigns(:model))
     created_model = assigns(:model)
 
-    # The orphaned blobs are now attached to the model
-    attached_blobs = ContentBlob.where(id: orphan_ids)
-    assert_equal 2, attached_blobs.count
-    attached_blobs.each do |blob|
+    orphan_ids.each do |id|
+      blob = ContentBlob.find(id)
       assert_equal created_model.id, blob.asset_id
       assert_equal 'Model', blob.asset_type
       assert_equal 1, blob.asset_version
