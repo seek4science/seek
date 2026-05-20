@@ -48,7 +48,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "attachment; filename=\"this_model.zip\"; filename*=UTF-8''this_model.zip", @response.header['Content-Disposition']
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '3024', @response.header['Content-Length']
+    assert_equal '3104', @response.header['Content-Length']
   end
 
   test 'should download model with a single file' do
@@ -68,7 +68,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '3024', @response.header['Content-Length']
+    assert_equal '3104', @response.header['Content-Length']
     zip_file_size1 = @response.header['Content-Length'].to_i
 
     # 3 files, 2 of them have the same name
@@ -80,7 +80,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '4023', @response.header['Content-Length']
+    assert_equal '4143', @response.header['Content-Length']
     zip_file_size2 = @response.header['Content-Length'].to_i
 
     # the same name file is not overwriten, by checking the zip file size
