@@ -711,7 +711,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
     # test update
     old_id = cm.id
