@@ -33,6 +33,7 @@ module Seek
         additional_ids = all_additional_potential_annotation_predicates
         property_ids = additional_ids | [@schema.title.to_s, @schema.description.to_s]
         sample_type = find_closest_matching_sample_type(person, property_ids)
+        # count check catches attributes without PIDs, which are invisible to the PID comparison below
         return unless sample_type && sample_type.sample_attributes.count == property_ids.count
 
         core_pid_strings = core_annotations.map(&:to_s)
