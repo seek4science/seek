@@ -5,12 +5,16 @@ class ISAAssaysControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
-    login_as FactoryBot.create :user
+    @person = FactoryBot.create :person
+    login_as @person
+    @project = @person.projects.first
+    @material_template = FactoryBot.create(:isa_assay_material_template, projects: [@project], contributor:@person)
+    @data_file_template = FactoryBot.create(:isa_assay_data_file_template, projects: [@project], contributor:@person)
   end
 
   test 'should get new' do
-    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
-    study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects: [@project], contributor: @person)
+    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: @person)
 
     get :new, params: { study_id: study }
     assert_response :success
@@ -18,33 +22,31 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should create' do
-    projects = User.current_user.person.projects
-    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
-    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects:[@project], contributor: @person)
+    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: @person)
     other_creator = FactoryBot.create(:person)
-    this_person = User.current_user.person
 
     source_sample_type = FactoryBot.create(:simple_sample_type, title: 'source sample_type')
 
-    sample_collection_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [projects.first.id],
+    sample_collection_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [@project.id],
                                                                                  title: 'sample_collection sample_type')
     sample_collection_sample_type.sample_attributes.last.linked_sample_type = source_sample_type
 
     study.sample_types = [source_sample_type, sample_collection_sample_type]
 
     policy_attributes = { access_type: Policy::ACCESSIBLE,
-                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
     assert_difference('Assay.count', 1) do
       assert_difference('SampleType.count', 1) do
         post :create, params: { isa_assay: { assay: { title: 'test', study_id: study.id,
                                                       sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
-                                                      creator_ids: [this_person.id, other_creator.id],
+                                                      creator_ids: [@person.id, other_creator.id],
                                                       other_creators: 'other collaborators',
                                                       assay_class_id: AssayClass.experimental.id,
                                                       position: 0, policy_attributes: },
                                              input_sample_type_id: sample_collection_sample_type.id,
-                                             sample_type: create_material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id)
+                                             sample_type: create_material_assay_sample_type_attributes(@project, sample_collection_sample_type.id)
         } }
       end
     end
@@ -58,54 +60,48 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
     assert_equal "Input (#{title})", sample_multi.title
 
-    assert_equal [this_person, other_creator], isa_assay.assay.creators
+    assert_equal [@person, other_creator], isa_assay.assay.creators
     assert_equal 'other collaborators', isa_assay.assay.other_creators
   end
 
   test 'should create an assay stream' do
-    projects = User.current_user.person.projects
-    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
-    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects:[@project], contributor: @person)
+    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: @person)
 
 
     policy_attributes = { access_type: Policy::ACCESSIBLE,
-                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
     assert_difference('Assay.count', 1) do
       post :create, params: { isa_assay: { assay: { title: 'test stream', study_id: study.id,
                                                     sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
-                                                    creator_ids: [User.current_user.person.id],
+                                                    creator_ids: [@person.id],
                                                     other_creators: 'other collaborators',
                                                     assay_class_id: AssayClass.assay_stream.id,
-                                                    projects: projects.first,
+                                                    projects: @project,
                                                     policy_attributes: policy_attributes
       } } }
 
-      assert_redirected_to single_page_path(id: projects.first.id, item_type: 'assay', item_id: Assay.last.id)
+      assert_redirected_to single_page_path(id: @project.id, item_type: 'assay', item_id: Assay.last.id)
     end
   end
 
   test 'author form partial uses correct nested param attributes' do
-    get :new, params: { study_id: FactoryBot.create(:isa_json_compliant_study, contributor: User.current_user.person) }
+    get :new, params: { study_id: FactoryBot.create(:isa_json_compliant_study, contributor: @person) }
     assert_response :success
     assert_select '#author-list[data-field-name=?]', 'isa_assay[assay][assets_creators_attributes]'
     assert_select '#isa_assay_assay_other_creators'
   end
 
   test 'should show new when parameters are incomplete' do
-    projects = User.current_user.person.projects
-    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
-    study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects: [@project], contributor: @person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: @person)
 
-    # source_sample_type = study.sample_types.first
-    #
-    # sample_collection_sample_type = study.sample_types.second
-    #
     post :create, params: { isa_assay: {
       assay: { title: 'test', study_id: study.id,
                sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id] },
       sample_type: {
-        title: 'source', project_ids: [projects.first.id],
+        title: 'source', project_ids: [@project.id],
         sample_attributes_attributes: {}
       }
     } }
@@ -114,58 +110,54 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should update isa assay' do
-    person = User.current_user.person
-    project = person.projects.first
-    investigation = FactoryBot.create(:investigation, projects: [project])
+    investigation = FactoryBot.create(:investigation, projects: [@project])
     other_creator = FactoryBot.create(:person)
 
-    source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
-    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
+    source_type = FactoryBot.create(:isa_source_sample_type, contributor: @person, projects: [@project])
+    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: @person, projects: [@project],
                                                                                    linked_sample_type: source_type)
-    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project],
+    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: @person, projects: [@project],
                                                            linked_sample_type: sample_collection_type)
 
-    study = FactoryBot.create(:study, investigation:, contributor: person,
+    study = FactoryBot.create(:study, investigation:, contributor: @person,
                                       sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
                                       sample_types: [source_type, sample_collection_type])
 
-    assay = FactoryBot.create(:assay, study:, contributor: person)
+    assay = FactoryBot.create(:assay, study:, contributor: @person)
     put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title' } } }
-    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: assay.id)
+    assert_redirected_to single_page_path(id: @project, item_type: 'assay', item_id: assay.id)
     assert flash[:error].include?('Sample type not found.')
 
-    assay = FactoryBot.create(:assay, study:, sample_type: assay_type, contributor: person)
+    assay = FactoryBot.create(:assay, study:, sample_type: assay_type, contributor: @person)
 
     put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title', sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
-                                                            creator_ids: [person.id, other_creator.id], other_creators: 'other collaborators' },
+                                                            creator_ids: [@person.id, other_creator.id], other_creators: 'other collaborators' },
                                                    sample_type: { title: 'sample type title' } } }
 
     isa_assay = assigns(:isa_assay)
     assert_equal 'assay title', isa_assay.assay.title
     assert_equal 'sample type title', isa_assay.sample_type.title
-    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: assay.id)
+    assert_redirected_to single_page_path(id: @project, item_type: 'assay', item_id: assay.id)
 
-    assert_equal [person, other_creator], isa_assay.assay.creators
+    assert_equal [@person, other_creator], isa_assay.assay.creators
     assert_equal 'other collaborators', isa_assay.assay.other_creators
   end
 
   test 'should create an isa assay with extended metadata' do
-    projects = User.current_user.person.projects
-    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
-    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: User.current_user.person)
+    inv = FactoryBot.create(:investigation, projects: [@project], contributor: @person)
+    study = FactoryBot.create(:study, investigation_id: inv.id, contributor: @person)
     other_creator = FactoryBot.create(:person)
-    this_person = User.current_user.person
 
     source_sample_type = FactoryBot.create(:simple_sample_type, title: 'source sample_type')
 
-    sample_collection_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [projects.first.id],
+    sample_collection_sample_type = FactoryBot.create(:multi_linked_sample_type, project_ids: [@project.id],
                                                                                  title: 'sample_collection sample_type')
     sample_collection_sample_type.sample_attributes.last.linked_sample_type = source_sample_type
 
     study.sample_types = [source_sample_type, sample_collection_sample_type]
 
     policy_attributes = { access_type: Policy::ACCESSIBLE,
-                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
     emt = FactoryBot.create(:simple_assay_extended_metadata_type)
 
@@ -180,13 +172,13 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
     assay_attributes = { title: 'First assay with custom metadata', study_id: study.id,
                          sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
-                         creator_ids: [this_person.id, other_creator.id],
+                         creator_ids: [@person.id, other_creator.id],
                          other_creators: 'other collaborators',
                          position: 0, assay_class_id: AssayClass.experimental.id, policy_attributes: }
 
     isa_assay_attributes = { assay: assay_attributes.merge(emt_attributes),
                              input_sample_type_id: sample_collection_sample_type.id,
-                             sample_type: create_material_assay_sample_type_attributes(projects.first, sample_collection_sample_type.id)
+                             sample_type: create_material_assay_sample_type_attributes(@project, sample_collection_sample_type.id)
     }
 
     assert_difference 'Assay.count', 1 do
@@ -198,12 +190,9 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'hide sops, publications, documents, and discussion channels if assay stream' do
-    person = FactoryBot.create(:person)
-    investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
-    study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
-    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
-
-    login_as(person)
+    investigation = FactoryBot.create(:investigation, contributor: @person, is_isa_json_compliant: true)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: )
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: @person, position: 0)
 
     get :new, params: { study_id: study.id, is_assay_stream: true }
     assert_response :success
@@ -225,13 +214,9 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'show sops, publications, documents, and discussion channels if experimental assay' do
-    person = FactoryBot.create(:person)
-    project = person.projects.first
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person, projects: [project])
-    study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
-    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
-
-    login_as(person)
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person, projects: [@project])
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: )
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: @person, position: 0)
 
     get :new, params: { study_id: study.id, assay_stream_id: assay_stream.id, source_assay_id: assay_stream.id }
     assert_response :success
@@ -242,8 +227,8 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_select 'div.panel-heading', text: /Discussion Channels/i, count: 1
     assert_select 'div.panel-heading', text: /Define Sample type for Assay/i, count: 1
 
-    first_assay_st = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project], linked_sample_type: study.sample_types.second)
-    first_assay = FactoryBot.create(:assay, contributor: person, study: , assay_stream: , position: 1, sample_type: first_assay_st)
+    first_assay_st = FactoryBot.create(:isa_assay_material_sample_type, contributor: @person, projects: [@project], linked_sample_type: study.sample_types.second)
+    first_assay = FactoryBot.create(:assay, contributor: @person, study: , assay_stream: , position: 1, sample_type: first_assay_st)
     assert_equal assay_stream, first_assay.assay_stream
 
     get :edit, params: { id: first_assay.id, assay_stream_id: assay_stream.id, source_assay_id: first_assay.id, study_id: study.id }
@@ -257,14 +242,11 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'insert assay between assay stream and experimental assay' do
-    person = FactoryBot.create(:person)
-    project = person.projects.first
-    login_as(person)
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
-    study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: person )
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: @person )
 
     ## Create an assay stream
-    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study: )
+    assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study: )
     assert assay_stream.is_assay_stream?
     assert_equal assay_stream.previous_linked_sample_type, study.sample_types.second
     assert_nil assay_stream.next_linked_child_assay
@@ -272,9 +254,9 @@ class ISAAssaysControllerTest < ActionController::TestCase
     ## Create an assay at the end of the stream
     end_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
                                               linked_sample_type: study.sample_types.second,
-                                              projects: [project],
-                                              contributor: person)
-    end_assay = FactoryBot.create(:assay, position: 0, contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
+                                              projects: [@project],
+                                              contributor: @person)
+    end_assay = FactoryBot.create(:assay, position: 0, contributor: @person, study: , sample_type: end_assay_sample_type, assay_stream: )
 
     refute end_assay.is_assay_stream?
     assert_equal end_assay.previous_linked_sample_type, assay_stream.previous_linked_sample_type, study.sample_types.second
@@ -288,7 +270,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     intermediate_assay_attributes1 = { title: 'First intermediate assay',
                                       study_id: study.id,
                                       assay_class_id: AssayClass.experimental.id,
-                                      creator_ids: [person.id],
+                                      creator_ids: [@person.id],
                                       policy_attributes: ,
                                       assay_stream_id: assay_stream.id, position: 0 }
 
@@ -304,7 +286,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     end
 
     isa_assay = assigns(:isa_assay)
-    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: isa_assay.assay.id)
+    assert_redirected_to single_page_path(id: @project, item_type: 'assay', item_id: isa_assay.assay.id)
 
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, study.sample_types.second
     assert_equal isa_assay.assay.next_linked_child_assay, end_assay
@@ -319,14 +301,11 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'insert assay between two experimental assays' do
-    person = FactoryBot.create(:person)
-    project = person.projects.first
-    login_as(person)
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
-    study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: person )
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: @person )
 
     ## Create an assay stream
-    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study: )
+    assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study: )
     assert assay_stream.is_assay_stream?
     assert_equal assay_stream.previous_linked_sample_type, study.sample_types.second
     assert_nil assay_stream.next_linked_child_assay
@@ -334,16 +313,16 @@ class ISAAssaysControllerTest < ActionController::TestCase
     ## Create an assay at the begin of the stream
     begin_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
                                                 linked_sample_type: study.sample_types.second,
-                                                projects: [project],
-                                                contributor: person)
-    begin_assay = FactoryBot.create(:assay, title: 'Begin Assay', position: 0, contributor: person, study: , sample_type: begin_assay_sample_type, assay_stream: )
+                                                projects: [@project],
+                                                contributor: @person)
+    begin_assay = FactoryBot.create(:assay, title: 'Begin Assay', position: 0, contributor: @person, study: , sample_type: begin_assay_sample_type, assay_stream: )
 
     ## Create an assay at the end of the stream
     end_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: begin_assay_sample_type,
-                                              projects: [project],
-                                              contributor: person)
-    end_assay = FactoryBot.create(:assay, title: 'End Assay', position: 1, contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
+                                              projects: [@project],
+                                              contributor: @person)
+    end_assay = FactoryBot.create(:assay, title: 'End Assay', position: 1, contributor: @person, study: , sample_type: end_assay_sample_type, assay_stream: )
 
     refute end_assay.is_assay_stream?
     assert_equal begin_assay.previous_linked_sample_type, assay_stream.previous_linked_sample_type, study.sample_types.second
@@ -357,12 +336,12 @@ class ISAAssaysControllerTest < ActionController::TestCase
     intermediate_assay_attributes2 = { title: 'Second intermediate assay',
                                       study_id: study.id,
                                       assay_class_id: AssayClass.experimental.id,
-                                      creator_ids: [person.id],
+                                      creator_ids: [@person.id],
                                       policy_attributes: ,
                                       assay_stream_id: assay_stream.id }
 
     intermediate_assay_sample_type_attributes2 = { title: "Intermediate Assay Sample type 2",
-                                                    project_ids: [project.id],
+                                                    project_ids: [@project.id],
                                                     sample_attributes_attributes: {
                                                       '0': {
                                                         pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -400,7 +379,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     end
 
     isa_assay = assigns(:isa_assay)
-    assert_redirected_to single_page_path(id: project, item_type: 'assay', item_id: isa_assay.assay.id)
+    assert_redirected_to single_page_path(id: @project, item_type: 'assay', item_id: isa_assay.assay.id)
 
     assert_equal begin_assay.previous_linked_sample_type, study.sample_types.second
     assert_equal isa_assay.assay.sample_type.previous_linked_sample_type, begin_assay.sample_type
@@ -416,14 +395,11 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should not insert assay if next assay has samples' do
-    person = FactoryBot.create(:person)
-    project = person.projects.first
-    login_as(person)
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
-    study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: person )
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: @person )
 
     ## Create an assay stream
-    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study: )
+    assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study: )
     assert assay_stream.is_assay_stream?
     assert_equal assay_stream.previous_linked_sample_type, study.sample_types.second
     assert_nil assay_stream.next_linked_child_assay
@@ -431,16 +407,16 @@ class ISAAssaysControllerTest < ActionController::TestCase
     ## Create an assay at the begin of the stream
     begin_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
                                                 linked_sample_type: study.sample_types.second,
-                                                projects: [project],
-                                                contributor: person)
-    begin_assay = FactoryBot.create(:assay, title: 'Begin Assay', contributor: person, study: , sample_type: begin_assay_sample_type, assay_stream: )
+                                                projects: [@project],
+                                                contributor: @person)
+    begin_assay = FactoryBot.create(:assay, title: 'Begin Assay', contributor: @person, study: , sample_type: begin_assay_sample_type, assay_stream: )
 
     ## Create an assay at the end of the stream
     end_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                               linked_sample_type: begin_assay_sample_type,
-                                              projects: [project],
-                                              contributor: person)
-    end_assay = FactoryBot.create(:assay, title: 'End Assay', contributor: person, study: , sample_type: end_assay_sample_type, assay_stream: )
+                                              projects: [@project],
+                                              contributor: @person)
+    end_assay = FactoryBot.create(:assay, title: 'End Assay', contributor: @person, study: , sample_type: end_assay_sample_type, assay_stream: )
 
     refute end_assay.is_assay_stream?
     assert_equal begin_assay.previous_linked_sample_type, assay_stream.previous_linked_sample_type, study.sample_types.second
@@ -450,7 +426,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     FactoryBot.create :sample,
           title: 'source 1',
           sample_type: study.sample_types.first,
-          project_ids: [project.id],
+          project_ids: [@project.id],
           data: {
             'Source Name': 'Source Name',
             'Source Characteristic 1': 'Source Characteristic 1',
@@ -463,13 +439,13 @@ class ISAAssaysControllerTest < ActionController::TestCase
                 .first
                 .label
           },
-          contributor: person
+          contributor: @person
 
     sample_sample =
       FactoryBot.create :sample,
           title: 'sample 1',
           sample_type: study.sample_types.second,
-          project_ids: [project.id],
+          project_ids: [@project.id],
           data: {
             Input: [source_sample.id],
             'sample collection': 'sample collection',
@@ -477,12 +453,12 @@ class ISAAssaysControllerTest < ActionController::TestCase
             'Sample Name': 'sample name',
             'sample characteristic 1': 'sample characteristic 1'
           },
-          contributor: person
+          contributor: @person
 
     FactoryBot.create :sample,
       title: 'Begin Material 1',
       sample_type: begin_assay_sample_type,
-      project_ids: [project.id],
+      project_ids: [@project.id],
       data: {
         Input: [sample_sample.id],
         'Protocol Assay 1': 'Protocol Assay 1',
@@ -490,7 +466,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
         'Extract Name': 'Extract Name',
         'other material characteristic 1': 'other material characteristic 1'
     },
-    contributor: person
+    contributor: @person
 
 
     assert assay_stream.next_linked_child_assay.sample_type.samples.any?
@@ -503,12 +479,12 @@ class ISAAssaysControllerTest < ActionController::TestCase
     intermediate_assay_attributes3 = { title: 'Third intermediate assay',
                                       study_id: study.id,
                                       assay_class_id: AssayClass.experimental.id,
-                                      creator_ids: [person.id],
+                                      creator_ids: [@person.id],
                                       policy_attributes: ,
                                       assay_stream_id: assay_stream.id }
 
     intermediate_assay_sample_type_attributes3 = { title: "Intermediate Assay Sample type 3",
-                                                    project_ids: [project.id],
+                                                    project_ids: [@project.id],
                                                     sample_attributes_attributes: {
                                                       '0': {
                                                         pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -547,24 +523,23 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'position when creating assays' do
-    person = FactoryBot.create(:person)
-    investigation = FactoryBot.create(:investigation, contributor: person, is_isa_json_compliant: true)
-    study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @person, is_isa_json_compliant: true)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: )
 
-    login_as(person)
+    login_as(@person)
 
     get :new, params: { study_id: study.id, is_assay_stream: true }
     assert_response :success
     # New assay stream should have position 0 and is of type 'number'
     assert_select 'input[type=number][value=0]#isa_assay_assay_position', count: 1
 
-    assay_stream1 = FactoryBot.create(:assay_stream, study: , contributor: person, position: 0)
+    assay_stream1 = FactoryBot.create(:assay_stream, study: , contributor: @person, position: 0)
     get :new, params: { study_id: study.id, is_assay_stream: true }
     assert_response :success
     # New assay stream should have position 1 and is of type 'number'
     assert_select 'input[type=number][value=1]#isa_assay_assay_position', count: 1
 
-    FactoryBot.create(:assay_stream, study: , contributor: person, position: 5)
+    FactoryBot.create(:assay_stream, study: , contributor: @person, position: 5)
     get :new, params: { study_id: study.id, is_assay_stream: true }
     assert_response :success
     # New assay stream should have position 6 and is of type 'number'
@@ -580,12 +555,11 @@ class ISAAssaysControllerTest < ActionController::TestCase
     person = FactoryBot.create(:person_not_in_project)
     second_person = FactoryBot.create(:person_not_in_project)
     institution = FactoryBot.create(:institution)
-    project = FactoryBot.create(:project)
     [person, second_person].each do |p|
-      p.add_to_project_and_institution(project, institution)
+      p.add_to_project_and_institution(@project, institution)
       p.reload
     end
-    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: person)
 
     study = FactoryBot.create(:isa_json_compliant_study, contributor: person, investigation: )
 
@@ -596,7 +570,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assay_attributes = assay.as_json.reject { |_, v| v.blank? }
 
     login_as person.user
-    post :create, params: { isa_assay: { assay: assay_attributes, sample_type: create_material_assay_sample_type_attributes(project, study.sample_types.second.id), source_assay_id: assay_stream.id, input_sample_type_id: study.sample_types.second.id }, policy_attributes: assay_policy_attributes }
+    post :create, params: { isa_assay: { assay: assay_attributes, sample_type: create_material_assay_sample_type_attributes(@project, study.sample_types.second.id), source_assay_id: assay_stream.id, input_sample_type_id: study.sample_types.second.id }, policy_attributes: assay_policy_attributes }
     @isa_assay = assigns(:isa_assay)
     assert_redirected_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay', item_id: @isa_assay.assay)
 
@@ -616,30 +590,27 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should update sample metadata when updating the isa assay sample type' do
-    person = FactoryBot.create(:person)
-    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @person)
+    source_type = FactoryBot.create(:isa_source_sample_type, contributor: @person, projects: [@project])
+    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: @person, projects: [@project], linked_sample_type: source_type)
+    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: @person, projects: [@project], linked_sample_type: sample_collection_type)
 
-    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
-    source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
-    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project], linked_sample_type: source_type)
-    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: person, projects: [project], linked_sample_type: sample_collection_type)
+    FactoryBot.create(:sample, sample_type: source_type, contributor: @person, project_ids: [@project.id], data: { 'Source Name': 'source1', 'Source Characteristic 1': 'source 1 characteristic 1', 'Source Characteristic 2': 'Bramley' })
+    FactoryBot.create(:sample, sample_type: source_type, contributor: @person, project_ids: [@project.id], data: { 'Source Name': 'source2', 'Source Characteristic 1': 'source 2 characteristic 1', 'Source Characteristic 2': 'Granny Smith' })
 
-    FactoryBot.create(:sample, sample_type: source_type, contributor: person, project_ids: [project.id], data: { 'Source Name': 'source1', 'Source Characteristic 1': 'source 1 characteristic 1', 'Source Characteristic 2': 'Bramley' })
-    FactoryBot.create(:sample, sample_type: source_type, contributor: person, project_ids: [project.id], data: { 'Source Name': 'source2', 'Source Characteristic 1': 'source 2 characteristic 1', 'Source Characteristic 2': 'Granny Smith' })
+    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: @person, project_ids: [@project.id], data: { 'Sample Name': 'sample1', 'sample collection': 'collection method 1', Input: 'source1', 'sample characteristic 1': 'value sample 1', 'sample collection parameter value 1': 'value 1' })
+    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: @person, project_ids: [@project.id], data: { 'Sample Name': 'sample2', 'sample collection': 'collection method 1', Input: 'source2', 'sample characteristic 1': 'value sample 2', 'sample collection parameter value 1': 'value 2' })
 
-    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: person, project_ids: [project.id], data: { 'Sample Name': 'sample1', 'sample collection': 'collection method 1', Input: 'source1', 'sample characteristic 1': 'value sample 1', 'sample collection parameter value 1': 'value 1' })
-    FactoryBot.create(:sample, sample_type: sample_collection_type, contributor: person, project_ids: [project.id], data: { 'Sample Name': 'sample2', 'sample collection': 'collection method 1', Input: 'source2', 'sample characteristic 1': 'value sample 2', 'sample collection parameter value 1': 'value 2' })
+    FactoryBot.create(:sample, sample_type: assay_type, contributor: @person, project_ids: [@project.id], data: { 'Extract Name': 'Extract 1', 'Protocol Assay 1': 'method 1', Input: 'sample1', 'Assay 1 parameter value 1': 'value extract 1', 'other material characteristic 1': 'characteristics value extract 1' })
+    FactoryBot.create(:sample, sample_type: assay_type, contributor: @person, project_ids: [@project.id], data: { 'Extract Name': 'Extract 2', 'Protocol Assay 1': 'method 1', Input: 'sample2', 'Assay 1 parameter value 1': 'value extract 2', 'other material characteristic 1': 'characteristics value extract 2' })
 
-    FactoryBot.create(:sample, sample_type: assay_type, contributor: person, project_ids: [project.id], data: { 'Extract Name': 'Extract 1', 'Protocol Assay 1': 'method 1', Input: 'sample1', 'Assay 1 parameter value 1': 'value extract 1', 'other material characteristic 1': 'characteristics value extract 1' })
-    FactoryBot.create(:sample, sample_type: assay_type, contributor: person, project_ids: [project.id], data: { 'Extract Name': 'Extract 2', 'Protocol Assay 1': 'method 1', Input: 'sample2', 'Assay 1 parameter value 1': 'value extract 2', 'other material characteristic 1': 'characteristics value extract 2' })
+    study = FactoryBot.create(:study, investigation: investigation, contributor: @person, sample_types: [source_type, sample_collection_type])
 
-    study = FactoryBot.create(:study, investigation: investigation, contributor: person, sample_types: [source_type, sample_collection_type])
-
-    assay_stream = FactoryBot.create(:assay_stream, study: study, contributor: person, position: 0)
-    assay = FactoryBot.create(:assay, study: , contributor: person, assay_class: AssayClass.experimental, assay_stream: assay_stream, assay_type_uri: nil, sample_type: assay_type)
+    assay_stream = FactoryBot.create(:assay_stream, study: study, contributor: @person, position: 0)
+    assay = FactoryBot.create(:assay, study: , contributor: @person, assay_class: AssayClass.experimental, assay_stream: assay_stream, assay_type_uri: nil, sample_type: assay_type)
     title_attribute = assay.sample_type.sample_attributes.detect(&:is_title)
 
-    login_as person.user
+    login_as @person.user
     patch :update, params: { id: assay, isa_assay:
       { sample_type:
           { sample_attributes: [
@@ -656,15 +627,13 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should not update sample type linkage if it is the first assay in the assay stream' do
-    person = FactoryBot.create(:person)
-    project = person.projects.first
-    login_as(person)
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
-    study = FactoryBot.create(:isa_json_compliant_study, investigation:, contributor: person)
+    login_as(@person)
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation:, contributor: @person)
 
     # Create the assay streams
-    first_assay_stream = FactoryBot.create(:assay_stream, contributor: person, study:)
-    second_assay_stream = FactoryBot.create(:assay_stream, contributor: person, study:)
+    first_assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study:)
+    second_assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study:)
     assert first_assay_stream.is_assay_stream?
     assert second_assay_stream.is_assay_stream?
     assert_equal first_assay_stream.previous_linked_sample_type, study.sample_types.second
@@ -675,16 +644,16 @@ class ISAAssaysControllerTest < ActionController::TestCase
     # Create an assay at the begin of the first stream
     first_assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
                                                 linked_sample_type: study.sample_types.second,
-                                                projects: [project],
-                                                contributor: person)
-    first_assay = FactoryBot.create(:assay, title: 'First Assay in the second assay stream', contributor: person, study:, sample_type: first_assay_sample_type, assay_stream: second_assay_stream)
+                                                projects: [@project],
+                                                contributor: @person)
+    first_assay = FactoryBot.create(:assay, title: 'First Assay in the second assay stream', contributor: @person, study:, sample_type: first_assay_sample_type, assay_stream: second_assay_stream)
 
     # Create an assay at the end of the first stream
     second_assay_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type,
                                                  linked_sample_type: first_assay_sample_type,
-                                                 projects: [project],
-                                                 contributor: person)
-    second_assay = FactoryBot.create(:assay, title: 'Second Assay in the second assay stream', contributor: person, study:, sample_type: second_assay_sample_type, assay_stream: second_assay_stream)
+                                                 projects: [@project],
+                                                 contributor: @person)
+    second_assay = FactoryBot.create(:assay, title: 'Second Assay in the second assay stream', contributor: @person, study:, sample_type: second_assay_sample_type, assay_stream: second_assay_stream)
 
     refute first_assay.is_assay_stream?
     refute second_assay.is_assay_stream?
@@ -698,12 +667,12 @@ class ISAAssaysControllerTest < ActionController::TestCase
     third_assay_attributes = { title: 'First assay of the first assay stream',
                                study_id: study.id,
                                assay_class_id: AssayClass.experimental.id,
-                               creator_ids: [person.id],
+                               creator_ids: [@person.id],
                                policy_attributes:,
                                assay_stream_id: first_assay_stream.id }
 
     third_assay_sample_type_attributes = { title: "Third Assay Sample type",
-                                           project_ids: [project.id],
+                                           project_ids: [@project.id],
                                            sample_attributes_attributes: {
                                              '0': {
                                                pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -751,14 +720,13 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should auto-populate the sample type title and description' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    projects = person.projects
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: person)
-    study = FactoryBot.create(:isa_json_compliant_study, investigation:, contributor: person)
-    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study:)
-    material_assay_template = FactoryBot.create(:isa_assay_material_template)
-    data_file_assay_template = FactoryBot.create(:isa_assay_data_file_template)
+    login_as(@person)
+    projects = [@project]
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation:, contributor: @person)
+    assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study:)
+    material_assay_template = FactoryBot.create(:isa_assay_material_template, projects: [@project])
+    data_file_assay_template = FactoryBot.create(:isa_assay_data_file_template, projects: [@project])
 
     policy_attributes = { access_type: Policy::ACCESSIBLE,
                           permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
@@ -770,7 +738,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     material_assay_attributes = { title: 'Material Assay',
                                   study_id: study.id,
                                   assay_class_id: AssayClass.experimental.id,
-                                  creator_ids: [person.id],
+                                  creator_ids: [@person.id],
                                   policy_attributes:,
                                   assay_stream_id: assay_stream.id }
 
@@ -797,7 +765,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     data_file_assay_attributes = { title: 'Material Assay',
                                   study_id: study.id,
                                   assay_class_id: AssayClass.experimental.id,
-                                  creator_ids: [person.id],
+                                  creator_ids: [@person.id],
                                   policy_attributes:,
                                   assay_stream_id: assay_stream.id }
 
@@ -820,13 +788,11 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'Should not run sample metadata updating callbacks and tasks when updating assay streams' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    project = person.projects.first
+    login_as(@person)
 
-    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
-    study = FactoryBot.create(:study, contributor: person, investigation: investigation)
-    assay_stream = FactoryBot.create(:assay_stream, contributor: person, study: study, title: 'my asay stream', description: 'Original assay stream')
+    investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @person)
+    study = FactoryBot.create(:study, contributor: @person, investigation: investigation)
+    assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study: study, title: 'my asay stream', description: 'Original assay stream')
 
     assert assay_stream.can_edit?
 
@@ -849,7 +815,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
   private
 
-  def create_material_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=nil, counter=1)
+  def create_material_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=@material_template.id, counter=1)
     { title: "Intermediate Assay Sample type #{counter}",
       project_ids: [project.id],
       template_id: parent_template_id,
@@ -879,7 +845,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     }
   end
 
-  def create_data_file_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=nil, counter=1)
+  def create_data_file_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=@data_file_template.id, counter=1)
     { title: "Data File Assay Sample type #{counter}",
       project_ids: [project.id],
       template_id: parent_template_id,
