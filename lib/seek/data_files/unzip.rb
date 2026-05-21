@@ -26,8 +26,10 @@ module Seek
         def unzip_zip(tmp_dir)
           Zip::File.open(content_blob.filepath) do |zipfile|
             zipfile.each do |entry|
-              unless ::File.exist?(::File.join(tmp_dir, entry.name))
-                FileUtils::mkdir_p(::File.dirname(entry.name))
+              next if entry.name_is_directory?
+              dest = ::File.join(tmp_dir, entry.name)
+              unless ::File.exist?(dest)
+                FileUtils::mkdir_p(::File.dirname(dest))
                 entry.extract(entry.name, destination_directory: tmp_dir)
               end
             end
