@@ -74,6 +74,11 @@ module Git
           git_version.mutable = version.version == version.versions.maximum(:version)
           git_version.save!
         end
+
+        path_io_url_triples.each do |_, io, _|
+          next unless io.is_a?(File)
+          io.close unless io.closed?
+        end
         git_version
       end
     end
