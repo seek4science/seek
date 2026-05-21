@@ -110,24 +110,19 @@ class ISAAssaysControllerTest < ActionController::TestCase
   end
 
   test 'should update isa assay' do
-    investigation = FactoryBot.create(:investigation, projects: [@project])
+    investigation = FactoryBot.create(:investigation, projects: [@project], is_isa_json_compliant: true)
     other_creator = FactoryBot.create(:person)
 
-    source_type = FactoryBot.create(:isa_source_sample_type, contributor: @person, projects: [@project])
-    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: @person, projects: [@project],
-                                                                                   linked_sample_type: source_type)
-    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: @person, projects: [@project],
-                                                           linked_sample_type: sample_collection_type)
-
-    study = FactoryBot.create(:study, investigation:, contributor: @person,
-                                      sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))],
-                                      sample_types: [source_type, sample_collection_type])
-
-    assay = FactoryBot.create(:assay, study:, contributor: @person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation:, contributor: @person,
+                                      sops: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))])
+    assay_stream = FactoryBot.create(:assay_stream, title: 'Assay stream', study:, contributor:@person)
+    assay = FactoryBot.create(:assay, study:, assay_stream:, contributor: @person)
     put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title' } } }
     assert_redirected_to single_page_path(id: @project, item_type: 'assay', item_id: assay.id)
     assert flash[:error].include?('Sample type not found.')
 
+    assay_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: @person, projects: [@project],
+                                   linked_sample_type: study.sample_types.second)
     assay = FactoryBot.create(:assay, study:, sample_type: assay_type, contributor: @person)
 
     put :update, params: { id: assay, isa_assay: { assay: { title: 'assay title', sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id],
