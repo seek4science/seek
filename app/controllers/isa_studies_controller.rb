@@ -46,7 +46,6 @@ class ISAStudiesController < ApplicationController
     end
   rescue StandardError => e
     respond_to do |format|
-      format.html { render action: 'new', status: :unprocessable_entity }
       format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
@@ -93,7 +92,6 @@ class ISAStudiesController < ApplicationController
     end
   rescue StandardError => e
     respond_to do |format|
-      format.html { render action: 'edit', status: :unprocessable_entity }
       format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
