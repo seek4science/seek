@@ -22,15 +22,13 @@ module Seek
           end
           find_unzipped_datafiles(tmp_dir)
         end
-  
+
         def unzip_zip(tmp_dir)
-          Dir.chdir(tmp_dir) do
-            Zip::File.open(content_blob.filepath) do |zipfile|
-              zipfile.each do |entry|
-                unless ::File.exist?(entry.name)
-                  FileUtils::mkdir_p(::File.dirname(entry.name))
-                  zipfile.extract(entry, entry.name)
-                end
+          Zip::File.open(content_blob.filepath) do |zipfile|
+            zipfile.each do |entry|
+              unless ::File.exist?(::File.join(tmp_dir, entry.name))
+                FileUtils::mkdir_p(::File.dirname(entry.name))
+                entry.extract(entry.name, destination_directory: tmp_dir)
               end
             end
           end

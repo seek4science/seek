@@ -40,19 +40,17 @@ module Git
           if unzip && blob.original_filename.end_with?('.zip')
             blob_dir = File.join(tmp_dir, "blob_#{blob.id}")
             Dir.mkdir(blob_dir)
-            Dir.chdir(blob_dir) do
-              ROCrate::Reader.unzip_file_to(blob.filepath, blob_dir)
-              files = Dir.glob('**/*', ::File::FNM_DOTMATCH).select do |path|
-                ::File.file?(path) && !(path == '.' || path == '..' || path.end_with?('/.'))
-              end
-              # Don't include generated RO-Crate files for basic crates
-              if blob.original_filename.end_with?('.basic.crate.zip')
-                files.delete('ro-crate-metadata.json')
-                files.delete('ro-crate-metadata.jsonld')
-                files.delete('ro-crate-preview.html')
-              end
-              path_io_url_triples += files.map { |f| [f, File.open(f)] }
+            ROCrate::Reader.unzip_file_to(blob.filepath, blob_dir)
+            files = Dir.glob('**/*', File::FNM_DOTMATCH, base: blob_dir).select do |path|
+              !(path == '.' || path == '..' || path.end_with?('/.')) && File.file?(File.join(blob_dir, path))
             end
+            # Don't include generated RO-Crate files for basic crates
+            if blob.original_filename.end_with?('.basic.crate.zip')
+              files.delete('ro-crate-metadata.json')
+              files.delete('ro-crate-metadata.jsonld')
+              files.delete('ro-crate-preview.html')
+            end
+            path_io_url_triples += files.map { |f| [f, File.open(File.join(blob_dir, f))] }
           else
             tuple = [blob.original_filename, blob.data_io_object || StringIO.new('')]
             tuple << blob.url if blob.url

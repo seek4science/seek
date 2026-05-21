@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ResearchObject/ro-crate-ruby.git
-  revision: ad8c6306547ccf9c5ef29f7bd88071da82725329
+  revision: 623621af81ffb44329ffdaabfa1e0cc727bfb022
   branch: master
   specs:
     ro-crate (0.6.0)
@@ -145,7 +145,7 @@ GEM
     acts-as-taggable-on (12.0.0)
       activerecord (>= 7.1, < 8.1)
       zeitwerk (>= 2.4, < 3.0)
-    addressable (2.8.9)
+    addressable (2.8.10)
       public_suffix (>= 2.0.2, < 8.0)
     aes_key_wrap (1.1.0)
     ansi (1.5.0)
