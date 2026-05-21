@@ -92,7 +92,7 @@ gem 'rest-client'
 gem 'rfc-822'
 gem 'rmagick'
 gem 'ro-bundle', git: 'https://github.com/fbacall/ruby-ro-bundle.git' # Needed to relax rubyzip min version
-gem 'ro-crate', git: 'https://github.com/ResearchObject/ro-crate-ruby.git', branch: 'master'
+gem 'ro-crate'
 gem 'rspec-rails'
 gem 'rubyzip'
 gem 'rugged'
