@@ -232,7 +232,7 @@ class ISAAssaysController < ApplicationController
   end
 
   def old_attributes
-    return if @isa_assay.assay.is_assay_stream?
+    return if @isa_assay.assay.is_assay_stream? || @isa_assay.sample_type.nil?
 
     @old_attributes = @isa_assay.sample_type.sample_attributes.map do |attr|
       { id: attr.id, title: attr.title }
