@@ -24,20 +24,11 @@ module Seek
         end
 
         def unzip_zip(tmp_dir)
-          Zip::File.open(content_blob.filepath) do |zipfile|
-            zipfile.each do |entry|
-              next if entry.name_is_directory?
-              dest = ::File.join(tmp_dir, entry.name)
-              unless ::File.exist?(dest)
-                FileUtils::mkdir_p(::File.dirname(dest))
-                entry.extract(entry.name, destination_directory: tmp_dir)
-              end
-            end
-          end
+          Seek::Zip.unzip(content_blob.filepath, tmp_dir)
         end
 
         def unzip_tar(tmp_dir, input = content_blob.filepath)
-            Minitar.unpack(input, tmp_dir)
+          Minitar.unpack(input, tmp_dir)
         end
 
         def unzip_tbz2(tmp_dir)

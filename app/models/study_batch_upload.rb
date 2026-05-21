@@ -87,19 +87,11 @@ class StudyBatchUpload < ApplicationRecord
     dir.mkdir
     study_data = []
     studies = []
-    Zip::File.open(file_path) do |zipfile|
-      zipfile.entries.each do |file|
-        next if file.name_is_directory?
-        dest = ::File.join(dir, file.name)
-        if file.name.start_with?('data/')
-          study_data << file
-        else
-          studies << file
-        end
-        unless ::File.exist?(dest)
-          FileUtils::mkdir_p(::File.dirname(dest))
-          file.extract(file.name, destination_directory: dir)
-        end
+    Seek::Zip.unzip(file_path, dir) do |entry|
+      if entry.name.start_with?('data/')
+        study_data << entry
+      else
+        studies << entry
       end
     end
     [study_data, studies]
