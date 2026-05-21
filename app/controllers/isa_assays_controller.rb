@@ -76,6 +76,11 @@ class ISAAssaysController < ApplicationController
         format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
     end
+  rescue StandardError => e
+    respond_to do |format|
+      format.html { render action: 'new', status: :unprocessable_entity }
+      format.json { render json: { error: e.message }, status: :unprocessable_entity }
+    end
   end
 
   def edit
@@ -103,6 +108,11 @@ class ISAAssaysController < ApplicationController
         format.html { render action: 'edit', status: :unprocessable_entity }
         format.json { render json: @isa_assay.errors, status: :unprocessable_entity }
       end
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.html { render action: 'edit', status: :unprocessable_entity }
+      format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
 
@@ -195,7 +205,7 @@ class ISAAssaysController < ApplicationController
             attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id].to_i
           elsif attribute[:sample_attribute_type][:title]
             attribute[:sample_attribute_type_id] =
-              SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
+              SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first&.id
           end
         end
         attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
