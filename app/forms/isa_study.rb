@@ -67,39 +67,44 @@ class ISAStudy
   def validate_objects
     @study.errors.each { |e| errors.add(:base, "[Study]: #{e.full_message}") } unless @study.valid?
 
-    unless @source_sample_type.valid?
-      @source_sample_type.errors.full_messages.each { |e| errors.add(:base, "[Source sample type]: #{e}") }
-    end
+    [@source_sample_type, @sample_collection_sample_type].each do |sample_type|
+      # Add generic Sample type errors
+      unless sample_type.valid?
+        sample_type.errors.full_messages.each do |e|
+          errors.add(:base, "[Sample type '#{sample_type.title}']: #{e}")
+        end
+      end
 
-    if @source_sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
-      errors.add(:base, '[Source sample type]: All attributes must have an ISA tag')
-    end
-
-    if @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag.nil? && !a.title.include?('Input') }.any?
-      errors.add(:base,
-                 "[Sample collection sample type]: All attributes should have an ISA Tag except for the <em>'Input'</em> attribute (hidden)".html_safe)
-    end
-
-    unless @sample_collection_sample_type.valid?
-      @sample_collection_sample_type.errors.full_messages.each do |e|
-        errors.add(:base, "[Sample collection sample type]: #{e}")
+      # All Sample Attributes must have an ISA tag
+      missing_tag_attributes = sample_type.sample_attributes.select { |a| a.isa_tag.nil? }
+      missing_tag_attributes.each do |attribute|
+        errors.add(:base, "[Sample type '#{sample_type.title}']: #{attribute.title} does not have an ISA tag.")
       end
     end
 
+    # Source sample type must have exactly one SOURCE attribute
     unless @source_sample_type.sample_attributes.select { |a| a.isa_tag&.isa_source? }.one?
-      errors.add(:base, "[Sample type]: Should have exactly one attribute with the 'source' ISA tag selected")
+      errors.add(:base, "[Sample type '#{@source_sample_type.title}']: Should have exactly one attribute with the '#{Seek::ISA::TagType::INPUT}' ISA tag selected")
     end
 
-    %i[isa_sample? isa_protocol?].each do |tag_type|
-      sample_type_tag_types = @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag&.send(tag_type) }
+    # Sample collection sample type must have at exactly one attribute with these ISA tags:
+    # - SAMPLE
+    # - PROTOCOL
+    # - INPUT
+    [Seek::ISA::TagType::SAMPLE, Seek::ISA::TagType::PROTOCOL, Seek::ISA::TagType::INPUT].each do |tag_type|
+      sample_type_tag_types = @sample_collection_sample_type.sample_attributes.select { |a| a.isa_tag&.title == tag_type }
       unless sample_type_tag_types.one?
-        tag_title = sample_type_tag_types[0]&.isa_tag&.title
-        errors.add(:base, "[Sample type]: Should have exactly one attribute with the '#{tag_title}' ISA tag selected")
+        errors.add(:base, "[Sample type '#{@sample_collection_sample_type.title}']: Should have exactly one attribute with the '#{tag_type}' ISA tag selected")
       end
     end
 
-    return if @sample_collection_sample_type.sample_attributes.any?(&:seek_sample_multi?)
-
-    errors.add(:base, '[Sample Collection sample type]: SEEK Sample Multi attribute is not provided')
+    # The input attribute must conform to these restrictions:
+    # - Input ISA tag
+    # - 'input' in the title
+    # - Sample attribute type must be 'Registered Sample List'
+    if @sample_collection_sample_type.sample_attributes.detect { |attribute| attribute.input_attribute? }.nil?
+      attribute_type_title = SampleAttributeType.find_by(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)&.title
+      errors.add(:base, "[Sample type '#{@sample_collection_sample_type.title}']: No valid input attribute detected! A valid input attribute must have an '#{Seek::ISA::TagType::INPUT}' ISA tag, have 'input in the title' and must be of type '#{attribute_type_title}'.")
+    end
   end
 end
