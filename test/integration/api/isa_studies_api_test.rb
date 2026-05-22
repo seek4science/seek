@@ -19,6 +19,7 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
     # ISA tags
     @source_isa_tag = ISATag.find_by(title: 'source') || FactoryBot.create(:source_isa_tag)
     @sample_isa_tag = ISATag.find_by(title: 'sample') || FactoryBot.create(:sample_isa_tag)
+    @input_isa_tag = ISATag.find_by(title: 'input') || FactoryBot.create(:input_isa_tag)
     @protocol_isa_tag = ISATag.find_by(title: 'protocol') || FactoryBot.create(:protocol_isa_tag)
     @source_characteristic_isa_tag = ISATag.find_by(title: 'source_characteristic') || FactoryBot.create(:source_characteristic_isa_tag)
   end
@@ -62,7 +63,8 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
           "sample_attribute_type_id": @sample_multi_sample_attribute_type.id,
           "linked_sample_type_id": "self",
           "required": true,
-          "is_title": false
+          "is_title": false,
+          "isa_tag_id": @input_isa_tag.id
         },
         "2": {
           "pos": 2,
