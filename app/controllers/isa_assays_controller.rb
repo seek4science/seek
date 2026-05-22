@@ -76,10 +76,6 @@ class ISAAssaysController < ApplicationController
         format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
     end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { error: e.message }, status: :unprocessable_entity }
-    end
   end
 
   def edit
@@ -99,18 +95,19 @@ class ISAAssaysController < ApplicationController
     end
 
     if @isa_assay.save
-      flash[:notice] = "The #{t('isa_assay')} was successfully updated.<br/>".html_safe
-      redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+      respond_to do |format|
+        format.html do
+          flash[:notice] = "The #{t('isa_assay')} was successfully updated"
+          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay.id)
+        end
+        format.json { render json: @isa_assay, include: [params[:include]], status: :ok }
+      end
     else
       respond_to do |format|
         format.html { render action: 'edit', status: :unprocessable_entity }
-        format.json { render json: @isa_assay.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
 

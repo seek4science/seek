@@ -84,7 +84,7 @@ class ISAStudy
 
     # Source sample type must have exactly one SOURCE attribute
     unless @source_sample_type.sample_attributes.select { |a| a.isa_tag&.isa_source? }.one?
-      errors.add(:base, "[Sample type '#{@source_sample_type.title}']: Should have exactly one attribute with the '#{Seek::ISA::TagType::INPUT}' ISA tag selected")
+      errors.add(:base, "[Sample type '#{@source_sample_type.title}']: Should have exactly one attribute with the '#{Seek::ISA::TagType::SOURCE}' ISA tag selected")
     end
 
     # Sample collection sample type must have at exactly one attribute with these ISA tags:

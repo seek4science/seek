@@ -91,7 +91,7 @@ class ISAAssay
       end
     end
 
-    # The Sample type must have at least one attribute with one of the ISA tags:
+    # The Sample type must have exactly one attribute with one of the ISA tags:
     # - OTHER_MATERIAL
     # - DATA_FILE
     assay_sample_or_datafile_attributes = @sample_type.sample_attributes.select do |a|

@@ -41,12 +41,8 @@ class ISAStudiesController < ApplicationController
     else
       respond_to do |format|
         format.html { render action: 'new', status: :unprocessable_entity }
-        format.json { render json: @isa_study.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@isa_study), status: :unprocessable_entity }
       end
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
 
@@ -77,6 +73,7 @@ class ISAStudiesController < ApplicationController
     if @isa_study.save
       respond_to do |format|
         format.html do
+          flash[:notice] = "The #{t('isa_study')} was successfully updated"
           redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
                                        item_id: @isa_study.study.id)
 
@@ -89,10 +86,6 @@ class ISAStudiesController < ApplicationController
         format.html { render action: 'edit', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@isa_study), status: :unprocessable_entity }
       end
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
 
@@ -197,10 +190,10 @@ class ISAStudiesController < ApplicationController
     @isa_study.errors.add(:study, "You are not authorized to edit this #{t('isa_study')}.") unless requested_item_authorized?(@isa_study.study)
 
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} not found.") if @isa_study.source.nil?
-    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} is locked by a background process.") if @isa_study.source.locked?
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} is locked by a background process.") if @isa_study.source&.locked?
     @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} source' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.source)
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
-    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} is locked by a background process.") if @isa_study.sample_collection.locked?
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} is locked by a background process.") if @isa_study.sample_collection&.locked?
     @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} sample collection' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.sample_collection)
 
     if @isa_study.errors.any?
@@ -214,7 +207,7 @@ class ISAStudiesController < ApplicationController
                                        item_id: @isa_study.study)
         end
 
-        format.json { render json: @isa_study.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@isa_study), status: :unprocessable_entity }
       end
     end
   end

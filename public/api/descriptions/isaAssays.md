@@ -5,7 +5,7 @@ An **ISA Assay** bundles:
 * An **Assay** — with title, description, and references to its parent <a href="#studies">**Study**</a> and assay stream
 * A **Sample Type** — defines the output material or data file attributes for this assay step. Must contain:
   * Exactly one attribute with the `protocol` <a href="#ISA tags">**ISA Tag**</a>
-  * Exactly one SEEK Sample Multi attribute acting as the input link (no ISA tag)
+  * Exactly one SEEK Sample Multi attribute acting as the input link with an `input` ISA tag.
   * Exactly one attribute with either the `other_material` or `data_file` ISA tag (set as `is_title: true`)
   * Any additional attributes with characteristic or parameter value ISA tags
 * An **input_sample_type_id** — the ID of the sample type from the preceding step (the study's sample collection sample type for the first assay, or the previous assay's sample type for subsequent assays)

@@ -33,7 +33,7 @@
             "pos": 1,
             "required": true,
             "is_title": false,
-            "isa_tag_id": null,
+            "isa_tag_id": "11",
             "sample_attribute_type": {
               "id": "13",
               "title": "SEEK Sample Multi"

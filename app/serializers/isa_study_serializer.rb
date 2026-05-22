@@ -34,9 +34,10 @@ class ISAStudySerializer < SimpleBaseSerializer
 
   def _meta
     meta = super
-    meta[:uuid] = study&.uuid if study.respond_to?('uuid')
-    meta[:created] = study&.created_at if study.respond_to?('created_at')
-    meta[:modified] = study&.updated_at if study.respond_to?('updated_at')
+    study_obj = object.study
+    meta[:uuid] = study_obj&.uuid if study_obj.respond_to?('uuid')
+    meta[:created] = study_obj&.created_at if study_obj.respond_to?('created_at')
+    meta[:modified] = study_obj&.updated_at if study_obj.respond_to?('updated_at')
     meta
   end
 

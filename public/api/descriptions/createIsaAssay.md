@@ -9,7 +9,7 @@ The request body must include:
   * `assay_stream_id` — the ID of the parent assay stream (for experimental assays)
 * `sample_type` — the output sample type definition with `title` and `sample_attributes`. Required unless creating an assay stream. Must contain:
   * Exactly one attribute with the `protocol` <a href="#ISA tags">**ISA Tag**</a>
-  * Exactly one SEEK Sample Multi attribute (input link, no ISA tag) linking to the previous sample type
+  * Exactly one input attribute of type `SEEK Sample Multi` with the `input` ISA tag, linking to the previous sample type
   * Exactly one attribute with either `other_material` or `data_file` ISA tag (set as `is_title: true`)
 * `input_sample_type_id` — the ID of the sample type from the previous step in the assay stream. For the first assay in a stream, this is the study's sample collection sample type ID.
 

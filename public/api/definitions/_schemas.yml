@@ -5402,6 +5402,7 @@ isaSampleAttributePost:
   required:
     - title
     - sample_attribute_type
+    - isa_tag_id
   additionalProperties: false
 isaSampleAttributePatch:
   type: object
