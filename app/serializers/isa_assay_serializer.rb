@@ -20,6 +20,7 @@ class ISAAssaySerializer < SimpleBaseSerializer
       description: object.assay.description,
       other_creators: object.assay.other_creators,
       position: object.assay.position,
+      study_id: object.assay.study_id,
       assay_class: {
         title: object.assay.assay_class&.title,
         key: object.assay.assay_class&.key
