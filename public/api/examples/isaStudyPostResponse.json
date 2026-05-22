@@ -48,7 +48,8 @@
             "description": null,
             "pid": null
           }
-        ]
+        ],
+        "samples": []
       },
       "sample_collection_sample_type": {
         "id": "121",
@@ -103,7 +104,8 @@
             "description": null,
             "pid": null
           }
-        ]
+        ],
+        "samples": []
       }
     },
     "meta": {
