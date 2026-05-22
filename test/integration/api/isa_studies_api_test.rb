@@ -40,8 +40,42 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
     assert_equal 'isa_studies', response_body['data']['type']
     assert_equal study.id.to_s, response_body['data']['id']
     assert response_body['data']['attributes']['study'].present?
-    assert response_body['data']['attributes']['source_sample_type'].present?
-    assert response_body['data']['attributes']['sample_collection_sample_type'].present?
+    source = response_body['data']['attributes']['source_sample_type']
+    collection = response_body['data']['attributes']['sample_collection_sample_type']
+    assert source.present?
+    assert collection.present?
+    assert_equal [], source['samples']
+    assert_equal [], collection['samples']
+  end
+
+  test 'show ISA study - samples are filtered by authorization' do
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: current_person)
+    source_type = study.sample_types.first
+    vocab_term = source_type.sample_attributes.find_by_title('Source Characteristic 2')
+                             .sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+    sample_data = { 'Source Name' => 'Source 1', 'Source Characteristic 1' => 'char1',
+                    'Source Characteristic 2' => vocab_term }
+
+    viewable_sample = FactoryBot.create(:sample, sample_type: source_type,
+                                                  contributor: current_person,
+                                                  project_ids: current_person.projects.map(&:id),
+                                                  data: sample_data,
+                                                  policy: FactoryBot.create(:public_policy))
+    private_sample = FactoryBot.create(:sample, sample_type: source_type,
+                                                 contributor: FactoryBot.create(:person),
+                                                 project_ids: current_person.projects.map(&:id),
+                                                 data: sample_data.merge('Source Name' => 'Source 2'),
+                                                 policy: FactoryBot.create(:private_policy))
+
+    get isa_study_path(study.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    source_samples = JSON.parse(response.body)['data']['attributes']['source_sample_type']['samples']
+    sample_ids = source_samples.map { |s| s['id'] }
+    assert_includes sample_ids, viewable_sample.id.to_s
+    refute_includes sample_ids, private_sample.id.to_s
+    assert source_samples.first['data'].present?
   end
 
   test 'show ISA study - not found' do

@@ -820,8 +820,10 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_equal 'isa_assays', response_body['data']['type']
     assert_equal assay.id.to_s, response_body['data']['id']
     assert response_body['data']['attributes']['assay'].present?
-    assert response_body['data']['attributes']['sample_type'].present?
+    sample_type = response_body['data']['attributes']['sample_type']
+    assert sample_type.present?
     assert response_body['data']['attributes']['input_sample_type_id'].present?
+    assert_equal [], sample_type['samples']
   end
 
   test 'should return not found when ISA assay does not exist' do

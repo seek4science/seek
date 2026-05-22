@@ -43,8 +43,61 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
     assert_equal 'isa_assays', response_body['data']['type']
     assert_equal assay.id.to_s, response_body['data']['id']
     assert response_body['data']['attributes']['assay'].present?
-    assert response_body['data']['attributes']['sample_type'].present?
+    sample_type = response_body['data']['attributes']['sample_type']
+    assert sample_type.present?
     assert response_body['data']['attributes']['input_sample_type_id'].present?
+    assert_equal [], sample_type['samples']
+  end
+
+  test 'show ISA assay - samples are filtered by authorization' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                               linked_sample_type: @study.sample_types.last)
+    assay_sample_type = assay.sample_type
+    source_type = @study.sample_types.first
+    collection_type = @study.sample_types.last
+
+    source_vocab_term = source_type.sample_attributes.find_by_title('Source Characteristic 2')
+                                    .sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+    source_sample = FactoryBot.create(:sample, sample_type: source_type,
+                                               contributor: current_person,
+                                               project_ids: current_person.projects.map(&:id),
+                                               data: { 'Source Name' => 'Source 1',
+                                                       'Source Characteristic 1' => 'c1',
+                                                       'Source Characteristic 2' => source_vocab_term })
+
+    collection_sample = FactoryBot.create(:sample, sample_type: collection_type,
+                                                    contributor: current_person,
+                                                    project_ids: current_person.projects.map(&:id),
+                                                    data: { 'Input' => [source_sample.id],
+                                                            'sample collection' => 'protocol 1',
+                                                            'sample collection parameter value 1' => 'pv1',
+                                                            'Sample Name' => 'Sample 1',
+                                                            'sample characteristic 1' => 'char1' })
+
+    assay_data = { 'Input' => [collection_sample.id], 'Protocol Assay 1' => 'prot',
+                   'Assay 1 parameter value 1' => 'pv1', 'Extract Name' => 'Extract 1',
+                   'other material characteristic 1' => 'mc1' }
+
+    viewable_sample = FactoryBot.create(:sample, sample_type: assay_sample_type,
+                                                  contributor: current_person,
+                                                  project_ids: current_person.projects.map(&:id),
+                                                  data: assay_data,
+                                                  policy: FactoryBot.create(:public_policy))
+    private_sample = FactoryBot.create(:sample, sample_type: assay_sample_type,
+                                                 contributor: FactoryBot.create(:person),
+                                                 project_ids: current_person.projects.map(&:id),
+                                                 data: assay_data.merge('Extract Name' => 'Extract 2'),
+                                                 policy: FactoryBot.create(:private_policy))
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    assay_samples = JSON.parse(response.body)['data']['attributes']['sample_type']['samples']
+    sample_ids = assay_samples.map { |s| s['id'] }
+    assert_includes sample_ids, viewable_sample.id.to_s
+    refute_includes sample_ids, private_sample.id.to_s
+    assert assay_samples.first['data'].present?
   end
 
   test 'show ISA assay - not found' do

@@ -206,8 +206,41 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_equal 'isa_studies', response_body['data']['type']
     assert_equal study.id.to_s, response_body['data']['id']
     assert response_body['data']['attributes']['study'].present?
-    assert response_body['data']['attributes']['source_sample_type'].present?
-    assert response_body['data']['attributes']['sample_collection_sample_type'].present?
+    source = response_body['data']['attributes']['source_sample_type']
+    collection = response_body['data']['attributes']['sample_collection_sample_type']
+    assert source.present?
+    assert collection.present?
+    assert_equal [], source['samples']
+    assert_equal [], collection['samples']
+  end
+
+  test 'should show ISA study with samples filtered by authorization' do
+    person = User.current_user.person
+    project = person.projects.first
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
+    source_type = study.sample_types.first
+    vocab_term = source_type.sample_attributes.find_by_title('Source Characteristic 2')
+                             .sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+    sample_data = { 'Source Name' => 'S1', 'Source Characteristic 1' => 'c1',
+                    'Source Characteristic 2' => vocab_term }
+
+    viewable = FactoryBot.create(:sample, sample_type: source_type, contributor: person,
+                                           project_ids: [project.id], data: sample_data,
+                                           policy: FactoryBot.create(:public_policy))
+    private_s = FactoryBot.create(:sample, sample_type: source_type,
+                                            contributor: FactoryBot.create(:person),
+                                            project_ids: [project.id],
+                                            data: sample_data.merge('Source Name' => 'S2'),
+                                            policy: FactoryBot.create(:private_policy))
+
+    get :show, as: :json, params: { id: study.id }
+    assert_response :success
+
+    source_samples = JSON.parse(response.body)['data']['attributes']['source_sample_type']['samples']
+    sample_ids = source_samples.map { |s| s['id'] }
+    assert_includes sample_ids, viewable.id.to_s
+    refute_includes sample_ids, private_s.id.to_s
+    assert source_samples.first['data'].present?
   end
 
   test 'should return not found when ISA study does not exist' do
