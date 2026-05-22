@@ -25,6 +25,10 @@ module Seek
     # Replaces all AssetsCreators with the given set, creating, updating and deleting records as necessary.
     # It identifiers existing assets_creators by: creator_id, orcid, or identical name + affiliation.
     def api_assets_creators= attrs
+      retained_and_new_creators(attrs)
+    end
+
+    def retained_and_new_creators(attrs)
       existing = assets_creators.to_a
       retained_and_new = attrs.map do |attr|
         ex = existing.detect do |ac|

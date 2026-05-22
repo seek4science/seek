@@ -367,4 +367,81 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test 'can submit updated version of RO-Crate with authors' do
+    # Submit the workflow with an author
+    post submit_workflows_path, params: {
+      ro_crate: fixture_file_upload('workflows/ro-crate-with-author.crate.zip'),
+      workflow: {
+        project_ids: [@project.id]
+      }
+    }, headers: { 'Authorization' => write_access_auth }
+
+    assert_response :success
+
+    workflow = assigns(:workflow)
+    assert_equal 1, workflow.assets_creators.count
+
+    # Update the version in the RO-Crate and resubmit
+
+    assert_no_difference('Workflow.count') do
+      assert_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-author-updated-version.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }, headers: { 'Authorization' => write_access_auth }
+
+        assert_response :success
+        assert_equal '2.0.0', assigns(:workflow).git_version.name
+
+        workflow = assigns(:workflow).reload
+        old_version = workflow.find_version(1)
+        new_version = workflow.git_version
+        assert_equal old_version.assets_creators, new_version.assets_creators
+      end
+    end
+  end
+
+  test 'can submit updated version of RO-Crate with different authors' do
+    # Submit the workflow with an author
+    post submit_workflows_path, params: {
+      ro_crate: fixture_file_upload('workflows/ro-crate-with-author.crate.zip'),
+      workflow: {
+        project_ids: [@project.id]
+      }
+    }, headers: { 'Authorization' => write_access_auth }
+
+    assert_response :success
+
+    workflow = assigns(:workflow)
+    assert_equal 1, workflow.assets_creators.count
+    assert_equal workflow.assets_creators[0].given_name, 'Jane'
+    assert_equal workflow.assets_creators[0].family_name, 'Doe'
+    assert_equal workflow.assets_creators[0].affiliation, 'Example University'
+
+    # Update the version in the RO-Crate and resubmit
+
+    assert_no_difference('Workflow.count') do
+      assert_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-updated-author-and-version.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }, headers: { 'Authorization' => write_access_auth }
+
+        assert_response :success
+        workflow = assigns(:workflow)
+        assert_equal '5.0.0', workflow.git_version.name
+
+        workflow.reload
+        assert_equal workflow.assets_creators.count, 1
+        assert_equal workflow.assets_creators[0].given_name, 'Jane'
+        assert_equal workflow.assets_creators[0].family_name, 'Doe'
+        assert_equal workflow.assets_creators[0].affiliation, 'Example University 2'
+      end
+    end
+  end
 end
