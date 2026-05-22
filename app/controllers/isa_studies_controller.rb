@@ -42,7 +42,7 @@ class ISAStudiesController < ApplicationController
           redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
                                        item_id: @isa_study.study)
         end
-        format.json { render json: @isa_study, include: [params[:include]] }
+        format.json { render json: @isa_study, include: [params[:include]], status: :created }
       end
 
     else

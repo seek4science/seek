@@ -69,7 +69,7 @@ class ISAAssaysController < ApplicationController
           redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                        item_id: @isa_assay.assay)
         end
-        format.json { render json: @isa_assay, include: [params[:include]] }
+        format.json { render json: @isa_assay, include: [params[:include]], status: :created }
       end
     else
       respond_to do |format|
@@ -210,7 +210,7 @@ class ISAAssaysController < ApplicationController
               SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first&.id
           end
         end
-        attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
+        attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first&.id unless attribute[:unit_symbol].nil?
         params[:sample_type][:sample_attributes_attributes] << attribute
       end
     end
