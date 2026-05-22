@@ -4,6 +4,7 @@ class ISAAssaysController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
+  before_action :find_requested_item_for_show, only: :show
   before_action :initialize_isa_assay, only: :create
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
   after_action :fix_assay_linkage_for_new_assays, only: :create
@@ -12,7 +13,7 @@ class ISAAssaysController < ApplicationController
   before_action :old_attributes, only: :update
   after_action :update_sample_json_metadata, only: :update
 
-  api_actions :create, :update
+  api_actions :create, :update, :show
 
   def new
     study = Study.find(params[:study_id])
@@ -75,6 +76,12 @@ class ISAAssaysController < ApplicationController
         format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.json { render json: @isa_assay, include: [params[:include]] }
     end
   end
 
@@ -222,6 +229,19 @@ class ISAAssaysController < ApplicationController
                                         description pid
                                         allow_cv_free_text
                                         unit_id _destroy] }, { assay_ids: [] }]
+  end
+
+  def find_requested_item_for_show
+    @isa_assay = ISAAssay.new
+    @isa_assay.populate(params[:id])
+
+    if @isa_assay.assay.nil?
+      render json: { errors: [{ title: 'Not Found', detail: "ISA Assay with id '#{params[:id]}' was not found." }] },
+             status: :not_found
+    elsif !@isa_assay.assay.can_view?
+      render json: { errors: [{ title: 'Forbidden', detail: "You are not authorized to view this #{t('isa_assay')}." }] },
+             status: :forbidden
+    end
   end
 
   def set_up_instance_variable

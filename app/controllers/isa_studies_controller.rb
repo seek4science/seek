@@ -4,11 +4,18 @@ class ISAStudiesController < ApplicationController
 
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
+  before_action :find_requested_item_for_show, only: :show
   before_action :old_attributes, only: %i[update]
 
   after_action :update_sample_json_metadata, only: :update
 
-  api_actions :create, :update
+  api_actions :create, :update, :show
+
+  def show
+    respond_to do |format|
+      format.json { render json: @isa_study, include: [params[:include]] }
+    end
+  end
 
   def new
     @isa_study = ISAStudy.new({ study: { investigation_id: params[:investigation_id] } })
@@ -175,6 +182,19 @@ class ISAStudiesController < ApplicationController
         { id: attr.id, old_title: old_attr[:title], new_title: attr.title } unless old_attr[:title] == attr.title
       end.compact
       UpdateSampleMetadataJob.perform_later(@isa_study.sample_collection, @current_user, attribute_changes[:sample_collection]) unless attribute_changes[:sample_collection].blank?
+    end
+  end
+
+  def find_requested_item_for_show
+    @isa_study = ISAStudy.new
+    @isa_study.populate(params[:id])
+
+    if @isa_study.study.nil?
+      render json: { errors: [{ title: 'Not Found', detail: "ISA Study with id '#{params[:id]}' was not found." }] },
+             status: :not_found
+    elsif !@isa_study.study.can_view?
+      render json: { errors: [{ title: 'Forbidden', detail: "You are not authorized to view this #{t('isa_study')}." }] },
+             status: :forbidden
     end
   end
 
