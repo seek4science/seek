@@ -54,8 +54,7 @@ class WorkflowCrateExtractor
       git_version.replace_files(files)
 
       extractor = Seek::WorkflowExtractors::ROCrate.new(git_version)
-      metadata = extractor.metadata
-      workflow.provide_metadata(metadata)
+      workflow.provide_metadata(extractor.metadata)
       workflow.assign_attributes(params) if params.present?
       git_version.set_resource_attributes(workflow.attributes)
     end
