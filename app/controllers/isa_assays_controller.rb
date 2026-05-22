@@ -272,12 +272,17 @@ class ISAAssaysController < ApplicationController
     end
 
     if @isa_assay.errors.any?
-      error_messages = @isa_assay.errors.map do |error|
-        "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
-      end.join('')
-      flash[:error] = "<ul>#{error_messages}</ul>".html_safe
-      redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                   item_id: @isa_assay.assay)
+      respond_to do |format|
+        format.html do
+          error_messages = @isa_assay.errors.map do |error|
+            "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
+          end.join('')
+          flash[:error] = "<ul>#{error_messages}</ul>".html_safe
+          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+                                       item_id: @isa_assay.assay)
+        end
+        format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
+      end
     end
   end
 end
