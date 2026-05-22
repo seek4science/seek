@@ -29,6 +29,37 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
     Seek::Config.project_single_page_folders_enabled = @old_single_pages_config
   end
 
+  test 'show ISA study' do
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: current_person)
+
+    get isa_study_path(study.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'isa_studies', response_body['data']['type']
+    assert_equal study.id.to_s, response_body['data']['id']
+    assert response_body['data']['attributes']['study'].present?
+    assert response_body['data']['attributes']['source_sample_type'].present?
+    assert response_body['data']['attributes']['sample_collection_sample_type'].present?
+  end
+
+  test 'show ISA study - not found' do
+    get isa_study_path(0, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :not_found
+  end
+
+  test 'show ISA study - unauthorized' do
+    other_person = FactoryBot.create(:person)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: other_person,
+                               policy: FactoryBot.create(:private_policy))
+
+    get isa_study_path(study.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :forbidden
+  end
+
   test 'create ISA study' do
     source_sample_type_params = {
       "title": "Source Sample Type via API",

@@ -808,6 +808,46 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_equal assay_stream.description, 'Updated assay stream'
   end
 
+  test 'should show ISA assay as JSON' do
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person)
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: @person,
+                               study: study, linked_sample_type: study.sample_types.last)
+
+    get :show, as: :json, params: { id: assay.id }
+    assert_response :success
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'isa_assays', response_body['data']['type']
+    assert_equal assay.id.to_s, response_body['data']['id']
+    assert response_body['data']['attributes']['assay'].present?
+    assert response_body['data']['attributes']['sample_type'].present?
+    assert response_body['data']['attributes']['input_sample_type_id'].present?
+  end
+
+  test 'should return not found when ISA assay does not exist' do
+    get :show, as: :json, params: { id: 0 }
+    assert_response :not_found
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'Not Found', response_body['errors'].first['title']
+  end
+
+  test 'should return forbidden when not authorized to view ISA assay' do
+    other_person = FactoryBot.create(:person)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: other_person)
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: other_person,
+                               study: study, linked_sample_type: study.sample_types.last,
+                               policy: FactoryBot.create(:private_policy))
+    viewer = FactoryBot.create(:person)
+    login_as viewer.user
+
+    get :show, as: :json, params: { id: assay.id }
+    assert_response :forbidden
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'Forbidden', response_body['errors'].first['title']
+  end
+
   private
 
   def create_material_assay_sample_type_attributes(project, linked_sample_type_id='self', parent_template_id=@material_template.id, counter=1)

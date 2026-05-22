@@ -31,6 +31,39 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
     Seek::Config.project_single_page_folders_enabled = @old_single_pages_config
   end
 
+  test 'show ISA assay' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                               linked_sample_type: @study.sample_types.last)
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'isa_assays', response_body['data']['type']
+    assert_equal assay.id.to_s, response_body['data']['id']
+    assert response_body['data']['attributes']['assay'].present?
+    assert response_body['data']['attributes']['sample_type'].present?
+    assert response_body['data']['attributes']['input_sample_type_id'].present?
+  end
+
+  test 'show ISA assay - not found' do
+    get isa_assay_path(0, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :not_found
+  end
+
+  test 'show ISA assay - unauthorized' do
+    other_person = FactoryBot.create(:person)
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: other_person,
+                               linked_sample_type: @study.sample_types.last,
+                               policy: FactoryBot.create(:private_policy))
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :forbidden
+  end
+
   test 'create ISA assay' do
     sample_collection_sample_type_id = @study.sample_types.last.id
 

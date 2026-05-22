@@ -195,6 +195,43 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_equal isa_study.sample_collection.title, "#{isa_study.study.title} - Sample Collection Sample Type"
   end
 
+  test 'should show ISA study as JSON' do
+    person = User.current_user.person
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
+
+    get :show, as: :json, params: { id: study.id }
+    assert_response :success
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'isa_studies', response_body['data']['type']
+    assert_equal study.id.to_s, response_body['data']['id']
+    assert response_body['data']['attributes']['study'].present?
+    assert response_body['data']['attributes']['source_sample_type'].present?
+    assert response_body['data']['attributes']['sample_collection_sample_type'].present?
+  end
+
+  test 'should return not found when ISA study does not exist' do
+    get :show, as: :json, params: { id: 0 }
+    assert_response :not_found
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'Not Found', response_body['errors'].first['title']
+  end
+
+  test 'should return forbidden when not authorized to view ISA study' do
+    other_person = FactoryBot.create(:person)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: other_person,
+                               policy: FactoryBot.create(:private_policy))
+    viewer = FactoryBot.create(:person)
+    login_as viewer.user
+
+    get :show, as: :json, params: { id: study.id }
+    assert_response :forbidden
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'Forbidden', response_body['errors'].first['title']
+  end
+
   private
 
   def sample_collection_attributes(projects=[])
