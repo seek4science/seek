@@ -188,14 +188,13 @@ class ISAStudiesController < ApplicationController
   def find_requested_item_for_show
     @isa_study = ISAStudy.new
     @isa_study.populate(params[:id])
-
-    if @isa_study.study.nil?
-      render json: { errors: [{ title: 'Not Found', detail: "ISA Study with id '#{params[:id]}' was not found." }] },
-             status: :not_found
-    elsif !@isa_study.study.can_view?
+    unless @isa_study.study.can_view?
       render json: { errors: [{ title: 'Forbidden', detail: "You are not authorized to view this #{t('isa_study')}." }] },
              status: :forbidden
     end
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: [{ title: 'Not Found', detail: "ISA Study with id '#{params[:id]}' was not found." }] },
+           status: :not_found
   end
 
   def set_up_instance_variable

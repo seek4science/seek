@@ -234,14 +234,13 @@ class ISAAssaysController < ApplicationController
   def find_requested_item_for_show
     @isa_assay = ISAAssay.new
     @isa_assay.populate(params[:id])
-
-    if @isa_assay.assay.nil?
-      render json: { errors: [{ title: 'Not Found', detail: "ISA Assay with id '#{params[:id]}' was not found." }] },
-             status: :not_found
-    elsif !@isa_assay.assay.can_view?
+    unless @isa_assay.assay.can_view?
       render json: { errors: [{ title: 'Forbidden', detail: "You are not authorized to view this #{t('isa_assay')}." }] },
              status: :forbidden
     end
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: [{ title: 'Not Found', detail: "ISA Assay with id '#{params[:id]}' was not found." }] },
+           status: :not_found
   end
 
   def set_up_instance_variable
