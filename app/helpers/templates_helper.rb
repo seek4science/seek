@@ -14,9 +14,13 @@ module TemplatesHelper
     end
   end
 
-  def load_templates
+  def load_templates(sample_type_creation=false)
     privilege = Seek::Permissions::Translator.translate('view')
-    Template.order(:group, :group_order).select { |t| t.can_perform?(privilege) }.map do |item|
+    templates = Template.order(:group, :group_order).select { |t| t.can_perform?(privilege) }
+    if sample_type_creation
+      templates.reject! { |t| t.group == "ISA minimal starter" }
+    end
+    templates.map do |item|
       { title: sanitize(item.title),
         group: sanitize(item.group),
         level: sanitize(item.level),
