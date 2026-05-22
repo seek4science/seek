@@ -62,8 +62,15 @@ class ISAAssaySerializer < SimpleBaseSerializer
       id: sample_type.id.to_s,
       title: sample_type.title,
       description: sample_type.description,
-      sample_attributes: serialize_isa_sample_attributes(sample_type)
+      sample_attributes: serialize_isa_sample_attributes(sample_type),
+      samples: serialize_viewable_samples(sample_type)
     }
+  end
+
+  def serialize_viewable_samples(sample_type)
+    sample_type.samples.select(&:can_view?).map do |sample|
+      { id: sample.id.to_s, title: sample.title, data: sample.data.to_h }
+    end
   end
 
   def serialize_isa_sample_attributes(sample_type)
