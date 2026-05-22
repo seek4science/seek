@@ -2614,10 +2614,37 @@
     - name: id
       in: path
       required: true
-      description: The ID of the ISA study (Study ID) to update
+      description: The ID of the ISA study (Study ID) to fetch or update
       schema:
         type: integer
       example: 67
+  get:
+    operationId: readIsaStudy
+    summary: Fetch an ISA study
+    description:
+      $ref: ../descriptions/readIsaStudy.md
+    tags:
+      - read
+      - isaStudies
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaStudyResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaStudyResponse.json
+      "401":
+        $ref: "#/components/responses/unauthorized"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "406":
+        $ref: "#/components/responses/notAcceptable"
   patch:
     operationId: updateIsaStudy
     summary: Update an ISA study
@@ -2696,10 +2723,37 @@
     - name: id
       in: path
       required: true
-      description: The ID of the ISA assay (Assay ID) to update
+      description: The ID of the ISA assay (Assay ID) to fetch or update
       schema:
         type: integer
       example: 120
+  get:
+    operationId: readIsaAssay
+    summary: Fetch an ISA assay
+    description:
+      $ref: ../descriptions/readIsaAssay.md
+    tags:
+      - read
+      - isaAssays
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaAssayResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaAssayResponse.json
+      "401":
+        $ref: "#/components/responses/unauthorized"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "406":
+        $ref: "#/components/responses/notAcceptable"
   patch:
     operationId: updateIsaAssay
     summary: Update an ISA assay

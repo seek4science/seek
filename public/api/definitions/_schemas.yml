@@ -5637,6 +5637,10 @@ isaStudyResponse:
                   type: array
                   items:
                     $ref: "#/components/schemas/isaSampleAttributeResponse"
+                samples:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/isaSampleInResponse"
               required:
                 - id
                 - title
@@ -5654,6 +5658,10 @@ isaStudyResponse:
                   type: array
                   items:
                     $ref: "#/components/schemas/isaSampleAttributeResponse"
+                samples:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/isaSampleInResponse"
               required:
                 - id
                 - title
@@ -5872,6 +5880,10 @@ isaAssayResponse:
                   type: array
                   items:
                     $ref: "#/components/schemas/isaSampleAttributeResponse"
+                samples:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/isaSampleInResponse"
               required:
                 - id
                 - title
@@ -5928,4 +5940,21 @@ isaSampleAttributeResponse:
   required:
     - id
     - title
+  additionalProperties: false
+isaSampleInResponse:
+  type: object
+  description: A sample visible to the authenticated user, as embedded in an ISA study or assay response.
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    data:
+      type: object
+      description: The attribute values for this sample. Keys are attribute titles; values vary by attribute type.
+      additionalProperties: true
+  required:
+    - id
+    - title
+    - data
   additionalProperties: false

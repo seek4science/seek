@@ -12,6 +12,6 @@ An **ISA Assay** bundles:
 
 ISA tags can be retrieved from the <a href="#ISA tags">**ISA Tags**</a> endpoint (`/isa_tags`).
 
-**ISA Assays** support only <a href="#create">**Create**</a> and <a href="#update">**Update**</a> operations via the API. To read or list assays, use the standard <a href="#assays">**Assays**</a> endpoints.
+**ISA Assays** support <a href="#create">**Create**</a>, <a href="#update">**Update**</a>, and <a href="#read">**Read**</a> operations via the API. The read endpoint returns the assay together with its output sample type and the samples (visible to the authenticated user) within that sample type. To list assays, use the standard <a href="#assays">**Assays**</a> endpoints.
 
 Note: Assay streams (ISA assays with `assay_class_id` corresponding to the assay stream class) do not have an associated sample type.

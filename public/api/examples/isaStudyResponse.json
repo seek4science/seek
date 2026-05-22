@@ -1,0 +1,149 @@
+{
+  "data": {
+    "id": "67",
+    "type": "isa_studies",
+    "attributes": {
+      "study": {
+        "id": "67",
+        "title": "An ISA-Compliant Study",
+        "description": "A study tracking sources through sample collection",
+        "experimentalists": null,
+        "other_creators": null,
+        "position": null
+      },
+      "source_sample_type": {
+        "id": "120",
+        "title": "Study Sources",
+        "description": "Source materials for the study",
+        "sample_attributes": [
+          {
+            "id": "301",
+            "title": "Source Name",
+            "pos": 1,
+            "required": true,
+            "is_title": true,
+            "isa_tag_id": "1",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "302",
+            "title": "Organism",
+            "pos": 2,
+            "required": false,
+            "is_title": false,
+            "isa_tag_id": "2",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          }
+        ],
+        "samples": [
+          {
+            "id": "1",
+            "title": "Source 1",
+            "data": {
+              "Source Name": "Source 1",
+              "Organism": "Arabidopsis thaliana"
+            }
+          },
+          {
+            "id": "2",
+            "title": "Source 2",
+            "data": {
+              "Source Name": "Source 2",
+              "Organism": "Homo sapiens"
+            }
+          }
+        ]
+      },
+      "sample_collection_sample_type": {
+        "id": "121",
+        "title": "Study Sample Collection",
+        "description": "Collected samples for the study",
+        "sample_attributes": [
+          {
+            "id": "303",
+            "title": "Sample Name",
+            "pos": 1,
+            "required": true,
+            "is_title": true,
+            "isa_tag_id": "3",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "304",
+            "title": "Collection Protocol",
+            "pos": 2,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": "5",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "305",
+            "title": "Input (Source Name)",
+            "pos": 3,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": "11",
+            "sample_attribute_type": {
+              "id": "13",
+              "title": "SEEK Sample Multi"
+            },
+            "linked_sample_type_id": "120",
+            "unit": null,
+            "description": null,
+            "pid": null
+          }
+        ],
+        "samples": [
+          {
+            "id": "3",
+            "title": "Sample 1",
+            "data": {
+              "Sample Name": "Sample 1",
+              "Collection Protocol": "Standard protocol A",
+              "Input (Source Name)": [{"id": "1", "title": "Source 1"}]
+            }
+          }
+        ]
+      }
+    },
+    "meta": {
+      "created": "2026-03-19T16:35:28.334Z",
+      "modified": "2026-03-19T16:35:28.299Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "8feb9520-05df-013f-f2a8-00155d52079b"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

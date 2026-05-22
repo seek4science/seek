@@ -8,4 +8,4 @@ An **ISA Study** bundles:
 
 ISA tags can be retrieved from the <a href="#ISA tags">**ISA Tags**</a> endpoint (`/isa_tags`).
 
-**ISA Studies** support only <a href="#create">**Create**</a> and <a href="#update">**Update**</a> operations via the API. To read or list studies, use the standard <a href="#studies">**Studies**</a> endpoints.
+**ISA Studies** support <a href="#create">**Create**</a>, <a href="#update">**Update**</a>, and <a href="#read">**Read**</a> operations via the API. The read endpoint returns the study together with its sample types and the samples (visible to the authenticated user) within each sample type. To list studies, use the standard <a href="#studies">**Studies**</a> endpoints.
