@@ -229,6 +229,7 @@ class ModelsControllerTest < ActionController::TestCase
     orphaned_blobs = ContentBlob.where(asset_id: nil).where.not(id: blobs_before)
     assert_equal 2, orphaned_blobs.count
     assert orphaned_blobs.all?(&:file_exists?), 'Orphaned blob files should exist on disk'
+    assert_equal orphaned_blobs.map(&:id).sort, session[:orphaned_content_blob_ids].sort
   end
 
   test 'orphaned content blobs attached to model on successful resubmit after validation error' do

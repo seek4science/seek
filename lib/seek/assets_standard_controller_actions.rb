@@ -108,6 +108,8 @@ module Seek
     def manage; end
 
     def create
+      session.delete(:orphaned_content_blob_ids) if retained_content_blob_ids.blank?
+
       item = initialize_asset
 
       if item.is_git_versioned? || handle_upload_data
@@ -170,8 +172,9 @@ module Seek
       ids = safe_retained_content_blob_ids
       return if ids.blank?
 
-      ContentBlob.where(id: ids, asset_id: nil)
-                 .update_all(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
+      ContentBlob.where(id: ids, asset_id: nil).each do |blob|
+        blob.update(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
+      end
       session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) - ids
     end
 
