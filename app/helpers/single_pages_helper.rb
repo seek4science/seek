@@ -89,8 +89,8 @@ module SinglePagesHelper
   end
 
   def get_values_for_registered_samples(sample_attribute)
-    sample_attribute.linked_sample_type.samples.authorized_for(:view).map do |sample|
-      { id: sample.id, type: 'Sample', title: sample.title }.to_json
+    sample_attribute.linked_sample_type.samples.authorized_for(:view).pluck(:id, :title).map do |id, title|
+      { id: id, type: 'Sample', title: title }.to_json
     end
   end
 
@@ -102,16 +102,19 @@ module SinglePagesHelper
       sops = sample_attribute.sample_type.studies.first.sops
     end
 
-    sops.authorized_for(:view).map { |sop| { id: sop.id, type: 'Sop', title: sop.title }.to_json }
+    sops.authorized_for(:view).pluck(:id, :title).map { |id, title| { id: id, type: 'Sop', title: title }.to_json }
+
   end
 
   def get_values_for_datafiles
-    data_files = DataFile.authorized_for(:view)
-    data_files.map { |data_file| { id: data_file.id, type: 'DataFile', title: data_file.title }.to_json }
+    DataFile.authorized_for(:view).find_each.pluck(:id, :title).map do |id, title|
+      { id: id, type: 'DataFile', title: title }.to_json
+    end
   end
 
   def get_values_for_strains
-    strains = Strain.authorized_for(:view)
-    strains.map { |strain| { id: strain.id, type: 'Strain', title: strain.title }.to_json }
+    Strain.authorized_for(:view).find_each.pluck(:id, :title).map do |id, title|
+      { id: id, type: 'Strain', title: title }.to_json
+    end
   end
 end
