@@ -97,7 +97,7 @@
         <%= hidden_field_tag "studies[license]", @license %>
       <% end %>
       <% @existing_studies.each do |existing_study| %>
-        <%= hidden_field_tag "existing_studies[]", existing_study %>
+        <%= hidden_field_tag "existing_studies[]", existing_study.to_json %>
       <% end %>
       </tbody>
     </table>
