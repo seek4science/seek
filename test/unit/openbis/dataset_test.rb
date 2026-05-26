@@ -231,7 +231,7 @@ class DatasetTest < ActiveSupport::TestCase
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
 
     # Mock out OpenBIS download by manually creating some files
-    DummyDownloader = Struct.new(:folder) do
+    dummy_downloader = Struct.new(:folder) do
       def download(*)
         File.write(File.join(folder, 'test.txt'), 'hello world')
         File.write(File.join(folder, 'test2.txt'), 'hello world')
@@ -244,7 +244,7 @@ class DatasetTest < ActiveSupport::TestCase
       dest_folder = File.join(dir, 'dest')
       Dir.mkdir(dest_folder)
 
-      downloader = DummyDownloader.new(dest_folder)
+      downloader = dummy_downloader.new(dest_folder)
       dataset.stub(:datastore_server_download_instance, downloader) do
         dataset.download(File.join(dir, 'dest'), File.join(dir, 'file.zip'), 'root_dir')
       end
