@@ -35,7 +35,9 @@ function validateUploadFormFields(resourceName=null, parentId=null) {
 
     // Also count retained blobs from a previous upload attempt (shown after a validation error)
     if (!hasFiles) {
-        hasFiles = $j('input[name="retained_content_blob_ids[]"]').toArray().some(function (f) { return f.value; });
+        var retainedSelector = 'input[name="retained_content_blob_ids[]"]';
+        var retained = parentId ? $j(`#${parentId} ${retainedSelector}`) : $j(retainedSelector);
+        hasFiles = retained.toArray().some(function (f) { return f.value; });
     }
     var valid = true;
 

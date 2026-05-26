@@ -158,9 +158,7 @@ module Seek
     def preserve_content_blobs_for_rerender(item)
       return unless Seek::Util.is_multi_file_asset_type?(item.class)
 
-      saved_ids = item.content_blobs.select(&:new_record?).filter_map do |blob|
-        blob.id if blob.save
-      end
+      saved_ids = item.content_blobs.select(&:new_record?).filter_map { |blob| save_orphaned_blob(blob) }
       session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) | saved_ids
     end
 
@@ -172,10 +170,10 @@ module Seek
       ids = safe_retained_content_blob_ids
       return if ids.blank?
 
-      ContentBlob.where(id: ids, asset_id: nil).each do |blob|
-        blob.update(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
+      attached_ids = ContentBlob.where(id: ids, asset_id: nil).filter_map do |blob|
+        blob.id if blob.update(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
       end
-      session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) - ids
+      session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) - attached_ids
     end
 
     # makes sure the asset it only associated with projects that match the current user
@@ -229,6 +227,13 @@ module Seek
 
     def json_api_include_param
       [params[:include]]
+    end
+
+    def save_orphaned_blob(blob)
+      return blob.id if blob.save
+
+      Rails.logger.warn "Failed to preserve content blob for re-render: #{blob.errors.full_messages.join(', ')}"
+      nil
     end
   end
 end

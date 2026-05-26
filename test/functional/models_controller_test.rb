@@ -261,10 +261,10 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'tampered retained_content_blob_ids not in session are not attached' do
+  test 'tampered retained_content_blob_ids not in session are not attached and model is not created' do
     other_persons_orphan = FactoryBot.create(:content_blob, original_filename: 'stolen.txt')
 
-    assert_difference('Model.count', 1) do
+    assert_no_difference('Model.count') do
       post :create, params: {
         model: valid_model,
         content_blobs: [{ data_url: '' }],
@@ -275,6 +275,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     other_persons_orphan.reload
     assert_nil other_persons_orphan.asset_id, 'Tampered blob should not have been attached'
+    assert_not_nil flash.now[:error]
   end
 
   test 'associates assay' do

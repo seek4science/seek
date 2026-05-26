@@ -22,7 +22,7 @@ module Seek
 
         allow_empty_content_blob = model_image_present? || json_api_request?
 
-        unless allow_empty_content_blob || retained_content_blob_ids.present?
+        unless allow_empty_content_blob || safe_retained_content_blob_ids.present?
           if blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
             flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
@@ -134,7 +134,7 @@ module Seek
         return unless asset.respond_to?(:content_blobs)
 
         ContentBlob.where(id: retained_ids, asset_id: nil).each do |blob|
-          asset.content_blobs.target.push(blob)
+          asset.content_blobs.proxy_association.add_to_target(blob)
         end
       end
 
