@@ -18,12 +18,14 @@
       "sample_type": {
         "title": "Material Assay Output",
         "description": "Output sample type for the material assay",
+        "template_id": "3",
         "sample_attributes": [
           {
             "title": "Input (Sample Name)",
             "pos": 1,
             "required": true,
             "is_title": false,
+            "template_attribute_id": "6",
             "sample_attribute_type": { "title": "SEEK Sample Multi" },
             "linked_sample_type_id": "121",
             "isa_tag_id": "11"
@@ -41,6 +43,7 @@
             "pos": 3,
             "required": true,
             "is_title": false,
+            "template_attribute_id": "7",
             "sample_attribute_type": { "title": "String" },
             "isa_tag_id": "5"
           },
@@ -49,6 +52,7 @@
             "pos": 4,
             "required": false,
             "is_title": false,
+            "template_attribute_id": "8",
             "sample_attribute_type": { "title": "String" },
             "isa_tag_id": "7"
           }

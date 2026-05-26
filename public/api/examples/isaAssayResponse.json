@@ -27,6 +27,7 @@
         "id": "122",
         "title": "Material Assay Output",
         "description": "Output sample type for the material assay",
+        "template_id": "3",
         "sample_attributes": [
           {
             "id": "310",
@@ -35,6 +36,7 @@
             "required": true,
             "is_title": false,
             "isa_tag_id": "11",
+            "template_attribute_id": "6",
             "sample_attribute_type": {
               "id": "13",
               "title": "SEEK Sample Multi"
@@ -51,6 +53,7 @@
             "required": true,
             "is_title": true,
             "isa_tag_id": "6",
+            "template_attribute_id": "7",
             "sample_attribute_type": {
               "id": "9",
               "title": "String"
@@ -67,6 +70,7 @@
             "required": true,
             "is_title": false,
             "isa_tag_id": "5",
+            "template_attribute_id": "8",
             "sample_attribute_type": {
               "id": "9",
               "title": "String"
@@ -83,6 +87,7 @@
             "required": false,
             "is_title": false,
             "isa_tag_id": "7",
+            "template_attribute_id": "9",
             "sample_attribute_type": {
               "id": "9",
               "title": "String"
@@ -98,7 +103,7 @@
             "id": "4",
             "title": "Extract 1",
             "data": {
-              "Input (Sample Name)": [{"id": "3", "title": "Sample 1"}],
+              "Input (Sample Name)": [{ "id": "3", "title": "Sample 1" }],
               "Other Material Name": "Extract 1",
               "Processing Protocol": "Extraction protocol B",
               "Material Characteristic": "leaf tissue"

@@ -14,12 +14,14 @@
       "source_sample_type": {
         "title": "Study Sources",
         "description": "Source materials for the study",
+        "template_id": "1",
         "sample_attributes": [
           {
             "title": "Source Name",
             "pos": 1,
             "required": true,
             "is_title": true,
+            "template_attribute_id": "1",
             "sample_attribute_type": { "title": "String" },
             "isa_tag_id": "1"
           },
@@ -28,6 +30,7 @@
             "pos": 2,
             "required": false,
             "is_title": false,
+            "template_attribute_id": "2",
             "sample_attribute_type": { "title": "String" },
             "isa_tag_id": "2"
           }
@@ -36,12 +39,14 @@
       "sample_collection_sample_type": {
         "title": "Study Sample Collection",
         "description": "Collected samples for the study",
+        "template_id": "2",
         "sample_attributes": [
           {
             "title": "Sample Name",
             "pos": 1,
             "required": true,
             "is_title": true,
+            "template_attribute_id": "3",
             "sample_attribute_type": { "title": "String" },
             "isa_tag_id": "3"
           },
@@ -50,6 +55,7 @@
             "pos": 2,
             "required": true,
             "is_title": false,
+            "template_attribute_id": "4",
             "sample_attribute_type": { "title": "String" },
             "isa_tag_id": "5"
           },
@@ -58,6 +64,7 @@
             "pos": 3,
             "required": true,
             "is_title": false,
+            "template_attribute_id": "5",
             "sample_attribute_type": { "title": "SEEK Sample Multi" },
             "linked_sample_type_id": "self",
             "isa_tag_id": "11"

@@ -15,6 +15,7 @@
         "id": "120",
         "title": "Study Sources",
         "description": "Source materials for the study",
+        "template_id": "1",
         "sample_attributes": [
           {
             "id": "301",
@@ -23,6 +24,7 @@
             "required": true,
             "is_title": true,
             "isa_tag_id": "1",
+            "template_attribute_id": "1",
             "sample_attribute_type": {
               "id": "9",
               "title": "String"
@@ -39,6 +41,7 @@
             "required": false,
             "is_title": false,
             "isa_tag_id": "2",
+            "template_attribute_id": "2",
             "sample_attribute_type": {
               "id": "9",
               "title": "String"
@@ -72,6 +75,7 @@
         "id": "121",
         "title": "Study Sample Collection",
         "description": "Collected samples for the study",
+        "template_id": "2",
         "sample_attributes": [
           {
             "id": "303",
@@ -80,6 +84,7 @@
             "required": true,
             "is_title": true,
             "isa_tag_id": "3",
+            "template_attribute_id": "3",
             "sample_attribute_type": {
               "id": "9",
               "title": "String"
@@ -96,6 +101,7 @@
             "required": true,
             "is_title": false,
             "isa_tag_id": "5",
+            "template_attribute_id": "4",
             "sample_attribute_type": {
               "id": "9",
               "title": "String"
@@ -112,6 +118,7 @@
             "required": true,
             "is_title": false,
             "isa_tag_id": "11",
+            "template_attribute_id": "5",
             "sample_attribute_type": {
               "id": "13",
               "title": "SEEK Sample Multi"
@@ -129,7 +136,7 @@
             "data": {
               "Sample Name": "Sample 1",
               "Collection Protocol": "Standard protocol A",
-              "Input (Source Name)": [{"id": "1", "title": "Source 1"}]
+              "Input (Source Name)": [{ "id": "1", "title": "Source 1" }]
             }
           }
         ]

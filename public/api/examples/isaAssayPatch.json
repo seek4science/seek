@@ -14,6 +14,7 @@
             "pos": 4,
             "required": false,
             "is_title": false,
+            "template_attribute_id": "9",
             "sample_attribute_type": { "title": "String" },
             "isa_tag_id": "7"
           }
