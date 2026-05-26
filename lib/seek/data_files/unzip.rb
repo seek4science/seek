@@ -24,7 +24,7 @@ module Seek
         end
 
         def unzip_zip(tmp_dir)
-          Seek::Zip.unzip(content_blob.filepath, tmp_dir)
+          Seek::Util.unzip(content_blob.filepath, tmp_dir)
         end
 
         def unzip_tar(tmp_dir, input = content_blob.filepath)

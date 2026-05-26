@@ -87,7 +87,7 @@ class StudyBatchUpload < ApplicationRecord
     dir.mkdir
     study_data = []
     studies = []
-    Seek::Zip.unzip(file_path, dir) do |entry|
+    Seek::Util.unzip(file_path, dir) do |entry|
       if entry.name.start_with?('data/')
         study_data << entry
       else
