@@ -183,10 +183,10 @@ class StudiesController < ApplicationController
     unless params[:content_blobs][0][:data].nil?
       tempzip_path = params[:content_blobs][0][:data].tempfile.path
       data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path, user_uuid)
-      study_filename = File.basename(studies.first.to_s)
+      study_path = studies.first
       studies_file = ContentBlob.new
-      studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
-      studies_file.original_filename = "#{study_filename}"
+      studies_file.tmp_io_object = File.open(study_path)
+      studies_file.original_filename = File.basename(study_path)
       studies_file.save!
       @studies = StudyBatchUpload.extract_studies_from_file(studies_file)
       @study = @studies[0]
