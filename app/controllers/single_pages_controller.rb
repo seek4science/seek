@@ -64,8 +64,29 @@ class SinglePagesController < ApplicationController
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay&.id.to_s + ', Title: ' + @assay&.title.to_s : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title.to_s}]</b> downloaded:<br/><ul>"
-    notice_message << "<li class='checkmark'><b>#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}</b> visible to you #{@samples.count != 1 ? 'were' : 'was'} included</li>"
+    notice_message = helpers.content_tag(:ul, class: "list-unstyled") do
+      helpers.safe_join([
+        helpers.content_tag(:li) do
+          helpers.safe_join([
+            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
+            "Downloaded contents of ".html_safe,
+            helpers.content_tag(:b) do
+              "#{@assay ? t('isa_assay') + ' [ID: ' + @assay&.id.to_s + ', Title: ' + h(@assay&.title.to_s) : t('isa_study') + ' [ID: ' + @study.id.to_s + ', Title: ' + h(@study.title.to_s)}]"
+            end
+          ])
+        end,
+        helpers.content_tag(:li) do
+          helpers.safe_join([
+            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
+            helpers.content_tag(:b) do
+              "#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}"
+            end,
+            " visible to you #{@samples.count != 1 ? 'were' : 'was'} included".html_safe
+          ])
+        end
+      ])
+    end
+
     raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
     @sample_type = SampleType.find(sample_type_id)
@@ -84,8 +105,7 @@ class SinglePagesController < ApplicationController
               @sample_type.title&.concat(".xlsx")
             end
 
-    notice_message << '</ul>'
-    flash[:notice] = notice_message.html_safe
+    flash[:notice] = notice_message
     render xlsx: 'download_samples_spreadsheet', filename: helpers.sanitized_text(spreadsheet_name), disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
