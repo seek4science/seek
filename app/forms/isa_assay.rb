@@ -109,7 +109,7 @@ class ISAAssay
     # - Sample attribute type must be 'Registered Sample List'
     if @sample_type.sample_attributes.detect { |attribute| attribute.input_attribute? }.nil?
       attribute_type_title = SampleAttributeType.find_by(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)&.title
-      errors.add(:base, "[Sample type '#{@sample_type.title}']: No valid input attribute detected! A valid input attribute must have an '#{Seek::ISA::TagType::INPUT}' ISA tag, have 'input in the title' and must be of type '#{attribute_type_title}'.")
+      errors.add(:base, "[Sample type '#{@sample_type.title}']: No valid input attribute detected! A valid input attribute must have an '#{Seek::ISA::TagType::INPUT}' ISA tag, have 'input' in the title and must be of type '#{attribute_type_title}'.")
     end
   end
 end

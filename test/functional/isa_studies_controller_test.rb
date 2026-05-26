@@ -262,7 +262,7 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_response :forbidden
 
     response_body = JSON.parse(response.body)
-    assert_equal 'Forbidden', response_body['errors'].first['title']
+    assert_equal 'You are not authorized to view this ISA Study.', response_body['errors'].first['detail']
   end
 
   private

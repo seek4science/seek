@@ -5744,7 +5744,6 @@ isaAssayPost:
               $ref: "#/components/schemas/nonEmptyString"
           required:
             - assay
-            - input_sample_type_id
           additionalProperties: false
       required:
         - type

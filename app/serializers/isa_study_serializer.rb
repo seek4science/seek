@@ -50,6 +50,7 @@ class ISAStudySerializer < SimpleBaseSerializer
       id: sample_type.id.to_s,
       title: sample_type.title,
       description: sample_type.description,
+      template_id: sample_type.template_id,
       sample_attributes: serialize_isa_sample_attributes(sample_type),
       samples: serialize_viewable_samples(sample_type)
     }
@@ -57,7 +58,7 @@ class ISAStudySerializer < SimpleBaseSerializer
 
   def serialize_viewable_samples(sample_type)
     sample_type.samples.select(&:can_view?).map do |sample|
-      { id: sample.id.to_s, title: sample.title, data: sample.data.to_h }
+      { id: sample.id.to_s, title: sample.title, data: sample.data.to_hash }
     end
   end
 
@@ -69,6 +70,7 @@ class ISAStudySerializer < SimpleBaseSerializer
         pos: attr.pos,
         required: attr.required,
         is_title: attr.is_title,
+        template_attribute_id: attr.template_attribute_id,
         isa_tag_id: attr.isa_tag_id&.to_s,
         sample_attribute_type: {
           id: attr.sample_attribute_type_id&.to_s,

@@ -3,7 +3,7 @@ class ISAStudiesController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   before_action :set_up_instance_variable
-  before_action :find_requested_item, only: %i[edit update]
+  before_action :find_requested_item_for_edit, only: %i[edit update]
   before_action :find_requested_item_for_show, only: :show
   before_action :old_attributes, only: %i[update]
 
@@ -14,6 +14,11 @@ class ISAStudiesController < ApplicationController
   def show
     respond_to do |format|
       format.json { render json: @isa_study, include: [params[:include]] }
+      format.html do
+        flash[:notice] = "You have been redirected to the #{t('single_page')} view"
+        redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                     item_id: @isa_study.study)
+      end
     end
   end
 
@@ -35,7 +40,7 @@ class ISAStudiesController < ApplicationController
     @isa_study.study.sample_types = [ @isa_study.source, @isa_study.sample_collection ]
 
     if @isa_study.save
-      flash[:notice] = "The #{t('isa_study')} was succesfully created.<br/>".html_safe
+      flash[:notice] = "The #{t('isa_study')} was successfully created"
 
       respond_to do |format|
         format.html do
@@ -185,49 +190,68 @@ class ISAStudiesController < ApplicationController
     end
   end
 
-  def find_requested_item_for_show
-    @isa_study = ISAStudy.new
-    @isa_study.populate(params[:id])
-    unless @isa_study.study.can_view?
-      render json: { errors: [{ title: 'Forbidden', detail: "You are not authorized to view this #{t('isa_study')}." }] },
-             status: :forbidden
-    end
-  rescue ActiveRecord::RecordNotFound
-    render json: { errors: [{ title: 'Not Found', detail: "ISA Study with id '#{params[:id]}' was not found." }] },
-           status: :not_found
-  end
-
   def set_up_instance_variable
     @single_page = true
   end
 
-  def find_requested_item
+  def respond_with_error(status=:unprocessable_entity)
+    respond_to do |format|
+      format.html do
+        error_messages = @isa_study.errors.map do |error|
+          helpers.content_tag(:li) do
+            "[" + helpers.content_tag(:b, error.attribute.to_s) + "]: #{ERB::Util.html_escape(error.message)}"
+          end
+        end
+        flash[:error] = helpers.content_tag(:ul) do
+          helpers.safe_join(error_messages)
+        end.html_safe
+        redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                     item_id: @isa_study.study)
+      end
+
+      format.json { render json: json_api_errors(@isa_study), status: status }
+    end
+  end
+
+  def find_requested_item_for_show
     @isa_study = ISAStudy.new
     @isa_study.populate(params[:id])
 
+    # Check whether base objects exist
     @isa_study.errors.add(:study, "The #{t('isa_study')} was not found.") if @isa_study.study.nil?
-    @isa_study.errors.add(:study, "You are not authorized to edit this #{t('isa_study')}.") unless requested_item_authorized?(@isa_study.study)
-
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} not found.") if @isa_study.source.nil?
-    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} is locked by a background process.") if @isa_study.source&.locked?
-    @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} source' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.source)
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
-    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} is locked by a background process.") if @isa_study.sample_collection&.locked?
+    return respond_with_error(:not_found) if @isa_study.errors.any?
+
+    # Check authorizations
+    @isa_study.errors.add(:study, "You are not authorized to view this #{t('isa_study')}.") unless @isa_study.study.can_view?
+    return respond_with_error(:forbidden) if @isa_study.errors.any?
+
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: [{ title: 'Not Found', detail: "#{t('isa_study')} with id '#{params[:id]}' was not found." }] },
+           status: :not_found
+    return false
+  end
+
+  def find_requested_item_for_edit
+    @isa_study = ISAStudy.new
+    @isa_study.populate(params[:id])
+
+    # Check whether base objects exist
+    @isa_study.errors.add(:study, "The #{t('isa_study')} was not found.") if @isa_study.study.nil?
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} not found.") if @isa_study.source.nil?
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
+    return respond_with_error(:not_found) if @isa_study.errors.any?
+
+    # Check authorizations
+    @isa_study.errors.add(:study, "You are not authorized to edit this #{t('isa_study')}.") unless requested_item_authorized?(@isa_study.study)
+    @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} source' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.source)
     @isa_study.errors.add(:sample_type, "You are not authorized to edit the '#{t('isa_study')} sample collection' #{t('sample_type')}.") unless requested_item_authorized?(@isa_study.sample_collection)
+    return respond_with_error(:forbidden) if @isa_study.errors.any?
 
-    if @isa_study.errors.any?
-      respond_to do |format|
-        format.html do
-          error_messages = @isa_study.errors.map do |error|
-            "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
-          end.join('')
-          flash[:error] = "<ul>#{error_messages}</ul>".html_safe
-          redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                       item_id: @isa_study.study)
-        end
-
-        format.json { render json: json_api_errors(@isa_study), status: :unprocessable_entity }
-      end
-    end
+    # Check whether sample types are locked
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} is locked by a background process.") if @isa_study.source&.locked?
+    @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} is locked by a background process.") if @isa_study.sample_collection&.locked?
+    respond_with_error(:unprocessable_entity) if @isa_study.errors.any?
   end
 end

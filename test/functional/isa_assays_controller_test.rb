@@ -787,7 +787,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
 
     investigation = FactoryBot.create(:investigation, projects: [@project], contributor: @person)
     study = FactoryBot.create(:study, contributor: @person, investigation: investigation)
-    assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study: study, title: 'my asay stream', description: 'Original assay stream')
+    assay_stream = FactoryBot.create(:assay_stream, contributor: @person, study: study, title: 'my assay stream', description: 'Original assay stream')
 
     assert assay_stream.can_edit?
 
@@ -847,7 +847,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_response :forbidden
 
     response_body = JSON.parse(response.body)
-    assert_equal 'Forbidden', response_body['errors'].first['title']
+    assert_equal 'You are not authorized to view this ISA Assay.', response_body['errors'].first['detail']
   end
 
   private

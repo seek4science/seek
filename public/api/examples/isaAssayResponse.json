@@ -9,6 +9,7 @@
         "description": "An ISA assay measuring other material outputs",
         "other_creators": null,
         "position": 1,
+        "study_id": "2",
         "assay_class": {
           "title": "Experimental assay",
           "key": "EXP"
