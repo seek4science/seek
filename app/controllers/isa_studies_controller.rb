@@ -205,8 +205,13 @@ class ISAStudiesController < ApplicationController
         flash[:error] = helpers.content_tag(:ul) do
           helpers.safe_join(error_messages)
         end.html_safe
-        redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                     item_id: @isa_study.study)
+        path = if @isa_study.study.nil?
+                 studies_path
+               else
+                 single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                  item_id: @isa_study.study)
+               end
+        redirect_to path
       end
 
       format.json { render json: json_api_errors(@isa_study), status: status }
