@@ -257,6 +257,6 @@ class ISAStudiesController < ApplicationController
     # Check whether sample types are locked
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} is locked by a background process.") if @isa_study.source&.locked?
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} is locked by a background process.") if @isa_study.sample_collection&.locked?
-    respond_with_error(:unprocessable_entity) if @isa_study.errors.any?
+    return respond_with_error(:unprocessable_entity) if @isa_study.errors.any?
   end
 end
