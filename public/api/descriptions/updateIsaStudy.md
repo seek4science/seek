@@ -3,7 +3,7 @@
 All fields are optional — only the fields provided will be updated. ISA tag constraints are re-validated on save:
 
 * The source sample type must retain exactly one `source`-tagged attribute
-* The sample collection sample type must retain exactly one `sample`-tagged and one `protocol`-tagged attribute
+* The sample collection sample type must retain exactly one `sample`-tagged and one `protocol`-tagged , and one `INPUT`-tagged attribute
 
 If sample attributes are renamed and samples already exist, a background job will update the stored sample metadata to reflect the new attribute titles.
 
