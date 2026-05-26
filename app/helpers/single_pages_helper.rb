@@ -107,13 +107,13 @@ module SinglePagesHelper
   end
 
   def get_values_for_datafiles
-    DataFile.authorized_for(:view).find_each.pluck(:id, :title).map do |id, title|
+    DataFile.authorized_for(:view).pluck(:id, :title).map do |id, title|
       { id: id, type: 'DataFile', title: title }.to_json
     end
   end
 
   def get_values_for_strains
-    Strain.authorized_for(:view).find_each.pluck(:id, :title).map do |id, title|
+    Strain.authorized_for(:view).pluck(:id, :title).map do |id, title|
       { id: id, type: 'Strain', title: title }.to_json
     end
   end
