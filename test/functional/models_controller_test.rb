@@ -213,13 +213,15 @@ class ModelsControllerTest < ActionController::TestCase
   test 'content blobs preserved as orphans after validation error' do
     invalid_model = { title: 'Test' }
     blob1_params = { data: file_for_upload, data_url: '', original_filename: '', make_local_copy: '0' }
-    blob2_params = { data: fixture_file_upload('little_file_v2.txt', 'text/plain'), data_url: '', original_filename: '', make_local_copy: '0' }
+    blob2_params = { data: fixture_file_upload('little_file_v2.txt', 'text/plain'),
+                     data_url: '', original_filename: '', make_local_copy: '0' }
 
     blobs_before = ContentBlob.where(asset_id: nil).pluck(:id)
 
     assert_no_difference('Model.count') do
       assert_difference('ContentBlob.count', 2) do
-        post :create, params: { model: invalid_model, content_blobs: [blob1_params, blob2_params], policy_attributes: valid_sharing }
+        post :create, params: { model: invalid_model, content_blobs: [blob1_params, blob2_params],
+                                policy_attributes: valid_sharing }
       end
     end
 
