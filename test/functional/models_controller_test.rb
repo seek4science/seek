@@ -232,7 +232,6 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'orphaned content blobs attached to model on successful resubmit after validation error' do
-    # Simulate blobs saved as orphans during a prior failed attempt
     orphan1 = FactoryBot.create(:content_blob, original_filename: 'file1.txt')
     orphan2 = FactoryBot.create(:content_blob, original_filename: 'file2.txt')
     orphan_ids = [orphan1.id, orphan2.id]
@@ -244,7 +243,7 @@ class ModelsControllerTest < ActionController::TestCase
           content_blobs: [{ data_url: '' }],
           retained_content_blob_ids: orphan_ids.map(&:to_s),
           policy_attributes: valid_sharing
-        }
+        }, session: { orphaned_content_blob_ids: orphan_ids }
       end
     end
 
@@ -257,6 +256,22 @@ class ModelsControllerTest < ActionController::TestCase
       assert_equal 'Model', blob.asset_type
       assert_equal 1, blob.asset_version
     end
+  end
+
+  test 'tampered retained_content_blob_ids not in session are not attached' do
+    other_persons_orphan = FactoryBot.create(:content_blob, original_filename: 'stolen.txt')
+
+    assert_difference('Model.count', 1) do
+      post :create, params: {
+        model: valid_model,
+        content_blobs: [{ data_url: '' }],
+        retained_content_blob_ids: [other_persons_orphan.id.to_s],
+        policy_attributes: valid_sharing
+      }
+    end
+
+    other_persons_orphan.reload
+    assert_nil other_persons_orphan.asset_id, 'Tampered blob should not have been attached'
   end
 
   test 'associates assay' do
