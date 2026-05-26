@@ -156,7 +156,10 @@ module Seek
     def preserve_content_blobs_for_rerender(item)
       return unless Seek::Util.is_multi_file_asset_type?(item.class)
 
-      item.content_blobs.select(&:new_record?).each { |blob| blob.save(validate: false) }
+      saved_ids = item.content_blobs.select(&:new_record?).filter_map do |blob|
+        blob.id if blob.save(validate: false)
+      end
+      session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) | saved_ids
     end
 
     # After a successful save, updates any orphaned content blobs (saved during a previous failed
@@ -164,11 +167,12 @@ module Seek
     def attach_retained_orphaned_content_blobs(item)
       return unless Seek::Util.is_multi_file_asset_type?(item.class)
 
-      ids = retained_content_blob_ids.select(&:positive?)
+      ids = safe_retained_content_blob_ids
       return if ids.blank?
 
       ContentBlob.where(id: ids, asset_id: nil)
                  .update_all(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
+      session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) - ids
     end
 
     # makes sure the asset it only associated with projects that match the current user

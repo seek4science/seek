@@ -129,7 +129,7 @@ module Seek
       # asset's in-memory association, so they appear correctly on re-render and are available for
       # attachment after a successful save.
       def load_orphaned_content_blobs(asset)
-        retained_ids = retained_content_blob_ids.select(&:positive?)
+        retained_ids = safe_retained_content_blob_ids
         return if retained_ids.blank?
         return unless asset.respond_to?(:content_blobs)
 
