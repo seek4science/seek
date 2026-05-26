@@ -268,6 +268,7 @@ class StudiesController < ApplicationController
 
       data_file_path = StudyBatchUpload.upload_directory.join('data')
       data_file_name = datafile_name_with_extension("#{data_file_names[data_file_index]}", data_file_path)
+      next unless data_file_name
       data_file_location = data_file_path.join(data_file_name)
       data_file_content_blob = ContentBlob.new
       data_file_content_blob.tmp_io_object = File.open(data_file_location)
@@ -325,6 +326,8 @@ class StudiesController < ApplicationController
         return file
       end
     end
+
+    nil
   end
 
   def remove_existing_studies(studies)
