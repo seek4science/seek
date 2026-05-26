@@ -22,6 +22,7 @@ module Git
     end
 
     def convert_version(repo, version, unzip: false)
+      path_io_url_triples = []
       Dir.mktmpdir do |tmp_dir|
         git_version = asset.git_versions.where(git_repository: repo, version: version.version).first_or_initialize
         git_version.assign_attributes(name: "Version #{version.version}",
@@ -35,7 +36,6 @@ module Git
         attribute_keys.delete('revision_comments')
         attribute_keys.delete('contributor_id')
         git_version.set_resource_attributes(version.attributes.slice(*attribute_keys))
-        path_io_url_triples = []
         version.all_content_blobs.map do |blob|
           if unzip && blob.original_filename.end_with?('.zip')
             blob_dir = File.join(tmp_dir, "blob_#{blob.id}")
@@ -75,11 +75,12 @@ module Git
           git_version.save!
         end
 
-        path_io_url_triples.each do |_, io, _|
-          next unless io.is_a?(File)
-          io.close unless io.closed?
-        end
         git_version
+      end
+    ensure
+      path_io_url_triples.each do |_, io, _|
+        next unless io.is_a?(File)
+        io.close unless io.closed?
       end
     end
 
