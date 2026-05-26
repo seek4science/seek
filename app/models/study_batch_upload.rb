@@ -81,8 +81,8 @@ class StudyBatchUpload < ApplicationRecord
     end
   end
 
-  def self.unzip_batch(file_path, user_uuid)
-    dir = Rails.root.join('tmp', "#{user_uuid}_studies_upload")
+  def self.unzip_batch(file_path, user = User.current_user)
+    dir = upload_directory(user)
     FileUtils.rm_r(dir) if dir.exist?
     dir.mkdir
     study_data = []
@@ -158,6 +158,11 @@ class StudyBatchUpload < ApplicationRecord
       end
     end
 
+  end
+
+  def self.upload_directory(user = User.current_user)
+    user_uuid = user ? user.uuid : 'user_uuid'
+    Rails.root.join('tmp', "#{user_uuid}_studies_upload")
   end
 
 end

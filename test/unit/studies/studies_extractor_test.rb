@@ -4,19 +4,18 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   setup do
     @zip_file = "#{Rails.root}/test/fixtures/files/study_batch.zip"
-    @user_uuid = 'user_uuid'
-    @data_files, @studies = StudyBatchUpload.unzip_batch @zip_file, @user_uuid
+    @data_files, @studies = StudyBatchUpload.unzip_batch(@zip_file)
   end
 
   teardown do
-    FileUtils.rm_r("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/")
+    FileUtils.rm_r(StudyBatchUpload.upload_directory)
   end
 
   test 'check extracted files' do
 
       # Extracts study file and associated data files from zip
       # file_name = params[:data][:content_blob][:tempfile].path
-    data_files, studies = StudyBatchUpload.unzip_batch @zip_file, @user_uuid
+    data_files, studies = StudyBatchUpload.unzip_batch(@zip_file)
 
     assert_equal 3, data_files.count
     assert_equal 1, studies.count
