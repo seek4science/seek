@@ -157,7 +157,7 @@ module Seek
       return unless Seek::Util.is_multi_file_asset_type?(item.class)
 
       saved_ids = item.content_blobs.select(&:new_record?).filter_map do |blob|
-        blob.id if blob.save(validate: false)
+        blob.id if blob.save
       end
       session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) | saved_ids
     end
