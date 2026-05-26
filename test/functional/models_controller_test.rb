@@ -275,7 +275,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     other_persons_orphan.reload
     assert_nil other_persons_orphan.asset_id, 'Tampered blob should not have been attached'
-    assert_not_nil flash.now[:error]
+    assert_equal 'Please select a file to upload or provide a URL to the data.', flash.now[:error]
   end
 
   test 'associates assay' do
