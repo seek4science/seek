@@ -16,13 +16,13 @@ module Seek
       end
 
       def retained_content_blob_ids
-        (params[:retained_content_blob_ids] || []).map(&:to_i).sort
+        (params[:retained_content_blob_ids] || []).map(&:to_i).select(&:positive?).sort
       end
 
       # Returns retained blob IDs that were recorded in the session during a previous failed save,
       # preventing a user from attaching blobs they did not upload by tampering with params.
       def safe_retained_content_blob_ids
-        allowed = session[:orphaned_content_blob_ids] || []
+        allowed = (session[:orphaned_content_blob_ids] || []).map(&:to_i)
         retained_content_blob_ids & allowed
       end
 
