@@ -243,7 +243,6 @@ module Seek
       end
 
       def cast_boolean_for_rdf(value)
-        return value if value.is_a?(TrueClass) || value.is_a?(FalseClass)
         return value unless value.is_a?(String)
 
         ActiveModel::Type::Boolean.new.cast(value)
