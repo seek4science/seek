@@ -36,7 +36,7 @@ $j(document).ready(function () {
         // Local file
         var addLocalFile = function () {
             var newField = HandlebarsTemplates['upload/file_field']();
-            $j(this).parent().append(newField);
+            $j(this).parent().append($j(newField).addClass('hide-no-file-text'));
             var filename = this.value.split(/\\/)[this.value.split(/\\/).length - 1];
             var listItem = $j(HandlebarsTemplates['upload/local_file']({ text: filename }));
             pending.append(listItem);
@@ -44,6 +44,12 @@ $j(document).ready(function () {
         };
 
         field.on('change', 'input[type=file][data-batch-upload=true]', addLocalFile);
+
+        // When existing files are already listed (e.g. after a validation error re-render),
+        // hide the "No file chosen" text beside the file input since files are already shown.
+        if (pending.children().length > 0) {
+            $j('input[type=file][data-batch-upload=true]', field).first().addClass('hide-no-file-text');
+        }
 
         // Remote file
         var addRemoteFile = function () {
