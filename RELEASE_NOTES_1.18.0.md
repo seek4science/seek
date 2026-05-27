@@ -21,6 +21,7 @@
 
 - **BibTeX import UI** — The BibTeX import interface has been clarified to make the two import options (file upload vs. paste) more obvious (#2315)
 - **Bioschemas/schema.org enhancements for Workflows** — Added `creativeWorkStatus`, `contributor`, `citation`, `datePublished`, and other properties to the schema.org/Bioschemas output for workflows and other creative works (#2546)
+- **RDF export for nested Extended Metadata attributes** — Nested (Linked) Extended Metadata attributes are now exported as blank nodes in the RDF output, with correct `RDF::XSD` type mappings (#2557)
 - **Hyphen-proof search** — Search indexing and queries now handle punctuation such as hyphens correctly, so e.g. searching "UPC" finds results containing "UPC-1234" (#1823)
 - **`registered_mode` exposed in Publications API** — The `registered_mode` field is now included in the Publications JSON API response (#2520)
 - **Terms & Conditions checkbox placement** — The T&C checkbox now appears above the Register button on the registration form (#2528)
@@ -36,6 +37,7 @@
 - **PDF preview rendering** — Upgraded PDF.js from v0.7.55 to v2.16.105, fixing incomplete PDF rendering in the browser (#2343)
 - **FDS import: required attribute matching** — Sample types and Extended Metadata types with required fields that are absent from the FDS import RDF are now correctly rejected as candidates, preventing incorrect type matches (#2527)
 - **FDS import: core annotation handling** — Core RDF annotations (e.g. `rdf:type`, `rdfs:label`) are now ignored when matching sample types during FDS import (#2587)
+- **FDS import: false duplicate sample type detection** — Fixed an incorrect "sample type already exists" error caused by matching solely on property count rather than property identity (#2589)
 - **Registered sample attribute validation** — Sample attributes of type "Registered sample" no longer incorrectly turn red/invalid for IDs over 100 (#2514)
 - **Batch delete nil error** — Fixed an error that could occur when batch-deleting assets with missing associations (#2459)
 - **Spreadsheet download from default view** — Fixed downloading the DataHub spreadsheet when accessed from the default view (#2470)
