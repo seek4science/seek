@@ -1,5 +1,11 @@
 name: tests
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 1.18-release-notes
+  pull_request:
+    branches-ignore:
+      - 1.18-release-notes
 
 jobs:
   tests:
