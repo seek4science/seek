@@ -212,6 +212,7 @@ class StudiesController < ApplicationController
     studies_length = params[:studies][:title].length
     studies_uploaded = false
     data_file_uploaded = false
+    @studies = []
     studies_length.times do |index|
       metadata = generate_metadata(params[:studies], index)
       study_params = {
@@ -223,12 +224,15 @@ class StudiesController < ApplicationController
           data: metadata
         )
       }
-      @study = Study.new(study_params)
-      StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
-      if @study.valid? && @study.save! && @study.extended_metadata.valid?
-        studies_uploaded = true if @study.save
+      study = Study.new(study_params)
+      @studies << study
+      StudyBatchUpload.check_study_is_MIAPPE_compliant(study, metadata)
+      if study.valid? && study.save! && study.extended_metadata.valid?
+        studies_uploaded = true if study.save
       end
-      data_file_uploaded = create_batch_assay_asset(params, index)
+      if studies_uploaded
+        data_file_uploaded = create_batch_assay_asset(params, index)
+      end
     end
 
     batch_uploaded = studies_uploaded && data_file_uploaded

@@ -183,23 +183,26 @@ FactoryBot.define do
   factory(:study_extended_metadata_type_for_MIAPPE, class: ExtendedMetadataType) do
     title { ExtendedMetadataType::MIAPPE_TITLE }
     supported_type { 'Study' }
-    after(:build) do |a|
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'id')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'study_start_date')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'study_end_date')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'contact_institution')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'geographic_location_country')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'experimental_site_name')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'latitude')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'longitude')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'altitude')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'description_of_the_experimental_design')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'type_of_experimental_design')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'observation_unit_level_hierarchy')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'observation_unit_description')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'description_of_growth_facility')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'type_of_growth_facility')
-      a.extended_metadata_attributes << FactoryBot.create(:name_extended_metadata_attribute, title:'cultural_practices')
+    after(:build) do |emt|
+      string_type = SampleAttributeType.find_by(title: "String") || FactoryBot.create(:string_sample_attribute_type, title: "String")
+      date_type = SampleAttributeType.find_by(title: "Date") || FactoryBot.create(:date_sample_attribute_type, title: "Date")
+
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_start_date', required:true, sample_attribute_type: date_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'study_end_date', sample_attribute_type: date_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'contact_institution', required:true, sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'geographic_location_country', required:true, sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'experimental_site_name', required:true, sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'latitude', sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'longitude', sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'altitude', sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'description_of_the_experimental_design', required:true, sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'type_of_experimental_design', sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'observation_unit_level_hierarchy', sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'observation_unit_description', required:true, sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'description_of_growth_facility', required:true, sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'type_of_growth_facility', sample_attribute_type: string_type)
+      emt.extended_metadata_attributes << ExtendedMetadataAttribute.new(title: 'cultural_practices', sample_attribute_type: string_type)
     end
   end
 

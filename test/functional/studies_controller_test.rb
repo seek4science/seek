@@ -2372,7 +2372,7 @@ class StudiesControllerTest < ActionController::TestCase
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
 
     # Use the test fixture zip file
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
 
     post :preview_content, params: {
       content_blobs: [{ data: zip_file }]
@@ -2389,7 +2389,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'batch preview should extract license from file' do
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
 
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
     post :preview_content, params: {
       content_blobs: [{ data: zip_file }]
     }
@@ -2415,14 +2415,14 @@ class StudiesControllerTest < ActionController::TestCase
       )
     )
 
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
     post :preview_content, params: {
       content_blobs: [{ data: zip_file }]
     }
 
     assert_response :success
     assert_not_nil assigns(:existing_studies)
-    existing_studies_array = JSON.parse(assigns(:existing_studies))
+    existing_studies_array = assigns(:existing_studies)
     assert_equal 1, existing_studies_array.length
     assert_equal existing_study.id, existing_studies_array.first['id']
   end
@@ -2430,7 +2430,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'batch preview should extract study data files information' do
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
 
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
     post :preview_content, params: {
       content_blobs: [{ data: zip_file }]
     }
@@ -2448,7 +2448,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'batch preview should extract correct study metadata' do
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
 
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
     post :preview_content, params: {
       content_blobs: [{ data: zip_file }]
     }
@@ -2473,7 +2473,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'batch preview should render preview form with study data' do
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
     post :preview_content, params: { 
       content_blobs: [{ data: zip_file }]
     }
@@ -2521,7 +2521,7 @@ class StudiesControllerTest < ActionController::TestCase
     FactoryBot.create(:project, title: 'Default Project')
 
     # First preview to get temp files setup
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
     post :preview_content, params: {
       content_blobs: [{ data: zip_file }]
     }
@@ -2567,7 +2567,7 @@ class StudiesControllerTest < ActionController::TestCase
     FactoryBot.create(:project, title: 'Default Project')
 
     # First upload and preview
-    zip_file = fixture_file_upload('files/study_batch.zip', 'application/zip')
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
     post :preview_content, params: {
       content_blobs: [{ data: zip_file }]
     }
