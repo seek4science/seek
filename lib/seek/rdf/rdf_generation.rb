@@ -74,10 +74,9 @@ module Seek
 
       def extended_metadata_triples(rdf_graph)
         return rdf_graph unless supports_extended_metadata? && extended_metadata&.extended_metadata_type
-        attributes = extended_metadata.extended_metadata_type.extended_metadata_attributes.select{|at| at.pid.present?}
-        resource = rdf_resource
-        attributes.each do |attribute|
-          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(extended_metadata.get_attribute_value(attribute))]
+
+        emit_emt_attributes(rdf_graph, rdf_resource, extended_metadata.extended_metadata_type) do |attribute|
+          extended_metadata.get_attribute_value(attribute)
         end
         rdf_graph
       end
@@ -178,6 +177,81 @@ module Seek
 
       def refresh_rdf
         queue_rdf_generation(true, false)
+      end
+
+      private
+
+      def emit_emt_attributes(rdf_graph, subject, emt_type, &value_resolver)
+        emt_type.extended_metadata_attributes.each do |attribute|
+          next unless attribute.pid.present?
+
+          value = value_resolver.call(attribute)
+          next if value.nil?
+          next if scalar_emt_attribute?(attribute) && emt_value_blank?(attribute, value)
+
+          emit_emt_attribute(rdf_graph, subject, attribute, value)
+        end
+      end
+
+      def emit_emt_attribute(rdf_graph, subject, attribute, value)
+        predicate = RDF::URI(attribute.pid)
+        if attribute.linked_extended_metadata?
+          append_emt_blank_node(rdf_graph, subject, predicate, attribute.linked_extended_metadata_type, value)
+        elsif attribute.linked_extended_metadata_multi?
+          Array(value).each do |item|
+            append_emt_blank_node(rdf_graph, subject, predicate, attribute.linked_extended_metadata_type, item)
+          end
+        else
+          rdf_graph << [subject, predicate, RDF::Literal(cast_emt_value_for_rdf(attribute, value))]
+        end
+      end
+
+      def append_emt_blank_node(rdf_graph, subject, predicate, nested_type, data)
+        blank = RDF::Node.new
+        rdf_graph << [subject, predicate, blank]
+        # Nested values are a plain Hash at this point — there is no ExtendedMetadata
+        # wrapper, so look up by accessor_name directly.
+        emit_emt_attributes(rdf_graph, blank, nested_type) { |attr| data[attr.accessor_name] }
+      end
+
+      def scalar_emt_attribute?(attribute)
+        !attribute.linked_extended_metadata? && !attribute.linked_extended_metadata_multi?
+      end
+
+      def emt_value_blank?(attribute, value)
+        attribute.respond_to?(:test_blank?) ? attribute.test_blank?(value) : value.blank?
+      end
+
+      # Casts the stored value to the matching Ruby type so RDF::Literal can infer
+      # the right XSD datatype (xsd:integer, xsd:double, xsd:boolean, xsd:date,
+      # xsd:dateTime). Falls back to the raw value if parsing fails.
+      def cast_emt_value_for_rdf(attribute, value)
+        case attribute.sample_attribute_type&.base_type
+        when Seek::Samples::BaseType::INTEGER
+          Integer(value, exception: false) || value
+        when Seek::Samples::BaseType::FLOAT
+          Float(value, exception: false) || value
+        when Seek::Samples::BaseType::BOOLEAN
+          cast_boolean_for_rdf(value)
+        when Seek::Samples::BaseType::DATE
+          parse_or_value(value) { |v| Date.parse(v) }
+        when Seek::Samples::BaseType::DATE_TIME
+          parse_or_value(value) { |v| DateTime.parse(v) }
+        else
+          value
+        end
+      end
+
+      def cast_boolean_for_rdf(value)
+        return value unless value.is_a?(String)
+
+        ActiveModel::Type::Boolean.new.cast(value)
+      end
+
+      def parse_or_value(value)
+        yield(value.to_s)
+      rescue ArgumentError, TypeError, Date::Error
+        value
       end
     end
   end

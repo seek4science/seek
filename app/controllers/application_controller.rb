@@ -284,7 +284,19 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html do
         User.with_current_user current_user do
-          render template: 'general/landing_page_for_not_found_item', status: :not_found
+          klass = controller_name.singularize.camelize
+          version = params[:version]
+
+          if version.nil?
+            retract_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], action: AssetDoiLog::DELETE).last
+          else
+            retract_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], asset_version: version, action: AssetDoiLog::DELETE).last
+          end
+          if retract_log.present?
+            render template: 'general/landing_page_for_doi_retracted_item', status: :gone, locals: { retract_log: retract_log }
+          else
+            render template: 'general/landing_page_for_not_found_item', status: :not_found
+          end
         end
       end
 

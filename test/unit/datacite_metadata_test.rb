@@ -110,4 +110,22 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
   end
+
+  test 'DataCite metadata reader' do
+    someone = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Bloggs')
+    thing = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy),
+                    title: 'The title',
+                    description: 'The description',
+                    creators: [someone],
+                    contributor: FactoryBot.create(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
+    ).latest_version
+
+    xml = thing.datacite_metadata.build
+    metadata = Datacite::MetadataReader.new(xml).parse
+    assert_equal 'The title', metadata[:title]
+    assert_equal 1, metadata[:creators].length
+    creator = metadata[:creators].first
+    assert_equal 'Jane', creator.first_name
+    assert_equal 'Bloggs', creator.last_name
+  end
 end

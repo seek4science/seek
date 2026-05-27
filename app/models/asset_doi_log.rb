@@ -23,4 +23,12 @@ class AssetDoiLog < ApplicationRecord
   def self.unpublished
     where(action: UNPUBLISH)
   end
+
+  def metadata
+    JSON.parse(datacite_metadata) if datacite_metadata.present?
+  end
+
+  def metadata=(value)
+    self.datacite_metadata = value.to_json if value.present?
+  end
 end

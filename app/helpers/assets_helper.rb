@@ -214,6 +214,8 @@ module AssetsHelper
                          instance_variable_get('@study')
                        when 'assays'
                          instance_variable_get('@assay')
+                       when 'observation_units'
+                         instance_variable_get('@observation_unit')
                        else
                          nil
                        end
@@ -235,6 +237,15 @@ module AssetsHelper
 
     # If current is an Assay, check if target is its Study or Investigation
     if current.is_a?(Assay)
+      if target.is_a?(Study)
+        return current.study == target
+      elsif target.is_a?(Investigation)
+        return current.investigation == target
+      end
+    end
+
+    # If current is an ObservationUnit, check if target is its Study or Investigation
+    if current.is_a?(ObservationUnit)
       if target.is_a?(Study)
         return current.study == target
       elsif target.is_a?(Investigation)
