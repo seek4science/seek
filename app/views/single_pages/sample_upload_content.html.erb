@@ -84,10 +84,12 @@
     $j('#close-upload-xlsx-modal-btn').prop('disabled', true);
 
     try{
-      const postCall = await uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) });
-      const putCall = await uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) });
+      const [postCall, putCall] = await Promise.all([
+        uploadAjaxCall("<%= batch_create_samples_path %>", "POST", { data: JSON.stringify(newSamples) }),
+        uploadAjaxCall("<%= batch_update_samples_path %>", "PUT", { data: JSON.stringify(updatedSamples) })
+      ]);
         let errors = {newSamples: postCall.errors, updatedSamples: putCall.errors};
-        if (errors.newSamples.length > 0 || errors.updatedSamples.length > 0) {
+        if ((errors.newSamples?.length ?? 0) > 0 || (errors.updatedSamples?.length ?? 0) > 0) {
             throw new Error(JSON.stringify(errors));
         }
       $j('#sample-upload-spinner').hide();
@@ -129,10 +131,10 @@
 
   function createSampleObject(row, action, index){
 
-    cells = $j(row).find('td:not(:has(".danger"))').toArray();
-    samplesObj = {};
+    const cells = $j(row).find('td:not(:has(".danger"))').toArray();
+    const samplesObj = {};
     cells.map(function(cell){
-      const val = cell.textContent;
+      const val = cell.textContent.trim();
       const key = cell.id.match(/\[.*\]/)[0].replace('[', "").replace("]", '');
       const seekSampleMultiFields = $j(cell).find('span[data-attr_type="seek-sample-multi"]').toArray();
       const cvListFields = $j(cell).find('span[data-attr_type="cv-list"]').toArray();
@@ -230,8 +232,7 @@
         Accept: "application/json"
       },
       error: function(err) {
-        console.log("err", err);
-        alert(json.stringify(err));
+        console.error("Ajax error", err);
       }
     });
   };
