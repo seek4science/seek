@@ -1455,6 +1455,41 @@ class SampleTest < ActiveSupport::TestCase
 
   end
 
+  test 'to rdf with typed attributes uses correct XSD datatypes' do
+    sample = FactoryBot.create(:sample, sample_type: FactoryBot.create(:typed_rdf_sample_type),
+                               data: {
+                                 'Title' => 'test',
+                                 'Count' => 42,
+                                 'Weight' => 3.14,
+                                 'Flag' => true,
+                                 'Collected on' => '2024-06-01',
+                                 'Recorded at' => '2024-06-01T12:00:00'
+                               })
+    rdf = sample.to_rdf
+    graph = RDF::Graph.new do |g|
+      RDF::Reader.for(:ttl).new(rdf) { |reader| g << reader }
+    end
+    sub = RDF::URI.new("http://localhost:3000/samples/#{sample.id}")
+
+    count = graph.query([sub, RDF::URI('http://example.org/count'), nil]).first&.object
+    assert_equal RDF::XSD.integer.to_s, count.datatype.to_s, 'Integer must carry xsd:integer'
+    assert_equal 42, count.object
+
+    weight = graph.query([sub, RDF::URI('http://example.org/weight'), nil]).first&.object
+    assert_equal RDF::XSD.double.to_s, weight.datatype.to_s, 'Float must carry xsd:double'
+
+    flag = graph.query([sub, RDF::URI('http://example.org/flag'), nil]).first&.object
+    assert_equal RDF::XSD.boolean.to_s, flag.datatype.to_s, 'Boolean must carry xsd:boolean'
+    assert_equal true, flag.object
+
+    date = graph.query([sub, RDF::URI('http://example.org/collectedOn'), nil]).first&.object
+    assert_equal RDF::XSD.date.to_s, date.datatype.to_s, 'Date must carry xsd:date'
+    assert_equal '2024-06-01', date.to_s
+
+    dt = graph.query([sub, RDF::URI('http://example.org/recordedAt'), nil]).first&.object
+    assert_equal RDF::XSD.dateTime.to_s, dt.datatype.to_s, 'DateTime must carry xsd:dateTime'
+  end
+
   test 'add sample to a locked sample type' do
     person = FactoryBot.create(:person)
     sample_type = FactoryBot.create(:simple_sample_type, project_ids: [FactoryBot.create(:project).id], contributor: person)
