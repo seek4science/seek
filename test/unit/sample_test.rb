@@ -1435,7 +1435,8 @@ class SampleTest < ActiveSupport::TestCase
                                  'Title':'the title',
                                  'Description':'the description',
                                  'Host':'the host',
-                                 'Occupation':'the occupation'
+                                 'Occupation':'the occupation',
+                                 'Marital status': ''
                                })
     assert sample.rdf_supported?
     rdf = sample.to_rdf
@@ -1450,8 +1451,8 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal RDF::Literal('the host'), match.object
     match = graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/occupation')}
     assert_equal RDF::Literal('the occupation'), match.object
-    match = graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/marital_status')}
-    assert_equal RDF::Literal(''), match.object
+    assert_nil graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/marital_status')},
+               'blank string attribute must not emit a triple'
 
   end
 
@@ -1488,6 +1489,21 @@ class SampleTest < ActiveSupport::TestCase
 
     dt = graph.query([sub, RDF::URI('http://example.org/recordedAt'), nil]).first&.object
     assert_equal RDF::XSD.dateTime.to_s, dt.datatype.to_s, 'DateTime must carry xsd:dateTime'
+  end
+
+  test 'to rdf omits triples for nil typed attribute values' do
+    sample = FactoryBot.create(:sample, sample_type: FactoryBot.create(:typed_rdf_sample_type),
+                               data: { 'Title' => 'test' })
+    rdf = sample.to_rdf
+    graph = RDF::Graph.new do |g|
+      RDF::Reader.for(:ttl).new(rdf) { |reader| g << reader }
+    end
+    sub = RDF::URI.new("http://localhost:3000/samples/#{sample.id}")
+
+    %w[count weight flag collectedOn recordedAt].each do |fragment|
+      assert_nil graph.query([sub, RDF::URI("http://example.org/#{fragment}"), nil]).first,
+                 "nil #{fragment} attribute must not emit a triple"
+    end
   end
 
   test 'add sample to a locked sample type' do

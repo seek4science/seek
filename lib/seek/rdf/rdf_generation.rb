@@ -86,6 +86,8 @@ module Seek
         resource = rdf_resource
         attributes.each do |attribute|
           value = get_attribute_value(attribute)
+          next if value.nil? || attribute_value_blank?(attribute, value)
+
           rdf_graph << [resource, RDF::URI(attribute.pid),
                         RDF::Literal(cast_value_by_base_type_for_rdf(attribute, value))]
         end
@@ -188,7 +190,7 @@ module Seek
 
           value = value_resolver.call(attribute)
           next if value.nil?
-          next if scalar_emt_attribute?(attribute) && emt_value_blank?(attribute, value)
+          next if scalar_emt_attribute?(attribute) && attribute_value_blank?(attribute, value)
 
           emit_emt_attribute(rdf_graph, subject, attribute, value)
         end
@@ -219,7 +221,7 @@ module Seek
         !attribute.linked_extended_metadata? && !attribute.linked_extended_metadata_multi?
       end
 
-      def emt_value_blank?(attribute, value)
+      def attribute_value_blank?(attribute, value)
         attribute.respond_to?(:test_blank?) ? attribute.test_blank?(value) : value.blank?
       end
 
