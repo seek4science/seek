@@ -1,6 +1,5 @@
 x-shared:
-  seek_base: &seek_base
-    # build: .
+  seek_base: &seek_base # build: .
     image: fairdom/seek:main
 
     restart: always
@@ -20,20 +19,19 @@ x-shared:
       solr:
         condition: service_started
 
-
 services:
   db:
     # Database implementation, in this case MySQL
     image: mysql:8.4
     container_name: seek-mysql
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --log-error-verbosity=1
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --log-error-verbosity=1
       # Optional: Enable mysql_native_password if needed for legacy apps
-      # --mysql-native-password=ON
+      # - --mysql-native-password=ON
       # Optional: restrict foreign keys if needed
-      # --restrict_fk_on_non_standard_key=OFF
+      # - --restrict_fk_on_non_standard_key=OFF
     restart: always
     stop_grace_period: 1m30s
     env_file:
@@ -41,12 +39,15 @@ services:
     volumes:
       - seek-mysql-db:/var/lib/mysql
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent" ]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 20s
-
 
   seek:
     # The SEEK application
@@ -59,7 +60,7 @@ services:
       <<: *seek_base_env
       NO_ENTRYPOINT_WORKERS: 1
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -74,7 +75,7 @@ services:
       QUIET_SUPERCRONIC: 1
     command: docker/start_workers.sh
     healthcheck:
-      test: [ "CMD", "bash", "script/check_worker_pids.sh" ]
+      test: ["CMD", "bash", "script/check_worker_pids.sh"]
       retries: 5
 
   solr:
