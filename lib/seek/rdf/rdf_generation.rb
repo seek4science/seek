@@ -86,7 +86,8 @@ module Seek
         resource = rdf_resource
         attributes.each do |attribute|
           value = get_attribute_value(attribute)
-          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(cast_value_by_base_type_for_rdf(attribute, value))]
+          rdf_graph << [resource, RDF::URI(attribute.pid),
+                        RDF::Literal(cast_value_by_base_type_for_rdf(attribute, value))]
         end
         rdf_graph
       end

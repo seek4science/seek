@@ -275,8 +275,14 @@ FactoryBot.define do
 
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Bio safety level', pid:'http://fairbydesign.nl/ontology/biosafety_level', sample_type: type)
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', required: true, sample_type: type)
-      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism ncbi id', pid:'http://purl.uniprot.org/core/organism', required: true, sample_type: type)
-      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Collection date', pid:'https://w3id.org/mixs/0000011', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute,
+                                                  sample_attribute_type: FactoryBot.create(:string_sample_attribute_type),
+                                                  title: 'Organism ncbi id', pid: 'http://purl.uniprot.org/core/organism',
+                                                  required: true, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute,
+                                                  sample_attribute_type: FactoryBot.create(:string_sample_attribute_type),
+                                                  title: 'Collection date', pid: 'https://w3id.org/mixs/0000011',
+                                                  sample_type: type)
     end
   end
 end
