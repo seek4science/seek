@@ -82,11 +82,11 @@ module Seek
       end
 
       def sample_metadata_triples(rdf_graph)
-
-        attributes = sample_type.sample_attributes.select{|at| at.pid.present?}
+        attributes = sample_type.sample_attributes.select { |at| at.pid.present? }
         resource = rdf_resource
         attributes.each do |attribute|
-          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(get_attribute_value(attribute))]
+          value = get_attribute_value(attribute)
+          rdf_graph << [resource, RDF::URI(attribute.pid), RDF::Literal(cast_value_by_base_type_for_rdf(attribute, value))]
         end
         rdf_graph
       end
@@ -202,7 +202,7 @@ module Seek
             append_emt_blank_node(rdf_graph, subject, predicate, attribute.linked_extended_metadata_type, item)
           end
         else
-          rdf_graph << [subject, predicate, RDF::Literal(cast_emt_value_for_rdf(attribute, value))]
+          rdf_graph << [subject, predicate, RDF::Literal(cast_value_by_base_type_for_rdf(attribute, value))]
         end
       end
 
@@ -225,7 +225,7 @@ module Seek
       # Casts the stored value to the matching Ruby type so RDF::Literal can infer
       # the right XSD datatype (xsd:integer, xsd:double, xsd:boolean, xsd:date,
       # xsd:dateTime). Falls back to the raw value if parsing fails.
-      def cast_emt_value_for_rdf(attribute, value)
+      def cast_value_by_base_type_for_rdf(attribute, value)
         case attribute.sample_attribute_type&.base_type
         when Seek::Samples::BaseType::INTEGER
           Integer(value, exception: false) || value
