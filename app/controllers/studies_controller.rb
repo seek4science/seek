@@ -182,11 +182,11 @@ class StudiesController < ApplicationController
 
     unless params[:content_blobs][0][:data].nil?
       tempzip_path = params[:content_blobs][0][:data].tempfile.path
-      data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path, user_uuid)
-      study_filename = File.basename(studies.first.to_s)
+      data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path)
+      study_path = studies.first
       studies_file = ContentBlob.new
-      studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
-      studies_file.original_filename = "#{study_filename}"
+      studies_file.tmp_io_object = File.open(study_path)
+      studies_file.original_filename = File.basename(study_path)
       studies_file.save!
       @studies = StudyBatchUpload.extract_studies_from_file(studies_file)
       @study = @studies[0]
@@ -234,17 +234,10 @@ class StudiesController < ApplicationController
     batch_uploaded = studies_uploaded && data_file_uploaded
 
     if batch_uploaded
-      user_uuid = if User.current_user
-                    User.current_user.attributes['uuid'].to_s
-                  else
-                    'user_uuid'
-                  end
-
-
       unless params[:existing_studies].blank?
         remove_existing_studies(params[:existing_studies])
       end
-      FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
+      FileUtils.rm_r(StudyBatchUpload.upload_directory(User.current_user))
       respond_to do |format|
         flash[:notice] = "The #{t('study').pluralize} were successfully created.<br/>".html_safe
         format.html { redirect_to studies_path }
@@ -257,13 +250,6 @@ class StudiesController < ApplicationController
   end
 
   def create_batch_assay_asset(params, index)
-
-    user_uuid = if User.current_user
-                  User.current_user.attributes['uuid'].to_s
-                else
-                  'user_uuid'
-                end
-
     @assay_assets = []
     data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
     data_file_names.length.times do |data_file_index|
@@ -280,12 +266,13 @@ class StudiesController < ApplicationController
       }
 
 
-      data_file_path = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/"
+      data_file_path = StudyBatchUpload.upload_directory.join('data')
       data_file_name = datafile_name_with_extension("#{data_file_names[data_file_index]}", data_file_path)
-      data_file_location = "#{data_file_path}#{data_file_name}"
+      next unless data_file_name
+      data_file_location = data_file_path.join(data_file_name)
       data_file_content_blob = ContentBlob.new
       data_file_content_blob.tmp_io_object = File.open(data_file_location)
-      data_file_content_blob.original_filename = "#{data_file_name}"
+      data_file_content_blob.original_filename = File.basename(data_file_name)
 
       license = params[:studies][:license]
       data_file_params = {
@@ -339,6 +326,8 @@ class StudiesController < ApplicationController
         return file
       end
     end
+
+    nil
   end
 
   def remove_existing_studies(studies)
