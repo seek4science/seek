@@ -115,7 +115,7 @@ module Seek
 
       def to_extended_metadata_type_json
         json = {}
-        json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || UUID.generate}"
+        json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || SecureRandom.uuid}"
         json['supported_type'] = type_name
         json['enabled'] = true
         seek_attributes = all_additional_potential_annotation_details.collect(&:to_extended_metadata_attribute_json)

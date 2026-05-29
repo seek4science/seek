@@ -106,7 +106,6 @@ gem 'sqlite3'
 gem 'sunspot_rails'
 gem 'terrapin'
 gem 'terser'
-gem 'uuid'
 gem 'validate_url'
 gem 'whenever', require: false
 gem 'will_paginate'

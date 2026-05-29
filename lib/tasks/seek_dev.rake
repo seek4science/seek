@@ -159,7 +159,7 @@ namespace :seek_dev do
 
   task(random_projects: :environment) do
     (0...50).to_a.each do
-      title = ('A'..'Z').to_a[rand(26)] + UUID.generate
+      title = ('A'..'Z').to_a[rand(26)] + SecureRandom.uuid
       p = Project.create title: title
       p.save!
     end

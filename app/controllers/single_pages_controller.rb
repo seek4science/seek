@@ -121,7 +121,7 @@ class SinglePagesController < ApplicationController
   end
 
   def export_to_excel
-    cache_uuid = UUID.new.generate
+    cache_uuid = SecureRandom.uuid
     sample_ids = JSON.parse(params[:sample_ids])
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
