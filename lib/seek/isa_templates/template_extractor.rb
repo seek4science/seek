@@ -101,7 +101,6 @@ module Seek
               terms = []
             end
             terms.each_with_index do |term, i|
-              puts "#{j}) #{i + 1} FROM #{terms.length}"
               if i.zero?
                 # Skip the parent name
                 des = term[:description]
