@@ -6,7 +6,7 @@
         <thead>
         <tr>
           <th></th>
-          <% for key in @new_samples[0].keys %>
+          <% for key in (@new_samples.compact.first&.keys || []) %>
             <% unless key == 'uuid' %>
               <th><%= key %></th>
             <% end %>
@@ -18,43 +18,43 @@
           <% new_sample_id = UUID.generate %>
           <tr id='<%= "new-sample-#{new_sample_id}" %>'>
             <td>
-              <button id=<%= "remove-#{new_sample_id}" %> class="btn glyphicon glyphicon-trash danger
-              " style="background-color:#d9534f;color:white;"
+              <button id=<%= "remove-#{new_sample_id}" %> class="btn glyphicon glyphicon-trash danger"
+              style="background-color:#d9534f;color:white;"
               onclick=<%= "removeSample('new-sample-#{new_sample_id}')" %>></button>
             </td>
-            <% new_sample.map do |key, val| %>
-              <% val = '<new>' if key == 'id' %>
-              <% unless key == 'uuid' %>
-                <% if @registered_sample_multi_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
-                    <% val.each do |sub_sample| %>
-                      <span class="badge" title="ID: <%= sub_sample['id'] %>" data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
+            <% new_sample.each do |new_sample_key, new_sample_val| %>
+              <% new_sample_val = '<new>' if new_sample_key == 'id' %>
+              <% unless new_sample_key == 'uuid' %>
+                <% if @registered_sample_multi_fields.include?(new_sample_key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
+                    <% Array(new_sample_val).each do |sub_sample| %>
+                      <span class="badge" title="ID: <%= sub_sample&.fetch('id', nil) %>" data-attr_type="seek-sample-multi"><%= sub_sample&.fetch('title', nil) %></span>
                     <% end %>
                   </td>
-                <% elsif @cv_list_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
-                    <% val.each do |cv_term| %>
+                <% elsif @cv_list_fields.include?(new_sample_key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
+                    <% Array(new_sample_val).each do |cv_term| %>
                       <span class="label label-default" title="<%= cv_term %>" data-attr_type="cv-list"><%= cv_term %></span>
                     <% end %>
                   </td>
-                <% elsif @registered_sample_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
-                    <span class="badge" title="<%= val['id'] %>" data-attr_type="seek-sample"><%= val['title'] %></span>
+                <% elsif @registered_sample_fields.include?(new_sample_key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
+                    <span class="badge" title="<%= new_sample_val&.fetch('id', nil) %>" data-attr_type="seek-sample"><%= new_sample_val&.fetch('title', nil) %></span>
                   </td>
-                <% elsif @registered_data_file_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
-                    <span class="badge" title="<%= val['id'] %>" data-attr_type="seek-data-file"><%= val['title'] %></span>
+                <% elsif @registered_data_file_fields.include?(new_sample_key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
+                    <span class="badge" title="<%= new_sample_val&.fetch('id', nil) %>" data-attr_type="seek-data-file"><%= new_sample_val&.fetch('title', nil) %></span>
                   </td>
-                <% elsif @registered_strain_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
-                    <span class="badge" title="<%= val['id'] %>" data-attr_type="seek-strain"><%= val['title'] %></span>
+                <% elsif @registered_strain_fields.include?(new_sample_key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
+                    <span class="badge" title="<%= new_sample_val&.fetch('id', nil) %>" data-attr_type="seek-strain"><%= new_sample_val&.fetch('title', nil) %></span>
                   </td>
-                <% elsif @registered_sops_fields.include?(key) %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'>
-                    <span class="badge" title="<%= val['id'] %>" data-attr_type="seek-sop"><%= val['title'] %></span>
+                <% elsif @registered_sops_fields.include?(new_sample_key) %>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'>
+                    <span class="badge" title="<%= new_sample_val&.fetch('id', nil) %>" data-attr_type="seek-sop"><%= new_sample_val&.fetch('title', nil) %></span>
                   </td>
                 <% else %>
-                  <td id='<%= "new-sample-#{new_sample_id}[#{key}]" %>'><%= val %></td>
+                  <td id='<%= "new-sample-#{new_sample_id}[#{new_sample_key}]" %>'><%= new_sample_val %></td>
                 <% end %>
               <% end %>
             <% end %>

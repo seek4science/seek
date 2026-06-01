@@ -22,6 +22,7 @@ module Git
     end
 
     def convert_version(repo, version, unzip: false)
+      path_io_url_triples = []
       Dir.mktmpdir do |tmp_dir|
         git_version = asset.git_versions.where(git_repository: repo, version: version.version).first_or_initialize
         git_version.assign_attributes(name: "Version #{version.version}",
@@ -35,24 +36,21 @@ module Git
         attribute_keys.delete('revision_comments')
         attribute_keys.delete('contributor_id')
         git_version.set_resource_attributes(version.attributes.slice(*attribute_keys))
-        path_io_url_triples = []
         version.all_content_blobs.map do |blob|
           if unzip && blob.original_filename.end_with?('.zip')
             blob_dir = File.join(tmp_dir, "blob_#{blob.id}")
             Dir.mkdir(blob_dir)
-            Dir.chdir(blob_dir) do
-              ROCrate::Reader.unzip_file_to(blob.filepath, blob_dir)
-              files = Dir.glob('**/*', ::File::FNM_DOTMATCH).select do |path|
-                ::File.file?(path) && !(path == '.' || path == '..' || path.end_with?('/.'))
-              end
-              # Don't include generated RO-Crate files for basic crates
-              if blob.original_filename.end_with?('.basic.crate.zip')
-                files.delete('ro-crate-metadata.json')
-                files.delete('ro-crate-metadata.jsonld')
-                files.delete('ro-crate-preview.html')
-              end
-              path_io_url_triples += files.map { |f| [f, File.open(f)] }
+            ROCrate::Reader.unzip_file_to(blob.filepath, blob_dir)
+            files = Dir.glob('**/*', File::FNM_DOTMATCH, base: blob_dir).select do |path|
+              !(path == '.' || path == '..' || path.end_with?('/.')) && File.file?(File.join(blob_dir, path))
             end
+            # Don't include generated RO-Crate files for basic crates
+            if blob.original_filename.end_with?('.basic.crate.zip')
+              files.delete('ro-crate-metadata.json')
+              files.delete('ro-crate-metadata.jsonld')
+              files.delete('ro-crate-preview.html')
+            end
+            path_io_url_triples += files.map { |f| [f, File.open(File.join(blob_dir, f))] }
           else
             tuple = [blob.original_filename, blob.data_io_object || StringIO.new('')]
             tuple << blob.url if blob.url
@@ -76,7 +74,13 @@ module Git
           git_version.mutable = version.version == version.versions.maximum(:version)
           git_version.save!
         end
+
         git_version
+      end
+    ensure
+      path_io_url_triples.each do |_, io, _|
+        next unless io.is_a?(File)
+        io.close unless io.closed?
       end
     end
 
