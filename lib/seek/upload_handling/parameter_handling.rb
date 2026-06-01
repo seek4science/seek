@@ -37,7 +37,7 @@ module Seek
       def missing_content_error(blob_param)
         if blob_param.include?(:data_url)
           'Please select a file to upload or provide a URL to the data.'
-        elsif blob_param.include?(:data)
+        else
           'Please select a file to upload.'
         end
       end
