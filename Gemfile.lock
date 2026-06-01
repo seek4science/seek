@@ -130,7 +130,7 @@ GEM
     acts-as-taggable-on (12.0.0)
       activerecord (>= 7.1, < 8.1)
       zeitwerk (>= 2.4, < 3.0)
-    addressable (2.8.10)
+    addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     aes_key_wrap (1.1.0)
     ansi (1.5.0)
@@ -474,8 +474,8 @@ GEM
       rubyntlm (~> 0.6, >= 0.6.3)
       webrick (~> 1.7)
       webrobots (~> 0.1.2)
-    metainspector (5.17.0)
-      addressable (~> 2.8.4)
+    metainspector (5.17.2)
+      addressable (~> 2.9.0)
       faraday (~> 2.5)
       faraday-cookie_jar (~> 0.0)
       faraday-encoding (~> 0.0)
@@ -622,7 +622,7 @@ GEM
     psych (5.2.6)
       date
       stringio
-    public_suffix (6.0.2)
+    public_suffix (7.0.5)
     puma (6.6.0)
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)
@@ -1187,7 +1187,6 @@ DEPENDENCIES
   terrapin
   terser
   test-prof
-  uuid
   validate_url
   vcr
   web-console

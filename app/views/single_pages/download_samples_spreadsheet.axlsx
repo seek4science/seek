@@ -2,7 +2,7 @@
 debug = Rails.env.development?
 #####################################
 
-secret_pwd = debug ? 'seek' : UUID.new.generate
+secret_pwd = debug ? 'seek' : SecureRandom.uuid
 
 xlsx_package = Axlsx::Package.new
 workbook = xlsx_package.workbook

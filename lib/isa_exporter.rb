@@ -70,12 +70,12 @@ module ISAExporter
       end
 
       study_comments.append({
-        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        '@id': "#study_comment/#{ [study_id, SecureRandom.uuid].join('_') }",
         'name': 'SEEK Study ID',
         'value': study_id.to_s
       })
       study_comments.append({
-        '@id': "#study_comment/#{ [study_id, UUID.new.generate].join('_') }",
+        '@id': "#study_comment/#{ [study_id, SecureRandom.uuid].join('_') }",
         'name': 'SEEK creation date',
         'value': study.created_at.utc.iso8601
       })
