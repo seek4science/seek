@@ -35,7 +35,8 @@ module Seek
 
         blob_params.each do |item_params|
           unless allow_empty_content_blob || check_for_data_or_url(item_params)
-            flash.now[:error] ||= missing_content_error(item_params) || 'Please select a file to upload or provide a URL to the data.'
+            flash.now[:error] ||= missing_content_error(item_params) ||
+                                  'Please select a file to upload or provide a URL to the data.'
             return false
           end
 
