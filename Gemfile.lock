@@ -1185,7 +1185,6 @@ DEPENDENCIES
   terrapin
   terser
   test-prof
-  uuid
   validate_url
   vcr
   web-console

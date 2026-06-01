@@ -377,7 +377,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                       content_blob: FactoryBot.create(:pdf_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.pdf',
-                                            uuid: UUID.generate))
+                                            uuid: SecureRandom.uuid))
     assert !pdf_sop.content_blob.file_exists?
     assert pdf_sop.content_blob.cachable?
 
@@ -405,7 +405,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                       content_blob: FactoryBot.create(:doc_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.doc',
-                                            uuid: UUID.generate))
+                                            uuid: SecureRandom.uuid))
     with_config_value(:hard_max_cachable_size, 10_000) do # Temporarily increase this, as the PDF is ~9kB
       get :get_pdf, params: { sop_id: doc_sop.id, id: doc_sop.content_blob.id }
     end
@@ -427,7 +427,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                   content_blob: FactoryBot.create(:doc_content_blob,
                                         data: nil,
                                         url: 'http://somewhere.com/piccy.doc',
-                                        uuid: UUID.generate))
+                                        uuid: SecureRandom.uuid))
     blob = sop.content_blob
     get :get_pdf, params: { sop_id: 999, id: blob.id }
     assert_redirected_to root_path
@@ -645,7 +645,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked302.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
     assert !df.content_blob.file_exists?
 
     get :download, params: { data_file_id: df, id: df.content_blob }
@@ -658,7 +658,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked401.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
     assert !df.content_blob.file_exists?
 
     get :download, params: { data_file_id: df, id: df.content_blob }
@@ -700,7 +700,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                       content_blob: FactoryBot.create(:doc_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.doc',
-                                            uuid: UUID.generate))
+                                            uuid: SecureRandom.uuid))
     get :download, params: { sop_id: doc_sop, id: doc_sop.content_blob }
     assert_response :success
 
@@ -722,7 +722,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mockedlocation.com/a-piccy.png',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
     assert_difference('ActivityLog.count') do
       get :download, params: { data_file_id: df, id: df.content_blob }
     end
@@ -735,7 +735,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://unknownhost.com/pic.png',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
 
     get :download, params: { data_file_id: df, id: df.content_blob }
 
@@ -749,7 +749,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked404.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
 
     get :download, params: { data_file_id: df, id: df.content_blob }
     assert_redirected_to data_file_path(df, version: df.version)
@@ -762,7 +762,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked500.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
 
     get :download, params: { data_file_id: df, id: df.content_blob }
     assert_redirected_to data_file_path(df, version: df.version)

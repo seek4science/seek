@@ -15,7 +15,7 @@
         </thead>
         <tbody>
         <% for new_sample in @new_samples %>
-          <% new_sample_id = UUID.generate %>
+          <% new_sample_id = SecureRandom.uuid %>
           <tr id='<%= "new-sample-#{new_sample_id}" %>'>
             <td>
               <button id=<%= "remove-#{new_sample_id}" %> class="btn glyphicon glyphicon-trash danger"

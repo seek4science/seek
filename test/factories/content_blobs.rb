@@ -2,13 +2,13 @@ FactoryBot.define do
   # ContentBlob
   # either url or data should be provided for assets
   factory(:content_blob) do
-    sequence(:uuid) { UUID.generate }
+    sequence(:uuid) { SecureRandom.uuid }
     sequence(:data) { |n| "data [#{n}]" }
     sequence(:original_filename) { |n| "file-#{n}" }
   end
   
   factory(:min_content_blob, class: ContentBlob) do
-    sequence(:uuid) { UUID.generate }
+    sequence(:uuid) { SecureRandom.uuid }
     data { 'Min Data' }
     original_filename { 'min file' }
     asset { FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:downloadable_public_policy)) }
