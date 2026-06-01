@@ -31,17 +31,14 @@ module Seek
       end
 
       def check_for_data_or_url(blob_param)
-        if blob_param[:data].blank? && blob_param[:data_url].blank? && blob_param[:base64_data].blank?
-          if blob_param.include?(:data_url)
-            flash.now[:error] = 'Please select a file to upload or provide a URL to the data.'
-          elsif blob_param.include?(:data_url)
-            flash.now[:error] = 'Please select a file to upload.'
-          else
-            # What to do?
-          end
-          false
-        else
-          true
+        blob_param[:data].present? || blob_param[:data_url].present? || blob_param[:base64_data].present?
+      end
+
+      def missing_content_error(blob_param)
+        if blob_param.include?(:data_url)
+          'Please select a file to upload or provide a URL to the data.'
+        elsif blob_param.include?(:data)
+          'Please select a file to upload.'
         end
       end
 
