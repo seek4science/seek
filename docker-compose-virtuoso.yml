@@ -34,7 +34,7 @@ services:
       # Optional: Enable mysql_native_password if needed for legacy apps
       # - --mysql-native-password=ON
       # Optional: restrict foreign keys if needed
-      # - --restrict_fk_on_non_standard_key=OFF
+      # - --restrict-fk-on-non-standard-key=OFF
     restart: always
     stop_grace_period: 1m30s
     env_file:
