@@ -56,8 +56,23 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
     assert_response :success
     assert_equal 200, assigns(:info)[:code]
+    assert assigns(:info)[:allow_copy]
+    refute assigns(:info)[:blocked_file_uploads]
     assert !@response.body.include?('Webpage Link')
     assert_equal 'file', assigns(:type)
+  end
+
+  test 'examine url to file blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      stub_request(:head, 'http://mockedlocation.com/a-piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
+      get :examine_url, xhr: true, params: { data_url: 'http://mockedlocation.com/a-piccy.png' }
+      assert_response :success
+      assert_equal 200, assigns(:info)[:code]
+      refute assigns(:info)[:allow_copy]
+      assert assigns(:info)[:blocked_file_uploads]
+      assert !@response.body.include?('Webpage Link')
+      assert_equal 'file', assigns(:type)
+    end
   end
 
   test 'examine url to webpage' do
@@ -66,6 +81,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :examine_url, xhr: true, params: { data_url: 'http://somewhere.com' }
     assert_response :success
     assert_equal 200, assigns(:info)[:code]
+    assert assigns(:info)[:allow_copy]
+    refute assigns(:info)[:blocked_file_uploads]
     assert @response.body.include?('Webpage Link')
     assert_equal 'webpage', assigns(:type)
   end
@@ -200,6 +217,15 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url bad uri' do
     # bad uri
     get :examine_url, xhr: true, params: { data_url: 'this is not a uri' }
+    assert_response 400
+    assert @response.body.include?('The URL appears to be invalid')
+    assert @response.body.include?('I understand the risks and want to override URL validation')
+    assert_equal 'override', assigns(:type)
+    assert assigns(:error_msg)
+  end
+
+  test 'examine url no host' do
+    get :examine_url, xhr: true, params: { data_url: 'http://' }
     assert_response 400
     assert @response.body.include?('The URL appears to be invalid')
     assert @response.body.include?('I understand the risks and want to override URL validation')
@@ -351,7 +377,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                       content_blob: FactoryBot.create(:pdf_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.pdf',
-                                            uuid: UUID.generate))
+                                            uuid: SecureRandom.uuid))
     assert !pdf_sop.content_blob.file_exists?
     assert pdf_sop.content_blob.cachable?
 
@@ -379,7 +405,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                       content_blob: FactoryBot.create(:doc_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.doc',
-                                            uuid: UUID.generate))
+                                            uuid: SecureRandom.uuid))
     with_config_value(:hard_max_cachable_size, 10_000) do # Temporarily increase this, as the PDF is ~9kB
       get :get_pdf, params: { sop_id: doc_sop.id, id: doc_sop.content_blob.id }
     end
@@ -401,7 +427,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                   content_blob: FactoryBot.create(:doc_content_blob,
                                         data: nil,
                                         url: 'http://somewhere.com/piccy.doc',
-                                        uuid: UUID.generate))
+                                        uuid: SecureRandom.uuid))
     blob = sop.content_blob
     get :get_pdf, params: { sop_id: 999, id: blob.id }
     assert_redirected_to root_path
@@ -431,7 +457,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
 
     download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, intent: :inline_view)
-    assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
+    assert @response.body.include?("PDFViewerApplicationOptions.set('defaultUrl', '#{download_path}')")
 
     al = ActivityLog.last
     assert_equal 'inline_view', al.action
@@ -619,7 +645,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked302.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
     assert !df.content_blob.file_exists?
 
     get :download, params: { data_file_id: df, id: df.content_blob }
@@ -632,7 +658,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked401.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
     assert !df.content_blob.file_exists?
 
     get :download, params: { data_file_id: df, id: df.content_blob }
@@ -674,7 +700,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                       content_blob: FactoryBot.create(:doc_content_blob,
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.doc',
-                                            uuid: UUID.generate))
+                                            uuid: SecureRandom.uuid))
     get :download, params: { sop_id: doc_sop, id: doc_sop.content_blob }
     assert_response :success
 
@@ -696,7 +722,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mockedlocation.com/a-piccy.png',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
     assert_difference('ActivityLog.count') do
       get :download, params: { data_file_id: df, id: df.content_blob }
     end
@@ -709,7 +735,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://unknownhost.com/pic.png',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
 
     get :download, params: { data_file_id: df, id: df.content_blob }
 
@@ -723,7 +749,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked404.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
 
     get :download, params: { data_file_id: df, id: df.content_blob }
     assert_redirected_to data_file_path(df, version: df.version)
@@ -736,7 +762,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                  policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                  content_blob: FactoryBot.create(:url_content_blob,
                                        url: 'http://mocked500.com',
-                                       uuid: UUID.generate)
+                                       uuid: SecureRandom.uuid)
 
     get :download, params: { data_file_id: df, id: df.content_blob }
     assert_redirected_to data_file_path(df, version: df.version)

@@ -4,7 +4,6 @@ require 'minitest/mock'
 class PublicationTest < ActiveSupport::TestCase
   include MockHelper
 
-
   test 'title validation allows long titles' do
     long_title = ('a' * 65536).freeze
     ok_title = ('a' * 65535).freeze
@@ -77,6 +76,77 @@ class PublicationTest < ActiveSupport::TestCase
       assert_nil publication.pubmed_id
       assert_nil publication.doi
       assert_equal Publication::REGISTRATION_BY_DOI, publication.registered_mode
+    end
+  end
+
+  test 'extract_doi_metadata sets publication_type from DOI API type' do
+    parsed_record = OpenStruct.new(
+      title: 'Test Publication', abstract: nil, journal: 'Nature',
+      date_published: nil, doi: '10.1234/test', citation: nil,
+      publisher: nil, booktitle: nil, editors: nil, type: 'journal-article'
+    )
+    publication = Publication.new
+    publication.extract_doi_metadata(parsed_record)
+    assert_not_nil publication.publication_type
+    assert publication.publication_type.journalarticle?
+  end
+
+
+
+  test 'extract_doi_metadata does not set publication_type when API type is blank' do
+    parsed_record = OpenStruct.new(
+      title: 'Test', abstract: nil, journal: nil, date_published: nil,
+      doi: '10.1234/test', citation: nil, publisher: nil,
+      booktitle: nil, editors: nil, type: nil
+    )
+    publication = Publication.new
+    publication.extract_doi_metadata(parsed_record)
+    assert_nil publication.publication_type
+  end
+
+  test 'extract_pubmed_metadata sets journalarticle type for Journal Article PT' do
+    reference = Bio::Reference.new('title' => 'Test', 'journal' => 'Nature', 'pubmed' => '12345')
+    publication = Publication.new
+    pub_types = ['Journal Article', "Research Support, Non-U.S. Gov't"]
+    publication.instance_variable_set(:@pubmed_publication_types, pub_types)
+    publication.extract_pubmed_metadata(reference)
+    assert_not_nil publication.publication_type
+    assert publication.publication_type.journalarticle?
+  end
+
+  test 'extract_pubmed_metadata sets preprint type for Preprint PT' do
+    reference = Bio::Reference.new('title' => 'Test Preprint', 'pubmed' => '99999')
+    publication = Publication.new
+    publication.instance_variable_set(:@pubmed_publication_types, ['Preprint'])
+    publication.extract_pubmed_metadata(reference)
+    assert_not_nil publication.publication_type
+    assert_equal 'preprint', publication.publication_type.key
+  end
+
+  test 'extract_pubmed_metadata falls back to journalarticle for unmapped PT values' do
+    reference = Bio::Reference.new('title' => 'Test', 'pubmed' => '11111')
+    publication = Publication.new
+    publication.instance_variable_set(:@pubmed_publication_types, ['Research Support, N.I.H., Extramural'])
+    publication.extract_pubmed_metadata(reference)
+    assert_not_nil publication.publication_type
+    assert publication.publication_type.journalarticle?
+  end
+
+  test 'extract_pubmed_metadata leaves publication_type nil when pub_types is empty' do
+    reference = Bio::Reference.new('title' => 'Test', 'pubmed' => '22222')
+    publication = Publication.new
+    publication.instance_variable_set(:@pubmed_publication_types, [])
+    publication.extract_pubmed_metadata(reference)
+    assert_nil publication.publication_type
+  end
+
+  test 'extract_metadata via mock pubmed sets journalarticle type' do
+    mock_pubmed(content_file: 'pubmed_21533085.txt')
+    with_config_value(:pubmed_api_email, 'test@seek.example.com') do
+      publication = Publication.new
+      publication.extract_metadata('21533085', nil)
+      assert_not_nil publication.publication_type
+      assert publication.publication_type.journalarticle?
     end
   end
 

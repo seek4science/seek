@@ -159,7 +159,7 @@ namespace :seek_dev do
 
   task(random_projects: :environment) do
     (0...50).to_a.each do
-      title = ('A'..'Z').to_a[rand(26)] + UUID.generate
+      title = ('A'..'Z').to_a[rand(26)] + SecureRandom.uuid
       p = Project.create title: title
       p.save!
     end
@@ -463,5 +463,11 @@ namespace :seek_dev do
     filename = Rails.root.join('config', 'default_data', 'controlled-vocabs', 'openalex_fields.json')
     File.write(filename, JSON.pretty_generate(domains))
     puts "Written to: #{filename}"
+  end
+
+  desc 'Fetch SPDX licenses from GitHub'
+  task fetch_spdx: :environment do
+    url = 'https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json'
+    IO.copy_stream(URI.open(url), File.join(Rails.root, 'public', 'spdx_licenses.json'))
   end
 end

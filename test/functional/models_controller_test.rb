@@ -48,7 +48,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "attachment; filename=\"this_model.zip\"; filename*=UTF-8''this_model.zip", @response.header['Content-Disposition']
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '3024', @response.header['Content-Length']
+    assert_equal '3104', @response.header['Content-Length']
   end
 
   test 'should download model with a single file' do
@@ -68,7 +68,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '3024', @response.header['Content-Length']
+    assert_equal '3104', @response.header['Content-Length']
     zip_file_size1 = @response.header['Content-Length'].to_i
 
     # 3 files, 2 of them have the same name
@@ -80,7 +80,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '4023', @response.header['Content-Length']
+    assert_equal '4143', @response.header['Content-Length']
     zip_file_size2 = @response.header['Content-Length'].to_i
 
     # the same name file is not overwriten, by checking the zip file size
@@ -272,7 +272,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
 
     get :show, params: { id: model }
@@ -362,9 +362,31 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
+        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }],
+                                policy_attributes: valid_sharing,
+                                model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
+      end
+    end
+
+    model = assigns(:model)
+    assert_equal 'file_picture.png', model.model_image.original_filename
+    assert_equal 'image/png', model.model_image.content_type
+  end
+
+  test 'should create model with image even with blocked file uploads' do
+    stub_request(:head, 'http://somehwere/model.sbml').to_return(status: 200, headers: { 'Content-Type' => 'text/xml' })
+    with_config_value(:block_file_uploads, true) do
+      login_as(:model_owner)
+      assert_difference('Model.count') do
+        assert_difference('ModelImage.count') do
+          post :create, params: { model: valid_model, content_blobs: [{ data_url: 'http://somehwere/model.sbml' }],
+                                  policy_attributes: valid_sharing,
+                                  model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
+
+          assert_redirected_to model_path(assigns(:model))
+        end
       end
     end
 

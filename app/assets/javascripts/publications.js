@@ -50,6 +50,12 @@ function transferProjectIds() {
 }
 
 
+function setPubTypeInCreateTab(key) {
+    if (key && typeof SEEK_PUB_TYPE_KEY_TO_ID !== 'undefined' && SEEK_PUB_TYPE_KEY_TO_ID[key]) {
+        $j('#Create #publication_publication_type_id').val(SEEK_PUB_TYPE_KEY_TO_ID[key]);
+    }
+}
+
 function retrieveFromCrossref(e) {
     e.preventDefault(); // prevent the default form submit action
 
@@ -98,6 +104,9 @@ function retrieveFromCrossref(e) {
 
             $j('#publication_citation').val(citation);
             populateAuthors($j('#publication_publication_authors'), data.author);
+
+            // Auto-fill publication type
+            setPubTypeInCreateTab(CROSSREF_TYPE_TO_PUB_KEY[data.type]);
         },
         statusCode: {
             204: function() { console.log("DOI: " + doi + " The request was OK but there was no metadata available."); },
@@ -191,6 +200,9 @@ function retrieveFromPubmed(e) {
 
             var select = $j('#publication_publication_authors');
             populateAuthors(select, authors);
+
+            // PubMed results are always journal articles
+            setPubTypeInCreateTab('journalarticle');
         },
         error: function() {
             $j('#publication_pubmed_id').parents('.form-group').removeClass('has-success');
