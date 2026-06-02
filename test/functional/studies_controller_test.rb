@@ -2424,6 +2424,43 @@ class StudiesControllerTest < ActionController::TestCase
     assert_redirected_to studies_path
   end
 
+  test 'batch_create with missing MIAPPE fields and data files specified does not raise' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    # omit mandatory MIAPPE fields so the study fails compliance and is not saved,
+    # leaving no ExtendedMetadata row for create_batch_assay_asset to look up
+    params = {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: [''],
+        description: [''],
+        id: ['MISSING-001'],
+        startDate: [''],
+        endDate: [''],
+        contactInstitution: [''],
+        geographicLocationCountry: [''],
+        experimentalSiteName: [''],
+        latitude: [''], longitude: [''], altitude: [''],
+        descriptionOfTheExperimentalDesign: [''],
+        typeOfExperimentalDesign: [''],
+        observationUnitLevelHierarchy: [''],
+        observationUnitDescription: [''],
+        descriptionOfGrowthFacility: [''],
+        typeOfGrowthFacility: [''],
+        culturalPractices: [''],
+        data_files: ['some_data_file'],
+        data_file_description: [''],
+        license: ['CC-BY-4.0']
+      }
+    }
+    assert_no_difference('Study.count') do
+      post :batch_create, params: params
+    end
+    assert_redirected_to batch_uploader_studies_path
+    assert flash[:error].present?
+  end
+
   private
 
   def batch_create_study_params(investigation)
