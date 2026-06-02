@@ -255,7 +255,7 @@ class StudiesController < ApplicationController
     data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
     license = params[:studies][:license]
     study_metadata_id = params[:studies][:id][index]
-    data_file_path = StudyBatchUpload.upload_directory.join('data')
+    data_file_path = StudyBatchUpload.data_directory
 
     data_file_names.each_with_index do |file_name, data_file_index|
       extended_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last
@@ -314,6 +314,7 @@ class StudiesController < ApplicationController
   end
 
   def datafile_name_with_extension(file_name, path)
+    return nil unless File.directory?(path)
     files = Dir.entries(path)
     files.each do |file|
       if File.basename(file, '.*') == file_name

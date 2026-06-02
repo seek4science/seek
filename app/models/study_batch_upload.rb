@@ -34,12 +34,13 @@ class StudyBatchUpload < ApplicationRecord
     study_start_row_index = 4
     parsed_sheet.each_record(3, columns) do |index, data|
       if index > study_start_row_index
+        col = data.each_with_object({}) { |d, h| h[d.column] = d.value }
         studies << Study.new(
-            title: data[1].value,
-            description: data[2].value,
+            title: col[3] || '',
+            description: col[4] || '',
             extended_metadata: ExtendedMetadata.new(
                 extended_metadata_type: metadata_type,
-                data: generate_metadata(data)
+                data: generate_metadata(col)
             )
         )
       end
@@ -47,26 +48,25 @@ class StudyBatchUpload < ApplicationRecord
     studies
   end
 
-  def self.generate_metadata(data)
-    metadata = {
-        id: data[0].value,
-        study_start_date: validate_date(data[3].value) ? data[3].value : '',
-        study_end_date: validate_date(data[4].value) ? data[4].value : '',
-        contact_institution: data[5].value,
-        geographic_location_country: data[6].value,
-        experimental_site_name: data[7].value,
-        latitude: data[8].value,
-        longitude: data[9].value,
-        altitude: data[10].value,
-        description_of_the_experimental_design: data[11].value,
-        type_of_experimental_design: data[12].value,
-        observation_unit_level_hierarchy: data[13].value,
-        observation_unit_description: data[14].value,
-        description_of_growth_facility: data[15].value,
-        type_of_growth_facility: data[16].value,
-        cultural_practices: data[17].value
+  def self.generate_metadata(col)
+    {
+      id: col[2] || '',
+      study_start_date: validate_date(col[5]) ? col[5] : '',
+      study_end_date: validate_date(col[6]) ? col[6] : '',
+      contact_institution: col[7] || '',
+      geographic_location_country: col[8] || '',
+      experimental_site_name: col[9] || '',
+      latitude: col[10] || '',
+      longitude: col[11] || '',
+      altitude: col[12] || '',
+      description_of_the_experimental_design: col[13] || '',
+      type_of_experimental_design: col[14] || '',
+      observation_unit_level_hierarchy: col[15] || '',
+      observation_unit_description: col[16] || '',
+      description_of_growth_facility: col[17] || '',
+      type_of_growth_facility: col[18] || '',
+      cultural_practices: col[19] || ''
     }
-    metadata
   end
 
 
@@ -91,7 +91,7 @@ class StudyBatchUpload < ApplicationRecord
     study_data = []
     studies = []
     Seek::Util.unzip(file_path, dir) do |entry|
-      if entry.name.start_with?('data/')
+      if entry.name.split('/').include?('data')
         study_data << dir.join(entry.name)
       else
         studies << dir.join(entry.name)
@@ -152,6 +152,11 @@ class StudyBatchUpload < ApplicationRecord
   def self.upload_directory(user = User.current_user)
     user_uuid = user ? user.uuid : 'user_uuid'
     Rails.root.join('tmp', "#{user_uuid}_studies_upload")
+  end
+
+  def self.data_directory(user = User.current_user)
+    base = upload_directory(user)
+    Pathname.glob(base.join('**', 'data')).find(&:directory?) || base.join('data')
   end
 
   def self.cleanup_stale_upload_directories(max_age: 24.hours)
