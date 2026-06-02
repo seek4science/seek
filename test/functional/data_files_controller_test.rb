@@ -710,7 +710,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :download, params: { id: data_files(:url_based_data_file) }
     end
-    assert_not_empty @response.body
+    assert_equal File.size("#{Rails.root}/test/fixtures/files/file_picture.png"), @response.body.to_a.join.bytesize
     assert_response :success
   end
 
