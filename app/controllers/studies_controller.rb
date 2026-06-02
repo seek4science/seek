@@ -224,8 +224,8 @@ class StudiesController < ApplicationController
         )
       }
       @study = Study.new(study_params)
-      StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
-      if @study.valid? && @study.save! && @study.extended_metadata.valid?
+      missing_fields = StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
+      if missing_fields.empty? && @study.valid? && @study.save! && @study.extended_metadata.valid?
         studies_uploaded = true if @study.save
       end
       data_file_uploaded = create_batch_assay_asset(params, index)
