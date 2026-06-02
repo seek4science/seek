@@ -2354,4 +2354,104 @@ class StudiesControllerTest < ActionController::TestCase
     get :show, params: { id: study.id, code: 'invalid_code' }
     assert_response :forbidden
   end
+
+  # batch MIAPPE upload tests
+
+  test 'batch_uploader renders when miappe type exists' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    get :batch_uploader
+    assert_response :success
+    assert_select 'form'
+  end
+
+  test 'batch_uploader renders unavailable message when miappe type does not exist' do
+    get :batch_uploader
+    assert_response :success
+    assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+  end
+
+  test 'batch_uploader renders unavailable when file uploads blocked' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    with_config_value(:block_file_uploads, true) do
+      get :batch_uploader
+      assert_response :success
+      assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+    end
+  end
+
+  test 'preview_content without file shows error' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    post :preview_content, params: { content_blobs: [{}] }
+    assert_response :success
+    assert_template 'studies/batch_uploader'
+    assert_equal 'Please select a file to upload or provide a URL to the data.', flash.now[:error]
+  end
+
+  test 'preview_content with valid zip shows preview' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
+    post :preview_content, params: { content_blobs: [{ data: zip_file }] }
+    assert_response :success
+    assert_template 'studies/batch_preview'
+    assert_equal 3, assigns(:studies).count
+
+    # three study rows in the table
+    assert_select 'tbody tr', count: 3
+
+    # each MIAPPE study ID appears as a readonly input
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-F"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-I"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-UK"]'
+
+    # study title populated in each title textarea
+    assert_select 'textarea[name="studies[title][]"]', count: 3,
+                  text: 'Clonal test of mapping pedigree 0504B in nursery'
+
+    # form submits to batch_create
+    assert_select "form[action='#{batch_create_studies_path}']"
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
+  test 'batch_create creates studies' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    study_params = batch_create_study_params(investigation)
+    assert_difference('Study.count', 1) do
+      post :batch_create, params: study_params
+    end
+    assert_redirected_to studies_path
+  end
+
+  private
+
+  def batch_create_study_params(investigation)
+    {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: ['Test MIAPPE Study'],
+        description: ['A test description'],
+        id: ['TEST-001'],
+        startDate: ['2023-01-01'],
+        endDate: ['2023-12-31'],
+        contactInstitution: ['Test Institute'],
+        geographicLocationCountry: ['Germany'],
+        experimentalSiteName: ['Test Site'],
+        latitude: ['51.5'],
+        longitude: ['9.9'],
+        altitude: ['100'],
+        descriptionOfTheExperimentalDesign: ['Randomised block design'],
+        typeOfExperimentalDesign: ['CO_715:0000145'],
+        observationUnitLevelHierarchy: ['block>plot'],
+        observationUnitDescription: ['Block of 30 plots'],
+        descriptionOfGrowthFacility: ['Open field'],
+        typeOfGrowthFacility: ['CO_715:0000162'],
+        culturalPractices: ['Irrigation'],
+        data_files: [''],
+        data_file_description: [''],
+        license: ['CC-BY-4.0']
+      }
+    }
+  end
 end

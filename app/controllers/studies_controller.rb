@@ -180,7 +180,7 @@ class StudiesController < ApplicationController
                   'user_uuid'
                 end
 
-    unless params[:content_blobs][0][:data].nil?
+    if params.dig(:content_blobs, 0, :data).present?
       tempzip_path = params[:content_blobs][0][:data].tempfile.path
       data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path)
       study_path = studies.first
@@ -237,7 +237,7 @@ class StudiesController < ApplicationController
       unless params[:existing_studies].blank?
         remove_existing_studies(params[:existing_studies])
       end
-      FileUtils.rm_r(StudyBatchUpload.upload_directory(User.current_user))
+      FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
       respond_to do |format|
         flash[:notice] = "The #{t('study').pluralize} were successfully created.<br/>".html_safe
         format.html { redirect_to studies_path }
