@@ -131,6 +131,21 @@ test 'Files SHOULD contain valid UTF-8 content' do
 end
 ```
 
+### 3.6 `AttributionsTest#test_should_remove_attribution_on_update` — empty attributions array lost in params (`test/functional/attributions_test.rb`)
+
+**Root cause:** The test passed `attributions: []` (a Ruby empty array) to the `put :update` action. Before the `scrub_env!` monkey-patch (fix 3.1), this accidentally worked: the preceding multipart POST left `CONTENT_TYPE: multipart/form-data` in the env; `assign_parameters` detected this unrecognised MIME type, fell through to its `else` branch, and registered a custom param parser that passed the raw Ruby hash to the controller — preserving the `[]`. After the monkey-patch deleted `CONTENT_TYPE`, `assign_parameters` defaulted to `application/x-www-form-urlencoded` and called `to_query` on the params; `{ attributions: [] }.to_query` produces `""`, so `params[:attributions]` became `nil`. `Relationship.set_attributions` has an explicit `unless attributions_from_params.nil?` guard (to avoid accidentally deleting all attributions on incomplete requests), so it silently skipped the deletion.
+
+**Fix:** Changed the test to encode the empty array as a JSON string, consistent with how all other tests in the file pass attribution params and with how the browser actually sends them:
+
+```ruby
+# before
+attributions: []
+# after
+attributions: ActiveSupport::JSON.encode([])
+```
+
+`"[]"` survives URL encoding (`attributions=%5B%5D`), decodes back to `"[]"`, and `set_attributions` correctly parses it via `ActiveSupport::JSON.decode`.
+
 ---
 
 ## 4. Outstanding / Known Issues
