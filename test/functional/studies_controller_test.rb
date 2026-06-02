@@ -2424,6 +2424,51 @@ class StudiesControllerTest < ActionController::TestCase
     assert_redirected_to studies_path
   end
 
+  test 'batch_create with existing_studies destroys old study and its dependents' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    old_study = FactoryBot.create(:study, investigation: investigation, contributor: person)
+    old_assay = FactoryBot.create(:assay, study: old_study, contributor: person)
+    old_assay_asset = FactoryBot.create(:assay_asset, assay: old_assay)
+
+    existing_study_json = { id: old_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: old_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    assert_difference('Study.count', 0) do  # one created, one destroyed
+      post :batch_create, params: params
+    end
+    assert_redirected_to studies_path
+
+    refute Study.exists?(old_study.id), 'old study should be destroyed'
+    refute Assay.exists?(old_assay.id), 'old assay should be destroyed'
+    refute AssayAsset.exists?(old_assay_asset.id), 'old assay_asset should be destroyed'
+  end
+
+  test 'batch_create with existing_studies does not destroy a study the user cannot manage' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    other_person = FactoryBot.create(:person)
+    other_investigation = FactoryBot.create(:investigation, contributor: other_person)
+    other_study = FactoryBot.create(:study, investigation: other_investigation,
+                                    contributor: other_person,
+                                    policy: FactoryBot.create(:private_policy))
+
+    existing_study_json = { id: other_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: other_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    post :batch_create, params: params
+
+    assert Study.exists?(other_study.id), 'unauthorized study should not be destroyed'
+    assert flash[:error].present?
+  end
+
   test 'batch_create assigns data files to the investigation projects' do
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     person = User.current_user.person
