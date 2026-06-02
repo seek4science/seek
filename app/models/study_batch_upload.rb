@@ -123,7 +123,6 @@ class StudyBatchUpload < ApplicationRecord
   end
 
   def self.get_license_id(studies_file)
-
     default_license = 'CC-BY-SA-4.0'
     investigation_license_id = nil
     license_row_index = 7
@@ -132,18 +131,8 @@ class StudyBatchUpload < ApplicationRecord
     parsed_sheet.each_record(2, columns) do |index, data|
       investigation_license_id = data[0].value if index == license_row_index
     end
-    licenses_ids = JSON.parse(File.read(File.join(Rails.root, 'public', 'od_licenses.json'))).keys
-
-    licenses_ids.each do |license_id|
-      if normalize_license_id(license_id) == normalize_license_id(investigation_license_id)
-        return license_id
-      end
-    end
-    default_license
-  end
-
-  def self.normalize_license_id(license_id)
-    license_id.remove('-').remove('_').remove('.').remove(' ').upcase
+    normalized_input = investigation_license_id&.gsub(/[-_.\s]/, '')&.upcase
+    Seek::License.combined.keys.find { |id| id.gsub(/[-_.\s]/, '').upcase == normalized_input } || default_license
   end
 
   def self.check_study_is_MIAPPE_compliant(study, metadata)
