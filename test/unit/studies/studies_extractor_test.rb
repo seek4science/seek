@@ -153,5 +153,40 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     assert_includes missing, 'id'
   end
 
+  test 'cleanup_stale_upload_directories removes directories older than max_age' do
+    stale_dir = Rails.root.join('tmp', 'stale-uuid_studies_upload')
+    FileUtils.mkdir_p(stale_dir)
+    FileUtils.touch(stale_dir, mtime: 25.hours.ago.to_time)
+
+    StudyBatchUpload.cleanup_stale_upload_directories(max_age: 24.hours)
+
+    refute Dir.exist?(stale_dir), 'stale directory should have been removed'
+  ensure
+    FileUtils.rm_rf(stale_dir)
+  end
+
+  test 'cleanup_stale_upload_directories leaves recent directories alone' do
+    recent_dir = Rails.root.join('tmp', 'recent-uuid_studies_upload')
+    FileUtils.mkdir_p(recent_dir)
+
+    StudyBatchUpload.cleanup_stale_upload_directories(max_age: 24.hours)
+
+    assert Dir.exist?(recent_dir), 'recent directory should not have been removed'
+  ensure
+    FileUtils.rm_rf(recent_dir)
+  end
+
+  test 'unzip_batch sweeps stale directories before extracting' do
+    stale_dir = Rails.root.join('tmp', 'stale-uuid_studies_upload')
+    FileUtils.mkdir_p(stale_dir)
+    FileUtils.touch(stale_dir, mtime: 25.hours.ago.to_time)
+
+    StudyBatchUpload.unzip_batch(@zip_file)
+
+    refute Dir.exist?(stale_dir), 'unzip_batch should have swept stale directory'
+  ensure
+    FileUtils.rm_rf(stale_dir)
+  end
+
 
 end
