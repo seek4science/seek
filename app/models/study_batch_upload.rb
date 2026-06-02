@@ -71,6 +71,8 @@ class StudyBatchUpload < ApplicationRecord
 
 
   def self.validate_date(date)
+    return false if date.nil?
+
     format_ok = date.match(/\d{4}-\d{2}-\d{2}/)
     parseable = Date.strptime(date, '%Y-%m-%d') rescue false
 

@@ -244,7 +244,8 @@ class StudiesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render action: 'batch_preview', status: :unprocessable_entity }
+        flash[:error] = "Some #{t('study').pluralize} could not be created. Please check the data and try again."
+        format.html { redirect_to batch_uploader_studies_path }
       end
     end
   end
@@ -255,7 +256,9 @@ class StudiesController < ApplicationController
     data_file_names.length.times do |data_file_index|
 
       study_metadata_id = params[:studies][:id][index]
-      study_id = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
+      extended_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last
+      next unless extended_metadata
+      study_id = extended_metadata.item_id
       assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
       data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
       assay_params = {

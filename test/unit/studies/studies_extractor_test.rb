@@ -75,6 +75,14 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   end
 
+  test 'validate_date returns false for nil without raising' do
+    assert_equal false, StudyBatchUpload.validate_date(nil)
+  end
+
+  test 'validate_date returns false for empty string' do
+    assert_equal false, StudyBatchUpload.validate_date('')
+  end
+
 
   test 'get right licence from file' do
     user_uuid = 'user_uuid'
