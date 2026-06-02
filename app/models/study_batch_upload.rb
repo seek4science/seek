@@ -84,6 +84,7 @@ class StudyBatchUpload < ApplicationRecord
   end
 
   def self.unzip_batch(file_path, user = User.current_user)
+    cleanup_stale_upload_directories
     dir = upload_directory(user)
     FileUtils.rm_r(dir) if dir.exist?
     dir.mkdir
@@ -162,6 +163,12 @@ class StudyBatchUpload < ApplicationRecord
   def self.upload_directory(user = User.current_user)
     user_uuid = user ? user.uuid : 'user_uuid'
     Rails.root.join('tmp', "#{user_uuid}_studies_upload")
+  end
+
+  def self.cleanup_stale_upload_directories(max_age: 24.hours)
+    Dir.glob(Rails.root.join('tmp', '*_studies_upload')).each do |dir|
+      FileUtils.rm_rf(dir) if File.mtime(dir) < max_age.ago
+    end
   end
 
 end
