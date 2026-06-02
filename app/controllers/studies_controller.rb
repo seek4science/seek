@@ -330,12 +330,14 @@ class StudiesController < ApplicationController
     JSON.parse(studies.to_json).each do |study_json|
       study = Study.find_by(id: JSON.parse(study_json)['id'])
       next unless study
-      unless study.can_manage?
-        flash[:error] = "Not authorized to replace #{t('study')} '#{study.title}'"
+      unless study.authorized_for_delete? && study.assays.all?(&:authorized_for_delete?)
+        flash[:error] ||= "Not authorized to replace #{t('study')} '#{study.title}'"
         next
       end
-      AssayAsset.where(assay_id: study.assay_ids).destroy_all
-      study.assays.each { |assay| assay.reload.destroy }
+      # destroy_authorized? is the first before_destroy callback (registered in ApplicationRecord),
+      # so state_allows_delete? fires before the has_many dependent: :destroy cascade can clear
+      # assay_assets. Assets must be removed first so the state check passes.
+      study.assays.each { |assay| assay.assay_assets.destroy_all; assay.destroy }
       study.reload.destroy
     end
   end
