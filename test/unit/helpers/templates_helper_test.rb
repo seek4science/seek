@@ -21,6 +21,26 @@ class TemplatesHelperTest < ActionView::TestCase
         assert_equal @template.template_attributes.length, test_template[:attributes].length
     end
 
+    test 'should not load the Minimal ISA templates when applying to a Sample Type' do
+      %i[
+      isa_source_template
+      isa_sample_collection_template
+      isa_assay_material_template
+      isa_assay_data_file_template
+      ].each do |t|
+        FactoryBot.create(t, group: "ISA minimal starter",
+                          policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE ))
+      end
+
+      templates_for_sample_types = load_templates(true)
+      assert_equal templates_for_sample_types.length, 1
+      assert_equal Template.count, 5
+      assert templates_for_sample_types.none? { |t| t[:group] == "ISA minimal starter" }
+
+      templates_for_templates = load_templates
+      assert_equal templates_for_templates.length, Template.count
+    end
+
     test 'should not show private templates' do
         assert_equal Template.all.length, load_templates.length
         FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS ))
