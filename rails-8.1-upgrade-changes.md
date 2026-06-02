@@ -150,4 +150,4 @@ attributions: ActiveSupport::JSON.encode([])
 
 ## 4. Outstanding / Known Issues
 
-- The `scrub_env!` monkey-patch in `test/test_helper.rb` is a workaround for a Rails bug not yet fixed upstream as of 8.1.3. It should be reviewed and removed if/when Rails fixes `scrub_env!` to also clear `CONTENT_TYPE`.
+- The `scrub_env!` monkey-patch in `test/test_helper.rb` is a workaround for a confirmed Rails bug ([rails/rails#54582](https://github.com/rails/rails/issues/54582)) not yet fixed upstream as of 8.1.3. It should be reviewed and removed if/when Rails fixes `scrub_env!` to also clear `CONTENT_TYPE`.

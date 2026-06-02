@@ -117,7 +117,7 @@ end
 # Rails 8.1: scrub_env! doesn't clear CONTENT_TYPE between requests, so a multipart
 # POST's Content-Type bleeds into subsequent GET requests, causing Rack's multipart
 # parser to raise EOFError on the empty body. Delete CONTENT_TYPE so each request
-# sets it fresh.
+# sets it fresh. Upstream bug: https://github.com/rails/rails/issues/54582
 module ActionController
   class TestCase
     module Behavior
