@@ -95,7 +95,12 @@ var AuthorForm = {
         } else if (creator.orcid) {
             return creator.orcid;
         } else if (creator.given_name && creator.family_name) {
-            return creator.given_name + ' ' + creator.family_name;
+            let base = creator.given_name + ' ' + creator.family_name;
+            if (creator.affiliation) {
+                base += ` @ ${creator.affiliation}`;
+            }
+
+            return base;
         } else {
             return null;
         }
