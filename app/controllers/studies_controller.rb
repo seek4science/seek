@@ -333,20 +333,16 @@ class StudiesController < ApplicationController
   end
 
   def remove_existing_studies(studies)
-
-    existing_studies = JSON.parse(studies.to_json)
-
-    existing_studies.each do |study|
-      study_id = JSON.parse(study.gsub("=>",":"))["id"].to_i
-      metadata_id = JSON.parse(study.gsub("=>",":"))["metadata_id"].to_i
-
-      Study.where(id: study_id).delete_all
-      ExtendedMetadata.where(id: metadata_id).delete_all
-      assays = Assay.where(study_id: study_id)
-      assays.each do |assay|
-        AssayAsset.where(assay_id: assay.id).delete_all
+    JSON.parse(studies.to_json).each do |study_json|
+      study = Study.find_by(id: JSON.parse(study_json)['id'])
+      next unless study
+      unless study.can_manage?
+        flash[:error] = "Not authorized to replace #{t('study')} '#{study.title}'"
+        next
       end
-      assays.delete_all
+      AssayAsset.where(assay_id: study.assay_ids).destroy_all
+      study.assays.each { |assay| assay.reload.destroy }
+      study.reload.destroy
     end
   end
 
