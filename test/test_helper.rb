@@ -114,10 +114,12 @@ Kernel.class_eval do
   end
 end
 
-# Rails 8.1: scrub_env! doesn't clear CONTENT_TYPE between requests, so a multipart
-# POST's Content-Type bleeds into subsequent GET requests, causing Rack's multipart
-# parser to raise EOFError on the empty body. Delete CONTENT_TYPE so each request
-# sets it fresh. Upstream bug: https://github.com/rails/rails/issues/54582
+# Workaround: Rails won't fix scrub_env! to clear CONTENT_TYPE between requests
+# (https://github.com/rails/rails/issues/54582 — marked won't fix; the Rails team
+# considers multiple actions per controller test unsupported). A multipart POST's
+# Content-Type otherwise bleeds into subsequent requests, causing Rack's multipart
+# parser to raise EOFError on the empty body of a following GET.
+# TODO: remove this patch and refactor affected tests to use only one action each.
 module ActionController
   class TestCase
     module Behavior

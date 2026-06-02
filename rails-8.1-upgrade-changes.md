@@ -150,4 +150,8 @@ attributions: ActiveSupport::JSON.encode([])
 
 ## 4. Outstanding / Known Issues
 
-- The `scrub_env!` monkey-patch in `test/test_helper.rb` is a workaround for a confirmed Rails bug ([rails/rails#54582](https://github.com/rails/rails/issues/54582)) not yet fixed upstream as of 8.1.3. It should be reviewed and removed if/when Rails fixes `scrub_env!` to also clear `CONTENT_TYPE`.
+### 4.1 `scrub_env!` monkey-patch needs follow-up test refactoring
+
+The `scrub_env!` monkey-patch in `test/test_helper.rb` is a temporary workaround for [rails/rails#54582](https://github.com/rails/rails/issues/54582). The Rails team has marked this **won't fix**, stating that making multiple action calls within a single `ActionController::TestCase` test is unsupported behaviour. The correct approach is for each test to exercise only one controller action.
+
+The affected tests (those that do a multipart POST followed by a GET or other request in the same test method) need to be refactored: the setup state should be created directly (e.g. via `FactoryBot`) rather than by calling `post :create` as part of the test. The monkey-patch and this TODO should be removed once that refactoring is done.
