@@ -152,12 +152,12 @@ class StudyBatchUpload < ApplicationRecord
     missing_fields = []
 
     mandatory_fields.each do |mandatory_f|
-
       if study.attributes[mandatory_f].blank? && metadata[mandatory_f.to_sym].blank?
         missing_fields << mandatory_f
       end
     end
 
+    missing_fields
   end
 
   def self.upload_directory(user = User.current_user)

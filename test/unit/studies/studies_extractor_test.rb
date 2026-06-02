@@ -99,5 +99,51 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     assert_equal normalize_output, 'HEREISMYTESTSTRING'
   end
 
+  test 'check_study_is_MIAPPE_compliant returns empty list when all mandatory fields are present' do
+    study = Study.new(title: 'My study')
+    metadata = {
+      id: 'TEST-001',
+      study_start_date: '2023-01-01',
+      contact_institution: 'Test Institute',
+      geographic_location_country: 'Germany',
+      experimental_site_name: 'Test Site',
+      description_of_the_experimental_design: 'Randomised block design',
+      observation_unit_description: 'Block of 30 plots',
+      description_of_growth_facility: 'Open field'
+    }
+    assert_empty StudyBatchUpload.check_study_is_MIAPPE_compliant(study, metadata)
+  end
+
+  test 'check_study_is_MIAPPE_compliant returns all mandatory fields when both study and metadata are empty' do
+    study = Study.new
+    missing = StudyBatchUpload.check_study_is_MIAPPE_compliant(study, {})
+    assert_includes missing, 'id'
+    assert_includes missing, 'title'
+    assert_includes missing, 'study_start_date'
+    assert_includes missing, 'contact_institution'
+    assert_includes missing, 'geographic_location_country'
+    assert_includes missing, 'experimental_site_name'
+    assert_includes missing, 'description_of_the_experimental_design'
+    assert_includes missing, 'observation_unit_description'
+    assert_includes missing, 'description_of_growth_facility'
+  end
+
+  test 'check_study_is_MIAPPE_compliant field present in metadata is not reported missing' do
+    study = Study.new
+    metadata = { id: 'TEST-001', study_start_date: '2023-01-01' }
+    missing = StudyBatchUpload.check_study_is_MIAPPE_compliant(study, metadata)
+    refute_includes missing, 'id'
+    refute_includes missing, 'study_start_date'
+    assert_includes missing, 'title'
+    assert_includes missing, 'contact_institution'
+  end
+
+  test 'check_study_is_MIAPPE_compliant field present on study is not reported missing' do
+    study = Study.new(title: 'My study')
+    missing = StudyBatchUpload.check_study_is_MIAPPE_compliant(study, {})
+    refute_includes missing, 'title'
+    assert_includes missing, 'id'
+  end
+
 
 end
