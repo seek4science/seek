@@ -174,12 +174,6 @@ class StudiesController < ApplicationController
   def batch_uploader; end
 
   def preview_content
-    user_uuid = if User.current_user
-                  User.current_user.attributes['uuid'].to_s
-                else
-                  'user_uuid'
-                end
-
     if params.dig(:content_blobs, 0, :data).present?
       tempzip_path = params[:content_blobs][0][:data].tempfile.path
       data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path)
