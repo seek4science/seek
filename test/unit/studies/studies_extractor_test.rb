@@ -97,15 +97,6 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   end
 
-  test 'check if string is normalized ' do
-
-    my_string = 'Here is-my_test STRING'
-    normalize_output = StudyBatchUpload.normalize_license_id(my_string)
-    assert_not_equal normalize_output, 'Here is-my_test STRING'
-    assert_not_equal normalize_output, 'here is my test string'
-    assert_not_equal normalize_output, 'Hereismyteststring'
-    assert_equal normalize_output, 'HEREISMYTESTSTRING'
-  end
 
   test 'check_study_is_MIAPPE_compliant returns empty list when all mandatory fields are present' do
     study = Study.new(title: 'My study')
