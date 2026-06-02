@@ -251,51 +251,50 @@ class StudiesController < ApplicationController
   end
 
   def create_batch_assay_asset(params, index)
-    @assay_assets = []
-    data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
-    data_file_names.length.times do |data_file_index|
+    investigation = Investigation.find_by(id: params[:study][:investigation_id])
+    return unless investigation
 
-      study_metadata_id = params[:studies][:id][index]
+    assay_class = AssayClass.where(title: 'Experimental assay').first
+    return unless assay_class
+
+    data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
+    data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
+    license = params[:studies][:license]
+    study_metadata_id = params[:studies][:id][index]
+    data_file_path = StudyBatchUpload.upload_directory.join('data')
+
+    data_file_names.each_with_index do |file_name, data_file_index|
       extended_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last
       next unless extended_metadata
-      study_id = extended_metadata.item_id
-      assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
-      data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
-      assay_params = {
-        title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index + 1).to_s,
-          description: data_file_description[data_file_index],
-          study_id: study_id,
-          assay_class_id: assay_class_id
-      }
 
-
-      data_file_path = StudyBatchUpload.upload_directory.join('data')
-      data_file_name = datafile_name_with_extension("#{data_file_names[data_file_index]}", data_file_path)
+      data_file_name = datafile_name_with_extension(file_name.to_s, data_file_path)
       next unless data_file_name
-      data_file_location = data_file_path.join(data_file_name)
+
+      assay = Assay.new(
+        title: "Assay for #{study_metadata_id}-#{data_file_index + 1}",
+        description: data_file_description[data_file_index],
+        study_id: extended_metadata.item_id,
+        assay_class: assay_class
+      )
+      next unless assay.save
+
       data_file_content_blob = ContentBlob.new
-      data_file_content_blob.tmp_io_object = File.open(data_file_location)
+      data_file_content_blob.tmp_io_object = File.open(data_file_path.join(data_file_name))
       data_file_content_blob.original_filename = File.basename(data_file_name)
 
-      license = params[:studies][:license]
-      data_file_params = {
-        title: data_file_names[data_file_index],
-          description: data_file_description[data_file_index],
-          license: license,
-          projects: Project.where(title: 'Default Project'),
-          content_blob: data_file_content_blob
-      }
+      data_file = DataFile.new(
+        title: file_name,
+        description: data_file_description[data_file_index],
+        license: license,
+        projects: investigation.projects,
+        content_blob: data_file_content_blob
+      )
+      next unless data_file.save
 
-      assay_asset_params = {
-        assay: Assay.new(assay_params),
-        asset: DataFile.new(data_file_params)
-      }
+      AssayAsset.create(assay: assay, asset: data_file)
+    end
 
-      @assay_assets << AssayAsset.new(assay_asset_params)
-    end
-    if @assay_assets.each(&:valid?) && @assay_assets.each(&:save!)
-      @assay_assets.each(&:save)
-    end
+    true
   end
 
   def generate_metadata(studies_meta_data, index)

@@ -2424,6 +2424,27 @@ class StudiesControllerTest < ActionController::TestCase
     assert_redirected_to studies_path
   end
 
+  test 'batch_create assigns data files to the investigation projects' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    upload_dir = StudyBatchUpload.upload_directory(User.current_user)
+    FileUtils.mkdir_p(upload_dir.join('data'))
+    File.write(upload_dir.join('data', 'test_data.csv'), "col1,col2\nval1,val2\n")
+
+    params = batch_create_study_params(investigation).deep_merge(
+      studies: { data_files: ['test_data'], data_file_description: ['Test data'] }
+    )
+
+    assert_difference('DataFile.count', 1) do
+      post :batch_create, params: params
+    end
+    assert_equal investigation.projects.sort, DataFile.last.projects.sort
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
   test 'batch_create with missing MIAPPE fields and data files specified does not raise' do
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     person = User.current_user.person
@@ -2451,7 +2472,7 @@ class StudiesControllerTest < ActionController::TestCase
         culturalPractices: [''],
         data_files: ['some_data_file'],
         data_file_description: [''],
-        license: ['CC-BY-4.0']
+        license: 'CC-BY-4.0'
       }
     }
     assert_no_difference('Study.count') do
@@ -2487,7 +2508,7 @@ class StudiesControllerTest < ActionController::TestCase
         culturalPractices: ['Irrigation'],
         data_files: [''],
         data_file_description: [''],
-        license: ['CC-BY-4.0']
+        license: 'CC-BY-4.0'
       }
     }
   end
