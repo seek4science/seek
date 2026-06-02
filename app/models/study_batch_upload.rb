@@ -107,13 +107,12 @@ class StudyBatchUpload < ApplicationRecord
       next if find_metadata.nil?
 
       find_metadata.each do |metadata|
-
-        study = Study.where(id: metadata.item_id).last
+        existing_study = Study.where(id: metadata.item_id).last
         old_study = {
-            id: study.id,
+            id: existing_study.id,
             metadata_id: metadata.id,
             study_miappe_id: study_metadata_id,
-            description: study.description
+            description: existing_study.description
         }
         existing_studies << old_study
       end
@@ -133,8 +132,6 @@ class StudyBatchUpload < ApplicationRecord
       investigation_license_id = data[0].value if index == license_row_index
     end
     licenses_ids = JSON.parse(File.read(File.join(Rails.root, 'public', 'od_licenses.json'))).keys
-
-    normalize_license_id(default_license)
 
     licenses_ids.each do |license_id|
       if normalize_license_id(license_id) == normalize_license_id(investigation_license_id)
