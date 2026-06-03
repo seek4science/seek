@@ -25,5 +25,5 @@ then
     echo "started"
 else
     echo "creating and starting seek-search container"
-    docker run -d --name seek-search --restart=unless-stopped -p 8983:8983 -v "seek-solr-data-volume:/var/solr/" fairdom/seek-solr:8.11 solr-precreate seek /opt/solr/server/solr/configsets/seek_config
+    docker run -d --name seek-search --restart=unless-stopped -p 8983:8983 -v "seek-solr-data-volume:/var/solr/" -v "$(pwd)/solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf" solr:8.11.4 solr-precreate seek /opt/solr/server/solr/configsets/seek_config
 fi
