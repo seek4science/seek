@@ -24,7 +24,6 @@ docker volume rm seek-solr-data-volume
 echo "recreating seek-solr-data-volume"
 docker volume create --name=seek-solr-data-volume
 
-echo "creating and starting seek-search container"
 "$(dirname "$0")/start-docker-solr.sh"
 
 echo "waiting for Solr to be ready ..."
