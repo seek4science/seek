@@ -79,13 +79,14 @@ services:
       retries: 5
 
   solr:
-    image: fairdom/seek-solr:8.11
+    image: solr:8.11.4
     container_name: seek-solr
     restart: always
     environment:
       SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
       - seek-solr-data:/var/solr/
+      - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
