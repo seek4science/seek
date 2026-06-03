@@ -204,8 +204,7 @@ class StudiesController < ApplicationController
     # render plain: params[:studies].inspect
     metadata_types = ExtendedMetadataType.where(title: ExtendedMetadataType::MIAPPE_TITLE, supported_type: 'Study').last
     studies_length = params[:studies][:title].length
-    studies_uploaded = false
-    data_file_uploaded = false
+    all_studies_saved = true
     studies_length.times do |index|
       metadata = generate_metadata(params[:studies], index)
       study_params = {
@@ -219,15 +218,14 @@ class StudiesController < ApplicationController
       }
       @study = Study.new(study_params)
       missing_fields = StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
-      if missing_fields.empty? && @study.valid? && @study.save! && @study.extended_metadata.valid?
-        studies_uploaded = true if @study.save
+      if missing_fields.empty? && @study.valid? && @study.save && @study.extended_metadata.valid?
+        create_batch_assay_asset(params, index)
+      else
+        all_studies_saved = false
       end
-      data_file_uploaded = create_batch_assay_asset(params, index)
     end
 
-    batch_uploaded = studies_uploaded && data_file_uploaded
-
-    if batch_uploaded
+    if all_studies_saved
       unless params[:existing_studies].blank?
         remove_existing_studies(params[:existing_studies])
       end
@@ -251,16 +249,16 @@ class StudiesController < ApplicationController
     assay_class = AssayClass.where(title: 'Experimental assay').first
     return unless assay_class
 
-    data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
-    data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
+    data_file_names = params[:studies][:data_files][index].to_s.remove(' ').split(',')
+    data_file_description = params[:studies][:data_file_description][index].to_s.remove(' ').split(',')
     license = params[:studies][:license]
     study_metadata_id = params[:studies][:id][index]
     data_file_path = StudyBatchUpload.data_directory
 
-    data_file_names.each_with_index do |file_name, data_file_index|
-      extended_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last
-      next unless extended_metadata
+    extended_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last
+    return unless extended_metadata
 
+    data_file_names.each_with_index do |file_name, data_file_index|
       data_file_name = datafile_name_with_extension(file_name.to_s, data_file_path)
       next unless data_file_name
 
@@ -272,8 +270,9 @@ class StudiesController < ApplicationController
       )
       next unless assay.save
 
+      file_io = File.open(data_file_path.join(data_file_name))
       data_file_content_blob = ContentBlob.new
-      data_file_content_blob.tmp_io_object = File.open(data_file_path.join(data_file_name))
+      data_file_content_blob.tmp_io_object = file_io
       data_file_content_blob.original_filename = File.basename(data_file_name)
 
       data_file = DataFile.new(
@@ -283,9 +282,14 @@ class StudiesController < ApplicationController
         projects: investigation.projects,
         content_blob: data_file_content_blob
       )
-      next unless data_file.save
+      saved = data_file.save
+      file_io.close
+      next unless saved
 
-      AssayAsset.create(assay: assay, asset: data_file)
+      unless AssayAsset.create(assay: assay, asset: data_file).persisted?
+        assay.destroy
+        data_file.destroy
+      end
     end
 
     true
@@ -331,14 +335,18 @@ class StudiesController < ApplicationController
     JSON.parse(studies.to_json).each do |study_json|
       study = Study.find_by(id: JSON.parse(study_json)['id'])
       next unless study
-      unless study.authorized_for_delete? && study.assays.all?(&:authorized_for_delete?)
+      assays = study.assays.to_a
+      unless study.authorized_for_delete? && assays.all?(&:authorized_for_delete?)
         flash[:error] ||= "Not authorized to replace #{t('study')} '#{study.title}'"
         next
       end
       # destroy_authorized? is the first before_destroy callback (registered in ApplicationRecord),
       # so state_allows_delete? fires before the has_many dependent: :destroy cascade can clear
       # assay_assets. Assets must be removed first so the state check passes.
-      study.assays.each { |assay| assay.assay_assets.destroy_all; assay.destroy }
+      assays.each do |assay|
+        assay.assay_assets.destroy_all
+        assay.destroy
+      end
       study.reload.destroy
     end
   end

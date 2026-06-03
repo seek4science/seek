@@ -91,7 +91,7 @@ class StudyBatchUpload < ApplicationRecord
     study_data = []
     studies = []
     Seek::Util.unzip(file_path, dir) do |entry|
-      if entry.name.split('/').include?('data')
+      if entry.name.split('/').tap(&:pop).include?('data')
         study_data << dir.join(entry.name)
       else
         studies << dir.join(entry.name)
@@ -109,6 +109,7 @@ class StudyBatchUpload < ApplicationRecord
 
       find_metadata.each do |metadata|
         existing_study = Study.where(id: metadata.item_id).last
+        next if existing_study.nil?
         old_study = {
             id: existing_study.id,
             metadata_id: metadata.id,
