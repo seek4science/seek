@@ -42,7 +42,7 @@
   </th>
   <td>
 
-    <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
+    <%= text_field_tag "#{field_name_prefix}[title]", title, class: "form-control#{allow_title_change ? '' : ' disabled'}",
                        placeholder: 'Attribute name', data: { attr: "title" } %>
   </td>
 
