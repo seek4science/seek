@@ -1,7 +1,7 @@
 x-shared:
   seek_base: &seek_base
     # build: .
-    image: fairdom/seek:main
+    image: fairdom/seek:1.18-dev
 
     restart: always
     environment: &seek_base_env
@@ -76,18 +76,19 @@ services:
     command: docker/start_workers.sh
 
   solr:
-    image: fairdom/seek-solr:8.11
+    image: solr:8.11.4
     container_name: seek-solr
     restart: always
     environment:
       SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
       - seek-solr-data:/var/solr/
+      - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
       - seek
-      - /opt/solr/server/solr/configsets/seek_config      
+      - /opt/solr/server/solr/configsets/seek_config
 
 
 volumes:
