@@ -28,14 +28,15 @@ class TemplatesHelperTest < ActionView::TestCase
       isa_assay_material_template
       isa_assay_data_file_template
       ].each do |t|
-        FactoryBot.create(t, group: "ISA minimal starter",
+        FactoryBot.create(t, group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER,
                           policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE ))
       end
 
       templates_for_sample_types = load_templates(true)
-      assert_equal templates_for_sample_types.length, 1
-      assert_equal Template.count, 5
-      assert templates_for_sample_types.none? { |t| t[:group] == "ISA minimal starter" }
+      assert_equal 1, templates_for_sample_types.length
+      assert_equal 1, Template.for_sample_type_creation.length
+      assert_equal 5, Template.count
+      assert templates_for_sample_types.none? { |t| t[:group] == Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER }
 
       templates_for_templates = load_templates
       assert_equal templates_for_templates.length, Template.count
