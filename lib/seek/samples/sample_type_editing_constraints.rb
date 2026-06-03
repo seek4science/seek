@@ -5,7 +5,6 @@ module Seek
     class SampleTypeEditingConstraints
       attr_reader :sample_type
       delegate :samples, to: :sample_type
-      delegate :is_isa_json_compliant?, to: :sample_type
 
       def initialize(sample_type)
         fail Exception.new('Sample type cannot be nil') unless sample_type
@@ -106,7 +105,7 @@ module Seek
       private
 
       def inherited?(attr)
-        attr&.inherited_from_template_attribute? && is_isa_json_compliant?
+        attr&.inherited_from_template_attribute? && @sample_type.isa_template.present?
       end
 
       def blanks?(attr)
