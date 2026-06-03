@@ -12,6 +12,7 @@ then
     exit 1
 fi
 
-echo "stopping seek-search container"
+echo "stopping and removing seek-search container"
 docker stop seek-search > /dev/null
+docker rm seek-search > /dev/null
 echo "stopped"
