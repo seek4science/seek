@@ -195,6 +195,10 @@ class SampleType < ApplicationRecord
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
 
+  def creation_constraints
+    Seek::Samples::SampleTypeCreationConstraints.new(self)
+  end
+
   def contributing_user
     contributor&.user
   end
