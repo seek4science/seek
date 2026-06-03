@@ -1,5 +1,7 @@
 #!/bin/sh
 
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
 if ! pgrep -x "dockerd" >/dev/null
 then
     echo "the Docker service isn't running"
@@ -24,7 +26,7 @@ then
     docker start seek-search > /dev/null
 else
     echo "creating and starting seek-search container"
-    docker run -d --name seek-search --restart=unless-stopped -p 8983:8983 -v "seek-solr-data-volume:/var/solr/" -v "$(pwd)/solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf" solr:8.11.4 solr-precreate seek /opt/solr/server/solr/configsets/seek_config
+    docker run -d --name seek-search --restart=unless-stopped -p 8983:8983 -v "seek-solr-data-volume:/var/solr/" -v "$REPO_ROOT/solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf" solr:8.11.4 solr-precreate seek /opt/solr/server/solr/configsets/seek_config
 fi
 
 echo "waiting for Solr to be ready ..."

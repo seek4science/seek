@@ -26,13 +26,7 @@ docker volume create --name=seek-solr-data-volume
 
 "$(dirname "$0")/start-docker-solr.sh"
 
-echo "waiting for Solr to be ready ..."
-until curl -sf http://localhost:8983/solr/seek/admin/ping > /dev/null 2>&1; do
-    sleep 2
-done
-echo "Solr is ready"
-
 echo "reindexing ..."
-bundle exec rake seek:reindex_all
+(cd "$(dirname "$0")/.." && bundle exec rake seek:reindex_all)
 
 echo "done"
