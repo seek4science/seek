@@ -14,6 +14,7 @@ class Template < ApplicationRecord
   validate :validate_template_attributes
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
+  scope :for_sample_type_creation, -> { where.not(group: Seek::ISATemplates::TemplateGroup::FOR_SAMPLE_TYPE_CREATION) }
 
   has_filter :isa_template_group
   def can_delete?(user = User.current_user)
