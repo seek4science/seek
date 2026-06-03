@@ -64,10 +64,8 @@ class SearchControllerTest < ActionController::TestCase
     FactoryBot.create_list(:model, 3, policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
-      with_config_value(:external_search_enabled, true) do
-        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(3) }) do
-          get :index, params: { q: 'yeast', include_external_search: '1' }
-        end
+      Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(3) }) do
+        get :index, params: { q: 'yeast', include_external_search: '1' }
       end
     end
 
@@ -81,9 +79,7 @@ class SearchControllerTest < ActionController::TestCase
 
   test 'biomodels search can handle unreleased models' do
     VCR.use_cassette('biomodels/search-unreleased') do
-      with_config_value(:external_search_enabled, true) do
-        get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
-      end
+      get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
     end
 
     assert_select '.related-items li a', text: 'BioModels Database (6)'
@@ -236,10 +232,8 @@ class SearchControllerTest < ActionController::TestCase
     FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
-      with_config_value(:external_search_enabled, true) do
-        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
-          get :index, params: { q: 'yeast', include_external_search: '1' }
-        end
+      Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
+        get :index, params: { q: 'yeast', include_external_search: '1' }
       end
     end
 

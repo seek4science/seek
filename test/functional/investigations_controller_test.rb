@@ -504,8 +504,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     # check the project form exists, studies and assays don't have this
     assert_select 'div#add_projects_form', count:1
 
-    #no sharing link, not for Investigation, Study and Assay
-    assert_select 'div#temporary_links', count:0
+    assert_select 'div#temporary_links', count:1
 
     assert_select 'div#author-form', count:1
   end
@@ -624,7 +623,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
   end
 
   test 'create an investigation with extended metadata validated' do
@@ -888,12 +887,21 @@ class InvestigationsControllerTest < ActionController::TestCase
       other_user.person.add_to_project_and_institution(project, current_user.person.institutions.first)
       investigation = FactoryBot.create(:investigation, projects: [project], contributor: current_user.person, is_isa_json_compliant: true)
 
+      study_sop = FactoryBot.create(:max_sop, projects: [project], contributor: current_user.person, title:'Sample collection protocol')
+      assay1_sop = FactoryBot.create(:min_sop, projects: [project], contributor: current_user.person, title: 'Protocol Assay 1')
+      assay2_sop = FactoryBot.create(:min_sop, projects: [project], contributor: current_user.person, title: 'Protocol Assay 2')
+      sop_sample_attribute_type = FactoryBot.create(:sop_sample_attribute_type)
+
       source_sample_type = FactoryBot.create(:isa_source_sample_type, template_id: FactoryBot.create(:isa_source_template).id)
       sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type, template_id: FactoryBot.create(:isa_sample_collection_template).id)
+      sample_collection_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
       accessible_study = FactoryBot.create(:study,
                                            investigation: investigation,
                                            sample_types:[source_sample_type, sample_collection_sample_type],
-                                           contributor: current_user.person)
+                                           contributor: current_user.person,
+                                           sops: [study_sop])
 
 
       source_sample = FactoryBot.create(:sample,
@@ -921,7 +929,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [source_sample.id],
-                            'sample collection': 'sample collection',
+                            'sample collection': study_sop.id,
                             'sample collection parameter value 1': 'sample collection parameter value 1',
                             'Sample Name': 'sample name',
                             'sample characteristic 1': 'sample characteristic 1'
@@ -935,7 +943,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [source_sample.id],
-                            'sample collection': 'sample collection',
+                            'sample collection': study_sop.id,
                             'sample collection parameter value 1': 'sample collection parameter value 2',
                             'Sample Name': 'sample name 2',
                             'sample characteristic 1': 'sample characteristic 2'
@@ -947,17 +955,32 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_equal(stream_1.study, accessible_study)
       assert(stream_1.is_assay_stream?)
       assay_1_stream_1_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: other_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
-      assay_1_stream_1 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+      assay_1_stream_1_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
+
+      assay_1_stream_1 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id, sops: [assay1_sop])
       assay_2_stream_1_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: other_user.person, linked_sample_type: assay_1_stream_1_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
-      assay_2_stream_1 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id)
+      assay_2_stream_1_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
+
+      assay_2_stream_1 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_1_sample_type, study: accessible_study, contributor: other_user.person, assay_stream_id: stream_1.id, sops: [assay2_sop])
 
       # Create an assay stream with all assays visible
       stream_2 = FactoryBot.create(:assay_stream, title: 'Assay Stream 2', study: accessible_study, contributor: current_user.person)
       assert_equal(stream_2.study, accessible_study)
       assert(stream_2.is_assay_stream?)
       assay_1_stream_2_sample_type = FactoryBot.create(:isa_assay_material_sample_type, contributor: current_user.person, linked_sample_type: sample_collection_sample_type, template_id: FactoryBot.create(:isa_assay_material_template).id)
+      assay_1_stream_2_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
       assay_1_stream_2 = FactoryBot.create(:assay, position: 1, sample_type: assay_1_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
+
       assay_2_stream_2_sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, contributor: current_user.person, linked_sample_type: assay_1_stream_2_sample_type, template_id: FactoryBot.create(:isa_assay_data_file_template).id)
+      assay_2_stream_2_sample_type.sample_attributes.detect { |sa| sa.isa_tag.isa_protocol? }.tap do |sa_attribute|
+        sa_attribute.update_column(:sample_attribute_type_id, sop_sample_attribute_type.id)
+      end
       assay_2_stream_2 = FactoryBot.create(:assay, position: 2, sample_type: assay_2_stream_2_sample_type, study: accessible_study, contributor: current_user.person, assay_stream_id: stream_2.id)
 
       # create samples in second assay stream with viewing permission
@@ -969,7 +992,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [study_sample.id],
-                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Protocol Assay 1': assay1_sop.id,
                             'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
                             'Assay 1 parameter value 2': assay_1_stream_2_sample_type
                                                            .sample_attributes
@@ -1010,7 +1033,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [study_sample.id],
-                            'Protocol Assay 1': 'Protocol Assay 1',
+                            'Protocol Assay 1': assay1_sop.id,
                             'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
                             'Assay 1 parameter value 2': assay_1_stream_2_sample_type
                                                            .sample_attributes
@@ -1051,7 +1074,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [assay_1_stream_2_sample.id],
-                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Protocol Assay 2': assay2_sop.id,
                             'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
                             'Assay 2 parameter value 2': assay_2_stream_2_sample_type
                                                            .sample_attributes
@@ -1092,7 +1115,7 @@ class InvestigationsControllerTest < ActionController::TestCase
                           project_ids: [project.id],
                           data: {
                             Input: [assay_1_stream_2_sample.id],
-                            'Protocol Assay 2': 'Protocol Assay 2',
+                            'Protocol Assay 2': assay2_sop.id,
                             'Assay 2 parameter value 1': 'Assay 2 parameter value 1',
                             'Assay 2 parameter value 2': assay_2_stream_2_sample_type
                                                            .sample_attributes
@@ -1158,6 +1181,13 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert study_output_ids.include? "#sample/#{study_sample.id}"
       refute study_output_ids.include? "#sample/#{hidden_study_sample.id}"
 
+      # Check the protocols at the study level
+      protocols_json = study_json['protocols']
+      assert_equal protocols_json.length, 3
+      sops_with_sop_type_annotations = protocols_json.select { |protocol| !protocol["protocolType"]["termAccession"].blank? }
+      assert_equal sops_with_sop_type_annotations.length, 1
+      assert_equal study_sop.sop_type_annotations.first, sops_with_sop_type_annotations.first["protocolType"]["termAccession"]
+      assert_equal study_sop.sop_type_annotation_values.first.sample_controlled_vocab.source_ontology, sops_with_sop_type_annotations.first["protocolType"]["termSource"]
       assay_json = study_json['assays'].first
 
       # Check otherMaterials
@@ -1699,4 +1729,230 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal 'seek-test-investigation', investigation.external_identifier
     investigation
   end
+
+  # Tests for temporary link (special auth code) functionality
+
+  test 'should create temporary link for investigation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    assert_difference('SpecialAuthCode.count', 1) do
+      post :manage_update, params: {
+        id: investigation.id,
+        investigation: {
+          title: investigation.title,
+          special_auth_codes_attributes: {
+            '0' => {
+              code: SecureRandom.base64(30),
+              expiration_date: (Date.today + 7.days).to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    assert_redirected_to investigation_path(investigation)
+
+    investigation.reload
+    assert_equal 1, investigation.special_auth_codes.count
+
+    code = investigation.special_auth_codes.first
+    assert_not_nil code.code
+    assert_equal 40, code.code.length
+    assert code.expiration_date > Date.today
+  end
+
+  test 'should update existing temporary link for investigation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    # Create initial code
+    initial_code = nil
+    disable_authorization_checks do
+      initial_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    new_expiration = Date.today + 14.days
+
+    assert_no_difference('SpecialAuthCode.count') do
+      post :manage_update, params: {
+        id: investigation.id,
+        investigation: {
+          title: investigation.title,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: initial_code.id,
+              code: initial_code.code,
+              expiration_date: new_expiration.to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    initial_code.reload
+    assert_equal new_expiration, initial_code.expiration_date
+  end
+
+  test 'should revoke temporary link for investigation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    code = nil
+    disable_authorization_checks do
+      code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert_difference('SpecialAuthCode.count', -1) do
+      post :manage_update, params: {
+        id: investigation.id,
+        investigation: {
+          title: investigation.title,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: code.id,
+              _destroy: '1'
+            }
+          }
+        }
+      }
+    end
+
+    investigation.reload
+    assert_equal 0, investigation.special_auth_codes.count
+  end
+
+  test 'temporary link persists across page loads' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    # Create code
+    post :manage_update, params: {
+      id: investigation.id,
+      investigation: {
+        title: investigation.title,
+        special_auth_codes_attributes: {
+          '0' => {
+            code: SecureRandom.base64(30),
+            expiration_date: (Date.today + 7.days).to_s,
+            _destroy: '0'
+          }
+        }
+      }
+    }
+
+    # Load manage page again
+    get :manage, params: { id: investigation.id }
+    assert_response :success
+
+    # Verify code still exists in database
+    investigation.reload
+    assert_equal 1, investigation.special_auth_codes.count
+  end
+
+  test 'temporary link code is saved to database with correct attributes' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+
+    expiration_date = Date.today + 10.days
+
+    post :manage_update, params: {
+      id: investigation.id,
+      investigation: {
+        title: investigation.title,
+        special_auth_codes_attributes: {
+          '0' => {
+            code: SecureRandom.base64(30),
+            expiration_date: expiration_date.to_s,
+            _destroy: '0'
+          }
+        }
+      }
+    }
+
+    # Query database directly
+    code = SpecialAuthCode.where(
+      asset_type: 'Investigation',
+      asset_id: investigation.id
+    ).first
+
+    assert_not_nil code
+    assert_equal 'Investigation', code.asset_type
+    assert_equal investigation.id, code.asset_id
+    assert_equal expiration_date, code.expiration_date
+    assert_equal 40, code.code.length
+  end
+
+
+  test 'investigation accessible with valid code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    auth_code = nil
+    disable_authorization_checks do
+      auth_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: investigation.id, code: auth_code.code }
+    assert_response :success
+    assert_select 'h1', text: investigation.title
+  end
+
+  test 'investigation not accessible with invalid code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    logout
+
+    get :show, params: { id: investigation.id, code: 'invalid_code' }
+    assert_response :forbidden
+  end
+
+  test 'investigation not accessible with expired code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    expired_code = nil
+    disable_authorization_checks do
+      expired_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.yesterday
+      )
+    end
+
+    logout
+
+    get :show, params: { id: investigation.id, code: expired_code.code }
+    assert_response :forbidden
+  end
+
+  test 'child study not accessible with investigation code - no upward propagation' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    study_code = nil
+    disable_authorization_checks do
+      study_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    # Try to access investigation with study code - should fail
+    get :show, params: { id: investigation.id, code: study_code.code }
+    assert_response :forbidden
+  end
+
 end

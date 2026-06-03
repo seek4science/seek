@@ -4,24 +4,23 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   setup do
     @zip_file = "#{Rails.root}/test/fixtures/files/study_batch.zip"
-    @user_uuid = 'user_uuid'
-    @data_files, @studies = StudyBatchUpload.unzip_batch @zip_file, @user_uuid
+    @data_files, @studies = StudyBatchUpload.unzip_batch(@zip_file)
   end
 
   teardown do
-    FileUtils.rm_r("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/")
+    FileUtils.rm_r(StudyBatchUpload.upload_directory)
   end
 
   test 'check extracted files' do
 
       # Extracts study file and associated data files from zip
       # file_name = params[:data][:content_blob][:tempfile].path
-    data_files, studies = StudyBatchUpload.unzip_batch @zip_file, @user_uuid
+    data_files, studies = StudyBatchUpload.unzip_batch(@zip_file)
 
     assert_equal 3, data_files.count
     assert_equal 1, studies.count
-    assert File.exist?("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/#{data_files.first.name}")
-    assert File.exist?("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/#{studies.first.name}")
+    assert File.exist?(data_files.first)
+    assert File.exist?(studies.first)
   end
 
   test 'read study file' do
@@ -29,8 +28,8 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     user_uuid = 'user_uuid'
     studies_file = ContentBlob.new
-    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
-    studies_file.original_filename = @studies.first.name.to_s
+    studies_file.tmp_io_object = File.open(@studies.first)
+    studies_file.original_filename = File.basename(@studies.first)
     studies_file.save!
 
     studies = StudyBatchUpload.extract_studies_from_file(studies_file)
@@ -41,8 +40,8 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     extended_metadata_type = FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     assert_equal 'MIAPPE metadata v1.1', extended_metadata_type.title, 'must match the seed data title'
     studies_file = ContentBlob.new
-    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{@user_uuid}_studies_upload/#{@studies.first.name}")
-    studies_file.original_filename = @studies.first.name.to_s
+    studies_file.tmp_io_object = File.open(@studies.first)
+    studies_file.original_filename = File.basename(@studies.first)
     studies_file.save!
 
     studies = StudyBatchUpload.extract_studies_from_file(studies_file)
@@ -81,8 +80,8 @@ class StudiesExtractorTest < ActiveSupport::TestCase
     user_uuid = 'user_uuid'
     FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
     studies_file = ContentBlob.new
-    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{@studies.first.name}")
-    studies_file.original_filename = @studies.first.name.to_s
+    studies_file.tmp_io_object = File.open(@studies.first)
+    studies_file.original_filename = File.basename(@studies.first)
     studies_file.save!
 
     licence = StudyBatchUpload.get_license_id(studies_file)

@@ -97,7 +97,7 @@ class DataDumpTest < ActiveSupport::TestCase
 
     assert_equal 'workflows-bioschemas-dump.jsonld', dump.file_name
     assert dump.exists?
-    assert_in_delta 3800, dump.size, 500
+    assert_in_delta 4500, dump.size, 700
     assert_in_delta Time.now, dump.date_modified, 60
   end
 

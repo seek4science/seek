@@ -227,7 +227,7 @@ class SampleTypesController < ApplicationController
     build_sample_type
     @sample_type.uploaded_template = true
 
-    handle_upload_data
+    handle_upload_data(false, true)
     @sample_type.content_blob.save! # Need's to be saved so the spreadsheet can be read from disk
     @sample_type.build_attributes_from_template
   end

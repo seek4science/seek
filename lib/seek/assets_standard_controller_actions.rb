@@ -2,6 +2,8 @@ module Seek
   # The standard basic actions for assets - currently show, new, create, edit, destroy. THe intention is to support all methods for all asset types.
   # DataFile is currently not fully supported due to biosample complications which are intended to be revisited.
   module AssetsStandardControllerActions
+    extend ActiveSupport::Concern
+
     include Seek::DestroyHandling
     include Seek::UploadHandling::DataUpload
 
@@ -106,6 +108,8 @@ module Seek
     def manage; end
 
     def create
+      session.delete(:orphaned_content_blob_ids) if retained_content_blob_ids.blank?
+
       item = initialize_asset
 
       if item.is_git_versioned? || handle_upload_data
@@ -129,21 +133,47 @@ module Seek
     def create_asset_and_respond(item)
       item = create_asset(item)
       if item.save
+        attach_retained_orphaned_content_blobs(item)
         unless return_to_fancy_parent(item)
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
             format.html { redirect_to params[:single_page] ?
-              { controller: :single_pages, action: :show, id: params[:single_page] } 
+              { controller: :single_pages, action: :show, id: params[:single_page] }
               : item }
             format.json { render json: item, include: json_api_include_param }
           end
         end
       else
+        preserve_content_blobs_for_rerender(item)
         respond_to do |format|
           format.html { render action: 'new' }
           format.json { render json: json_api_errors(item), status: :unprocessable_entity }
         end
       end
+    end
+
+    # Saves any unsaved content blobs as orphaned records (no parent asset) so they have database IDs
+    # and their file data is persisted on disk. This allows the re-rendered form to reference them
+    # by ID via retained_content_blob_ids, so they survive a validation error on multi-file assets.
+    def preserve_content_blobs_for_rerender(item)
+      return unless Seek::Util.is_multi_file_asset_type?(item.class)
+
+      saved_ids = item.content_blobs.select(&:new_record?).filter_map { |blob| save_orphaned_blob(blob) }
+      session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) | saved_ids
+    end
+
+    # After a successful save, updates any orphaned content blobs (saved during a previous failed
+    # validation attempt) to point to the newly created asset. Only applies to multi-file assets.
+    def attach_retained_orphaned_content_blobs(item)
+      return unless Seek::Util.is_multi_file_asset_type?(item.class)
+
+      ids = safe_retained_content_blob_ids
+      return if ids.blank?
+
+      attached_ids = ContentBlob.where(id: ids, asset_id: nil).filter_map do |blob|
+        blob.id if blob.update(asset_id: item.id, asset_type: item.class.name, asset_version: item.version)
+      end
+      session[:orphaned_content_blob_ids] = (session[:orphaned_content_blob_ids] || []) - attached_ids
     end
 
     # makes sure the asset it only associated with projects that match the current user
@@ -197,6 +227,13 @@ module Seek
 
     def json_api_include_param
       [params[:include]]
+    end
+
+    def save_orphaned_blob(blob)
+      return blob.id if blob.save
+
+      Rails.logger.warn "Failed to preserve content blob for re-render: #{blob.errors.full_messages.join(', ')}"
+      nil
     end
   end
 end

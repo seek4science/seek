@@ -366,4 +366,17 @@ class SopTest < ActiveSupport::TestCase
     assert_equal [sample1, sample2].sort_by(&:id), sop.related_samples.sort_by(&:id)
   end
 
+  test 'Add SOP type annotation to a SOP' do
+    person = FactoryBot.create(:person)
+    User.current_user = person.user
+    sop = FactoryBot.create(:sop, contributor: person)
+    sop_type_cv = SampleControlledVocab::SystemVocabs.vocab_for_property(:sop_types) || FactoryBot.create(:sop_types_controlled_vocab)
+    sop_type1 = sop_type_cv.sample_controlled_vocab_terms.detect { |term| term.label == 'enrichment protocol' }
+    sop.sop_type_annotations = sop_type1.label
+
+    sop.save!
+
+    assert_equal [sop_type1.iri], sop.sop_type_annotations
+  end
+
 end
