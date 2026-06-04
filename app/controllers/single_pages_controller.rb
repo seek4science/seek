@@ -45,34 +45,12 @@ class SinglePagesController < ApplicationController
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
     assay_id = JSON.parse(params[:assay_id])
+    project_id = JSON.parse(params[:project_id])
 
     @study = Study.find(study_id)
     @assay = Assay.find(assay_id) unless assay_id.nil?
-    @project = @study.projects.first
+    @project = Project.find(project_id)
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
-
-    notice_message = helpers.content_tag(:ul, class: "list-unstyled") do
-      helpers.safe_join([
-        helpers.content_tag(:li) do
-          helpers.safe_join([
-            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
-            "Downloaded contents of ".html_safe,
-            helpers.content_tag(:b) do
-              "#{@assay ? t('isa_assay') + ' [ID: ' + @assay&.id.to_s + ', Title: ' + h(@assay&.title.to_s) : t('isa_study') + ' [ID: ' + @study.id.to_s + ', Title: ' + h(@study.title.to_s)}]"
-            end
-          ])
-        end,
-        helpers.content_tag(:li) do
-          helpers.safe_join([
-            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
-            helpers.content_tag(:b) do
-              "#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}"
-            end,
-            " visible to you #{@samples.count != 1 ? 'were' : 'was'} included".html_safe
-          ])
-        end
-      ])
-    end
 
     raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
@@ -92,7 +70,6 @@ class SinglePagesController < ApplicationController
               @sample_type.title&.concat(".xlsx")
             end
 
-    flash[:notice] = notice_message
     respond_to do |format|
       format.xlsx do
         render xlsx: 'download_samples_spreadsheet',
@@ -102,15 +79,8 @@ class SinglePagesController < ApplicationController
     end
   rescue StandardError => e
     flash[:error] = e.message
-    respond_to do |format|
-      format.html do
-        redirect_to single_page_path(id: @project.id, item_type: @assay.nil? ? 'study' : 'assay',
-                                     item_id: @assay.nil? ? @study.id : @assay.id)
-      end
-      format.json do
-        render json: { parameters: { sample_ids:, sample_type_id:, study_id: }, errors: e }, status: :bad_request
-      end
-    end
+    redirect_to single_page_path(id: @project.id, item_type: @assay.nil? ? 'study' : 'assay',
+                                 item_id: @assay.nil? ? @study.id : @assay.id)
   end
 
   def upload_samples
