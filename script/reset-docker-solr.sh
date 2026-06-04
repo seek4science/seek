@@ -16,7 +16,7 @@ then
 fi
 
 echo "removing seek-solr-data-volume"
-docker volume rm seek-solr-data-volume
+docker volume rm seek-solr-data-volume > /dev/null 2>&1 || true
 
 echo "recreating seek-solr-data-volume"
 docker volume create --name=seek-solr-data-volume

@@ -23,5 +23,5 @@ then
 else
     echo "container seek-search does not exist, skipping"
 fi
-docker volume rm seek-solr-data-volume > /dev/null
+docker volume rm seek-solr-data-volume > /dev/null 2>&1 || true
 echo "deleted volume"

@@ -8,13 +8,13 @@ then
     exit 1
 fi
 
-if ! docker ps | grep -q seek-search
+if ! docker ps -a | grep -q seek-search
 then
-    echo "container named seek-search is not running"
+    echo "container named seek-search does not exist"
     exit 1
 fi
 
 echo "stopping and removing seek-search container"
-docker stop seek-search > /dev/null
+docker stop seek-search > /dev/null 2>&1 || true
 docker rm seek-search > /dev/null
 echo "stopped"
