@@ -65,7 +65,7 @@ class SearchController < ApplicationController
 
     if type == 'all'
       sources = searchable_types
-      sources -= [Strain, Sample] if request.format.json?
+      sources -= [Strain] if request.format.json?
       sources -= [ISATag] unless request.format.json?
     else
       type_name = type.singularize.camelize
