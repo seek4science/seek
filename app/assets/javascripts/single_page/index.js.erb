@@ -282,7 +282,15 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectI
     assay_id: JSON.stringify(assayId)
   });
 
-  window.location.href = `<%= download_samples_excel_single_pages_path(format: :xlsx) %>?${params.toString()}`;
+  const iframe = document.createElement("iframe");
+  iframe.style.display = 'none';
+  iframe.src = `<%= download_samples_excel_single_pages_path(format: :xlsx) %>?${params.toString()}`;
+
+  iframe.onload = function(){
+    window.location.reload();
+  }
+
+  document.body.appendChild(iframe);
 }
 
 async function batchUpdateSample(sampleTypes) {
