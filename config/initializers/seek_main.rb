@@ -7,7 +7,6 @@ require 'sunspot_rails'
 require 'mimemagic'
 require 'omniauth-ldap'
 require 'recaptcha'
-require 'uuid'
 require 'libreconv'
 require 'extensions/secret_key_base'
 

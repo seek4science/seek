@@ -14,7 +14,7 @@ end
 
 # Source - ISA minimal starter template
 source_template = Template.find_or_initialize_by(title: 'Source - ISA minimal starter template', level: 'study source',
-                                                 group: 'ISA minimal starter')
+                                                 group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 source_temp_attributes = []
 source_temp_attributes << upsert_template_attribute('Source Name',
@@ -50,7 +50,7 @@ end
 
 # Sample - ISA minimal starter template
 sample_template = Template.find_or_initialize_by(title: 'Sample - ISA minimal starter template', level: 'study sample',
-                                                 group: 'ISA minimal starter')
+                                                 group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 sample_temp_attributes = []
 sample_temp_attributes << upsert_template_attribute('Input',
@@ -112,7 +112,7 @@ end
 
 # Material output assay - ISA minimal starter template
 material_template = Template.find_or_initialize_by(title: 'Material output assay - ISA minimal starter template',
-                                                   level: 'assay - material', group: 'ISA minimal starter')
+                                                   level: 'assay - material', group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 material_temp_attributes = []
 material_temp_attributes << upsert_template_attribute('Input',
@@ -174,7 +174,7 @@ end
 
 # Data file output assay - ISA minimal starter template
 data_file_template = Template.find_or_initialize_by(title: 'Data file output assay - ISA minimal starter template',
-                                                    level: 'assay - data file', group: 'ISA minimal starter')
+                                                    level: 'assay - data file', group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 data_file_temp_attributes = []
 data_file_temp_attributes << upsert_template_attribute('Input',

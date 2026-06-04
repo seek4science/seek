@@ -22,7 +22,7 @@ module Seek
 
         allow_empty_content_blob = model_image_present? || json_api_request?
 
-        unless allow_empty_content_blob || retained_content_blob_ids.present?
+        unless allow_empty_content_blob || safe_retained_content_blob_ids.present?
           if blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
             flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
@@ -34,7 +34,10 @@ module Seek
         end
 
         blob_params.each do |item_params|
-          return false unless allow_empty_content_blob || check_for_data_or_url(item_params)
+          unless allow_empty_content_blob || check_for_data_or_url(item_params)
+            flash.now[:error] ||= missing_content_error(item_params)
+            return false
+          end
 
           if add_from_upload?(item_params)
             return false unless add_data_for_upload(item_params)
@@ -73,7 +76,12 @@ module Seek
         version += 1 if new_version
 
         unless model_image_present? && params[:content_blobs].blank?
-          content_blobs_params.each do |item_params|
+          (params[:content_blobs] || []).each do |item_params|
+            next if !json_api_request? &&
+                    item_params[:tmp_io_object].blank? &&
+                    item_params[:data_url].blank? &&
+                    item_params[:base64_data].blank?
+
             attributes = build_attributes_hash_for_content_blob(item_params, version)
             if asset.respond_to?(:content_blobs)
               asset.content_blobs.build(attributes)
@@ -91,7 +99,11 @@ module Seek
           raise 'No content-blob defined'
         end
 
-        retain_previous_content_blobs(asset, version) if version && version > 1
+        if version && version > 1
+          retain_previous_content_blobs(asset, version)
+        else
+          load_orphaned_content_blobs(asset)
+        end
       end
 
       def build_attributes_hash_for_content_blob(item_params, version)
@@ -113,6 +125,19 @@ module Seek
           retained_blobs.each do |blob|
             copy_blob_to_asset(asset, blob, new_version)
           end
+        end
+      end
+
+      # Loads previously saved orphaned content blobs (from a failed validation attempt) into the
+      # asset's in-memory association, so they appear correctly on re-render and are available for
+      # attachment after a successful save.
+      def load_orphaned_content_blobs(asset)
+        retained_ids = safe_retained_content_blob_ids
+        return if retained_ids.blank?
+        return unless asset.respond_to?(:content_blobs)
+
+        ContentBlob.where(id: retained_ids, asset_id: nil).each do |blob|
+          asset.content_blobs.proxy_association.add_to_target(blob)
         end
       end
 
