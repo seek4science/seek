@@ -228,7 +228,7 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectI
 
   // Checks whether the dynamic table has errors
   // The excel export will be aborted as long as the dynamic table has errors
-  hasErrorcells = table.find('select.select2__error').size() > 0
+  const hasErrorcells = table.find('select.select2__error').size() > 0
   if (hasErrorcells) {
     alert('It appears this sample table has some errors. Please correct the errors in the current sample table and try downloading again.');
     return;
@@ -275,38 +275,14 @@ async function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectI
   // Finally only use the sample IDs
     .map(row => row[idFieldName]);
 
-  // Use ajax for POST request with table data in the body
-  // If succes => Redirect to download path for retrieving excel file
-  $j.ajax({
-    type: 'POST',
-    headers: {
-      'Accept': 'application/json'
-    },
-    url: '<%= export_to_excel_single_pages_path() %>',
-    data: { sample_ids: JSON.stringify(sampleIds),
-      sample_type_id: JSON.stringify(sampleTypeId),
-      study_id: JSON.stringify(studyId),
-      assay_id: JSON.stringify(assayId),
-    }
-  })
-  .done( function(response){
-    window.location.href = `<%= download_samples_excel_single_pages_path() %>?uuid=${response.uuid}`;
-  })
-  .fail( function(response){
-    alert(`Failed to export through excel!\nStatus: ${response.status} - ${JSON.stringify(response.error().statusText)}\nError: ${response.responseText}`);
-  })
-  .always( function(response){
-    setTimeout(() => {
-      const itemType = assayId == null ? 'study' : 'assay';
-      const itemId = assayId == null ? studyId : assayId;
-      if (projectId != null && itemType && itemId != null) {
-        window.location.href = `/single_pages/${projectId}?item_type=${itemType}&item_id=${itemId}`;
-      } else {
-        // If one of the variables is missing, just reload the current page.
-        location.reload();
-      }
-    }, 2000);
+  const params = new URLSearchParams({
+    sample_ids: JSON.stringify(sampleIds),
+    sample_type_id: JSON.stringify(sampleTypeId),
+    study_id: JSON.stringify(studyId),
+    assay_id: JSON.stringify(assayId)
   });
+
+  window.location.href = `<%= download_samples_excel_single_pages_path(format: :xlsx) %>?${params.toString()}`;
 }
 
 async function batchUpdateSample(sampleTypes) {
