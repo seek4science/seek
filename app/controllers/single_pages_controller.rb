@@ -13,7 +13,7 @@ class SinglePagesController < ApplicationController
                 only: %i[ batch_sharing_permission_preview
                           batch_change_permission_for_selected_items
                           download_samples_excel
-                          export_to_excel
+                          dynamic_table_data
                           upload_samples ]
   respond_to :html, :js
 
@@ -461,6 +461,6 @@ class SinglePagesController < ApplicationController
   def check_user_logged_in
     return if current_user
 
-    render json: { status: :unprocessable_entity, error: 'You must be logged in to access batch sharing permission.' }
+    render json: { status: :unauthorized, error: 'You must be logged in to use this feature.' }
   end
 end
