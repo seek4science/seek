@@ -250,6 +250,17 @@ class SearchControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:results)['ISATag'].count
   end
 
+  test 'Sample is included in JSON API search results' do
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
+
+    Sample.stub(:solr_cache, -> (q) { [sample.id] }) do
+      get :index, params: { q: 'sample' }, format: :json
+    end
+
+    assert_response :success
+    assert_equal 1, assigns(:results)['Sample'].count
+  end
+
   test 'remember external search' do
     FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
 
