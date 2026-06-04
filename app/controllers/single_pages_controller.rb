@@ -28,17 +28,6 @@ class SinglePagesController < ApplicationController
     redirect_to projects_path
   end
 
-  def project_folders
-    return unless Seek::Config.project_single_page_folders_enabled
-
-    project_folders = ProjectFolder.root_folders(@project)
-    if project_folders.empty?
-      project_folders = ProjectFolder.initialize_default_folders(@project)
-      ProjectFolderAsset.assign_existing_assets @project
-    end
-    project_folders
-  end
-
   def dynamic_table_data
     data = []
     if params[:sample_type_id]
@@ -257,6 +246,17 @@ class SinglePagesController < ApplicationController
   end
 
   private
+
+  def project_folders
+    return unless Seek::Config.project_single_page_folders_enabled
+
+    project_folders = ProjectFolder.root_folders(@project)
+    if project_folders.empty?
+      project_folders = ProjectFolder.initialize_default_folders(@project)
+      ProjectFolderAsset.assign_existing_assets @project
+    end
+    project_folders
+  end
 
   def get_spreadsheet_data(samples_sheet)
     sample_fields = samples_sheet.row(1).actual_cells.map { |field| field&.value&.sub(' *', '') }.compact
