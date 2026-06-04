@@ -31,6 +31,8 @@
 - **Nested Extended Metadata attribute labels** — Label rendering for nested EMT attributes now prioritises the configured label over a generic humanised fallback (#2563)
 - **Remove Skype name from user profile** — The Skype name field has been removed from user profiles (#2523)
 - **Session table trimming in batches** — The sessions cleanup rake task now trims in batches to avoid timeouts on large tables
+- **Registered assets in global ISA templates** — Global sample type templates can now reference registered assets (#2600)
+- **Minimal ISA template removed from create step** — The minimal ISA template is no longer presented as an option during the study/assay creation wizard (#2560)
 
 ## Bug Fixes
 
@@ -44,6 +46,8 @@
 - **Docker image missing LibreOffice** — Added missing LibreOffice dependency to the Docker image (#2460)
 - **Notebook HTML generation Python version error** — Fixed an error in `generate_notebook_html` caused by an incorrect Python version (#2474)
 - **XSS security fixes** — Multiple cross-site scripting vulnerabilities addressed
+- **Sample RDF incorrect XSD types** — Fixed the RDF generated for samples to use correct XSD types; nil and blank attribute values are now skipped (#2595)
+- **Model files lost after validation error** — Files attached to a model are no longer lost when a validation error occurs during creation (#2582)
 
 ## Infrastructure & Dependencies
 
@@ -57,3 +61,9 @@
 - SPDX licence list updated
 - Example data seeds refactored into library classes
 - Docker base images updated
+- Optional flags added to Docker Compose (#2597)
+- UUIDs generated via `SecureRandom` for improved security (#2598)
+- addressable bumped to 2.9.0
+- rack security bump (2.2.22 → 2.2.23)
+- zlib bumped to 3.0.1
+- yard bumped to 0.9.42
