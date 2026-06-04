@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-if docker ps -a | grep -q seek-search
+if docker ps -a | grep -qw seek-search
 then
     echo "stopping and removing seek-search container"
     docker stop seek-search > /dev/null 2>&1 || true

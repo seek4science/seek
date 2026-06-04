@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-if docker ps | grep -q seek-search
+if docker ps | grep -qw seek-search
 then
     echo "container named seek-search is current running, stop first"
     exit 1
@@ -16,7 +16,7 @@ fi
 
 
 echo "deleting seek-search container and seek-solr-data-volume volume"
-if docker ps -a | grep -q seek-search
+if docker ps -a | grep -qw seek-search
 then
     docker rm seek-search > /dev/null
     echo "deleted container"

@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-if ! docker ps -a | grep -q seek-search
+if ! docker ps -a | grep -qw seek-search
 then
     echo "container named seek-search does not exist"
     exit 1
