@@ -10,7 +10,7 @@ then
     exit 1
 fi
 
-if docker ps | grep -q seek-search
+if docker ps | grep -qw seek-search
 then
     echo "container named seek-search is already running"
     exit 1
