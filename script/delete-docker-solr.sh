@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if ! pgrep -x "dockerd" >/dev/null
 then
     echo "the Docker service isn't running"
@@ -14,7 +16,12 @@ fi
 
 
 echo "deleting seek-search container and seek-solr-data-volume volume"
-docker rm seek-search > /dev/null
-echo "deleted container"
+if docker ps -a | grep -q seek-search
+then
+    docker rm seek-search > /dev/null
+    echo "deleted container"
+else
+    echo "container seek-search does not exist, skipping"
+fi
 docker volume rm seek-solr-data-volume > /dev/null
 echo "deleted volume"

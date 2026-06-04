@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if ! pgrep -x "dockerd" >/dev/null
 then
     echo "the Docker service isn't running"

@@ -8,15 +8,12 @@ then
     exit 1
 fi
 
-if ! docker ps | grep -q seek-search
+if docker ps -a | grep -q seek-search
 then
-    echo "container named seek-search is not running"
-    exit 1
+    echo "stopping and removing seek-search container"
+    docker stop seek-search > /dev/null 2>&1 || true
+    docker rm seek-search > /dev/null
 fi
-
-echo "stopping and removing seek-search container"
-docker stop seek-search > /dev/null
-docker rm seek-search > /dev/null
 
 echo "removing seek-solr-data-volume"
 docker volume rm seek-solr-data-volume
