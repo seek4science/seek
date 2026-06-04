@@ -28,7 +28,18 @@ uploadExcel||="studySampleUploadExcel()"
   </div>
 </div>
 
+<div id="export-status-<%= sample_type_id %>" class="alert alert-dismissible fade in" role="alert" style="margin-top: 20px; display: none;" >
+  <button type="button" class="close" aria-label="Close" onclick="hideExportStatus(<%= sample_type_id %>)">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <div id="export-status-detail-<%= sample_type_id %>"></div>
+</div>
+
 <script>
+  function hideExportStatus(sampleTypeId) {
+    $j(`#export-status-${sampleTypeId}`).hide();
+  }
+
   function loadBatchPermission(dtName, e){
     const sample_ids = window[dtName].selectedSampleIds()
     let publish_list = {'Sample': {}}
@@ -58,5 +69,4 @@ uploadExcel||="studySampleUploadExcel()"
     });
 
   }
-
 </script>
