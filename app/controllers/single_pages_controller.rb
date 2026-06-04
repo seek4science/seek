@@ -120,20 +120,6 @@ class SinglePagesController < ApplicationController
     end
   end
 
-  def export_to_excel
-    cache_uuid = SecureRandom.uuid
-    sample_ids = JSON.parse(params[:sample_ids])
-    sample_type_id = JSON.parse(params[:sample_type_id])
-    study_id = JSON.parse(params[:study_id])
-    assay_id = JSON.parse(params[:assay_id])
-
-    Rails.cache.write(cache_uuid, { "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
-                      expires_in: 1.minute)
-    respond_to do |format|
-      format.json { render json: { uuid: cache_uuid } }
-    end
-  end
-
   def upload_samples
     uploaded_file = params[:file]
     project_id = params[:project_id]
