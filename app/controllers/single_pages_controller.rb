@@ -53,11 +53,10 @@ class SinglePagesController < ApplicationController
   end
 
   def download_samples_excel
-    cached_asset_ids = Rails.cache.read(params[:uuid])
-    raise "Request took too long or was interrupted." if cached_asset_ids.nil?
-
-    sample_ids, sample_type_id, study_id, assay_id = cached_asset_ids.values_at(:sample_ids, :sample_type_id,
-                                                                                               :study_id, :assay_id)
+    sample_ids = JSON.parse(params[:sample_ids])
+    sample_type_id = JSON.parse(params[:sample_type_id])
+    study_id = JSON.parse(params[:study_id])
+    assay_id = JSON.parse(params[:assay_id])
 
     @study = Study.find(study_id)
     @assay = Assay.find(assay_id) unless assay_id.nil?
@@ -106,7 +105,13 @@ class SinglePagesController < ApplicationController
             end
 
     flash[:notice] = notice_message
-    render xlsx: 'download_samples_spreadsheet', filename: helpers.sanitized_text(spreadsheet_name), disposition: 'inline'
+    respond_to do |format|
+      format.xlsx do
+        render xlsx: 'download_samples_spreadsheet',
+               filename: helpers.sanitized_text(spreadsheet_name),
+               disposition: 'attachment'
+      end
+    end
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
