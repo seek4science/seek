@@ -30,29 +30,11 @@ module ResourceListItemHelper
 
   def list_item_title(resource, options = {})
 
-    html = nil
-
-    cache_key = "#{resource.list_item_title_cache_key_prefix}_#{resource.authorization_supported? && resource.can_manage?}"
-    result = Rails.cache.fetch(cache_key) do
-      title = options[:title]
-      url = options[:url]
-      include_avatar = options[:include_avatar]
-      include_avatar = true if include_avatar.nil?
-
-      title = get_object_title(resource) if title.nil?
-
-      html = '<div class="list_item_title">'
-
-      if resource.class.name.split('::')[0] == 'Person'
-        html = list_item_title_for_person(html, resource, title, url)
-      else
-        if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
-          html = list_item_title_with_avatar(html, resource, title, url)
-        else
-          html << (link_to title, (url.nil? ? show_resource_path(resource) : url)).to_s
-        end
-      end
-      html << '</div>'
+    result = if params[:code].present?
+      build_list_item_title_html(resource, options)
+    else
+      cache_key = "#{resource.list_item_title_cache_key_prefix}_#{resource.authorization_supported? && resource.can_manage?}"
+      Rails.cache.fetch(cache_key) { build_list_item_title_html(resource, options) }
     end
 
     if [Person, Project].include?(resource.class)
@@ -78,6 +60,28 @@ module ResourceListItemHelper
     visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ''
     result = result.gsub('#item_visibility', visibility)
     result.html_safe
+  end
+
+  def build_list_item_title_html(resource, options)
+    title = options[:title]
+    url = options[:url]
+    include_avatar = options[:include_avatar]
+    include_avatar = true if include_avatar.nil?
+
+    title = get_object_title(resource) if title.nil?
+
+    html = '<div class="list_item_title">'
+
+    if resource.class.name.split('::')[0] == 'Person'
+      html = list_item_title_for_person(html, resource, title, url)
+    else
+      if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
+        html = list_item_title_with_avatar(html, resource, title, url)
+      else
+        html << (link_to title, (url.nil? ? show_resource_path(resource) : url)).to_s
+      end
+    end
+    html << '</div>'
   end
 
   def list_item_title_for_person(html, person, title, url)
