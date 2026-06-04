@@ -19,7 +19,7 @@ x-shared:
       db:
         condition: service_healthy
       solr:
-        condition: service_started
+        condition: service_healthy
 
 
 services:
@@ -43,7 +43,7 @@ services:
       - seek-mysql-db:/var/lib/mysql
     healthcheck:
       test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent" ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
       retries: 5
       start_period: 20s
@@ -84,6 +84,12 @@ services:
     volumes:
       - seek-solr-data:/var/solr/
       - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/seek/admin/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
