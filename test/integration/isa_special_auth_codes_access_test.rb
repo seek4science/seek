@@ -814,5 +814,136 @@ class IsaSpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
     get "/studies/#{study.id}?code=#{code}"
     assert_response :success
   end
+
+  # ===============================================
+  # Related Items View Tests
+  # ===============================================
+
+  test 'investigation code shows private children at all levels in related items' do
+    contributor = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation,
+      policy: FactoryBot.create(:private_policy),
+      contributor: contributor
+    )
+    study = FactoryBot.create(:study,
+      investigation: investigation,
+      policy: FactoryBot.create(:private_policy),
+      contributor: contributor
+    )
+    assay = FactoryBot.create(:assay,
+      study: study,
+      policy: FactoryBot.create(:private_policy),
+      contributor: contributor
+    )
+    data_file = FactoryBot.create(:data_file,
+      policy: FactoryBot.create(:private_policy),
+      contributor: contributor
+    )
+    sample = FactoryBot.create(:sample,
+      policy: FactoryBot.create(:private_policy),
+      contributor: contributor
+    )
+
+    disable_authorization_checks do
+      assay.assay_assets.create(asset: data_file)
+      assay.assay_assets.create(asset: sample)
+    end
+
+    auth_code = User.with_current_user(contributor.user) do
+      FactoryBot.create(:special_auth_code,
+        expiration_date: (Time.now + 1.days),
+        asset: investigation
+      )
+    end
+
+    code = CGI.escape(auth_code.code)
+    get "/investigations/#{investigation.id}?code=#{code}"
+    assert_response :success
+
+    # the title and favouritable avatar link
+    assert_select '#studies .list_item_title a[href*=?]', "/studies/#{study.id}", count: 2
+    assert_select '#studies .list_item_title a[href*=?]', "code=#{code}", count: 2
+
+    assert_select '#assays .list_item_title a[href*=?]', "/assays/#{assay.id}", count: 2
+    assert_select '#assays .list_item_title a[href*=?]', "code=#{code}", count: 2
+
+    assert_select '#datafiles .list_item_title a[href*=?]', "/data_files/#{data_file.id}", count: 2
+    assert_select '#datafiles .list_item_title a[href*=?]', "code=#{code}", count: 2
+
+    assert_select '#samples .list_item_title a[href*=?]', "/samples/#{sample.id}", count: 2
+    assert_select '#samples .list_item_title a[href*=?]', "code=#{code}", count: 2
+  end
+
+  test 'study code shows private child assays in related items' do
+    investigation = FactoryBot.create(:investigation)
+    study = FactoryBot.create(:study,
+      investigation: investigation,
+      policy: FactoryBot.create(:private_policy)
+    )
+    assay = FactoryBot.create(:assay,
+      study: study,
+      policy: FactoryBot.create(:private_policy),
+      contributor: study.contributor
+    )
+
+    auth_code = User.with_current_user(study.contributor.user) do
+      FactoryBot.create(:special_auth_code,
+        expiration_date: (Time.now + 1.days),
+        asset: study
+      )
+    end
+
+    code = CGI.escape(auth_code.code)
+    get "/studies/#{study.id}?code=#{code}"
+    assert_response :success
+
+    assert_select '#assays .list_item_title a[href*=?]', "/assays/#{assay.id}", count: 2
+    assert_select '#assays .list_item_title a[href*=?]', "code=#{code}", count: 2
+  end
+
+  test 'assay code shows private linked data files in related items' do
+    investigation = FactoryBot.create(:investigation)
+    study = FactoryBot.create(:study, investigation: investigation)
+    assay = FactoryBot.create(:assay,
+      study: study,
+      policy: FactoryBot.create(:private_policy)
+    )
+    data_file = FactoryBot.create(:data_file,
+      policy: FactoryBot.create(:private_policy),
+      contributor: assay.contributor
+    )
+
+    disable_authorization_checks do
+      assay.assay_assets.create(asset: data_file)
+    end
+
+    auth_code = User.with_current_user(assay.contributor.user) do
+      FactoryBot.create(:special_auth_code,
+        expiration_date: (Time.now + 1.days),
+        asset: assay
+      )
+    end
+
+    code = CGI.escape(auth_code.code)
+    get "/assays/#{assay.id}?code=#{code}"
+    assert_response :success
+
+    assert_select '#datafiles .list_item_title a[href*=?]', "/data_files/#{data_file.id}", count: 2
+    assert_select '#datafiles .list_item_title a[href*=?]', "code=#{code}", count: 2
+  end
+
+  test 'private children not shown in related items without code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+    study = FactoryBot.create(:study,
+      investigation: investigation,
+      policy: FactoryBot.create(:private_policy),
+      contributor: investigation.contributor
+    )
+
+    get "/investigations/#{investigation.id}"
+    assert_response :success
+
+    assert_select '.list_item a[href*=?]', "/studies/#{study.id}", count: 0
+  end
 end
 
