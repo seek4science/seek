@@ -228,6 +228,28 @@ class SearchControllerTest < ActionController::TestCase
   end
 
 
+  test 'ISATag is excluded from HTML search results' do
+    isa_tag = FactoryBot.create(:min_isa_tag)
+
+    ISATag.stub(:solr_cache, -> (q) { [isa_tag.id] }) do
+      get :index, params: { q: 'isa' }
+    end
+
+    assert_response :success
+    assert_nil assigns(:results)['ISATag']
+  end
+
+  test 'ISATag is included in JSON API search results' do
+    isa_tag = FactoryBot.create(:min_isa_tag)
+
+    ISATag.stub(:solr_cache, -> (q) { [isa_tag.id] }) do
+      get :index, params: { q: 'isa' }, format: :json
+    end
+
+    assert_response :success
+    assert_equal 1, assigns(:results)['ISATag'].count
+  end
+
   test 'remember external search' do
     FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
 
