@@ -50,30 +50,24 @@ class SinglePagesControllerTest < ActionController::TestCase
     sample_type_id = source_sample_type.id
     study_id = study.id
     assay_id = nil
+    project_id = project.id
 
     login_as(unauthorized_person)
 
-    post_params = { sample_ids: source_ids.to_json,
+    download_params = { sample_ids: source_ids.to_json,
                     sample_type_id: sample_type_id.to_json,
                     study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
+                    assay_id: assay_id.to_json,
+                    project_id: project_id.to_json}
 
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
-    assert_redirected_to single_page_path(id: project.id, item_type: 'study', item_id: study_id)
+    get :download_samples_excel, params: download_params, format: :xlsx
+    assert_redirected_to single_page_path(id: project_id, item_type: 'study', item_id: study_id)
     assert_equal flash[:error], 'Could not retrieve Study Sample Type! Do you have at least viewing permissions?'
   end
 
   test 'generates a valid export of study sources in single page' do
     # Generate the excel data
-    id_label, person, _project, study, source_sample_type, sources = setup_file_upload.values_at(
+    id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
 
@@ -81,85 +75,67 @@ class SinglePagesControllerTest < ActionController::TestCase
     sample_type_id = source_sample_type.id
     study_id = study.id
     assay_id = nil
+    project_id = project.id
 
     login_as(person)
 
-    post_params = { sample_ids: source_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
+    download_params = { sample_ids: source_ids.to_json,
+                        sample_type_id: sample_type_id.to_json,
+                        study_id: study_id.to_json,
+                        assay_id: assay_id.to_json,
+                        project_id: project_id.to_json}
 
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
+    get :download_samples_excel, params: download_params, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{study.id} - #{study.title} sources table.xlsx\"")
   end
 
   test 'generates a valid export of study samples in single page' do
-    id_label, person, study, sample_collection_sample_type, study_samples = setup_file_upload.values_at(
-      :id_label, :person, :study, :sample_collection_sample_type, :study_samples
+    id_label, person, project, study, sample_collection_sample_type, study_samples = setup_file_upload.values_at(
+      :id_label, :person, :project, :study, :sample_collection_sample_type, :study_samples
     )
 
     source_sample_ids = study_samples.map { |ss| { id_label => ss.id } }
     sample_type_id = sample_collection_sample_type.id
     study_id = study.id
     assay_id = nil
+    project_id = project.id
 
     login_as(person)
 
-    post_params = { sample_ids: source_sample_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
+    download_params = { sample_ids: source_sample_ids.to_json,
+                        sample_type_id: sample_type_id.to_json,
+                        study_id: study_id.to_json,
+                        assay_id: assay_id.to_json,
+                        project_id: project_id.to_json}
 
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
+    get :download_samples_excel, params: download_params, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{study.id} - #{study.title} samples table.xlsx\"")
   end
 
   test 'generates a valid export of assay samples in single page' do
-    id_label, person, study, assay, assay_sample_type, assay_samples = setup_file_upload.values_at(
-      :id_label, :person, :study, :assay, :assay_sample_type, :assay_samples
+    id_label, person, project, study, assay, assay_sample_type, assay_samples = setup_file_upload.values_at(
+      :id_label, :person, :project, :study, :assay, :assay_sample_type, :assay_samples
     )
 
     assay_sample_ids = assay_samples.map { |ss| { id_label => ss.id } }
     sample_type_id = assay_sample_type.id
     study_id = study.id
     assay_id = assay.id
+    project_id = project.id
 
     login_as(person)
 
-    post_params = { sample_ids: assay_sample_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
+    download_params = { sample_ids: assay_sample_ids.to_json,
+                        sample_type_id: sample_type_id.to_json,
+                        study_id: study_id.to_json,
+                        assay_id: assay_id.to_json,
+                        project_id: project_id.to_json}
 
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
+    get :download_samples_excel, params: download_params, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{assay.id} - #{assay.title} table.xlsx\"")
@@ -419,18 +395,17 @@ class SinglePagesControllerTest < ActionController::TestCase
       sample_type_id = source_sample_type.id
       study_id = study.id
       assay_id = nil
+      project_id = project.id
 
       post_params = { sample_ids: source_ids.to_json,
                       sample_type_id: sample_type_id.to_json,
                       study_id: study_id.to_json,
-                      assay_id: assay_id.to_json }
+                      assay_id: assay_id.to_json,
+                      project_id: project_id.to_json}
 
-      post :export_to_excel, params: post_params, format: :json
+      get :download_samples_excel, params: post_params
 
-      assert_response :unprocessable_entity
-
-      response_body = JSON.parse(response.body)
-      assert_equal response_body, {"title" => "ISA JSON compliance are disabled"}
+      assert_redirected_to root_path
     end
   end
 
@@ -487,7 +462,7 @@ class SinglePagesControllerTest < ActionController::TestCase
 
   test 'Should sanitize spreadsheet name' do
     # Generate the excel data
-    id_label, person, _project, study, source_sample_type, sources = setup_file_upload.values_at(
+    id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
 
@@ -497,23 +472,17 @@ class SinglePagesControllerTest < ActionController::TestCase
     sample_type_id = source_sample_type.id
     study_id = study.id
     assay_id = nil
+    project_id = project.id
 
     login_as(person)
 
-    post_params = { sample_ids: source_ids.to_json,
+    download_params = { sample_ids: source_ids.to_json,
                     sample_type_id: sample_type_id.to_json,
                     study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
+                    assay_id: assay_id.to_json,
+                    project_id: project_id.to_json}
 
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
+    get :download_samples_excel, params: download_params, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     expected_file_name = "My sample type sources table.xlsx"
