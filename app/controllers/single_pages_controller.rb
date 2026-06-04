@@ -23,7 +23,10 @@ class SinglePagesController < ApplicationController
     respond_to(&:html)
   end
 
-  def index; end
+  def index
+    flash[:notice] = "You have redirected to the #{t('project').pluralize} page."
+    redirect_to projects_path
+  end
 
   def project_folders
     return unless Seek::Config.project_single_page_folders_enabled
