@@ -41,19 +41,26 @@ class SinglePagesController < ApplicationController
   end
 
   def export_to_spreadsheet
-    cache_uuid = SecureRandom.uuid
     sample_ids = JSON.parse(params[:sample_ids])
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
     assay_id = JSON.parse(params[:assay_id])
     project_id = JSON.parse(params[:project_id])
 
+    raise 'Export aborted! The Sample Type ID was not included in the request!' if sample_type_id.nil?
+    raise 'Export aborted! At least a Study ID or Assay ID must be provided in the request!' if study_id.nil? && assay_id.nil?
+    raise 'Export aborted! The Project ID was not included in the request!' if project_id.nil?
+    raise 'Export aborted! The provided Sample IDs are not valid!' unless sample_ids.all? { |sid| !!Integer(sid.to_s, exception: false) }
+
+    cache_uuid = SecureRandom.uuid
     Rails.cache.write(cache_uuid, { "project_id": project_id, "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
                       expires_in: 1.minute)
 
     respond_to do |format|
       format.json { render json: { uuid: cache_uuid } }
     end
+  rescue StandardError => e
+    render json: { error: e }, status: :unprocessable_entity
   end
 
   def download_spreadsheet
@@ -68,7 +75,6 @@ class SinglePagesController < ApplicationController
     @project = Project.find(project_id)
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    raise 'Export aborted! The sample type ID was not included in request!' if sample_type_id.nil?
 
     unless @samples.all? { |sample| sample.project_ids.include? project_id }
       raise "Export aborted! Some sample could not be associated with the provided project (\"#{project_id}: #{@project.title}\")."

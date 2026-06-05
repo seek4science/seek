@@ -287,10 +287,6 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
   // Finally only use the sample IDs
     .map(row => row[idFieldName]);
 
-  statusDetails
-    .empty()
-    .append("<p>Spreadsheet download:</p>");
-
   $j.ajax({
     type: 'POST',
     headers: {
@@ -305,11 +301,13 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
       project_id: JSON.stringify(projectId)
     }
   })
-  .done( function(response){
+  .done( function(response) {
     window.location.href = `<%= download_spreadsheet_single_pages_path(format: :xlsx) %>?uuid=${response.uuid}`;
     statusElement
       .removeClass('alert-info alert-success alert-danger')
       .addClass("alert-success");
+
+    statusDetails.empty();
 
     if(sampleIds.length < 1) {
       statusDetails
@@ -322,15 +320,17 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
         .append(`<p><b>${sampleIds.length}</b> samples included</p>`);
     }
   })
-  .fail( function(response){
+  .fail( function(response) {
     statusElement
       .removeClass('alert-info alert-success alert-danger')
-      .addClass("alert-success");
+      .addClass("alert-danger");
 
+    debugger;
     statusDetails
+      .empty()
       .append(`<p><b>Failed to export to spreadsheet!</b></p>`)
       .append(`<p><b>Status:</b> ${response.status} - ${JSON.stringify(response.error().statusText)}</p>`)
-      .append(`<p><b>Error:</b> ${response.responseText}</p>`);
+      .append(`<p><b>Error:</b> ${response.responseJSON.error}</p>`);
   });
 }
 
