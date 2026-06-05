@@ -46,7 +46,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
     unauthorized_person = FactoryBot.create(:person)
-    source_ids = sources.map { |s| { id_label => s.id } }
+    source_ids = sources.map(&:id)
     sample_type_id = source_sample_type.id
     study_id = study.id
     assay_id = nil
@@ -60,7 +60,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                     assay_id: assay_id.to_json,
                     project_id: project_id.to_json}
 
-    get :download_samples_excel, params: download_params, format: :xlsx
+    post :export_to_spreadsheet, params: download_params, format: :json
+    assert_response :ok, msg = "Couldn't reach the server"
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
     assert_redirected_to single_page_path(id: project_id, item_type: 'study', item_id: study_id)
     assert_equal flash[:error], 'Could not retrieve Study Sample Type! Do you have at least viewing permissions?'
   end
@@ -71,7 +78,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
 
-    source_ids = sources.map { |s| { id_label => s.id } }
+    source_ids = sources.map(&:id)
     sample_type_id = source_sample_type.id
     study_id = study.id
     assay_id = nil
@@ -85,7 +92,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                         assay_id: assay_id.to_json,
                         project_id: project_id.to_json}
 
-    get :download_samples_excel, params: download_params, format: :xlsx
+    post :export_to_spreadsheet, params: download_params, format: :json
+    assert_response :ok, msg = "Couldn't reach the server"
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{study.id} - #{study.title} sources table.xlsx\"")
@@ -96,7 +110,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       :id_label, :person, :project, :study, :sample_collection_sample_type, :study_samples
     )
 
-    source_sample_ids = study_samples.map { |ss| { id_label => ss.id } }
+    source_sample_ids = study_samples.map(&:id)
     sample_type_id = sample_collection_sample_type.id
     study_id = study.id
     assay_id = nil
@@ -110,7 +124,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                         assay_id: assay_id.to_json,
                         project_id: project_id.to_json}
 
-    get :download_samples_excel, params: download_params, format: :xlsx
+    post :export_to_spreadsheet, params: download_params, format: :json
+    assert_response :ok, msg = "Couldn't reach the server"
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{study.id} - #{study.title} samples table.xlsx\"")
@@ -121,7 +142,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       :id_label, :person, :project, :study, :assay, :assay_sample_type, :assay_samples
     )
 
-    assay_sample_ids = assay_samples.map { |ss| { id_label => ss.id } }
+    assay_sample_ids = assay_samples.map(&:id)
     sample_type_id = assay_sample_type.id
     study_id = study.id
     assay_id = assay.id
@@ -135,7 +156,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                         assay_id: assay_id.to_json,
                         project_id: project_id.to_json}
 
-    get :download_samples_excel, params: download_params, format: :xlsx
+    post :export_to_spreadsheet, params: download_params, format: :json
+    assert_response :ok, msg = "Couldn't reach the server"
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{assay.id} - #{assay.title} table.xlsx\"")
@@ -391,21 +419,25 @@ class SinglePagesControllerTest < ActionController::TestCase
         :id_label, :person, :project, :study, :source_sample_type, :sources
       )
 
-      source_ids = sources.map { |s| { id_label => s.id } }
+      source_ids = sources.map(&:id)
       sample_type_id = source_sample_type.id
       study_id = study.id
       assay_id = nil
       project_id = project.id
 
-      post_params = { sample_ids: source_ids.to_json,
+      download_params = { sample_ids: source_ids.to_json,
                       sample_type_id: sample_type_id.to_json,
                       study_id: study_id.to_json,
                       assay_id: assay_id.to_json,
                       project_id: project_id.to_json}
 
-      get :download_samples_excel, params: post_params
-
+      post :export_to_spreadsheet, params: download_params
       assert_redirected_to root_path
+
+      post :export_to_spreadsheet, params: download_params, format: :json
+      assert_response :unprocessable_entity
+      response_body = JSON.parse(response.body)
+      assert_equal "ISA JSON compliance are disabled", response_body['title']
     end
   end
 
@@ -468,7 +500,7 @@ class SinglePagesControllerTest < ActionController::TestCase
 
     study.update_column(:title, '<script>alert("Script tags should be removed!")</script> My sample type')
 
-    source_ids = sources.map { |s| { id_label => s.id } }
+    source_ids = sources.map(&:id)
     sample_type_id = source_sample_type.id
     study_id = study.id
     assay_id = nil
@@ -482,7 +514,14 @@ class SinglePagesControllerTest < ActionController::TestCase
                     assay_id: assay_id.to_json,
                     project_id: project_id.to_json}
 
-    get :download_samples_excel, params: download_params, format: :xlsx
+    post :export_to_spreadsheet, params: download_params, format: :json
+    assert_response :ok, msg = "Couldn't reach the server"
+
+    response_body = JSON.parse(response.body)
+    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
+    cache_uuid = response_body['uuid']
+
+    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     expected_file_name = "My sample type sources table.xlsx"
