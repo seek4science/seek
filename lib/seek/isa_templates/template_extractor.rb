@@ -36,7 +36,7 @@ module Seek
               template = Template.new(template_details.merge({ projects: [project], policy: Policy.public_policy }))
 
               current_template_attributes = []
-              item['data'].each_with_index do |attribute, j|
+              item['data'].each do |attribute|
                 is_cv = attribute['dataType'].include? 'Controlled Vocabulary'
                 allow_cv_free_text = false
                 if is_cv
@@ -101,7 +101,6 @@ module Seek
               terms = []
             end
             terms.each_with_index do |term, i|
-              puts "#{j}) #{i + 1} FROM #{terms.length}"
               if i.zero?
                 # Skip the parent name
                 des = term[:description]
