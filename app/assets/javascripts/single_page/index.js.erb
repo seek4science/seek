@@ -307,7 +307,9 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
       .removeClass('alert-info alert-success alert-danger')
       .addClass("alert-success");
 
-    statusDetails.empty();
+    statusDetails
+      .empty()
+      .append("<p>Your export has been generated. A download should start soon.</p>");
 
     if(sampleIds.length < 1) {
       statusDetails
