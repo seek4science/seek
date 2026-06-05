@@ -40,22 +40,48 @@ class SinglePagesController < ApplicationController
     render json: { status: :unprocessable_entity, error: e.message }
   end
 
-  def download_samples_excel
+  def export_to_spreadsheet
+    cache_uuid = SecureRandom.uuid
     sample_ids = JSON.parse(params[:sample_ids])
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
     assay_id = JSON.parse(params[:assay_id])
     project_id = JSON.parse(params[:project_id])
 
+    Rails.cache.write(cache_uuid, { "project_id": project_id, "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
+                      expires_in: 1.minute)
+
+    respond_to do |format|
+      format.json { render json: { uuid: cache_uuid } }
+    end
+  end
+
+  def download_spreadsheet
+    cached_asset_ids = Rails.cache.read(params[:uuid])
+    raise "Request took too long or was interrupted." if cached_asset_ids.nil?
+
+    project_id, sample_ids, sample_type_id, study_id, assay_id = cached_asset_ids.values_at(:project_id, :sample_ids, :sample_type_id,
+                                                                                :study_id, :assay_id)
+
     @study = Study.find(study_id)
     @assay = Assay.find(assay_id) unless assay_id.nil?
     @project = Project.find(project_id)
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
+    raise 'Export aborted! The sample type ID was not included in request!' if sample_type_id.nil?
+
+    unless @samples.all? { |sample| sample.project_ids.include? project_id }
+      raise "Export aborted! Some sample could not be associated with the provided project (\"#{project_id}: #{@project.title}\")."
+    end
 
     @sample_type = SampleType.find(sample_type_id)
     raise "Could not retrieve #{assay_id.nil? ? 'Study' : 'Assay'} Sample Type! Do you have at least viewing permissions?" unless @sample_type.can_view?
+
+    raise "Export aborted! The sample type could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @sample_type.project_ids.include?(project_id)
+    raise "Export aborted! The study could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @study.project_ids.include?(project_id)
+    unless @assay.nil?
+      raise "Export aborted! The assay could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @sample_type.project_ids.include?(project_id)
+    end
 
     @template = Template.find(@sample_type.template_id)
 
@@ -79,8 +105,17 @@ class SinglePagesController < ApplicationController
     end
   rescue StandardError => e
     flash[:error] = e.message
-    redirect_to single_page_path(id: @project.id, item_type: @assay.nil? ? 'study' : 'assay',
-                                 item_id: @assay.nil? ? @study.id : @assay.id)
+
+    project_id = @project&.id || (JSON.parse(params[:project_id]) rescue nil)
+    study_id   = @study&.id   || (JSON.parse(params[:study_id]) rescue nil)
+    assay_id   = @assay&.id   || (JSON.parse(params[:assay_id]) rescue nil)
+
+    if project_id && (study_id || assay_id)
+      redirect_to single_page_path(id: project_id, item_type: assay_id.nil? ? 'study' : 'assay',
+                                   item_id: assay_id.nil? ? study_id : assay_id)
+    else
+      redirect_to projects_path
+    end
   end
 
   def upload_samples
