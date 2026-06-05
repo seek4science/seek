@@ -430,6 +430,6 @@ class SinglePagesController < ApplicationController
   def check_user_logged_in
     return if current_user
 
-    render json: { status: :unauthorized, error: 'You must be logged in to use this feature.' }
+    return render json: { status: :unauthorized, error: 'You must be logged in to use this feature.' }
   end
 end
