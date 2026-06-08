@@ -14,9 +14,13 @@ module TemplatesHelper
     end
   end
 
-  def load_templates
+  def load_templates(sample_type_creation=false)
     privilege = Seek::Permissions::Translator.translate('view')
-    Template.order(:group, :group_order).select { |t| t.can_perform?(privilege) }.map do |item|
+    templates = (sample_type_creation ? Template.for_sample_type_creation : Template)
+                  .order(:group, :group_order)
+                  .select { |t| t.can_perform?(privilege) }
+
+    templates.map do |item|
       { title: sanitize(item.title),
         group: sanitize(item.group),
         level: sanitize(item.level),

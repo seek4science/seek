@@ -16,7 +16,14 @@ module Seek
       end
 
       def retained_content_blob_ids
-        (params[:retained_content_blob_ids] || []).map(&:to_i).sort
+        (params[:retained_content_blob_ids] || []).map(&:to_i).select(&:positive?).sort
+      end
+
+      # Returns retained blob IDs that were recorded in the session during a previous failed save,
+      # preventing a user from attaching blobs they did not upload by tampering with params.
+      def safe_retained_content_blob_ids
+        allowed = (session[:orphaned_content_blob_ids] || []).map(&:to_i)
+        retained_content_blob_ids & allowed
       end
 
       def model_image_present?
@@ -24,17 +31,14 @@ module Seek
       end
 
       def check_for_data_or_url(blob_param)
-        if blob_param[:data].blank? && blob_param[:data_url].blank? && blob_param[:base64_data].blank?
-          if blob_param.include?(:data_url)
-            flash.now[:error] = 'Please select a file to upload or provide a URL to the data.'
-          elsif blob_param.include?(:data_url)
-            flash.now[:error] = 'Please select a file to upload.'
-          else
-            # What to do?
-          end
-          false
+        blob_param[:data].present? || blob_param[:data_url].present? || blob_param[:base64_data].present?
+      end
+
+      def missing_content_error(blob_param)
+        if blob_param.include?(:data_url)
+          'Please select a file to upload or provide a URL to the data.'
         else
-          true
+          'Please select a file to upload.'
         end
       end
 
