@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class PolicyTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'deep clone' do
     policy = policies(:download_for_all_sysmo_users_policy)

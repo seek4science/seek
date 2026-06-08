@@ -7,7 +7,6 @@ require 'sunspot_rails'
 require 'mimemagic'
 require 'omniauth-ldap'
 require 'recaptcha'
-require 'uuid'
 require 'libreconv'
 require 'extensions/secret_key_base'
 
@@ -20,7 +19,7 @@ Rails.configuration.after_initialize do
 
 
   SEEK::Application.configure do
-    ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']
+    ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'ObservationUnit', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']
 
     begin
       Seek::Config.propagate_all

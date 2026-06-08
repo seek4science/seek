@@ -2,7 +2,6 @@ require 'test_helper'
 require 'minitest/mock'
 
 class SopsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -190,11 +189,13 @@ class SopsControllerTest < ActionController::TestCase
         post :create, params: { sop: sop_details, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
-    assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin).person, assigns(:sop).contributor
-    assert !assigns(:sop).content_blob.url.blank?
-    assert_equal 'sysmo-db-logo-grad2.png', assigns(:sop).content_blob.original_filename
-    assert_equal 'image/png', assigns(:sop).content_blob.content_type
+    sop = assigns(:sop)
+    assert_redirected_to sop_path(sop)
+    assert_equal users(:quentin).person, sop.contributor
+    refute sop.content_blob.url.blank?
+    assert_equal 'sysmo-db-logo-grad2.png', sop.content_blob.original_filename
+    assert_equal 'image/png', sop.content_blob.content_type
+    assert sop.content_blob.make_local_copy?
   end
 
   test 'should show sop' do
@@ -1802,7 +1803,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
 
     get :show, params: { id: sop }
@@ -2220,6 +2221,20 @@ class SopsControllerTest < ActionController::TestCase
     results = JSON.parse(response.body)['error']
     assert_equal results, "No asset could be linked to the provided parameters. Make sure the ID is correct and you have at least viewing permission for assay ID '#{assay.id}'."
 
+  end
+
+  test 'create SOP with SOP type annotations' do
+    sop_params, blob = valid_sop
+    sop_params[:sop_type_annotations] = ["HCS protocol"]
+    sop_types_cv = SampleControlledVocab::SystemVocabs.vocab_for_property(:sop_types) || FactoryBot.create(:sop_types_controlled_vocab)
+    assert_difference('Sop.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params: { sop: sop_params, content_blobs: [blob], policy_attributes: valid_sharing }
+      end
+    end
+    sop = assigns(:sop)
+    expected_term = sop_types_cv.sample_controlled_vocab_terms.detect { |term| term.label == "HCS protocol" }
+    assert sop.sop_type_annotations == [expected_term.iri]
   end
 
   private

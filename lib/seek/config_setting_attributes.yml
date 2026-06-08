@@ -57,7 +57,7 @@ email_enabled:
 jws_enabled:
 copasi_enabled:
 morpheus_enabled:
-external_search_enabled:
+external_search_adaptors:
 piwik_analytics_enabled:
 piwik_analytics_tracking_notice:
 custom_analytics_snippet_enabled:
@@ -98,7 +98,6 @@ profile_select_by_default:
 recaptcha_public_key:
 recaptcha_private_key:
 support_email_address:
-show_as_external_link_enabled:
 doi_minting_enabled:
 datacite_username:
 datacite_password:
@@ -119,6 +118,8 @@ zenodo_client_id:
 zenodo_client_secret:
 programme_user_creation_enabled:
 programmes_open_for_projects_enabled:
+show_as_external_link_enabled:
+block_file_uploads:
 cache_remote_files:
 orcid_required:
 max_cachable_size:
@@ -218,6 +219,8 @@ workflows_enabled:
 collections_enabled:
 file_templates_enabled:
 placeholders_enabled:
+# Standard login panel
+standard_login_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:

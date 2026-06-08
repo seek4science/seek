@@ -4,7 +4,6 @@ class AttributionsTest < ActionController::TestCase
   # use SopsController, because attributions don't have their own controller
   tests SopsController
 
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper

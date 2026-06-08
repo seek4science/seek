@@ -249,6 +249,15 @@ versionNumber:
   minLength: 1
   enum:
     - "1.0"
+eventLocationTypeString:
+  anyOf:
+    - type: 'null'
+    - type: string
+      minlength: 1
+      enum:
+        - in_person
+        - hybrid
+        - online
 JsonApiVersion:
   type: object
   properties:
@@ -850,6 +859,7 @@ anyType:
     - human_diseases
     - institutions
     - investigations
+    - isa_tags
     - models
     - observation_units
     - organisms
@@ -931,6 +941,11 @@ institutionType:
   minLength: 1
   enum:
     - institutions
+isaTagType:
+  type: string
+  minLength: 1
+  enum:
+    - isa_tags
 modelType:
   type: string
   minLength: 1
@@ -1679,6 +1694,10 @@ eventPost:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -1740,6 +1759,10 @@ eventPatch:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -2110,8 +2133,6 @@ personPost:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
               $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
-              $ref: "#/components/schemas/nullableNonEmptyString"
           required:
             - first_name
             - last_name
@@ -2156,8 +2177,6 @@ personPatch:
             tools:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
-              $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
               $ref: "#/components/schemas/nullableNonEmptyString"
           additionalProperties: false
       required:
@@ -3144,6 +3163,24 @@ unprocessableEntityResponse:
     errors:
       - detail: id specified by the PUT request does not match object-id in the
           JSON input
+unauthorizedResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: Unauthorized
+        detail: You are not authorized to perform this action.
+notAcceptableResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: Not Acceptable
+        detail: Only Application/json is supported.
 badRequestResponse:
   type: object
   properties:
@@ -3682,6 +3719,10 @@ eventResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -3899,6 +3940,31 @@ investigationResponse:
     - data
     - jsonapi
   additionalProperties: false
+isaTagResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/isaTagType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+          required:
+            - title
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/indexLinks"
+      required:
+        - id
+        - type
+        - attributes
+        - links
 modelResponse:
   type: object
   properties:
@@ -4051,8 +4117,6 @@ personResponse:
             tools:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
-              $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
               $ref: "#/components/schemas/nullableNonEmptyString"
             login:
               $ref: "#/components/schemas/nullableNonEmptyString"
@@ -4457,6 +4521,8 @@ publicationResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             publication_type:
               $ref: "#/components/schemas/nonEmptyString"
+            registered_mode:
+              $ref: "#/components/schemas/nonEmptyString"
             authors:
               $ref: "#/components/schemas/nonEmptyStringList"
             content_blobs:
@@ -4496,6 +4562,7 @@ publicationResponse:
             - pubmed_id
             - citation
             - publication_type
+            - registered_mode
             - link_to_pub
           additionalProperties: false
         relationships:
@@ -4840,6 +4907,8 @@ extendedMetadataTypeExtendedMetadataAttributeResponse:
       type: boolean
     pos:
       $ref: "#/components/schemas/nullableInteger"
+    allow_cv_free_text:
+      type: boolean
     sample_controlled_vocab_id:
       $ref: "#/components/schemas/nullableNonEmptyString"
     linked_extended_metadata_type_id:

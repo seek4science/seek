@@ -2,7 +2,6 @@ require 'test_helper'
 
 class RegistrationStateTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
-  fixtures :all
 
   test 'partially registered user always redirects to select person' do
     User.current_user = FactoryBot.create(:user, login: 'partial', person: nil)

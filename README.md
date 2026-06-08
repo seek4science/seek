@@ -5,7 +5,7 @@
 
 ## License
 
-Copyright © 2009-2023, University of Manchester and HITS gGmbH
+Copyright © 2009-2026, University of Manchester and HITS gGmbH
 
 [BSD 3-clause](BSD-LICENSE)
 
@@ -18,7 +18,13 @@ FAIRDOM-SEEK is incorporating semantic technology allowing sophisticated queries
 
 For an example of FAIRDOM-SEEK please visit our [Demo](http://demo.seek4science.org/).
 
-To see FAIRDOM-SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOMHub](http://fairdomhub.org)
+To see FAIRDOM-SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOMHub](http://fairdomhub.org). Examples include: 
+
+- [FAIRDOMHub](https://fairdomhub.org/)
+- [WorkflowHub](https://workflowhub.eu/)
+- [DataHub](https://datahub.elixir-belgium.org/)
+- [IBISBAKHub](https://hub.ibisba.eu/)
+- [NextSEEK](https://fair-dom.org/fairdom-in-use/nextseek)
 
 For more information please visit: [SEEK for Science](http://www.seek4science.org/)
 

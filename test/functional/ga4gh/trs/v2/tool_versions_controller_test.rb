@@ -4,7 +4,6 @@ module Ga4gh
     module V2
       class ToolVersionsControllerTest < ActionController::TestCase
         include AuthenticatedTestHelper
-        fixtures :users, :people
 
         test 'should list workflow versions as tool versions' do
           workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy))

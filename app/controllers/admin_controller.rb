@@ -75,6 +75,7 @@ class AdminController < ApplicationController
     end
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
+    Seek::Config.standard_login_enabled = string_to_boolean params[:standard_login_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
     Seek::Config.omniauth_ldap_enabled = string_to_boolean params[:omniauth_ldap_enabled]
@@ -105,6 +106,14 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
+    # Per-adaptor external search toggles (map: key => {'enabled' =>boolean})
+    if params.key?(:external_search_adaptors)
+      adaptor_settings = {}
+      params[:external_search_adaptors].each do |k, v|
+        adaptor_settings[k] = { 'enabled' => ['1', 'true', true].include?(v['enabled']) }
+      end
+      Seek::Config.external_search_adaptors = adaptor_settings
+    end
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
     Seek::Config.max_filters = params[:max_filters]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
@@ -337,6 +346,8 @@ class AdminController < ApplicationController
     Seek::Config.auth_lookup_update_batch_size = params[:auth_lookup_update_batch_size]
 
     Seek::Config.allow_private_address_access = string_to_boolean params[:allow_private_address_access]
+    Seek::Config.show_as_external_link_enabled = string_to_boolean params[:show_as_external_link_enabled]
+    Seek::Config.block_file_uploads = string_to_boolean params[:block_file_uploads]
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]

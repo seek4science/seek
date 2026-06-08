@@ -3,7 +3,6 @@ require 'test_helper'
 class GatekeeperPublishTest < ActionController::TestCase
   tests PeopleController
 
-  fixtures :all
 
   include AuthenticatedTestHelper
 

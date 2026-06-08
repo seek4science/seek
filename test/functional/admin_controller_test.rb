@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class AdminControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 
@@ -702,4 +701,100 @@ class AdminControllerTest < ActionController::TestCase
 
     assert flash[:error].blank?
   end
+
+  test 'should update external search adaptors settings' do
+    # Get available adaptors from YAML files
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    # Build params to disable all adaptors
+    adaptors_params = {}
+    setting = {}
+    adaptors.each do |adaptor|
+      adaptors_params[adaptor.key] = { 'enabled' => '0' } # Disabled
+      setting[adaptor.key] = { 'enabled' => true }
+    end
+
+    with_config_value(:external_search_adaptors, setting) do
+      refute Seek::ExternalSearch.instance.search_adaptors.empty?
+
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
+
+      # Verify settings were saved
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, _value|
+        # The controller converts '0' to false and '1' to true
+        assert_equal false, saved_config[key]['enabled'], "Adaptor #{key} should be disabled"
+      end
+
+      # checking the caching has been cleared
+      assert Seek::ExternalSearch.instance.search_adaptors.empty?
+    end
+  end
+
+  test 'should enable external search adaptors via update_settings' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    # Build params to enable all adaptors
+    adaptors_params = {}
+    setting = {}
+    adaptors.each do |adaptor|
+      adaptors_params[adaptor.key] = { 'enabled' => '1' } # Enabled
+      setting[adaptor.key] = { 'enabled' => false }
+    end
+
+    with_config_value(:external_search_adaptors, setting) do
+      assert Seek::ExternalSearch.instance.search_adaptors.empty?
+
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
+
+      # Verify settings were saved
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, _value|
+        assert_equal true, saved_config[key]['enabled'], "Adaptor #{key} should be enabled"
+      end
+
+      refute Seek::ExternalSearch.instance.search_adaptors.empty?
+    end
+  end
+
+  test 'should handle mixed enabled/disabled adaptors in update_settings' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    adaptors_params = {}
+    adaptors.each_with_index do |adaptor, idx|
+      adaptors_params[adaptor.key] = { 'enabled' => idx.even? ? '1' : '0' }
+    end
+
+    with_config_value(:external_search_adaptors, {}) do
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
+
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, value|
+        expected = value['enabled'] == '1'
+        assert_equal expected, saved_config[key]['enabled'], "Adaptor #{key} should be #{expected ? 'enabled' : 'disabled'}"
+      end
+    end
+  end
+
+  test 'features enabled page displays external search adaptors' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    get :features_enabled
+    assert_response :success
+
+    # Verify page mentions adaptors
+    assert_select 'div#external-search-details' do
+      # Verify each adaptor name appears on the page
+      adaptors.each do |adaptor|
+        assert_select 'div.checkbox label.admin-checkbox', text: adaptor.name
+        assert_select 'p.help-block', text:/Whether the #{adaptor.name} external search is active/
+      end
+    end
+  end
+
+
 end

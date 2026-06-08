@@ -92,7 +92,8 @@
         "NCBI ID",
         "Registered Data file",
         "Linked Extended Metadata",
-        "Linked Extended Metadata (multiple)"
+        "Linked Extended Metadata (multiple)",
+        "Registered SOP"
       ]
     },
     "allowCVFreeText": {
@@ -120,6 +121,7 @@
         {
           "type": "string",
           "enum": [
+            "input",
             "source",
             "sample",
             "protocol",

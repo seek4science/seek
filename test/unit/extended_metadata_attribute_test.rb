@@ -214,7 +214,32 @@ class ExtendedMetadataAttributeTest < ActiveSupport::TestCase
     attribute.title = nil
 
     assert_nil attribute.label
+  end
 
+  test 'label prioritizes explicit label over humanized title for nested attributes' do
+    nested_type = FactoryBot.create(:role_name_extended_metadata_type)
+    nested_attr = nested_type.extended_metadata_attributes.first
+    original_title = nested_attr.title
+
+    # Test 1: Explicit custom label should be returned as-is
+    nested_attr.label = 'Custom Label'
+    nested_attr.save
+    nested_attr.reload
+    assert_equal 'Custom Label', nested_attr.label
+
+    # Test 2: Explicitly set blank label should return blank, not fall back to humanized title
+    nested_attr.label = ''
+    nested_attr.save
+    nested_attr.reload
+    assert_equal '', nested_attr.label
+    assert_not_equal original_title.humanize, ''
+
+    # Test 3: No explicit label should fall back to humanized title
+    nested_attr2 = nested_type.extended_metadata_attributes.last
+    nested_attr2.label = nil
+    nested_attr2.save
+    nested_attr2.reload
+    assert_equal nested_attr2.title.humanize, nested_attr2.label
   end
 
 

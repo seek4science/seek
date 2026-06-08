@@ -2,7 +2,6 @@ require 'test_helper'
 require 'minitest/mock'
 
 class ModelsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -49,7 +48,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "attachment; filename=\"this_model.zip\"; filename*=UTF-8''this_model.zip", @response.header['Content-Disposition']
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '3024', @response.header['Content-Length']
+    assert_equal '3104', @response.header['Content-Length']
   end
 
   test 'should download model with a single file' do
@@ -69,7 +68,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '3024', @response.header['Content-Length']
+    assert_equal '3104', @response.header['Content-Length']
     zip_file_size1 = @response.header['Content-Length'].to_i
 
     # 3 files, 2 of them have the same name
@@ -81,7 +80,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :download, params: { id: model.id }
     assert_response :success
     assert_equal 'application/zip', @response.header['Content-Type']
-    assert_equal '4023', @response.header['Content-Length']
+    assert_equal '4143', @response.header['Content-Length']
     zip_file_size2 = @response.header['Content-Length'].to_i
 
     # the same name file is not overwriten, by checking the zip file size
@@ -211,6 +210,74 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
   end
 
+  test 'content blobs preserved as orphans after validation error' do
+    invalid_model = { title: 'Test' }
+    blob1_params = { data: file_for_upload, data_url: '', original_filename: '', make_local_copy: '0' }
+    blob2_params = { data: fixture_file_upload('little_file_v2.txt', 'text/plain'),
+                     data_url: '', original_filename: '', make_local_copy: '0' }
+
+    blobs_before = ContentBlob.where(asset_id: nil).pluck(:id)
+
+    assert_no_difference('Model.count') do
+      assert_difference('ContentBlob.count', 2) do
+        post :create, params: { model: invalid_model, content_blobs: [blob1_params, blob2_params],
+                                policy_attributes: valid_sharing }
+      end
+    end
+
+    assert_response :success
+    assert assigns(:model).errors.any?
+
+    orphaned_blobs = ContentBlob.where(asset_id: nil).where.not(id: blobs_before)
+    assert_equal 2, orphaned_blobs.count
+    assert orphaned_blobs.all?(&:file_exists?), 'Orphaned blob files should exist on disk'
+    assert_equal orphaned_blobs.map(&:id).sort, session[:orphaned_content_blob_ids].sort
+  end
+
+  test 'orphaned content blobs attached to model on successful resubmit after validation error' do
+    orphan1 = FactoryBot.create(:content_blob, original_filename: 'file1.txt')
+    orphan2 = FactoryBot.create(:content_blob, original_filename: 'file2.txt')
+    orphan_ids = [orphan1.id, orphan2.id]
+
+    assert_difference('Model.count', 1) do
+      assert_no_difference('ContentBlob.count') do
+        post :create, params: {
+          model: valid_model,
+          content_blobs: [{ data_url: '' }],
+          retained_content_blob_ids: orphan_ids.map(&:to_s),
+          policy_attributes: valid_sharing
+        }, session: { orphaned_content_blob_ids: orphan_ids }
+      end
+    end
+
+    assert_redirected_to model_path(assigns(:model))
+    created_model = assigns(:model)
+
+    orphan_ids.each do |id|
+      blob = ContentBlob.find(id)
+      assert_equal created_model.id, blob.asset_id
+      assert_equal 'Model', blob.asset_type
+      assert_equal 1, blob.asset_version
+    end
+  end
+
+  test 'tampered retained_content_blob_ids not in session are not attached and model is not created' do
+    other_persons_orphan = FactoryBot.create(:content_blob, original_filename: 'stolen.txt')
+
+    assert_no_difference('Model.count') do
+      post :create, params: {
+        model: valid_model,
+        content_blobs: [{ data_url: '' }],
+        retained_content_blob_ids: [other_persons_orphan.id.to_s],
+        policy_attributes: valid_sharing
+      }
+    end
+
+    other_persons_orphan.reload
+    assert_nil other_persons_orphan.asset_id, 'Tampered blob should not have been attached'
+    assert_equal 'Please select a file to upload or provide a URL to the data.', flash.now[:error]
+  end
+
   test 'associates assay' do
     login_as(:model_owner) # can edit assay_can_edit_by_my_first_sop_owner
     m = models(:teusink)
@@ -273,7 +340,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
 
     get :show, params: { id: model }
@@ -363,9 +430,31 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
+        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }],
+                                policy_attributes: valid_sharing,
+                                model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
+      end
+    end
+
+    model = assigns(:model)
+    assert_equal 'file_picture.png', model.model_image.original_filename
+    assert_equal 'image/png', model.model_image.content_type
+  end
+
+  test 'should create model with image even with blocked file uploads' do
+    stub_request(:head, 'http://somehwere/model.sbml').to_return(status: 200, headers: { 'Content-Type' => 'text/xml' })
+    with_config_value(:block_file_uploads, true) do
+      login_as(:model_owner)
+      assert_difference('Model.count') do
+        assert_difference('ModelImage.count') do
+          post :create, params: { model: valid_model, content_blobs: [{ data_url: 'http://somehwere/model.sbml' }],
+                                  policy_attributes: valid_sharing,
+                                  model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
+
+          assert_redirected_to model_path(assigns(:model))
+        end
       end
     end
 

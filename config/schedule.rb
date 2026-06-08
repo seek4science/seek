@@ -89,5 +89,5 @@ end
 
 # trim sessions
 every 1.day, at: '1:15 am' do
-  rake 'db:sessions:trim'
+  rake 'db:sessions:batch_trim'
 end

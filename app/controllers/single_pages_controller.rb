@@ -10,7 +10,11 @@ class SinglePagesController < ApplicationController
                 only: %i[show index project_folders]
   before_action :isa_json_compliance_enabled?
   before_action :check_user_logged_in,
-                only: %i[batch_sharing_permission_preview batch_change_permission_for_selected_items]
+                only: %i[ batch_sharing_permission_preview
+                          batch_change_permission_for_selected_items
+                          download_samples_excel
+                          export_to_excel
+                          upload_samples ]
   respond_to :html, :js
 
   def show
@@ -49,7 +53,10 @@ class SinglePagesController < ApplicationController
   end
 
   def download_samples_excel
-    sample_ids, sample_type_id, study_id, assay_id = Rails.cache.read(params[:uuid]).values_at(:sample_ids, :sample_type_id,
+    cached_asset_ids = Rails.cache.read(params[:uuid])
+    raise "Request took too long or was interrupted." if cached_asset_ids.nil?
+
+    sample_ids, sample_type_id, study_id, assay_id = cached_asset_ids.values_at(:sample_ids, :sample_type_id,
                                                                                                :study_id, :assay_id)
 
     @study = Study.find(study_id)
@@ -57,8 +64,29 @@ class SinglePagesController < ApplicationController
     @project = @study.projects.first
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    notice_message = "Contents of <b>#{@assay ? 'Assay [ID: ' + @assay&.id.to_s + ', Title: ' + @assay&.title.to_s : 'Study [ID: ' + @study.id.to_s + ', Title: ' + @study.title.to_s}]</b> downloaded:<br/><ul>"
-    notice_message << "<li class='checkmark'><b>#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}</b> visible to you #{@samples.count != 1 ? 'were' : 'was'} included</li>"
+    notice_message = helpers.content_tag(:ul, class: "list-unstyled") do
+      helpers.safe_join([
+        helpers.content_tag(:li) do
+          helpers.safe_join([
+            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
+            "Downloaded contents of ".html_safe,
+            helpers.content_tag(:b) do
+              "#{@assay ? t('isa_assay') + ' [ID: ' + @assay&.id.to_s + ', Title: ' + h(@assay&.title.to_s) : t('isa_study') + ' [ID: ' + @study.id.to_s + ', Title: ' + h(@study.title.to_s)}]"
+            end
+          ])
+        end,
+        helpers.content_tag(:li) do
+          helpers.safe_join([
+            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
+            helpers.content_tag(:b) do
+              "#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}"
+            end,
+            " visible to you #{@samples.count != 1 ? 'were' : 'was'} included".html_safe
+          ])
+        end
+      ])
+    end
+
     raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
 
     @sample_type = SampleType.find(sample_type_id)
@@ -66,35 +94,19 @@ class SinglePagesController < ApplicationController
 
     @template = Template.find(@sample_type.template_id)
 
-    sample_attributes = @sample_type.sample_attributes.map do |sa|
-      is_cv_list = sa.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
-      obj = if sa.sample_controlled_vocab_id.nil?
-              { sa_cv_title: sa.title, sa_cv_id: nil }
+    spreadsheet_name = case @sample_type.level
+            when 'study source'
+              "#{@study.id} - #{@study.title} sources table.xlsx"
+            when 'study sample'
+              "#{@study.id} - #{@study.title} samples table.xlsx"
+            when 'assay - material', 'assay - data file'
+              "#{@assay&.id} - #{@assay&.title} table.xlsx"
             else
-              { sa_cv_title: sa.title, sa_cv_id: sa.sample_controlled_vocab_id, allows_custom_input: sa.allow_cv_free_text }
+              @sample_type.title&.concat(".xlsx")
             end
-      obj.merge({ required: sa.required, is_cv_list: })
-    end
 
-    @sa_cv_terms = [{ name: 'id', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil },
-                    { name: 'uuid', has_cv: false, data: nil, allows_custom_input: nil, required: nil, is_cv_list: nil }]
-
-    sample_attributes.map do |sa|
-      if sa[:sa_cv_id].nil?
-        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: false, data: nil,
-                            allows_custom_input: nil, required: sa[:required], is_cv_list: nil })
-      else
-        sa_terms = SampleControlledVocabTerm.where(sample_controlled_vocab_id: sa[:sa_cv_id]).map(&:label)
-        @sa_cv_terms.push({ name: sa[:sa_cv_title], has_cv: true, data: sa_terms,
-                            allows_custom_input: sa[:allows_custom_input], required: sa[:required], is_cv_list: sa[:is_cv_list] })
-      end
-    end
-
-    spreadsheet_name = @sample_type.title&.concat(".xlsx")
-
-    notice_message << '</ul>'
-    flash[:notice] = notice_message.html_safe
-    render xlsx: 'download_samples_excel', filename: spreadsheet_name, disposition: 'inline'
+    flash[:notice] = notice_message
+    render xlsx: 'download_samples_spreadsheet', filename: helpers.sanitized_text(spreadsheet_name), disposition: 'inline'
   rescue StandardError => e
     flash[:error] = e.message
     respond_to do |format|
@@ -109,7 +121,7 @@ class SinglePagesController < ApplicationController
   end
 
   def export_to_excel
-    cache_uuid = UUID.new.generate
+    cache_uuid = SecureRandom.uuid
     sample_ids = JSON.parse(params[:sample_ids])
     sample_type_id = JSON.parse(params[:sample_type_id])
     study_id = JSON.parse(params[:study_id])
@@ -132,7 +144,9 @@ class SinglePagesController < ApplicationController
     when 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       spreadsheet_xml = spreadsheet_to_xml(uploaded_file.path, Seek::Config.jvm_memory_allocation)
       wb = parse_spreadsheet_xml(spreadsheet_xml)
-      metadata_sheet = wb.sheet('Metadata')
+      raise 'Invalid workbook! Cannot process this spreadsheet. Consider first exporting the table as a spreadsheet for the proper format.' unless valid_workbook?(wb)
+
+      metadata_sheet = wb.sheet('Sample Type Metadata')
       samples_sheet = wb.sheet('Samples')
     else
       raise "Please upload a valid spreadsheet file with extension '.xlsx'"
@@ -140,21 +154,17 @@ class SinglePagesController < ApplicationController
 
     sample_type_id_ui = params[:sample_type_id].to_i
 
-    unless valid_workbook?(wb)
-      raise 'Invalid workbook! Cannot process this spreadsheet. Consider first exporting the table as a spreadsheet for the proper format.'
-    end
-
     # Extract Samples metadata from spreadsheet
-    study_id = metadata_sheet.cell(2, 2).value.to_i
+    sample_type_id_spreadsheet = metadata_sheet.cell(2, 2).value.to_i
+    @sample_type = SampleType.find(sample_type_id_spreadsheet)
+    study_id = metadata_sheet.cell(10, 2).value.to_i
     @study = Study.find(study_id)
-    sample_type_id = metadata_sheet.cell(5, 2).value.to_i
-    @sample_type = SampleType.find(sample_type_id)
     is_assay = @sample_type.assays.any?
     @assay = @sample_type.assays.first
 
     # Sample Type validation rules
-    unless sample_type_id_ui == @sample_type&.id
-      raise "Sample Type #{@sample_type&.id} from spreadsheet doesn't match Sample Type #{sample_type_id_ui} from the table. Please upload in the correct table."
+    unless sample_type_id_ui == @sample_type.id
+      raise "Sample Type #{@sample_type.id} from spreadsheet doesn't match Sample Type #{sample_type_id_ui} from the table. Please upload in the correct table."
     end
     unless @study.sample_types.include?(@sample_type) || is_assay
       raise "Sample Type '#{@sample_type.id}' doesn't belong to Study #{@study.id}. Sample Upload aborted."
@@ -163,17 +173,29 @@ class SinglePagesController < ApplicationController
       raise "Sample Type '#{@sample_type.id}' doesn't belong to Assay #{@assay.id}. Sample Upload aborted."
     end
 
-    @multiple_input_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
-    end
+    @registered_sample_multi_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_sample_multi?
+    end.map(&:title)
 
-    @registered_sample_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE
-    end
+    @registered_sample_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_sample?
+    end.map(&:title)
 
-    @cv_list_fields = @sample_type.sample_attributes.map do |sa_attr|
-      sa_attr.title if sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
-    end
+    @registered_data_file_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_data_file?
+    end.map(&:title)
+
+    @registered_strain_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_strain?
+    end.map(&:title)
+
+    @registered_sops_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.seek_sop?
+    end.map(&:title)
+
+    @cv_list_fields = @sample_type.sample_attributes.select do |sa_attr|
+      sa_attr.sample_attribute_type.base_type == Seek::Samples::BaseType::CV_LIST
+    end.map(&:title)
 
     sample_fields, samples_data = get_spreadsheet_data(samples_sheet)
 
@@ -190,20 +212,20 @@ class SinglePagesController < ApplicationController
                               end
                             end)
 
-    has_unmapped_sample_attributes = sample_type_attributes.map { |sa| sample_fields.include?(sa[:title]) }.include?(false)
-    if has_unmapped_sample_attributes
-      raise "The Sample Attributes from the excel sheet don't match those of the Sample Type in the database. Sample upload was aborted!"
+    unmapped_attributes = sample_type_attributes.pluck(:title).select { |sa_title| !sample_fields.include?(sa_title) }
+    unless unmapped_attributes.blank?
+      raise "The Sample Attributes '#{unmapped_attributes}' where not found in the uploaded spreadsheet. Sample upload was aborted!"
     end
 
     # Construct Samples objects from Excel data
     excel_samples = generate_excel_samples(samples_data, sample_fields, sample_type_attributes)
 
-    existing_excel_samples = excel_samples.map { |sample| sample unless sample['id'].nil? }.compact
-    new_excel_samples = excel_samples.map { |sample| sample if sample['id'].nil? }.compact
+    existing_excel_samples = excel_samples.select { |sample| !sample['id'].nil? }
+    new_excel_samples = excel_samples.select { |sample| sample['id'].nil? }
 
     # Retrieve all samples of the Sample Type, also the unauthorized ones
     @db_samples = sample_type_samples(@sample_type)
-    # Retrieve the Sample Types samples wich are authorized for editing
+    # Retrieve the Sample Types samples which are authorized for editing
     @authorized_db_samples = sample_type_samples(@sample_type, :edit)
 
     # Determine whether samples have been modified or not,
@@ -260,49 +282,78 @@ class SinglePagesController < ApplicationController
     cv_sample_attributes = sample_type_attributes.select { |sa| sa[:is_cv] && !sa[:allows_custom_input] }
     samples_data.map do |excel_sample|
       obj = {}
-      (0..sample_fields.size - 1).map do |i|
-        current_sample_attribute = sample_type_attributes.detect { |sa| sa[:title] == sample_fields[i] }
-        validate_cv_terms = cv_sample_attributes.map{ |cv_sa| cv_sa[:title] }.include?(sample_fields[i])
-        validate_cv_terms &&= current_sample_attribute[:required] && !excel_sample[i].blank?
-        attr_terms = validate_cv_terms ? cv_sample_attributes.detect { |sa| sa[:title] == sample_fields[i] }[:cv_terms] : []
-        if @multiple_input_fields.include?(sample_fields[i])
-          parsed_excel_input_samples = JSON.parse(excel_sample[i].gsub(/"=>/x, '":')).map do |subsample|
+      sample_fields.each_with_index do |field, i|
+        cell_value = excel_sample[i]
+        current_sample_attribute = sample_type_attributes.detect { |sa| sa[:title] == field }
+        validate_cv_terms = cv_sample_attributes.any? { |cv_sa| cv_sa[:title] == field }
+        validate_cv_terms &&= !cell_value.blank?
+        attr_terms = validate_cv_terms ? current_sample_attribute&.dig(:cv_terms) || [] : []
+        if @registered_sample_multi_fields.include?(field)
+          parsed_json =
+            begin
+              cell_value.nil? ? [] : JSON.parse(cell_value.gsub(/"=>/x, '":'))
+            rescue JSON::ParserError
+              []
+            end
+
+          parsed_excel_input_samples = parsed_json.map do |subsample|
             # Uploader should at least have viewing permissions for the inputs he's using
-            unless Sample.find(subsample['id'])&.authorized_for_view?
+            unless Sample.find_by(id: subsample['id'])&.authorized_for_view?
               raise "Unauthorized Sample was detected in spreadsheet: #{subsample.inspect}"
             end
 
             subsample
           end
-          obj.merge!(sample_fields[i] => parsed_excel_input_samples)
-        elsif @registered_sample_fields.include?(sample_fields[i])
-          parsed_excel_registered_sample = JSON.parse(excel_sample[i].gsub(/"=>/x, '":'))
-          unless Sample.find(parsed_excel_registered_sample['id'])&.authorized_for_view?
-            raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_sample.inspect}"
-          end
-          obj.merge!(sample_fields[i] => parsed_excel_registered_sample)
-        elsif @cv_list_fields.include?(sample_fields[i])
-          parsed_cv_terms = JSON.parse(excel_sample[i])
-          # CV validation for CV_LIST attributes
-          parsed_cv_terms.map do |term|
-            if !attr_terms.include?(term) && validate_cv_terms
-              raise "Invalid Controlled vocabulary term detected '#{term}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{parsed_cv_terms.inspect} }"
+          obj[field] = parsed_excel_input_samples
+        elsif [@registered_sample_fields, @registered_sops_fields, @registered_data_file_fields, @registered_strain_fields].any? { |reg_asset| reg_asset.include?(field) }
+          unless cell_value.nil?
+            parsed_excel_registered_asset =
+              begin
+                JSON.parse(cell_value.gsub(/"=>/x, '":'))
+              rescue JSON::ParserError
+                nil
+              end
+
+            registered_asset_id = parsed_excel_registered_asset.try(:[], 'id')
+            if @registered_sample_fields.include?(field)
+              unless Sample.find_by(id: registered_asset_id)&.authorized_for_view?
+                raise "Unauthorized Sample was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
+            elsif @registered_sops_fields.include?(field)
+              unless Sop.find_by(id: registered_asset_id)&.authorized_for_view?
+                raise "Unauthorized Sop was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
+            elsif @registered_data_file_fields.include?(field)
+              unless DataFile.find_by(id: registered_asset_id)&.authorized_for_view?
+                raise "Unauthorized Data File was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
+            elsif @registered_strain_fields.include?(field)
+              unless Strain.find_by(id: registered_asset_id)&.authorized_for_view?
+                raise "Unauthorized Strain was detected in spreadsheet: #{parsed_excel_registered_asset.inspect}"
+              end
             end
           end
-          obj.merge!(sample_fields[i] => parsed_cv_terms)
-        elsif sample_fields[i] == 'id'
-          if excel_sample[i].blank?
-            obj.merge!(sample_fields[i] => nil)
-          else
-            obj.merge!(sample_fields[i] => excel_sample[i]&.to_i)
+          obj[field] = parsed_excel_registered_asset
+        elsif @cv_list_fields.include?(field)
+          parsed_cv_terms =
+            begin
+              cell_value.blank? ? [] : JSON.parse(cell_value)
+            rescue JSON::ParserError
+              []
+            end
+          parsed_cv_terms.each do |term|
+            if validate_cv_terms && !attr_terms.include?(term)
+              raise "Invalid Controlled vocabulary term detected '#{term}' in sample ID #{excel_sample[0]}: { #{field}: #{parsed_cv_terms.inspect} }"
+            end
           end
+          obj[field] = parsed_cv_terms
+        elsif field == 'id'
+          obj[field] = cell_value.blank? ? nil : cell_value.to_i
         else
-          if validate_cv_terms
-            unless attr_terms.include?(excel_sample[i])
-              raise "Invalid Controlled vocabulary term detected '#{excel_sample[i]}' in sample ID #{excel_sample[0]}: { #{sample_fields[i]}: #{excel_sample[i]} }"
-            end
+          if validate_cv_terms && !attr_terms.include?(cell_value)
+            raise "Invalid Controlled vocabulary term detected '#{cell_value}' in sample ID #{excel_sample[0]}: { #{field}: #{cell_value} }"
           end
-          obj.merge!(sample_fields[i] => excel_sample[i])
+          obj[field] = cell_value
         end
       end
       obj
@@ -310,39 +361,34 @@ class SinglePagesController < ApplicationController
   end
 
   def sample_type_samples(sample_type, authorization_method = nil)
-    if authorization_method
-      sample_type.samples&.authorized_for(authorization_method)&.map do |sample|
-        attributes = JSON.parse(sample[:json_metadata])
-        { 'id' => sample.id,
-          'uuid' => sample.uuid }.merge(attributes)
-      end
-    else
-      sample_type.samples&.map do |sample|
-        attributes = JSON.parse(sample[:json_metadata])
-        { 'id' => sample.id,
-          'uuid' => sample.uuid }.merge(attributes)
-      end
+    scope = authorization_method ? sample_type.samples.authorized_for(authorization_method) : sample_type.samples
+    scope.map do |sample|
+      sample_metadata =
+        begin
+          JSON.parse(sample[:json_metadata])
+        rescue JSON::ParserError
+          {}
+        end
+
+      remove_nil_assets!(sample_metadata)
+
+      { 'id' => sample.id,
+        'uuid' => sample.uuid }.merge(sample_metadata)
     end
   end
 
   def separate_unauthorized_samples(existing_excel_samples, db_samples, authorized_db_samples)
     update_samples = []
     unauthorized_samples = []
-    existing_excel_samples.map do |ees|
-      db_sample = db_samples.select { |s| s['id'] == ees['id'] }.first
+    existing_excel_samples.each do |ees|
+      db_sample = db_samples.detect { |s| s['id'] == ees['id'] }
 
-      # An exception is raised if the ID of an existing Sample cannot be found in the DB
       raise "Sample with id '#{ees['id']}' does not exist in the database. Sample upload was aborted!" if db_sample.nil?
 
-      is_authorized_for_update = authorized_db_samples.select { |s| s['id'] == ees['id'] }.any?
+      is_authorized_for_update = authorized_db_samples.any? { |s| s['id'] == ees['id'] }
 
-      is_changed = false
-
-      db_sample.map do |k, v|
-        unless ees[k] == v || %w[id uuid].include?(k)
-          is_changed = true
-          break
-        end
+      is_changed = db_sample.any? do |k, v|
+        !%w[id uuid].include?(k) && fields_differ?(ees[k], v)
       end
 
       if is_changed
@@ -386,9 +432,35 @@ class SinglePagesController < ApplicationController
   end
 
   def valid_workbook?(workbook)
-    !((workbook.sheet_names.map do |sheet|
-         %w[Metadata Samples cv_ontology].include? sheet
-       end.include? false) && (workbook.sheets.size != 3))
+    ["Sample Type Metadata", "Samples", "Controlled Vocabularies"].all? do |expected_sheet|
+      workbook.sheet_names.include? expected_sheet
+    end
+  end
+
+  def remove_nil_assets!(metadata)
+    metadata.each do |key, value|
+      if value.blank?
+        metadata[key] = nil
+      end
+
+      if value.is_a? Hash
+        if value.keys.include?('id') && !value['id'].present?
+          metadata[key] = nil
+        end
+      end
+
+      if value.is_a? Array
+        metadata[key] = value.filter_map do |subvalue|
+          next if subvalue.is_a?(Hash) && subvalue.key?('id') && !subvalue['id'].present?
+
+          subvalue
+        end
+      end
+    end
+  end
+
+  def fields_differ?(incoming_value, reference_value)
+    incoming_value != reference_value
   end
 
   def set_up_instance_variable

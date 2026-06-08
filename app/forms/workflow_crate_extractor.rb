@@ -5,28 +5,35 @@ require 'seek/download_handling/http_streamer'
 class WorkflowCrateExtractor
   include ActiveModel::Model
 
-  attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params, :update_existing
+  attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params, :detect_workflow
 
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
-  validate :source_url_and_version_present?, if: -> { update_existing }
-  validate :find_workflows_matching_id, if: -> { update_existing }
+  validate :source_url_and_version_present?, if: -> { detect_workflow }
+  validate :find_workflows_matching_id, if: -> { detect_workflow }
 
   def build
     if valid?
-      if update_existing && @existing_workflows.length == 1
+      if detect_workflow && @existing_workflows.length == 1
         self.workflow = @existing_workflows.first
         if self.workflow.git_versions.map(&:name).include?(@crate['version']&.to_s)
           return self.workflow
-        else
-          self.workflow.latest_git_version.lock if self.workflow.latest_git_version.mutable?
-          self.git_version = self.workflow.latest_git_version.next_version(mutable: true)
         end
       end
-      self.workflow ||= default_workflow
-      self.git_version ||= workflow.git_version.tap do |gv|
-        gv.set_default_git_repository
+
+      # If we have an existing workflow, initialise a new version
+      if new_version?
+        self.workflow.latest_git_version.lock if self.workflow.latest_git_version.mutable?
+        self.git_version = self.workflow.git_versions.build(mutable: true)
+        # This is a hacky way of ensuring all the default attributes are set (via the before_validation callbacks)
+        self.git_version.valid?
+      else
+        self.workflow = default_workflow
+        self.git_version = workflow.git_version.tap do |gv|
+          gv.set_default_git_repository
+        end
       end
+
       self.git_version.name = @crate['version'].to_s if @crate['version']
       git_version.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
       if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
@@ -116,5 +123,9 @@ class WorkflowCrateExtractor
     end
 
     extract_crate
+  end
+
+  def new_version?
+    workflow.present? && workflow.persisted?
   end
 end

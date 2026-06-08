@@ -165,7 +165,18 @@
 
     ########## Install python tools
 
-    - name: Add repository to install python3.9
+    - name: Read python version from .python-version file
+      ansible.builtin.slurp:
+        src: '{{git_dest}}/SEEK/.python-version'
+      register: python_version_file
+      tags: python
+
+    - name: Set python version fact
+      ansible.builtin.set_fact:
+        python_version: "{{ python_version_file.content | b64decode | trim }}"
+      tags: python
+
+    - name: Add repository to install python
       become: true
       become_user: root
       ansible.builtin.apt_repository:
@@ -181,9 +192,9 @@
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - python3.9-dev
-        - python3.9-distutils
+        - python{{ python_version }}-dev
         - python3-pip
+        - python{{ python_version }}-venv
         - python3-pymysql
       tags:
         - python
@@ -192,9 +203,8 @@
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
-        - python3.9 -m pip install --upgrade pip
-        - python3.9 -m pip install setuptools==58
-        - python3.9 -m pip install -r requirements.txt
+        - python{{ python_version }} -m ensurepip --upgrade --default-pip
+        - python{{ python_version }} -m pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
       tags:

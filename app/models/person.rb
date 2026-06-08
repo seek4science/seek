@@ -7,8 +7,6 @@ class Person < ApplicationRecord
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
-
-
   acts_as_yellow_pages
 
   before_save :first_person_add_to_default_project

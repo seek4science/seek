@@ -49,7 +49,9 @@ def load_seek_config_defaults!
   Seek::Config.default :home_description_position, 'side'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :auth_lookup_enabled,true
-  Seek::Config.default :external_search_enabled, true
+  # per-adaptor settings map, keyed by adaptor `key` values (e.g. 'biomodels', 'tess'),
+  # with nested hashes containing settings such as { 'enabled' => true/false }
+  Seek::Config.default :external_search_adaptors, {}
   Seek::Config.default :project_single_page_enabled, false
   Seek::Config.default :isa_json_compliance_enabled, false
   Seek::Config.default :project_single_page_folders_enabled, false
@@ -77,6 +79,7 @@ def load_seek_config_defaults!
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
   Seek::Config.default :recommended_data_licenses,  ['CC-BY-4.0', 'CC0-1.0', 'CC-BY-NC-4.0', 'CC-BY-SA-4.0', 'ODC-BY-1.0']
   Seek::Config.default :recommended_software_licenses, ['Apache-2.0','GPL-3.0','MIT','BSD-2-Clause','BSD-3-Clause','LGPL-2.1']
+  Seek::Config.default :standard_login_enabled, true
 
   # Types
   Seek::Config.default :documents_enabled,true
@@ -200,6 +203,7 @@ def load_seek_config_defaults!
   Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
 
   Seek::Config.default :allow_private_address_access, false
+  Seek::Config.default :block_file_uploads, false
   Seek::Config.default :cache_remote_files, true
   Seek::Config.default :max_cachable_size, 20 * 1024 * 1024
   Seek::Config.default :hard_max_cachable_size, 100 * 1024 * 1024

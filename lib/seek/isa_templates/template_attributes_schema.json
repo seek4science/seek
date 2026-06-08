@@ -80,7 +80,9 @@
         "Controlled Vocabulary",
         "URI",
         "Registered Data file",
-        "ENA custom date"
+        "ENA custom date",
+        "Registered SOP",
+        "Registered Strain"
       ]
     },
     "allowCVFreeText": {
@@ -108,6 +110,7 @@
         {
           "type": "string",
           "enum": [
+            "input",
             "source",
             "sample",
             "protocol",

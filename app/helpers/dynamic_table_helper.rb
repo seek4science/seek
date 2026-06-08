@@ -138,7 +138,7 @@ module DynamicTableHelper
       end
 
       if a.sample_attribute_type&.seek_sample_multi? || a.sample_attribute_type&.seek_sample?
-        attribute.merge!(linked_sample_type: a.linked_sample_type_id)
+        attribute.merge!({ linked_sample_type: a.linked_sample_type_id, linked_sample_ids: dt_linked_sample_ids(a) })
       end
 
       if a.input_attribute?
@@ -208,5 +208,14 @@ module DynamicTableHelper
         attribute
       end.unshift({ title: 'id', is_id_field: true, unit: {} }, { title: 'uuid', is_id_field: true, unit: {} })
     end
+  end
+
+  def dt_linked_sample_ids(attribute)
+    linked_samples = attribute&.linked_sample_type&.samples
+    return [] if linked_samples.blank?
+
+    linked_samples
+      .authorized_for(:view)
+      .pluck(:id)
   end
 end

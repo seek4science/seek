@@ -11,6 +11,7 @@ class PresentationsController < ApplicationController
   before_action :find_display_asset, :only=>[:show, :explore, :download]
 
   include Seek::Publishing::PublishingCommon
+  include Seek::Doi::Minting
 
   include Seek::ISAGraphExtensions
 

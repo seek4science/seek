@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class ModelTypeTest < ActiveSupport::TestCase
-  fixtures :model_types
 
   test 'validation' do
     existing = model_types(:ODE)

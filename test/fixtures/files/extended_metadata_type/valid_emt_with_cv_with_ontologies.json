@@ -8,6 +8,7 @@
       "description": "Topics, used for annotating. Describes the domain, field of interest, of study, application, work, data, or technology. Initially seeded from the EDAM ontology.",
       "type": "Controlled Vocabulary",
       "required": true,
+      "allow_cv_free_text": true,
       "pos": 1,
       "pid": "http://edamontology.org/topic_0003",
       "ID": "CV_TOPICS_ID"

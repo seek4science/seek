@@ -1,0 +1,588 @@
+{
+  "title": "Protocol",
+  "description": "A plan specification which has sufficient level of detail and quantitative information to communicate it between investigation agents, so that different investigation agents will reliably be able to independently reproduce the process.",
+  "ols_root_term_uris": "http://purl.obolibrary.org/obo/OBI_0000272",
+  "source_ontology": "efo",
+  "sample_controlled_vocab_terms_attributes": [
+    {
+      "label": "hydrolysis collection protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0010892",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "enrichment protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0009089",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "dissociation protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0009088",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "HCS protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0007570",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "HCS data analysis protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0007573",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0007570"
+    },
+    {
+      "label": "HCS image acquistion and feature extraction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0007572",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0007570"
+    },
+    {
+      "label": "HCS library protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0007571",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0007570"
+    },
+    {
+      "label": "single cell isolation protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0010214",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "conversion protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005520",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "dissection protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005519",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "sample collection protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005518",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "nucleic acid library construction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004184",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "single cell library construction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0010213",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004184"
+    },
+    {
+      "label": "nucleic acid sequencing protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004170",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "single cell nucleic acid sequencing protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0008439",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "Drop-seq sequencing protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0008444",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0008439"
+    },
+    {
+      "label": "10x sequencing protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0008443",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0008439"
+    },
+    {
+      "label": "Smart-seq2 protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0008442",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0008439"
+    },
+    {
+      "label": "Illumina MiSeq standard manufacturer's protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005087",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "Illumina HiSeq 2000 standard manufacturer's protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005086",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "Illumina HiSeq 1000 standard manufacturer's protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005085",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "Illumina Genome Analyzer IIx standard manufacturer's protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005084",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "Illumina Genome Analyzer II standard manufacturer's protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005083",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "Illumina Genome Analyzer standard manufacturer's protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005082",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "454 GS 20 standard manufacturer's protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005051",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "cot filtration for theoretical single copy genomic DNA",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004174",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "cot filtration for highly repetitive genomic DNA",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004173",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "cot filtration for moderately repetitive genomic DNA",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004172",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "cot filtration for single or low copy genomic DNA",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004171",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004170"
+    },
+    {
+      "label": "treatment protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003969",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "sample treatment protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003809",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003969"
+    },
+    {
+      "label": "clinical treatment protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0000355",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003969"
+    },
+    {
+      "label": "diet",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0002755",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0000355"
+    },
+    {
+      "label": "dietary approaches to stop hypertension diet",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0803365",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0002755"
+    },
+    {
+      "label": "ketogenic diet",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0009371",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0002755"
+    },
+    {
+      "label": "low fat diet",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0002758",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0002755"
+    },
+    {
+      "label": "high fat diet",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0002757",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0002755"
+    },
+    {
+      "label": "labelling protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003808",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "nucleic acid labeling protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003813",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003808"
+    },
+    {
+      "label": "hybridization protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003790",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "nucleic acid hybridization to array protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003815",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003790"
+    },
+    {
+      "label": "growth protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003789",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "gene expression protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003788",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "high throughput sequence alignment protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004917",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003788"
+    },
+    {
+      "label": "normalization data transformation protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003816",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003788"
+    },
+    {
+      "label": "nucleic acid extraction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0002944",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003788"
+    },
+    {
+      "label": "RNA extraction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0010959",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0002944"
+    },
+    {
+      "label": "DNA extraction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0022384",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0002944"
+    },
+    {
+      "label": "array scanning and feature extraction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0003814",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0003788"
+    },
+    {
+      "label": "study design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001426",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "methodological variation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004669",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0001426"
+    },
+    {
+      "label": "array specific design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004668",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "loop design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001770",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004668"
+    },
+    {
+      "label": "dye swap design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001765",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004668"
+    },
+    {
+      "label": "array platform variation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001764",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004668"
+    },
+    {
+      "label": "all pairs",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001763",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004668"
+    },
+    {
+      "label": "self vs self design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001777",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004668"
+    },
+    {
+      "label": "quality control testing design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001774",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "optimization design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001773",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "operator variation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001772",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "normalization testing design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001771",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "hardware variation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001767",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "software variation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001778",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "replicate design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001776",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "reference design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001775",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "validation by real time PCR design",
+      "iri": "http://purl.obolibrary.org/obo/OBI_0001166",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "validation by reverse transcription PCR design",
+      "iri": "http://purl.obolibrary.org/obo/OBI_0001162",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004669"
+    },
+    {
+      "label": "biological variation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004667",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0001426"
+    },
+    {
+      "label": "cellular modification design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004666",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "stimulus or stress design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001762",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "pathogenicity design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001761",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "injury design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001760",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "growth condition design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001759",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "genetic modification design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001758",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "dose response design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001757",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "disease state design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001756",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "compound treatment design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001755",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "strain or line design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001754",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "species design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001753",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "sex design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001752",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "organism status design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001751",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "organism part comparison design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001750",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "innate behavior design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001749",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "genotype design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001748",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "imprinting design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001747",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "development or differentiation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001746",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "cell type comparison design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001745",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "cell cycle design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001744",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "cell component comparison design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001743",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "population based design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001430",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "family based design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001429",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "twin design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001431",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0001429"
+    },
+    {
+      "label": "cross sectional design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001428",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "case control design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001427",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "reference sample",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0009654",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0001427"
+    },
+    {
+      "label": "abnormal sample",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0009655",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0001427"
+    },
+    {
+      "label": "neoplastic sample",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0009656",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0009655"
+    },
+    {
+      "label": "cancer cell line sample",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0030035",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0009656"
+    },
+    {
+      "label": "recurrent tumor sample",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0010943",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0009656"
+    },
+    {
+      "label": "primary tumor sample",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0010942",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0009656"
+    },
+    {
+      "label": "metastasis sample",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0010941",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0009656"
+    },
+    {
+      "label": "observational design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0000629",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "RNA stability design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001783",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "clinical history design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001780",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "time series design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001779",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004667"
+    },
+    {
+      "label": "biomolecular annotation design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004665",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0001426"
+    },
+    {
+      "label": "mobile element identification design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005693",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004665"
+    },
+    {
+      "label": "transposable element identification design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0005692",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004665"
+    },
+    {
+      "label": "binding site identification design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0004664",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004665"
+    },
+    {
+      "label": "translational bias design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001787",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004665"
+    },
+    {
+      "label": "secreted protein identification design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001786",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004665"
+    },
+    {
+      "label": "operon identification design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001785",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004665"
+    },
+    {
+      "label": "genotyping design",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0001784",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0004665"
+    },
+    {
+      "label": "extraction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0000490",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    },
+    {
+      "label": "protein extraction protocol",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0022383",
+      "parent_iri": "http://www.ebi.ac.uk/efo/EFO_0000490"
+    },
+    {
+      "label": "delivery method",
+      "iri": "http://www.ebi.ac.uk/efo/EFO_0000395",
+      "parent_iri": "http://purl.obolibrary.org/obo/OBI_0000272"
+    }
+  ]
+}

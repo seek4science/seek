@@ -9,7 +9,6 @@ class ProjectsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include MockHelper
 
-  fixtures :all
 
   def setup
     login_as(FactoryBot.create(:admin))
@@ -142,7 +141,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
 
     get :show, params: { id: project }

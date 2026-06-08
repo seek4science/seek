@@ -6,6 +6,7 @@
 <% show_explore_btn = display_asset && explorable_spreadsheet && display_asset.supported_spreadsheet_format? %>
 <% show_view_content_btn = display_asset&.single_content_blob && !display_asset.single_content_blob.show_as_external_link? %>
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
+<% show_retract_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && asset.can_retract_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
 <% show_cancel_publishing_request_button = (asset.is_waiting_approval? || asset.is_rejected?) && asset.can_manage? %>
 
@@ -40,7 +41,30 @@
                            'data-tooltip' => tooltip("The Workflow RO-Crate is a package containing the workflow definition, its metadata and supporting resources like test data")) %>
         <% if asset.can_run? %>
           <%# TODO: Change this to be more generic when other types can be run %>
-          <%= button_link_to("Run on Galaxy", 'run_galaxy', run_workflow_path(asset, version: version), method: :post) %>
+          <%= dropdown_button( t('workflows.run.on_galaxy'), 'run_galaxy') do %>
+            <li>
+              <%= link_to image('run_galaxy') + ' ' + t('workflows.run.on_default'), run_workflow_path(asset, version: version), method: :post -%>
+            </li>
+            <li>
+              <%= link_to image('run_galaxy') + ' ' + t('workflows.run.on_select'), '#', 'data-toggle' => 'modal', 'data-target' => '#run-galaxy-modal' -%>
+            </li>
+          <% end %>
+
+          <%= modal({ id: 'run-galaxy-modal', size: 's', class: 'text-left' }) do %>
+            <%= modal_header(t'workflows.run.on_galaxy') %>
+            <%= modal_body do %>
+              <p>
+                <%= t('workflows.run.select_prompt') -%>
+              </p>
+              <%= form_with url: run_workflow_path(asset, version: version), method: :post do |f| -%>
+                <div class="form-group">
+                  <%= f.label :execution_instance_url, t('workflows.run.select_label') %>
+                  <%= f.url_field :execution_instance_url, placeholder: Seek::Config.galaxy_instance_default, required: true, class: 'form-control' %>
+                </div>
+                <%= f.submit t('submit_button.run'), class: 'btn btn-primary' %>
+              <% end -%>
+            <% end %>
+          <% end %>
         <% end %>
       <% else %>
         <%= button_link_to('Download RO-Crate', 'ro_crate_file', nil,
@@ -120,5 +144,9 @@
 
   <% if show_doi_button %>
     <li><%= image_tag_for_key('doi', polymorphic_path(asset, action: 'mint_doi_confirm', version: display_asset.version), nil, {}, "Generate a DOI") -%></li>
+  <% end %>
+
+  <% if show_retract_button %>
+    <li><%= image_tag_for_key('doi', polymorphic_path(asset, action: 'retract_doi_confirm'), nil, {}, "Retract DOI") -%></li>
   <% end %>
 <% end %>

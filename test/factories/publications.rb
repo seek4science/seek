@@ -30,6 +30,7 @@ FactoryBot.define do
     with_project_contributor
     title { 'A Minimal Publication' }
     doi { 'https://doi.org/10.5075/abcd' }
+    registered_mode { Publication::REGISTRATION_MANUALLY }
     projects { [FactoryBot.create(:min_project)] }
     association :publication_type, factory: :journal
   end
@@ -37,6 +38,7 @@ FactoryBot.define do
   factory(:max_publication, class: Publication) do
     with_project_contributor
     title { 'A Maximal Publication' }
+    registered_mode { Publication::REGISTRATION_BY_DOI }
     discussion_links { [FactoryBot.build(:discussion_link, label:'Slack')] }
     misc_links { [FactoryBot.build(:misc_link, label:'A link')] }
     journal { 'Journal of Molecular Biology' }
