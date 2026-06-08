@@ -1,6 +1,6 @@
 x-shared:
   seek_base: &seek_base # build: .
-    image: fairdom/seek:main
+    image: fairdom/seek:rails-8.1
 
     restart: always
     environment: &seek_base_env
