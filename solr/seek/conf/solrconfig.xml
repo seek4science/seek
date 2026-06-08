@@ -580,7 +580,6 @@
       <str name="breakWords">true</str>
       <int name="maxChanges">10</int>
     </lst>
-    -->
   </searchComponent>
 
   <!-- Search Components
@@ -626,9 +625,5 @@
     </lst>
   </requestHandler>
 
-  <!-- Legacy config for the admin interface -->
-  <admin>
-    <defaultQuery>*:*</defaultQuery>
-  </admin>
 
 </config>
