@@ -790,11 +790,17 @@ GEM
     recaptcha (5.19.0)
     redis (5.4.1)
       redis-client (>= 0.22.0)
+    redis-actionpack (5.5.0)
+      actionpack (>= 5)
+      redis-rack (>= 2.1.0, < 4)
+      redis-store (>= 1.1.0, < 2)
     redis-client (0.28.0)
       connection_pool
-    redis-session-store (0.11.6)
-      actionpack (>= 5.2.4.1, < 9)
-      redis (>= 3, < 6)
+    redis-rack (3.0.0)
+      rack-session (>= 0.2.0)
+      redis-store (>= 1.2, < 2)
+    redis-store (1.11.0)
+      redis (>= 4, < 6)
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
@@ -1154,7 +1160,7 @@ DEPENDENCIES
   rdoc
   recaptcha
   redis (~> 5.4)
-  redis-session-store (~> 0.11.6)
+  redis-actionpack (~> 5.5)
   remotipart
   request-log-analyzer
   request_store
