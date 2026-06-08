@@ -33,6 +33,7 @@
 - **Session table trimming in batches** — The sessions cleanup rake task now trims in batches to avoid timeouts on large tables
 - **Registered assets in global ISA templates** — Global sample type templates can now reference registered assets (#2600)
 - **Minimal ISA template removed from create step** — The minimal ISA template is no longer presented as an option during the study/assay creation wizard (#2560)
+- **Samples included in API search results** — Samples are now fully supported in API-based searches and are returned in search results
 
 ## Bug Fixes
 
@@ -48,6 +49,7 @@
 - **XSS security fixes** — Multiple cross-site scripting vulnerabilities addressed
 - **Sample RDF incorrect XSD types** — Fixed the RDF generated for samples to use correct XSD types; nil and blank attribute values are now skipped (#2595)
 - **Model files lost after validation error** — Files attached to a model are no longer lost when a validation error occurs during creation (#2582)
+- **ISATag results causing error in HTML search** — ISATag results are now excluded from HTML search result rendering, preventing a crash when browsing search results (#2604)
 
 ## Infrastructure & Dependencies
 
@@ -67,3 +69,4 @@
 - rack security bump (2.2.22 → 2.2.23)
 - zlib bumped to 3.0.1
 - yard bumped to 0.9.42
+- Solr Docker setup updated to official `solr:8.11.4` image with mounted config; Solr healthcheck added; reindex and rebuild helper scripts added (#2605)
