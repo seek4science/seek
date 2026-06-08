@@ -1,0 +1,36 @@
+name: Mark and close stale issues
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # runs every Monday at midnight UTC
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug logging'
+        type: boolean
+        default: false
+
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        env:
+          ACTIONS_STEP_DEBUG: ${{ inputs.debug }}
+        with:
+          days-before-stale: 1461      # mark as stale after 4 years (365*4+1 leap year)
+          days-before-close: 14        # close 14 days after being marked stale
+          stale-issue-message: >
+            This issue has been inactive for 4 years and has been marked as stale.
+            It will be closed in 14 days unless there is new activity.
+          close-issue-message: >
+            Closing due to 4+ years of inactivity. Feel free to reopen if this is still relevant.
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'pinned'
+          days-before-pr-stale: -1     # disable stale marking for PRs
+          days-before-pr-close: -1     # disable closing for PRs
+          enable-statistics: true      # requires ACTIONS_STEP_DEBUG to be visible
+          debug-only: true             # dry run — remove this when ready to go live
