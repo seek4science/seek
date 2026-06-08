@@ -142,8 +142,8 @@ group :test do
   gem 'simplecov'
   gem 'sunspot_matchers'
   gem 'test-prof'
+  gem 'selenium-webdriver', '~> 4.44'
   gem 'vcr'
-  gem 'webdrivers'
   gem 'whenever-test'
 end
 
