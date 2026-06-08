@@ -148,6 +148,22 @@ attributions: ActiveSupport::JSON.encode([])
 
 ---
 
+## 5. Gem Housekeeping
+
+### 5.1 `webdrivers` removed, `selenium-webdriver` upgraded to 4.44
+
+`webdrivers` (5.3.1) is retired upstream. Selenium Manager, built into `selenium-webdriver` >= 4.6, handles browser driver management automatically. The gem was removed from the test group and `selenium-webdriver` was added explicitly at `~> 4.44`.
+
+### 5.2 `coffee-rails` removed
+
+No `.coffee` files exist in the codebase. The gem and its transitive dependencies (`coffee-script`, `coffee-script-source`, `execjs`) were removed.
+
+### 5.3 `rack` upgraded to v3, version pin removed
+
+The Gemfile previously pinned `rack < 3.0.0` due to functional test failures. With `rack-session` 2.x (which resolves the incompatibility), Rack 3.2.6 now resolves cleanly. The `data_files`, `sops`, and `models` functional test suites (472 tests) all pass on Rack 3.
+
+---
+
 ## 4. Outstanding / Known Issues
 
 ### 4.1 `scrub_env!` monkey-patch needs follow-up test refactoring
