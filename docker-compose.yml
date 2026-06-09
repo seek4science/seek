@@ -10,7 +10,7 @@ x-shared:
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
       REDIS_URL: redis://redis_store:6379/0
-#      DOMAIN_NAME: 'localhost' # Replace with your FQDN and uncomment
+#      SEEK_FQDN: 'localhost' # Replace with your FQDN and uncomment. E.g. 'example.com' or '.example.com' for including subdomains.
 #      ENFORCE_SECURE_COOKIES: "true" # Uncomment if you need to enforce server-side secure cookies
     env_file:
       - docker/db.env
