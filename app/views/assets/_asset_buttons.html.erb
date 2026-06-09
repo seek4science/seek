@@ -71,7 +71,7 @@
       <% end %>
 
       <% if !asset.main_workflow_blob.nil?%>
-        <div><%= asset.main_workflow_blob.path %></div>
+        <div><%= polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_blob.path, code: params[:code]) %></div>
       <% end %>
     <% else %>
       <%= download_or_link_button display_asset,
