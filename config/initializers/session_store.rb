@@ -6,7 +6,7 @@
 # FIXME: Use Seek::Config.session_store_timeout somehow
 
 session_url = "#{ENV.fetch('REDIS_URL', 'redis://localhost:6379/0')}/session"
-domain_name = ENV.fetch('DOMAIN_NAME', 'localhost')
+domain_name = ENV.fetch('SEEK_FQDN', 'localhost')
 enforce_secure_cookies = ENV.fetch('ENFORCE_SECURE_COOKIES', 'false').downcase == 'true'
 
 session_options = {
