@@ -50,6 +50,7 @@
 - **Sample RDF incorrect XSD types** — Fixed the RDF generated for samples to use correct XSD types; nil and blank attribute values are now skipped (#2595)
 - **Model files lost after validation error** — Files attached to a model are no longer lost when a validation error occurs during creation (#2582)
 - **ISATag results causing error in HTML search** — ISATag results are now excluded from HTML search result rendering, preventing a crash when browsing search results (#2604)
+- **Related items view broken with temporary auth codes** — The related items panel now correctly propagates the temporary auth code, so linked assets remain accessible when viewing a resource via a sharing link (#2583)
 
 ## Infrastructure & Dependencies
 
@@ -70,3 +71,4 @@
 - zlib bumped to 3.0.1
 - yard bumped to 0.9.42
 - Solr Docker setup updated to official `solr:8.11.4` image with mounted config; Solr healthcheck added; reindex and rebuild helper scripts added (#2605)
+- puma bumped from 6.6.0 to 7.2.1
