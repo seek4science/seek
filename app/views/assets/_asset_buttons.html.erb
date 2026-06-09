@@ -69,6 +69,10 @@
         <%= button_link_to('Download RO-Crate', 'ro_crate_file', nil,
                            disabled_reason: 'This workflow is still being processed, check back later.') %>
       <% end %>
+
+      <% if !asset.main_workflow_blob.nil?%>
+        <div><%= asset.main_workflow_blob.path %></div>
+      <% end %>
     <% else %>
       <%= download_or_link_button display_asset,
                                   polymorphic_path(asset, version: version, action: :download, code: params[:code]),
