@@ -20,7 +20,7 @@ session_options = {
 }
 
 # Only set the domain constraint if FQDN is configured
-session_options[:domain] = domain_name if domain_name != 'localhost'
+session_options[:domain] = domain_name if domain_name.present? && domain_name != 'localhost'
 
 # Define the redis session store
 SEEK::Application.config.session_store(:redis_store, **session_options)
