@@ -48,7 +48,7 @@ class SinglePagesController < ApplicationController
     project_id = JSON.parse(params[:project_id])
 
     raise 'Export aborted! The Sample Type ID was not included in the request!' if sample_type_id.nil?
-    raise 'Export aborted! At least a Study ID or Assay ID must be provided in the request!' if study_id.nil? && assay_id.nil?
+    raise 'Export aborted! At least a Study ID must be provided in the request!' if study_id.nil?
     raise 'Export aborted! The Project ID was not included in the request!' if project_id.nil?
     raise 'Export aborted! The provided Sample IDs are not valid!' unless sample_ids.all? { |sid| !!Integer(sid.to_s, exception: false) }
 
@@ -60,7 +60,7 @@ class SinglePagesController < ApplicationController
       format.json { render json: { uuid: cache_uuid } }
     end
   rescue StandardError => e
-    render json: { error: e }, status: :unprocessable_entity
+    render json: { error: e.message }, status: :unprocessable_entity
   end
 
   def download_spreadsheet
@@ -86,7 +86,7 @@ class SinglePagesController < ApplicationController
     raise "Export aborted! The sample type could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @sample_type.project_ids.include?(project_id)
     raise "Export aborted! The study could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @study.project_ids.include?(project_id)
     unless @assay.nil?
-      raise "Export aborted! The assay could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @sample_type.project_ids.include?(project_id)
+      raise "Export aborted! The assay could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @assay.project_ids.include?(project_id)
     end
 
     @template = Template.find(@sample_type.template_id)
@@ -471,6 +471,6 @@ class SinglePagesController < ApplicationController
   def check_user_logged_in
     return if current_user
 
-    return render json: { status: :unauthorized, error: 'You must be logged in to use this feature.' }
+    return render json: { error: 'You must be logged in to use this feature.' }, status: :unauthorized
   end
 end

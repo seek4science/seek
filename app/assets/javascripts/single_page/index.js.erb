@@ -328,10 +328,22 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
       .addClass("alert-danger");
 
     statusDetails
-      .empty()
-      .append(`<p><b>Failed to export to spreadsheet!</b></p>`)
-      .append(`<p><b>Status:</b> ${response.status} - ${JSON.stringify(response.error().statusText)}</p>`)
-      .append(`<p><b>Error:</b> ${response.responseJSON.error}</p>`);
+      .empty();
+
+    statusDetails
+      .append($j("<p>")
+        .html("<b>Failed to export to spreadsheet!</b>")
+      );
+
+    statusDetails
+      .append($j("<p>")
+        .text(`Status: ${response.status} - ${response.statusText}`)
+      );
+
+    statusDetails
+      .append($j("<p>")
+        .text(`Error: ${(response.responseJSON && response.responseJSON.error) || response.responseText || ''}`)
+      );
   });
 }
 
