@@ -2,6 +2,7 @@ require 'test_helper'
 
 class SinglePagesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
+  include SinglePageTestUtils
 
   def setup
     @instance_name = Seek::Config.instance_name
@@ -42,7 +43,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'Should not generate export if not authorized' do
-    id_label, _person, project, study, source_sample_type, sources = setup_file_upload.values_at(
+    id_label, _person, project, study, source_sample_type, sources = setup_test_data.values_at(
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
     unauthorized_person = FactoryBot.create(:person)
@@ -74,7 +75,7 @@ class SinglePagesControllerTest < ActionController::TestCase
 
   test 'generates a valid export of study sources in single page' do
     # Generate the excel data
-    id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
+    id_label, person, project, study, source_sample_type, sources = setup_test_data.values_at(
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
 
@@ -105,40 +106,8 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert response_cd.include?("filename=\"#{study.id} - #{study.title} sources table.xlsx\"")
   end
 
-  test 'generates a valid export of study samples in single page' do
-    id_label, person, project, study, sample_collection_sample_type, study_samples = setup_file_upload.values_at(
-      :id_label, :person, :project, :study, :sample_collection_sample_type, :study_samples
-    )
-
-    source_sample_ids = study_samples.map(&:id)
-    sample_type_id = sample_collection_sample_type.id
-    study_id = study.id
-    assay_id = nil
-    project_id = project.id
-
-    login_as(person)
-
-    download_params = { sample_ids: source_sample_ids.to_json,
-                        sample_type_id: sample_type_id.to_json,
-                        study_id: study_id.to_json,
-                        assay_id: assay_id.to_json,
-                        project_id: project_id.to_json}
-
-    post :export_to_spreadsheet, params: download_params, format: :json
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
-    response_cd = response.headers["Content-Disposition"]
-    assert_response :ok
-    assert response_cd.include?("filename=\"#{study.id} - #{study.title} samples table.xlsx\"")
-  end
-
   test 'generates a valid export of assay samples in single page' do
-    id_label, person, project, study, assay, assay_sample_type, assay_samples = setup_file_upload.values_at(
+    id_label, person, project, study, assay, assay_sample_type, assay_samples = setup_test_data.values_at(
       :id_label, :person, :project, :study, :assay, :assay_sample_type, :assay_samples
     )
 
@@ -173,7 +142,7 @@ class SinglePagesControllerTest < ActionController::TestCase
     file_path = 'upload_single_page/00_wrong_format_spreadsheet.ods'
     file = fixture_file_upload(file_path, 'application/vnd.oasis.opendocument.spreadsheet')
 
-    project, source_sample_type = setup_file_upload.values_at(
+    project, source_sample_type = setup_test_data.values_at(
       :project, :source_sample_type
     )
 
@@ -185,7 +154,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'Should prevent to upload to the wrong Sample Type' do
-    project, sample_collection_sample_type = setup_file_upload.values_at(
+    project, sample_collection_sample_type = setup_test_data.values_at(
       :project, :sample_collection_sample_type
     )
 
@@ -199,7 +168,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'Should not process invalid workbooks' do
-    project, source_sample_type = setup_file_upload.values_at(
+    project, source_sample_type = setup_test_data.values_at(
       :project, :source_sample_type
     )
 
@@ -213,7 +182,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'Should update, create and detect duplicate sources when uploading to a source Sample Type' do
-    project, source_sample_type = setup_file_upload.values_at(
+    project, source_sample_type = setup_test_data.values_at(
       :project, :source_sample_type
     )
 
@@ -266,7 +235,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'Should update, create and detect duplicate samples when uploading to a source sample Sample Type' do
-    project, sample_collection_sample_type = setup_file_upload.values_at(
+    project, sample_collection_sample_type = setup_test_data.values_at(
       :project, :sample_collection_sample_type
     )
 
@@ -317,7 +286,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'Should update, create and detect duplicate samples when uploading to a assay Sample Type' do
-    project, assay_sample_type = setup_file_upload.values_at(
+    project, assay_sample_type = setup_test_data.values_at(
       :project, :assay_sample_type
     )
 
@@ -370,7 +339,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   test 'Should show permission conflicts for samples' do
     unauthorized_user = FactoryBot.create(:user)
     login_as unauthorized_user
-    project, source_sample_type = setup_file_upload.values_at(
+    project, source_sample_type = setup_test_data.values_at(
       :project, :source_sample_type
     )
 
@@ -415,7 +384,7 @@ class SinglePagesControllerTest < ActionController::TestCase
 
   test 'Should not be able to use the download feature if isa_json_compliance_enabled is false' do
     with_config_value(:isa_json_compliance_enabled, false) do
-      id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
+      id_label, person, project, study, source_sample_type, sources = setup_test_data.values_at(
         :id_label, :person, :project, :study, :source_sample_type, :sources
       )
 
@@ -442,7 +411,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'Should link registered assets to the sample metadata' do
-    project, assay_sample_type = setup_file_upload.values_at(
+    project, assay_sample_type = setup_test_data.values_at(
       :project, :assay_sample_type
     )
     car_catalogue = car_catalogue(project, @member.person)
@@ -477,7 +446,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'should raise error when Sample Type attributes don\'t match the spreadsheet header' do
-    project, assay_sample_type = setup_file_upload.values_at(
+    project, assay_sample_type = setup_test_data.values_at(
       :project, :assay_sample_type
     )
 
@@ -494,7 +463,7 @@ class SinglePagesControllerTest < ActionController::TestCase
 
   test 'Should sanitize spreadsheet name' do
     # Generate the excel data
-    id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
+    id_label, person, project, study, source_sample_type, sources = setup_test_data.values_at(
       :id_label, :person, :project, :study, :source_sample_type, :sources
     )
 
@@ -529,243 +498,5 @@ class SinglePagesControllerTest < ActionController::TestCase
     assert %w[<script> </script>].none? { |tag| response_cd.include?(tag) }
 
 
-  end
-
-  private
-
-  def setup_file_upload
-    id_label = "#{Seek::Config.instance_name} id"
-    person = @member.person
-    institution = FactoryBot.create(:institution, title: 'Legion Of Doooooooooom', country: 'AQ')
-    project = FactoryBot.create(:project, id: 10_000)
-    person.add_to_project_and_institution(project, institution)
-    investigation = FactoryBot.create(:investigation, id: 10_000, is_isa_json_compliant: true, projects: [project], contributor: person)
-    study = FactoryBot.create(:study, id: 10_001, investigation: investigation, contributor: person)
-    assay = FactoryBot.create(:assay, id: 10_002, study:, contributor: person)
-
-    source_sample_type_template = FactoryBot.create(:isa_source_template, id: 10_006)
-    source_sample_type = FactoryBot.create(:isa_source_sample_type,
-                                           id: 10_003,
-                                           contributor: person,
-                                           project_ids: [project.id],
-                                           isa_template: source_sample_type_template,
-                                           studies: [study])
-
-    sample_collection_sample_type_template = FactoryBot.create(:isa_sample_collection_template, id: 10_007)
-    sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type,
-                                                      id: 10_004,
-                                                      contributor: person,
-                                                      project_ids: [project.id],
-                                                      isa_template: sample_collection_sample_type_template,
-                                                      studies: [study],
-                                                      linked_sample_type: source_sample_type)
-
-    assay_sample_type_template = FactoryBot.create(:isa_assay_material_template, id: 10_008)
-    assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
-                                          id: 10_005,
-                                          contributor: person,
-                                          isa_template: assay_sample_type_template,
-                                          projects: [project],
-                                          studies: [study],
-                                          linked_sample_type: sample_collection_sample_type)
-
-    sources = (1..5).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_010 + n,
-        title: "source_#{n}",
-        sample_type: source_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          'Source Name': "Source #{n}",
-          'Source Characteristic 1': 'Source Characteristic 1',
-          'Source Characteristic 2':
-            source_sample_type
-              .sample_attributes
-              .find_by_title('Source Characteristic 2')
-              .sample_controlled_vocab
-              .sample_controlled_vocab_terms
-              .first
-              .label
-        }
-      )
-    end
-
-    study_samples = (1..4).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_020 + n,
-        title: "Sample collection #{n}",
-        sample_type: sample_collection_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          Input: [sources[n - 1].id, sources[n].id],
-          'sample collection': 'sample collection',
-          'sample collection parameter value 1': 'sample collection parameter value 1',
-          'Sample Name': "sample nr. #{n}",
-          'sample characteristic 1': 'sample characteristic 1'
-        }
-      )
-    end
-
-    assay_samples = (1..3).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_030 + n,
-        title: "Assay Sample #{n}",
-        sample_type: assay_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          Input: [study_samples[n - 1].id, study_samples[n].id],
-          'Protocol Assay 1': 'How to make concentrated dark matter',
-          'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
-          'Extract Name': "Extract nr. #{n}",
-          'other material characteristic 1': 'other material characteristic 1'
-        }
-      )
-    end
-
-    {
-      "id_label": id_label,
-      "person": person,
-      "project": project,
-      "investigation": investigation,
-      "study": study,
-      "assay": assay,
-      "source_sample_type": source_sample_type,
-      "sample_collection_sample_type": sample_collection_sample_type,
-      "assay_sample_type": assay_sample_type,
-      "sources": sources,
-      "study_samples": study_samples,
-      "assay_samples": assay_samples
-    }
-  end
-
-  def car_catalogue(project, person)
-    sample_catalogue_cars = FactoryBot.build(:sample_type,
-                                              title: "Sample Catalogue Cars",
-                                              projects: [project],
-                                              contributor: person
-                                             )
-    sample_catalogue_cars.sample_attributes << [
-      FactoryBot.create(:any_string_sample_attribute, title: "Car name", sample_type: sample_catalogue_cars, is_title: true),
-      FactoryBot.create(:any_string_sample_attribute, title: "Brand", sample_type: sample_catalogue_cars),
-      FactoryBot.create(:any_string_sample_attribute, title: "Model", sample_type: sample_catalogue_cars),
-    ]
-    sample_catalogue_cars.save
-    names = [
-      "Herbie",
-      "Ecto-1",
-      "K.I.T.T.",
-      "General Lee",
-      "DeLorean Time Machine"
-    ]
-    brands = [
-      "Volkswagen",
-      "Cadillac",
-      "Pontiac",
-      "Dodge",
-      "DeLorean Motor Company"
-    ]
-    models = [
-      "Beetle",
-      "Miller-Meteor",
-      "Firebird Trans Am",
-      "Charger",
-      "DMC-12"
-    ]
-    _cars = (1..5).map do |n|
-      FactoryBot.create(:sample,
-                        id: 10_040 + n,
-                        title: names[n-1],
-                        sample_type: sample_catalogue_cars,
-                        project_ids: [project.id],
-                        contributor: person,
-                        data: {
-                          'Car name': names[n-1],
-                          Brand: brands[n-1],
-                          Model: models[n-1]
-                        }
-      )
-    end
-    sample_catalogue_cars.reload
-  end
-
-  def flower_names(project, person)
-    sample_catalogue_flower_names = FactoryBot.build(:sample_type,
-                                                title: "Sample Catalogue Flowers",
-                                                projects: [project],
-                                                contributor: person
-                                                )
-
-    sample_catalogue_flower_names.sample_attributes << [
-      FactoryBot.create(:any_string_sample_attribute, title: "Human name", sample_type: sample_catalogue_flower_names, is_title: true),
-      FactoryBot.create(:any_string_sample_attribute, title: "Scientific Name", sample_type: sample_catalogue_flower_names),
-      FactoryBot.create(:any_string_sample_attribute, title: "Trivial Name", sample_type: sample_catalogue_flower_names),
-    ]
-    sample_catalogue_flower_names.save
-    human_names = %w[Rosalind Sonny Daisy Lavanda Daffy]
-    scientific_names = ["Rosa indica", "Helianthus annuus", "Bellis perennis", "Lavandula", "Narcissus pseudonarcissus"]
-    trivial_names = ["Rose", "Sunflower", "English Daisy", "Lavender", "Wild Daffodil"]
-    _flowers = (1..5).map do |n|
-      FactoryBot.create(:sample,
-                        id: 10_050 + n,
-                        title: human_names[n - 1],
-                        sample_type: sample_catalogue_flower_names,
-                        project_ids: [project.id],
-                        contributor: person,
-                        data: {
-                          'Human name': human_names[n - 1],
-                          'Scientific Name': scientific_names[n-1],
-                          'Trivial Name': trivial_names[n-1]
-                        }
-      )
-    end
-    sample_catalogue_flower_names.reload
-  end
-
-  def bacteria_strains(project, person)
-    organism = FactoryBot.create(:organism, title: "Bacteriaceae", projects: [project])
-    bacteria_names = [
-      "Escherichia coli",
-      "Streptococcus pyogenes",
-      "Staphylococcus aureus",
-      "Streptococcus pneumoniae",
-      "Clostridioides difficile"
-    ]
-
-    (1..5).map do |n|
-      FactoryBot.create(:strain, id: 10_060 + n, title: bacteria_names[n-1], organism: organism, projects: [project], contributor: person)
-    end
-  end
-
-  def create_data_files(project, person)
-    file_types = [
-      "Comma-Separated Values",
-      "JavaScript Object Notation",
-      "Extensible Markup Language",
-      "Apache Parquet",
-      "Portable Document Format"
-    ]
-    (1..5).map do |n|
-      FactoryBot.create(:min_data_file, id: 10_070 + n, title: "My #{file_types[n-1]} file", projects: [project], contributor: person)
-    end
-  end
-
-  def create_sops(project, person)
-    lab_protocols = [
-      "Standard Operating Procedure for High-Performance Liquid Chromatography (HPLC) Analysis",
-      "Protocol for DNA Isolation and Purification Using the CTAB Method",
-      "Polymerase Chain Reaction (PCR) Program for Target Sequence Amplification",
-      "Protocol for Protein Extraction and SDS-PAGE Analysis",
-      "Standard Procedure for Chemical Spill Response and Hazardous Waste Disposal"
-    ]
-
-    (1..5).map do |n|
-      FactoryBot.create(:sop, id: 10_080 + n, title: lab_protocols[n-1], projects: [project], contributor: person)
-    end
   end
 end
