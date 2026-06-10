@@ -6,8 +6,6 @@
 # FIXME: Use Seek::Config.session_store_timeout somehow
 
 session_url = "#{ENV.fetch('REDIS_URL', 'redis://localhost:6379/0')}/session"
-domain_name = ENV.fetch('SEEK_FQDN', 'localhost')
-enforce_secure_cookies = ENV.fetch('ENFORCE_SECURE_COOKIES', 'false').downcase == 'true'
 
 session_options = {
   servers: [session_url],
@@ -15,12 +13,8 @@ session_options = {
   key: '_seek_session',
   threadsafe: true,
   same_site: :lax,
-  secure: Rails.env.production? && enforce_secure_cookies,
   httponly: true
 }
-
-# Only set the domain constraint if FQDN is configured
-session_options[:domain] = domain_name if domain_name.present? && domain_name != 'localhost'
 
 # Define the redis session store
 SEEK::Application.config.session_store(:redis_store, **session_options)
