@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '7.2.3.1'
+gem 'rails', '8.1.3'
 
 gem 'abbrev'
 gem 'active_model_serializers'
@@ -21,7 +21,6 @@ gem 'caxlsx'
 gem 'caxlsx_rails'
 gem 'cff'
 gem 'citeproc-ruby'
-gem 'coffee-rails'
 gem 'commonmarker'
 gem 'country_select'
 gem 'csl-styles'
@@ -74,7 +73,7 @@ gem 'private_address_check'# Rails 5 upgrade
 gem 'progress_bar'
 gem 'psych'
 gem 'puma'
-gem 'rack', '< 3.0.0' # Rack >= 3 causes errors when running functional tests that call multiple actions in a single test
+gem 'rack'
 gem 'rack-attack'
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails-html-sanitizer'
@@ -142,8 +141,8 @@ group :test do
   gem 'simplecov'
   gem 'sunspot_matchers'
   gem 'test-prof'
+  gem 'selenium-webdriver', '~> 4.44'
   gem 'vcr'
-  gem 'webdrivers'
   gem 'whenever-test'
 end
 
