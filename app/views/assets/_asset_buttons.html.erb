@@ -38,6 +38,9 @@
       <% if display_asset.is_git_versioned? || asset.content_blob&.file_exists? %>
         <%= button_link_to('Download RO-Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code]),
                            'data-tooltip' => tooltip("The Workflow RO-Crate is a package containing the workflow definition, its metadata and supporting resources like test data")) %>
+        <% if !asset.main_workflow_blob.nil?%>
+          <%= button_link_to('Download Main Workflow', 'ro_crate_file', polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_blob.path, code: params[:code])) %>
+        <% end %>
         <% if asset.can_run? %>
           <%# TODO: Change this to be more generic when other types can be run %>
           <%= dropdown_button( t('workflows.run.on_galaxy'), 'run_galaxy') do %>
@@ -70,9 +73,6 @@
                            disabled_reason: 'This workflow is still being processed, check back later.') %>
       <% end %>
 
-      <% if !asset.main_workflow_blob.nil?%>
-        <div><%= polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_blob.path, code: params[:code]) %></div>
-      <% end %>
     <% else %>
       <%= download_or_link_button display_asset,
                                   polymorphic_path(asset, version: version, action: :download, code: params[:code]),
