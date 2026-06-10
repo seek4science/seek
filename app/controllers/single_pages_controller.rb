@@ -20,7 +20,7 @@ class SinglePagesController < ApplicationController
   end
 
   def index
-    flash[:notice] = "You have redirected to the #{t('project').pluralize} page."
+    flash[:notice] = "You have been redirected to the #{t('project').pluralize} page."
     redirect_to projects_path
   end
 
