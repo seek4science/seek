@@ -2,7 +2,7 @@ require 'test_helper'
 
 class  SpreadsheetDownloadTest < ActionController::TestCase
   include AuthenticatedTestHelper
-  # include SinglePageTestUtils
+  include SinglePageTestUtils
 
   tests SinglePagesController
 
@@ -219,93 +219,5 @@ class  SpreadsheetDownloadTest < ActionController::TestCase
     # Download without assay should work
     get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
     assert_response :ok
-  end
-
-  private
-
-  def setup_test_data
-    person = @member.person
-    institution = FactoryBot.create(:institution)
-    project = FactoryBot.create(:project)
-    person.add_to_project_and_institution(project, institution)
-    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
-    study = FactoryBot.create(:study, investigation:, contributor: person)
-    assay = FactoryBot.create(:assay, study:, contributor: person)
-
-    source_sample_type_template = FactoryBot.create(:isa_source_template)
-    source_sample_type = FactoryBot.create(:isa_source_sample_type,
-                                           contributor: person,
-                                           projects: [project],
-                                           isa_template: source_sample_type_template,
-                                           studies: [study])
-
-    sources = (1..3).map do |n|
-      FactoryBot.create(:sample,
-                        title: "source_#{n}",
-                        sample_type: source_sample_type,
-                        project_ids: [project.id],
-                        contributor: person,
-                        data: {
-                          'Source Name': "Source #{n}",
-                          'Source Characteristic 1': 'Value 1',
-                          'Source Characteristic 2': source_sample_type.sample_attributes
-                                                                       .find_by_title('Source Characteristic 2')
-                                                                       .sample_controlled_vocab
-                                                                       .sample_controlled_vocab_terms
-                                                                       .first
-                                                                       .label
-                        })
-    end
-
-    study_samples = (1..4).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_020 + n,
-        title: "Sample collection #{n}",
-        sample_type: sample_collection_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          Input: [sources[n - 1].id, sources[n].id],
-          'sample collection': 'sample collection',
-          'sample collection parameter value 1': 'sample collection parameter value 1',
-          'Sample Name': "sample nr. #{n}",
-          'sample characteristic 1': 'sample characteristic 1'
-        }
-      )
-    end
-
-    assay_samples = (1..3).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_030 + n,
-        title: "Assay Sample #{n}",
-        sample_type: assay_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          Input: [study_samples[n - 1].id, study_samples[n].id],
-          'Protocol Assay 1': 'How to make concentrated dark matter',
-          'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
-          'Extract Name': "Extract nr. #{n}",
-          'other material characteristic 1': 'other material characteristic 1'
-        }
-      )
-    end
-
-    {
-      "id_label": id_label,
-      "person": person,
-      "project": project,
-      "investigation": investigation,
-      "study": study,
-      "assay": assay,
-      "source_sample_type": source_sample_type,
-      "sample_collection_sample_type": sample_collection_sample_type,
-      "assay_sample_type": assay_sample_type,
-      "sources": sources,
-      "study_samples": study_samples,
-      "assay_samples": assay_samples
-    }
   end
 end
