@@ -48,7 +48,9 @@
               <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <%= button_link_to('Download Main Workflow', 'ro_crate_file', polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_blob.path, code: params[:code])) %>
+              <li>
+                <%= icon_link_to('Download Main Workflow File', 'ro_crate_file', polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_blob.path, code: params[:code])) %>
+              </li>
             </ul>
           </div>
         <% end %>
