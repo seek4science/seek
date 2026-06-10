@@ -61,7 +61,6 @@
               <%= link_to image('run_galaxy') + ' ' + t('workflows.run.on_select'), '#', 'data-toggle' => 'modal', 'data-target' => '#run-galaxy-modal' -%>
             </li>
           <% end %>
-
           <%= modal({ id: 'run-galaxy-modal', size: 's', class: 'text-left' }) do %>
             <%= modal_header(t'workflows.run.on_galaxy') %>
             <%= modal_body do %>
