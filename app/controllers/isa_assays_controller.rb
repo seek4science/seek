@@ -3,7 +3,8 @@ class ISAAssaysController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   before_action :set_up_instance_variable
-  before_action :find_requested_item, only: %i[edit update]
+  before_action :find_requested_item_for_edit, only: %i[edit update]
+  before_action :find_requested_item_for_show, only: :show
   before_action :initialize_isa_assay, only: :create
   after_action :rearrange_assay_positions_create_isa_assay, only: :create
   after_action :fix_assay_linkage_for_new_assays, only: :create
@@ -11,6 +12,8 @@ class ISAAssaysController < ApplicationController
   # Update sample metadata when updating an assay
   before_action :old_attributes, only: :update
   after_action :update_sample_json_metadata, only: :update
+
+  api_actions :create, :update, :show
 
   def new
     study = Study.find(params[:study_id])
@@ -66,12 +69,23 @@ class ISAAssaysController < ApplicationController
           redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                        item_id: @isa_assay.assay)
         end
-        format.json { render json: @isa_assay, include: [params[:include]] }
+        format.json { render json: @isa_assay, include: [params[:include]], status: :created }
       end
     else
       respond_to do |format|
         format.html { render action: 'new', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.json { render json: @isa_assay, include: [params[:include]] }
+      format.html do
+        flash[:notice] = "You have been redirected to the #{t('single_page')} view"
+        redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+                                     item_id: @isa_assay.assay.id)
       end
     end
   end
@@ -93,13 +107,18 @@ class ISAAssaysController < ApplicationController
     end
 
     if @isa_assay.save
-      flash[:notice] = "The #{t('isa_assay')} was successfully updated.<br/>".html_safe
-      redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+      respond_to do |format|
+        format.html do
+          flash[:notice] = "The #{t('isa_assay')} was successfully updated"
+          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
                                    item_id: @isa_assay.assay.id)
+        end
+        format.json { render json: @isa_assay, include: [params[:include]], status: :ok }
+      end
     else
       respond_to do |format|
         format.html { render action: 'edit', status: :unprocessable_entity }
-        format.json { render json: @isa_assay.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@isa_assay), status: :unprocessable_entity }
       end
     end
   end
@@ -193,10 +212,10 @@ class ISAAssaysController < ApplicationController
             attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id].to_i
           elsif attribute[:sample_attribute_type][:title]
             attribute[:sample_attribute_type_id] =
-              SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
+              SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first&.id
           end
         end
-        attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
+        attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first&.id unless attribute[:unit_symbol].nil?
         params[:sample_type][:sample_attributes_attributes] << attribute
       end
     end
@@ -222,7 +241,7 @@ class ISAAssaysController < ApplicationController
   end
 
   def old_attributes
-    return if @isa_assay.assay.is_assay_stream?
+    return if @isa_assay.assay.is_assay_stream? || @isa_assay.sample_type.nil?
 
     @old_attributes = @isa_assay.sample_type.sample_attributes.map do |attr|
       { id: attr.id, title: attr.title }
@@ -243,34 +262,67 @@ class ISAAssaysController < ApplicationController
     UpdateSampleMetadataJob.perform_later(@isa_assay.sample_type, @current_user, attribute_changes)
   end
 
-  def find_requested_item
+  def respond_with_error(status=:unprocessable_entity)
+    respond_to do |format|
+      format.html do
+        error_messages = @isa_assay.errors.map do |error|
+          helpers.content_tag(:li) do
+            "[" + helpers.content_tag(:b, error.attribute.to_s) + "]: #{ERB::Util.html_escape(error.message)}"
+          end
+        end
+        flash[:error] = helpers.content_tag(:ul) do
+          helpers.safe_join(error_messages)
+        end.html_safe
+        path = if @isa_assay.assay.nil?
+                 assays_path
+               else
+                 single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+                                  item_id: @isa_assay.assay)
+               end
+        redirect_to path
+      end
+
+      format.json { render json: json_api_errors(@isa_assay), status: status }
+    end
+  end
+
+  def find_requested_item_for_show
     @isa_assay = ISAAssay.new
     @isa_assay.populate(params[:id])
 
-    if @isa_assay.assay.nil?
-      @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.")
-    else
-      @isa_assay.errors.add(:assay, "You are not authorized to edit this #{t('isa_assay')}.") unless requested_item_authorized?(@isa_assay.assay)
+    @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.") if @isa_assay.assay.nil?
+    return respond_with_error(:not_found) if @isa_assay.errors.any?
+
+    @isa_assay.errors.add(:assay, "You are not authorized to view this #{t('isa_assay')}.") unless @isa_assay.assay.can_view?
+    return respond_with_error(:forbidden) if @isa_assay.errors.any?
+
+    unless @isa_assay.assay.is_assay_stream?
+      @isa_assay.errors.add(:sample_type, 'Sample type not found.') if @isa_assay.sample_type.nil?
+      return respond_with_error(:not_found) if @isa_assay.errors.any?
     end
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: [{ title: 'Not Found', detail: "#{t('isa_assay')} with id '#{params[:id]}' was not found." }] },
+           status: :not_found
+  end
+
+  def find_requested_item_for_edit
+    @isa_assay = ISAAssay.new
+    @isa_assay.populate(params[:id])
+
+    @isa_assay.errors.add(:assay, "The #{t('isa_assay')} was not found.") if @isa_assay.assay.nil?
+    return respond_with_error(:not_found) if @isa_assay.errors.any?
+
+    @isa_assay.errors.add(:assay, "You are not authorized to edit this #{t('isa_assay')}.") unless requested_item_authorized?(@isa_assay.assay)
+    return respond_with_error(:forbidden) if @isa_assay.errors.any?
 
     # Should not deal with sample type if assay has assay_class assay stream
-    unless @isa_assay.assay&.is_assay_stream?
-      if @isa_assay.sample_type.nil?
-        @isa_assay.errors.add(:sample_type, 'Sample type not found.')
-      elsif @isa_assay.sample_type.locked?
-        @isa_assay.errors.add(:sample_type, "The #{t('isa_assay')}'s #{t('sample_type')} is locked by a background process and cannot be edited.")
-      else
-        @isa_assay.errors.add(:sample_type, "You are not authorized to edit this #{t('isa_assay')}'s #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
-      end
-    end
+    unless @isa_assay.assay.is_assay_stream?
+      @isa_assay.errors.add(:sample_type, 'Sample type not found.') if @isa_assay.sample_type.nil?
+      return respond_with_error(:not_found) if @isa_assay.errors.any?
 
-    if @isa_assay.errors.any?
-      error_messages = @isa_assay.errors.map do |error|
-        "<li>[<b>#{error.attribute.to_s}</b>]: #{error.message}</li>"
-      end.join('')
-      flash[:error] = "<ul>#{error_messages}</ul>".html_safe
-      redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                   item_id: @isa_assay.assay)
+      @isa_assay.errors.add(:sample_type, "The #{t('isa_assay')}'s #{t('sample_type')} is locked by a background process and cannot be edited.") if @isa_assay.sample_type.locked?
+      @isa_assay.errors.add(:sample_type, "You are not authorized to edit this #{t('isa_assay')}'s #{t('sample_type')}.") unless requested_item_authorized?(@isa_assay.sample_type)
+      return respond_with_error(:unprocessable_entity) if @isa_assay.errors.any?
     end
   end
 end
