@@ -8,9 +8,10 @@ x-shared:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
     env_file:
       - docker/db.env
+      - docker/redis.env
     volumes:
       - seek-filestore:/seek/filestore
       - seek-cache:/seek/tmp/cache
@@ -55,7 +56,14 @@ services:
   redis:
     image: redis:8.6-alpine
     container_name: seek-session-store
-    command: ["redis-server", "--appendonly", "yes"]
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - "${REDIS_PASSWORD}"
+    env_file:
+      - docker/redis.env
     volumes:
       - seek-redis-data:/data
     restart: always
@@ -63,8 +71,8 @@ services:
       test:
         [
           "CMD",
-          "redis-cli",
-          "ping"
+          "redis-cli -a \"$${REDIS_PASSWORD}\"",
+          "ping | grep PONG"
         ]
       interval: 5s
       timeout: 3s
