@@ -46,7 +46,7 @@
             </button>
             <ul class="dropdown-menu">
               <li>
-                <%= icon_link_to('Download Main Workflow File', 'ro_crate_file', polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_path, code: params[:code])) %>
+                <%= icon_link_to('Download Main Workflow File', 'download', polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_path, code: params[:code])) %>
               </li>
             </ul>
             <% end %>
