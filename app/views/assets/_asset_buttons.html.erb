@@ -39,7 +39,7 @@
         <div class="btn-group">
           <%= button_link_to('Download RO-Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code]),
                           'data-tooltip' => tooltip("The Workflow RO-Crate is a package containing the workflow definition, its metadata and supporting resources like test data")) %>
-          <% if !asset.main_workflow_path.nil? %>
+          <% if asset.is_git_versioned? && !asset.main_workflow_path.nil?%>
             <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
               <span class="sr-only">Toggle Dropdown</span>
@@ -49,7 +49,7 @@
                 <%= icon_link_to('Download Main Workflow File', 'download', polymorphic_path([asset, :git_download], version: version, path: asset.main_workflow_path, code: params[:code])) %>
               </li>
             </ul>
-            <% end %>
+          <% end %>
         </div>
         <% if asset.can_run? %>
           <%# TODO: Change this to be more generic when other types can be run %>
