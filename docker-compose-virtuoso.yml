@@ -1,5 +1,6 @@
 x-shared:
-  seek_base: &seek_base # build: .
+  seek_base: &seek_base
+    # build: .
     image: fairdom/seek:main
 
     restart: always
@@ -8,6 +9,7 @@ x-shared:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
+      REDIS_URL: redis://redis_store:6379/0
     env_file:
       - docker/db.env
       - docker/virtuoso.env
@@ -49,6 +51,20 @@ services:
         ]
       interval: 10s
       timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  redis_store:
+    image: redis:8.6-alpine
+    container_name: seek-session-store
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - seek-redis-data:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
       retries: 5
       start_period: 20s
 

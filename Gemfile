@@ -159,4 +159,4 @@ gem "seven-zip", require: 'seven_zip_ruby'
 gem "ruby-xz", require: 'xz'
 
 gem "redis", "~> 5.4"
-gem "redis-session-store", "~> 0.11.6"
+gem "redis-actionpack", "~> 5.5"
