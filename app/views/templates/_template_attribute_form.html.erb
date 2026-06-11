@@ -21,7 +21,7 @@
 <% allow_isa_tag_change = template_attribute ? template_attribute.allow_isa_tag_change? : true %>
 <% hide_seek_sample_multi = template_attribute&.input_attribute? %>
 
-<tr class="sample-attribute <%= 'success' if template_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
+<tr class="sample-attribute <%= 'success' if template_attribute.nil? || template_attribute.new_record? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
     <div class="btn btn-info attribute-handle">
       <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>

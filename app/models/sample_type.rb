@@ -105,8 +105,9 @@ class SampleType < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    has_only_isa_json_compliant_investigations = studies.map(&:investigation).compact.all?(&:is_isa_json_compliant?) || assays.map(&:investigation).compact.all?(&:is_isa_json_compliant?)
-    (studies.any? || assays.any?) && has_only_isa_json_compliant_investigations && !isa_template.nil?
+    return false if investigations.blank?
+
+    (studies.any? || assays.any?) && investigations.all? { |inv| inv.is_isa_json_compliant } && !isa_template.nil?
   end
 
   def locked?
@@ -192,6 +193,10 @@ class SampleType < ApplicationRecord
 
   def editing_constraints
     Seek::Samples::SampleTypeEditingConstraints.new(self)
+  end
+
+  def creation_constraints
+    Seek::Samples::SampleTypeCreationConstraints.new(self)
   end
 
   def contributing_user

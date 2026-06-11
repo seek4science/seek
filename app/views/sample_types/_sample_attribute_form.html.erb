@@ -1,4 +1,5 @@
 <% sample_attribute ||= nil %>
+<% display_isa_tag ||= false %>
 <% index ||= 'replace-me' %>
 <% id = sample_attribute&.id || '' %>
 <% title = sample_attribute&.title || '' %>
@@ -15,14 +16,14 @@
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
 <% prefix ||= 'sample_type' %>
 <% field_name_prefix = "#{prefix}[sample_attributes_attributes][#{index}]" %>
-<% constraints = sample_type.editing_constraints %>
+<% constraints = (display_isa_tag && sample_type.new_record?) ? sample_type.creation_constraints : sample_type.editing_constraints %>
+<% allow_title_change = constraints.allow_type_change?(sample_attribute) %>
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
 <% allow_unit_change = constraints.allow_unit_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute&.seek_sample_multi? %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
-<% display_isa_tag ||= false %>
 <% hide_seek_sample_multi = display_isa_tag ? (sample_attribute&.input_attribute? && displaying_single_page?) : false %>
 <% level = sample_type.level if display_isa_tag %>
 <% isa_tags_options = ISATag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } if display_isa_tag %>
@@ -42,7 +43,7 @@
   </th>
   <td>
 
-    <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
+    <%= text_field_tag "#{field_name_prefix}[title]", title, class: "form-control#{allow_title_change ? '' : ' disabled'}",
                        placeholder: 'Attribute name', data: { attr: "title" } %>
   </td>
 
