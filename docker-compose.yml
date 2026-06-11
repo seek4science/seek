@@ -1,6 +1,6 @@
 x-shared:
   seek_base: &seek_base
-#    build: .
+    # build: .
     image: fairdom/seek:main
 
     restart: always
@@ -61,12 +61,7 @@ services:
       - seek-redis-data:/data
     restart: always
     healthcheck:
-      test:
-        [
-          "CMD",
-          "redis-cli",
-          "ping"
-        ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
