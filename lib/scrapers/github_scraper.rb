@@ -79,7 +79,9 @@ module Scrapers
             next
           end
         end
-        tags.map { |tag| create_resource(repo, tag) }
+        resources = tags.map { |tag| create_resource(repo, tag) }
+        repo.git_base.close
+        resources
       end.flatten.compact
     end
 
@@ -117,6 +119,9 @@ module Scrapers
       end
 
       workflow
+    rescue ROCrate::ReadException => e
+      output.puts "    RO-Crate read error: #{e.message}"
+      nil
     end
 
     def main_branch(repo)
@@ -143,7 +148,10 @@ module Scrapers
     def clone_repositories(repo_list)
       repos = repo_list.map { |repo| Git::Repository.find_or_create_by(remote: repo['clone_url']) }
 
-      repos.each(&:fetch)
+      repos.each do |r|
+        r.fetch
+        r.git_base.close # Close open files
+      end
 
       repos
     end
