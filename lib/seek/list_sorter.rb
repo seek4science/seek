@@ -118,15 +118,8 @@ module Seek
       relevance: { title: 'Relevance', order: '--relevance',
                    relation_proc: -> (items) {
                      ids = items.solr_cache(items.last_solr_query)
-                     return [] if ids.empty?
-                     case ActiveRecord::Base.connection.instance_values["config"][:adapter]
-                     when 'mysql2'
-                       Arel.sql("FIELD(#{items.arel_table.name}.id,#{ids.join(',')})")
-                     when 'postgresql'
-                       Arel.sql("position(#{items.arel_table.name}.id::text in '#{ids.join(',')}')")
-                     else
-                       ids.map { |id| Arel::Nodes::Descending.new(items.arel_table[:id].eq(id)) }
-                     end
+                     return items.none if ids.empty?
+                     items.klass.unscoped.from(items.distinct, items.table_name).in_order_of(:id, ids.map(&:to_i))
                    },
                    enum_proc: -> (items) { # Curry a sorting function that sorts two items: a and b based on search relevance
                      return nil if items.empty?
@@ -164,6 +157,7 @@ module Seek
       order ||= order_for_view(items.first.class.name, :index)
       if items.is_a?(ActiveRecord::Relation)
         orderings = strategy_for_relation(order, items)
+        return orderings if orderings.is_a?(ActiveRecord::Relation)
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
         if ["--views_desc","--downloads_desc"].include? order
           columns = []
@@ -232,12 +226,14 @@ module Seek
       self.order_from_keys(self.key_for_view(type_name, view))
     end
 
-    # Returns an Array of Arel "orderings", which can be passed into `SomeModel#order` to sort a relation.
+    # Returns an Array of Arel "orderings", or an ActiveRecord::Relation when a relation_proc returns one directly.
     def self.strategy_for_relation(order, relation)
       fields_and_directions = order.split(',').flat_map do |f|
         field, order = f.strip.split(' ', 2)
         if field.start_with?('--')
-          ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
+          result = ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
+          return result if result.is_a?(ActiveRecord::Relation)
+          result
         else
           m = field.match(/LOWER\((.+)\)/)
           field = m[1] if m

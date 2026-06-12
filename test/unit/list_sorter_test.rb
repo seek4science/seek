@@ -125,6 +125,23 @@ class ListSorterTest < ActiveSupport::TestCase
     end
   end
 
+  test 'sort by relevance as relation' do
+    d1 = FactoryBot.create(:document, title: 'document a')
+    d2 = FactoryBot.create(:document, title: 'document b')
+    d3 = FactoryBot.create(:document, title: 'document c')
+    d4 = FactoryBot.create(:document, title: 'document d')
+    d5 = FactoryBot.create(:document, title: 'document e')
+
+    relevance_ordered = [d3, d1, d2, d4, d5]
+    docs = Document.where(id: relevance_ordered.map(&:id))
+
+    Document.stub(:solr_cache, -> (q) { relevance_ordered.collect { |d| d.id.to_s } }) do
+      result = Seek::ListSorter.sort_by_order(docs, '--relevance')
+      assert_kind_of ActiveRecord::Relation, result
+      assert_equal relevance_ordered, result.to_a
+    end
+  end
+
   test 'sort by downloads' do
     person = FactoryBot.create(:person)
     d1 = FactoryBot.create(:document, title: 'document a',policy: FactoryBot.create(:publicly_viewable_policy))
