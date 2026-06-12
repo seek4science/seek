@@ -156,8 +156,12 @@ module Seek
     def self.sort_by_order(items, order = nil)
       order ||= order_for_view(items.first.class.name, :index)
       if items.is_a?(ActiveRecord::Relation)
+        field = order.strip
+        if field.start_with?('--')
+          proc_result = ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(items)
+          return proc_result if proc_result.is_a?(ActiveRecord::Relation)
+        end
         orderings = strategy_for_relation(order, items)
-        return orderings if orderings.is_a?(ActiveRecord::Relation)
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
         if ["--views_desc","--downloads_desc"].include? order
           columns = []
@@ -226,14 +230,12 @@ module Seek
       self.order_from_keys(self.key_for_view(type_name, view))
     end
 
-    # Returns an Array of Arel "orderings", or an ActiveRecord::Relation when a relation_proc returns one directly.
+    # Returns an Array of Arel "orderings", which can be passed into `SomeModel#order` to sort a relation.
     def self.strategy_for_relation(order, relation)
       fields_and_directions = order.split(',').flat_map do |f|
         field, order = f.strip.split(' ', 2)
         if field.start_with?('--')
-          result = ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
-          return result if result.is_a?(ActiveRecord::Relation)
-          result
+          ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
         else
           m = field.match(/LOWER\((.+)\)/)
           field = m[1] if m
