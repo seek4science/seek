@@ -119,6 +119,9 @@ module Scrapers
       end
 
       workflow
+    rescue ROCrate::ReadException => e
+      output.puts "    RO-Crate read error: #{e.message}"
+      nil
     end
 
     def main_branch(repo)
