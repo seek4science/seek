@@ -291,29 +291,25 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'should show external search when not logged in' do
     with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, true do
-        get :index
-        assert_response :success
-        assert_select 'div#search_box input#include_external_search', count: 1
-      end
+      get :index
+      assert_response :success
+      assert_select 'div#search_box input#include_external_search', count: 1
     end
   end
 
   test 'should show external search when logged in' do
     login_as FactoryBot.create(:user)
     with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, true do
-        get :index
-        assert_response :success
-        assert_select 'div#search_box input#include_external_search', count: 1
-      end
+      get :index
+      assert_response :success
+      assert_select 'div#search_box input#include_external_search', count: 1
     end
   end
 
-  test 'should not show external search when disabled' do
-    login_as FactoryBot.create(:user)
+  test 'should not show external search when all external search adaptors are disabled' do
     with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, false do
+      settings = { 'biomodels' => { 'enabled' => false }, 'tess' => { 'enabled' => false } }
+      with_config_value :external_search_adaptors, settings do
         get :index
         assert_response :success
         assert_select 'div#search_box input#include_external_search', count: 0
@@ -802,6 +798,18 @@ class HomesControllerTest < ActionController::TestCase
       assert_select 'li' do
         assert_select 'a[href=?]', select_sample_types_path(act: :create), text: 'Sample'
       end
+    end
+  end
+
+  test 'should mention metadata license in footer' do
+    with_config_value(:metadata_license, nil) do
+      get :index
+      assert_select '.ft-info', text: /Metadata is licensed/, count: 0
+    end
+
+    with_config_value(:metadata_license, 'CC0-1.0') do
+      get :index
+      assert_select '.ft-info', text: /Metadata is licensed under Creative Commons Zero v1.0 Universal \(CC0-1.0\)/
     end
   end
 

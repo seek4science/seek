@@ -281,11 +281,12 @@ var ISA = {
 
     visitNode: function (node) {
         if (node != ISA.originNode && node.data('url')) {
-            var url = node.data('url') + '?graph_view=' + ISA.view.current;
+            var url = new URL(node.data('url'), window.location.origin);
+            url.searchParams.set('graph_view', ISA.view.current);
             if (ISA.isFullscreen()) {
-                url = url + "&fullscreen";
+                url.searchParams.set('fullscreen', '');
             }
-            window.location = url;
+            window.location = url.toString();
         }
     },
 

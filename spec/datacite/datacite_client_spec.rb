@@ -91,12 +91,27 @@ describe Datacite::Client do
   end
 
   describe 'inactivate a DOI' do
-    it 'marks a dataset as inactive'
+    it 'marks a dataset as inactive',
+       vcr: { cassette_name: 'inactivate_a_DOI/marks_a_dataset_as_inactive' } do
+      # upload metadata and mint a DOI first
+      metadata = open_test_metadata('my_test.xml')
+      expect(endpoint.upload_metadata(metadata)).to eq('OK (10.5072/MY_TEST)')
+      expect(endpoint.mint(doi, url)).to eq('OK')
+      expect(endpoint.inactivate(doi)).to eq('OK')
+    end
   end
 
   describe 'activate a DOI' do
     context 'after a DOI being inactivated' do
-      it 'post new metadata for a given DOI'
+      it 'post new metadata for a given DOI', 
+         vcr: { cassette_name: 'inactivate_a_DOI/post_new_metadata_for_a_given_DOI' } do
+        # upload metadata and mint a DOI first
+        metadata = open_test_metadata('my_test.xml')
+        expect(endpoint.upload_metadata(metadata)).to eq('OK (10.5072/MY_TEST)')
+        expect(endpoint.mint(doi, url)).to eq('OK')
+        expect(endpoint.inactivate(doi)).to eq('OK')
+        expect(endpoint.upload_metadata(metadata)).to eq('OK (10.5072/MY_TEST)')
+      end
     end
   end
 

@@ -1,11 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'rails', '7.2.3.1'
+gem 'rails', '8.1.3'
 
 gem 'abbrev'
 gem 'active_model_serializers'
 gem 'activerecord-import'
-gem 'activerecord-session_store'
 gem 'acts-as-taggable-on'
 gem 'addressable'
 gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b' #necessary for newer hashie dependency, original api_smith is no longer active
@@ -23,7 +22,6 @@ gem 'caxlsx'
 gem 'caxlsx_rails'
 gem 'cff'
 gem 'citeproc-ruby'
-gem 'coffee-rails'
 gem 'commonmarker'
 gem 'country_select'
 gem 'csl-styles'
@@ -76,7 +74,7 @@ gem 'private_address_check'# Rails 5 upgrade
 gem 'progress_bar'
 gem 'psych'
 gem 'puma'
-gem 'rack', '< 3.0.0' # Rack >= 3 causes errors when running functional tests that call multiple actions in a single test
+gem 'rack'
 gem 'rack-attack'
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails-html-sanitizer'
@@ -92,7 +90,7 @@ gem 'responders'
 gem 'rest-client'
 gem 'rfc-822'
 gem 'rmagick'
-gem 'ro-bundle'
+gem 'ro-bundle', git: 'https://github.com/fbacall/ruby-ro-bundle.git' # Needed to relax rubyzip min version
 gem 'ro-crate'
 gem 'rspec-rails'
 gem 'rubyzip'
@@ -107,7 +105,6 @@ gem 'sqlite3'
 gem 'sunspot_rails'
 gem 'terrapin'
 gem 'terser'
-gem 'uuid'
 gem 'validate_url'
 gem 'whenever', require: false
 gem 'will_paginate'
@@ -145,8 +142,8 @@ group :test do
   gem 'simplecov'
   gem 'sunspot_matchers'
   gem 'test-prof'
+  gem 'selenium-webdriver', '~> 4.44'
   gem 'vcr'
-  gem 'webdrivers'
   gem 'whenever-test'
 end
 
@@ -161,3 +158,6 @@ gem "minitar"
 gem "bzip2-ffi"
 gem "seven-zip", require: 'seven_zip_ruby'
 gem "ruby-xz", require: 'xz'
+
+gem "redis", "~> 5.4"
+gem "redis-session-store", "~> 0.11.6"

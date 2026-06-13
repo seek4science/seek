@@ -515,7 +515,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     content = File.open(content_blob.filepath('txt'), 'rb').read
 
-    assert content.mb_chars.unicode_normalize(:nfd).include?('This is a rtf format')
+    assert content.force_encoding('UTF-8').unicode_normalize(:nfd).include?('This is a rtf format')
   end
 
   test 'convert_office should convert txt to pdf' do
@@ -707,6 +707,16 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 500, blob.file_size
 
     assert_raise Seek::DownloadHandling::RedirectLimitExceededException do
+      blob.retrieve
+    end
+    refute blob.file_exists?
+  end
+
+  test "won't follow redirect and fetch local file" do
+    stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'file:///etc/passwd' }, status: 302)
+    blob = FactoryBot.create(:url_content_blob)
+    refute blob.file_exists?
+    assert_raise Addressable::URI::InvalidURIError do
       blob.retrieve
     end
     refute blob.file_exists?
@@ -937,6 +947,18 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'does not enqueue remote content fetching job if file uploads blocked' do
+    content_blob = FactoryBot.build(:url_content_blob, make_local_copy: true)
+    with_config_value(:block_file_uploads, true) do
+      assert_no_difference('Task.count') do
+        assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
+          content_blob.save!
+          refute content_blob.remote_content_fetch_task.pending?
+        end
+      end
+    end
+  end
+
   test 'does not enqueue remote content fetching job for local content blob' do
     content_blob = FactoryBot.build(:content_blob)
     assert_no_difference('Task.count') do
@@ -1030,5 +1052,15 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob = ContentBlob.new(data: data, original_filename: 'size.txt')
     blob.save!
     assert_equal data.bytesize, blob.file_size
+  end
+
+  test 'not cachable if file uploads blocked' do
+    blob = FactoryBot.build(:url_content_blob, make_local_copy: true, file_size: 12)
+    with_config_value(:block_file_uploads, false) do
+      assert blob.cachable?
+    end
+    with_config_value(:block_file_uploads, true) do
+      refute blob.cachable?
+    end
   end
 end

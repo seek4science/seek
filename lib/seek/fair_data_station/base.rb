@@ -115,7 +115,7 @@ module Seek
 
       def to_extended_metadata_type_json
         json = {}
-        json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || UUID.generate}"
+        json['title'] = "FDS #{type_name.underscore.humanize} - #{package_name || SecureRandom.uuid}"
         json['supported_type'] = type_name
         json['enabled'] = true
         seek_attributes = all_additional_potential_annotation_details.collect(&:to_extended_metadata_attribute_json)
@@ -153,20 +153,19 @@ module Seek
         emt
       end
 
-      def find_closest_matching_extended_metadata_type(property_ids = additional_metadata_annotations.collect do |annotation|
-        annotation[0]
-      end)
-        # collect and sort those with the most properties that match, eliminating any where no properties match
-        candidates = ::ExtendedMetadataType.where(supported_type: type_name).enabled.includes(:extended_metadata_attributes).collect do |emt|
-          extended_metadata_property_ids = emt.deep_extended_metadata_attributes.collect(&:pid).compact_blank
+      def find_closest_matching_extended_metadata_type(property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
+        candidates = ::ExtendedMetadataType.where(supported_type: type_name).enabled.includes(:extended_metadata_attributes).filter_map do |emt|
+          deep_attributes = emt.deep_extended_metadata_attributes
+          extended_metadata_property_ids = deep_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & extended_metadata_property_ids)
+          # skip types with no matching properties
+          next if intersection.empty?
+          # skip types where any required attribute is absent from the FDS data — they would fail validation
+          required_pids = deep_attributes.select(&:required?).collect(&:pid).compact_blank
+          next if (required_pids - property_ids).any?
           difference = (property_ids | extended_metadata_property_ids) - intersection
-          emt = nil if intersection.empty?
           [intersection.length, difference.length, emt]
-        end.sort_by do |x|
-          # order by the number of properties matched coming top, but downgraded by the number of differences
-          [-x[0], x[1]]
-        end
+        end.sort_by { |x| [-x[0], x[1]] }
 
         candidates.first&.last
       end

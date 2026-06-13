@@ -1,17 +1,29 @@
 module Seek
   module UploadHandling
     module DataUpload
+      extend ActiveSupport::Concern
+
       include Seek::UploadHandling::ParameterHandling
       include Seek::UploadHandling::ContentInspection
 
-      def handle_upload_data(new_version = false)
-        blob_params = params[:content_blobs]
+      class UploadBlockedException < StandardError; end
+
+      included do
+        # this concern is for controllers only, otherwise the following line will throw an exception
+        rescue_from UploadBlockedException, with: :handle_upload_blocked_exception
+      end
+
+      def handle_upload_data(new_version = false, always_allow_uploads = false)
+        blob_params = params[:content_blobs] || []
+        unless always_allow_uploads
+          check_for_blocked_uploads(blob_params)
+          prevent_local_copy_for_blocked_uploads(blob_params)
+        end
 
         allow_empty_content_blob = model_image_present? || json_api_request?
 
-        unless allow_empty_content_blob || retained_content_blob_ids.present?
-          if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
-
+        unless allow_empty_content_blob || safe_retained_content_blob_ids.present?
+          if blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
             flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
           end
@@ -22,7 +34,10 @@ module Seek
         end
 
         blob_params.each do |item_params|
-          return false unless allow_empty_content_blob || check_for_data_or_url(item_params)
+          unless allow_empty_content_blob || check_for_data_or_url(item_params)
+            flash.now[:error] ||= missing_content_error(item_params)
+            return false
+          end
 
           if add_from_upload?(item_params)
             return false unless add_data_for_upload(item_params)
@@ -61,7 +76,12 @@ module Seek
         version += 1 if new_version
 
         unless model_image_present? && params[:content_blobs].blank?
-          content_blobs_params.each do |item_params|
+          (params[:content_blobs] || []).each do |item_params|
+            next if !json_api_request? &&
+                    item_params[:tmp_io_object].blank? &&
+                    item_params[:data_url].blank? &&
+                    item_params[:base64_data].blank?
+
             attributes = build_attributes_hash_for_content_blob(item_params, version)
             if asset.respond_to?(:content_blobs)
               asset.content_blobs.build(attributes)
@@ -79,7 +99,11 @@ module Seek
           raise 'No content-blob defined'
         end
 
-        retain_previous_content_blobs(asset, version) if version && version > 1
+        if version && version > 1
+          retain_previous_content_blobs(asset, version)
+        else
+          load_orphaned_content_blobs(asset)
+        end
       end
 
       def build_attributes_hash_for_content_blob(item_params, version)
@@ -101,6 +125,19 @@ module Seek
           retained_blobs.each do |blob|
             copy_blob_to_asset(asset, blob, new_version)
           end
+        end
+      end
+
+      # Loads previously saved orphaned content blobs (from a failed validation attempt) into the
+      # asset's in-memory association, so they appear correctly on re-render and are available for
+      # attachment after a successful save.
+      def load_orphaned_content_blobs(asset)
+        retained_ids = safe_retained_content_blob_ids
+        return if retained_ids.blank?
+        return unless asset.respond_to?(:content_blobs)
+
+        ContentBlob.where(id: retained_ids, asset_id: nil).each do |blob|
+          asset.content_blobs.proxy_association.add_to_target(blob)
         end
       end
 
@@ -217,6 +254,38 @@ module Seek
       def render_new?
         action_name == 'create'
       end
+
+      # forces params to prevent local copies to be made from urls if Seek::Config.block_file_uploads is true
+      def prevent_local_copy_for_blocked_uploads(blob_params)
+        return unless Seek::Config.block_file_uploads
+
+        blob_params.each do |params|
+          params[:make_local_copy] = '0'
+        end
+      end
+
+      # raises UploadBlockedException if data upload params are present for any blob params whilst Seek::Config.block_file_uploads is true
+      def check_for_blocked_uploads(blob_params)
+        return unless Seek::Config.block_file_uploads
+
+        blob_params.each do |params|
+          if check_for_data_upload_params(params)
+            raise UploadBlockedException, 'Data upload is not allowed. Please provide a URL to the data instead.'
+          end
+        end
+      end
+
+      def handle_upload_blocked_exception(exception)
+        respond_to do |format|
+          format.html do
+            flash[:error] = exception.message
+            redirect_to polymorphic_path(controller_name)
+          end
+          format.json { render json: { error: exception.message }, status: :forbidden }
+        end
+      end
+
     end
+
   end
 end

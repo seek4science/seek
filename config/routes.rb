@@ -45,7 +45,7 @@ SEEK::Application.routes.draw do
   end
 
   concern :has_dashboard do |stats_options|
-    resources :stats, stats_options.reverse_merge(only: []) do
+    resources :stats, **stats_options.reverse_merge(only: []) do
       collection do
         get :dashboard
         get :contributions
@@ -94,6 +94,8 @@ SEEK::Application.routes.draw do
     member do
       get :mint_doi_confirm
       post :mint_doi
+      get :retract_doi_confirm
+      post :retract_doi
     end
   end
 

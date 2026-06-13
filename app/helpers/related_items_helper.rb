@@ -42,7 +42,7 @@ module RelatedItemsHelper
   end
 
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
-  def get_related_resources(resource, limit = nil)
+  def get_related_resources(resource, limit = nil, code: nil)
     items_hash = {}
     resource.class.related_type_methods.each_key do |type|
       next if type == 'Organism' && !resource.is_a?(Sample)
@@ -52,7 +52,7 @@ module RelatedItemsHelper
       items_hash[type] = resource.get_related(type)
     end
 
-    related_items_hash(items_hash, limit)
+    related_items_hash(items_hash, limit, code: code)
   end
 
   def sort_project_member_by_status(resource, project_id)
@@ -70,7 +70,7 @@ module RelatedItemsHelper
   end
 
   # Use order: false to prevent ordering
-  def related_items_hash(items_hash, limit = nil, order: nil)
+  def related_items_hash(items_hash, limit = nil, order: nil, code: nil)
     hash = {}
     items_hash.each_key do |type|
 
@@ -90,7 +90,11 @@ module RelatedItemsHelper
         end
         total = hash[type][:items].to_a
         total_count = hash[type][:items_count]
-        hash[type][:items] = hash[type][:items].authorized_for('view', User.current_user).to_a
+        if code.present?
+          hash[type][:items] = total.select { |item| item.can_view? || (item.respond_to?(:auth_by_code?) && item.auth_by_code?(code)) }
+        else
+          hash[type][:items] = hash[type][:items].authorized_for('view', User.current_user).to_a
+        end
         hash[type][:items_count] = hash[type][:items].count
         hash[type][:hidden_count] = total_count - hash[type][:items_count]
         hash[type][:hidden_items] = total - hash[type][:items]

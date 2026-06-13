@@ -17,14 +17,29 @@ jobs:
 
     services:
       mysql:
-          image: mysql:8.0.21
+          image: mysql:8.4
           env:
               MYSQL_ALLOW_EMPTY_PASSWORD: yes
               MYSQL_ROOT_PASSWORD: ''
               MYSQL_DATABASE: test
           ports:
             - 3306:3306
-          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --restart=always
+          options: >-
+            --health-cmd="mysqladmin ping"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=3
+            --restart=always
+
+      redis:
+        image: redis:8.6-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
 
     steps:
       - name: Checkout
@@ -50,7 +65,7 @@ jobs:
       - name: Install SEEK through ansible
         working-directory: /home/runner/work/seek/seek/script/ansible/
         run: |
-          ansible-playbook Deploy-SEEK.yml --skip-tags database
+          ansible-playbook Deploy-SEEK.yml --skip-tags "database,redis-server"
 
       - name: Configures database
         working-directory: /home/runner/work/SEEK

@@ -5,7 +5,7 @@ require 'seek/upload_handling/examine_url'
 
 class UploadHandingTest < ActiveSupport::TestCase
 
-  include Seek::UploadHandling::DataUpload
+  include ActiveSupport::Rescuable
   include Seek::UploadHandling::DataUpload
   include Seek::UrlValidation
 
@@ -225,6 +225,31 @@ class UploadHandingTest < ActiveSupport::TestCase
     refute check_for_empty_data_if_present(data: [empty_content, file_with_content])
   end
 
+  test 'check for data upload params' do
+    assert check_for_data_upload_params(data: '', data_url: 'http://fish')
+    assert check_for_data_upload_params(data: '')
+    assert check_for_data_upload_params(data: 'sdf')
+    assert check_for_data_upload_params(base64_data: '', data_url: 'http://fish')
+    assert check_for_data_upload_params(base64_data: '')
+    assert check_for_data_upload_params(base64_data: 'sdf')
+    refute check_for_data_upload_params(data_url: 'http://fish')
+  end
+
+  test 'exception in handle upload if upload data present and blocked' do
+    with_config_value(:block_file_uploads, true) do
+      @params = { content_blobs: [{ data_url: 'http://fish.com', data: fixture_file_upload('empty_file', 'text/plain') }] }
+      assert_raises(Seek::UploadHandling::DataUpload::UploadBlockedException, match: /Data upload is not allowed\. Please provide a URL to the data instead/) do
+        handle_upload_data
+      end
+      @params = { content_blobs: [{ data_url: 'http://fish.com', base64_data: fixture_file_upload('empty_file', 'text/plain') }] }
+      assert_raises(Seek::UploadHandling::DataUpload::UploadBlockedException, match: /Data upload is not allowed\. Please provide a URL to the data instead/) do
+        handle_upload_data
+      end
+    end
+
+
+  end
+
   # allows some methods to be tested the rely on flash.now[:error]
   def flash
     ActionDispatch::Flash::FlashHash.new
@@ -247,4 +272,5 @@ class UploadHandingTest < ActiveSupport::TestCase
   def check_url_response_code(url)
     Seek::DownloadHandling::HTTPHandler.new(url, fallback_to_get: false).info[:code]
   end
+
 end

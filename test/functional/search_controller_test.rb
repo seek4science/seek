@@ -64,10 +64,8 @@ class SearchControllerTest < ActionController::TestCase
     FactoryBot.create_list(:model, 3, policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
-      with_config_value(:external_search_enabled, true) do
-        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(3) }) do
-          get :index, params: { q: 'yeast', include_external_search: '1' }
-        end
+      Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(3) }) do
+        get :index, params: { q: 'yeast', include_external_search: '1' }
       end
     end
 
@@ -81,9 +79,7 @@ class SearchControllerTest < ActionController::TestCase
 
   test 'biomodels search can handle unreleased models' do
     VCR.use_cassette('biomodels/search-unreleased') do
-      with_config_value(:external_search_enabled, true) do
-        get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
-      end
+      get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
     end
 
     assert_select '.related-items li a', text: 'BioModels Database (6)'
@@ -232,14 +228,45 @@ class SearchControllerTest < ActionController::TestCase
   end
 
 
+  test 'ISATag is excluded from HTML search results' do
+    isa_tag = FactoryBot.create(:min_isa_tag)
+
+    ISATag.stub(:solr_cache, -> (q) { [isa_tag.id] }) do
+      get :index, params: { q: 'isa' }
+    end
+
+    assert_response :success
+    assert_nil assigns(:results)['ISATag']
+  end
+
+  test 'ISATag is included in JSON API search results' do
+    isa_tag = FactoryBot.create(:min_isa_tag)
+
+    ISATag.stub(:solr_cache, -> (q) { [isa_tag.id] }) do
+      get :index, params: { q: 'isa' }, format: :json
+    end
+
+    assert_response :success
+    assert_equal 1, assigns(:results)['ISATag'].count
+  end
+
+  test 'Sample is included in JSON API search results' do
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
+
+    Sample.stub(:solr_cache, -> (q) { [sample.id] }) do
+      get :index, params: { q: 'sample' }, format: :json
+    end
+
+    assert_response :success
+    assert_equal 1, assigns(:results)['Sample'].count
+  end
+
   test 'remember external search' do
     FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
-      with_config_value(:external_search_enabled, true) do
-        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
-          get :index, params: { q: 'yeast', include_external_search: '1' }
-        end
+      Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
+        get :index, params: { q: 'yeast', include_external_search: '1' }
       end
     end
 
