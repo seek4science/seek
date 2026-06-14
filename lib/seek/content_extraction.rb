@@ -32,7 +32,7 @@ module Seek
       content = []
       if file_exists?
         # Pattern A: read via adapter IO; force encoding to match original File.read behaviour.
-        text = data_io_object.read.force_encoding('iso-8859-1')
+        text = data_io_object.read.force_encoding(Encoding::ISO_8859_1)
         unless text.blank?
           content = filter_text_content text
           content = split_content(content, 10, 5)
@@ -84,8 +84,11 @@ module Seek
     end
 
     def extract_csv
-      # Pattern A: read via adapter IO.
-      data_io_object.read
+      # Pattern A: read via adapter IO. The adapter returns binary (ASCII-8BIT) data;
+      # CSV/TSV content is text, so relabel it as UTF-8 to match the previous file-based
+      # read. Otherwise downstream operations like String#unicode_normalize fail with
+      # "Unicode Normalization not appropriate for ASCII-8BIT".
+      data_io_object.read.force_encoding(Encoding::UTF_8)
     end
 
     def to_spreadsheet_xml
