@@ -1,8 +1,10 @@
 require 'test_helper'
 require 'minitest/mock'
+require 'storage_stub_helper'
 
 class SnapshotTest < ActiveSupport::TestCase
   include MockHelper
+  include StorageStubHelper
 
 
   setup do
@@ -64,6 +66,56 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert snapshot.metadata.is_a?(Hash)
     assert_equal @investigation.title, snapshot.metadata['title']
+  end
+
+  test 'create_snapshot uploads the RO bundle via the storage adapter on S3' do
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: 1)
+      client.stub_responses(:get_object, body: 'stubbed member content')
+      client.stub_responses(:put_object, {})
+
+      snapshot = @investigation.create_snapshot
+      assert snapshot.persisted?
+      assert snapshot.content_blob.present?
+      # The snapshot zip must be uploaded through the adapter, not written to a local filepath.
+      uploads = client.api_requests.select { |r| r[:operation_name] == :put_object }
+      assert uploads.any?, 'expected the snapshot RO bundle to be uploaded via put_object'
+    end
+  end
+
+  test 'metadata parses the RO bundle from S3 (snapshot show page path)' do
+    # Reproduces the snapshot show-page failure: metadata -> parse_metadata -> SnapshotParser
+    # reads the bundle lazily, so the temporary copy must survive the whole parse.
+    snapshot = @investigation.create_snapshot
+    bundle_bytes = File.binread(snapshot.content_blob.filepath)
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: bundle_bytes.bytesize)
+      client.stub_responses(:get_object, body: bundle_bytes)
+
+      fresh = Snapshot.find(snapshot.id) # avoid memoised metadata
+      md = fresh.metadata
+      assert md.is_a?(Hash)
+      assert_equal @investigation.title, md['title']
+    end
+  end
+
+  test 'research_object reads the RO bundle from S3 when there is no local copy' do
+    # Create on the local backend to obtain a real, valid RO bundle, then capture its bytes.
+    snapshot = @investigation.create_snapshot
+    bundle_bytes = File.binread(snapshot.content_blob.filepath)
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: bundle_bytes.bytesize)
+      client.stub_responses(:get_object, body: bundle_bytes)
+
+      yielded = nil
+      snapshot.research_object { |ro| yielded = ro }
+      refute_nil yielded, 'expected research_object to yield a readable RO bundle streamed from S3'
+    end
   end
 
   test 'can fetch by snapshot number' do

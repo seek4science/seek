@@ -35,27 +35,32 @@ module Seek #:nodoc:
           blob = snapshot.build_content_blob(content_type: Mime::Type.lookup_by_extension('ro').to_s,
                                              original_filename: filename)
           ro_file = nil
+          fixed_file = nil
           begin
             Rails.logger.debug("Generating RO...")
             ro_file = Seek::ResearchObjects::Generator.new(self).generate
             Rails.logger.debug("Writing zip file to content blob (and fixing)...")
-            `zip -FF #{ro_file.path} --out #{blob.filepath}`
+            # Repair the zip into a tempfile, then store it through the storage adapter
+            # (local or S3) rather than writing directly to a local filepath. Array form
+            # of zip avoids shell interpolation of the path.
+            fixed_file = Tempfile.new(['snapshot', '.ro.zip'])
+            fixed_file.close
+            system('zip', '-FF', ro_file.path, '--out', fixed_file.path)
+            blob.tmp_io_object = File.open(fixed_file.path)
             blob.save!
             Rails.logger.debug("Done!")
             snapshot
           rescue StandardError => e
             # Clean up
             snapshot.destroy
-            if blob.persisted?
-              blob.destroy
-              File.delete(blob.filepath) if File.exist?(blob.filepath)
-            end
+            blob.destroy if blob.persisted? # adapter delete handles the stored object
             raise e
           ensure
             if ro_file
               ro_file.close unless ro_file.closed?
               File.delete(ro_file.path) if File.exist?(ro_file.path)
             end
+            File.delete(fixed_file.path) if fixed_file && File.exist?(fixed_file.path)
           end
         end
 

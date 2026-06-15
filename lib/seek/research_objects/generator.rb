@@ -23,11 +23,17 @@ module Seek
       #
       def generate(file = nil)
         file ||= temp_file(DEFAULT_FILENAME)
+        @temp_blob_copies = []
         ROBundle::File.create(file) do |ro|
           @bundle = ro
           bundle(@resource)
         end
         file
+      ensure
+        # ROBundle reads added files lazily (when the bundle is written above), so any
+        # streamed-from-S3 temp copies must live until here. Clean them up now.
+        @temp_blob_copies&.each { |path| File.delete(path) if File.exist?(path) }
+        @temp_blob_copies = nil
       end
 
       # Recursively store metadata/files of this resource and its children.
@@ -105,7 +111,22 @@ module Seek
       # stores a content blob file, added the aggregate to the manifest
       def store_blob_file(asset, blob, parents = [])
         path = resolve_entry_path(asset, blob, parents)
-        @bundle.add(path, blob.filepath, aggregate: true)
+        @bundle.add(path, local_path_for(blob), aggregate: true)
+      end
+
+      # Returns a local filesystem path for the blob's content, for ROBundle to read.
+      # On the local backend (or for fleximage-backed ModelImage, which has no adapter),
+      # this is the real on-disk path. On S3 it streams a temp copy, tracked in
+      # @temp_blob_copies so it survives until the bundle is written (see #generate).
+      def local_path_for(blob)
+        return blob.filepath unless blob.respond_to?(:storage_adapter)
+
+        local = blob.storage_adapter.full_path(blob.storage_key)
+        return local if local
+
+        copy = blob.make_temp_copy
+        (@temp_blob_copies ||= []) << copy
+        copy
       end
 
       # resolves the entry path, to avoid duplicates. If an asset has multiple files

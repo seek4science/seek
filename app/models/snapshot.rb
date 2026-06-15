@@ -71,9 +71,18 @@ class Snapshot < ApplicationRecord
     people.uniq.compact
   end
 
-  def research_object
-    ROBundle::File.open(content_blob.filepath) do |ro|
-      yield ro if block_given?
+  # Opens the snapshot's RO bundle and yields it to the block, returning the block's value.
+  # ROBundle reads entries lazily, so callers MUST do their reading inside the block: on S3
+  # the bundle is backed by a temporary copy that is removed once this method returns.
+  def research_object(&block)
+    local = content_blob.storage_adapter.full_path(content_blob.storage_key)
+    if local
+      read_research_object(local, &block)
+    else
+      # S3: no local path — stream a temporary copy that stays alive for the whole read.
+      content_blob.with_temporary_copy do |path|
+        read_research_object(path, &block)
+      end
     end
   end
 
@@ -104,7 +113,16 @@ class Snapshot < ApplicationRecord
   end
 
   def parse_metadata
-    Seek::ResearchObjects::SnapshotParser.new(research_object).parse
+    # Parse inside the block so the bundle is read while its (possibly temporary) backing file exists.
+    research_object { |ro| Seek::ResearchObjects::SnapshotParser.new(ro).parse }
+  end
+
+  # Opens the RO bundle at a local path and returns the block's result (or the bundle if no block).
+  # All reads must happen inside the block — see #research_object.
+  def read_research_object(path)
+    ROBundle::File.open(path) do |ro|
+      return block_given? ? yield(ro) : ro
+    end
   end
 
   # Need to re-index the parent model to update its' "doi" field
