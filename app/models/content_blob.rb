@@ -60,8 +60,25 @@ class ContentBlob < ApplicationRecord
 
   # This overrides the method from acts_as_fleximage so that the original image is read from the default SEEK filestore
   #  rather than the special `image_directory` specified above. Resized images will still go in there, though.
+  # During an S3-backed resize, #resize_image points this at a temporary local copy of the original
+  # (see below), since fleximage can only read the master image from a local path.
   def file_path
-    filepath
+    @resize_source_path || filepath
+  end
+
+  # fleximage's resize pipeline (resize_image -> operate -> load_image) reads the master image from
+  # #file_path, which assumes a local file. On the S3 backend the original has no local path, so stream
+  # a temporary copy and expose it via #file_path for the duration of the resize. The resized result is
+  # still cached locally, so this download only happens on the first resize of each size.
+  def resize_image(size = Seek::ActsAsFleximageExtension::STANDARD_SIZE)
+    return super if cache_exists?(size) || storage_adapter.full_path(storage_key)
+
+    with_temporary_copy do |tmp_path|
+      @resize_source_path = tmp_path
+      super
+    end
+  ensure
+    @resize_source_path = nil
   end
 
   def original_filename_or_url

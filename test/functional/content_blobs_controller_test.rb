@@ -368,6 +368,25 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'view image content on S3 backend resizes from a streamed copy and serves it' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
+                            content_blob: FactoryBot.create(:image_content_blob))
+    blob = sop.content_blob
+    original_bytes = File.binread(blob.filepath)
+    FileUtils.rm_f(blob.full_cache_path('600'))
+
+    with_stubbed_s3_storage do |dat, _converted|
+      s3_client(dat).stub_responses(:head_object, content_length: original_bytes.bytesize)
+      s3_client(dat).stub_responses(:get_object, body: original_bytes)
+      # This is the "View content" path for images: download with an image_size.
+      get :download, params: { sop_id: sop.id, id: blob.id, disposition: 'inline', image_size: '600' }
+      assert_response :success
+      assert_equal 'inline', @response.header['Content-Disposition'].to_s.split(';').first
+    end
+  ensure
+    FileUtils.rm_f(blob.full_cache_path('600')) if blob
+  end
+
   test 'get_pdf' do
     ms_word_sop = FactoryBot.create(:doc_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')

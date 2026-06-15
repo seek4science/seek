@@ -3,8 +3,10 @@ require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 require 'minitest/mock'
 require 'private_address_check'
+require 'storage_stub_helper'
 
 class ContentBlobTest < ActiveSupport::TestCase
+  include StorageStubHelper
 
   include NelsTestHelper
 
@@ -979,6 +981,24 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert FactoryBot.create(:image_content_blob).is_image_convertable?
     refute FactoryBot.create(:svg_content_blob).is_image_convertable?
     refute FactoryBot.create(:pdf_content_blob).is_image_convertable?
+  end
+
+  test 'resize_image streams the original from S3 when there is no local copy' do
+    blob = FactoryBot.create(:image_content_blob)
+    original_bytes = File.binread(blob.filepath)
+    FileUtils.rm_f(blob.full_cache_path('100'))
+
+    with_stubbed_s3_storage do |dat, _converted|
+      s3_client(dat).stub_responses(:head_object, content_length: original_bytes.bytesize)
+      s3_client(dat).stub_responses(:get_object, body: original_bytes)
+      # S3 has no local path, so the resize must stream a temporary copy of the original.
+      assert_nil blob.storage_adapter.full_path(blob.storage_key)
+      blob.resize_image('100')
+      assert File.exist?(blob.full_cache_path('100')),
+             'expected the resized image to be cached locally after streaming the original from S3'
+    end
+  ensure
+    FileUtils.rm_f(blob.full_cache_path('100')) if blob
   end
 
   # --- Storage adapter characterisation tests ---
