@@ -32,6 +32,12 @@ module Git
       touch(:last_fetch)
     end
 
+    def close
+      git_base.close
+      @git_base = nil
+      self
+    end
+
     def remote_refs
       @remote_refs ||= if remote.present?
                          refs = { branches: [], tags: [] }

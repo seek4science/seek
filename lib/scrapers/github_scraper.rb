@@ -64,24 +64,28 @@ module Scrapers
 
     def create_resources(repositories)
       repositories.map do |repo|
-        output.puts "  Considering #{repo.remote.chomp('.git')}..."
-        if @only_latest
-          tag = latest_tag(repo)
-          if tag.nil?
-            output.puts "    Error while getting latest tag - wrong branch name?"
-            next
+        begin
+          output.puts "  Considering #{repo.remote.chomp('.git')}..."
+          if @only_latest
+            tag = latest_tag(repo)
+            if tag.nil?
+              output.puts "    Error while getting latest tag - wrong branch name?"
+              next
+            end
+            tags = [tag]
+          else
+            tags = all_tags(repo)
+            if tags.empty?
+              output.puts "    No tags found to register"
+              next
+            end
           end
-          tags = [tag]
-        else
-          tags = all_tags(repo)
-          if tags.empty?
-            output.puts "    No tags found to register"
-            next
-          end
+          resources = tags.map { |tag| create_resource(repo, tag) }
+
+          resources
+        ensure
+          repo.close
         end
-        resources = tags.map { |tag| create_resource(repo, tag) }
-        repo.git_base.close
-        resources
       end.flatten.compact
     end
 
@@ -149,8 +153,11 @@ module Scrapers
       repos = repo_list.map { |repo| Git::Repository.find_or_create_by(remote: repo['clone_url']) }
 
       repos.each do |r|
-        r.fetch
-        r.git_base.close # Close open files
+        begin
+          r.fetch
+        ensure
+          r.close # Close open files
+        end
       end
 
       repos
