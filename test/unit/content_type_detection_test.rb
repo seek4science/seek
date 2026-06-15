@@ -1,7 +1,9 @@
 require 'test_helper'
+  require 'storage_stub_helper'
 
 class ContentTypeDetectionTest < ActiveSupport::TestCase
   include Seek::ContentTypeDetection
+  include StorageStubHelper
 
   test 'is_xls' do
     blob = FactoryBot.create :spreadsheet_content_blob
@@ -140,6 +142,34 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert blob.is_sbml?
     assert !blob.is_jws_dat?
     assert !blob.is_xgmml?
+  end
+
+  test 'is_sbml reads content through the adapter on S3 (no local file)' do
+    blob = FactoryBot.create :teusink_model_content_blob
+    sbml_bytes = File.binread(blob.filepath)
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: sbml_bytes.bytesize)
+      client.stub_responses(:get_object, body: sbml_bytes)
+      # check_content must read via the adapter, not a local filepath.
+      assert blob.is_sbml?, 'expected is_sbml? to detect SBML content streamed from S3'
+      assert_not blob.is_jws_dat?
+    end
+  end
+
+  test 'mime_magic content type detection does not crash on S3 (no local file)' do
+    blob = FactoryBot.create :teusink_model_content_blob
+    bytes = File.binread(blob.filepath)
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: bytes.bytesize)
+      client.stub_responses(:get_object, body: bytes)
+      # Reproduces the COPASI-upload crash: extension-less detection falls back to
+      # sniffing magic bytes, which used to File.open(filepath) and raise Errno::ENOENT on S3.
+      assert_nothing_raised { blob.send(:mime_magic_content_type) }
+    end
   end
 
   test 'is_jws_dat' do

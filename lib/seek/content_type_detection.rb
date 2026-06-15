@@ -220,9 +220,10 @@ module Seek
 
     def check_content(blob, str, max_length = 1500)
       char_count = 0
-      filepath = blob.filepath
+      io = blob.data_io_object
+      return false unless io
       begin
-        File.open(filepath, 'r').each_line do |line|
+        io.each_line do |line|
           char_count += line.length
           # Rails.logger.info("line=>"+line)
           return true if line.downcase.include?(str)
@@ -230,6 +231,8 @@ module Seek
         end
       rescue => exception
         Rails.logger.error("Error reading content_blob contents #{exception.class.name}:#{exception.message}")
+      ensure
+        io.close if io.respond_to?(:close)
       end
       false
     end
@@ -244,10 +247,15 @@ module Seek
     end
 
     def mime_magic_content_type
-      io = File.open(filepath)
-      type = MimeMagic.by_magic(io).try(:type) if file_exists?
-      io.close
-      type
+      return nil unless file_exists?
+
+      io = data_io_object
+      return nil unless io
+      begin
+        MimeMagic.by_magic(io).try(:type)
+      ensure
+        io.close if io.respond_to?(:close)
+      end
     end
 
     def set_content_type_according_to_file
