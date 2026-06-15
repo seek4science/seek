@@ -115,6 +115,25 @@ class S3AdapterTest < ActiveSupport::TestCase
     assert_includes url, "#{PREFIX}/#{KEY}"
   end
 
+  test 'presigned_url overrides response filename and content type so downloads open correctly' do
+    url = @adapter.presigned_url(KEY, expires_in: 60,
+                                 filename: 'My Report.xlsx',
+                                 content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                 disposition: 'attachment')
+    decoded = CGI.unescape(url)
+    assert_includes decoded, 'response-content-disposition='
+    assert_includes decoded, 'attachment'
+    assert_includes decoded, 'My Report.xlsx'
+    assert_includes decoded, 'response-content-type='
+    assert_includes decoded, 'spreadsheetml.sheet'
+  end
+
+  test 'presigned_url omits response overrides when filename and content type are absent' do
+    decoded = CGI.unescape(@adapter.presigned_url(KEY, expires_in: 60))
+    assert_not_includes decoded, 'response-content-disposition='
+    assert_not_includes decoded, 'response-content-type='
+  end
+
   test 'test_connection returns success when list_objects_v2 succeeds' do
     client.stub_responses(:list_objects_v2, { contents: [] })
     assert @adapter.test_connection[:success]

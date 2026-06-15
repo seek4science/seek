@@ -1,10 +1,12 @@
 require 'test_helper'
 require 'minitest/mock'
 require 'private_address_check'
+require 'storage_stub_helper'
 
 class ContentBlobsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include StorageStubHelper
 
   def setup
     login_as(:quentin)
@@ -346,6 +348,24 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal "attachment; filename=\"file_with_no_extension\"; filename*=UTF-8''file_with_no_extension", @response.header['Content-Disposition']
     assert_equal 'application/octet-stream', @response.header['Content-Type']
     assert_equal '31', @response.header['Content-Length']
+  end
+
+  test 'download on S3 backend redirects to presigned URL carrying the original filename and content type' do
+    sop = FactoryBot.create(:doc_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    blob = sop.content_blob
+    with_stubbed_s3_storage do |dat, _converted|
+      # file_exists? (head_object) must succeed so the download serves the blob.
+      s3_client(dat).stub_responses(:head_object, content_length: blob.file_size || 1)
+      get :download, params: { sop_id: sop.id, id: blob.id }
+      assert_response :redirect
+      # Object is stored as "<uuid>.dat"; the presigned URL must override the
+      # response so the browser saves the real filename and type instead.
+      decoded = CGI.unescape(@response.location)
+      assert_includes decoded, blob.original_filename
+      assert_includes decoded, 'response-content-disposition='
+      assert_includes decoded, 'response-content-type='
+      assert_includes decoded, blob.content_type
+    end
   end
 
   test 'get_pdf' do

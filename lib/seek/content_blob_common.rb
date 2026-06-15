@@ -244,7 +244,11 @@ module Seek
                   type: content_blob.content_type || 'application/octet-stream',
                   disposition: disposition
       else
-        url = content_blob.storage_adapter.presigned_url(content_blob.storage_key, expires_in: 300)
+        url = content_blob.storage_adapter.presigned_url(content_blob.storage_key,
+                                                         expires_in: 300,
+                                                         filename: content_blob.original_filename,
+                                                         content_type: content_blob.content_type,
+                                                         disposition: disposition)
         redirect_to url, allow_other_host: true
       end
     end

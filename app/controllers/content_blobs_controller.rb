@@ -144,7 +144,8 @@ class ContentBlobsController < ApplicationController
       send_file local_path, filename: filename, type: 'application/pdf', disposition: 'attachment'
       headers['Content-Length'] = File.size(local_path).to_s
     else
-      redirect_to adapter.presigned_url(key, expires_in: 300), allow_other_host: true
+      redirect_to adapter.presigned_url(key, expires_in: 300, filename: filename, content_type: 'application/pdf'),
+                  allow_other_host: true
     end
   end
 

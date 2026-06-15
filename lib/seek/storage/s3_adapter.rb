@@ -86,12 +86,24 @@ module Seek
       end
 
       # Returns a presigned GET URL for the object, valid for expires_in seconds.
-      def presigned_url(key, expires_in: 300)
+      # Objects are stored under an opaque "<uuid>.dat" key, so the URL must tell
+      # S3 which filename and content type to return — otherwise the browser
+      # saves the download as "<uuid>.dat" with a generic type and cannot open it.
+      # These are applied via the response-content-disposition / response-content-type
+      # response header overrides supported by S3 presigned GETs.
+      def presigned_url(key, expires_in: 300, filename: nil, content_type: nil, disposition: 'attachment')
         presigner = Aws::S3::Presigner.new(client: @client)
-        presigner.presigned_url(:get_object,
-                                bucket: @bucket,
-                                key: object_key(key),
-                                expires_in: expires_in)
+        params = {
+          bucket: @bucket,
+          key: object_key(key),
+          expires_in: expires_in
+        }
+        if filename.present?
+          params[:response_content_disposition] =
+            ActionDispatch::Http::ContentDisposition.format(disposition: disposition, filename: filename)
+        end
+        params[:response_content_type] = content_type if content_type.present?
+        presigner.presigned_url(:get_object, **params)
       end
 
       private
