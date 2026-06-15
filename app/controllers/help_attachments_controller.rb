@@ -1,14 +1,15 @@
 class HelpAttachmentsController < ApplicationController
 
   include Seek::UploadHandling::DataUpload
+  include Seek::ContentBlobCommon
 
   before_action :documentation_enabled?
   before_action :is_user_admin_auth, :except => [:download]
-  
+
   def download
     @help_attachment = HelpAttachment.find(params[:id])
     @content_blob = @help_attachment.content_blob
-    send_file @content_blob.filepath, filename: @content_blob.original_filename, content_type: @content_blob.content_type, disposition: 'attachment'
+    serve_blob_file(@content_blob, disposition: 'attachment')
   end
 
   def create

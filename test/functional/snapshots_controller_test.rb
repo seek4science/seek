@@ -1,8 +1,10 @@
 require 'test_helper'
+require 'storage_stub_helper'
 
 class SnapshotsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include MockHelper
+  include StorageStubHelper
 
   setup do
     doi_citation_mock
@@ -728,6 +730,17 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_equal @investigation, activity.referenced
     assert_equal @user, activity.culprit
     assert_equal 'download', activity.action
+  end
+
+  test 'should redirect to presigned URL when downloading snapshot on S3 backend' do
+    create_investigation_snapshot
+    login_as(@user)
+    with_stubbed_s3_storage do
+      get :download, params: { investigation_id: @investigation, id: @snapshot }
+      assert_response :redirect
+      assert_match(/test-bucket/, @response.location)
+      assert_match(/#{@snapshot.content_blob.uuid}\.dat/, @response.location)
+    end
   end
 
   private

@@ -1,8 +1,10 @@
 require 'test_helper'
+require 'storage_stub_helper'
 
 class HelpAttachmentsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include StorageStubHelper
 
   def setup
     login_as(:quentin)
@@ -36,6 +38,18 @@ class HelpAttachmentsControllerTest < ActionController::TestCase
       attachment = help_documents(:one).attachments.create!(content_blob: FactoryBot.create(:pdf_content_blob))
       get :download, params: { id: attachment.id }
       assert_response :success
+    end
+  end
+
+  test 'should redirect to presigned URL when downloading attachment on S3 backend' do
+    with_config_value :internal_help_enabled, true do
+      attachment = help_documents(:one).attachments.create!(content_blob: FactoryBot.create(:pdf_content_blob))
+      with_stubbed_s3_storage do
+        get :download, params: { id: attachment.id }
+        assert_response :redirect
+        assert_match(/test-bucket/, @response.location)
+        assert_match(/#{attachment.content_blob.uuid}\.dat/, @response.location)
+      end
     end
   end
 end

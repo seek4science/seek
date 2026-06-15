@@ -14,6 +14,7 @@ class SnapshotsController < ApplicationController
 
   include Zenodo::Oauth2::SessionHelper
   include Seek::ExternalServiceWrapper
+  include Seek::ContentBlobCommon
 
   def create
     @snapshot = @parent_resource.create_snapshot(snapshot_params)
@@ -54,9 +55,7 @@ class SnapshotsController < ApplicationController
 
   def download
     @content_blob = @snapshot.content_blob
-    send_file @content_blob.filepath,
-              :filename => @content_blob.original_filename,
-              :type => @content_blob.content_type || "application/octet-stream"
+    serve_blob_file(@content_blob, disposition: 'attachment')
   end
 
   def mint_doi_confirm

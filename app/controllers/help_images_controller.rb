@@ -1,5 +1,6 @@
 class HelpImagesController < ApplicationController
   include Seek::UploadHandling::DataUpload
+  include Seek::ContentBlobCommon
 
   before_action :login_required
   before_action :is_user_admin_auth, :except => [:view]
@@ -9,15 +10,15 @@ class HelpImagesController < ApplicationController
     @content_blob = @help_image.content_blob
     image_size = params[:image_size]
     if image_size
+      # Resized images are written to the fleximage local cache. On S3, ContentBlob#resize_image
+      # streams the original from the adapter before resizing, so this works on both backends.
       @content_blob.resize_image(image_size)
       filepath = @content_blob.full_cache_path(image_size)
       headers['Content-Length'] = File.size(filepath).to_s
+      send_file filepath, filename: @content_blob.original_filename, content_type: @content_blob.content_type, disposition: 'inline'
     else
-      filepath = @content_blob.filepath
-      headers['Content-Length'] = @content_blob.file_size.to_s
+      serve_blob_file(@content_blob, disposition: 'inline')
     end
-
-    send_file filepath, filename: @content_blob.original_filename, content_type: @content_blob.content_type, disposition: 'inline'
   end
 
   def create
