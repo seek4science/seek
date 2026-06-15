@@ -1,9 +1,11 @@
 require 'test_helper'
+require 'storage_stub_helper'
 
 class CopasiTest < ActionController::TestCase
   tests ModelsController
 
   include AuthenticatedTestHelper
+  include StorageStubHelper
 
   test 'simulate model on copasi button visibility' do
 
@@ -56,6 +58,24 @@ class CopasiTest < ActionController::TestCase
   end
 
 
+
+  test 'copasi simulate reads the model via the adapter on S3' do
+    with_config_value(:copasi_enabled, true) do
+      model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
+      blob = model.copasi_supported_content_blobs.first
+      bytes = File.binread(blob.filepath)
+
+      with_stubbed_s3_storage do |dat, _converted|
+        client = s3_client(dat)
+        client.stub_responses(:head_object, content_length: bytes.bytesize)
+        client.stub_responses(:get_object, body: bytes)
+        # Previously crashed: File.read(content_blob.file) with a StringIO on S3.
+        get :copasi_simulate, params: { id: model.id, version: model.version }
+        assert_response :success
+        assert_select 'h1', text: /#{model.title} - Copasi Model Simulation/
+      end
+    end
+  end
 
   test 'copasi simulate when model is public' do
 

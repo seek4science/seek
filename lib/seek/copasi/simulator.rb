@@ -26,7 +26,10 @@ module Seek
           flash.now[:error] = 'The selected version does not contain a format supported by COPASI.'
         else
           if content_blob.file_exists?
-            @blob = (File.read(content_blob.file))
+            # Read via the storage adapter — content_blob.file is an IO (StringIO on S3),
+            # not a path, so File.read would raise. data_io_object works on both backends.
+            # Tag as UTF-8 to match the previous File.read(path) behaviour (the adapter reads binary).
+            @blob = content_blob.data_io_object.read.force_encoding('UTF-8')
           else
             blob_url = content_blob.url
             begin
