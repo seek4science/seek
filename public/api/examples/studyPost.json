@@ -11,7 +11,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "148",
+              "id": "1022250774",
               "type": "projects"
             },
             "access": "view"
@@ -23,14 +23,14 @@
         "attribute_map": {
           "name": "Fred Bloggs",
           "age": 44,
-          "date": "2024-01-01"
+          "datetime": "2024-01-01"
         }
       }
     },
     "relationships": {
       "investigation": {
         "data": {
-          "id": "68",
+          "id": "973654871",
           "type": "investigations"
         }
       },
@@ -45,7 +45,7 @@
       "creators": {
         "data": [
           {
-            "id": "148",
+            "id": "1039986616",
             "type": "people"
           }
         ]

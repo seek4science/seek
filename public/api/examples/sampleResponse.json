@@ -17,8 +17,8 @@
         "tag1",
         "tag2"
       ],
-      "created_at": "2026-03-19T16:39:53.889Z",
-      "updated_at": "2026-03-19T16:39:53.889Z",
+      "created_at": "2026-06-16T14:26:49.162Z",
+      "updated_at": "2026-06-16T14:26:49.162Z",
       "creators": [
 
       ],
@@ -49,12 +49,12 @@
         "age": 42,
         "bool": true,
         "data file": {
-          "id": 75,
+          "id": 883654437,
           "type": "DataFile",
           "title": "This Data file"
         },
         "sop": {
-          "id": 88,
+          "id": 1055250575,
           "type": "Sop",
           "title": "This Sop"
         }
@@ -69,7 +69,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1469",
+            "id": "1039988234",
             "type": "people"
           }
         ]
@@ -83,7 +83,7 @@
       "projects": {
         "data": [
           {
-            "id": "1449",
+            "id": "1022252286",
             "type": "projects"
           }
         ]
@@ -91,7 +91,7 @@
       "data_files": {
         "data": [
           {
-            "id": "75",
+            "id": "883654437",
             "type": "data_files"
           }
         ]
@@ -114,7 +114,7 @@
       "people": {
         "data": [
           {
-            "id": "1469",
+            "id": "1039988234",
             "type": "people"
           }
         ]
@@ -124,11 +124,11 @@
       "self": "/samples/153"
     },
     "meta": {
-      "created": "2026-03-19T16:39:53.889Z",
-      "modified": "2026-03-19T16:39:53.889Z",
+      "created": "2026-06-16T14:26:49.162Z",
+      "modified": "2026-06-16T14:26:49.162Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "2e2e3570-05e0-013f-f2a8-00155d52079b"
+      "uuid": "faf0b257-bf26-4e7c-8dd1-6c7c7d4b3ea3"
     }
   },
   "jsonapi": {

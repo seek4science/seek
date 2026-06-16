@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "218",
+    "id": "99",
     "type": "workflows",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "4901",
+              "id": "1022251854",
               "type": "projects"
             },
             "access": "edit"
@@ -30,14 +30,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/workflows/218?version=1",
+          "url": "http://localhost:3000/workflows/99?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-03-19T16:49:51.265Z",
-      "updated_at": "2026-03-19T16:49:51.265Z",
+      "created_at": "2026-06-16T14:25:15.793Z",
+      "updated_at": "2026-06-16T14:25:15.793Z",
       "doi": null,
       "content_blobs": [
         {
@@ -46,16 +46,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/x-yaml",
-          "link": "http://localhost:3000/workflows/218/content_blobs/1436",
+          "link": "http://localhost:3000/workflows/99/content_blobs/1050453021",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/4973",
+          "profile": "/people/1039987801",
           "family_name": "Last",
-          "given_name": "Person4213",
-          "affiliation": "An Institution: 5045",
+          "given_name": "Person1130",
+          "affiliation": "An Institution: 1335",
           "orcid": null
         }
       ],
@@ -98,7 +98,7 @@
       "creators": {
         "data": [
           {
-            "id": "4973",
+            "id": "1039987801",
             "type": "people"
           }
         ]
@@ -106,7 +106,7 @@
       "submitter": {
         "data": [
           {
-            "id": "4971",
+            "id": "1039987799",
             "type": "people"
           }
         ]
@@ -114,11 +114,11 @@
       "people": {
         "data": [
           {
-            "id": "4971",
+            "id": "1039987799",
             "type": "people"
           },
           {
-            "id": "4973",
+            "id": "1039987801",
             "type": "people"
           }
         ]
@@ -126,7 +126,7 @@
       "projects": {
         "data": [
           {
-            "id": "4901",
+            "id": "1022251854",
             "type": "projects"
           }
         ]
@@ -134,7 +134,7 @@
       "investigations": {
         "data": [
           {
-            "id": "869",
+            "id": "973655097",
             "type": "investigations"
           }
         ]
@@ -142,7 +142,7 @@
       "studies": {
         "data": [
           {
-            "id": "767",
+            "id": "1060385129",
             "type": "studies"
           }
         ]
@@ -150,7 +150,7 @@
       "assays": {
         "data": [
           {
-            "id": "609",
+            "id": "1035386853",
             "type": "assays"
           }
         ]
@@ -158,7 +158,7 @@
       "publications": {
         "data": [
           {
-            "id": "340",
+            "id": "156",
             "type": "publications"
           }
         ]
@@ -166,7 +166,7 @@
       "sops": {
         "data": [
           {
-            "id": "248",
+            "id": "1055250540",
             "type": "sops"
           }
         ]
@@ -174,7 +174,7 @@
       "presentations": {
         "data": [
           {
-            "id": "135",
+            "id": "53",
             "type": "presentations"
           }
         ]
@@ -182,7 +182,7 @@
       "data_files": {
         "data": [
           {
-            "id": "295",
+            "id": "883654402",
             "type": "data_files"
           }
         ]
@@ -190,21 +190,21 @@
       "documents": {
         "data": [
           {
-            "id": "286",
+            "id": "65",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/workflows/218?version=1"
+      "self": "/workflows/99?version=1"
     },
     "meta": {
-      "created": "2026-03-19T16:49:51.202Z",
-      "modified": "2026-03-19T16:49:51.265Z",
+      "created": "2026-06-16T14:25:15.747Z",
+      "modified": "2026-06-16T14:25:15.793Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "9236c460-05e1-013f-f2a8-00155d52079b"
+      "uuid": "ca806bbc-d75e-46cf-89bd-242886c289f9"
     }
   },
   "jsonapi": {

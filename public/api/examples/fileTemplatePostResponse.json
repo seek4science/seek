@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "4490",
+              "id": "1022253276",
               "type": "projects"
             },
             "access": "edit"
@@ -36,8 +36,8 @@
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-03-19T16:48:30.239Z",
-      "updated_at": "2026-03-19T16:48:30.239Z",
+      "created_at": "2026-06-16T14:31:11.300Z",
+      "updated_at": "2026-06-16T14:31:11.300Z",
       "doi": null,
       "content_blobs": [
         {
@@ -46,16 +46,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/35/content_blobs/1223",
+          "link": "http://localhost:3000/file_templates/35/content_blobs/1050453422",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/4489",
+          "profile": "/people/1039989285",
           "family_name": "Last",
-          "given_name": "Person3819",
-          "affiliation": "An Institution: 4538",
+          "given_name": "Person2384",
+          "affiliation": "An Institution: 2814",
           "orcid": null
         }
       ],
@@ -77,7 +77,7 @@
       "creators": {
         "data": [
           {
-            "id": "4489",
+            "id": "1039989285",
             "type": "people"
           }
         ]
@@ -85,7 +85,7 @@
       "submitter": {
         "data": [
           {
-            "id": "4487",
+            "id": "1039989283",
             "type": "people"
           }
         ]
@@ -93,11 +93,11 @@
       "people": {
         "data": [
           {
-            "id": "4487",
+            "id": "1039989283",
             "type": "people"
           },
           {
-            "id": "4489",
+            "id": "1039989285",
             "type": "people"
           }
         ]
@@ -105,7 +105,7 @@
       "projects": {
         "data": [
           {
-            "id": "4490",
+            "id": "1022253276",
             "type": "projects"
           }
         ]
@@ -125,11 +125,11 @@
       "self": "/file_templates/35?version=1"
     },
     "meta": {
-      "created": "2026-03-19T16:48:30.210Z",
-      "modified": "2026-03-19T16:48:30.239Z",
+      "created": "2026-06-16T14:31:11.255Z",
+      "modified": "2026-06-16T14:31:11.300Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "61f484c0-05e1-013f-f2a8-00155d52079b"
+      "uuid": "5fb40e9a-9dc7-4862-88e5-7082d6c25a06"
     }
   },
   "jsonapi": {
