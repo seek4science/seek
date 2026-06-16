@@ -41,8 +41,28 @@ module Seek
 
     def self.cff_to_csl(blob)
       Rails.cache.fetch("citation-cff-#{blob.cache_key}") do
-        cff = ::CFF::File.read(blob.file)
-        BibTeX.parse(cff.to_bibtex).to_citeproc.first
+        read_cff(blob) do |cff|
+          BibTeX.parse(cff.to_bibtex).to_citeproc.first
+        end
+      end
+    end
+
+    # CFF::File.read does ::File.read(path) internally, so it needs a real on-disk path.
+    # blob.file is a File (local ContentBlob) or Tempfile (Git::Blob) — both have a usable
+    # path — but a StringIO on the S3 backend, which has none. In that case stream it to a
+    # temporary file first. Works for ContentBlob (local + S3) and Git::Blob.
+    def self.read_cff(blob)
+      io = blob.file
+      if io.respond_to?(:path) && io.path && ::File.exist?(io.path)
+        yield ::CFF::File.read(io.path)
+      else
+        Tempfile.create(['citation', '.cff']) do |tmp|
+          tmp.binmode
+          io.rewind if io.respond_to?(:rewind)
+          IO.copy_stream(io, tmp)
+          tmp.flush
+          yield ::CFF::File.read(tmp.path)
+        end
       end
     end
 
