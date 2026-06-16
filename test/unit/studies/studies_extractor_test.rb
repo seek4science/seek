@@ -75,6 +75,14 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   end
 
+  test 'validate_date returns false for nil without raising' do
+    assert_equal false, StudyBatchUpload.validate_date(nil)
+  end
+
+  test 'validate_date returns false for empty string' do
+    assert_equal false, StudyBatchUpload.validate_date('')
+  end
+
 
   test 'get right licence from file' do
     user_uuid = 'user_uuid'
@@ -89,14 +97,86 @@ class StudiesExtractorTest < ActiveSupport::TestCase
 
   end
 
-  test 'check if string is normalized ' do
 
-    my_string = 'Here is-my_test STRING'
-    normalize_output = StudyBatchUpload.normalize_license_id(my_string)
-    assert_not_equal normalize_output, 'Here is-my_test STRING'
-    assert_not_equal normalize_output, 'here is my test string'
-    assert_not_equal normalize_output, 'Hereismyteststring'
-    assert_equal normalize_output, 'HEREISMYTESTSTRING'
+  test 'check_study_is_MIAPPE_compliant returns empty list when all mandatory fields are present' do
+    study = Study.new(title: 'My study')
+    metadata = {
+      id: 'TEST-001',
+      study_start_date: '2023-01-01',
+      contact_institution: 'Test Institute',
+      geographic_location_country: 'Germany',
+      experimental_site_name: 'Test Site',
+      description_of_the_experimental_design: 'Randomised block design',
+      observation_unit_description: 'Block of 30 plots',
+      description_of_growth_facility: 'Open field'
+    }
+    assert_empty StudyBatchUpload.check_study_is_MIAPPE_compliant(study, metadata)
+  end
+
+  test 'check_study_is_MIAPPE_compliant returns all mandatory fields when both study and metadata are empty' do
+    study = Study.new
+    missing = StudyBatchUpload.check_study_is_MIAPPE_compliant(study, {})
+    assert_includes missing, 'id'
+    assert_includes missing, 'title'
+    assert_includes missing, 'study_start_date'
+    assert_includes missing, 'contact_institution'
+    assert_includes missing, 'geographic_location_country'
+    assert_includes missing, 'experimental_site_name'
+    assert_includes missing, 'description_of_the_experimental_design'
+    assert_includes missing, 'observation_unit_description'
+    assert_includes missing, 'description_of_growth_facility'
+  end
+
+  test 'check_study_is_MIAPPE_compliant field present in metadata is not reported missing' do
+    study = Study.new
+    metadata = { id: 'TEST-001', study_start_date: '2023-01-01' }
+    missing = StudyBatchUpload.check_study_is_MIAPPE_compliant(study, metadata)
+    refute_includes missing, 'id'
+    refute_includes missing, 'study_start_date'
+    assert_includes missing, 'title'
+    assert_includes missing, 'contact_institution'
+  end
+
+  test 'check_study_is_MIAPPE_compliant field present on study is not reported missing' do
+    study = Study.new(title: 'My study')
+    missing = StudyBatchUpload.check_study_is_MIAPPE_compliant(study, {})
+    refute_includes missing, 'title'
+    assert_includes missing, 'id'
+  end
+
+  test 'cleanup_stale_upload_directories removes directories older than max_age' do
+    stale_dir = Rails.root.join('tmp', 'stale-uuid_studies_upload')
+    FileUtils.mkdir_p(stale_dir)
+    FileUtils.touch(stale_dir, mtime: 25.hours.ago.to_time)
+
+    StudyBatchUpload.cleanup_stale_upload_directories(max_age: 24.hours)
+
+    refute Dir.exist?(stale_dir), 'stale directory should have been removed'
+  ensure
+    FileUtils.rm_rf(stale_dir)
+  end
+
+  test 'cleanup_stale_upload_directories leaves recent directories alone' do
+    recent_dir = Rails.root.join('tmp', 'recent-uuid_studies_upload')
+    FileUtils.mkdir_p(recent_dir)
+
+    StudyBatchUpload.cleanup_stale_upload_directories(max_age: 24.hours)
+
+    assert Dir.exist?(recent_dir), 'recent directory should not have been removed'
+  ensure
+    FileUtils.rm_rf(recent_dir)
+  end
+
+  test 'unzip_batch sweeps stale directories before extracting' do
+    stale_dir = Rails.root.join('tmp', 'stale-uuid_studies_upload')
+    FileUtils.mkdir_p(stale_dir)
+    FileUtils.touch(stale_dir, mtime: 25.hours.ago.to_time)
+
+    StudyBatchUpload.unzip_batch(@zip_file)
+
+    refute Dir.exist?(stale_dir), 'unzip_batch should have swept stale directory'
+  ensure
+    FileUtils.rm_rf(stale_dir)
   end
 
 

@@ -10,11 +10,7 @@ class SinglePagesController < ApplicationController
                 only: %i[show index project_folders]
   before_action :isa_json_compliance_enabled?
   before_action :check_user_logged_in,
-                only: %i[ batch_sharing_permission_preview
-                          batch_change_permission_for_selected_items
-                          download_samples_excel
-                          export_to_excel
-                          upload_samples ]
+                except: %i[ show index ]
   respond_to :html, :js
 
   def show
@@ -23,17 +19,9 @@ class SinglePagesController < ApplicationController
     respond_to(&:html)
   end
 
-  def index; end
-
-  def project_folders
-    return unless Seek::Config.project_single_page_folders_enabled
-
-    project_folders = ProjectFolder.root_folders(@project)
-    if project_folders.empty?
-      project_folders = ProjectFolder.initialize_default_folders(@project)
-      ProjectFolderAsset.assign_existing_assets @project
-    end
-    project_folders
+  def index
+    flash[:notice] = "You have been redirected to the #{t('project').pluralize} page."
+    redirect_to projects_path
   end
 
   def dynamic_table_data
@@ -52,45 +40,54 @@ class SinglePagesController < ApplicationController
     render json: { status: :unprocessable_entity, error: e.message }
   end
 
-  def download_samples_excel
+  def export_to_spreadsheet
+    sample_ids = JSON.parse(params[:sample_ids])
+    sample_type_id = JSON.parse(params[:sample_type_id])
+    study_id = JSON.parse(params[:study_id])
+    assay_id = JSON.parse(params[:assay_id])
+    project_id = JSON.parse(params[:project_id])
+
+    raise 'Export aborted! The Sample Type ID was not included in the request!' if sample_type_id.nil?
+    raise 'Export aborted! At least a Study ID must be provided in the request!' if study_id.nil?
+    raise 'Export aborted! The Project ID was not included in the request!' if project_id.nil?
+    raise 'Export aborted! The provided Sample IDs are not valid!' unless sample_ids.all? { |sid| !!Integer(sid.to_s, exception: false) }
+
+    cache_uuid = SecureRandom.uuid
+    Rails.cache.write(cache_uuid, { "project_id": project_id, "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
+                      expires_in: 1.minute)
+
+    respond_to do |format|
+      format.json { render json: { uuid: cache_uuid } }
+    end
+  rescue StandardError => e
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  def download_spreadsheet
     cached_asset_ids = Rails.cache.read(params[:uuid])
     raise "Request took too long or was interrupted." if cached_asset_ids.nil?
 
-    sample_ids, sample_type_id, study_id, assay_id = cached_asset_ids.values_at(:sample_ids, :sample_type_id,
-                                                                                               :study_id, :assay_id)
+    project_id, sample_ids, sample_type_id, study_id, assay_id = cached_asset_ids.values_at(:project_id, :sample_ids, :sample_type_id,
+                                                                                :study_id, :assay_id)
 
     @study = Study.find(study_id)
     @assay = Assay.find(assay_id) unless assay_id.nil?
-    @project = @study.projects.first
+    @project = Project.find(project_id)
     @samples = Sample.where(id: sample_ids)&.authorized_for(:view)&.sort_by(&:id)
 
-    notice_message = helpers.content_tag(:ul, class: "list-unstyled") do
-      helpers.safe_join([
-        helpers.content_tag(:li) do
-          helpers.safe_join([
-            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
-            "Downloaded contents of ".html_safe,
-            helpers.content_tag(:b) do
-              "#{@assay ? t('isa_assay') + ' [ID: ' + @assay&.id.to_s + ', Title: ' + h(@assay&.title.to_s) : t('isa_study') + ' [ID: ' + @study.id.to_s + ', Title: ' + h(@study.title.to_s)}]"
-            end
-          ])
-        end,
-        helpers.content_tag(:li) do
-          helpers.safe_join([
-            helpers.content_tag(:span, nil, class: "glyphicon glyphicon-ok text-success mr-2"),
-            helpers.content_tag(:b) do
-              "#{@samples.count < 1 ? 'No' : @samples.count} sample#{@samples.count != 1 ? 's' : ''}"
-            end,
-            " visible to you #{@samples.count != 1 ? 'were' : 'was'} included".html_safe
-          ])
-        end
-      ])
-    end
 
-    raise 'Export aborted! Sample type not included in request!' if sample_type_id.nil?
+    unless @samples.all? { |sample| sample.project_ids.include? project_id }
+      raise "Export aborted! Some sample could not be associated with the provided project (\"#{project_id}: #{@project.title}\")."
+    end
 
     @sample_type = SampleType.find(sample_type_id)
     raise "Could not retrieve #{assay_id.nil? ? 'Study' : 'Assay'} Sample Type! Do you have at least viewing permissions?" unless @sample_type.can_view?
+
+    raise "Export aborted! The sample type could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @sample_type.project_ids.include?(project_id)
+    raise "Export aborted! The study could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @study.project_ids.include?(project_id)
+    unless @assay.nil?
+      raise "Export aborted! The assay could not be associated with the provided project (\"#{project_id}: #{@project.title}\")." unless @assay.project_ids.include?(project_id)
+    end
 
     @template = Template.find(@sample_type.template_id)
 
@@ -105,32 +102,25 @@ class SinglePagesController < ApplicationController
               @sample_type.title&.concat(".xlsx")
             end
 
-    flash[:notice] = notice_message
-    render xlsx: 'download_samples_spreadsheet', filename: helpers.sanitized_text(spreadsheet_name), disposition: 'inline'
-  rescue StandardError => e
-    flash[:error] = e.message
     respond_to do |format|
-      format.html do
-        redirect_to single_page_path(id: @project.id, item_type: @assay.nil? ? 'study' : 'assay',
-                                     item_id: @assay.nil? ? @study.id : @assay.id)
-      end
-      format.json do
-        render json: { parameters: { sample_ids:, sample_type_id:, study_id: }, errors: e }, status: :bad_request
+      format.xlsx do
+        render xlsx: 'download_samples_spreadsheet',
+               filename: helpers.sanitized_text(spreadsheet_name),
+               disposition: 'attachment'
       end
     end
-  end
+  rescue StandardError => e
+    flash[:error] = e.message
 
-  def export_to_excel
-    cache_uuid = SecureRandom.uuid
-    sample_ids = JSON.parse(params[:sample_ids])
-    sample_type_id = JSON.parse(params[:sample_type_id])
-    study_id = JSON.parse(params[:study_id])
-    assay_id = JSON.parse(params[:assay_id])
+    project_id = @project&.id || (JSON.parse(params[:project_id]) rescue nil)
+    study_id   = @study&.id   || (JSON.parse(params[:study_id]) rescue nil)
+    assay_id   = @assay&.id   || (JSON.parse(params[:assay_id]) rescue nil)
 
-    Rails.cache.write(cache_uuid, { "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
-                      expires_in: 1.minute)
-    respond_to do |format|
-      format.json { render json: { uuid: cache_uuid } }
+    if project_id && (study_id || assay_id)
+      redirect_to single_page_path(id: project_id, item_type: assay_id.nil? ? 'study' : 'assay',
+                                   item_id: assay_id.nil? ? study_id : assay_id)
+    else
+      redirect_to projects_path
     end
   end
 
@@ -263,6 +253,17 @@ class SinglePagesController < ApplicationController
   end
 
   private
+
+  def project_folders
+    return unless Seek::Config.project_single_page_folders_enabled
+
+    project_folders = ProjectFolder.root_folders(@project)
+    if project_folders.empty?
+      project_folders = ProjectFolder.initialize_default_folders(@project)
+      ProjectFolderAsset.assign_existing_assets @project
+    end
+    project_folders
+  end
 
   def get_spreadsheet_data(samples_sheet)
     sample_fields = samples_sheet.row(1).actual_cells.map { |field| field&.value&.sub(' *', '') }.compact
@@ -470,6 +471,6 @@ class SinglePagesController < ApplicationController
   def check_user_logged_in
     return if current_user
 
-    render json: { status: :unprocessable_entity, error: 'You must be logged in to access batch sharing permission.' }
+    return render json: { error: 'You must be logged in to use this feature.' }, status: :unauthorized
   end
 end

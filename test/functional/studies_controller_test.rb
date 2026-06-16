@@ -2354,4 +2354,207 @@ class StudiesControllerTest < ActionController::TestCase
     get :show, params: { id: study.id, code: 'invalid_code' }
     assert_response :forbidden
   end
+
+  # batch MIAPPE upload tests
+
+  test 'batch_uploader renders when miappe type exists' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    get :batch_uploader
+    assert_response :success
+    assert_select 'form'
+  end
+
+  test 'batch_uploader renders unavailable message when miappe type does not exist' do
+    get :batch_uploader
+    assert_response :success
+    assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+  end
+
+  test 'batch_uploader renders unavailable when file uploads blocked' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    with_config_value(:block_file_uploads, true) do
+      get :batch_uploader
+      assert_response :success
+      assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+    end
+  end
+
+  test 'preview_content without file shows error' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    post :preview_content, params: { content_blobs: [{}] }
+    assert_response :success
+    assert_template 'studies/batch_uploader'
+    assert_equal 'Please select a file to upload or provide a URL to the data.', flash.now[:error]
+  end
+
+  test 'preview_content with valid zip shows preview' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
+    post :preview_content, params: { content_blobs: [{ data: zip_file }] }
+    assert_response :success
+    assert_template 'studies/batch_preview'
+    assert_equal 3, assigns(:studies).count
+
+    # three study rows in the table
+    assert_select 'tbody tr', count: 3
+
+    # each MIAPPE study ID appears as a readonly input
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-F"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-I"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-UK"]'
+
+    # study title populated in each title textarea
+    assert_select 'textarea[name="studies[title][]"]', count: 3,
+                  text: 'Clonal test of mapping pedigree 0504B in nursery'
+
+    # form submits to batch_create
+    assert_select "form[action='#{batch_create_studies_path}']"
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
+  test 'batch_create creates studies' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    study_params = batch_create_study_params(investigation)
+    assert_difference('Study.count', 1) do
+      post :batch_create, params: study_params
+    end
+    assert_redirected_to studies_path
+  end
+
+  test 'batch_create with existing_studies destroys old study and its dependents' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    old_study = FactoryBot.create(:study, investigation: investigation, contributor: person)
+    old_assay = FactoryBot.create(:assay, study: old_study, contributor: person)
+    old_assay_asset = FactoryBot.create(:assay_asset, assay: old_assay)
+
+    existing_study_json = { id: old_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: old_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    assert_difference('Study.count', 0) do  # one created, one destroyed
+      post :batch_create, params: params
+    end
+    assert_redirected_to studies_path
+
+    refute Study.exists?(old_study.id), 'old study should be destroyed'
+    refute Assay.exists?(old_assay.id), 'old assay should be destroyed'
+    refute AssayAsset.exists?(old_assay_asset.id), 'old assay_asset should be destroyed'
+  end
+
+  test 'batch_create with existing_studies does not destroy a study the user cannot manage' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    other_person = FactoryBot.create(:person)
+    other_investigation = FactoryBot.create(:investigation, contributor: other_person)
+    other_study = FactoryBot.create(:study, investigation: other_investigation,
+                                    contributor: other_person,
+                                    policy: FactoryBot.create(:private_policy))
+
+    existing_study_json = { id: other_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: other_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    post :batch_create, params: params
+
+    assert Study.exists?(other_study.id), 'unauthorized study should not be destroyed'
+    assert flash[:error].present?
+  end
+
+  test 'batch_create assigns data files to the investigation projects' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    upload_dir = StudyBatchUpload.upload_directory(User.current_user)
+    FileUtils.mkdir_p(upload_dir.join('data'))
+    File.write(upload_dir.join('data', 'test_data.csv'), "col1,col2\nval1,val2\n")
+
+    params = batch_create_study_params(investigation).deep_merge(
+      studies: { data_files: ['test_data'], data_file_description: ['Test data'] }
+    )
+
+    assert_difference('DataFile.count', 1) do
+      post :batch_create, params: params
+    end
+    assert_equal investigation.projects.sort, DataFile.last.projects.sort
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
+  test 'batch_create with missing MIAPPE fields and data files specified does not raise' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    # omit mandatory MIAPPE fields so the study fails compliance and is not saved,
+    # leaving no ExtendedMetadata row for create_batch_assay_asset to look up
+    params = {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: [''],
+        description: [''],
+        id: ['MISSING-001'],
+        startDate: [''],
+        endDate: [''],
+        contactInstitution: [''],
+        geographicLocationCountry: [''],
+        experimentalSiteName: [''],
+        latitude: [''], longitude: [''], altitude: [''],
+        descriptionOfTheExperimentalDesign: [''],
+        typeOfExperimentalDesign: [''],
+        observationUnitLevelHierarchy: [''],
+        observationUnitDescription: [''],
+        descriptionOfGrowthFacility: [''],
+        typeOfGrowthFacility: [''],
+        culturalPractices: [''],
+        data_files: ['some_data_file'],
+        data_file_description: [''],
+        license: 'CC-BY-4.0'
+      }
+    }
+    assert_no_difference('Study.count') do
+      post :batch_create, params: params
+    end
+    assert_redirected_to batch_uploader_studies_path
+    assert flash[:error].present?
+  end
+
+  private
+
+  def batch_create_study_params(investigation)
+    {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: ['Test MIAPPE Study'],
+        description: ['A test description'],
+        id: ['TEST-001'],
+        startDate: ['2023-01-01'],
+        endDate: ['2023-12-31'],
+        contactInstitution: ['Test Institute'],
+        geographicLocationCountry: ['Germany'],
+        experimentalSiteName: ['Test Site'],
+        latitude: ['51.5'],
+        longitude: ['9.9'],
+        altitude: ['100'],
+        descriptionOfTheExperimentalDesign: ['Randomised block design'],
+        typeOfExperimentalDesign: ['CO_715:0000145'],
+        observationUnitLevelHierarchy: ['block>plot'],
+        observationUnitDescription: ['Block of 30 plots'],
+        descriptionOfGrowthFacility: ['Open field'],
+        typeOfGrowthFacility: ['CO_715:0000162'],
+        culturalPractices: ['Irrigation'],
+        data_files: [''],
+        data_file_description: [''],
+        license: 'CC-BY-4.0'
+      }
+    }
+  end
 end
