@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "seek.fullname" . }}-solr
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+    app.kubernetes.io/component: solr
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: solr
+      port: 8983
+      targetPort: solr
+  selector:
+    {{- include "seek.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: solr

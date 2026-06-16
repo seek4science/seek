@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "seek.fullname" . }}-solr-conf
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+data:
+  schema.xml: |
+{{ .Files.Get "files/solr/conf/schema.xml" | indent 4 }}
+  solrconfig.xml: |
+{{ .Files.Get "files/solr/conf/solrconfig.xml" | indent 4 }}
+  managed-schema: |
+{{ .Files.Get "files/solr/conf/managed-schema" | indent 4 }}
+  protwords.txt: |
+{{ .Files.Get "files/solr/conf/protwords.txt" | indent 4 }}
+  stopwords.txt: |
+{{ .Files.Get "files/solr/conf/stopwords.txt" | indent 4 }}
+  synonyms.txt: |
+{{ .Files.Get "files/solr/conf/synonyms.txt" | indent 4 }}

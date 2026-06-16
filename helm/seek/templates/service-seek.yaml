@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "seek.fullname" . }}-seek
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+    app.kubernetes.io/component: seek
+spec:
+  type: {{ .Values.seek.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.seek.service.port }}
+      targetPort: http
+  selector:
+    {{- include "seek.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: seek

@@ -1,0 +1,59 @@
+# Local development overrides for kind/minikube single-node clusters.
+# Usage: helm install seek ./helm/seek -f helm/values-local.yaml
+
+seek:
+  # Single-node: RWO works because seek and workers land on the same node
+  filestore:
+    accessMode: ReadWriteOnce
+    size: 2Gi
+  cache:
+    accessMode: ReadWriteOnce
+    size: 1Gi
+  # Reduce startup resources
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1"
+
+workers:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+mysql:
+  persistence:
+    size: 2Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+redis:
+  persistence:
+    size: 256Mi
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+
+solr:
+  javaMem: "-Xms256m -Xmx512m"
+  persistence:
+    size: 2Gi
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"

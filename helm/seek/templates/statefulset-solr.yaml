@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "seek.fullname" . }}-solr
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+    app.kubernetes.io/component: solr
+spec:
+  serviceName: {{ include "seek.fullname" . }}-solr
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "seek.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: solr
+  template:
+    metadata:
+      labels:
+        {{- include "seek.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: solr
+      annotations:
+        checksum/solr-conf: {{ include (print $.Template.BasePath "/configmap-solr.yaml") . | sha256sum }}
+    spec:
+      initContainers:
+        # Builds the seek_config configset directory from the ConfigMap and the
+        # lang files already present in the Solr image's default configset.
+        - name: init-configset
+          image: "{{ .Values.solr.image.repository }}:{{ .Values.solr.image.tag }}"
+          imagePullPolicy: {{ .Values.solr.image.pullPolicy }}
+          command:
+            - bash
+            - -c
+            - |
+              set -e
+              TARGET=/opt/solr/server/solr/configsets/seek_config/conf
+              mkdir -p "$TARGET/lang"
+              cp /tmp/seek-conf/* "$TARGET/"
+              # Reuse the lang files bundled with the Solr image
+              cp /opt/solr/server/solr/configsets/_default/conf/lang/* "$TARGET/lang/"
+          volumeMounts:
+            - name: seek-conf
+              mountPath: /tmp/seek-conf
+            - name: configset
+              mountPath: /opt/solr/server/solr/configsets/seek_config
+      containers:
+        - name: solr
+          image: "{{ .Values.solr.image.repository }}:{{ .Values.solr.image.tag }}"
+          imagePullPolicy: {{ .Values.solr.image.pullPolicy }}
+          # Mirrors the docker-compose entrypoint: creates the "seek" core on
+          # first start; skips creation if the core already exists in the PVC.
+          command:
+            - docker-entrypoint.sh
+            - solr-precreate
+            - seek
+            - /opt/solr/server/solr/configsets/seek_config
+          env:
+            - name: SOLR_JAVA_MEM
+              value: {{ .Values.solr.javaMem | quote }}
+          ports:
+            - name: solr
+              containerPort: 8983
+          livenessProbe:
+            httpGet:
+              path: /solr/seek/admin/ping
+              port: solr
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /solr/seek/admin/ping
+              port: solr
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          {{- with .Values.solr.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/solr
+            - name: configset
+              mountPath: /opt/solr/server/solr/configsets/seek_config
+      volumes:
+        - name: seek-conf
+          configMap:
+            name: {{ include "seek.fullname" . }}-solr-conf
+        - name: configset
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.solr.persistence.storageClass }}
+        storageClassName: {{ .Values.solr.persistence.storageClass | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.solr.persistence.size }}

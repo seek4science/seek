@@ -1,0 +1,22 @@
+FAIRDOM-SEEK has been deployed.
+
+1. Wait for all pods to become Ready:
+   kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }} -w
+
+2. Access SEEK:
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else if eq .Values.seek.service.type "LoadBalancer" }}
+   Run: kubectl get svc {{ include "seek.fullname" . }}-seek -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+{{- else }}
+   Run: kubectl port-forward svc/{{ include "seek.fullname" . }}-seek 3000:{{ .Values.seek.service.port }}
+   Then open: http://localhost:3000
+{{- end }}
+
+3. On first startup the entrypoint runs `db:setup` automatically.
+   Subsequent restarts skip this step.
+
+NOTE: The filestore and cache PVCs use ReadWriteMany access mode.
+Ensure your StorageClass supports RWX (e.g. NFS, EFS, Azure Files).

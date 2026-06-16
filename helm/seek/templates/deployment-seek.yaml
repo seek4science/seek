@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "seek.fullname" . }}-seek
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+    app.kubernetes.io/component: seek
+spec:
+  replicas: {{ .Values.seek.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "seek.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: seek
+  template:
+    metadata:
+      labels:
+        {{- include "seek.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: seek
+    spec:
+      containers:
+        - name: seek
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - docker/entrypoint.sh
+          env:
+            {{- include "seek.commonEnv" . | nindent 12 }}
+            # Prevents the entrypoint from also starting delayed_job workers
+            # inside this pod; workers run in their own Deployment.
+            - name: NO_ENTRYPOINT_WORKERS
+              value: "1"
+          ports:
+            - name: http
+              containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          {{- with .Values.seek.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- include "seek.sharedVolumeMounts" . | nindent 12 }}
+      volumes:
+        {{- include "seek.sharedVolumes" . | nindent 8 }}

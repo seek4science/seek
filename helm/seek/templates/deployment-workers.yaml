@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "seek.fullname" . }}-workers
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+    app.kubernetes.io/component: workers
+spec:
+  replicas: {{ .Values.workers.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "seek.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: workers
+  template:
+    metadata:
+      labels:
+        {{- include "seek.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: workers
+    spec:
+      containers:
+        - name: seek-workers
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - docker/start_workers.sh
+          env:
+            {{- include "seek.commonEnv" . | nindent 12 }}
+            {{- if .Values.workers.quietSupercronic }}
+            - name: QUIET_SUPERCRONIC
+              value: "1"
+            {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - bash
+                - script/check_worker_pids.sh
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          {{- with .Values.workers.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- include "seek.sharedVolumeMounts" . | nindent 12 }}
+      volumes:
+        {{- include "seek.sharedVolumes" . | nindent 8 }}

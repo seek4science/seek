@@ -1,0 +1,15 @@
+apiVersion: v2
+name: seek
+description: FAIRDOM-SEEK — a platform for sharing scientific research data, models, simulations, and workflows
+type: application
+version: 0.1.0
+appVersion: "1.18"
+keywords:
+  - seek
+  - fairdom
+  - research
+  - data-management
+  - bioinformatics
+home: https://seek4science.org
+sources:
+  - https://github.com/seek4science/seek

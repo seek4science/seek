@@ -1,0 +1,34 @@
+# Shared PVCs between the seek web pod and seek_workers pod.
+# Both containers must mount these volumes, so ReadWriteMany is required.
+# Ensure your StorageClass supports RWX (e.g. NFS provisioner, AWS EFS, Azure Files).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "seek.fullname" . }}-filestore
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.seek.filestore.accessMode }}
+  {{- if .Values.seek.filestore.storageClass }}
+  storageClassName: {{ .Values.seek.filestore.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.seek.filestore.size }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "seek.fullname" . }}-cache
+  labels:
+    {{- include "seek.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.seek.cache.accessMode }}
+  {{- if .Values.seek.cache.storageClass }}
+  storageClassName: {{ .Values.seek.cache.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.seek.cache.size }}

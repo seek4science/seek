@@ -1,0 +1,97 @@
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: fairdom/seek
+  tag: main
+  pullPolicy: IfNotPresent
+
+seek:
+  replicaCount: 1
+  railsEnv: production
+  railsLogLevel: info
+  # Set to a sub-path if serving SEEK under a URL prefix, e.g. "/seek"
+  relativeUrlRoot: ""
+
+  resources: {}
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  # Shared PVC for uploaded files.
+  # Use ReadWriteMany when seek and seek_workers run on different nodes (production).
+  # ReadWriteOnce works on single-node clusters (kind, minikube) since both pods
+  # land on the same node.
+  filestore:
+    storageClass: ""
+    accessMode: ReadWriteMany
+    size: 10Gi
+
+  # Shared PVC for Rails/asset cache
+  cache:
+    storageClass: ""
+    accessMode: ReadWriteMany
+    size: 5Gi
+
+workers:
+  replicaCount: 1
+  quietSupercronic: true
+  resources: {}
+
+mysql:
+  image:
+    repository: mysql
+    tag: "8.4"
+    pullPolicy: IfNotPresent
+
+  auth:
+    rootPassword: "seek_root"
+    database: "seek_docker"
+    username: "seek_db_user"
+    # Override via --set mysql.auth.password=<value> or a values file;
+    # never commit real credentials here
+    password: "seek_db_password"
+
+  persistence:
+    storageClass: ""
+    size: 10Gi
+
+  resources: {}
+
+redis:
+  image:
+    repository: redis
+    tag: "8.6-alpine"
+    pullPolicy: IfNotPresent
+
+  persistence:
+    storageClass: ""
+    size: 1Gi
+
+  resources: {}
+
+solr:
+  image:
+    repository: solr
+    tag: "8.11.4"
+    pullPolicy: IfNotPresent
+
+  javaMem: "-Xms512m -Xmx1024m"
+
+  persistence:
+    storageClass: ""
+    size: 10Gi
+
+  resources: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: seek.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
