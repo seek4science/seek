@@ -587,7 +587,7 @@ class PublicationsController < ApplicationController
         text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
       end
 
-      codepoints = text.mb_chars.unicode_normalize(:nfd).split(//u)
+      codepoints = text.unicode_normalize(:nfd).split(//u)
       ascii = codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
 
       last_name_matches = Person.where(last_name: ascii)

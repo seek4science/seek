@@ -139,6 +139,59 @@ class GithubScraperTest < ActionDispatch::IntegrationTest
                         3.11.0 3.11.1 3.11.2 3.12.0 3.13.0 3.13.1 3.13.2 3.14.0], scraper.send(:all_tags, repo)
   end
 
+  test 'handles and logs RO-Crate read exception when scraping' do
+    project = Scrapers::Util.bot_project(title: 'test')
+    bot = Scrapers::Util.bot_account
+    project_admin = FactoryBot.create(:project_administrator)
+    disable_authorization_checks do
+      project.default_policy = FactoryBot.create(:private_policy)
+      project.default_policy.permissions << Permission.new(contributor: project, access_type: Policy::EDITING)
+      project.default_policy.permissions << Permission.new(contributor: project_admin, access_type: Policy::MANAGING)
+      project.default_policy.save!
+      project.use_default_policy = true
+      project.save!
+    end
+    output = StringIO.new
+    scraper = Scrapers::GithubScraper.new(project, bot, organization: 'test-123', main_branch: 'master', output: output)
+
+    repos = [
+      FactoryBot.create(:remote_workflow_ro_crate_repository, remote: 'https://github.com/crs4/sort-and-change-case-workflow.git'),
+      FactoryBot.create(:remote_workflow_ro_crate_repository, remote: 'https://github.com/crs4/sort-and-change-case-workflow2.git')
+    ]
+
+    failed = false
+    scraper.stub(:topics, -> (*) { [] }) do
+      scraper.stub(:list_repositories, -> () { repos.map { |r| { 'clone_url' => r.remote } } }) do
+        scraper.stub(:clone_repositories, -> (_) { repos }) do
+          # Stub this method as a hacky way to trigger an ROCrate::ReadException, but only on the first repository.
+          scraper.stub(:existing_resource, -> (*_) {
+            unless failed
+              failed = true
+              raise ROCrate::ReadException, 'uh oh'
+            end
+            nil
+          }) do
+            assert_difference('Workflow.count', 1) do
+              assert_difference('Workflow::Git::Version.count', 1) do
+                assert_difference('Git::Annotation.count', 1) do
+                  assert_no_difference('Git::Repository.count') do
+                    scraped = scraper.scrape
+                    wf = scraped.first
+                    assert_equal 'sort-and-change-case', wf.title
+
+                    output.rewind
+                    log = output.read
+                    assert_includes log, 'RO-Crate read error: uh oh'
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def login_as(user)

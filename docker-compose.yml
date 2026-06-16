@@ -9,7 +9,7 @@ x-shared:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://redis_store:6379/0
     env_file:
       - docker/db.env
     volumes:
@@ -19,8 +19,8 @@ x-shared:
       db:
         condition: service_healthy
       solr:
-        condition: service_started
-      redis:
+        condition: service_healthy
+      redis_store:
         condition: service_healthy
 
 services:
@@ -53,7 +53,7 @@ services:
       retries: 5
       start_period: 20s
 
-  redis:
+  redis_store:
     image: redis:8.6-alpine
     container_name: seek-session-store
     command: ["redis-server", "--appendonly", "yes"]
@@ -61,12 +61,7 @@ services:
       - seek-redis-data:/data
     restart: always
     healthcheck:
-      test:
-        [
-          "CMD",
-          "redis-cli",
-          "ping"
-        ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -102,13 +97,20 @@ services:
       retries: 5
 
   solr:
-    image: fairdom/seek-solr:8.11
+    image: solr:8.11.4
     container_name: seek-solr
     restart: always
     environment:
       SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
       - seek-solr-data:/var/solr/
+      - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/seek/admin/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
