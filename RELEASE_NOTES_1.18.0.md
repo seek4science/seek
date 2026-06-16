@@ -16,6 +16,9 @@
 - **External search adapters toggleable via settings** — External search adapters (e.g. BioPortal) can now be individually enabled/disabled through the admin settings UI rather than via config files (#2374)
 - **Option to disable SEEK local login** — Administrators can now disable the built-in username/password login to enforce SSO-only access (#2339)
 - **Event end date auto-set** — When selecting an event start date/time, the end date is automatically set 1 hour later (#2412)
+- **Batch download to Excel from dynamic table** — The dynamic table now supports batch downloading selected rows to an Excel spreadsheet (#2550)
+- **Controlled vocabulary list attributes** — Extended Metadata and sample type attributes can now be configured to accept a list of controlled vocabulary values (#2624)
+- **MIAPPE batch study upload improvements** — Multiple fixes to the MIAPPE template batch upload: folder-wrapped zip files are now supported, blank cells handled correctly, MIAPPE compliance checking works, stale temp directories are cleaned up, and date/license parsing is more robust (#2345)
 
 ## Improvements
 
@@ -51,13 +54,14 @@
 - **Model files lost after validation error** — Files attached to a model are no longer lost when a validation error occurs during creation (#2582)
 - **ISATag results causing error in HTML search** — ISATag results are now excluded from HTML search result rendering, preventing a crash when browsing search results (#2604)
 - **Related items view broken with temporary auth codes** — The related items panel now correctly propagates the temporary auth code, so linked assets remain accessible when viewing a resource via a sharing link (#2583)
+- **Workflow scraper stability fixes** — Git repositories are now properly closed after scraping to prevent "Too many open files" OS errors (triggered by large sources such as nf-core); all tags are fetched even when pointing to orphaned commits; and invalid RO-Crates no longer abort the entire scrape (#2620)
 
 ## Infrastructure & Dependencies
 
 - Rails updated to 7.2.3.1
 - MySQL in Docker Compose updated from 8.0 to 8.4
 - Nokogiri security bump
-- net-imap security bump
+- net-imap bumped to 0.5.15
 - nbconvert security bump
 - jwt bumped to 3.2.0
 - faraday bumped to 2.14.2
