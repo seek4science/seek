@@ -534,4 +534,36 @@ class GitVersionTest < ActiveSupport::TestCase
       assert_equal ['text.txt', 'text3.txt'], v1.blobs.map(&:path).sort
     end
   end
+
+  test 'automatically lock new versions on remote repositories' do
+    workflow = FactoryBot.create(:ro_crate_git_workflow)
+    assert_equal 1, workflow.version
+    assert_equal 1, workflow.latest_git_version.version
+    assert_equal 1, workflow.git_versions.count
+    disable_authorization_checks do
+      new_ver = workflow.latest_git_version.next_version(mutable: true)
+      assert new_ver.mutable?
+      assert new_ver.save
+      refute new_ver.mutable?
+    end
+    assert_equal 2, workflow.version
+    assert_equal 2, workflow.latest_git_version.version
+    assert_equal 2, workflow.git_versions.count
+  end
+
+  test 'do not automatically lock new versions on local repositories' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    assert_equal 1, workflow.version
+    assert_equal 1, workflow.latest_git_version.version
+    assert_equal 1, workflow.git_versions.count
+    disable_authorization_checks do
+      new_ver = workflow.latest_git_version.next_version(mutable: true)
+      assert new_ver.mutable?
+      assert new_ver.save
+      assert new_ver.mutable?
+    end
+    assert_equal 2, workflow.version
+    assert_equal 2, workflow.latest_git_version.version
+    assert_equal 2, workflow.git_versions.count
+  end
 end
