@@ -58,7 +58,7 @@ module Git
     end
 
     def mutable?
-      if new_record? && super.nil?
+      if new_record? && mutable.nil?
         git_repository&.remote.blank?
       else
         super
