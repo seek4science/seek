@@ -535,7 +535,36 @@ class GitVersionTest < ActiveSupport::TestCase
     end
   end
 
-  test 'automatically lock new versions on remote repositories' do
+  test 'mutable?' do
+    workflow = FactoryBot.create(:local_git_workflow)
+
+    gv = workflow.git_versions.build
+    assert_nil gv.mutable
+    assert gv.mutable?, 'Git::Version linked to local repo should be mutable by default'
+
+    gv.mutable = false
+    assert_equal false, gv.mutable
+    refute gv.mutable?
+
+    gv.mutable = true
+    assert_equal true, gv.mutable
+    assert gv.mutable?
+
+    remote_repo = FactoryBot.create(:remote_repository)
+    gv = workflow.git_versions.build(git_repository: remote_repo)
+    assert_nil gv.mutable
+    refute gv.mutable?, 'Git::Version linked to local repo should NOT be mutable by default'
+
+    gv.mutable = true
+    assert_equal true, gv.mutable
+    assert gv.mutable?
+
+    gv.mutable = false
+    assert_equal false, gv.mutable
+    refute gv.mutable?
+  end
+
+  test 'automatically lock new versions on remote repositories on save' do
     workflow = FactoryBot.create(:ro_crate_git_workflow)
     assert_equal 1, workflow.version
     assert_equal 1, workflow.latest_git_version.version
@@ -551,7 +580,7 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_equal 2, workflow.git_versions.count
   end
 
-  test 'do not automatically lock new versions on local repositories' do
+  test 'do not automatically lock new versions on local repositories on save' do
     workflow = FactoryBot.create(:local_git_workflow)
     assert_equal 1, workflow.version
     assert_equal 1, workflow.latest_git_version.version
