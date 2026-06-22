@@ -258,7 +258,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'create, update and show a document with extended metadata' do
+  test 'create a document with extended metadata' do
     cmt = FactoryBot.create(:simple_document_extended_metadata_type)
 
     person = FactoryBot.create(:person)
@@ -288,7 +288,19 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a document with extended metadata' do
+    cmt = FactoryBot.create(:simple_document_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    document = FactoryBot.create(:document, contributor: person, policy: FactoryBot.create(:public_policy),
+                                 extended_metadata: cm)
 
     get :show, params: { id: document }
     assert_response :success

@@ -378,11 +378,14 @@ class DataFilesControllerTest < ActionController::TestCase
       df = assigns(:data_file)
       assert_equal Policy::NO_ACCESS, df.policy.access_type
       assert df.policy.permissions.empty?
-
-      # check it doesn't create an error when retreiving the index
-      get :index
-      assert_response :success
     end
+  end
+
+  test 'index does not error with a data file with no access policy' do
+    FactoryBot.create(:data_file, contributor: users(:datafile_owner).person,
+                                  policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS))
+    get :index
+    assert_response :success
   end
 
   test 'should show data file' do
@@ -4010,7 +4013,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob(skip_provide_metadata:true)
 
-    get :provide_metadata, params: { assay_ids:[assay3.id] }
+    get :provide_metadata, params: { assay_ids:[assay3.id], format: 'html' }
     assert_response :success
 
     #assay 3 is not allowed
@@ -4211,16 +4214,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
   # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
   # this replicates the old behaviour and result of calling #new
+  # The content blob is created directly via a factory (rather than an additional multipart POST to
+  # :create_content_blob) so that this helper only makes the requests it needs to exercise - a multipart
+  # upload followed by further requests in the same test is not supported by ActionController::TestCase.
   def register_content_blob(skip_provide_metadata:false)
-
-    blob = {data: picture_file}
-    assert_difference('ContentBlob.count') do
-      post :create_content_blob, params: { content_blobs: [blob] }
-    end
-    content_blob_id = assigns(:data_file).content_blob.id
+    content_blob = FactoryBot.create(:image_content_blob)
+    content_blob_id = content_blob.id
     session[:uploaded_content_blob_id] = content_blob_id.to_s
     post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s, format:'js' }
-    get :provide_metadata unless skip_provide_metadata
+    get :provide_metadata, params: { format: 'html' } unless skip_provide_metadata
   end
 
   test 'manage menu item appears according to permission' do
