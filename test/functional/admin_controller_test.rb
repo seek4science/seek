@@ -796,5 +796,22 @@ class AdminControllerTest < ActionController::TestCase
     end
   end
 
+  test 'features enabled page shows disabled search adaptors as unchecked' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    setting = adaptors.each_with_object({}) { |a, h| h[a.key] = { 'enabled' => false } }
+    with_config_value(:external_search_adaptors, setting) do
+      get :features_enabled
+      assert_response :success
+
+      assert_select 'div#external-search-details' do
+        adaptors.each do |adaptor|
+          assert_select "input[type='checkbox'][name='external_search_adaptors[#{adaptor.key}][enabled]'][checked]", count: 0
+        end
+      end
+    end
+  end
+
 
 end
