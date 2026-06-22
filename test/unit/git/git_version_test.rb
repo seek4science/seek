@@ -537,8 +537,9 @@ class GitVersionTest < ActiveSupport::TestCase
 
   test 'mutable?' do
     workflow = FactoryBot.create(:local_git_workflow)
+    assert workflow.local_git_repository
 
-    gv = workflow.git_versions.build
+    gv = workflow.git_versions.build(git_repository: workflow.local_git_repository)
     assert_nil gv.mutable
     assert gv.mutable?, 'Git::Version linked to local repo should be mutable by default'
 
@@ -569,6 +570,8 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_equal 1, workflow.version
     assert_equal 1, workflow.latest_git_version.version
     assert_equal 1, workflow.git_versions.count
+    assert workflow.latest_git_version.remote?
+
     disable_authorization_checks do
       new_ver = workflow.latest_git_version.next_version(mutable: true)
       assert new_ver.mutable?
@@ -585,6 +588,8 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_equal 1, workflow.version
     assert_equal 1, workflow.latest_git_version.version
     assert_equal 1, workflow.git_versions.count
+    refute workflow.latest_git_version.remote?
+
     disable_authorization_checks do
       new_ver = workflow.latest_git_version.next_version(mutable: true)
       assert new_ver.mutable?
