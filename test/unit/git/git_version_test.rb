@@ -553,7 +553,7 @@ class GitVersionTest < ActiveSupport::TestCase
     remote_repo = FactoryBot.create(:remote_repository)
     gv = workflow.git_versions.build(git_repository: remote_repo)
     assert_nil gv.mutable
-    refute gv.mutable?, 'Git::Version linked to local repo should NOT be mutable by default'
+    refute gv.mutable?, 'Git::Version linked to remote repo should NOT be mutable by default'
 
     gv.mutable = true
     assert_equal true, gv.mutable
