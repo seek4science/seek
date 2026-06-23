@@ -1775,7 +1775,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'get data_file as json' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy), title: 'fish flop', description: 'testing json description')
-    get :show, params: { id: df, format: 'json' }
+    get :show, params: { id: df }, format: :json
     assert_response :success
     json = JSON.parse(response.body)
     assert_equal df.id, json['data']['id'].to_i
@@ -1787,7 +1787,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'get data_file as json returns error if feature disabled' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
     with_config_value(:data_files_enabled, false) do
-      get :show, params: { id: df, format: 'json' }
+      get :show, params: { id: df }, format: :json
       assert_response :unprocessable_entity
       json = JSON.parse(response.body)
       assert_equal 'Data files are disabled', json['title']
@@ -3200,7 +3200,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
-    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s }, format: 'js'
+    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s }, format: :js
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -3227,7 +3227,7 @@ class DataFilesControllerTest < ActionController::TestCase
     post :rightfield_extraction_ajax, params: {
         content_blob_id: content_blob.id.to_s,
         data_file: {assay_assets_attributes:[{assay_id:assay.id.to_s}]}
-    }, format: 'js'
+    }, format: :js
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -4013,7 +4013,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob(skip_provide_metadata:true)
 
-    get :provide_metadata, params: { assay_ids:[assay3.id], format: 'html' }
+    get :provide_metadata, params: { assay_ids:[assay3.id] }, format: :html
     assert_response :success
 
     #assay 3 is not allowed
@@ -4212,14 +4212,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a.btn[data-lightbox]', count: 1
   end
 
-  # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
-  # this replicates the old behaviour and result of calling #new
   def register_content_blob(skip_provide_metadata:false)
     content_blob = FactoryBot.create(:image_content_blob)
     content_blob_id = content_blob.id
     session[:uploaded_content_blob_id] = content_blob_id.to_s
-    post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s, format:'js' }
-    get :provide_metadata, params: { format: 'html' } unless skip_provide_metadata
+    post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s }, format: :js
+    get :provide_metadata, format: :html unless skip_provide_metadata
   end
 
   test 'manage menu item appears according to permission' do
