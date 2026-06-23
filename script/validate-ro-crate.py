@@ -1,7 +1,5 @@
 from rocrate_validator import services, models
 
-print("starting validation")
-
 settings = services.ValidationSettings(
     rocrate_uri='/home/abby/workflow-1531-1.crate.zip',
     profile_identifier='ro-crate-1.1',
