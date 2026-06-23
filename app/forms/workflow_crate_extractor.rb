@@ -87,13 +87,14 @@ class WorkflowCrateExtractor
   end
 
   def extract_crate
-    output = ''
     Open4.open4(Seek::Util.python_exec('script/validate-ro-crate.py')) do |_pid, _stdin, stdout, _stderr|
       until (line = stdout.gets).nil?
-        output << line
+        errors.add(:ro_crate, ": #{line}")
       end
     end
-    puts output
+
+    return if errors.any?
+
     begin
       @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
     rescue Zip::Error
