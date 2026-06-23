@@ -129,6 +129,7 @@ group :development do
   gem 'rails_best_practices'
   gem 'request-log-analyzer'
   gem 'rubocop', require: false
+  gem 'ruby-lsp'
   gem 'ruby-prof'
   gem 'stackprof'
   gem 'web-console'
