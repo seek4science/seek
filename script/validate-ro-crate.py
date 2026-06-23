@@ -11,4 +11,4 @@ result = services.validate(settings)
 
 if result.has_issues():
     for issue in result.get_issues():
-        print(f"Detected issue of severity {issue.severity.name} with check \"{issue.check.identifier}\": {issue.message}")
+        print(f"{issue.check.identifier}: {issue.message.replace(" "*8, u"\u00A0"*8)}")
