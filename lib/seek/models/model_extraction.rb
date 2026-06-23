@@ -36,13 +36,15 @@ module Seek
       private
 
       def species_from_sbml(content_blob)
-        parser = LibXML::XML::Parser.file(content_blob.filepath)
-        doc = parser.parse
-        doc.root.namespaces.default_prefix = 'sbml'
         species = []
-        doc.find('//sbml:listOfSpecies/sbml:species').each do |node|
-          species << node.attributes['name']
-          species << node.attributes['id']
+        content_blob.with_temporary_copy do |path|
+          parser = LibXML::XML::Parser.file(path)
+          doc = parser.parse
+          doc.root.namespaces.default_prefix = 'sbml'
+          doc.find('//sbml:listOfSpecies/sbml:species').each do |node|
+            species << node.attributes['name']
+            species << node.attributes['id']
+          end
         end
         species.reject(&:blank?).uniq
       rescue Exception => e
@@ -51,8 +53,8 @@ module Seek
       end
 
       def species_from_jws_dat(content_blob)
-        open(content_blob.filepath) do |f|
-          contents = f.read
+        content_blob.with_temporary_copy do |path|
+          contents = File.read(path)
           start_tag = 'begin initial conditions'
           start = contents.index(start_tag)
           last = contents.index('end initial conditions')
@@ -74,13 +76,15 @@ module Seek
       end
 
       def parameters_and_values_from_sbml(content_blob)
-        parser = LibXML::XML::Parser.file(content_blob.filepath)
-        doc = parser.parse
-        doc.root.namespaces.default_prefix = 'sbml'
         params = {}
-        doc.find('//sbml:listOfParameters/sbml:parameter').each do |node|
-          value = node.attributes['value'] || nil
-          params[node.attributes['id']] = value
+        content_blob.with_temporary_copy do |path|
+          parser = LibXML::XML::Parser.file(path)
+          doc = parser.parse
+          doc.root.namespaces.default_prefix = 'sbml'
+          doc.find('//sbml:listOfParameters/sbml:parameter').each do |node|
+            value = node.attributes['value'] || nil
+            params[node.attributes['id']] = value
+          end
         end
         params
       rescue Exception => e
@@ -89,8 +93,8 @@ module Seek
       end
 
       def parameters_and_values_from_jws_dat(content_blob)
-        open(content_blob.filepath) do |f|
-          contents = f.read
+        content_blob.with_temporary_copy do |path|
+          contents = File.read(path)
           start = contents.index('begin parameters')
           last = contents.index('end parameters')
           if start.nil? || last.nil?
