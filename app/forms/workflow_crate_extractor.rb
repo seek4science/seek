@@ -1,5 +1,6 @@
 require 'ro_crate'
 require 'seek/download_handling/http_streamer'
+require 'open4'
 
 # A kind of "form object" to create a Git repository + version + annotations from a Workflow RO-Crate.
 class WorkflowCrateExtractor
@@ -86,6 +87,11 @@ class WorkflowCrateExtractor
   end
 
   def extract_crate
+    output = ''
+    Open4.open4(Seek::Util.python_exec('script/validate-ro-crate.py')) do |_pid, _stdin, stdout, _stderr|
+      output = stdout.read
+    end
+    puts output
     begin
       @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
     rescue Zip::Error
