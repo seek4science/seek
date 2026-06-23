@@ -1,9 +1,15 @@
+import sys
 import argparse
+import zipfile
 from rocrate_validator import services, models
 
 parser = argparse.ArgumentParser("validate-ro-crate")
 parser.add_argument("filepath", help="The path to the RO-Crate file to validate")
 args = parser.parse_args()
+
+if not zipfile.is_zipfile(args.filepath):
+    print("Uploaded file is not a zip file")
+    sys.exit()
 
 settings = services.ValidationSettings(
     rocrate_uri=args.filepath,
