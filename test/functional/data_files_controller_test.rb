@@ -4214,9 +4214,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
   # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
   # this replicates the old behaviour and result of calling #new
-  # The content blob is created directly via a factory (rather than an additional multipart POST to
-  # :create_content_blob) so that this helper only makes the requests it needs to exercise - a multipart
-  # upload followed by further requests in the same test is not supported by ActionController::TestCase.
   def register_content_blob(skip_provide_metadata:false)
     content_blob = FactoryBot.create(:image_content_blob)
     content_blob_id = content_blob.id
