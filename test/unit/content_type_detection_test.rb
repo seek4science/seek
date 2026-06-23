@@ -172,6 +172,37 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     end
   end
 
+  # Regression: during create_version, model-type detection runs on blobs that are not yet saved,
+  # so data_io_object returns the blob's live @tmp_io_object (the pending upload). check_content
+  # must neither close nor consume it, or the subsequent save-to-storage write fails with
+  test 'check_content does not close or consume a pending tmp_io_object' do
+    sbml_bytes = File.binread(FactoryBot.create(:teusink_model_content_blob).filepath)
+
+    # StringIO case (mirrors a retained blob carried into a new version on S3).
+    blob = ContentBlob.new(original_filename: 'model.xml', content_type: 'text/xml')
+    blob.tmp_io_object = StringIO.new(sbml_bytes)
+    assert blob.is_sbml?, 'detection should work on a pending StringIO tmp_io_object'
+    io = blob.data_io_object
+    assert_not io.closed?, 'check_content must not close the pending tmp_io_object'
+    io.rewind
+    assert_equal sbml_bytes, io.read, 'pending content must remain fully readable for the save write'
+
+    # ActionDispatch::Http::UploadedFile case (the freshly uploaded file): delegates read/rewind
+    # but not each_line - the old each_line scan raised NoMethodError here.
+    Tempfile.create(['upload', '.xml']) do |tmp|
+      tmp.binmode
+      tmp.write(sbml_bytes)
+      tmp.rewind
+      uploaded = ActionDispatch::Http::UploadedFile.new(tempfile: tmp, filename: 'model.xml', type: 'text/xml')
+      blob2 = ContentBlob.new(original_filename: 'model.xml', content_type: 'text/xml')
+      blob2.tmp_io_object = uploaded
+      assert_nothing_raised { blob2.is_sbml? }
+      assert blob2.is_sbml?, 'detection should work on a pending UploadedFile tmp_io_object'
+      uploaded.rewind
+      assert_equal sbml_bytes, uploaded.read, 'uploaded file must remain readable for the save write'
+    end
+  end
+
   test 'is_jws_dat' do
     blob = FactoryBot.create :teusink_jws_model_content_blob
     assert !is_sbml?(blob)

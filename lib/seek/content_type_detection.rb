@@ -219,22 +219,23 @@ module Seek
     end
 
     def check_content(blob, str, max_length = 1500)
-      char_count = 0
       io = blob.data_io_object
       return false unless io
       begin
-        io.each_line do |line|
-          char_count += line.length
-          # Rails.logger.info("line=>"+line)
-          return true if line.downcase.include?(str)
-          break if char_count >= max_length
-        end
+        # Read a bounded chunk rather than each_line: data_io_object may hand back the blob's
+        # live @tmp_io_object, which for a pending upload is an ActionDispatch::Http::UploadedFile
+        # (delegates read/rewind, but not each_line).
+        io.rewind if io.respond_to?(:rewind)
+        io.read(max_length).to_s.downcase.include?(str)
       rescue => exception
         Rails.logger.error("Error reading content_blob contents #{exception.class.name}:#{exception.message}")
+        false
       ensure
-        io.close if io.respond_to?(:close)
+        # Never close here. data_io_object may return the blob's live @tmp_io_object (a not-yet-saved
+        # upload); closing/consuming it would corrupt the subsequent save-to-storage write. Just
+        # rewind it so the pending write starts from the beginning.
+        io.rewind if io.respond_to?(:rewind)
       end
-      false
     end
 
     def find_or_keep_type_with_mime_magic
