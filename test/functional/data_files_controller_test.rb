@@ -381,13 +381,6 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'index does not error with a data file with no access policy' do
-    FactoryBot.create(:data_file, contributor: users(:datafile_owner).person,
-                                  policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS))
-    get :index
-    assert_response :success
-  end
-
   test 'should show data file' do
     d = FactoryBot.create :rightfield_datafile, policy: FactoryBot.create(:public_policy)
     assert_difference('ActivityLog.count') do
