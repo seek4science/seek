@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'storage_stub_helper'
 
 require 'seek/upload_handling/data_upload'
 require 'seek/upload_handling/examine_url'
@@ -8,6 +9,7 @@ class UploadHandingTest < ActiveSupport::TestCase
   include ActiveSupport::Rescuable
   include Seek::UploadHandling::DataUpload
   include Seek::UrlValidation
+  include StorageStubHelper
 
   test 'valid scheme?' do
     assert_equal %w(file).sort, Seek::UploadHandling::ContentInspection::INVALID_SCHEMES.sort
@@ -192,6 +194,32 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert_equal [], retained_content_blob_ids
     @params = { retained_content_blob_ids: [1, 2, 3] }
     assert_equal [1, 2, 3], retained_content_blob_ids
+  end
+
+  # A content blob into a new version must carry the original content forward on the S3 backend.
+  test 'copy_blob_to_asset carries content forward when the source blob lives on S3' do
+    known_content = 'retain-me-on-s3-' * 64
+    asset = FactoryBot.create(:model) # Model has has_many :content_blobs (the retain code path)
+    source_blob = asset.content_blobs.first
+    # Drop any in-memory @data/@tmp_io_object so the read must go through the storage adapter.
+    source_blob = ContentBlob.find(source_blob.id)
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: known_content.bytesize)
+      client.stub_responses(:get_object, body: known_content)
+
+      copy_blob_to_asset(asset, source_blob, asset.version + 1)
+
+      new_blob = asset.content_blobs.detect { |b| b.asset_version == asset.version + 1 }
+      assert_not_nil new_blob, 'expected copy_blob_to_asset to build a retained blob'
+      # data_io_object returns the assigned @tmp_io_object; nil here would mean the retained
+      # blob has no content and would be saved empty (the pre-fix data-loss behaviour on S3).
+      io = new_blob.data_io_object
+      assert_not_nil io, 'retained blob must have content sourced from S3, not nil (would save empty)'
+      io.rewind if io.respond_to?(:rewind)
+      assert_equal known_content, io.read, 'retained blob content must match the source bytes from S3'
+    end
   end
 
   test 'model image present?' do

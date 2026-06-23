@@ -146,7 +146,8 @@ module Seek
                                              original_filename: blob.original_filename,
                                              content_type: blob.content_type,
                                              asset_version: new_version)
-        new_blob.tmp_io_object = File.open(blob.filepath) if File.exist?(blob.filepath)
+        # Read the source content through the storage adapter, not the local filesystem path.
+        new_blob.tmp_io_object = blob.data_io_object if blob.file_exists?
       end
 
       def process_upload(blob_params)
