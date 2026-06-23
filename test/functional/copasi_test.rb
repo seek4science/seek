@@ -154,8 +154,6 @@ class CopasiTest < ActionController::TestCase
     with_config_value(:copasi_enabled, true) do
       model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
 
-      # create the additional versions directly, rather than via multipart uploads, so this test only
-      # exercises the #copasi_simulate action
       FactoryBot.create(:model_version_with_blob, model: model,
                         content_blobs: [FactoryBot.create(:teusink_model_content_blob)])
       little_blob = FactoryBot.create(:little_file_content_blob)

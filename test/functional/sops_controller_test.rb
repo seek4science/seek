@@ -363,8 +363,6 @@ class SopsControllerTest < ActionController::TestCase
 
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
-    # create a new version with a different file directly, rather than via a multipart upload, so this test
-    # only exercises the #show action
     little_blob = FactoryBot.create(:little_file_v2_content_blob)
     FactoryBot.create(:sop_version_with_blob, sop: s, content_blob: little_blob)
 
@@ -1172,8 +1170,6 @@ class SopsControllerTest < ActionController::TestCase
 
     sop = FactoryBot.create(:sop, contributor: @user.person)
 
-    # create a second version directly, rather than via a multipart upload, so this test does not make a
-    # multipart request before the requests it actually exercises
     FactoryBot.create(:sop_version_with_blob, sop: sop)
 
     sop.reload
