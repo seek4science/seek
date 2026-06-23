@@ -1,7 +1,12 @@
+import argparse
 from rocrate_validator import services, models
 
+parser = argparse.ArgumentParser("validate-ro-crate")
+parser.add_argument("filepath", help="The path to the RO-Crate file to validate")
+args = parser.parse_args()
+
 settings = services.ValidationSettings(
-    rocrate_uri='/home/abby/workflow-1531-1.crate.zip',
+    rocrate_uri=args.filepath,
     profile_identifier='ro-crate-1.1',
     # Severity options are: REQUIRED, RECOMMENDED, and OPTIONAL
     requirement_severity=models.Severity.REQUIRED,
