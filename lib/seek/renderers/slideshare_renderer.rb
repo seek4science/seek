@@ -14,7 +14,7 @@ module Seek
         json = JSON.parse(RestClient.get(api_url))
         json['html']
       rescue RestClient::Exception, JSON::ParserError
-        nil
+        ''
       end
 
       # if it is a slideshare url, which starts with www.slideshare.net, and is made up of 2 parts (params ignored)
