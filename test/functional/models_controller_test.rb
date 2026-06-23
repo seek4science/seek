@@ -726,8 +726,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     # create new version with a different file directly, rather than via a multipart upload, so this test
     # only exercises the #show action
-    little_blob = FactoryBot.create(:content_blob, original_filename: 'little_file.txt', content_type: 'text/plain',
-                                    data: File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read)
+    little_blob = FactoryBot.create(:little_file_content_blob)
     FactoryBot.create(:model_version_with_blob, model: m, content_blobs: [little_blob])
 
     m = Model.find(m.id)

@@ -365,8 +365,7 @@ class SopsControllerTest < ActionController::TestCase
 
     # create a new version with a different file directly, rather than via a multipart upload, so this test
     # only exercises the #show action
-    little_blob = FactoryBot.create(:content_blob, original_filename: 'little_file_v2.txt', content_type: 'text/plain',
-                                    data: File.new("#{Rails.root}/test/fixtures/files/little_file_v2.txt", 'rb').read)
+    little_blob = FactoryBot.create(:little_file_v2_content_blob)
     FactoryBot.create(:sop_version_with_blob, sop: s, content_blob: little_blob)
 
     s = Sop.find(s.id)

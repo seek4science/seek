@@ -158,8 +158,7 @@ class CopasiTest < ActionController::TestCase
       # exercises the #copasi_simulate action
       FactoryBot.create(:model_version_with_blob, model: model,
                         content_blobs: [FactoryBot.create(:teusink_model_content_blob)])
-      little_blob = FactoryBot.create(:content_blob, original_filename: 'little_file.txt', content_type: 'text/plain',
-                                      data: File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read)
+      little_blob = FactoryBot.create(:little_file_content_blob)
       FactoryBot.create(:model_version_with_blob, model: model, content_blobs: [little_blob])
 
       get :copasi_simulate, params: { id: model.id, version: 1 }
