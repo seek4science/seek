@@ -210,6 +210,18 @@ FactoryBot.define do
     original_filename { 'binary.bin' }
     data { File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read }
   end
+
+  factory(:little_file_content_blob, parent: :content_blob) do
+    content_type { 'text/plain' }
+    original_filename { 'little_file.txt' }
+    data { File.open("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb') { |f| f.read } }
+  end
+
+  factory(:little_file_v2_content_blob, parent: :content_blob) do
+    content_type { 'text/plain' }
+    original_filename { 'little_file_v2.txt' }
+    data { File.open("#{Rails.root}/test/fixtures/files/little_file_v2.txt", 'rb') { |f| f.read } }
+  end
   
   factory(:study_template_content_blob, parent: :content_blob) do
     original_filename { 'study_batch.zip' }
