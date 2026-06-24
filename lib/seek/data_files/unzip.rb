@@ -23,41 +23,62 @@ module Seek
           find_unzipped_datafiles(tmp_dir)
         end
 
-        def unzip_zip(tmp_dir)
-          Seek::Util.unzip(content_blob.filepath, tmp_dir)
+        # Yields a guaranteed local filesystem path to the archive. On local storage this is the
+        # on-disk path; on S3 the object is streamed to a temp copy that is removed afterwards.
+        # Archive libraries below require a real local file, so every outermost read goes through here.
+        def with_archive_path(&block)
+          content_blob.with_temporary_copy(&block)
         end
 
-        def unzip_tar(tmp_dir, input = content_blob.filepath)
-          Minitar.unpack(input, tmp_dir)
+        def unzip_zip(tmp_dir)
+          with_archive_path { |path| Seek::Util.unzip(path, tmp_dir) }
+        end
+
+        # When +input+ is given (an already-decompressed stream from unzip_tgz/tbz2/txz) it is used
+        # directly. When omitted, the archive is a plain tar and is streamed to a local temp copy.
+        def unzip_tar(tmp_dir, input = nil)
+          if input
+            Minitar.unpack(input, tmp_dir)
+          else
+            with_archive_path { |path| Minitar.unpack(path, tmp_dir) }
+          end
         end
 
         def unzip_tbz2(tmp_dir)
           Tempfile.create('decompressed_tar') do |temp_tar|
-            Bzip2::FFI::Reader.open(content_blob.filepath) do |reader|
-              IO.copy_stream(reader, temp_tar)
+            with_archive_path do |path|
+              Bzip2::FFI::Reader.open(path) do |reader|
+                IO.copy_stream(reader, temp_tar)
+              end
             end
             temp_tar.rewind
             unzip_tar(tmp_dir, temp_tar)
           end
         end
-  
+
         def unzip_tgz(tmp_dir)
-          Zlib::GzipReader.open(content_blob.filepath)  do |unzip_folder|
-            unzip_tar(tmp_dir, unzip_folder)
+          with_archive_path do |path|
+            Zlib::GzipReader.open(path) do |unzip_folder|
+              unzip_tar(tmp_dir, unzip_folder)
+            end
           end
         end
-        
+
         def unzip_txz(tmp_dir)
           #This should work according to documentation but Buffer unusable error when trying to read the stream for large files
           #Seems to work fine for smaller files (<6MB) but not consitent error (e.g large empty txt file succeeded)
           #content_type_detection turned off until fixed
-          XZ::StreamReader.open(content_blob.filepath) do |stream|
-            unzip_tar(tmp_dir, stream)
+          with_archive_path do |path|
+            XZ::StreamReader.open(path) do |stream|
+              unzip_tar(tmp_dir, stream)
+            end
           end
         end
-  
+
         def unzip_7z(tmp_dir)
-          SevenZipRuby::Reader.open_file(content_blob.filepath).extract_all(tmp_dir)
+          with_archive_path do |path|
+            SevenZipRuby::Reader.open_file(path).extract_all(tmp_dir)
+          end
         end
 
         def find_unzipped_datafiles(tmp_dir)
