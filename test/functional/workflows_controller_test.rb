@@ -1748,6 +1748,23 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'download', log.action
   end
 
+  test 'should not have dropdown download button if there is no main workflow path' do
+    workflow = FactoryBot.create :workflow, policy: FactoryBot.create(:public_policy)
+
+    get :show, params: { id: workflow }
+
+    assert_select '#download-group', count: 1
+    assert_select '#download-group .dropdown-toggle', count: 0
+  end
+
+  test 'should have dropdown download button if there is a main workflow path' do
+    workflow = FactoryBot.create :ro_crate_git_workflow, policy: FactoryBot.create(:public_policy)
+
+    get :show, params: { id: workflow }
+
+    assert_select '#download-group .dropdown-toggle', count: 1
+  end
+
   test 'lists doi in index in table view' do
     Workflow.delete_all
 

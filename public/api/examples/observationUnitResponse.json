@@ -13,7 +13,7 @@
 
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "315",
+        "extended_metadata_type_id": "75",
         "attribute_map": {
           "name": "unit 1",
           "strain": "strain 1"
@@ -24,11 +24,11 @@
       "tags": [
 
       ],
-      "created_at": "2026-03-19T16:44:15.181Z",
-      "updated_at": "2026-03-19T16:44:15.181Z",
+      "created_at": "2026-06-16T14:28:30.901Z",
+      "updated_at": "2026-06-16T14:28:30.901Z",
       "creators": [
         {
-          "profile": "/people/3002",
+          "profile": "/people/1039988547",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -41,7 +41,7 @@
       "creators": {
         "data": [
           {
-            "id": "3002",
+            "id": "1039988547",
             "type": "people"
           }
         ]
@@ -49,7 +49,7 @@
       "submitter": {
         "data": [
           {
-            "id": "3003",
+            "id": "1039988548",
             "type": "people"
           }
         ]
@@ -57,11 +57,11 @@
       "people": {
         "data": [
           {
-            "id": "3002",
+            "id": "1039988547",
             "type": "people"
           },
           {
-            "id": "3003",
+            "id": "1039988548",
             "type": "people"
           }
         ]
@@ -69,29 +69,29 @@
       "projects": {
         "data": [
           {
-            "id": "3042",
+            "id": "1022252601",
             "type": "projects"
           }
         ]
       },
       "study": {
         "data": {
-          "id": "461",
+          "id": "1060385256",
           "type": "studies"
         }
       },
       "samples": {
         "data": [
           {
-            "id": "195",
+            "id": "187",
             "type": "samples"
           },
           {
-            "id": "196",
+            "id": "188",
             "type": "samples"
           },
           {
-            "id": "197",
+            "id": "189",
             "type": "samples"
           }
         ]
@@ -106,11 +106,11 @@
       "self": "/observation_units/31"
     },
     "meta": {
-      "created": "2026-03-19T16:44:15.181Z",
-      "modified": "2026-03-19T16:44:15.181Z",
+      "created": "2026-06-16T14:28:30.901Z",
+      "modified": "2026-06-16T14:28:30.901Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c9ef1de0-05e0-013f-f2a8-00155d52079b"
+      "uuid": "59e37115-d414-43cd-8a51-95d9bde7d7b6"
     }
   },
   "jsonapi": {

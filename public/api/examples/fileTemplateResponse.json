@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "232",
+          "id": "109",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -37,8 +37,8 @@
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-03-19T16:48:32.975Z",
-      "updated_at": "2026-03-19T16:48:32.975Z",
+      "created_at": "2026-06-16T14:31:14.605Z",
+      "updated_at": "2026-06-16T14:31:14.605Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +47,13 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/40/content_blobs/1228",
+          "link": "http://localhost:3000/file_templates/40/content_blobs/1050453427",
           "size": 8
         }
       ],
       "creators": [
         {
-          "profile": "/people/4509",
+          "profile": "/people/1039989305",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -78,7 +78,7 @@
       "creators": {
         "data": [
           {
-            "id": "4509",
+            "id": "1039989305",
             "type": "people"
           }
         ]
@@ -86,7 +86,7 @@
       "submitter": {
         "data": [
           {
-            "id": "4510",
+            "id": "1039989306",
             "type": "people"
           }
         ]
@@ -94,11 +94,11 @@
       "people": {
         "data": [
           {
-            "id": "4509",
+            "id": "1039989305",
             "type": "people"
           },
           {
-            "id": "4510",
+            "id": "1039989306",
             "type": "people"
           }
         ]
@@ -106,7 +106,7 @@
       "projects": {
         "data": [
           {
-            "id": "4513",
+            "id": "1022253299",
             "type": "projects"
           }
         ]
@@ -126,11 +126,11 @@
       "self": "/file_templates/40?version=1"
     },
     "meta": {
-      "created": "2026-03-19T16:48:32.954Z",
-      "modified": "2026-03-19T16:48:32.975Z",
+      "created": "2026-06-16T14:31:14.583Z",
+      "modified": "2026-06-16T14:31:14.605Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "63987230-05e1-013f-f2a8-00155d52079b"
+      "uuid": "0d201290-8359-453e-b61e-a021de4f70ab"
     }
   },
   "jsonapi": {

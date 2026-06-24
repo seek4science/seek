@@ -9,14 +9,14 @@
           {
             "resource": {
               "type": "projects",
-              "id": "4089"
+              "id": "1022255344"
             },
             "access": "manage"
           },
           {
             "resource": {
               "type": "projects",
-              "id": "4122"
+              "id": "1022255377"
             },
             "access": "manage"
           }
@@ -30,18 +30,18 @@
         "data": [
           {
             "type": "projects",
-            "id": "4089"
+            "id": "1022255344"
           },
           {
             "type": "projects",
-            "id": "4122"
+            "id": "1022255377"
           }
         ]
       },
       "publications": {
         "data": [
           {
-            "id": "274",
+            "id": "334",
             "type": "publications"
           }
         ]
@@ -49,7 +49,7 @@
       "creators": {
         "data": [
           {
-            "id": "4093",
+            "id": "1039991270",
             "type": "people"
           }
         ]
