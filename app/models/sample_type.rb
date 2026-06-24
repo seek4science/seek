@@ -105,9 +105,16 @@ class SampleType < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    return false if investigations.blank?
+    # At creation time the link with assays / studies does not exist yet.
+    # That would mean that 'new' Sample Types are by definition never ISA-JSON compliant.
+    # For this reason, we need to be a bit more lenient at creation time.
+    if self.new_record?
+      isa_template.present?
+    else
+      return false if investigations.blank?
 
-    (studies.any? || assays.any?) && investigations.all? { |inv| inv.is_isa_json_compliant } && !isa_template.nil?
+      (studies.any? || assays.any?) && investigations.all? { |inv| inv.is_isa_json_compliant } && isa_template.present?
+    end
   end
 
   def locked?

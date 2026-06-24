@@ -118,11 +118,7 @@ module Seek
       private
 
       def inherited?(attr)
-        if @sample_type.new_record?
-          attr&.inherited_from_template_attribute? && @sample_type.isa_template.present?
-        else
-          attr&.inherited_from_template_attribute? && is_isa_json_compliant?
-        end
+        attr&.inherited_from_template_attribute? && is_isa_json_compliant?
       end
 
       def blanks?(attr)
