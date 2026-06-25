@@ -93,8 +93,9 @@ module Seek
                 return nil if valid_methods.empty?
 
                 valid_methods.map do |collection|
-                  @additional_context.merge!(additional_contexts(send(collection)))
-                  mini_definitions(send(collection))
+                  items = send(collection)
+                  @additional_context.merge!(additional_contexts(items))
+                  mini_definitions(items)
                 end.flatten.compact
               end
             end
