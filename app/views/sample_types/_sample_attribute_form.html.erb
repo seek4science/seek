@@ -135,6 +135,9 @@
                       data: {attr: "isa_tag_title"},
                       disabled: !allow_isa_tag_change %>
     </td>
+
+    <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" } %>
+    <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
   <% end %>
 
   <td>
@@ -148,11 +151,8 @@
     %>
   </td>
 
-
   <td>
     <% if allow_attribute_removal %>
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
-      <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" } %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">
@@ -166,10 +166,8 @@
     <% end %>
   </td>
 
-
   <% if sample_attribute %>
-      <%= hidden_field_tag("#{field_name_prefix}[id]", id) %>
-      <%= hidden_field_tag("#{field_name_prefix}[template_column_index]", template_column_index) %>
-
+    <%= hidden_field_tag("#{field_name_prefix}[id]", id) %>
+    <%= hidden_field_tag("#{field_name_prefix}[template_column_index]", template_column_index) %>
   <% end %>
 </tr>
