@@ -13,9 +13,23 @@ class ModelImagesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        path = size ? @model_image.full_cache_path(size) : @model_image.file_path
-        send_file(path, type: 'image/png', disposition: 'inline')
-        headers['Content-Length'] = File.size(path).to_s
+        if size
+          # Resized images are cached on local disk (per node) regardless of backend.
+          path = @model_image.full_cache_path(size)
+          send_file(path, type: 'image/png', disposition: 'inline')
+          headers['Content-Length'] = File.size(path).to_s
+        elsif @model_image.remote_storage?
+          # The full-size master lives in object storage on S3 (no local file), so redirect to a
+          # presigned URL and let the browser fetch it directly.
+          redirect_to @model_image.storage_adapter.presigned_url(@model_image.storage_key,
+                                                                 content_type: 'image/png',
+                                                                 disposition: 'inline'),
+                      allow_other_host: true
+        else
+          path = @model_image.file_path
+          send_file(path, type: 'image/png', disposition: 'inline')
+          headers['Content-Length'] = File.size(path).to_s
+        end
       end
     end
   end
