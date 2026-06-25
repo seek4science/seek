@@ -84,9 +84,9 @@ module Seek
         disable_authorization_checks { data_file.save! }
         AssetsCreator.create(asset_id: data_file.id, creator_id: creator.id, asset_type: data_file.class.name)
         
-        # Copy file
+        # Attach the file via the storage adapter (works on local disk or S3).
         source_path = File.join(@seed_data_dir, filename)
-        FileUtils.cp(source_path, data_file.content_blob.filepath)
+        data_file.content_blob.tmp_io_object = File.open(source_path)
         disable_authorization_checks { data_file.content_blob.save! }
         
         data_file
@@ -126,10 +126,10 @@ module Seek
         disable_authorization_checks { model.save! }
         AssetsCreator.create(asset_id: model.id, creator_id: @guest_person.id, asset_type: model.class.name)
         
-        # Copy files
+        # Attach files via the storage adapter (works on local disk or S3).
         model.content_blobs.each do |blob|
           source_path = File.join(@seed_data_dir, blob.original_filename)
-          FileUtils.cp(source_path, blob.filepath)
+          blob.tmp_io_object = File.open(source_path)
           blob.save!
         end
         
@@ -153,8 +153,9 @@ module Seek
         
         AssetsCreator.create(asset_id: sop.id, creator_id: @guest_person.id, asset_type: sop.class.name)
         
+        # Attach the file via the storage adapter (works on local disk or S3).
         source_path = File.join(@seed_data_dir, sop.content_blob.original_filename)
-        FileUtils.cp(source_path, sop.content_blob.filepath)
+        sop.content_blob.tmp_io_object = File.open(source_path)
         
         disable_authorization_checks do
           sop.annotate_with(['protocol', 'enzymology', 'thermophile'], 'tag', @guest_person)

@@ -91,8 +91,9 @@ module Seek
           content_type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
         )
 
+        # Attach the file via the storage adapter (works on local disk or S3).
         source_path = File.join(@seed_data_dir, presentation.content_blob.original_filename)
-        FileUtils.cp(source_path, presentation.content_blob.filepath)
+        presentation.content_blob.tmp_io_object = File.open(source_path)
         
         presentation.version = 1
         disable_authorization_checks do

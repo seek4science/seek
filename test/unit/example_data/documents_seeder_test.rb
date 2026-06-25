@@ -1,5 +1,9 @@
 require 'test_helper'
+require 'storage_stub_helper'
+
 class DocumentsSeederTest < ActiveSupport::TestCase
+  include StorageStubHelper
+
   def setup
     User.current_user = nil
     @admin_person = FactoryBot.create(:admin, first_name: 'Admin', last_name: 'Person')
@@ -37,5 +41,28 @@ class DocumentsSeederTest < ActiveSupport::TestCase
     assert_equal [@admin_person], doc.creators
     assert_nil doc.other_creators
     assert_equal %w[gluconeogenesis protocol thermophile], doc.tags
+  end
+
+  # Seeding must store the file through the storage adapter, not by copying to a local filepath
+  # (which does not exist on S3). Stub the S3 adapter and assert the seeded blob lands in object
+  # storage with content (issue 2.K).
+  test 'seeded document is stored via the adapter on S3' do
+    seed_file = File.join(@seed_data_dir, 'example_document.txt')
+    bytes = File.binread(seed_file)
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: bytes.bytesize)
+      client.stub_responses(:get_object, body: bytes)
+
+      seeder = Seek::ExampleData::DocumentsSeeder.new(
+        @project, @guest_person, @admin_person, @seed_data_dir
+      )
+      result = seeder.seed
+      blob = result[:document].reload.content_blob
+
+      assert blob.file_exists?, 'seeded blob should exist in object storage on S3'
+      assert blob.file_size.to_i > 0, 'seeded blob should have non-zero size on S3'
+    end
   end
 end

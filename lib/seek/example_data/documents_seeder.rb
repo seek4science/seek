@@ -40,10 +40,10 @@ module Seek
         disable_authorization_checks { document.save! }
         AssetsCreator.create(asset_id: document.id, creator_id: creator.id, asset_type: document.class.name)
 
-        # Copy file
+        # Attach the file via the storage adapter (works on local disk or S3), rather than
+        # copying straight to content_blob.filepath which only exists on the local backend.
         source_path = File.join(@seed_data_dir, filename)
-        destination_path = document.content_blob.filepath
-        FileUtils.cp(source_path, destination_path)
+        document.content_blob.tmp_io_object = File.open(source_path)
 
         document.content_blob.original_filename = filename
         document.content_blob.content_type = content_type
