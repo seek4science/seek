@@ -15,6 +15,10 @@ class Avatar < ApplicationRecord
   end
   acts_as_fleximage_extension
 
+  # Store the master image through Seek::Storage (S3 on the S3 backend) instead of local disk only.
+  # Must come after the fleximage declarations so its overrides take precedence and `super` resolves.
+  include Seek::FleximageAdapterStorage
+
   attr_accessor :skip_owner_validation
   validates :owner, presence: true, unless: :skip_owner_validation
 
