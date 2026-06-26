@@ -617,6 +617,7 @@ class GitControllerTest < ActionController::TestCase
 
     assert_response :created
     assert workflow.git_version.file_exists?('new_file.txt')
+    assert_equal 'file contents', workflow.git_version.file_contents('new_file.txt')
   end
 
   test 'add a new remote file via API' do
