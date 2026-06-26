@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'minitest/mock'
+require 'storage_stub_helper'
 
 class ModelsControllerTest < ActionController::TestCase
 
@@ -7,6 +8,7 @@ class ModelsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
+  include StorageStubHelper
 
   def setup
     login_as(:model_owner)
@@ -1105,6 +1107,24 @@ class ModelsControllerTest < ActionController::TestCase
     get :compare_versions, params: { id: model, other_version: model.versions.last.version }
     assert_response :success
     assert_select 'div.bives_output ul li', text: /Both documents have same Level\/Version:/, count: 1
+  end
+
+  # the compare JAR needs real local files. On S3 the blobs have no local path, so
+  # compare_versions must stream temporary copies. Runs the real JAR against copies streamed from a
+  # stubbed S3 backend.
+  test 'compare versions reads blobs from S3 via temporary copies' do
+    model = FactoryBot.create :model, contributor: User.current_user.person
+    sbml_bytes = File.binread(model.sbml_content_blobs.first.filepath)
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: sbml_bytes.bytesize)
+      client.stub_responses(:get_object, body: sbml_bytes)
+
+      get :compare_versions, params: { id: model, other_version: model.versions.last.version }
+      assert_response :success
+      assert_select 'div.bives_output ul li', text: /Both documents have same Level\/Version:/, count: 1
+    end
   end
 
   test 'cannot compare versions if you cannot download' do

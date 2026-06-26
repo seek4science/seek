@@ -35,7 +35,12 @@ class ModelsController < ApplicationController
     select_blobs_for_comparison
     if @blob1 && @blob2
       begin
-        json = compare @blob1.filepath, @blob2.filepath, ["reportHtml", "crnJson", "json", "SBML"]
+        # The compare JAR needs real local files; stream temp copies so this works on S3 too.
+        json = @blob1.with_temporary_copy do |path1|
+          @blob2.with_temporary_copy do |path2|
+            compare path1, path2, ["reportHtml", "crnJson", "json", "SBML"]
+          end
+        end
         @crn = JSON.parse(json)["crnJson"]
         @comparison_html = JSON.parse(json)["reportHtml"]
       rescue Exception => e
