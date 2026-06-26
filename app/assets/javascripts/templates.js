@@ -249,11 +249,12 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="type"]').val(row[3]);
     if (appliedToSampleType) $j(newRow).find('[data-attr="type"]').addClass("disabled");
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
-    if (appliedToSampleType) $j(newRow).find('[data-attr="cv_id"]').parent().addClass("disabled");
+    if (appliedToSampleType)
+      $j(newRow).find('[data-attr="cv_id"]').addClass("disabled");
     $j(newRow).find('[data-attr="allow_cv_free_text"]').prop("checked", row[5]);
     if (appliedToSampleType) $j(newRow)
-                                .find('[data-attr="allow_cv_free_text"]')
-                                .addClass("disabled");
+                                .find('input[type="checkbox"][data-attr="allow_cv_free_text"]')
+                                .prop("disabled", true);
     $j(newRow).find('[data-attr="unit"]').val(row[6]);
     if (appliedToSampleType)  $j(newRow).find('[data-attr="unit"]').addClass("disabled");
     $j(newRow).find('[data-attr="pid"]').val(row[9]);
