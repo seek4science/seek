@@ -368,6 +368,26 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'download on S3 backend with stream param serves through the app (for COPASI/Morpheus desktop apps)' do
+    # The COPASI/Morpheus desktop links pass ?stream=1 because their downloaders cannot follow the
+    # presigned cross-host redirect. Such requests are served as HTTP 200 + body through SEEK instead.
+    sop = FactoryBot.create(:doc_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    blob = sop.content_blob
+    bytes = File.binread(blob.filepath)
+    with_stubbed_s3_storage do |dat, _converted|
+      s3_client(dat).stub_responses(:head_object, content_length: bytes.bytesize)
+      s3_client(dat).stub_responses(:get_object, body: bytes)
+      get :download, params: { sop_id: sop.id, id: blob.id, stream: true }
+      # HTTP 200 (not a 302 redirect) with the correct filename/type/length headers. The streaming
+      # body itself is not materialised by ActionController::TestCase, so the byte-level check is
+      # covered end-to-end against real MinIO.
+      assert_response :success
+      assert_includes @response.header['Content-Disposition'], blob.original_filename
+      assert_equal blob.content_type, @response.header['Content-Type']
+      assert_equal bytes.bytesize.to_s, @response.header['Content-Length']
+    end
+  end
+
   test 'view image content on S3 backend resizes from a streamed copy and serves it' do
     sop = FactoryBot.create(:sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy),
                             content_blob: FactoryBot.create(:image_content_blob))

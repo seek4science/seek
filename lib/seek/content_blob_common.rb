@@ -235,21 +235,42 @@ module Seek
 
     # Send a content blob's file to the browser, routing through the storage adapter.
     # LocalAdapter: uses send_file with the on-disk path.
-    # S3Adapter: redirects to a presigned URL (full_path returns nil).
+    # S3Adapter: redirects to a presigned URL by default; when the request carries ?stream=1
+    #   (COPASI/Morpheus desktop links, which cannot follow the cross-host redirect) the bytes are
+    #   streamed through SEEK as an HTTP 200 response instead.
     def serve_blob_file(content_blob, disposition: 'attachment')
-      local_path = content_blob.storage_adapter.full_path(content_blob.storage_key)
+      adapter = content_blob.storage_adapter
+      key = content_blob.storage_key
+      local_path = adapter.full_path(key)
       if local_path
         send_file local_path,
                   filename: content_blob.original_filename,
                   type: content_blob.content_type || 'application/octet-stream',
                   disposition: disposition
+      elsif params[:stream].present?
+        stream_blob_through_app(adapter, key,
+                                filename: content_blob.original_filename,
+                                type: content_blob.content_type || 'application/octet-stream',
+                                disposition: disposition)
       else
-        url = content_blob.storage_adapter.presigned_url(content_blob.storage_key,
-                                                         expires_in: 300,
-                                                         filename: content_blob.original_filename,
-                                                         content_type: content_blob.content_type,
-                                                         disposition: disposition)
+        url = adapter.presigned_url(key,
+                                    expires_in: 300,
+                                    filename: content_blob.original_filename,
+                                    content_type: content_blob.content_type,
+                                    disposition: disposition)
         redirect_to url, allow_other_host: true
+      end
+    end
+
+    # Streams an object from the storage adapter through the app as a chunked HTTP 200 response,
+    # without buffering the whole object in memory. Mirrors the Enumerator pattern used by #stream_with.
+    def stream_blob_through_app(adapter, key, filename:, type:, disposition:)
+      response.headers['Content-Length'] = adapter.size(key).to_s
+      response.headers['Content-Disposition'] =
+        ActionDispatch::Http::ContentDisposition.format(disposition: disposition, filename: filename)
+      response.headers['Content-Type'] = type
+      self.response_body = Enumerator.new do |yielder|
+        adapter.stream(key) { |chunk| yielder << chunk }
       end
     end
 

@@ -37,6 +37,15 @@ module Seek
         StringIO.new(response.body.read)
       end
 
+      # Streams the object's content in chunks, yielding each to the block, without buffering the
+      # whole object in memory. Used to serve a download through the app (HTTP 200 + body) for clients
+      # that cannot follow a presigned redirect (e.g. the COPASI/Morpheus desktop apps).
+      def stream(key)
+        @client.get_object(bucket: @bucket, key: object_key(key)) do |chunk, _headers|
+          yield chunk
+        end
+      end
+
       # Returns true if the object exists. Handles multiple not-found error forms
       # raised by different SDK versions and S3-compatible servers.
       def exist?(key)

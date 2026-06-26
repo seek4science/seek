@@ -293,7 +293,9 @@ module AssetsHelper
 
     auth_code = @model.special_auth_codes.where('code LIKE ?', 'copasi_%').first.code unless @model.can_download?(nil)
 
-    download_path = polymorphic_path([@model, blob], action: :download, code: auth_code)
+    # stream: true makes SEEK serve the bytes directly (HTTP 200) instead of a presigned S3 redirect,
+    # which the CopasiUI downloader cannot follow.
+    download_path = polymorphic_path([@model, blob], action: :download, code: auth_code, stream: true)
 
     copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
 
@@ -307,7 +309,9 @@ module AssetsHelper
   def open_with_morpheus_button
 
     blob  =   @display_model.morpheus_supported_content_blobs.first
-    download_path = polymorphic_path([@model, blob], action: :download)
+    # stream: true makes SEEK serve the bytes directly (HTTP 200) instead of a presigned S3 redirect,
+    # which the MorpheusUI downloader cannot follow.
+    download_path = polymorphic_path([@model, blob], action: :download, stream: true)
     morpheus_download_path =  "morpheus://"+request.host_with_port+download_path
     tooltip_text_morpheus_button = "Simulate your model locally using desk application MorpheusUI."
 
