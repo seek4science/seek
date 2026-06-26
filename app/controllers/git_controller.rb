@@ -75,9 +75,11 @@ class GitController < ApplicationController
     if file_params[:url].present?
       add_remote_file
       operation_response("Registered #{file_params[:url]}", status: 201)
-    else
+    elsif file_params[:data].present?
       add_local_file
       operation_response("Uploaded #{file_params[:path] || params[:path]}", status: 201)
+    else
+      render_git_error("Please select a file to upload or provide a URL to the data.", status: 422)
     end
   end
 
