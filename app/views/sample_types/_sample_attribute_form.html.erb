@@ -74,21 +74,22 @@
                    options_for_select(displayed_sample_attribute_types.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map do |t|
                      [t.title, t.id,{'data-use-cv': t.controlled_vocab? || t.seek_cv_list?, 'data-is-seek-sample': t.seek_sample? || t.seek_sample_multi? }]
                    end , attribute_type_id),
-                   class: 'form-control sample-type-attribute-type',
-                   disabled: !allow_type_change, data: { attr: "type" } %>
+                   class: "form-control sample-type-attribute-type#{allow_type_change ? '' : ' disabled'}",
+                   data: { attr: "type" } %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                      options_for_select(SampleControlledVocab.all.map { |scv| [scv.title, scv.id, {'data-editable': scv.can_edit?}] },
                                         sample_controlled_vocab_id),
                      include_blank: true,
-                     class: 'form-control controlled-vocab-selection',
-                     disabled: !allow_type_change, data: { attr: "cv_id" }%>
+                     class: "form-control controlled-vocab-selection#{allow_type_change ? '' : ' disabled'}",
+                     data: { attr: "cv_id" }%>
 
       <div>
         <label>
           <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", '0'  %>
-          <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text, data: { attr: 'allow_cv_free_text' } %>
+          <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text,
+                            disabled: !allow_type_change, data: { attr: 'allow_cv_free_text' } %>
           <%= t('samples.allow_free_text_checkbox_label') %> <%= allow_free_text_help_icon %>
         </label>
       </div>
@@ -114,8 +115,7 @@
                      grouped_options_for_select(options,
                                         link_to_self ? 'self' : linked_sample_type_id),
                      include_blank: true,
-                     disabled: !allow_type_change,
-                     class: 'form-control linked-sample-type-selection' %>
+                     class: "form-control linked-sample-type-selection#{allow_type_change ? '' : ' disabled'}" %>
     </div>
   </td>
   <td>
@@ -145,9 +145,8 @@
                    options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
                                       unit_id),
                    include_blank: true,
-                   class: 'form-control',
-                   data: { attr: "unit" },
-                   disabled: !allow_unit_change
+                   class: "form-control#{allow_unit_change ? '' : ' disabled'}",
+                   data: { attr: "unit" }
     %>
   </td>
 
