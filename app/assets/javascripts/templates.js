@@ -250,7 +250,7 @@ const applyTemplate = () => {
     if (appliedToSampleType) $j(newRow).find('[data-attr="type"]').addClass("disabled");
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
     if (appliedToSampleType)
-      $j(newRow).find('[data-attr="cv_id"]').addClass("disabled");
+      $j(newRow).find('[data-attr="cv_id"]').parent().addClass("disabled");
     $j(newRow).find('[data-attr="allow_cv_free_text"]').prop("checked", row[5]);
     if (appliedToSampleType) $j(newRow)
                                 .find('input[type="checkbox"][data-attr="allow_cv_free_text"]')
