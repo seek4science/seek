@@ -97,5 +97,24 @@ module Seek
         yield tmp.path
       end
     end
+
+    public
+
+    # Materialises a persisted local copy of the master image and returns its path. Mirrors
+    # ContentBlob#make_temp_copy so callers (e.g. the RO bundle generator) can treat fleximage models
+    # and content blobs the same way. The caller is responsible for deleting the returned file.
+    # Uses the local master when present (local backend), otherwise streams it from the adapter (S3).
+    def make_temp_copy
+      temp_name = "#{Time.now.strftime('%Y%m%d%H%M%S%L')}-#{self.class.name.underscore}-#{id}." \
+                  "#{self.class.image_storage_format}"
+      temp_path = File.join(Seek::Config.temporary_filestore_path, temp_name).to_s
+      FileUtils.mkdir_p(File.dirname(temp_path))
+      if File.exist?(file_path)
+        FileUtils.cp(file_path, temp_path)
+      else
+        File.open(temp_path, 'wb') { |f| IO.copy_stream(storage_adapter.open(storage_key), f) }
+      end
+      temp_path
+    end
   end
 end

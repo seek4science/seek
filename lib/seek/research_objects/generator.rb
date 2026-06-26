@@ -115,14 +115,20 @@ module Seek
       end
 
       # Returns a local filesystem path for the blob's content, for ROBundle to read.
-      # On the local backend (or for fleximage-backed ModelImage, which has no adapter),
-      # this is the real on-disk path. On S3 it streams a temp copy, tracked in
+      # On the local backend this is the real on-disk path; on S3 it streams a temp copy, tracked in
       # @temp_blob_copies so it survives until the bundle is written (see #generate).
+      #
+      # Handles two adapter-backed shapes: ContentBlob (local file lives at the adapter path), and
+      # fleximage models like ModelImage (local master lives at #filepath, not the adapter path — only
+      # the S3 copy uses storage_key). Hence the existence checks before trusting either path.
       def local_path_for(blob)
         return blob.filepath unless blob.respond_to?(:storage_adapter)
 
         local = blob.storage_adapter.full_path(blob.storage_key)
-        return local if local
+        return local if local && File.exist?(local)
+
+        # fleximage-backed models keep their master at #filepath on the local backend.
+        return blob.filepath if blob.respond_to?(:filepath) && blob.filepath && File.exist?(blob.filepath.to_s)
 
         copy = blob.make_temp_copy
         (@temp_blob_copies ||= []) << copy
