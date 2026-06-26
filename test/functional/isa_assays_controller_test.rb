@@ -97,10 +97,6 @@ class ISAAssaysControllerTest < ActionController::TestCase
     inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
     study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: User.current_user.person)
 
-    # source_sample_type = study.sample_types.first
-    #
-    # sample_collection_sample_type = study.sample_types.second
-    #
     post :create, params: { isa_assay: {
       assay: { title: 'test', study_id: study.id,
                sop_ids: [FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy)).id] },
