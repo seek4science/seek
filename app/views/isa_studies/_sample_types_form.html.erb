@@ -96,19 +96,6 @@
         $j("#<%=attribute_table_id%>").on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
         $j("#<%=attribute_table_id%>").on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
         $j('.controlled-vocab-selection').change();
-
-        // Change ISA tag ID of the sample attribute when the select is changed
-        const sampleTypeTables = [
-          '#attribute-table_source_sample_type',
-          '#attribute-table_sample_collection_sample_type',
-          '#attribute-table_sample_type'
-        ].join(', ');
-        $j(sampleTypeTables).on('change', 'select[data-attr="isa_tag_title"]', function() {
-            const hiddenInputName = $j(this).attr('name').replace('isa_tag_title', 'isa_tag_id');
-            const isa_tag_id_sel = $j(this).val();
-
-            $j(`input:hidden[name="${hiddenInputName}"]`).val(isa_tag_id_sel);
-        });
     });
     $j(document).on('submit', function(){
       // Remove the table from the form

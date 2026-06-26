@@ -129,15 +129,14 @@
 
   <% if display_isa_tag %>
     <td>
-      <%= select_tag "#{field_name_prefix}[isa_tag_title]",
+      <%= select_tag "#{field_name_prefix}[isa_tag_id]",
                       options_for_select(isa_tags_options, isa_tag_id),
-                      include_blank: true, class: 'form-control',
-                      data: {attr: "isa_tag_title"},
-                      disabled: !allow_isa_tag_change %>
+                      include_blank: true,
+                      data: {attr: "isa_tag_id"},
+                      class: "form-control#{allow_isa_tag_change ? '' : ' disabled'}"%>
     </td>
 
     <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" } %>
-    <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", (display_isa_tag ? isa_tag_id : nil), data: { attr: "isa_tag_id" }  %>
   <% end %>
 
   <td>

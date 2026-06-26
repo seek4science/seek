@@ -259,9 +259,8 @@ const applyTemplate = () => {
     if (appliedToSampleType)  $j(newRow).find('[data-attr="unit"]').addClass("disabled");
     $j(newRow).find('[data-attr="pid"]').val(row[9]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
-    $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
     $j(newRow)
-        .find('[data-attr="isa_tag_title"]')
+        .find('[data-attr="isa_tag_id"]')
         .addClass("disabled");
     $j(newRow).find('[data-attr="template_attribute_id"]').val(row[14]); // In case of a sample type
     $j(newRow).find('[data-attr="parent_attribute_id"]').val(row[14]); // In case of a template
