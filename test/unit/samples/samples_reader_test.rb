@@ -1,6 +1,9 @@
 require 'test_helper'
+require 'storage_stub_helper'
 
 class SamplesReaderTest < ActiveSupport::TestCase
+  include StorageStubHelper
+
   def setup
     # need a string type registered
     create_sample_attribute_type
@@ -8,6 +11,25 @@ class SamplesReaderTest < ActiveSupport::TestCase
     @content_blob = FactoryBot.create(:sample_type_template_content_blob)
     @content_blob2 = FactoryBot.create(:sample_type_template_content_blob2)
     @binary_blob = FactoryBot.create(:binary_content_blob)
+  end
+
+  # spreadsheet->XML uses the POI JAR, which needs a real local file. On S3 the template
+  # blob has no local path, so it must stream a temporary copy. Runs the real JAR against a copy
+  # streamed from a stubbed S3 backend and checks the XML matches the local-backend run.
+  test 'template_xml reads the spreadsheet from S3 via a temporary copy' do
+    xls_bytes = File.binread(@content_blob.filepath)
+    expected = Seek::Templates::SamplesReader.new(@content_blob).send(:template_xml)
+    refute_empty expected.to_s, 'expected the local POI run to produce template XML'
+    Rails.cache.clear # force the S3 run to re-execute rather than hit the cached result
+
+    with_stubbed_s3_storage do |dat, _converted|
+      client = s3_client(dat)
+      client.stub_responses(:head_object, content_length: xls_bytes.bytesize)
+      client.stub_responses(:get_object, body: xls_bytes)
+
+      result = Seek::Templates::SamplesReader.new(ContentBlob.find(@content_blob.id)).send(:template_xml)
+      assert_equal expected, result, 'template XML from S3 should match the local-backend output'
+    end
   end
 
   test 'compatible?' do

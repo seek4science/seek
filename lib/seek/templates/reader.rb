@@ -67,7 +67,10 @@ module Seek
       # the content_blob cache_key
       def spreadsheet_content_blob_to_xml(content_blob)
         Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
-          spreadsheet_to_xml(content_blob.filepath, memory_allocation = Seek::Config.jvm_memory_allocation)
+          # POI needs a real local file; stream a temp copy so this works on S3 too.
+          content_blob.with_temporary_copy do |path|
+            spreadsheet_to_xml(path, Seek::Config.jvm_memory_allocation)
+          end
         end
       end
     end
