@@ -109,6 +109,77 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_template :new
   end
 
+  test 'should preserve sample_attribute_type_id on re-render after validation failure with template-based attributes' do
+    projects = User.current_user.person.projects
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
+    study = FactoryBot.create(:isa_json_compliant_study, investigation_id: inv.id, contributor: User.current_user.person)
+    assay_stream = FactoryBot.create(:assay_stream, contributor: User.current_user.person, study:)
+    template = FactoryBot.create(:isa_assay_material_template)
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([projects.first], Policy::ACCESSIBLE) }
+
+    string_type = FactoryBot.create(:string_sample_attribute_type)
+    multi_type = FactoryBot.create(:sample_multi_sample_attribute_type)
+    t_attrs = template.template_attributes
+
+    # Simulate what JS applyTemplate produces: template_id on the sample type
+    # and template_attribute_id on each individual attribute
+    sample_type_attrs = {
+      title: 'Template-based Sample Type',
+      project_ids: [projects.first.id],
+      template_id: template.id,
+      sample_attributes_attributes: {
+        '0': { pos: '1', title: 'Extract Name', required: '1', is_title: '1', _destroy: '0',
+               sample_attribute_type_id: string_type.id,
+               isa_tag_id: FactoryBot.create(:other_material_isa_tag).id,
+               template_attribute_id: t_attrs.find { |a| a.title == 'Extract Name' }.id },
+        '1': { pos: '2', title: 'Protocol Assay 1', required: '1', is_title: '0', _destroy: '0',
+               sample_attribute_type_id: string_type.id,
+               isa_tag_id: FactoryBot.create(:protocol_isa_tag).id,
+               template_attribute_id: t_attrs.find { |a| a.title == 'Protocol Assay 1' }.id },
+        '2': { pos: '3', title: 'Input', required: '1', _destroy: '0',
+               sample_attribute_type_id: multi_type.id,
+               linked_sample_type_id: study.sample_types.second.id,
+               isa_tag_id: FactoryBot.create(:input_isa_tag).id,
+               template_attribute_id: t_attrs.find { |a| a.title == 'Input' }.id }
+      }
+    }
+
+    # POST without assay title to trigger validation failure
+    post :create, params: { isa_assay: { assay: { study_id: study.id,
+                                                  assay_class_id: AssayClass.experimental.id,
+                                                  assay_stream_id: assay_stream.id,
+                                                  position: 0,
+                                                  policy_attributes: },
+                                         input_sample_type_id: study.sample_types.second.id,
+                                         sample_type: sample_type_attrs } }
+
+    assert_response :unprocessable_entity
+    assert_template :new
+
+    isa_assay = assigns(:isa_assay)
+
+    # Errors should be about the missing title
+    assert_equal ["[Assay]: Title can't be blank"], isa_assay.errors.full_messages
+
+    # A new Sample Type only needs the `isa_template_id`to be ISA-JSON compliant.
+    assert isa_assay.sample_type.is_isa_json_compliant?
+
+    # All submitted sample_attribute_type_ids must survive the round-trip through
+    # the controller so the re-rendered form can show the correct selected values
+    isa_assay.sample_type.sample_attributes.each do |attr|
+      assert attr.sample_attribute_type_id.present?,
+             "#{attr.title}: sample_attribute_type_id should be preserved after validation failure"
+    end
+    assert_equal string_type.id, isa_assay.sample_type.sample_attributes.find { |a| a.title == 'Protocol Assay 1' }.sample_attribute_type_id
+    assert_equal multi_type.id, isa_assay.sample_type.sample_attributes.find { |a| a.title == 'Input' }.sample_attribute_type_id
+
+    # The re-rendered form must not carry the HTML disabled attribute on type
+    # selects — disabled fields are silently dropped on the next form submission
+    assert_select 'select[name*="sample_attribute_type_id"][disabled]', count: 0
+  end
+
   test 'should update isa assay' do
     person = User.current_user.person
     project = person.projects.first
