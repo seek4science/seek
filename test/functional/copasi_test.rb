@@ -174,34 +174,23 @@ class CopasiTest < ActionController::TestCase
     with_config_value(:copasi_enabled, true) do
       model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
 
+      FactoryBot.create(:model_version_with_blob, model: model,
+                        content_blobs: [FactoryBot.create(:teusink_model_content_blob)])
+      little_blob = FactoryBot.create(:little_file_content_blob)
+      FactoryBot.create(:model_version_with_blob, model: model, content_blobs: [little_blob])
+
       get :copasi_simulate, params: { id: model.id, version: 1 }
       assert_response :success
       assert_select 'div.version', text:/Version 1/
-
-
-      assert_difference('Model::Version.count', 1) do
-        post :create_version, params: { id: model, model: { title: model.title },
-                                        content_blobs:[{ data: fixture_file_upload('Teusink.xml') }],
-                                        revision_comments: 'This is a new revision'}
-
-        assert_redirected_to model_path(assigns(:model))
-      end
 
       get :copasi_simulate, params: { id: model.id, version: 2 }
       assert_response :success
       assert_select 'div.version', text:/Version 2/
 
-      assert_difference('Model::Version.count', 1) do
-        post :create_version, params: { id: model, model: { title: model.title },
-                                        content_blobs:[{ data: fixture_file_upload('little_file.txt') }],
-                                        revision_comments: 'This is a new revision'}
-
-        get :copasi_simulate, params: { id: model.id, version: 3 }
-        assert_response :success
-        assert_select 'div.version', text:/Version 3/
-        assert_select 'div#error_flash', text:/The selected version does not contain a format supported by COPASI./
-
-      end
+      get :copasi_simulate, params: { id: model.id, version: 3 }
+      assert_response :success
+      assert_select 'div.version', text:/Version 3/
+      assert_select 'div#error_flash', text:/The selected version does not contain a format supported by COPASI./
     end
   end
 

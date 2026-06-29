@@ -2,7 +2,9 @@
 
 set -e
 
-if ! pgrep -x "dockerd" >/dev/null
+# Check the Docker daemon is reachable. Works on Linux (native daemon) and
+# macOS/Docker Desktop (daemon in a VM).
+if ! docker info >/dev/null 2>&1
 then
     echo "the Docker service isn't running"
     exit 1

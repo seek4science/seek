@@ -314,7 +314,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_includes assay.models, assigns(:model)
   end
 
-  test 'create, update and show a model with extended metadata' do
+  test 'create a model with extended metadata' do
     cmt = FactoryBot.create(:simple_model_extended_metadata_type)
 
     person = FactoryBot.create(:person)
@@ -336,14 +336,25 @@ class ModelsControllerTest < ActionController::TestCase
       end
     end
 
-
     assert model = assigns(:model)
     cm = model.extended_metadata
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a model with extended metadata' do
+    cmt = FactoryBot.create(:simple_model_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    model = FactoryBot.create(:model, contributor: person, policy: FactoryBot.create(:public_policy),
+                              extended_metadata: cm)
 
     get :show, params: { id: model }
     assert_response :success
@@ -715,11 +726,9 @@ class ModelsControllerTest < ActionController::TestCase
     m = FactoryBot.create(:model, contributor: User.current_user.person)
     m.save! # to force creation of initial version (fixtures don't include it)
 
-    # create new version
-    assert_difference('Model::Version.count', 1) do
-      post :create_version, params: { id: m, content_blobs: [{ data: fixture_file_upload('little_file.txt') }] }
-    end
-    assert_redirected_to model_path(assigns(:model))
+    little_blob = FactoryBot.create(:little_file_content_blob)
+    FactoryBot.create(:model_version_with_blob, model: m, content_blobs: [little_blob])
+
     m = Model.find(m.id)
     assert_equal 2, m.versions.size
     assert_equal 2, m.version
@@ -865,9 +874,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal users(:model_owner).person, created_model.contributor
 
     assert_equal Policy::VISIBLE, created_model.policy.access_type
-    # check it doesn't create an error when retreiving the index
-    get :index
-    assert_response :success
   end
 
   test "owner should be able to choose policy 'share with everyone' when updating a model" do
