@@ -75,7 +75,7 @@ class GitControllerTest < ActionController::TestCase
     refute @git_version.file_exists?('little_file.txt')
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                              file: { path: 'new-file.tx' } }
+                              file: { path: 'new-file.txt' } }
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
     assert flash[:error].include?('select a file')
