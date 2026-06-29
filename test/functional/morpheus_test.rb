@@ -7,7 +7,7 @@ class MorpheusTest < ActionController::TestCase
 
   def morpheus_download_path(model)
     blob = model.content_blobs.first
-    "morpheus://#{request.host_with_port}/models/#{model.id}/content_blobs/#{blob.id}/download"
+    "morpheus://#{request.host_with_port}/models/#{model.id}/content_blobs/#{blob.id}/download?stream=true"
   end
 
   test 'simulate model on morpheus button visibility when Morpheus is disabled' do

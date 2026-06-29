@@ -93,7 +93,7 @@ class CopasiTest < ActionController::TestCase
       assert_select 'h1', text: /#{model.title} - Copasi Model Simulation/
       assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
 
-      expected_href = "copasi://process?downloadUrl=http://#{request.host_with_port}/models/#{model.id}/content_blobs/#{model.content_blobs.first.id}/download&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
+      expected_href = "copasi://process?downloadUrl=http://#{request.host_with_port}/models/#{model.id}/content_blobs/#{model.content_blobs.first.id}/download?stream=true&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
       assert_select 'a[href=?]', expected_href, text: 'Simulate in CopasiUI'
     end
   end
