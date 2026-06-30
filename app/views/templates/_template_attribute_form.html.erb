@@ -115,7 +115,6 @@
   </td>
   <td>
     <div class="btn-group" data-toggle="buttons">
-      <%= hidden_field_tag "#{field_name_prefix}[parent_attribute_id]", parent_attribute_id, data: { attr: "parent_attribute_id" } %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <label class="btn btn-danger">
         Remove
@@ -124,6 +123,8 @@
       </label>
     </div>
   </td>
+
+  <%= hidden_field_tag "#{field_name_prefix}[parent_attribute_id]", parent_attribute_id, data: { attr: "parent_attribute_id" } %>
 
   <% if template_attribute %>
       <%= hidden_field_tag("#{field_name_prefix}[id]", id) %>
