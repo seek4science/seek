@@ -93,7 +93,7 @@ services:
     command: docker/start_workers.sh
 
   solr:
-    image: solr:8.11.4
+    image: solr:9.10.1
     container_name: seek-solr
     restart: always
     environment:
