@@ -104,7 +104,6 @@
          IndexWriter to write its info stream to solr's log. By default,
          this is enabled here, and controlled through log4j.properties.
       -->
-     <infoStream>true</infoStream>
   </indexConfig>
 
 
@@ -329,7 +328,7 @@
        handleSelect="true" is not recommended for new users, but is the default
        for backwards compatibility
     -->
-  <requestDispatcher handleSelect="false" >
+  <requestDispatcher>
     <!-- Request Parsing
 
          These settings indicate how Solr Requests may be parsed, and
