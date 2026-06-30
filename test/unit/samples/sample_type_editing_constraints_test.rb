@@ -206,7 +206,12 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
 
     # Allow attribute unit to change when there are no samples
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
-    assert c.allow_isa_tag_change?(weight_attribute)
+    assert c.allow_unit_change?(weight_attribute)
+    # nil (new form row) always allowed
+    assert c.allow_unit_change?(nil)
+    # unsaved attribute always allowed
+    new_attr = SampleAttribute.new
+    assert c.allow_unit_change?(new_attr)
 
     # Adding samples that have no value for the weight attribute should still allow users to change the attribute's unit
     sample_no_weight = Sample.new(sample_type: sample_type, projects: [project], contributor: person)
