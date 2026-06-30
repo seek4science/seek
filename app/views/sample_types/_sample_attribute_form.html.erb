@@ -28,7 +28,6 @@
   ########
   # Sample Type editing constraints
   ########
-  # constraints = (display_isa_tag && sample_type.new_record?) ? sample_type.creation_constraints : sample_type.editing_constraints
   constraints = sample_type.editing_constraints
   allow_title_change = sample_type.new_record? ? constraints.allow_change_at_creation?(sample_attribute) : constraints.allow_type_change?(sample_attribute)
   allow_required = sample_type.new_record? ? constraints.allow_change_at_creation?(sample_attribute) : constraints.allow_required?(sample_attribute)
