@@ -29,7 +29,6 @@
   # Sample Type editing constraints
   ########
   constraints = sample_type.editing_constraints
-  allow_title_change = sample_type.new_record? ? constraints.allow_change_at_creation?(sample_attribute) : constraints.allow_type_change?(sample_attribute)
   allow_required = sample_type.new_record? ? constraints.allow_change_at_creation?(sample_attribute) : constraints.allow_required?(sample_attribute)
 
   # Attribute removal should not be different at creation time
@@ -52,7 +51,7 @@
   </th>
   <td>
 
-    <%= text_field_tag "#{field_name_prefix}[title]", title, class: "form-control#{allow_title_change ? '' : ' disabled'}",
+    <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
                        placeholder: 'Attribute name', data: { attr: "title" } %>
   </td>
 

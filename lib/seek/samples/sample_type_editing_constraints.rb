@@ -16,10 +16,6 @@ module Seek
         samples.any?
       end
 
-      def allow_title_change?
-        true
-      end
-
       # an attribute can be changed to required, if no samples have that field blank
       # attr can be the attribute accessor name, or the attribute itself
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
