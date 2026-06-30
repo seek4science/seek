@@ -55,6 +55,7 @@ module Seek
                                      description: attribute['description'],
                                      sample_controlled_vocab_id: scv&.id,
                                      pid: attribute['pid'],
+                                     unit_id: get_unit_id(attribute['unit']),
                                      sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']),
                                      allow_cv_free_text: allow_cv_free_text,
                                      title: attribute['name'])
@@ -190,6 +191,15 @@ module Seek
         @errors.append "<li>Could not find an ISA Tag named '#{title}'</li>" if it.nil?
 
         it&.id
+      end
+
+      def self.get_unit_id(symbol)
+        return nil if symbol.blank?
+
+        unit = Unit.find_by(symbol: symbol)
+        @errors.append "<li>Could not find a Unit with symbol '#{symbol}'</li>" if unit.nil?
+
+        unit&.id
       end
 
       def self.seed_isa_tags
