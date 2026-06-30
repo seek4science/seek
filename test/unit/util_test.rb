@@ -39,7 +39,7 @@ Sample Sop Strain Study]
   end
 
   test 'searchable types' do
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, 
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, ISATag,
 Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
 
     types = with_config_value :isa_json_compliance_enabled, true do
@@ -91,7 +91,7 @@ Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, 
   test 'doiable asset types' do
     types = Seek::Util.doiable_asset_types
 
-    expected = [DataFile, Document, FileTemplate, Model, Sop, Investigation, Study, Assay, Workflow]
+    expected = [DataFile, Document, FileTemplate, Model, Presentation, Sop, Investigation, Study, Assay, Workflow]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort

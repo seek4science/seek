@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "67",
+    "id": "1060384928",
     "type": "studies",
     "attributes": {
       "policy": {
@@ -21,7 +21,7 @@
         "attribute_map": {
           "age": 44,
           "name": "Fred Bloggs",
-          "date": "2024-01-01"
+          "datetime": "2024-01-01"
         }
       },
       "snapshots": [
@@ -34,7 +34,7 @@
       "position": null,
       "creators": [
         {
-          "profile": "/people/180",
+          "profile": "/people/1039986648",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -46,7 +46,7 @@
       "creators": {
         "data": [
           {
-            "id": "180",
+            "id": "1039986648",
             "type": "people"
           }
         ]
@@ -54,7 +54,7 @@
       "submitter": {
         "data": [
           {
-            "id": "178",
+            "id": "1039986646",
             "type": "people"
           }
         ]
@@ -62,11 +62,11 @@
       "people": {
         "data": [
           {
-            "id": "178",
+            "id": "1039986646",
             "type": "people"
           },
           {
-            "id": "180",
+            "id": "1039986648",
             "type": "people"
           }
         ]
@@ -74,21 +74,21 @@
       "projects": {
         "data": [
           {
-            "id": "178",
+            "id": "1022250804",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "82",
+          "id": "973654885",
           "type": "investigations"
         }
       },
       "assays": {
         "data": [
           {
-            "id": "30",
+            "id": "1035386679",
             "type": "assays"
           }
         ]
@@ -96,7 +96,7 @@
       "data_files": {
         "data": [
           {
-            "id": "5",
+            "id": "883654270",
             "type": "data_files"
           }
         ]
@@ -104,7 +104,7 @@
       "models": {
         "data": [
           {
-            "id": "9",
+            "id": "1004285490",
             "type": "models"
           }
         ]
@@ -112,7 +112,7 @@
       "sops": {
         "data": [
           {
-            "id": "5",
+            "id": "1055250444",
             "type": "sops"
           }
         ]
@@ -135,14 +135,14 @@
       }
     },
     "links": {
-      "self": "/studies/67"
+      "self": "/studies/1060384928"
     },
     "meta": {
-      "created": "2026-03-19T16:35:37.703Z",
-      "modified": "2026-03-19T16:35:37.703Z",
+      "created": "2026-06-16T14:21:04.542Z",
+      "modified": "2026-06-16T14:21:04.542Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "9581afe0-05df-013f-f2a8-00155d52079b"
+      "uuid": "4c492943-0841-4d9f-aeb3-1fbf81c08e28"
     }
   },
   "jsonapi": {

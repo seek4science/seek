@@ -2,7 +2,6 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class OpenbisExperimentsControllerTest < ActionController::TestCase
-  #fixtures :all
   include AuthenticatedTestHelper
 
   def setup

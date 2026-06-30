@@ -2,7 +2,6 @@ require 'test_helper'
 require 'minitest/mock'
 
 class FileTemplatesControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper

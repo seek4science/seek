@@ -1,0 +1,22 @@
+{
+  "data": {
+    "id": "929390540",
+    "type": "isa_tags",
+    "attributes": {
+      "title": "Maximum isa tag"
+    },
+    "links": {
+      "self": "/isa_tags/929390540"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/isa_tags"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
+}

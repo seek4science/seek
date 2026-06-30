@@ -16,24 +16,36 @@
                            'BioPortal API key', "Required to interact with BioPortal - for example when creating new Organisms through the NCBI Taxonomy. Please register with #{link_to 'http://bioportal.bioontology.org','http://bioportal.bioontology.org',:target=>:_blank} to get an API key.") %>
 
     <%= admin_checkbox_setting(:hide_details_enabled, 1, Seek::Config.hide_details_enabled,
-                               "Hide contact details", "Hides email addresses, skype and internal web addresses.") %>
+                               "Hide contact details", "Hides email addresses and internal web addresses.") %>
 
     <%= admin_checkbox_setting(:allow_private_address_access, 1, Seek::Config.allow_private_address_access,
                                "Allow private network address access", "Allow SEEK to access URLs that resolve to private network addresses, e.g. 127.0.0.1, 192.168.1.1, localhost, fd00::2") %>
 
     <%= admin_text_setting(:session_store_timeout, Seek::Config.session_store_timeout.to_i / 60,
                            'Session store timeout', 'The length of time, in MINUTES, that the server session store is active until it expires. (Requires a restart after changing)') %>
+
+  <h2>File handling settings</h2>
+  <%= admin_checkbox_setting(:show_as_external_link_enabled, 1, Seek::Config.show_as_external_link_enabled,
+                             "Always show external links", "Items registered as a URL will always show the external link. When disabled, items are downloaded through SEEK as a proxy.") %>
+
+  <%= admin_checkbox_setting(:block_file_uploads, 1, Seek::Config.block_file_uploads,
+                             "Prevent asset file uploads", "If this setting is enabled, SEEK will block the ability to upload files for assets, and registering a URL will only be possible.
+                             Caching of remote files will also be prevented, even if enabled. The purpose is to enforce a much smaller filestore footprint.
+                             <strong>This only affects the main asset files, other auxiliary files such as avatars, model images, RO-Crates and template files for configuration can still be uploaded. This setting shouldn't be enabled in conjunction with Workflows being enabled</strong>'.", onchange: toggle_appear_javascript('remote-cache-settings-block', reverse: true)) %>
+  <div id='remote-cache-settings-block' style="<%= show_or_hide_block !Seek::Config.block_file_uploads -%>">
     <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
-                               "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
-                               onchange: toggle_appear_javascript('cache_remote_block')) %>
-    <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
-      <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
-                             'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
-                             :onkeypress => "javascript: return onlyNumbers(event);") %>
-      <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
-                             'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
-                             :onkeypress => "javascript: return onlyNumbers(event);") %>
-    </div>
+                                 "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
+                                 onchange: toggle_appear_javascript('cache_remote_block')) %>
+      <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
+        <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
+                               'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
+                               :onkeypress => "javascript: return onlyNumbers(event);") %>
+        <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
+                               'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
+                               :onkeypress => "javascript: return onlyNumbers(event);") %>
+      </div>
+  </div>
+  <h2>Sandbox settings</h2>
 
     <%= admin_text_setting(:sandbox_instance_url, Seek::Config.sandbox_instance_url,
                            'Sandbox instance URL', "A URL of an instance of SEEK to be used for testing/development. Users will be directed here if they attempt to create a #{t('project')} or #{t('programme')} with a name including \"test\".") %>

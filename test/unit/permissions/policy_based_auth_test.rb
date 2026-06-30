@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class PolicyBasedAuthTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'has advanced permissions' do
     user = FactoryBot.create(:user)

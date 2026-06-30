@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class UuidsControllerTest < ActionController::TestCase
-  fixtures :all
   include AuthenticatedTestHelper
 
   def setup

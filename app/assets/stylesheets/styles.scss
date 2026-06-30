@@ -601,8 +601,19 @@ span.required, label.required::after {
   margin: 0.5em 1em;
 }
 
+.remote-content-preview-result img.preview {
+    max-width: 30em;
+    max-height: 30em;
+}
+
 li.upload-field-tab {
   cursor: pointer;
+}
+
+// Hides the "No file chosen" label beside the native file input button without affecting the button itself.
+// Used when files are already shown in the pending list, so the label is misleading.
+input[type="file"].hide-no-file-text {
+  color: transparent;
 }
 
 img.github-logo {

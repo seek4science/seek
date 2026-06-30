@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_22_131727) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -204,6 +204,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "doi"
+    t.text "datacite_metadata"
   end
 
   create_table "asset_links", force: :cascade do |t|
@@ -566,6 +567,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.index ["user_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_can_view"
   end
 
+  create_table "event_types", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.index ["title"], name: "index_event_types_on_title", unique: true
+  end
+
   create_table "events", id: :integer, force: :cascade do |t|
     t.datetime "start_date"
     t.datetime "end_date"
@@ -583,6 +590,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "uuid"
     t.string "deleted_contributor"
     t.string "time_zone"
+    t.integer "location_type"
+    t.bigint "event_type_id"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
@@ -1333,7 +1342,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "last_name"
     t.string "email"
     t.string "phone"
-    t.string "skype_name"
     t.text "web_page"
     t.text "description"
     t.integer "avatar_id"
@@ -1442,6 +1450,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "license"
     t.string "deleted_contributor"
     t.integer "visibility"
+    t.string "doi"
   end
 
   create_table "presentation_versions_projects", id: false, force: :cascade do |t|
@@ -1463,6 +1472,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_17_142856) do
     t.string "license"
     t.string "deleted_contributor"
     t.string "external_identifier", limit: 2048
+    t.string "doi"
   end
 
   create_table "presentations_projects", id: false, force: :cascade do |t|

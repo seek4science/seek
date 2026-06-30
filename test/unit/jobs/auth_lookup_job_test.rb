@@ -97,10 +97,10 @@ class AuthLookupJobTest < ActiveSupport::TestCase
       Sop.clear_lookup_table
 
       assert_nil sop.lookup_for('view', user.id)
-      assert_nil  sop.lookup_for('download', user.id)
-      assert_nil  sop.lookup_for('edit', user.id)
-      assert_nil  sop.lookup_for('manage', user.id)
-      assert_nil  sop.lookup_for('delete', user.id)
+      assert_nil sop.lookup_for('download', user.id)
+      assert_nil sop.lookup_for('edit', user.id)
+      assert_nil sop.lookup_for('manage', user.id)
+      assert_nil sop.lookup_for('delete', user.id)
 
       UserAuthLookupUpdateJob.new.perform(user, 'Sop')
 

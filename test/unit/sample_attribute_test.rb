@@ -520,15 +520,14 @@ class SampleAttributeTest < ActiveSupport::TestCase
   end
 
   test 'is input attribute?' do
-    correct_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    correct_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: FactoryBot.create(:input_isa_tag), is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
     assert correct_input_attribute.input_attribute?
 
     incorrect_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Input from previous sample type', isa_tag: FactoryBot.create(:default_isa_tag), is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
     refute incorrect_input_attribute.input_attribute?
-    second_incorrect_input_attribute = FactoryBot.create(:sample_multi_sample_attribute, title: 'Ingoing material', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
+    second_incorrect_input_attribute = FactoryBot.create(:sample_sample_attribute,
+                                                         title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
     refute second_incorrect_input_attribute.input_attribute?
-    third_incorrect_input_attribute = FactoryBot.create(:sample_sample_attribute, title: 'Input from previous sample type', isa_tag: nil, is_title: true, sample_type: FactoryBot.create(:simple_sample_type))
-    refute third_incorrect_input_attribute.input_attribute?
   end
 
   test 'inherited_from_template_attribute?' do

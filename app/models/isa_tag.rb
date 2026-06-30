@@ -1,4 +1,11 @@
 class ISATag < ApplicationRecord
+
+  if Seek::Config.solr_enabled
+    searchable(auto_index: false) do
+      text :title
+    end
+  end
+
   validates :title, presence: true
 
   has_many :template_attributes, inverse_of: :isa_tag
@@ -42,6 +49,10 @@ class ISATag < ApplicationRecord
 
   def isa_parameter_value?
     title == Seek::ISA::TagType::PARAMETER_VALUE
+  end
+
+  def isa_input?
+    title == Seek::ISA::TagType::INPUT
   end
 
   def self.allowed_isa_tags_for_level(level)

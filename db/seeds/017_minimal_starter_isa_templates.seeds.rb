@@ -14,7 +14,7 @@ end
 
 # Source - ISA minimal starter template
 source_template = Template.find_or_initialize_by(title: 'Source - ISA minimal starter template', level: 'study source',
-                                                 group: 'ISA minimal starter')
+                                                 group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 source_temp_attributes = []
 source_temp_attributes << upsert_template_attribute('Source Name',
@@ -50,7 +50,7 @@ end
 
 # Sample - ISA minimal starter template
 sample_template = Template.find_or_initialize_by(title: 'Sample - ISA minimal starter template', level: 'study sample',
-                                                 group: 'ISA minimal starter')
+                                                 group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 sample_temp_attributes = []
 sample_temp_attributes << upsert_template_attribute('Input',
@@ -58,7 +58,8 @@ sample_temp_attributes << upsert_template_attribute('Input',
                                                     description: 'Registered Samples in the platform used as input for this protocol.',
                                                     sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                     is_title: false,
-                                                    required: true)
+                                                    required: true,
+                                                    isa_tag: ISATag.all.detect { |tag| tag.isa_input? })
 
 sample_temp_attributes << upsert_template_attribute('Name of a protocol with samples as outputs',
                                                     sample_template.id,
@@ -111,7 +112,7 @@ end
 
 # Material output assay - ISA minimal starter template
 material_template = Template.find_or_initialize_by(title: 'Material output assay - ISA minimal starter template',
-                                                   level: 'assay - material', group: 'ISA minimal starter')
+                                                   level: 'assay - material', group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 material_temp_attributes = []
 material_temp_attributes << upsert_template_attribute('Input',
@@ -119,7 +120,8 @@ material_temp_attributes << upsert_template_attribute('Input',
                                                       description: 'Registered Samples in the platform used as input for this protocol.',
                                                       sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                       is_title: false,
-                                                      required: true)
+                                                      required: true,
+                                                      isa_tag: ISATag.find_by(title: 'input'))
 
 material_temp_attributes << upsert_template_attribute('Name of a protocol with material output',
                                                       material_template.id,
@@ -172,7 +174,7 @@ end
 
 # Data file output assay - ISA minimal starter template
 data_file_template = Template.find_or_initialize_by(title: 'Data file output assay - ISA minimal starter template',
-                                                    level: 'assay - data file', group: 'ISA minimal starter')
+                                                    level: 'assay - data file', group: Seek::ISATemplates::TemplateGroup::ISA_MINIMAL_STARTER)
 
 data_file_temp_attributes = []
 data_file_temp_attributes << upsert_template_attribute('Input',
@@ -180,7 +182,8 @@ data_file_temp_attributes << upsert_template_attribute('Input',
                                                        description: 'Registered Samples in the platform used as input for this protocol.',
                                                        sample_attribute_type: SampleAttributeType.find_by(title: 'Registered Sample List'),
                                                        is_title: false,
-                                                       required: true)
+                                                       required: true,
+                                                       isa_tag: ISATag.find_by(title: 'input'))
 
 data_file_temp_attributes << upsert_template_attribute('Name of a protocol with data file output',
                                                        data_file_template.id,

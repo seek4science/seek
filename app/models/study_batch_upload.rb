@@ -34,12 +34,13 @@ class StudyBatchUpload < ApplicationRecord
     study_start_row_index = 4
     parsed_sheet.each_record(3, columns) do |index, data|
       if index > study_start_row_index
+        col = data.each_with_object({}) { |d, h| h[d.column] = d.value }
         studies << Study.new(
-            title: data[1].value,
-            description: data[2].value,
+            title: col[3] || '',
+            description: col[4] || '',
             extended_metadata: ExtendedMetadata.new(
                 extended_metadata_type: metadata_type,
-                data: generate_metadata(data)
+                data: generate_metadata(col)
             )
         )
       end
@@ -47,30 +48,31 @@ class StudyBatchUpload < ApplicationRecord
     studies
   end
 
-  def self.generate_metadata(data)
-    metadata = {
-        id: data[0].value,
-        study_start_date: validate_date(data[3].value) ? data[3].value : '',
-        study_end_date: validate_date(data[4].value) ? data[4].value : '',
-        contact_institution: data[5].value,
-        geographic_location_country: data[6].value,
-        experimental_site_name: data[7].value,
-        latitude: data[8].value,
-        longitude: data[9].value,
-        altitude: data[10].value,
-        description_of_the_experimental_design: data[11].value,
-        type_of_experimental_design: data[12].value,
-        observation_unit_level_hierarchy: data[13].value,
-        observation_unit_description: data[14].value,
-        description_of_growth_facility: data[15].value,
-        type_of_growth_facility: data[16].value,
-        cultural_practices: data[17].value
+  def self.generate_metadata(col)
+    {
+      id: col[2] || '',
+      study_start_date: validate_date(col[5]) ? col[5] : '',
+      study_end_date: validate_date(col[6]) ? col[6] : '',
+      contact_institution: col[7] || '',
+      geographic_location_country: col[8] || '',
+      experimental_site_name: col[9] || '',
+      latitude: col[10] || '',
+      longitude: col[11] || '',
+      altitude: col[12] || '',
+      description_of_the_experimental_design: col[13] || '',
+      type_of_experimental_design: col[14] || '',
+      observation_unit_level_hierarchy: col[15] || '',
+      observation_unit_description: col[16] || '',
+      description_of_growth_facility: col[17] || '',
+      type_of_growth_facility: col[18] || '',
+      cultural_practices: col[19] || ''
     }
-    metadata
   end
 
 
   def self.validate_date(date)
+    return false if date.nil?
+
     format_ok = date.match(/\d{4}-\d{2}-\d{2}/)
     parseable = Date.strptime(date, '%Y-%m-%d') rescue false
 
@@ -81,23 +83,18 @@ class StudyBatchUpload < ApplicationRecord
     end
   end
 
-
-  def self.unzip_batch(file_path, user_uuid)
-    unzipped_files = Zip::File.open(file_path)
-    FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload") if File.exist?("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
-    Dir.mkdir("#{Rails.root}/tmp/#{user_uuid}_studies_upload")
-    tmp_dir = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/"
+  def self.unzip_batch(file_path, user = User.current_user)
+    cleanup_stale_upload_directories
+    dir = upload_directory(user)
+    FileUtils.rm_r(dir) if dir.exist?
+    dir.mkdir
     study_data = []
     studies = []
-    unzipped_files.entries.each do |file|
-      file_name = File.basename(file.name)
-      if file.name.include?('data/') && file.ftype != :directory
-        study_data << file
-        Dir.mkdir "#{tmp_dir}/data" unless File.exist? "#{tmp_dir}/data"
-        file.extract("#{tmp_dir}/data/#{file_name}") unless File.exist? "#{tmp_dir}/data/#{file_name}"
-      elsif file.ftype == :file
-        studies << file
-        file.extract("#{tmp_dir}#{file_name}") unless File.exist? "#{tmp_dir}#{file_name}"
+    Seek::Util.unzip(file_path, dir) do |entry|
+      if entry.name.split('/').tap(&:pop).include?('data')
+        study_data << dir.join(entry.name)
+      else
+        studies << dir.join(entry.name)
       end
     end
     [study_data, studies]
@@ -111,13 +108,13 @@ class StudyBatchUpload < ApplicationRecord
       next if find_metadata.nil?
 
       find_metadata.each do |metadata|
-
-        study = Study.where(id: metadata.item_id).last
+        existing_study = Study.where(id: metadata.item_id).last
+        next if existing_study.nil?
         old_study = {
-            id: study.id,
+            id: existing_study.id,
             metadata_id: metadata.id,
             study_miappe_id: study_metadata_id,
-            description: study.description
+            description: existing_study.description
         }
         existing_studies << old_study
       end
@@ -127,7 +124,6 @@ class StudyBatchUpload < ApplicationRecord
   end
 
   def self.get_license_id(studies_file)
-
     default_license = 'CC-BY-SA-4.0'
     investigation_license_id = nil
     license_row_index = 7
@@ -136,20 +132,8 @@ class StudyBatchUpload < ApplicationRecord
     parsed_sheet.each_record(2, columns) do |index, data|
       investigation_license_id = data[0].value if index == license_row_index
     end
-    licenses_ids = JSON.parse(File.read(File.join(Rails.root, 'public', 'od_licenses.json'))).keys
-
-    normalize_license_id(default_license)
-
-    licenses_ids.each do |license_id|
-      if normalize_license_id(license_id) == normalize_license_id(investigation_license_id)
-        return license_id
-      end
-    end
-    default_license
-  end
-
-  def self.normalize_license_id(license_id)
-    license_id.remove('-').remove('_').remove('.').remove(' ').upcase
+    normalized_input = investigation_license_id&.gsub(/[-_.\s]/, '')&.upcase
+    Seek::License.combined.keys.find { |id| id.gsub(/[-_.\s]/, '').upcase == normalized_input } || default_license
   end
 
   def self.check_study_is_MIAPPE_compliant(study, metadata)
@@ -158,12 +142,28 @@ class StudyBatchUpload < ApplicationRecord
     missing_fields = []
 
     mandatory_fields.each do |mandatory_f|
-
       if study.attributes[mandatory_f].blank? && metadata[mandatory_f.to_sym].blank?
         missing_fields << mandatory_f
       end
     end
 
+    missing_fields
+  end
+
+  def self.upload_directory(user = User.current_user)
+    user_uuid = user ? user.uuid : 'user_uuid'
+    Rails.root.join('tmp', "#{user_uuid}_studies_upload")
+  end
+
+  def self.data_directory(user = User.current_user)
+    base = upload_directory(user)
+    Pathname.glob(base.join('**', 'data')).find(&:directory?) || base.join('data')
+  end
+
+  def self.cleanup_stale_upload_directories(max_age: 24.hours)
+    Dir.glob(Rails.root.join('tmp', '*_studies_upload')).each do |dir|
+      FileUtils.rm_rf(dir) if File.mtime(dir) < max_age.ago
+    end
   end
 
 end

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "2703",
+    "id": "1039989171",
     "type": "people",
     "attributes": {
       "avatar": null,
@@ -25,7 +25,7 @@
       "projects": {
         "data": [
           {
-            "id": "2742",
+            "id": "1022253164",
             "type": "projects"
           }
         ]
@@ -33,7 +33,7 @@
       "institutions": {
         "data": [
           {
-            "id": "2727",
+            "id": "980193662",
             "type": "institutions"
           }
         ]
@@ -100,14 +100,14 @@
       }
     },
     "links": {
-      "self": "/people/2703"
+      "self": "/people/1039989171"
     },
     "meta": {
-      "created": "2026-03-19T16:43:19.923Z",
-      "modified": "2026-03-19T16:43:20.001Z",
+      "created": "2026-06-16T14:30:45.309Z",
+      "modified": "2026-06-16T14:30:45.385Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "a903fb40-05e0-013f-f2a8-00155d52079b"
+      "uuid": "0ef5257f-1a8e-4456-9571-bbaf356730ef"
     }
   },
   "jsonapi": {

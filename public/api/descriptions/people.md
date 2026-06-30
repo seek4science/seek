@@ -16,7 +16,6 @@ A **Person** has the following associated information:
 * A list of strings describing the expertise of the **Person**
 * A list of strings describing the tools that the **Person** uses
 * The telephone number of the **Person**, including country code
-* The [Skype](https://www.skype.com) name of the **Person**
 
 A response for a **Person** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
 

@@ -262,7 +262,7 @@ FactoryBot.define do
       repo = FactoryBot.create(:remote_workflow_ro_crate_repository)
       { git_repository_id: repo.id,
         ref: 'refs/remotes/origin/master',
-        commit: 'a321b6e',
+        commit: 'a321b6e4dd2cfb5219cf03bb9e2743db344f537a',
         main_workflow_path: 'sort-and-change-case.ga',
         mutable: false
       }
@@ -277,7 +277,7 @@ FactoryBot.define do
       repo = FactoryBot.create(:workflow_ro_crate_repository)
       { git_repository_id: repo.id,
         ref: 'refs/heads/master',
-        commit: 'a321b6e',
+        commit: 'a321b6e4dd2cfb5219cf03bb9e2743db344f537a',
         main_workflow_path: 'sort-and-change-case.ga',
         mutable: false
       }

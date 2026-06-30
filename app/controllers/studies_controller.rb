@@ -174,19 +174,13 @@ class StudiesController < ApplicationController
   def batch_uploader; end
 
   def preview_content
-    user_uuid = if User.current_user
-                  User.current_user.attributes['uuid'].to_s
-                else
-                  'user_uuid'
-                end
-
-    unless params[:content_blobs][0][:data].nil?
+    if params.dig(:content_blobs, 0, :data).present?
       tempzip_path = params[:content_blobs][0][:data].tempfile.path
-      data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path, user_uuid)
-      study_filename = File.basename(studies.first.to_s)
+      data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path)
+      study_path = studies.first
       studies_file = ContentBlob.new
-      studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
-      studies_file.original_filename = "#{study_filename}"
+      studies_file.tmp_io_object = File.open(study_path)
+      studies_file.original_filename = File.basename(study_path)
       studies_file.save!
       @studies = StudyBatchUpload.extract_studies_from_file(studies_file)
       @study = @studies[0]
@@ -210,8 +204,7 @@ class StudiesController < ApplicationController
     # render plain: params[:studies].inspect
     metadata_types = ExtendedMetadataType.where(title: ExtendedMetadataType::MIAPPE_TITLE, supported_type: 'Study').last
     studies_length = params[:studies][:title].length
-    studies_uploaded = false
-    data_file_uploaded = false
+    all_studies_saved = true
     studies_length.times do |index|
       metadata = generate_metadata(params[:studies], index)
       study_params = {
@@ -224,88 +217,82 @@ class StudiesController < ApplicationController
         )
       }
       @study = Study.new(study_params)
-      StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
-      if @study.valid? && @study.save! && @study.extended_metadata.valid?
-        studies_uploaded = true if @study.save
+      missing_fields = StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
+      if missing_fields.empty? && @study.valid? && @study.save && @study.extended_metadata.valid?
+        create_batch_assay_asset(params, index)
+      else
+        all_studies_saved = false
       end
-      data_file_uploaded = create_batch_assay_asset(params, index)
     end
 
-    batch_uploaded = studies_uploaded && data_file_uploaded
-
-    if batch_uploaded
-      user_uuid = if User.current_user
-                    User.current_user.attributes['uuid'].to_s
-                  else
-                    'user_uuid'
-                  end
-
-
+    if all_studies_saved
       unless params[:existing_studies].blank?
         remove_existing_studies(params[:existing_studies])
       end
-      FileUtils.rm_r("#{Rails.root}/tmp/#{user_uuid}_studies_upload/")
+      FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
       respond_to do |format|
         flash[:notice] = "The #{t('study').pluralize} were successfully created.<br/>".html_safe
         format.html { redirect_to studies_path }
       end
     else
       respond_to do |format|
-        format.html { render action: 'batch_preview', status: :unprocessable_entity }
+        flash[:error] = "Some #{t('study').pluralize} could not be created. Please check the data and try again."
+        format.html { redirect_to batch_uploader_studies_path }
       end
     end
   end
 
   def create_batch_assay_asset(params, index)
+    investigation = Investigation.find_by(id: params[:study][:investigation_id])
+    return unless investigation
 
-    user_uuid = if User.current_user
-                  User.current_user.attributes['uuid'].to_s
-                else
-                  'user_uuid'
-                end
+    assay_class = AssayClass.where(title: 'Experimental assay').first
+    return unless assay_class
 
-    @assay_assets = []
-    data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
-    data_file_names.length.times do |data_file_index|
+    data_file_names = params[:studies][:data_files][index].to_s.remove(' ').split(',')
+    data_file_description = params[:studies][:data_file_description][index].to_s.remove(' ').split(',')
+    license = params[:studies][:license]
+    study_metadata_id = params[:studies][:id][index]
+    data_file_path = StudyBatchUpload.data_directory
 
-      study_metadata_id = params[:studies][:id][index]
-      study_id = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last.item_id
-      assay_class_id = AssayClass.where(title: 'Experimental assay').first.id
-      data_file_description = params[:studies][:data_file_description][index].remove(' ').split(',')
-      assay_params = {
-        title: 'Assay for ' + params[:studies][:id][index] + '-' + (data_file_index + 1).to_s,
-          description: data_file_description[data_file_index],
-          study_id: study_id,
-          assay_class_id: assay_class_id
-      }
+    extended_metadata = ExtendedMetadata.where('json_metadata LIKE ?', "%\"id\":\"#{study_metadata_id}\"%").last
+    return unless extended_metadata
 
+    data_file_names.each_with_index do |file_name, data_file_index|
+      data_file_name = datafile_name_with_extension(file_name.to_s, data_file_path)
+      next unless data_file_name
 
-      data_file_path = "#{Rails.root}/tmp/#{user_uuid}_studies_upload/data/"
-      data_file_name = datafile_name_with_extension("#{data_file_names[data_file_index]}", data_file_path)
-      data_file_location = "#{data_file_path}#{data_file_name}"
+      assay = Assay.new(
+        title: "Assay for #{study_metadata_id}-#{data_file_index + 1}",
+        description: data_file_description[data_file_index],
+        study_id: extended_metadata.item_id,
+        assay_class: assay_class
+      )
+      next unless assay.save
+
+      file_io = File.open(data_file_path.join(data_file_name))
       data_file_content_blob = ContentBlob.new
-      data_file_content_blob.tmp_io_object = File.open(data_file_location)
-      data_file_content_blob.original_filename = "#{data_file_name}"
+      data_file_content_blob.tmp_io_object = file_io
+      data_file_content_blob.original_filename = File.basename(data_file_name)
 
-      license = params[:studies][:license]
-      data_file_params = {
-        title: data_file_names[data_file_index],
-          description: data_file_description[data_file_index],
-          license: license,
-          projects: Project.where(title: 'Default Project'),
-          content_blob: data_file_content_blob
-      }
+      data_file = DataFile.new(
+        title: file_name,
+        description: data_file_description[data_file_index],
+        license: license,
+        projects: investigation.projects,
+        content_blob: data_file_content_blob
+      )
+      saved = data_file.save
+      file_io.close
+      next unless saved
 
-      assay_asset_params = {
-        assay: Assay.new(assay_params),
-        asset: DataFile.new(data_file_params)
-      }
-
-      @assay_assets << AssayAsset.new(assay_asset_params)
+      unless AssayAsset.create(assay: assay, asset: data_file).persisted?
+        assay.destroy
+        data_file.destroy
+      end
     end
-    if @assay_assets.each(&:valid?) && @assay_assets.each(&:save!)
-      @assay_assets.each(&:save)
-    end
+
+    true
   end
 
   def generate_metadata(studies_meta_data, index)
@@ -331,6 +318,7 @@ class StudiesController < ApplicationController
   end
 
   def datafile_name_with_extension(file_name, path)
+    return nil unless File.directory?(path)
     files = Dir.entries(path)
     files.each do |file|
       if File.basename(file, '.*') == file_name
@@ -339,23 +327,27 @@ class StudiesController < ApplicationController
         return file
       end
     end
+
+    nil
   end
 
   def remove_existing_studies(studies)
-
-    existing_studies = JSON.parse(studies.to_json)
-
-    existing_studies.each do |study|
-      study_id = JSON.parse(study.gsub("=>",":"))["id"].to_i
-      metadata_id = JSON.parse(study.gsub("=>",":"))["metadata_id"].to_i
-
-      Study.where(id: study_id).delete_all
-      ExtendedMetadata.where(id: metadata_id).delete_all
-      assays = Assay.where(study_id: study_id)
-      assays.each do |assay|
-        AssayAsset.where(assay_id: assay.id).delete_all
+    JSON.parse(studies.to_json).each do |study_json|
+      study = Study.find_by(id: JSON.parse(study_json)['id'])
+      next unless study
+      assays = study.assays.to_a
+      unless study.authorized_for_delete? && assays.all?(&:authorized_for_delete?)
+        flash[:error] ||= "Not authorized to replace #{t('study')} '#{study.title}'"
+        next
       end
-      assays.delete_all
+      # destroy_authorized? is the first before_destroy callback (registered in ApplicationRecord),
+      # so state_allows_delete? fires before the has_many dependent: :destroy cascade can clear
+      # assay_assets. Assets must be removed first so the state check passes.
+      assays.each do |assay|
+        assay.assay_assets.destroy_all
+        assay.destroy
+      end
+      study.reload.destroy
     end
   end
 
@@ -369,6 +361,7 @@ class StudiesController < ApplicationController
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
+                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { extended_metadata_attributes: determine_extended_metadata_keys })
   end
 end

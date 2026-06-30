@@ -51,6 +51,24 @@ class ContentBlobApiTest < ActionDispatch::IntegrationTest
 
   end
 
+  test 'update content blob data fails with blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy),
+                              contributor: @current_user.person,
+                              content_blob: FactoryBot.create(:content_blob, data: nil))
+      blob = sop.content_blob
+      assert blob.no_content?
+      new_data = 'X'*123
+
+      assert sop.can_edit?
+      put polymorphic_url([sop, blob]), params: new_data, headers: {'Content-Type': 'application/octet-stream'}
+      assert_response :forbidden
+      assert_equal 'Data upload is not allowed.', response.body
+      blob.reload
+      assert blob.no_content?
+    end
+  end
+
   private
 
   def collection_url

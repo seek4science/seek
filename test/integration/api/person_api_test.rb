@@ -10,7 +10,7 @@ class PersonApiTest < ActionDispatch::IntegrationTest
   end
 
   def ignored_attributes
-    super | ['email', 'skype_name', 'phone', 'web_page']
+    super | ['email', 'phone', 'web_page']
   end
 
   def populate_extra_attributes(hash)

@@ -73,3 +73,4 @@
 //= require fair_data_station
 //= require DataTables-2.3.1/datatables.min
 //= require sparql
+//= require events

@@ -94,6 +94,8 @@ SEEK::Application.routes.draw do
     member do
       get :mint_doi_confirm
       post :mint_doi
+      get :retract_doi_confirm
+      post :retract_doi
     end
   end
 
@@ -533,7 +535,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :investigations, :assays, :data_files, :samples, :studies, :publications, :events, :collections, :workflows, :file_templates, :placeholders, :observation_units, only: [:index]
   end
 
-  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet] do
+  resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset, :explorable_spreadsheet, :has_doi] do
     resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, :investigations, :studies, :assays, only: [:index]
   end
 
@@ -579,6 +581,7 @@ SEEK::Application.routes.draw do
       get :new_git_version
       post :create_version_metadata
       post :create_version_from_git
+      post :create_version_from_ro_crate
       get :edit_paths
       patch :update_paths
       post :run
@@ -790,7 +793,6 @@ SEEK::Application.routes.draw do
       post :template_attributes
     end
     collection do
-      post :filter_isa_tags_by_level
       get :task_status
       get :default_templates
       post :populate_template
@@ -809,8 +811,8 @@ SEEK::Application.routes.draw do
       get :batch_sharing_permission_preview
       post :batch_change_permission_for_selected_items
       post :batch_sharing_permission_changed
-      post :export_to_excel, action: :export_to_excel
-      get :download_samples_excel, action: :download_samples_excel
+      post :export_to_spreadsheet
+      get :download_spreadsheet
       post :upload_samples, action: :upload_samples
     end
   end
@@ -848,6 +850,14 @@ SEEK::Application.routes.draw do
   resources :sparql, only: [:index] do
     collection do
       post :query
+    end
+  end
+
+  ### ISA Tags ###
+
+  resources :isa_tags, only: [:index, :show] do
+    collection do
+      get :isa_tag_options_for_attributes
     end
   end
 
@@ -891,6 +901,9 @@ SEEK::Application.routes.draw do
 
   # feedback
   get '/home/feedback' => 'homes#feedback', as: :feedback
+
+  # Healthcheck
+  get "up" => "rails/health#show", as: :rails_health_check
 
   # error rendering
   get '/404' => 'errors#error_404'

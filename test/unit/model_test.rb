@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class ModelTest < ActiveSupport::TestCase
-  fixtures :all
 
   test 'assocations' do
     model = models(:teusink)

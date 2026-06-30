@@ -6,7 +6,7 @@
         <thead>
         <tr>
           <th></th>
-          <% for key in @possible_duplicates[0].keys %>
+          <% for key in (@possible_duplicates.compact.first&.keys || []) %>
             <% unless %w[uuid duplicate].include?(key) %>
               <th><%= key %></th>
             <% end %>
@@ -23,21 +23,33 @@
             <% dupl_sample.map do |key, val| %>
               <% val = '<new>' if key == 'id' %>
               <% unless %w[uuid duplicate].include?(key) %>
-                <% if @multiple_input_fields.include?(key) %>
+                <% if @registered_sample_multi_fields.include?(key) %>
                   <td>
-                    <% val.each do |sub_sample| %>
-                      <span class="badge" , title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
+                    <% Array(val).each do |sub_sample| %>
+                      <span class="badge" title='ID: <%= sub_sample['id'] %>' data-attr_type="seek-sample-multi"><%= sub_sample['title'] %></span>
                     <% end %>
                   </td>
                 <% elsif @cv_list_fields.include?(key) %>
                   <td>
-                    <% val.each do |cv_term| %>
-                      <span class="label label-default" , title='<%= cv_term %>' data-attr_type="cv-list"><%= cv_term %></span>
+                    <% Array(val).each do |cv_term| %>
+                      <span class="label label-default" title='<%= cv_term %>' data-attr_type="cv-list"><%= cv_term %></span>
                     <% end %>
                   </td>
                 <% elsif @registered_sample_fields.include?(key) %>
                   <td>
-                    <span class="badge" , title='<%= val['id'] %>' data-attr_type="seek-sample"><%= val['title'] %></span>
+                    <span class="badge" title='<%= val&.dig('id') %>' data-attr_type="seek-sample"><%= val&.dig('title') %></span>
+                  </td>
+                <% elsif @registered_data_file_fields.include?(key) %>
+                  <td>
+                    <span class="badge" title='<%= val&.dig('id') %>' data-attr_type="seek-data-file"><%= val&.dig('title') %></span>
+                  </td>
+                <% elsif @registered_strain_fields.include?(key) %>
+                  <td>
+                    <span class="badge" title='<%= val&.dig('id') %>' data-attr_type="seek-strain"><%= val&.dig('title') %></span>
+                  </td>
+                <% elsif @registered_sops_fields.include?(key) %>
+                  <td>
+                    <span class="badge" title='<%= val&.dig('id') %>' data-attr_type="seek-sop"><%= val&.dig('title') %></span>
                   </td>
                 <% else %>
                   <td id='<%= "#{dupl_sample['duplicate']['id']}[#{key}]" %>'><%= val %></td>
@@ -45,28 +57,33 @@
               <% end %>
             <% end %>
             <tr id='<%= "duplicate-sample-#{dupl_sample['duplicate']['id']}-2" %>' class="danger">
-              <% dupl_sample['duplicate'].map do |key, val| %>
+              <% dupl_sample['duplicate'].each do |key, val| %>
                 <% unless %w[uuid duplicate].include?(key) %>
-                  <% if @multiple_input_fields.include?(key) %>
+                  <% if @registered_sample_multi_fields.include?(key) %>
                     <td>
-                      <% val.each do |sub_sample| %>
-                        <span class="badge" , title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
+                      <% Array(val).each do |sub_sample| %>
+                        <span class="badge" title='ID: <%= sub_sample['id'] %>'><%= sub_sample['title'] %></span>
                       <% end %>
                     </td>
                   <% elsif @cv_list_fields.include?(key) %>
                     <td>
-                      <% val.each do |cv_term| %>
-                        <span class="label label-default" , title='<%= cv_term %>'><%= cv_term %></span>
+                      <% Array(val).each do |cv_term| %>
+                        <span class="label label-default" title='<%= cv_term %>'><%= cv_term %></span>
                       <% end %>
                     </td>
                   <% elsif @registered_sample_fields.include?(key) %>
-                    <td><span class="badge" , title='<%= val['id'] %>'><%= val['title'] %></span></td>
+                    <td><span class="badge" title='<%= val&.dig('id') %>'><%= val&.dig('title') %></span></td>
+                  <% elsif @registered_data_file_fields.include?(key) %>
+                    <td><span class="badge" title='<%= val&.dig('id') %>'><%= val&.dig('title') %></span></td>
+                  <% elsif @registered_strain_fields.include?(key) %>
+                    <td><span class="badge" title='<%= val&.dig('id') %>'><%= val&.dig('title') %></span></td>
+                  <% elsif @registered_sops_fields.include?(key) %>
+                    <td><span class="badge" title='<%= val&.dig('id') %>'><%= val&.dig('title') %></span></td>
                   <% else %>
                     <td><%= val %></td>
                   <% end %>
                 <% end %>
               <% end %>
-            </tr>
             </tr>
         <% end %>
         </tbody>
