@@ -891,7 +891,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_response :unprocessable_entity
     end
 
-    assert assigns(:crate_extractor).errors.added?(:ro_crate, 'did not specify a main workflow.')
+    assert assigns(:crate_extractor).errors.added?(:base, 'ro-crate-1.1_3.1: file descriptor "ro-crate-metadata.json" is not present')
   end
 
   test 'RO-Crate with missing file reports error back to user' do
