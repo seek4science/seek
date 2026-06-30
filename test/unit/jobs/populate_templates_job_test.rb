@@ -81,7 +81,7 @@ class PopulateTemplatesJobTest < ActiveSupport::TestCase
     assert_equal unit, weight_attribute.unit
   end
 
-  test 'perform with null unit leaves unit blank on template attribute' do
+  test 'perform with missing unit leaves unit blank on template attribute' do
     src = Rails.root.join('test', 'fixtures', 'files', 'upload_json_sample_type_template', 'test_templates.json')
     dest = Seek::Config.append_filestore_path('source_types')
     FileUtils.cp(src, dest)
