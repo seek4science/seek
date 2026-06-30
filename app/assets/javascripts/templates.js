@@ -189,13 +189,13 @@ function updateIsaTagSelect(template_level, attribute_row) {
   const isa_tags = get_filtered_isa_tags(template_level);
 
   // Remove all options first from the select items that were not disabled, except blank one
-  $j(attribute_row).find('select[data-attr="isa_tag_title"]:not(:disabled) option:not([value=""])').each(function() {
+  $j(attribute_row).find('select[data-attr="isa_tag_id"]:not(:disabled) option:not([value=""])').each(function() {
     $j(this).remove();
   });
 
   // Append filtered option to a new attribute row
   $j.each(isa_tags, function (i, tag) {
-    $j(attribute_row).find('select[data-attr="isa_tag_title"]:not(:disabled)').append($j('<option>', {
+    $j(attribute_row).find('select[data-attr="isa_tag_id"]:not(:disabled)').append($j('<option>', {
       value: tag.value,
       text: tag.text
     }));
