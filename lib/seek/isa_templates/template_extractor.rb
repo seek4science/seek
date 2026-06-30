@@ -197,7 +197,10 @@ module Seek
         return nil if symbol.blank?
 
         unit = Unit.find_by(symbol: symbol)
-        @errors.append "<li>Could not find a Unit with symbol '#{symbol}'</li>" if unit.nil?
+        if unit.nil?
+          escaped_symbol = ERB::Util.h(symbol.to_s)
+          @errors.append "<li>Could not find a Unit with symbol '#{escaped_symbol}'</li>"
+        end
 
         unit&.id
       end
