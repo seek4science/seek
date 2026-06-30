@@ -1,25 +1,27 @@
-<% template_attribute ||= nil %>
-<% index ||= 'replace-me' %>
-<% id = template_attribute ? template_attribute.id : '' %>
-<% title = template_attribute ? template_attribute.title : '' %>
-<% description = template_attribute ? template_attribute.description : '' %>
-<% pid = template_attribute ? template_attribute.pid : '' %>
-<% pos = template_attribute ? template_attribute.pos : '' %>
-<% required = template_attribute ? template_attribute.required : false %>
-<% attribute_type_id = template_attribute ? template_attribute.sample_attribute_type_id : nil %>
-<% sample_controlled_vocab_id = template_attribute ? template_attribute.sample_controlled_vocab_id : nil %>
-<% unit_id = template_attribute ? template_attribute.unit_id : nil %>
-<% linked_sample_type_id = template_attribute&.linked_sample_type_id %>
-<% field_name_prefix = "template[template_attributes_attributes][#{index}]" %>
-<% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
-<% is_title = template_attribute ? template_attribute.is_title : false %>
-<% level = template&.level %>
-<% isa_tag_options = ISATag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] } %>
-<% isa_tag_id = template_attribute&.isa_tag_id %>
-<% allow_cv_free_text = template_attribute&.allow_cv_free_text || false %>
-<% parent_attribute_id = template_attribute&.parent_attribute_id %>
-<% allow_isa_tag_change = template_attribute ? template_attribute.allow_isa_tag_change? : true %>
-<% hide_seek_sample_multi = template_attribute&.input_attribute? %>
+<%
+  template_attribute ||= nil
+  index ||= 'replace-me'
+  id = template_attribute&.id || ''
+  title = template_attribute&.title || ''
+  description = template_attribute&.description || ''
+  pid = template_attribute&.pid || ''
+  pos = template_attribute&.pos || ''
+  required = template_attribute ? template_attribute.required : false
+  attribute_type_id = template_attribute&.sample_attribute_type_id
+  sample_controlled_vocab_id = template_attribute&.sample_controlled_vocab_id
+  unit_id = template_attribute&.unit_id
+  linked_sample_type_id = template_attribute&.linked_sample_type_id
+  field_name_prefix = "template[template_attributes_attributes][#{index}]"
+  seek_sample_multi = template_attribute.try(:seek_sample_multi?)
+  is_title = template_attribute ? template_attribute.is_title : false
+  level = template&.level
+  isa_tag_options = ISATag.allowed_isa_tags_for_level(level).map { |it| [it.title, it.id] }
+  isa_tag_id = template_attribute&.isa_tag_id
+  allow_cv_free_text = template_attribute ? template_attribute.allow_cv_free_text : false
+  parent_attribute_id = template_attribute&.parent_attribute_id
+  allow_isa_tag_change = template_attribute ? template_attribute.allow_isa_tag_change? : true
+  hide_seek_sample_multi = template_attribute&.input_attribute?
+%>
 
 <tr class="sample-attribute <%= 'success' if template_attribute.nil? || template_attribute.new_record? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
