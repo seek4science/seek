@@ -103,7 +103,10 @@
 <% else %>
   <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", (allow_cv_free_text ? '1' : '0') %>
   <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text,
-                    disabled: true, data: { attr: 'allow_cv_free_text' } %>
+                    class: 'disabled',
+                    tabindex: '-1',
+                    aria: { disabled: 'true' },
+                    data: { attr: 'allow_cv_free_text' } %>
 <% end %>
           <%= t('samples.allow_free_text_checkbox_label') %> <%= allow_free_text_help_icon %>
         </label>
@@ -130,6 +133,8 @@
                      grouped_options_for_select(options,
                                         link_to_self ? 'self' : linked_sample_type_id),
                      include_blank: true,
+                     tabindex: (allow_type_change ? nil : '-1'),
+                     aria: { disabled: allow_type_change ? nil : 'true' },
                      class: "form-control linked-sample-type-selection#{allow_type_change ? '' : ' disabled'}" %>
     </div>
   </td>
