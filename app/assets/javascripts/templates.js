@@ -123,7 +123,6 @@ Templates.mapData = (data) =>
     item.pid,
     item.pos,
     item.isa_tag_id,
-    item.isa_tag_title,
     item.linked_sample_type_id,
     item.template_attribute_id
   ]);

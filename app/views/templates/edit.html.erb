@@ -8,7 +8,7 @@
     $j('#attribute-table')
       .find('tr.sample-attribute')
       .has('input[data-attr="title"][value="Input"]') // Has an input with value "Input"
-      .has('select[data-attr="isa_tag_id"]:not([value])') // Has a select with data-attr "isa_tag_title" but no value
+      .has('select[data-attr="isa_tag_id"]:not([value])') // Has a select with data-attr "isa_tag_id" but no value
       .first() // Take the first one in case there are more
       .addClass('hidden'); // Hide the row
   });
