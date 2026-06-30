@@ -26,6 +26,7 @@
               catenateAll="1"
               preserveOriginal="1"
               splitOnCaseChange="0"/>
+      <filter class="solr.FlattenGraphFilterFactory"/>
       <filter class="solr.LowerCaseFilterFactory"/>
       <filter class="solr.EdgeNGramFilterFactory" minGramSize="2" maxGramSize="50"/>
     </analyzer>
