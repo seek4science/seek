@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>7.1.0</luceneMatchVersion>
+  <luceneMatchVersion>9.0</luceneMatchVersion>
 
   <!-- Data Directory
 
@@ -64,19 +64,6 @@
   <directoryFactory name="DirectoryFactory" 
                     class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}">
   </directoryFactory> 
-
-  <!-- The CodecFactory for defining the format of the inverted index.
-       The default implementation is SchemaCodecFactory, which is the official Lucene
-       index format, but hooks into the schema to provide per-field customization of
-       the postings lists and per-document values in the fieldType element
-       (postingsFormat/docValuesFormat). Note that most of the alternative implementations
-       are experimental, so if you choose to customize the index format, it's a good
-       idea to convert back to the official format e.g. via IndexWriter.addIndexes(IndexReader)
-       before upgrading to a newer version to avoid unnecessary reindexing.
-  -->
-  <codecFactory class="solr.SchemaCodecFactory"/>
-
-  <schemaFactory class="ClassicIndexSchemaFactory"/>
 
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        Index Config - These settings control low-level behavior of indexing
@@ -117,7 +104,6 @@
          IndexWriter to write its info stream to solr's log. By default,
          this is enabled here, and controlled through log4j.properties.
       -->
-     <infoStream>true</infoStream>
   </indexConfig>
 
 
@@ -193,20 +179,6 @@
        Query section - these settings control query time things like caches
        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <query>
-    <!-- Max Boolean Clauses
-
-         Maximum number of clauses in each BooleanQuery,  an exception
-         is thrown if exceeded.
-
-         ** WARNING **
-         
-         This option actually modifies a global Lucene property that
-         will affect all SolrCores.  If multiple solrconfig.xml files
-         disagree on this property, the value at any given moment will
-         be based on the last SolrCore to be initialized.
-         
-      -->
-    <maxBooleanClauses>1024</maxBooleanClauses>
 
 
     <!-- Solr Internal Query Caches
@@ -342,7 +314,7 @@
        handleSelect="true" is not recommended for new users, but is the default
        for backwards compatibility
     -->
-  <requestDispatcher handleSelect="false" >
+  <requestDispatcher>
     <!-- Request Parsing
 
          These settings indicate how Solr Requests may be parsed, and
@@ -419,9 +391,6 @@
     -->
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
-      <str name="spellcheck.dictionary">default</str>
-      <str name="spellcheck.extendedResults">true</str>
-      <str name="spellcheck.collate">true</str>
       <str name="df">text</str>
       <str name="q.op">AND</str>
     </lst>
@@ -461,7 +430,7 @@
   </requestHandler>
 
 
-  <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell">
+  <initParams path="/update/**,/query,/select,/tvrh,/elevate">
     <lst name="defaults">
       <str name="df">text</str>
     </lst>
@@ -533,58 +502,16 @@
   </requestHandler>
   
   <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
-
-    <str name="queryAnalyzerFieldType">textSpell</str>
-
-    <!-- Multiple "Spell Checkers" can be declared and used by this
-         component
-      -->
     <lst name="spellchecker">
       <str name="name">default</str>
-      <!-- change field to textSpell and use copyField in schema.xml
-      to spellcheck multiple fields -->
-      <str name="field">textSpell</str>
+      <str name="field">text</str>
       <str name="buildOnCommit">true</str>
-    </lst>
-
-    <lst name="spellchecker">
-      <str name="name">example</str>
-      <str name="field">title_text</str>
-      <str name="buildOnCommit">true</str>
-      <str name="classname">solr.DirectSolrSpellChecker</str>
-      <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
-      <str name="distanceMeasure">internal</str>
-      <!-- minimum accuracy needed to be considered a valid spellcheck suggestion -->
-      <float name="accuracy">0.5</float>
-      <!-- the maximum #edits we consider when enumerating terms: can be 1 or 2 -->
-      <int name="maxEdits">2</int>
-      <!-- the minimum shared prefix when enumerating terms -->
-      <int name="minPrefix">1</int>
-      <!-- maximum number of inspections per result. -->
-      <int name="maxInspections">5</int>
-      <!-- minimum length of a query term to be considered for correction -->
-      <int name="minQueryLength">4</int>
-      <!-- maximum threshold of documents a query term can appear to be considered for correction -->
-      <float name="maxQueryFrequency">0.01</float>
-      <!-- uncomment this to require suggestions to occur in 1% of the documents
-           <float name="thresholdTokenFrequency">.01</float>
-      -->
-    </lst>
-
-    <!-- a spellchecker that can break or combine words.  See "/spell" handler below for usage -->
-    <lst name="spellchecker">
-      <str name="name">wordbreak</str>
-      <str name="classname">solr.WordBreakSolrSpellChecker</str>
-      <str name="field">name</str>
-      <str name="combineWords">true</str>
-      <str name="breakWords">true</str>
-      <int name="maxChanges">10</int>
     </lst>
   </searchComponent>
 
   <!-- Search Components
 
-       Search components are registered to SolrCore and used by 
+       Search components are registered to SolrCore and used by
        instances of SearchHandler (which can access them by name)
        
        By default, the following components are available:
