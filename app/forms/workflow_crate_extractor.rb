@@ -89,7 +89,7 @@ class WorkflowCrateExtractor
   def extract_crate
     Open4.open4(Seek::Util.python_exec("script/validate-ro-crate.py #{ro_crate[:data].path}")) do |_pid, _stdin, stdout, _stderr|
       until (line = stdout.gets).nil?
-        errors.add(:base, line)
+        errors.add(:base, line.strip)
       end
     end
 
