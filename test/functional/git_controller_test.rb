@@ -72,7 +72,7 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'displays error message if adding file without data or url' do
-    refute @git_version.file_exists?('little_file.txt')
+    refute @git_version.file_exists?('new-file.txt')
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                               file: { path: 'new-file.txt' } }
