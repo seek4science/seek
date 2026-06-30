@@ -66,7 +66,7 @@
   <fieldType name="daterange" class="solr.DateRangeField" omitNorms="true"/>
 
   <!-- LatLonPointSpatialField replaces LatLonType (removed in Solr 7) -->
-  <fieldType name="location" class="solr.LatLonPointSpatialField" omitNorms="true"/>
+  <fieldType name="location" class="solr.LatLonPointSpatialField"/>
 
   <!-- *** This field is used by Sunspot! *** -->
   <field name="id" stored="true" type="string" multiValued="false" indexed="true"/>
