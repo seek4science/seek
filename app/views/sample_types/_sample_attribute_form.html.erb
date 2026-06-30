@@ -85,9 +85,15 @@
 
       <div>
         <label>
-          <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", "#{ allow_cv_free_text ? '1' : '0' }"  %>
-          <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text,
-                            disabled: !allow_type_change, data: { attr: 'allow_cv_free_text' } %>
+<% if allow_type_change %>
+  <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", '0' %>
+  <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text,
+                    data: { attr: 'allow_cv_free_text' } %>
+<% else %>
+  <%= hidden_field_tag "#{field_name_prefix}[allow_cv_free_text]", (allow_cv_free_text ? '1' : '0') %>
+  <%= check_box_tag "#{field_name_prefix}[allow_cv_free_text]", '1', allow_cv_free_text,
+                    disabled: true, data: { attr: 'allow_cv_free_text' } %>
+<% end %>
           <%= t('samples.allow_free_text_checkbox_label') %> <%= allow_free_text_help_icon %>
         </label>
       </div>
