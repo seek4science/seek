@@ -409,6 +409,9 @@
       <str name="df">text</str>
       <str name="q.op">AND</str>
     </lst>
+    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>
   </requestHandler>
 
   <!-- A request handler that returns indented JSON by default -->
@@ -420,6 +423,9 @@
        <str name="df">text</str>
        <str name="q.op">AND</str>
      </lst>
+     <arr name="last-components">
+       <str>spellcheck</str>
+     </arr>
   </requestHandler>
 
   <!--
@@ -510,9 +516,17 @@
     </lst>
   </requestHandler>
   
+  <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
+    <lst name="spellchecker">
+      <str name="name">default</str>
+      <str name="field">text</str>
+      <str name="buildOnCommit">true</str>
+    </lst>
+  </searchComponent>
+
   <!-- Search Components
 
-       Search components are registered to SolrCore and used by 
+       Search components are registered to SolrCore and used by
        instances of SearchHandler (which can access them by name)
        
        By default, the following components are available:
