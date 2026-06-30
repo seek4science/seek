@@ -213,10 +213,15 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     # new record, template_id set -> sample type is ISA JSON compliant
     # attribute with template_attribute_id -> NOT allowed (inherited from template)
     new_type_with_template = SampleType.new(template_id: template.id)
+    new_type_with_template.create_sample_attributes_from_isa_template(template)
     c_template = Seek::Samples::SampleTypeEditingConstraints.new(new_type_with_template)
     assert new_type_with_template.is_isa_json_compliant?,
            'New sample type with template_id set should be ISA JSON compliant'
-    assert new_type_with_template, 'New sample type with template_id is considered inherited'
+
+    # Inherited attributes should return false
+    new_type_with_template.sample_attributes.none? do |attribute|
+      c_template.allow_change_at_creation?(attribute)
+    end
 
     # nil or non-inherited attr is still allowed even on a template-linked sample type
     assert c_template.allow_change_at_creation?(nil)
