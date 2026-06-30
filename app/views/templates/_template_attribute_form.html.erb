@@ -44,7 +44,7 @@
    <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: seek_sample_multi %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class: "sample-type-is-title#{seek_sample_multi ? ' disabled' : ''}" %>
     </div>
   </td>
   <td>
@@ -69,10 +69,10 @@
         </label>
       </div>
 
-      <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>
+      <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button disabled', target: :_blank) %>
       <%= create_sample_controlled_vocab_modal_button  %>
 
-      <%= button_link_to('View current', 'show', '#', class:'cv-show-button', disabled: true, target: :_blank) %>
+      <%= button_link_to('View current', 'show', '#', class:'cv-show-button disabled', target: :_blank) %>
       <%= button_link_to('Browse', 'index', sample_controlled_vocabs_path, target: :_blank) %>
 
     </div>
@@ -104,9 +104,8 @@
     <%= select_tag "#{field_name_prefix}[isa_tag_title]",
                     options_for_select(isa_tag_options, isa_tag_id),
                     include_blank: true,
-                    class: 'form-control',
-                    data: {attr: "isa_tag_title"},
-                    disabled: !allow_isa_tag_change %>
+                    data: {attr: "isa_tag_id"},
+                    class: "form-control#{allow_isa_tag_change ? '' : ' disabled'}" %>
   </td>
 
   <td>

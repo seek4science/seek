@@ -133,7 +133,7 @@
                       options_for_select(isa_tags_options, isa_tag_id),
                       include_blank: true,
                       data: {attr: "isa_tag_id"},
-                      class: "form-control #{allow_isa_tag_change ? '' : ' disabled'}"%>
+                      class: "form-control#{allow_isa_tag_change ? '' : ' disabled'}" %>
     </td>
 
     <%= hidden_field_tag "#{field_name_prefix}[template_attribute_id]", template_attribute_id, data: { attr: "template_attribute_id" } %>
