@@ -7,8 +7,10 @@
     // Hide Input row
     $j('#attribute-table')
       .find('tr.sample-attribute')
-      .has('input[data-attr="title"][value="Input"]') // Has an input with value "Input"
-      .has('select[data-attr="isa_tag_id"]:not([value])') // Has a select with data-attr "isa_tag_id" but no value
+      .filter(function() {
+        return $j(this).find('input[data-attr="title"]').val() === 'Input' &&
+               !$j(this).find('select[data-attr="isa_tag_id"]').val();
+      })
       .first() // Take the first one in case there are more
       .addClass('hidden'); // Hide the row
   });

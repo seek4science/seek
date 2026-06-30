@@ -297,8 +297,7 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_response :success
 
     inherited_template.template_attributes.each_with_index do |_ta, i|
-      id = "select#template_template_attributes_attributes_#{i}_isa_tag_id[class='form-control disabled']"
-      assert_select id
+      assert_select "select#template_template_attributes_attributes_#{i}_isa_tag_id.disabled"
     end
 
     inherited_template.template_attributes << FactoryBot.create(:template_attribute, title: 'Extra attribute', isa_tag: FactoryBot.create(:source_characteristic_isa_tag), sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), pos: 4)
@@ -314,10 +313,10 @@ class TemplatesControllerTest < ActionController::TestCase
     get :edit, params: { id: inherited_template.id }
     assert_response :success
 
-    assert_select "select#template_template_attributes_attributes_0_isa_tag_id[class='form-control disabled']"
+    assert_select "select#template_template_attributes_attributes_0_isa_tag_id.disabled"
     cnt_last_attribute = inherited_template.template_attributes.count - 1
 
-    assert_select "select#template_template_attributes_attributes_#{cnt_last_attribute}_isa_tag_id[class='form-control disabled']", text: 'source_characteristic', count: 0
+    assert_select "select#template_template_attributes_attributes_#{cnt_last_attribute}_isa_tag_id.disabled", text: 'source_characteristic', count: 0
 
   end
 

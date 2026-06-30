@@ -219,9 +219,8 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
            'New sample type with template_id set should be ISA JSON compliant'
 
     # Inherited attributes should return false
-    new_type_with_template.sample_attributes.none? do |attribute|
-      c_template.allow_change_at_creation?(attribute)
-    end
+    assert new_type_with_template.sample_attributes.none? { |attribute| c_template.allow_change_at_creation?(attribute) },
+           'Inherited attributes should not be changeable at creation time'
 
     # nil or non-inherited attr is still allowed even on a template-linked sample type
     assert c_template.allow_change_at_creation?(nil)

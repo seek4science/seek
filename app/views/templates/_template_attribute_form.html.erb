@@ -105,6 +105,8 @@
                     options_for_select(isa_tag_options, isa_tag_id),
                     include_blank: true,
                     data: {attr: "isa_tag_id"},
+                    tabindex: (allow_isa_tag_change ? nil : '-1'),
+                    aria: { disabled: allow_isa_tag_change ? nil : 'true' },
                     class: "form-control#{allow_isa_tag_change ? '' : ' disabled'}" %>
   </td>
 

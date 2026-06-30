@@ -58,13 +58,20 @@
   <td class="text-center" title="<%= required_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, class: "#{ allow_required ? '' : 'disabled' }", data: { attr: "required" } %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required,
+                        class: "#{ allow_required ? '' : 'disabled' }",
+                        tabindex: (allow_required ? nil : '-1'),
+                        aria: { disabled: allow_required ? nil : 'true' },
+                        data: { attr: "required" } %>
     </div>
   </td>
   <td class="text-center" title="<%= is_title_title_text %>">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class: "sample-type-is-title #{ allow_required ? '' : 'disabled' }"%>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title,
+                        class: "sample-type-is-title #{ allow_required ? '' : 'disabled' }",
+                        tabindex: (allow_required ? nil : '-1'),
+                        aria: { disabled: allow_required ? nil : 'true' } %>
     </div>
   </td>
   <td>
@@ -73,6 +80,8 @@
                      [t.title, t.id,{'data-use-cv': t.controlled_vocab? || t.seek_cv_list?, 'data-is-seek-sample': t.seek_sample? || t.seek_sample_multi? }]
                    end , attribute_type_id),
                    class: "form-control sample-type-attribute-type#{allow_type_change ? '' : ' disabled'}",
+                   tabindex: (allow_type_change ? nil : '-1'),
+                   aria: { disabled: allow_type_change ? nil : 'true' },
                    data: { attr: "type" } %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
       <br/>
@@ -81,6 +90,8 @@
                                         sample_controlled_vocab_id),
                      include_blank: true,
                      class: "form-control controlled-vocab-selection#{allow_type_change ? '' : ' disabled'}",
+                     tabindex: (allow_type_change ? nil : '-1'),
+                     aria: { disabled: allow_type_change ? nil : 'true' },
                      data: { attr: "cv_id" }%>
 
       <div>
