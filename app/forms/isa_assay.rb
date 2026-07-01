@@ -68,34 +68,48 @@ class ISAAssay
 
     return unless @sample_type
 
+    # In case of an experimental Assay, it must  have an input sample type
+    errors.add(:base, '[Input Assay]: Input Assay is not provided') if @input_sample_type_id.blank?
+
+    # Add generic Sample type errors
     @sample_type.errors.full_messages.each { |e| errors.add(:base, "[Sample type]: #{e}") } unless @sample_type.valid?
 
-    unless @sample_type.sample_attributes.any?(&:seek_sample_multi?)
-      errors.add(:base, '[Sample type]: SEEK Sample Multi attribute is not provided')
-    end
-
-    unless @sample_type.sample_attributes.select { |a| a.isa_tag&.isa_protocol? }.one?
-      errors.add(:base, "[Sample type]: Should have exactly one attribute with the 'protocol' ISA tag selected")
-    end
-
-    unless @sample_type.sample_attributes.select { |a| a.input_attribute? }.one?
+    # All Sample Attributes must have an ISA tag
+    missing_tag_attributes = @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }
+    missing_tag_attributes.each do |attribute|
       errors.add(:base,
-                  "[Sample type]: Should have exactly one attribute with the 'input' ISA Tag.".html_safe)
+                 "[Sample type]: Attribute '#{attribute.title}' is missing an ISA Tag.")
     end
 
-    if @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
-      errors.add(:base,
-                  "[Sample type]: All attributes should have an ISA Tag.".html_safe)
+    # The Sample type must have at exactly one attribute with these ISA tags:
+    # - PROTOCOL
+    # - INPUT
+    [Seek::ISA::TagType::PROTOCOL, Seek::ISA::TagType::INPUT].each do |tag_type|
+      sample_type_tag_types = @sample_type.sample_attributes.select { |a| a.isa_tag&.title == tag_type }
+      unless sample_type_tag_types.one?
+        errors.add(:base, "[Sample type]: Should have exactly one attribute with the '#{tag_type}' ISA tag selected")
+      end
     end
 
+    # The Sample type must have exactly one attribute with one of the ISA tags:
+    # - OTHER_MATERIAL
+    # - DATA_FILE
     assay_sample_or_datafile_attributes = @sample_type.sample_attributes.select do |a|
       a.isa_tag&.isa_other_material? || a.isa_tag&.isa_data_file?
     end
 
     unless assay_sample_or_datafile_attributes.one?
       errors.add(:base,
-                  "[Sample type]: Should have exactly one attribute with the 'data_file' <u><b>or</b></u> 'other_material' ISA tag selected".html_safe)
+                  "[Sample type]: Should have exactly one attribute with the 'data_file' or 'other_material' ISA tag selected")
     end
-    errors.add(:base, '[Input Assay]: Input Assay is not provided') if @input_sample_type_id.blank?
+
+    # The input attribute must conform to these restrictions:
+    # - Input ISA tag
+    # - 'input' in the title
+    # - Sample attribute type must be 'Registered Sample List'
+    if @sample_type.sample_attributes.detect { |attribute| attribute.input_attribute? }.nil?
+      attribute_type_title = SampleAttributeType.find_by(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)&.title
+      errors.add(:base, "[Sample type '#{@sample_type.title}']: No valid input attribute detected! A valid input attribute must have an '#{Seek::ISA::TagType::INPUT}' ISA tag, have 'input' in the title and must be of type '#{attribute_type_title}'.")
+    end
   end
 end

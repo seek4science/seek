@@ -195,6 +195,76 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_equal isa_study.sample_collection.title, "#{isa_study.study.title} - Sample Collection Sample Type"
   end
 
+  test 'should show ISA study as JSON' do
+    person = User.current_user.person
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
+
+    get :show, as: :json, params: { id: study.id }
+    assert_response :success
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'isa_studies', response_body['data']['type']
+    assert_equal study.id.to_s, response_body['data']['id']
+    assert response_body['data']['attributes']['study'].present?
+    source = response_body['data']['attributes']['source_sample_type']
+    collection = response_body['data']['attributes']['sample_collection_sample_type']
+    assert source.present?
+    assert collection.present?
+    assert_equal [], source['samples']
+    assert_equal [], collection['samples']
+  end
+
+  test 'should show ISA study with samples filtered by authorization' do
+    person = User.current_user.person
+    project = person.projects.first
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
+    source_type = study.sample_types.first
+    vocab_term = source_type.sample_attributes.find_by_title('Source Characteristic 2')
+                             .sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+    sample_data = { 'Source Name' => 'S1', 'Source Characteristic 1' => 'c1',
+                    'Source Characteristic 2' => vocab_term }
+
+    viewable = FactoryBot.create(:sample, sample_type: source_type, contributor: person,
+                                           project_ids: [project.id], data: sample_data,
+                                           policy: FactoryBot.create(:public_policy))
+    private_s = FactoryBot.create(:sample, sample_type: source_type,
+                                            contributor: FactoryBot.create(:person),
+                                            project_ids: [project.id],
+                                            data: sample_data.merge('Source Name' => 'S2'),
+                                            policy: FactoryBot.create(:private_policy))
+
+    get :show, as: :json, params: { id: study.id }
+    assert_response :success
+
+    source_samples = JSON.parse(response.body)['data']['attributes']['source_sample_type']['samples']
+    sample_ids = source_samples.map { |s| s['id'] }
+    assert_includes sample_ids, viewable.id.to_s
+    refute_includes sample_ids, private_s.id.to_s
+    assert source_samples.first['data'].present?
+  end
+
+  test 'should return not found when ISA study does not exist' do
+    get :show, as: :json, params: { id: 0 }
+    assert_response :not_found
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'Not Found', response_body['errors'].first['title']
+  end
+
+  test 'should return forbidden when not authorized to view ISA study' do
+    other_person = FactoryBot.create(:person)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: other_person,
+                               policy: FactoryBot.create(:private_policy))
+    viewer = FactoryBot.create(:person)
+    login_as viewer.user
+
+    get :show, as: :json, params: { id: study.id }
+    assert_response :forbidden
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'You are not authorized to view this ISA Study.', response_body['errors'].first['detail']
+  end
+
   private
 
   def sample_collection_attributes(projects=[])
@@ -203,6 +273,7 @@ class ISAStudiesControllerTest < ActionController::TestCase
         '1': {
           pos: '1', title: 'Input', required: '1', is_title: '0',
           sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
+          isa_tag_id: FactoryBot.create(:input_isa_tag).id,
           linked_sample_type_id: 'self',
           _destroy: '0'
         },
