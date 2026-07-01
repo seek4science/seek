@@ -9,7 +9,6 @@ x-shared:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
-      REDIS_URL: "redis://:$$REDIS_PASSWORD@redis_store:6379/0"
     env_file:
       - docker/db.env
       - docker/redis.env
