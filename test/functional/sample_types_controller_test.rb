@@ -254,7 +254,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :edit, params: { id: sample_type }
     assert_response :success
 
-    assert_select "select[name*='unit_id'][disabled='disabled']", minimum: 1
+    assert_select "select[name*='unit_id'].disabled", minimum: 1
   end
 
   test 'should update sample_type' do
