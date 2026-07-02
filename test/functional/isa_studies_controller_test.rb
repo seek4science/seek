@@ -195,6 +195,61 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_equal isa_study.sample_collection.title, "#{isa_study.study.title} - Sample Collection Sample Type"
   end
 
+  test 'should preserve sample_attribute_type_id on re-render after validation failure with template-based attributes' do
+    projects = User.current_user.person.projects
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
+    source_template = FactoryBot.create(:isa_source_template)
+
+    string_type = FactoryBot.create(:string_sample_attribute_type)
+    t_attrs = source_template.template_attributes
+
+    # Simulate what JS applyTemplate produces: template_id on the sample type
+    # and template_attribute_id on each individual attribute
+    source_attrs = {
+      title: 'Template-based Source',
+      project_ids: projects.map(&:id),
+      template_id: source_template.id,
+      sample_attributes_attributes: {
+        '0': { pos: '1', title: 'Source Name', required: '1', is_title: '1', _destroy: '0',
+               sample_attribute_type_id: string_type.id,
+               isa_tag_id: FactoryBot.create(:source_isa_tag).id,
+               template_attribute_id: t_attrs.find { |a| a.title == 'Source Name' }.id },
+        '1': { pos: '2', title: 'Source Characteristic 1', required: '1', is_title: '0', _destroy: '0',
+               sample_attribute_type_id: string_type.id,
+               isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id,
+               template_attribute_id: t_attrs.find { |a| a.title == 'Source Characteristic 1' }.id }
+      }
+    }
+
+    # POST without study title to trigger validation failure
+    post :create, params: { isa_study: { study: { investigation_id: inv.id },
+                                         source_sample_type: source_attrs,
+                                         sample_collection_sample_type: sample_collection_attributes(projects) } }
+
+    assert_response :unprocessable_entity
+    assert_template :new
+
+    isa_study = assigns(:isa_study)
+
+    # Errors should be about the missing title
+    assert_equal ["[Study]: Title can't be blank"], isa_study.errors.full_messages
+
+    # A new Sample Type only needs the `isa_template_id` to be ISA-JSON compliant.
+    assert isa_study.source.is_isa_json_compliant?
+
+    # All submitted sample_attribute_type_ids must survive the round-trip through
+    # the controller so the re-rendered form can show the correct selected values
+    isa_study.source.sample_attributes.each do |attr|
+      assert attr.sample_attribute_type_id.present?,
+             "#{attr.title}: sample_attribute_type_id should be preserved after validation failure"
+    end
+    assert_equal string_type.id, isa_study.source.sample_attributes.find { |a| a.title == 'Source Name' }.sample_attribute_type_id
+
+    # The re-rendered form must not carry the HTML disabled attribute on type
+    # selects — disabled fields are silently dropped on the next form submission
+    assert_select 'select[name*="sample_attribute_type_id"][disabled]', count: 0
+  end
+
   private
 
   def sample_collection_attributes(projects=[])
