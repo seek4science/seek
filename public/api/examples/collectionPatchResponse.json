@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "41",
+    "id": "37",
     "type": "collections",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2245",
+              "id": "1022252755",
               "type": "projects"
             },
             "access": "edit"
@@ -26,14 +26,14 @@
         "tag2",
         "tag3"
       ],
-      "created_at": "2026-03-19T16:41:57.553Z",
-      "updated_at": "2026-03-19T16:41:57.613Z",
+      "created_at": "2026-06-16T14:29:03.875Z",
+      "updated_at": "2026-06-16T14:29:04.086Z",
       "creators": [
         {
-          "profile": "/people/2205",
+          "profile": "/people/1039988704",
           "family_name": "Last",
-          "given_name": "Person1898",
-          "affiliation": "An Institution: 2233",
+          "given_name": "Person1923",
+          "affiliation": "An Institution: 2239",
           "orcid": null
         }
       ],
@@ -43,7 +43,7 @@
       "creators": {
         "data": [
           {
-            "id": "2205",
+            "id": "1039988704",
             "type": "people"
           }
         ]
@@ -51,7 +51,7 @@
       "submitter": {
         "data": [
           {
-            "id": "2203",
+            "id": "1039988702",
             "type": "people"
           }
         ]
@@ -59,11 +59,11 @@
       "people": {
         "data": [
           {
-            "id": "2203",
+            "id": "1039988702",
             "type": "people"
           },
           {
-            "id": "2205",
+            "id": "1039988704",
             "type": "people"
           }
         ]
@@ -71,7 +71,7 @@
       "projects": {
         "data": [
           {
-            "id": "2245",
+            "id": "1022252755",
             "type": "projects"
           }
         ]
@@ -88,15 +88,15 @@
       }
     },
     "links": {
-      "self": "/collections/41",
-      "items": "/collections/41/items"
+      "self": "/collections/37",
+      "items": "/collections/37/items"
     },
     "meta": {
-      "created": "2026-03-19T16:41:57.553Z",
-      "modified": "2026-03-19T16:41:57.613Z",
+      "created": "2026-06-16T14:29:03.875Z",
+      "modified": "2026-06-16T14:29:04.086Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "77eabbc0-05e0-013f-f2a8-00155d52079b"
+      "uuid": "aeecf87f-910c-40d8-acaf-dda25b118c1f"
     }
   },
   "jsonapi": {

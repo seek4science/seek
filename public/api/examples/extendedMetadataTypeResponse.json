@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "177",
+    "id": "83",
     "type": "extended_metadata_types",
     "attributes": {
       "title": "A Max Extended Metadata Type",
@@ -8,94 +8,99 @@
       "enabled": true,
       "extended_metadata_attributes": [
         {
-          "id": "430",
+          "id": "209",
           "title": "age",
           "label": "Age",
           "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1552",
-            "title": "Integer attribute type 81",
+            "id": "1019850698",
+            "title": "Integer attribute type 73",
             "base_type": "Integer",
             "regexp": ".*"
           },
           "required": false,
           "pos": null,
+          "allow_cv_free_text": false,
           "sample_controlled_vocab_id": null,
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "431",
+          "id": "210",
           "title": "name",
           "label": "Name",
           "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1553",
-            "title": "String attribute type 316",
+            "id": "1019850699",
+            "title": "String attribute type 190",
             "base_type": "String",
             "regexp": ".*"
           },
           "required": true,
           "pos": null,
+          "allow_cv_free_text": false,
           "sample_controlled_vocab_id": null,
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "432",
-          "title": "date",
-          "label": "Date",
+          "id": "211",
+          "title": "datetime",
+          "label": "Datetime",
           "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1554",
-            "title": "DateTime attribute type 42",
+            "id": "1019850700",
+            "title": "DateTime attribute type 38",
             "base_type": "DateTime",
             "regexp": ".*"
           },
           "required": false,
           "pos": null,
+          "allow_cv_free_text": false,
           "sample_controlled_vocab_id": null,
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "433",
+          "id": "212",
           "title": "data file",
           "label": "Data file",
           "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1555",
-            "title": "Data file attribute type 43",
+            "id": "1019850701",
+            "title": "Data file attribute type 39",
             "base_type": "SeekDataFile",
             "regexp": ".*"
           },
           "required": false,
           "pos": null,
+          "allow_cv_free_text": false,
           "sample_controlled_vocab_id": null,
           "linked_extended_metadata_type_id": null
         },
         {
-          "id": "434",
+          "id": "213",
           "title": "sop",
           "label": "Sop",
           "pid": null,
           "description": null,
           "sample_attribute_type": {
-            "id": "1556",
-            "title": "SOP attribute type 43",
+            "id": "1019850702",
+            "title": "SOP attribute type 39",
             "base_type": "SeekSop",
             "regexp": ".*"
           },
           "required": false,
           "pos": null,
+          "allow_cv_free_text": false,
           "sample_controlled_vocab_id": null,
           "linked_extended_metadata_type_id": null
         }
       ]
     },
     "links": {
-      "self": "/extended_metadata_types/177"
+      "self": "/extended_metadata_types/83"
     },
     "meta": {
       "api_version": "0.3",
