@@ -13,6 +13,11 @@ module Seek
         @bucket = bucket
         @prefix = prefix
         @client = build_client(s3_options)
+        # Presigned URLs are handed to the browser, which may not be able to reach the
+        # internal endpoint used for server-to-store traffic (e.g. a docker-network
+        # hostname like "seaweedfs:8333"). public_endpoint lets that differ from endpoint;
+        # it defaults to endpoint when the two are the same (e.g. real AWS S3).
+        @presigning_client = s3_options[:public_endpoint].present? ? build_client(s3_options.merge(endpoint: s3_options[:public_endpoint])) : @client
       end
 
       # Write String or IO content to S3 under the given key.
@@ -101,7 +106,7 @@ module Seek
       # These are applied via the response-content-disposition / response-content-type
       # response header overrides supported by S3 presigned GETs.
       def presigned_url(key, expires_in: 300, filename: nil, content_type: nil, disposition: 'attachment')
-        presigner = Aws::S3::Presigner.new(client: @client)
+        presigner = Aws::S3::Presigner.new(client: @presigning_client)
         params = {
           bucket: @bucket,
           key: object_key(key),

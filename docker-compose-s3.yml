@@ -134,6 +134,7 @@ services:
     ports:
       - "9000:8333" # S3 API (matches the old Minio port for convenience)
       - "8888:8888" # Filer web UI — browse buckets at http://localhost:8888/buckets/
+      - "9333:9333" # Master UI/API — cluster status at http://localhost:9333/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9333/cluster/status"]
       interval: 10s

@@ -24,6 +24,9 @@ production:
   access_key_id: <%= ENV['SEEK_STORAGE_ACCESS_KEY_ID'] %>
   secret_access_key: <%= ENV['SEEK_STORAGE_SECRET_ACCESS_KEY'] %>
   endpoint: <%= ENV['SEEK_STORAGE_ENDPOINT'] %>
+  # Only needed when endpoint isn't reachable from the browser (e.g. an internal
+  # docker-network hostname) — used solely for signing presigned download URLs.
+  public_endpoint: <%= ENV['SEEK_STORAGE_PUBLIC_ENDPOINT'] %>
   force_path_style: <%= ENV['SEEK_STORAGE_FORCE_PATH_STYLE'] == 'true' %>
 
 
