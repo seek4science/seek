@@ -1,7 +1,7 @@
 x-shared:
   seek_base: &seek_base
-    build: .
-    # image: fairdom/seek:main  # the published image does not yet include S3 storage support
+    #build: .
+    image: fairdom/seek:s3-support
 
     restart: always
     environment: &seek_base_env
@@ -133,6 +133,7 @@ services:
       - ./docker/seaweedfs-s3-config.json:/etc/seaweedfs/s3.json:ro
     ports:
       - "9000:8333" # S3 API (matches the old Minio port for convenience)
+      - "8888:8888" # Filer web UI — browse buckets at http://localhost:8888/buckets/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9333/cluster/status"]
       interval: 10s
