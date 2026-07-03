@@ -1,0 +1,171 @@
+x-shared:
+  seek_base: &seek_base
+    build: .
+    # image: fairdom/seek:main  # the published image does not yet include S3 storage support
+
+    restart: always
+    environment: &seek_base_env
+      RAILS_ENV: production
+      SOLR_PORT: 8983
+      SOLR_HOST: solr
+      RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
+      REDIS_URL: redis://redis_store:6379/0
+    env_file:
+      - docker/db.env
+      - docker/s3.env
+    volumes:
+      # Still required: workflow diagram/RO-Crate extraction and git conversion
+      # (lib/git/converter.rb, app/models/concerns/workflow_extraction.rb) read
+      # content_blob.filepath directly and haven't been migrated to the S3
+      # adapter yet (see tmp/docs/s3_audit_report_2026-06-29.md, section 5).
+      - seek-filestore:/seek/filestore
+      - seek-cache:/seek/tmp/cache
+    depends_on:
+      db:
+        condition: service_healthy
+      solr:
+        condition: service_healthy
+      redis_store:
+        condition: service_healthy
+      seaweedfs-init:
+        condition: service_completed_successfully
+
+services:
+  db:
+    # Database implementation, in this case MySQL
+    image: mysql:8.4
+    container_name: seek-mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --log-error-verbosity=1
+    restart: always
+    stop_grace_period: 1m30s
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-mysql-db:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  redis_store:
+    image: redis:8.6-alpine
+    container_name: seek-session-store
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - seek-redis-data:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  seek:
+    # The SEEK application
+    <<: *seek_base
+    container_name: seek
+    command: docker/entrypoint.sh
+    ports:
+      - "3000:3000"
+    environment:
+      <<: *seek_base_env
+      NO_ENTRYPOINT_WORKERS: 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  seek_workers:
+    # The SEEK delayed job workers
+    <<: *seek_base
+    container_name: seek-workers
+    environment:
+      <<: *seek_base_env
+      QUIET_SUPERCRONIC: 1
+    command: docker/start_workers.sh
+    healthcheck:
+      test: ["CMD", "bash", "script/check_worker_pids.sh"]
+      retries: 5
+
+  solr:
+    image: solr:8.11.4
+    container_name: seek-solr
+    restart: always
+    environment:
+      SOLR_JAVA_MEM: -Xms512m -Xmx1024m
+    volumes:
+      - seek-solr-data:/var/solr/
+      - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/seek/admin/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - seek
+      - /opt/solr/server/solr/configsets/seek_config
+
+  seaweedfs:
+    # S3-compatible object store backing the S3 storage adapter.
+    # docker/seaweedfs-s3-config.json defines the "seek"/"seek1234" identity
+    # that matches docker/s3.env, so the SEEK containers can authenticate.
+    image: chrislusf/seaweedfs
+    container_name: seek-seaweedfs
+    restart: always
+    command: server -s3 -s3.config=/etc/seaweedfs/s3.json -dir /data
+    volumes:
+      - seek-seaweedfs-data:/data
+      - ./docker/seaweedfs-s3-config.json:/etc/seaweedfs/s3.json:ro
+    ports:
+      - "9000:8333" # S3 API (matches the old Minio port for convenience)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9333/cluster/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  seaweedfs-init:
+    # One-shot job that creates the bucket named in docker/s3.env.
+    # SeaweedFS does not auto-create buckets on first write, and this
+    # talks to the master directly so it doesn't need S3 credentials.
+    image: chrislusf/seaweedfs
+    restart: "no"
+    env_file:
+      - docker/s3.env
+    entrypoint:
+      - sh
+      - -c
+      - 'echo "s3.bucket.create -name $$SEEK_STORAGE_BUCKET" | weed shell -master=seaweedfs:9333'
+    depends_on:
+      seaweedfs:
+        condition: service_healthy
+
+volumes:
+  seek-filestore:
+    external: true
+  seek-mysql-db:
+    external: true
+  seek-solr-data:
+    external: true
+  seek-cache:
+    external: true
+  seek-redis-data:
+    external: true
+  seek-seaweedfs-data:
+    external: true

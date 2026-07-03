@@ -15,14 +15,15 @@ test:
   <<: *default
 
 production:
-  <<: *default
-  # To switch to S3-compatible storage, uncomment and fill in:
-  # backend: s3
-  # bucket: my-seek-bucket
-  # region: us-east-1
-  # access_key_id: AKIAIOSFODNN7EXAMPLE
-  # secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  # endpoint: https://minio.example.com   # omit for AWS S3
-  # force_path_style: true                # required for MinIO
+  # Driven by SEEK_STORAGE_* environment variables so the same image can run
+  # against local disk or an S3-compatible store (AWS S3, MinIO, SeaweedFS)
+  # without a rebuild. See docker/s3.env for the docker-compose-s3.yml values.
+  backend: <%= ENV.fetch('SEEK_STORAGE_BACKEND', 'local') %>
+  bucket: <%= ENV['SEEK_STORAGE_BUCKET'] %>
+  region: <%= ENV.fetch('SEEK_STORAGE_REGION', 'us-east-1') %>
+  access_key_id: <%= ENV['SEEK_STORAGE_ACCESS_KEY_ID'] %>
+  secret_access_key: <%= ENV['SEEK_STORAGE_SECRET_ACCESS_KEY'] %>
+  endpoint: <%= ENV['SEEK_STORAGE_ENDPOINT'] %>
+  force_path_style: <%= ENV['SEEK_STORAGE_FORCE_PATH_STYLE'] == 'true' %>
 
 

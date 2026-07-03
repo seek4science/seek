@@ -1,0 +1,18 @@
+{
+  "identities": [
+    {
+      "name": "seek",
+      "credentials": [
+        {
+          "accessKey": "seek",
+          "secretKey": "seek1234"
+        }
+      ],
+      "actions": [
+        "Admin",
+        "Read",
+        "Write"
+      ]
+    }
+  ]
+}
