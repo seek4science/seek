@@ -16,8 +16,9 @@ a large plugin set — `derivatives`, `presign_endpoint`, `upload_endpoint`, `ba
 
 ## 2. Pros of a full migration to Shrine
 
-- **Direct-to-S3 upload is a first-class, battle-tested feature** — `presign_endpoint` + Uppy on the client,
-  with support for presigned POST/PUT, multipart, and resumable (tus) uploads for very large files.
+- **Direct-to-S3 upload is a first-class, battle-tested feature** — `presign_endpoint` + Uppy on the client
+  for presigned POST/PUT; multipart and resumable uploads for very large files are available via the
+  maintained companion gems `uppy-s3_multipart` and `shrine-tus` (not core Shrine, but same ecosystem).
 - **Offloads long-term maintenance** of upload/storage edge cases (retry semantics, content-type sniffing
   after direct upload, multipart thresholds, provider quirks) to an actively maintained gem instead of
   in-house code.
@@ -41,7 +42,7 @@ a large plugin set — `derivatives`, `presign_endpoint`, `upload_endpoint`, `ba
   RDF generation, checksums (`Seek::Data::Checksums`), search-term extraction, fleximage-based thumbnailing.
   None of this goes away with Shrine — it all has to be re-wired around Shrine's attachment abstraction
   rather than the current direct `storage_adapter`/`storage_key` calls.
-- **Re-risks a large amount of already-working, tested code.** This branch's 41 commits touched ~20 call
+- **Re-risks a large amount of already-working, tested code.** This branch's ~40 commits touched ~20 call
   sites (versioning, model extraction, snapshot generation, archive extraction, RightField, avatars, COPASI
   simulator, citations/CFF reading) via the `with_temporary_copy` pattern. A Shrine migration would mean
   re-touching most of these again against a different IO/attachment interface, with the attendant regression
@@ -115,13 +116,17 @@ a full migration would avoid rewriting every existing read site, by keeping SEEK
 syncing them from Shrine's metadata on save rather than switching every call site over to reading the JSON
 blob directly.
 
-**One likely but unconfirmed difference**: Shrine's S3 storage is generally understood to pass the detected
-`mime_type` as the real `Content-Type` header on the `put_object` call by default, meaning a Shrine-stored
-object would report the correct MIME type if browsed directly in the S3/MinIO console or via a bare URl —
-where the current SEEK objects would show a generic/binary type since nothing sets it on write. This wasn't
-confirmed against Shrine's actual source (the hosted docs didn't spell it out) and should be checked before
-relying on it for a decision; it's a minor point either way since neither approach treats S3 object metadata
-as authoritative.
+**One confirmed difference** (verified against `lib/shrine/storage/s3.rb` in Shrine's repo): for server-side
+uploads, Shrine's S3 storage sets *both* `content_type:` (from the extracted `mime_type` metadata) *and*
+`content_disposition:` (inline, carrying the original filename) on the object itself. So a Shrine-stored
+object reports the correct MIME type and filename if fetched directly (S3/MinIO console, bare URL) — where
+the current SEEK objects show a generic/binary type and the opaque `<uuid>.dat` name, since nothing is set on
+write. (For *browser-direct* presigned uploads the object's Content-Type instead comes from whatever the
+presign parameters/client set — typically the browser-reported type.) A minor difference either way, since
+neither approach treats the object's own headers as authoritative — but it means Shrine objects are slightly
+more self-describing at rest than ours. Shrine's source also confirms its S3 storage handles large objects
+automatically: multipart upload above 15MB, multipart copy above 100MB, and its copy path passes
+`metadata_directive: "REPLACE"` — the same choice §7 recommends for our finalize copy.
 
 **Bottom line**: a backfill migration populating Shrine's data column for existing rows — whether run on a
 clean slate or against an install with real S3 data already in it (§4) — is legitimately a metadata-only
@@ -138,8 +143,9 @@ upload):
   needs a full migration, but it doesn't. If §7's narrow adoption already exists (the `shrine` gem, a
   `:cache` `Shrine::Storage::S3` instance, an authenticated presign endpoint), multipart/resumable upload is
   a cheap *extension* of it, not a separate project: swap the presign strategy for the multipart-aware one
-  (Uppy's `@uppy/aws-s3-multipart` client plugin + Shrine's corresponding multipart presign support) and add
-  a `complete_multipart_upload` step to the finalize handler. The genuinely hard, from-scratch version of
+  (Uppy's AWS-S3-multipart client plugin + the `uppy-s3_multipart` companion gem server-side — an extra
+  dependency, but from the same maintained ecosystem) and add a `complete_multipart_upload` step to the
+  finalize handler. The genuinely hard, from-scratch version of
   this (hand-implementing S3 multipart orchestration — initiate/upload-part/list-parts/complete — plus
   client-side chunking/retry) is only the comparison point if *not* adopting even the narrow plan. See the
   "Natural extensions" note under §7. This is *not* a reason favouring a full migration.
@@ -180,9 +186,9 @@ path. No schema change, no rewrite of existing call sites.
    - Server-side `copy_object` from `cache/<shrine-id>` to the canonical `assets/<uuid>.dat` key (S3-to-S3,
      no bytes through the app, cheap) — add this as a new method on the existing `S3Adapter`. **Explicitly
      pass `metadata_directive: 'REPLACE'`** (and no `content_type:`/`metadata:`) on this copy, rather than
-     relying on S3's default `COPY` directive. Without this, if Shrine's `:cache` storage set a real
-     `Content-Type` on the object when the browser uploaded it (see §5/§6 — unconfirmed but likely default
-     Shrine behaviour), that header would carry through to the canonical object by default, while every
+     relying on S3's default `COPY` directive — Shrine's own S3 copy path does the same (confirmed in its
+     source, see §5). Without this, whatever `Content-Type` the presigned browser upload set on the cache
+     object would carry through to the canonical object by default, while every
      object written via the *existing* server-proxied path (local backend, or non-direct S3 uploads,
      untouched by this plan) still gets none — an inconsistency that should be a deliberate choice, not an
      accident of which upload path a given file happened to take.
@@ -205,8 +211,12 @@ path. No schema change, no rewrite of existing call sites.
 Presigning directly to `assets/<uuid>.dat` would save the copy step, but loses Shrine's idiomatic
 cache/validate/promote separation (a natural point to reject or virus-scan an upload before it's treated as
 real content) and a natural boundary for cleaning up abandoned uploads via an S3 lifecycle rule on the
-`cache/` prefix (e.g. expire objects older than 24h that were never finalized). The copy itself is a
-metadata-only S3 operation (no data re-upload), so the cost is negligible.
+`cache/` prefix (e.g. expire objects older than 24h that were never finalized). The copy is a *server-side*
+S3 operation — the bytes are copied within S3 but never pass through the app — so the cost is small. One
+caveat: a single `CopyObject` call is limited to 5GB; above that, multipart copy (`UploadPartCopy`) is
+required. Implement `S3Adapter#copy_object` with the aws-sdk's `Aws::S3::Object#copy_to` (which supports
+`multipart_copy: true`) rather than the raw client call, so large files work from day one — Shrine's own S3
+storage does the equivalent automatically above a 100MB threshold.
 
 ### Scope / surface area
 
@@ -247,8 +257,8 @@ Storage mirroring (§6) is not made easier by this plan — it's orthogonal, sin
 - `S3Adapter#copy_object` + finalize endpoint + `ContentBlob` creation path: ~1 day.
 - Client-side direct-upload JS + progress UI: ~1–1.5 days (existing upload forms need a conditional path).
 - Orphan cleanup (lifecycle rule or job) + tests (unit + a system/integration test for the full flow): ~1 day.
-- **Total: ~4–5 days**, comparable to or smaller than the workflows gap already scoped in the audit report,
-  and with no risk to already-shipped code.
+- **Total: ~4–5 days** — somewhat more than the 2.5–3.5 days scoped for the workflows gap in the audit
+  report, but of the same order, and with no risk to already-shipped code.
 
 ## 8. Summary
 
