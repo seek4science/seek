@@ -71,6 +71,17 @@ class GitControllerTest < ActionController::TestCase
     refute assigns(:git_version).file_exists?('new-file.txt')
   end
 
+  test 'displays error message if adding file without data or url' do
+    refute @git_version.file_exists?('new-file.txt')
+
+    post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                              file: { path: 'new-file.txt' } }
+
+    assert_redirected_to workflow_path(@workflow, tab: 'files')
+    assert flash[:error].include?('select a file')
+    refute assigns(:git_version).file_exists?('new-file.txt')
+  end
+
   test 'move file' do
     assert @git_version.file_exists?('diagram.png')
     refute @git_version.file_exists?('cool-pic.png')
@@ -606,6 +617,7 @@ class GitControllerTest < ActionController::TestCase
 
     assert_response :created
     assert workflow.git_version.file_exists?('new_file.txt')
+    assert_equal 'file contents', workflow.git_version.file_contents('new_file.txt')
   end
 
   test 'add a new remote file via API' do
