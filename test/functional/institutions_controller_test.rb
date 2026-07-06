@@ -3,6 +3,7 @@ require 'test_helper'
 class InstitutionsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include MockHelper
 
   def setup
     login_as(:quentin)
@@ -525,5 +526,27 @@ class InstitutionsControllerTest < ActionController::TestCase
     dept_results = dept_json['results']
     assert_equal 1, dept_results.size
 
+  end
+
+  test 'displays ROR URL' do
+    ror_mock
+    Institution.delete_all
+    uniman = FactoryBot.create(:institution, title: 'UNIMAN', ror_id: '027m9bs27')
+    other = FactoryBot.create(:institution, title: 'Other')
+
+    get :index
+    assert_select '.list_items_container a[href=?]', 'https://ror.org/027m9bs27', text: 'https://ror.org/027m9bs27'
+
+    get :show, params: { id: uniman.id }
+    assert_select '.ror_id' do
+      assert_select 'strong', text: /ROR ID:/
+      assert_select 'a[href=?]', 'https://ror.org/027m9bs27', text: 'https://ror.org/027m9bs27'
+    end
+
+    get :show, params: { id: other.id }
+    assert_select '.ror_id' do
+      assert_select 'strong', text: /ROR ID:/
+      assert_select 'span.none_text', text: /Not specified/
+    end
   end
 end
