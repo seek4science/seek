@@ -52,13 +52,10 @@ The standalone container reads its credentials from a JSON file. It defines who 
 the S3 API and with what key — this is the **store's** side of the credential, and it must
 match the `access_key_id` / `secret_access_key` in `seek_storage.yml` above.
 
-Copy the repo's version to `$HOME/bin/seaweedfs-s3-config.json` (its `seek`/`seek1234`
-identity already matches the dev config):
-
-```bash
-mkdir -p "$HOME/bin"
-cp docker/seaweedfs-s3-config.json "$HOME/bin/seaweedfs-s3-config.json"
-```
+The repo already ships this file at `docker/seaweedfs-s3-config.json` (its `seek`/`seek1234`
+identity already matches the dev config), so you don't need to create or copy anything — the
+`docker run` command below mounts it straight from the repo. Just make sure you run that
+command **from the repo root** so `$(pwd)/docker/...` resolves correctly.
 
 For reference, the file looks like:
 
@@ -80,11 +77,14 @@ For reference, the file looks like:
 
 ## 4. Step 2 — Start SeaweedFS
 
+Run this **from the repo root** (the `-v` source must be an absolute path, which
+`$(pwd)/docker/...` provides):
+
 ```sh
 #!/bin/sh
-docker run -d -p 9000:8333 -p 9333:9333 -p 8080:8080 \
+docker run -d -p 9000:8333 -p 9333:9333 -p 8080:8080 -p 8888:8888 \
     --name=seaweedfs -v "seaweedfs-data:/data" \
-    -v "$HOME/bin/seaweedfs-s3-config.json:/etc/seaweedfs/s3.json" \
+    -v "$(pwd)/docker/seaweedfs-s3-config.json:/etc/seaweedfs/s3.json" \
   chrislusf/seaweedfs server -s3 -s3.config=/etc/seaweedfs/s3.json -dir /data
 ```
 
@@ -95,11 +95,8 @@ Port mapping in this command:
 | `9000` | `8333` | **S3 API** — this is what `endpoint: http://localhost:9000` points at |
 | `9333` | `9333` | Master UI / API (`weed shell` talks to this) |
 | `8080` | `8080` | Volume server |
+| `8888` | `8888` | **Filer UI** — browse stored objects at http://localhost:8888/buckets/ |
 
-*(This command does not publish the filer UI. To browse stored objects in a browser, add
-`-p 8888:8888` and open http://localhost:8888/buckets/.)*
-
----
 
 ## 5. Step 3 — Create the bucket
 
@@ -108,7 +105,18 @@ do it for you. Create the `seek-dev` bucket once:
 
 ```bash
 echo "s3.bucket.create -name seek-dev" | \
-  docker exec -i seaweedfs weed shell -master=localhost:9333
+  docker exec -i seaweedfs weed shell -master=localhost:9333 -filer=localhost:8888
+```
+
+> The `-filer=localhost:8888` flag is required — `s3.bucket.*` commands run against the
+> filer, and without it `weed shell` fails with `missing address`. (The bucket persists in
+> the `seaweedfs-data` volume, so you only need this once, not on every container restart.)
+
+Confirm it exists:
+
+```bash
+echo "s3.bucket.list" | \
+  docker exec -i seaweedfs weed shell -master=localhost:9333 -filer=localhost:8888
 ```
 
 ---
@@ -121,8 +129,8 @@ Start SEEK in development as usual:
 bundle exec rails server
 ```
 
-Upload a file through the UI, then confirm it landed in the store — via the filer UI (if
-you published 8888) or the AWS CLI:
+Upload a file through the UI, then confirm it landed in the store — via the filer UI at
+http://localhost:8888/buckets/seek-dev/, or the AWS CLI:
 
 ```bash
 aws --endpoint-url http://localhost:9000 s3 ls s3://seek-dev/assets/
@@ -142,24 +150,4 @@ docker rm -f seaweedfs            # remove the container
 docker volume rm seaweedfs-data   # wipe stored objects (then recreate the bucket, §5)
 ```
 
----
 
-## 8. Troubleshooting
-
-| Symptom | Cause / fix |
-|---|---|
-| Uploads fail / "access denied" | The keys in `seaweedfs-s3-config.json` and `config/seek_storage.yml` (development) don't match. |
-| `NoSuchBucket` on upload | You skipped §5 — create the `seek-dev` bucket. It doesn't persist if you delete the `seaweedfs-data` volume. |
-| SEEK still writing to local disk | The `development` section of `seek_storage.yml` isn't set to `backend: s3` (or `<<: *default` is still active). |
-| Connection refused to `localhost:9000` | The container isn't running, or the S3 port isn't mapped. Check `docker ps` — the mapping must be `9000:8333`. |
-| Config change to `seek_storage.yml` not taking effect | Restart `rails server` — the storage config is read at boot. |
-
----
-
-## 9. Notes
-
-- **Resized avatars / model images** are cached on local disk (temporary filestore) and
-  regenerated from the S3 master on demand — they aren't served from S3 directly.
-- Some features (workflow diagram / RO-Crate extraction, git conversion) still read files
-  from the local `filestore` and haven't been migrated to the S3 adapter yet. See
-  `tmp/docs/s3_audit_report_2026-06-29.md` §5.
