@@ -28,10 +28,12 @@ class TemplateTest < ActiveSupport::TestCase
   test 'template level validation' do
     template = FactoryBot.build(:isa_source_template, projects: [@project], contributor: @person)
     assert template.valid?
-    # assert_equal { :title => ["is not a valid template level"] }, template.errors.messages
+
+    # Change the level to an invalid value
     template.level = 'My random template level'
     refute template.valid?
-    assert template.errors.include?(:level)
+    assert_equal template.errors.map(&:attribute), [:level]
+    assert_equal ["is not a valid #{t('template')} level"], template.errors.messages[:level]
   end
 
 end
