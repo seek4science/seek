@@ -11,6 +11,7 @@ class Template < ApplicationRecord
   validates :title, presence: true
   validates :title, uniqueness: { scope: %i[group version] }
   validates :level, presence: true
+  validate :validate_template_level
   validate :validate_template_attributes
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
@@ -38,7 +39,12 @@ class Template < ApplicationRecord
       attributes_with_empty_isa_tag.map do |attribute|
         errors.add("[#{:template_attributes}]:", "Attribute '#{attribute.title}' is missing an ISA tag")
       end
+  def validate_template_level
+    unless Seek::ISATemplates::TemplateLevel.valid?(level)
+      errors.add :level, "is not a valid #{t('template')} level"
     end
+  end
+
 
     if test_tag_occurences.any?
       test_tag_occurences.map do |tag|
