@@ -87,13 +87,25 @@ class WorkflowCrateExtractor
   end
 
   def extract_crate
-    Open4.open4(Seek::Util.python_exec("script/validate-ro-crate.py #{ro_crate[:data].path}")) do |_pid, _stdin, stdout, _stderr|
-      until (line = stdout.gets).nil?
-        errors.add(:base, line.strip)
+    do_validation = false
+    Zip::File.open(ro_crate[:data].path) do |zip_file|
+      zip_file.each do |entry|
+        do_validation = true if entry.name == 'ro-crate-metadata.json'
       end
     end
 
-    return if errors.any?
+    # The validation library does not support version 1.0 crates
+    # They use ro-crate-metadata.jsonld rather than ro-crate-metadata.json
+    # So we only use this library if it contains a ro-crate-metadata.json file
+    if do_validation
+      Open4.open4(Seek::Util.python_exec("script/validate-ro-crate.py #{ro_crate[:data].path}")) do |_pid, _stdin, stdout, _stderr|
+        until (line = stdout.gets).nil?
+          errors.add(:base, line.strip)
+        end
+      end
+
+      return if errors.any?
+    end
 
     begin
       @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
