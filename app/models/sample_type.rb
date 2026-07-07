@@ -15,6 +15,8 @@ class SampleType < ApplicationRecord
 
   include Seek::ProjectAssociation
 
+  include HasSharedAttributeValidation
+
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
 
@@ -45,17 +47,9 @@ class SampleType < ApplicationRecord
 
   scope :without_template, -> { where(template_id: nil) }
 
-  validates :title, presence: true
-  validates :title, length: { maximum: 255 }
-  validates :description, length: { maximum: 65_535 }
-  validates :contributor, presence: true
-  validate :validate_one_title_attribute_present,
-           :validate_attribute_title_unique,
-           :validate_attribute_accessor_names_unique,
-           :validate_title_is_not_type_of_seek_sample_multi,
+  validate :validate_attribute_accessor_names_unique,
            :validate_against_editing_constraints,
            :validate_sample_type_is_not_locked
-  validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
@@ -253,23 +247,6 @@ class SampleType < ApplicationRecord
     end
   end
 
-  def validate_one_title_attribute_present
-    unless (count = sample_attributes.select(&:is_title).count) == 1
-      errors.add(:sample_attributes, "There must be 1 attribute which is the title, currently there are #{count}")
-    end
-  end
-
-  def validate_attribute_title_unique
-    # TODO: would like to have done this with uniquness{scope: :sample_type_id} on the attribute, but that leads to an exception when being added
-    # to the sample type
-    titles = attribute_titles.collect(&:downcase)
-    dups = titles.select { |title| titles.count(title) > 1 }.uniq
-    if dups.any?
-      dups_text = dups.join(', ')
-      errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups_text}")
-    end
-  end
-
   def validate_attribute_accessor_names_unique
     groups = sample_attributes.to_a.group_by(&:accessor_name)
     dups = groups.select { |_k, v| v.length > 1 }
@@ -296,22 +273,11 @@ class SampleType < ApplicationRecord
     attribute_titles
   end
 
-  def attribute_titles
-    sample_attributes.collect(&:title)
-  end
 
   # callback when the attribute is added to the sample type. it can now be linked to this sample type now we know what it is
   def detect_link_back_to_self(sample_attribute)
     if sample_attribute.deferred_link_to_self
       sample_attribute.linked_sample_type = self
-    end
-  end
-
-  def validate_title_is_not_type_of_seek_sample_multi
-    base_type = Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
-    is_title_seek_sample_multi = sample_attributes.find(&:is_title)&.sample_attribute_type&.base_type == base_type
-    if is_title_seek_sample_multi
-      errors.add(:sample_attributes, "Attribute type of #{base_type.underscore.humanize} can not be selected as the sample type title.")
     end
   end
 
