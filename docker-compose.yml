@@ -55,7 +55,7 @@ services:
 
   redis_store:
     image: redis:8.6-alpine
-    container_name: seek-session-store
+    container_name: seek-redis
     command:
       [
         "redis-server",

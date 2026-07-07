@@ -56,8 +56,17 @@ services:
 
   redis_store:
     image: redis:8.6-alpine
-    container_name: seek-session-store
-    command: ["redis-server", "--appendonly", "yes"]
+    container_name: seek-redis
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--maxmemory",
+        "512mb",
+        "--maxmemory-policy",
+        "allkeys-lru",
+      ]
     volumes:
       - seek-redis-data:/data
     restart: always
