@@ -142,3 +142,4 @@ volumes:
   seek-solr-data:
   seek-cache:
   seek-virtuoso-data:
+  seek-redis-data:

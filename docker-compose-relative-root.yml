@@ -133,3 +133,5 @@ volumes:
     external: true
   seek-assets:
     external: true
+  seek-redis-data:
+    external: true

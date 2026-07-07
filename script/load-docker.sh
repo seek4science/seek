@@ -27,14 +27,16 @@ if [ ! -d "$location/filestore" ];then
 fi
 
 docker-compose down
-docker volume rm seek-filestore 
+docker volume rm seek-filestore
 docker volume rm seek-solr-data
 docker volume rm seek-mysql-db
 docker volume rm seek-cache
+docker volume rm seek-redis-data
 docker volume create --name=seek-filestore
 docker volume create --name=seek-solr-data
 docker volume create --name=seek-mysql-db
 docker volume create --name=seek-cache
+docker volume create --name=seek-redis-data
 docker-compose up --no-start
 docker-compose start seek db
 
