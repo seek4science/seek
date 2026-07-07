@@ -59,6 +59,7 @@ docker exec seek bash -c 'mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h$MYSQL_HOST $M
 
 echo "cleaning up"
 docker exec seek bash -c 'bundle exec rake tmp:clear'
+docker exec seek bash -c 'bundle exec rake seek:clear_cache'
 docker exec seek bash -c 'bundle exec rake seek:reindex_all'
 docker exec seek bash -c 'rm /seek/filestore/seek.sql'
 

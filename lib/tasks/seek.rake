@@ -7,6 +7,12 @@ require 'active_record/fixtures'
 require 'csv'
 
 namespace :seek do
+  desc 'Clears Rails.cache - required alongside tmp:cache:clear since that only clears the filesystem overflow, not the Redis-backed cache'
+  task(clear_cache: :environment) do
+    Rails.cache.clear
+    puts 'Rails.cache cleared'
+  end
+
   desc 'Creates background jobs to rebuild all authorization lookup table for all items.'
   task(repopulate_auth_lookup_tables: :environment) do
     puts "..... repopulating auth lookup tables ..."

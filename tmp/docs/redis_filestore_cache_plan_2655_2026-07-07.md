@@ -194,16 +194,22 @@ that's already there rather than invent a db-swapping scheme:
       - `clear` does **not** wipe Redis keys outside the configured namespace — proves the
         namespace-safety point above with a live assertion, not just a comment
 
-Separately (informational, no plan change needed): `rake tmp:cache:clear` is a raw
-`rm_rf Dir["tmp/cache/*"]` (`railties/lib/rails/tasks/tmp.rake`) — it doesn't call
-`Rails.cache.clear` and has no idea what cache store is configured. After cutover it will only
-clear the filesystem-overflow side, leaving Redis-cached items untouched, silently changing this
-task from "clear the cache" to "clear part of the cache." It's invoked by
-`script/update-from-git.sh`, `script/mini-update-from-git.sh`, `script/load-docker.sh`, and
-`script/import-docker-data.sh` (all via `rake tmp:clear`, which depends on `tmp:cache:clear`).
-Not fixed here since it's an operational/deploy-script concern rather than part of the store
-implementation — worth a follow-up if a full cache clear via these scripts is ever actually relied
-upon in practice.
+Separately (informational): `rake tmp:cache:clear` is a raw `rm_rf Dir["tmp/cache/*"]`
+(`railties/lib/rails/tasks/tmp.rake`) — it doesn't call `Rails.cache.clear` and has no idea what
+cache store is configured. After cutover it only clears the filesystem-overflow side, leaving
+Redis-cached items untouched. That's correct as-is and needs no change — the task is scoped to
+`tmp/` by name and does exactly that; it's not meant to be a full cache clear. What *did* need
+fixing: the deploy/setup scripts that call it (`script/update-from-git.sh`,
+`script/mini-update-from-git.sh`, `script/load-docker.sh`, `script/import-docker-data.sh`, all via
+`rake tmp:clear`) previously had no step that cleared the Redis side at all, so a deploy expecting
+a fresh cache would leave stale Redis-cached values in place. Fixed:
+- [x] Added `rake seek:clear_cache` (`lib/tasks/seek.rake`), a small reusable task wrapping
+      `Rails.cache.clear`.
+- [x] `lib/tasks/seek_upgrades.rake`'s `seek:upgrade` task already called `Rails.cache.clear`
+      inline (alongside `tmp:clear`) — a pre-existing, independent confirmation that pairing the
+      two is the right pattern. Switched it to invoke `seek:clear_cache` instead of duplicating
+      the raw call, so there's one place that does it.
+- [x] All four deploy/setup scripts now run `rake seek:clear_cache` alongside `rake tmp:clear`.
 
 ## Step 4 — Oversized-entry logging
 
