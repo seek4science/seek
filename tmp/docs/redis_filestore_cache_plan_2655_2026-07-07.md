@@ -207,14 +207,16 @@ upon in practice.
 
 ## Step 4 — Oversized-entry logging
 
-- [ ] On the overflow-to-disk path in `RedisWithFileOverflowStore`, log a single line via
-      `Rails.logger.info` including the cache key and byte size — enough to `grep` the log for
-      overflow activity or wire up log-based alerting later if it's ever needed, without an email
-      firing on every routine large-item write.
-- [ ] No rate-limiting/dedupe needed — logging isn't inbox noise the way email is, so every
+- [x] Already landed as part of Step 3's `write_entry` (the overflow-to-disk branch calls
+      `log_overflow` before delegating to the file backend), since the two were naturally the same
+      code path — nothing left to implement here.
+- [x] `log_overflow` uses a single plain `Rails.logger.info` call with the cache key and byte
+      size, no rate-limiting/dedupe — logging isn't inbox noise the way email is, so every
       occurrence can be logged plainly.
-- [ ] **CI:** unit test asserting the log line is emitted (with key and size) for an oversized
-      write, and not emitted for a normal-sized write.
+- [x] **CI:** added the dedicated test this step calls for (`test/unit/redis_with_file_overflow_store_test.rb`):
+      swaps `Rails.logger` for a `Logger` writing to a `StringIO` for the duration of the test,
+      asserting an oversized write logs a line matching `overflow to disk`/`key=.../size=\d+`, and
+      that a normal-sized write logs no such line. 11 tests passing overall.
 
 ## Step 5 — Wire up configuration
 

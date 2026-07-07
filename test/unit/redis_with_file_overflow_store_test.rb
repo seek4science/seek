@@ -115,4 +115,30 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
   ensure
     unrelated&.clear
   end
+
+  test 'an oversized write logs an overflow entry with the key and size' do
+    log_output = capture_log { @store.write('large-key', 'x' * (MAX_SIZE * 2)) }
+
+    assert_match(/overflow to disk/, log_output)
+    assert_match(/key=large-key/, log_output)
+    assert_match(/size=\d+/, log_output)
+  end
+
+  test 'a normal-sized write does not log an overflow entry' do
+    log_output = capture_log { @store.write('small-key', 'x') }
+
+    refute_match(/overflow to disk/, log_output)
+  end
+
+  private
+
+  def capture_log
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = original_logger
+  end
 end
