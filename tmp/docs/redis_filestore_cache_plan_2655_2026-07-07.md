@@ -118,17 +118,28 @@ that's already there rather than invent a db-swapping scheme:
 
 ## Step 2 — Configurable size threshold
 
-- [ ] Add `cache_max_redis_item_size` to `lib/seek/config_setting_attributes.yml`, following the
-      pattern of `max_extractable_spreadsheet_size`.
-- [ ] Set a default in `config/initializers/seek_configuration.rb`, e.g.
-      `Seek::Config.default :cache_max_redis_item_size, 1.megabyte`.
-- [ ] Expose it in the admin settings UI (same section as other cache/size-related settings) so
-      it's tunable without a deploy.
-- [ ] **CI:** unit test asserting the default value and that it persists via
-      `Seek::Config.cache_max_redis_item_size = ...` (use the `with_config_value` test helper, as
-      in `test/unit/exception_forwarder_test.rb`).
-- [ ] **CI:** functional test on the admin settings controller confirming the new field is
-      present in the form and saved on submit, mirroring existing admin-settings tests.
+- [x] Add `cache_max_redis_item_size` to `lib/seek/config_setting_attributes.yml`
+      (`convert: :to_i`) — following the pattern of the existing `max_cachable_size` /
+      `hard_max_cachable_size` remote-file-cache settings rather than `max_extractable_spreadsheet_size`:
+      those two are the closer precedent since they're already byte-valued cache-size thresholds
+      with the same `convert: :to_i` numeric-input treatment, whereas
+      `max_extractable_spreadsheet_size` stores MB and needs a `* 1024 * 1024` conversion at every
+      call site — bytes avoids that indirection for a threshold that's inherently a byte comparison
+      against a serialized entry's `bytesize`.
+- [x] Set a default in `config/initializers/seek_configuration.rb`:
+      `Seek::Config.default :cache_max_redis_item_size, 1 * 1024 * 1024` (1MB), alongside the
+      `max_cachable_size` / `hard_max_cachable_size` defaults.
+- [x] Exposed in the admin settings UI (`app/views/admin/settings.html.erb`, `admin_controller.rb
+      #update_settings`) as a standalone field — not nested inside the existing
+      `block_file_uploads`/`cache_remote_files` toggle blocks, since those gate *remote file*
+      downloading/caching, an unrelated feature to the internal `Rails.cache` threshold this
+      setting controls.
+- [x] **CI:** unit test (`test/unit/config_test.rb`, `cache_max_redis_item_size default and
+      persistence`) asserting the 1MB default and that the value persists and coerces to `Integer`
+      via `with_config_value`.
+- [x] **CI:** functional tests on `AdminController` (`test/functional/admin_controller_test.rb`) —
+      one confirming the field renders in the settings form (`assert_select`), one confirming
+      `update_settings` persists a posted value to `Seek::Config.cache_max_redis_item_size`.
 
 ## Step 3 — `RedisWithFileOverflowStore`
 

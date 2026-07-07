@@ -45,6 +45,11 @@
                                :onkeypress => "javascript: return onlyNumbers(event);") %>
       </div>
   </div>
+
+  <%= admin_text_setting(:cache_max_redis_item_size, Seek::Config.cache_max_redis_item_size,
+                         'Maximum Redis cache item size', 'The size limit (in bytes) above which an item is stored on the filesystem cache instead of Redis.',
+                         :onkeypress => "javascript: return onlyNumbers(event);") %>
+
   <h2>Sandbox settings</h2>
 
     <%= admin_text_setting(:sandbox_instance_url, Seek::Config.sandbox_instance_url,

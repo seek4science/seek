@@ -170,6 +170,17 @@ class AdminControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'settings form includes cache_max_redis_item_size field' do
+    get :settings
+    assert_response :success
+    assert_select "input[name=?]", 'cache_max_redis_item_size'
+  end
+
+  test 'update cache_max_redis_item_size' do
+    post :update_settings, params: { cache_max_redis_item_size: '2097152' }
+    assert_equal 2097152, Seek::Config.cache_max_redis_item_size
+  end
+
   test 'should input integer' do
     post :update_home_settings, params: { tag_threshold: '', max_visible_tags: '20' }
     refute_nil flash[:error]

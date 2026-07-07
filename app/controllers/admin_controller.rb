@@ -351,6 +351,7 @@ class AdminController < ApplicationController
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
+    Seek::Config.cache_max_redis_item_size = params[:cache_max_redis_item_size]
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
     Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
