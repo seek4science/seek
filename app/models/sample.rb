@@ -153,7 +153,7 @@ class Sample < ApplicationRecord
       _linking_samples.each do |linking_sample|
         changed = false
         potential_linking_attributes.each do |attr|
-          Array(linking_sample.get_attribute_value(attr)).each do |linked_sample_data|
+          Array.wrap(linking_sample.get_attribute_value(attr)).each do |linked_sample_data|
             next unless linked_sample_data['id'] == id
             next if linked_sample_data['title'] == title
             linked_sample_data['title'] = title
