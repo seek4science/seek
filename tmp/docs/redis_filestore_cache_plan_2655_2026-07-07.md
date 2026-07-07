@@ -10,8 +10,8 @@ message body) so it shows up on the issue's timeline — not just `#2655` in the
 
 Replace the filesystem-based production cache (`config.cache_store = :file_store`) with Redis,
 while keeping a configurable maximum item size above which entries continue to be stored on and
-retrieved from the filesystem, and sending an exception-notification email whenever an item is
-too large for Redis and overflows to disk.
+retrieved from the filesystem, and logging whenever an item is too large for Redis and overflows
+to disk.
 
 ## Issue requirements (verbatim scope)
 
@@ -19,6 +19,8 @@ too large for Redis and overflows to disk.
 2. A configurable maximum size — items above it are stored/retrieved via the filesystem instead.
 3. An exception-notification email when an item is too large to cache in Redis.
 4. Investigate Solid Cache first, as an alternative, before implementing.
+
+Requirement 3 is deliberately *not* built as written — see the decision below.
 
 ## Decision: Redis + FileStore overflow, not Solid Cache
 
@@ -39,6 +41,17 @@ Investigated per the issue's instruction before starting implementation. Summary
 - Conclusion: build a single cache store that writes to Redis by default and overflows to the
   existing filesystem cache above a configurable size, rather than introducing Solid Cache.
 
+## Decision: log oversized writes, don't email on every one
+
+The issue asks for a notification email whenever an item is too large to cache in Redis. Overflow
+to disk is the expected, designed-for behaviour for the large-item call sites already identified
+(spreadsheet XML/CSV, notebook HTML, RightField output, ontology hierarchies) — those will
+overflow routinely, every time their content changes, not exceptionally. An email per occurrence
+(even deduped) would either be constant background noise or get filtered out and ignored, which
+defeats the purpose of an exception notification. Instead: log every overflow (`Rails.logger`,
+searchable, no inbox involved) and keep the admin-email pipeline for things that are genuinely
+unexpected, not for routine operation of the feature this issue is building.
+
 ## Architecture
 
 One cache store, `Seek::Caching::RedisWithFileOverflowStore`, replaces `Rails.cache`. It wraps a
@@ -48,7 +61,7 @@ One cache store, `Seek::Caching::RedisWithFileOverflowStore`, replaces `Rails.ca
   - `size <= Seek::Config.cache_max_redis_item_size` → write to Redis, delete any stale copy on
     disk under the same key.
   - `size > Seek::Config.cache_max_redis_item_size` → write to disk, delete any stale copy in
-    Redis under the same key, and send an exception notification.
+    Redis under the same key, and log the overflow.
 - **Read**: check Redis first (cheap, covers the large majority of keys); on a miss, check the
   filesystem store before reporting a true miss.
 - **Delete / delete_matched**: delegate to both backends, since a key's location isn't known
@@ -126,24 +139,21 @@ logical database for cache:
       - `delete_matched` removes matching keys from both backends (regression coverage for the two
         existing call sites that rely on it: `app/models/content_blob.rb:321`,
         `lib/seek/stats/dashboard_stats.rb:76`)
+      - a cache file written in the old plain-`FileStore` format (i.e. what's already sitting in
+        `tmp/cache` today, pre-cutover) is read back cleanly as a miss (or a compatible hit)
+        through the new store's file-side reader — leftover pre-cutover entries can't cause a
+        boot-time or request-time error once this store is live
 
-## Step 4 — Oversized-entry notification
+## Step 4 — Oversized-entry logging
 
-- [ ] Define `Seek::Caching::OversizedCacheEntryError < StandardError`, message including the
-      cache key and byte size.
-- [ ] On the overflow-to-disk path in `RedisWithFileOverflowStore`, call
-      `Seek::Errors::ExceptionForwarder.send_notification(Seek::Caching::OversizedCacheEntryError.new(...), data: { key: ..., size: ..., max_size: ... })`
-      — reuses the existing admin exception-email pipeline
-      (`Seek::Config.exception_notification_enabled` / `exception_notification_recipients`), so no
-      new mail plumbing is needed.
-- [ ] Rate-limit or dedupe the notification per key (e.g. only notify once per key per day) so a
-      frequently-recomputed large item — the spreadsheet/notebook caches, keyed by
-      `content_blob.cache_key`, are rewritten every time that key is invalidated — doesn't spam
-      the admin inbox.
-- [ ] **CI:** unit test stubbing `Seek::Errors::ExceptionForwarder.send_notification` (same
-      approach as `test/unit/exception_forwarder_test.rb`), asserting it's called exactly once for
-      an oversized write, never called for a normal-sized write, and not called again for a second
-      oversized write to the same key inside the dedupe window.
+- [ ] On the overflow-to-disk path in `RedisWithFileOverflowStore`, log a single line via
+      `Rails.logger.info` including the cache key and byte size — enough to `grep` the log for
+      overflow activity or wire up log-based alerting later if it's ever needed, without an email
+      firing on every routine large-item write.
+- [ ] No rate-limiting/dedupe needed — logging isn't inbox noise the way email is, so every
+      occurrence can be logged plainly.
+- [ ] **CI:** unit test asserting the log line is emitted (with key and size) for an oversized
+      write, and not emitted for a normal-sized write.
 
 ## Step 5 — Wire up configuration
 
@@ -168,25 +178,7 @@ logical database for cache:
       dir — this catches config-wiring mistakes (bad URL derivation, wrong constant, etc.)
       without making the whole suite depend on Redis.
 
-## Step 6 — Migration / cutover
-
-- [ ] Note (not a code task): cache is disposable, so no data migration is needed — existing
-      `tmp/cache` contents can simply be abandoned once the store is swapped.
-- [ ] Add a one-off deploy step to clear the old `tmp/cache` directory contents post-cutover, to
-      reclaim disk space (the FileStore side of the new store should use the same path, so stale
-      entries under old key formats should be purged rather than left to rot).
-- [ ] Deploy note: `seek` and `seek_workers` must be deployed together (both read the same cache
-      store config at boot) — add to the release runbook.
-- [ ] Expect a temporary cold-cache period after cutover — the large, CPU-heavy conversions
-      (spreadsheet XML/CSV extraction, notebook HTML rendering, RightField extraction, ontology
-      hierarchy fetches) will all re-run on first access post-deploy. No action needed, just a
-      known, one-time cost to call out in the deploy notes.
-- [ ] **CI:** regression test confirming a stale cache file written in the old plain-`FileStore`
-      format (i.e. what's already sitting in `tmp/cache` today) is read back cleanly as a miss (or
-      a compatible hit) through the new overflow store's file-side reader, so leftover pre-cutover
-      entries can't cause a boot-time or request-time error post-deploy.
-
-## Step 7 — Cleanup & eviction scheduling
+## Step 6 — Cleanup & eviction scheduling
 
 Redis and the filesystem overflow manage growth in fundamentally different ways — both need
 covering, but not with the same mechanism.
@@ -224,15 +216,15 @@ covering, but not with the same mechanism.
       against a future call site being added to the overflow path without a TTL, which would
       silently defeat the cleanup job.
 
-## Step 8 — Final testing & verification
+## Step 7 — Final testing & verification
 
-Steps 1–7 each land their own CI coverage alongside the code they test, so this step is the final
+Steps 1–6 each land their own CI coverage alongside the code they test, so this step is the final
 cross-cutting pass, not where testing starts:
 
-- [ ] Full CI suite green, including all the tests added incrementally in Steps 1–7.
+- [ ] Full CI suite green, including all the tests added incrementally in Steps 1–6.
 - [ ] End-to-end integration test spanning the whole path: write an item just under and just over
       the configured threshold through a real call site (not the store directly), confirm correct
-      backend placement end-to-end and that only the oversized write triggers a notification.
+      backend placement end-to-end and that only the oversized write logs an overflow entry.
 - [ ] Manual verification (`/verify`): exercise the spreadsheet-explore view, notebook rendering,
       RightField extraction, and ontology browsing; confirm large payloads land on disk under
       `tmp/cache` and small/frequent values (dashboard stats, settings, list-item titles) land in
