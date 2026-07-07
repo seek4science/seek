@@ -31,7 +31,7 @@ module HasSharedAttributeValidation
   end
 
   def validate_attribute_title_unique
-    # TODO: would like to have done this with uniquness{scope: :sample_type_id} on the attribute, but that leads to an exception when being added
+    # TODO: would like to have done this with uniqueness{scope: :sample_type_id} on the attribute, but that leads to an exception when being added
     # to the sample type
     titles = attribute_titles.collect(&:downcase)
     dups = titles.select { |title| titles.count(title) > 1 }.uniq
@@ -53,4 +53,12 @@ module HasSharedAttributeValidation
     end
   end
 
+  # fixes the consistency of the attribute controlled vocabs where the attrcibute doesn't match.
+  # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
+  # rather than clearing the selected vocab each time
+  def resolve_controlled_vocabs_inconsistencies
+    shared_attributes.each do |attribute|
+      attribute.sample_controlled_vocab = nil unless attribute.controlled_vocab? || attribute.seek_cv_list?
+    end
+  end
 end

@@ -2,6 +2,8 @@
 class Template < ApplicationRecord
   acts_as_asset
 
+  include HasSharedAttributeValidation
+
   has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
   has_many :samples, through: :sample_types
@@ -34,6 +36,14 @@ class Template < ApplicationRecord
     resolve_controlled_vocabs_inconsistencies
   end
 
+  private
+
+  def validate_template_level
+    unless Seek::ISATemplates::TemplateLevel.valid?(level)
+      errors.add :level, "is not a valid #{t('template')} level"
+    end
+  end
+
   def validate_template_attributes
     if attributes_with_empty_isa_tag.any?
       attributes_with_empty_isa_tag.map do |attribute|
@@ -58,14 +68,11 @@ class Template < ApplicationRecord
     test_attribute_title_uniqueness
   end
 
-  private
-
-  # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
-  # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
-  # rather than clearing the selected vocab each time
-  def resolve_controlled_vocabs_inconsistencies
+  def validate_no_attributes_with_empty_isa_tag
     template_attributes.each do |attribute|
-      attribute.sample_controlled_vocab = nil unless attribute.sample_attribute_type.controlled_vocab?
+      if attribute.isa_tag_id.blank?
+        errors.add("[#{:template_attributes}]:", "Attribute '#{attribute.title}' is missing an ISA tag")
+      end
     end
   end
 

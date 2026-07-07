@@ -229,15 +229,6 @@ class SampleType < ApplicationRecord
     samples.joins(:policy).where('policies.access_type >= ?', Policy::VISIBLE).any?
   end
 
-  # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
-  # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
-  # rather than clearing the selected vocab each time
-  def resolve_controlled_vocabs_inconsistencies
-    sample_attributes.each do |attribute|
-      attribute.sample_controlled_vocab = nil unless attribute.controlled_vocab? || attribute.seek_cv_list?
-    end
-  end
-
   # fixes the consistency of the attribute seek samples where the attribute doesn't match.
   # this is to help when a seek sample has been selected in the form, but then the type has been changed
   # rather than clearing the selected sample type each time
