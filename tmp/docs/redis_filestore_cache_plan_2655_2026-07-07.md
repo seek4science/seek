@@ -255,3 +255,41 @@ cross-cutting pass, not where testing starts:
 - [ ] Run the full app locally without Docker (`bundle exec rails server` against a local
       `redis-server`) and confirm caching, sessions, and the filesystem overflow all work with no
       Docker-specific assumptions.
+
+## Step 8 — Session-store impact if the cache fills Redis
+
+Step 1 flagged, as a documentation note, that `maxmemory-policy` is instance-wide, so cache growth
+can in principle evict session keys, not just cache keys. That risk deserves more than a note: a
+cache miss is invisible and cheap (re-fetch, maybe a slow request); a session eviction is user
+-visible (a silent forced logout before the 30-minute `expire_after`) and easy to miss in testing
+since it only shows up under real memory pressure.
+
+- [ ] Confirmed via the `redis-store` gem (`Redis::Store::Ttl#set`, `lib/redis/store/ttl.rb`) that
+      session keys already carry a real Redis-level `EXPIRE` matching `expire_after: 30.minutes`
+      (`config/initializers/session_store.rb`), refreshed on every write. This rules out one
+      tempting mitigation: switching `maxmemory-policy` from `allkeys-lru` to `volatile-lru` would
+      *not* protect sessions, since `volatile-lru` only spares keys with **no** TTL, and session
+      keys have one — it would just as happily evict them. Any real fix has to be about capacity
+      and visibility, not a policy trick.
+- [ ] Simulate the failure mode before launch: point a local/staging Redis at a small `maxmemory`
+      (e.g. 10mb), log in to create a handful of real sessions, then write cache entries until
+      eviction kicks in (`INFO stats` → `evicted_keys` climbing). Confirm directly whether active
+      session keys get evicted under sustained cache pressure, rather than assuming from the LRU
+      docs — this is the one part of the shared-instance decision that's cheap to verify for real.
+- [ ] Set `maxmemory` (Step 1) with headroom sized from a measured peak: concurrent active
+      sessions × average serialized session size, plus the expected cache working set, plus a
+      safety margin — not an arbitrary round number.
+- [ ] Wire the `evicted_keys` monitoring from Step 6's optional periodic job to something that
+      actually gets looked at (log line is enough initially, admin-alerting can follow later) —
+      the goal is that a rising `evicted_keys` count is noticed as "sessions may be getting dropped
+      early," not discovered via a user complaint.
+- [ ] Document the escalation path in the ops runbook if `evicted_keys` alerts fire repeatedly:
+      raise `maxmemory` first (cheapest fix); if cache growth keeps outpacing that, splitting
+      cache and sessions onto separate Redis instances is the real fix — flagged here as a known
+      future step, not built now, since Step 1's decision to share one instance was deliberately
+      scoped to SEEK's current scale.
+- [ ] **CI:** not meaningfully testable in the normal suite — real LRU eviction ordering depends on
+      timing and memory pressure that isn't deterministic enough to assert on reliably. Covered by
+      the manual simulation above instead, plus the existing session-store tests (unaffected by
+      this step, since nothing here changes session code, only capacity planning and monitoring
+      around the store it already uses).
