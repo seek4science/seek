@@ -80,30 +80,41 @@ requires a single reachable Redis instance in every environment, including local
 a developer's machine already needs a local Redis on `localhost:6379` (`REDIS_URL` default) for
 sessions to work at all. Adding a second dedicated instance would mean two Redis processes to run
 locally, and a new container/volume/health-check in `docker-compose.yml`, for a project at SEEK's
-scale — not worth the operational overhead. Instead, extend the existing db-per-purpose convention
-(`config/cable.yml` already uses db 1 in production, separate from sessions' db 0) with a third
-logical database for cache:
+scale — not worth the operational overhead.
 
-- [ ] Adopt the convention: db 0 = sessions, db 1 = Action Cable (production), db 2 = cache — in
-      every environment, derived from the same `REDIS_URL`.
-- [ ] Set `maxmemory` and `maxmemory-policy allkeys-lru` on the existing `redis_store` service in
-      `docker-compose.yml` (`command: ["redis-server", "--appendonly", "yes", "--maxmemory", ...,
-      "--maxmemory-policy", "allkeys-lru"]`) — no new service needed.
-- [ ] Document the shared-instance tradeoff explicitly: `maxmemory-policy` applies
-      instance-wide, not per-db, so under memory pressure Redis can in principle evict session
-      keys, not just cache keys. In practice this is low-risk at SEEK's scale — session keys are
-      actively touched (refreshed) while a user is logged in, so LRU naturally deprioritises
-      evicting them ahead of cold cache entries — but size `maxmemory` with comfortable headroom
-      above the expected session+cable footprint, and monitor `evicted_keys` post-launch rather
-      than treating the headroom as a one-time decision.
-- [ ] Derive the cache connection URL from the same `REDIS_URL` env var used for sessions/cable,
-      swapping only the db segment (mirroring how `session_store.rb` and `cable.yml` already each
-      derive their own URL from one shared env var) — no new env var required.
-- [ ] **CI:** if the db-index substitution is factored into a small helper (e.g.
-      `Seek::Caching.redis_cache_url(base_url)`), unit test it directly — pure string logic, no
-      live Redis needed, so it runs fast in every CI build. (`.github/workflows/tests.yml` already
-      starts a `redis:8.6-alpine` service on `localhost:6379` for session-store tests, so any
-      later step that does need a live Redis has one available without workflow changes.)
+**Correction from the original draft of this step:** it assumed `session_store.rb` and
+`cable.yml` already separate traffic by logical Redis *db* (0 vs 1). Reading the `redis-store` gem
+source (`Redis::Store::Factory.extract_host_options_from_uri`) shows that's not what's happening —
+a URL's third path segment (`.../0/session`) is parsed as a **key namespace**, not a second db
+number, so sessions actually live in db 0 with keys prefixed `session:...`. `cable.yml`'s
+`ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" }` only reaches its db-1 fallback when
+`REDIS_URL` is completely unset — in `docker-compose.yml`, where `REDIS_URL` is always
+`redis://redis_store:6379/0`, Action Cable also resolves to db 0 (moot in practice since cable has
+no channels defined anywhere in the app — see below). There's no real db-per-purpose separation
+today, just db 0 with one namespace applied ad hoc. `ActiveSupport::Cache::RedisCacheStore`
+supports the identical idiom as a first-class constructor option ("Provide one if the Redis cache
+server is shared with other apps: `namespace: 'myapp-cache'`" —
+`redis_cache_store.rb:132-133`), so the simplest, most consistent fix is to follow the pattern
+that's already there rather than invent a db-swapping scheme:
+
+- [x] Reuse `REDIS_URL` as-is for the cache store (same db 0, no new env var, no URL-derivation
+      helper needed) and pass `namespace: 'cache'` when constructing the `RedisCacheStore` in
+      Step 5 — mirroring how sessions already separate themselves with a namespace, just via a
+      constructor option instead of the `redis-store` URL-suffix trick.
+- [x] Set `maxmemory` and `maxmemory-policy allkeys-lru` on the existing `redis_store` service in
+      `docker-compose.yml` (`512mb`, `allkeys-lru`) — no new service needed.
+- [x] Document the shared-instance tradeoff explicitly: `maxmemory-policy` applies
+      instance-wide, not per-namespace, so under memory pressure Redis can in principle evict
+      session keys, not just cache keys. In practice this is low-risk at SEEK's scale — session
+      keys are actively touched (refreshed) while a user is logged in, so LRU naturally
+      deprioritises evicting them ahead of cold cache entries — but size `maxmemory` with
+      comfortable headroom above the expected session footprint, and monitor `evicted_keys`
+      post-launch rather than treating the headroom as a one-time decision.
+- [x] No CI task for this step — there's no derivation logic left to unit test (the db-swap helper
+      that would have needed one is no longer necessary); the `namespace: 'cache'` wiring gets
+      exercised for real by Step 3's store tests and Step 5's config-wiring test against the CI
+      Redis service (`.github/workflows/tests.yml` already runs `redis:8.6-alpine` on
+      `localhost:6379`).
 
 ## Step 2 — Configurable size threshold
 
