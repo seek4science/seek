@@ -275,37 +275,63 @@ Redis and the filesystem overflow manage growth in fundamentally different ways 
 covering, but not with the same mechanism.
 
 **Redis — continuous eviction, not a scheduled job:**
-- [ ] Confirm `maxmemory-policy allkeys-lru` (set in Step 1) is active — this is what bounds
-      Redis's growth; it evicts continuously under memory pressure, so no cron task is needed.
-- [ ] Optional: add a lightweight periodic check (extend `RegularMaintenanceJob`, or a new small
-      job) that logs Redis `INFO memory` (`used_memory`, `evicted_keys`) for ops visibility.
-- [ ] Not CI-testable as such — `maxmemory-policy` is Redis server configuration, not application
-      code. Verified operationally (Step 1's `evicted_keys` monitoring), not by a test suite.
+- [x] `maxmemory-policy allkeys-lru` set in Step 1 (`docker-compose.yml` and its two variants) —
+      this is what bounds Redis's growth; it evicts continuously under memory pressure, so no cron
+      task is needed.
+- [x] Implemented the optional periodic check as `CacheOverflowCleanupJob#log_redis_memory_stats`
+      rather than extending `RegularMaintenanceJob` — piggybacking on the same daily job that
+      already runs for the FileStore sweep, since both are cache-maintenance concerns, rather than
+      RegularMaintenanceJob's unrelated grab-bag of DB cleanup tasks. Added
+      `Seek::Caching::RedisWithFileOverflowStore#redis_memory_stats` (`INFO` sliced to
+      `used_memory`/`used_memory_human`/`evicted_keys`) so the job doesn't need to reach into the
+      store's private `@redis_store`. This directly sets up Step 8's monitoring requirement
+      ("wire the `evicted_keys` monitoring from Step 6's optional periodic job"), so building it
+      now avoids leaving that step with an undone dependency.
+- [x] Not CI-testable for the `maxmemory-policy` setting itself — Redis server configuration, not
+      application code, verified operationally (Step 1's `evicted_keys` monitoring). The logging
+      *around* it is tested (below).
 
 **FileStore overflow — needs an actual scheduled sweep:**
-- [ ] `ActiveSupport::Cache::FileStore#cleanup` only deletes entries with an **expired** TTL — it
-      does nothing for entries written without `expires_in`. Audit the large-item call sites that
-      will overflow to disk (spreadsheet XML/CSV, notebook HTML, RightField CSV/RDF, ontology
-      hierarchies, cached workbook objects, the generic text-blob renderer cache) and add a
-      sensible `expires_in` to each `Rails.cache.fetch` call so cleanup has something to reap —
-      long-lived is fine (e.g. 30 days) since most of these keys are already content-derived and
-      self-invalidate on content change; shorter for anything hitting an external API (e.g. the
-      EBI OLS ontology-descendants cache) so upstream changes are eventually picked up.
-- [ ] Create `CacheOverflowCleanupJob < ApplicationJob` (mirroring `RegularMaintenanceJob`'s
-      shape) that calls `.cleanup` on the filesystem side of `RedisWithFileOverflowStore`.
-- [ ] Schedule it in `config/schedule.rb` using the existing `whenever` pattern:
-      `every 1.day, at: offset(N) do runner "CacheOverflowCleanupJob.perform_later" end`, offset
-      to avoid colliding with `RegularMaintenanceJob` / `AuthLookupMaintenanceJob`.
-- [ ] Add a disk-space monitoring note to the ops runbook for the overflow cache path — TTL +
-      cleanup bounds growth but doesn't make it instantaneous; worth an alert threshold.
-- [ ] **CI:** unit test for `CacheOverflowCleanupJob`
-      (`test/unit/jobs/cache_overflow_cleanup_job_test.rb`, mirroring
-      `test/unit/jobs/regular_maintenance_job_test.rb`) — write one expired and one non-expired
-      entry directly to the file-side store, run the job, assert only the expired entry is gone.
-- [ ] **CI:** spot-check that the large-item call sites updated in this step actually pass
-      `expires_in` (e.g. a shared assertion helper used across their existing tests) — guards
-      against a future call site being added to the overflow path without a TTL, which would
-      silently defeat the cleanup job.
+- [x] Audited and added `expires_in` to the 12 large-item `Rails.cache.fetch` call sites: spreadsheet
+      XML/CSV (`lib/seek/templates/reader.rb`, `lib/seek/data/spreadsheet_explorer_representation.rb`),
+      cached workbook objects (`app/helpers/search_helper.rb`,
+      `lib/seek/assets_standard_controller_actions.rb`), RightField CSV/RDF
+      (`lib/rightfield/rightfield.rb`), the generic text-blob renderer cache
+      (`app/helpers/assets_helper.rb`), notebook HTML (`lib/seek/renderers/notebook_renderer.rb`) —
+      all `expires_in: 30.days`, since these keys are content-hash-derived (`content_blob.cache_key`)
+      or tied to an immutable content blob, so a stale entry is simply orphaned on content change,
+      never served incorrectly; long TTL just bounds eventual disk reclaim. Ontology hierarchies
+      (`lib/seek/ontologies/ontology_reader.rb`) and EBI OLS (`lib/ebi/ols_client.rb`, both call
+      sites) got `expires_in: 7.days` instead — their cache keys are *not* content-versioned (a
+      bundled ontology file path, or a raw external-API term IRI), so a shorter TTL is what
+      actually lets upstream changes get picked up, not just a disk-growth bound.
+- [x] Created `CacheOverflowCleanupJob < ApplicationJob` (`RUN_PERIOD = 1.day`). Calls
+      `Rails.cache.cleanup`, which required adding `cleanup` to `RedisWithFileOverflowStore` itself
+      (delegating only to the file side — confirmed `RedisCacheStore#cleanup` is literally
+      `super` → `raise NotImplementedError`, "manual cleanup is not supported", so calling it on
+      the Redis side would have crashed the job).
+- [x] Scheduled in `config/schedule.rb`: `every CacheOverflowCleanupJob::RUN_PERIOD, at: offset(4)`
+      — offset 4 is distinct from `RegularMaintenanceJob`/`AuthLookupMaintenanceJob` (offset 1),
+      `LifeMonitorStatusJob` (offset 2), and `Galaxy::ToolMap` (offset 3). Verified with
+      `bundle exec whenever` that it generates a correct, distinctly-timed crontab entry.
+- [x] Disk-space monitoring note (no separate ops runbook exists in this repo, so recorded here):
+      TTL + daily cleanup bounds the overflow directory's growth but isn't instantaneous — between
+      sweeps, disk usage can still climb. Worth an alert threshold on the `tmp/cache` filesystem
+      (or volume, in Docker) separately from the `evicted_keys` Redis alerting from Step 8.
+- [x] **CI:** `test/unit/jobs/cache_overflow_cleanup_job_test.rb` — swaps in a real
+      `RedisWithFileOverflowStore` against a temp dir + the CI Redis service (mirroring
+      `redis_with_file_overflow_store_test.rb`'s own pattern, not `regular_maintenance_job_test.rb`'s
+      DB-fixture style, since this job's state lives in the cache stores, not the database): write
+      one expired and one non-expired large entry, run the job, assert only the expired file is
+      gone; plus two tests for the memory-stats logging (logs when the store supports
+      `redis_memory_stats`, silently no-ops when it doesn't — e.g. test env's `:memory_store`).
+      4 tests total.
+- [x] **CI:** `test/unit/cache_overflow_call_sites_test.rb` — spot-checks all 12 updated call sites
+      via a static regex match against each file's source, asserting `expires_in:` is still present
+      on the exact `Rails.cache.fetch` line. Deliberately lightweight (no need to exercise RightField's
+      Java process, nbconvert, or live network calls just to check an option is passed) but
+      verified for real: temporarily stripped `expires_in` from one call site and confirmed the
+      test fails with a clear message, then restored it and confirmed it passes again.
 
 ## Step 7 — Final testing & verification
 

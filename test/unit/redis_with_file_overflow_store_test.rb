@@ -103,6 +103,26 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
     refute @store.exist?('large-key')
   end
 
+  test 'cleanup removes only expired entries from the file side' do
+    @store.write('expired-key', 'x' * (MAX_SIZE * 2), expires_in: 1.second)
+    @store.write('fresh-key', 'x' * (MAX_SIZE * 2))
+    expired_path = @file_store.send(:normalize_key, 'expired-key', {})
+    fresh_path = @file_store.send(:normalize_key, 'fresh-key', {})
+    sleep 1.1
+
+    @store.cleanup
+
+    refute File.exist?(expired_path)
+    assert File.exist?(fresh_path)
+  end
+
+  test 'redis_memory_stats returns used_memory and evicted_keys' do
+    stats = @store.redis_memory_stats
+
+    assert stats.key?('used_memory')
+    assert stats.key?('evicted_keys')
+  end
+
   test 'clear does not wipe keys outside the redis namespace' do
     unrelated = ActiveSupport::Cache::RedisCacheStore.new(url: 'redis://localhost:6379/15',
                                                           namespace: 'unrelated')
@@ -160,17 +180,5 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
       built_store.clear
       FileUtils.remove_entry(dir)
     end
-  end
-
-  private
-
-  def capture_log
-    io = StringIO.new
-    original_logger = Rails.logger
-    Rails.logger = Logger.new(io)
-    yield
-    io.string
-  ensure
-    Rails.logger = original_logger
   end
 end

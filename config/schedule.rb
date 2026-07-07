@@ -51,6 +51,10 @@ every AuthLookupMaintenanceJob::RUN_PERIOD, at: offset(1) do
   runner "AuthLookupMaintenanceJob.perform_later"
 end
 
+every CacheOverflowCleanupJob::RUN_PERIOD, at: offset(4) do
+  runner "CacheOverflowCleanupJob.perform_later"
+end
+
 every LifeMonitorStatusJob::PERIOD, at: offset(2) do
   runner "LifeMonitorStatusJob.perform_later"
 end

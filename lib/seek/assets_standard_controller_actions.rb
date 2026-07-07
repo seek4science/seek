@@ -37,7 +37,7 @@ module Seek
       @display_asset = instance_variable_get("@display_#{asset.class.name.underscore}")
       if @display_asset.contains_extractable_spreadsheet?
         begin
-          @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_asset.content_blob.cache_key}") do
+          @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_asset.content_blob.cache_key}", expires_in: 30.days) do
             @display_asset.spreadsheet
           end
           respond_to do |format|

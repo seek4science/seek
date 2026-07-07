@@ -147,6 +147,18 @@ class ActiveSupport::TestCase
     Seek::Config.clear_temporary_filestore
   end
 
+  # Swaps Rails.logger for a Logger writing to a StringIO for the duration of the block, returning
+  # everything logged as a String.
+  def capture_log
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = original_logger
+  end
+
   def clear_current_user
     User.current_user = nil
   end

@@ -50,6 +50,20 @@ module Seek
         @file_store.clear(options)
       end
 
+      # Redis expires keys natively (RedisCacheStore#cleanup is itself a no-op that raises
+      # NotImplementedError via the base class - "manual cleanup is not supported"), so only the
+      # file side needs a sweep. Used by CacheOverflowCleanupJob (Step 6).
+      def cleanup(options = nil)
+        @file_store.cleanup(options)
+      end
+
+      # Ops visibility for the shared-instance eviction tradeoff (Step 1/Step 8): used_memory
+      # shows how full the instance is, evicted_keys is the signal that Redis has started
+      # discarding keys under maxmemory-policy - including, in principle, session keys.
+      def redis_memory_stats
+        @redis_store.redis.then { |c| c.info.slice('used_memory', 'used_memory_human', 'evicted_keys') }
+      end
+
       private
 
       def read_entry(key, **options)
