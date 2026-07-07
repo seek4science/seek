@@ -538,14 +538,12 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_select '.list_items_container a[href=?]', 'https://ror.org/027m9bs27', text: 'https://ror.org/027m9bs27'
 
     get :show, params: { id: uniman.id }
-    assert_select '.ror_id' do
-      assert_select 'strong', text: /ROR ID:/
+    assert_select 'p.ror_id', text: /ROR ID:/ do
       assert_select 'a[href=?]', 'https://ror.org/027m9bs27', text: 'https://ror.org/027m9bs27'
     end
 
     get :show, params: { id: other.id }
-    assert_select '.ror_id' do
-      assert_select 'strong', text: /ROR ID:/
+    assert_select 'p.ror_id', text: /ROR ID:/ do
       assert_select 'span.none_text', text: /Not specified/
     end
   end
