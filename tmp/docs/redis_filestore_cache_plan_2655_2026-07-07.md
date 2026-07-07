@@ -143,28 +143,46 @@ that's already there rather than invent a db-swapping scheme:
 
 ## Step 3 — `RedisWithFileOverflowStore`
 
-- [ ] Create `lib/seek/caching/redis_with_file_overflow_store.rb`,
+- [x] Created `lib/seek/caching/redis_with_file_overflow_store.rb`,
       `Seek::Caching::RedisWithFileOverflowStore < ActiveSupport::Cache::Store`, constructed with
-      a `RedisCacheStore` instance, a `FileStore` instance, and a max-size value.
-- [ ] Implement `write_entry`, `read_entry`, `delete_entry` per the architecture above
-      (serialize once, measure `bytesize`, route, and clean up the non-chosen backend).
-- [ ] Implement `delete_matched` delegating to both backends.
-- [ ] **CI:** unit test the store directly against the CI Redis service (`localhost:6379`, already
-      started by `tests.yml`) plus a `Dir.mktmpdir` for the file side — this is the core
-      correctness suite everything else builds on, so it lands in the same step as the
-      implementation, not deferred:
+      `redis_store:`, `file_store:`, and `max_redis_item_size:`.
+- [x] Implemented `write_entry`, `read_entry`, `delete_entry` per the architecture above (serialize
+      once via this store's own coder to measure `bytesize` — since neither child store customizes
+      its coder, this measurement is byte-exact, not approximate — route, and clean up the
+      non-chosen backend first so a crash mid-write leaves a safe miss rather than a stale hit on
+      the wrong backend). Each read/write/delete calls `normalize_key` on the *target child store*
+      (via `send`, since it's private) rather than relying on this store's own key normalization —
+      necessary because `FileStore` overrides `normalize_key` to turn the logical key into a
+      filesystem path, while `RedisCacheStore` uses it to apply a namespace; delegating per-child
+      keeps each backend's key format identical to using that store directly, which is what makes
+      old on-disk `tmp/cache` files and the Redis `namespace: 'cache'` option both keep working.
+- [x] Implemented `delete_matched` delegating to both backends — with one correction found while
+      building it: `RedisCacheStore#delete_matched` only accepts a Redis glob **String** and raises
+      `ArgumentError` on anything else, but SEEK has two existing call sites with incompatible
+      matcher types — `app/models/content_blob.rb:321` passes a glob **String**
+      (`"st-match-#{id}*"`), `lib/seek/stats/dashboard_stats.rb:76` passes a **Regexp**
+      (`/#{cache_key_base}/`) — and `FileStore#delete_matched` tolerates both today (via
+      `String#match`, which accepts either). Forwarding a Regexp straight to
+      `RedisCacheStore#delete_matched` would have crashed `dashboard_stats.rb`'s cache-clearing
+      after cutover. Fixed by not using `RedisCacheStore#delete_matched` at all: scan Redis by hand
+      (`SCAN` + `UNLINK` via the store's public `redis` accessor) and apply the matcher with
+      `String#match?`, mirroring `FileStore`'s existing loose semantics exactly — both call sites
+      keep working unmodified, no app code touched.
+- [x] **CI:** unit test (`test/unit/redis_with_file_overflow_store_test.rb`) against a real local
+      Redis (`redis://localhost:6379/15`, the same instance CI's `tests.yml` already starts on
+      `localhost:6379` for session-store tests) plus a `Dir.mktmpdir` for the file side — 7 tests,
+      all passing:
       - small item → written to Redis only, not on disk
       - large item → written to disk only, not in Redis
       - `delete` removes a key from whichever backend actually holds it
       - a key's size crossing the threshold between writes doesn't leave a stale duplicate in the
         previously-used backend
-      - `delete_matched` removes matching keys from both backends (regression coverage for the two
-        existing call sites that rely on it: `app/models/content_blob.rb:321`,
-        `lib/seek/stats/dashboard_stats.rb:76`)
-      - a cache file written in the old plain-`FileStore` format (i.e. what's already sitting in
-        `tmp/cache` today, pre-cutover) is read back cleanly as a miss (or a compatible hit)
-        through the new store's file-side reader — leftover pre-cutover entries can't cause a
-        boot-time or request-time error once this store is live
+      - `delete_matched` removes matching keys from both backends, tested with **both** a glob
+        String (`content_blob.rb` style) and a Regexp (`dashboard_stats.rb` style)
+      - a cache file written in the plain `FileStore` format (simulating what's already sitting in
+        `tmp/cache` today, pre-cutover) is read back cleanly through the new store's file-side
+        reader — leftover pre-cutover entries can't cause a boot-time or request-time error once
+        this store is live
 
 ## Step 4 — Oversized-entry logging
 
