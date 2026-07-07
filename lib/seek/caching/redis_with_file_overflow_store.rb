@@ -6,6 +6,23 @@ module Seek
     # key format is identical to using that store directly - existing FileStore cache files remain
     # readable, and the Redis backend's own namespace option (if any) is honoured.
     class RedisWithFileOverflowStore < ActiveSupport::Cache::Store
+      # Builds the store the way config/environments/production.rb and development.rb do.
+      # max_redis_item_size is a Proc so it re-reads Seek::Config.cache_max_redis_item_size on
+      # every write rather than baking in a value captured once at boot - the setting is meant to
+      # be tunable from the admin UI without a restart (Step 2), and reading it eagerly here would
+      # also mean touching the database while config/environments/*.rb is still being evaluated,
+      # before Seek:: constants are even autoloadable (confirmed empirically - referencing Seek::
+      # anything that early raises NameError).
+      def self.build(file_cache_path)
+        redis_store = ActiveSupport::Cache::RedisCacheStore.new(
+          url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/0'),
+          namespace: 'cache'
+        )
+        file_store = ActiveSupport::Cache::FileStore.new(file_cache_path)
+        new(redis_store: redis_store, file_store: file_store,
+            max_redis_item_size: -> { Seek::Config.cache_max_redis_item_size })
+      end
+
       def initialize(redis_store:, file_store:, max_redis_item_size:, **options)
         super(options)
         @redis_store = redis_store
@@ -47,12 +64,16 @@ module Seek
       def write_entry(key, entry, **options)
         payload = serialize_entry(entry, **options)
 
-        if payload.bytesize <= @max_redis_item_size
+        if payload.bytesize <= max_redis_item_size
           write_to_redis(key, entry, **options)
         else
           log_overflow(key, payload.bytesize)
           write_to_file(key, entry, **options)
         end
+      end
+
+      def max_redis_item_size
+        @max_redis_item_size.respond_to?(:call) ? @max_redis_item_size.call : @max_redis_item_size
       end
 
       def write_to_redis(key, entry, **options)
@@ -76,7 +97,7 @@ module Seek
       def log_overflow(key, size)
         Rails.logger.info(
           '[Seek::Caching::RedisWithFileOverflowStore] overflow to disk ' \
-          "key=#{key} size=#{size} max=#{@max_redis_item_size}"
+          "key=#{key} size=#{size} max=#{max_redis_item_size}"
         )
       end
 

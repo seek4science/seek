@@ -226,26 +226,48 @@ a fresh cache would leave stale Redis-cached values in place. Fixed:
 
 ## Step 5 — Wire up configuration
 
-- [ ] In `config/environments/production.rb`, replace
-      `config.cache_store = :file_store, "#{Rails.root}/tmp/cache"` with an instance of
-      `Seek::Caching::RedisWithFileOverflowStore` built from the derived cache-db URL (Step 1),
-      `Rails.root.join('tmp/cache')`, and `Seek::Config.cache_max_redis_item_size`.
-- [ ] Decide the fate of `config.settings_cache_store` (currently its own `FileStore`, used for
-      hot, tiny config reads on nearly every request): recommend pointing it at the same Redis
-      cache db directly (no overflow wrapper needed — settings values are always small), rather
-      than maintaining a third store type.
-- [ ] Update `config/environments/development.rb` the same way, since it's the same single Redis
-      instance a developer already needs running for sessions — no environment-specific branching
-      needed. `maxmemory`/eviction policy is not expected to be configured on an ad hoc local
-      `redis-server`; that's fine for dev (low volume, no correctness impact, just unbounded
-      growth on a machine that gets restarted often anyway). The FileStore side of the overflow
-      store continues to use the existing dev cache path (`tmp/cache/dev-cache`).
-- [ ] **CI:** leave `config/environments/test.rb` on `:memory_store` for the suite as a whole
-      (fast, isolated, avoids coupling every test to Redis availability), but add one dedicated
-      test that builds the store the same way `production.rb`/`development.rb` do and asserts it
-      constructs without error and round-trips a value against the CI Redis service + a temp
-      dir — this catches config-wiring mistakes (bad URL derivation, wrong constant, etc.)
-      without making the whole suite depend on Redis.
+A real design problem surfaced while doing this, worth recording before the task list: the
+original wording ("built from... `Seek::Config.cache_max_redis_item_size`") implied reading the
+setting once at store-construction time. Verified empirically that `config/environments/*.rb` runs
+*before* Zeitwerk autoloading is active for `lib/` — referencing any `Seek::` constant there raises
+`NameError: uninitialized constant Seek`, and even if it didn't, capturing
+`Seek::Config.cache_max_redis_item_size` once at boot would defeat Step 2's whole point (tunable
+from the admin UI without a restart) and risk touching the database before it's safe to (e.g.
+during `assets:precompile`, which boots Rails without guaranteed DB access).
+
+- [x] `Seek::Caching::RedisWithFileOverflowStore.build(file_cache_path)` (added to the store class
+      itself) is the single factory both environments call. `max_redis_item_size` is passed as a
+      `Proc` (`-> { Seek::Config.cache_max_redis_item_size }`), resolved fresh on every write via a
+      new `max_redis_item_size` method — the constant-loading problem is solved by
+      `require_relative`-ing the store file directly at the top of each environment file (a plain
+      Ruby `require`, independent of Zeitwerk, which is how Rails' own docs recommend handling
+      custom cache/session stores needed this early); the DB-timing/live-tunability problem is
+      solved by the Proc, since it's only *called* at actual write time, long after boot — the
+      settings-DB read then goes through `Seek::Config`'s existing `RequestStore` + 1-week cache
+      layer (`Seek::Config.settings_cache`), so it's not a raw DB hit per write either. Confirmed
+      by booting both `development` and `production` (`RAILS_ENV=production`, `eager_load = true`)
+      via `rails runner`/direct `Rails.application.initialize!` — no Zeitwerk conflict, `Rails.cache`
+      resolves to the right class, and a real write/read round-trips.
+- [x] `config/environments/production.rb`: `config.cache_store = :file_store, ...` replaced with
+      `Seek::Caching::RedisWithFileOverflowStore.build("#{Rails.root}/tmp/cache")`.
+- [x] `config.settings_cache_store` decided: pointed directly at a plain `RedisCacheStore` on the
+      same Redis instance (no overflow wrapper — settings values are always small), with its own
+      `namespace: 'settings-cache'` distinct from the main store's `'cache'` namespace — mirrors the
+      isolation the old separate-directory `FileStore`s gave each other, just via namespace instead
+      of directory.
+- [x] `config/environments/development.rb` updated the same way, pointing the `FileStore` side at
+      the existing dev cache path (`tmp/cache/dev-cache`) — same single Redis instance a developer
+      already needs running for sessions, no environment-specific branching needed. No
+      `maxmemory`/eviction policy expected on an ad hoc local `redis-server`; fine for dev (low
+      volume, no correctness impact, just unbounded growth on a machine that restarts often anyway).
+- [x] **CI:** left `config/environments/test.rb` on `:memory_store` for the suite as a whole (fast,
+      isolated, avoids coupling every test to Redis availability). Added the dedicated test this
+      step calls for (`test/unit/redis_with_file_overflow_store_test.rb`, "build constructs a
+      working store the same way production.rb and development.rb do") — calls `.build` directly
+      against a temp dir + the CI Redis service and round-trips a small and a large value through
+      it, catching config-wiring mistakes without coupling the whole suite to Redis. Also added a
+      dedicated test proving the `Proc` threshold is re-evaluated on every write, not just at
+      construction (13 tests passing overall in this file).
 
 ## Step 6 — Cleanup & eviction scheduling
 

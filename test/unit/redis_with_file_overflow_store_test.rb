@@ -130,6 +130,38 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
     refute_match(/overflow to disk/, log_output)
   end
 
+  test 'max_redis_item_size accepts a Proc and re-evaluates it on every write' do
+    threshold = MAX_SIZE
+    store = Seek::Caching::RedisWithFileOverflowStore.new(redis_store: @redis_store,
+                                                          file_store: @file_store,
+                                                          max_redis_item_size: -> { threshold })
+
+    store.write('proc-key', 'x' * (MAX_SIZE * 2))
+    assert @file_store.exist?('proc-key')
+    refute @redis_store.exist?('proc-key')
+
+    threshold = MAX_SIZE * 3
+    store.write('proc-key', 'x' * (MAX_SIZE * 2))
+    assert @redis_store.exist?('proc-key')
+    refute @file_store.exist?('proc-key')
+  end
+
+  test 'build constructs a working store the same way production.rb and development.rb do' do
+    with_config_value(:cache_max_redis_item_size, MAX_SIZE) do
+      dir = Dir.mktmpdir
+      built_store = Seek::Caching::RedisWithFileOverflowStore.build(dir)
+
+      built_store.write('build-small-key', 'x')
+      built_store.write('build-large-key', 'x' * (MAX_SIZE * 2))
+
+      assert_equal 'x', built_store.read('build-small-key')
+      assert_equal 'x' * (MAX_SIZE * 2), built_store.read('build-large-key')
+
+      built_store.clear
+      FileUtils.remove_entry(dir)
+    end
+  end
+
   private
 
   def capture_log
