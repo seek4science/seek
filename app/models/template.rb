@@ -95,29 +95,9 @@ class Template < ApplicationRecord
     end
   end
 
+  # @todo: This is probably not used anywhere and can be deleted in the future. For now, this is just calling the method in the ISATag::TagType module.
   def isa_tag_white_list(template_level)
-    case template_level
-    when 'study source'
-      [Seek::ISA::TagType::SOURCE,
-       Seek::ISA::TagType::SOURCE_CHARACTERISTIC]
-    when 'study sample'
-      [Seek::ISA::TagType::SAMPLE,
-       Seek::ISA::TagType::SAMPLE_CHARACTERISTIC,
-       Seek::ISA::TagType::PROTOCOL,
-       Seek::ISA::TagType::PARAMETER_VALUE]
-    when 'assay - material'
-      [Seek::ISA::TagType::OTHER_MATERIAL,
-       Seek::ISA::TagType::OTHER_MATERIAL_CHARACTERISTIC,
-       Seek::ISA::TagType::PROTOCOL,
-       Seek::ISA::TagType::PARAMETER_VALUE]
-    when 'assay - data file'
-      [Seek::ISA::TagType::PROTOCOL,
-       Seek::ISA::TagType::DATA_FILE,
-       Seek::ISA::TagType::DATA_FILE_COMMENT,
-       Seek::ISA::TagType::PARAMETER_VALUE]
-    else
-      []
-    end
+    ISATag.allowed_isa_tags_for_level(template_level)
   end
 
   def self.supports_extended_metadata?
