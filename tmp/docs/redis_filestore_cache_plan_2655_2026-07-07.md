@@ -168,9 +168,16 @@ that's already there rather than invent a db-swapping scheme:
       (`SCAN` + `UNLINK` via the store's public `redis` accessor) and apply the matcher with
       `String#match?`, mirroring `FileStore`'s existing loose semantics exactly — both call sites
       keep working unmodified, no app code touched.
+- [x] Implemented `clear`, found missing during a follow-up check (`Rails.cache.clear` was
+      untouched by Step 3's original scope, so it silently inherited the base class's
+      `raise NotImplementedError`). Delegates to both children. Note this makes `@redis_store`'s
+      `namespace: 'cache'` option (Step 1/5) safety-critical, not just tidy:
+      `RedisCacheStore#clear` does a scoped `delete_matched("*", namespace: ...)` when namespaced,
+      but a full `FLUSHDB` on the whole shared instance if not — on a Redis shared with sessions,
+      losing the namespace would turn `Rails.cache.clear` into "log every user out."
 - [x] **CI:** unit test (`test/unit/redis_with_file_overflow_store_test.rb`) against a real local
       Redis (`redis://localhost:6379/15`, the same instance CI's `tests.yml` already starts on
-      `localhost:6379` for session-store tests) plus a `Dir.mktmpdir` for the file side — 7 tests,
+      `localhost:6379` for session-store tests) plus a `Dir.mktmpdir` for the file side — 9 tests,
       all passing:
       - small item → written to Redis only, not on disk
       - large item → written to disk only, not in Redis
@@ -183,6 +190,20 @@ that's already there rather than invent a db-swapping scheme:
         `tmp/cache` today, pre-cutover) is read back cleanly through the new store's file-side
         reader — leftover pre-cutover entries can't cause a boot-time or request-time error once
         this store is live
+      - `clear` removes entries from both backends
+      - `clear` does **not** wipe Redis keys outside the configured namespace — proves the
+        namespace-safety point above with a live assertion, not just a comment
+
+Separately (informational, no plan change needed): `rake tmp:cache:clear` is a raw
+`rm_rf Dir["tmp/cache/*"]` (`railties/lib/rails/tasks/tmp.rake`) — it doesn't call
+`Rails.cache.clear` and has no idea what cache store is configured. After cutover it will only
+clear the filesystem-overflow side, leaving Redis-cached items untouched, silently changing this
+task from "clear the cache" to "clear part of the cache." It's invoked by
+`script/update-from-git.sh`, `script/mini-update-from-git.sh`, `script/load-docker.sh`, and
+`script/import-docker-data.sh` (all via `rake tmp:clear`, which depends on `tmp:cache:clear`).
+Not fixed here since it's an operational/deploy-script concern rather than part of the store
+implementation — worth a follow-up if a full cache clear via these scripts is ever actually relied
+upon in practice.
 
 ## Step 4 — Oversized-entry logging
 

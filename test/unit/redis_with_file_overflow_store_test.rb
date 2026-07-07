@@ -92,4 +92,27 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
 
     assert_equal 'legacy-value', @store.read('legacy-key')
   end
+
+  test 'clear removes entries from both backends' do
+    @store.write('small-key', 'x')
+    @store.write('large-key', 'x' * (MAX_SIZE * 2))
+
+    @store.clear
+
+    refute @store.exist?('small-key')
+    refute @store.exist?('large-key')
+  end
+
+  test 'clear does not wipe keys outside the redis namespace' do
+    unrelated = ActiveSupport::Cache::RedisCacheStore.new(url: 'redis://localhost:6379/15',
+                                                          namespace: 'unrelated')
+    unrelated.write('session-like-key', 'do-not-touch')
+
+    @store.write('small-key', 'x')
+    @store.clear
+
+    assert_equal 'do-not-touch', unrelated.read('session-like-key')
+  ensure
+    unrelated&.clear
+  end
 end

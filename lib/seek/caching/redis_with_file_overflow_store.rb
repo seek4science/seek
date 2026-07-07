@@ -24,6 +24,15 @@ module Seek
         redis_result || file_result
       end
 
+      # RedisCacheStore#clear flushes the whole Redis instance unless it's namespaced, in which
+      # case it scopes itself to that namespace - relies on @redis_store being constructed with
+      # a namespace (e.g. 'cache') when the instance is shared with sessions, or this would wipe
+      # far more than the cache.
+      def clear(options = nil)
+        @redis_store.clear(options)
+        @file_store.clear(options)
+      end
+
       private
 
       def read_entry(key, **options)
