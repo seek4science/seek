@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class AdminControllerTest < ActionController::TestCase
 
@@ -236,6 +237,25 @@ class AdminControllerTest < ActionController::TestCase
   test 'get auth consistency stats' do
     get :get_stats, xhr: true, params: { page: 'auth_consistency' }
     assert_response :success
+  end
+
+  test 'redis cache stats reports when the cache is not redis-backed' do
+    # the test environment uses :memory_store, which has no redis_memory_stats
+    get :get_stats, xhr: true, params: { page: 'redis_stats' }
+    assert_response :success
+    assert_select 'p.none_text', text: /does not use Redis/
+  end
+
+  test 'redis cache stats renders evicted keys when the cache is redis-backed' do
+    fake_stats = { 'used_memory_human' => '2.50M', 'maxmemory_human' => '256.00M',
+                   'maxmemory_policy' => 'allkeys-lru', 'evicted_keys' => '42',
+                   'expired_keys' => '1000', 'keyspace_hits' => '5000', 'keyspace_misses' => '250' }
+    @controller.stub(:redis_cache_stats, fake_stats) do
+      get :get_stats, xhr: true, params: { page: 'redis_stats' }
+    end
+    assert_response :success
+    assert_select 'table#redis-stats'
+    assert_select 'span.label-warning', text: /memory pressure/
   end
 
   test 'The configuration should stay the same after test_email_configuration' do

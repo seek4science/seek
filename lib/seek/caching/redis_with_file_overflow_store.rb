@@ -57,11 +57,17 @@ module Seek
         @file_store.cleanup(options)
       end
 
-      # Ops visibility for the shared-instance eviction tradeoff (Step 1/Step 8): used_memory
-      # shows how full the instance is, evicted_keys is the signal that Redis has started
-      # discarding keys under maxmemory-policy - including, in principle, session keys.
+      # Ops visibility for the shared-instance eviction tradeoff (Step 1/Step 8): used_memory shows
+      # how full the instance is against maxmemory, and evicted_keys is the signal that Redis has
+      # started discarding keys under maxmemory-policy - including, in principle, session keys.
+      # expired_keys (natural TTL expiry - healthy) is included alongside so a reader can tell the
+      # two apart, and keyspace_hits/misses give cache effectiveness. Surfaced daily by
+      # CacheOverflowCleanupJob and on the admin dashboard (Status and statistics > Redis cache).
+      REDIS_STAT_FIELDS = %w[used_memory used_memory_human maxmemory_human maxmemory_policy
+                             evicted_keys expired_keys keyspace_hits keyspace_misses].freeze
+
       def redis_memory_stats
-        @redis_store.redis.then { |c| c.info.slice('used_memory', 'used_memory_human', 'evicted_keys') }
+        @redis_store.redis.then { |c| c.info.slice(*REDIS_STAT_FIELDS) }
       end
 
       private

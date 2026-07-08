@@ -396,10 +396,18 @@ since it only shows up under real memory pressure.
       the compose file — headroom should still be chosen from a measured peak (concurrent active
       sessions × average serialized session size, plus the expected cache working set, plus a safety
       margin), but 256mb is a saner default for a shared instance and is now trivially tunable.
-- [ ] Wire the `evicted_keys` monitoring from Step 6's optional periodic job to something that
-      actually gets looked at (log line is enough initially, admin-alerting can follow later) —
-      the goal is that a rising `evicted_keys` count is noticed as "sessions may be getting dropped
-      early," not discovered via a user complaint.
+- [x] Wire the `evicted_keys` monitoring somewhere it actually gets looked at. Two channels now:
+      (1) the daily `CacheOverflowCleanupJob` log line (Step 6); (2) a **"Redis cache" panel on the
+      admin dashboard** (Administration → Status and statistics → Redis cache) surfacing
+      `evicted_keys` alongside `expired_keys` (so the healthy-vs-pressure distinction is visible),
+      used/max memory, eviction policy, and keyspace hit/miss. `evicted_keys > 0` is flagged with a
+      "memory pressure" label. Enriched `RedisWithFileOverflowStore#redis_memory_stats` with the
+      extra `INFO` fields (`REDIS_STAT_FIELDS`); added `AdminController#redis_cache_stats` (guarded —
+      renders a "not Redis-backed" note under `:memory_store`, and an error line rather than a 500 if
+      Redis is unreachable) and the `admin/stats/_redis_stats` partial. Functional tests cover both
+      the Redis-backed (evicted-keys table + pressure label) and not-Redis-backed paths. Admin
+      alerting/email can still follow later, but the count is now visible on demand without shell
+      access.
 - [ ] Document the escalation path in the ops runbook if `evicted_keys` alerts fire repeatedly:
       raise `maxmemory` first (cheapest fix); if cache growth keeps outpacing that, splitting
       cache and sessions onto separate Redis instances is the real fix — flagged here as a known

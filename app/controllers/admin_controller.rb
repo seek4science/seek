@@ -484,6 +484,8 @@ class AdminController < ApplicationController
         render partial: 'admin/stats/storage_usage_stats'
       when 'snapshot_and_doi_stats'
         render partial: 'admin/stats/snapshot_and_doi_stats'
+      when 'redis_stats'
+        render partial: 'admin/stats/redis_stats', locals: { stats: redis_cache_stats }
       when 'none'
         render html: ''
       else
@@ -633,6 +635,17 @@ class AdminController < ApplicationController
   end
 
   private
+
+  # Redis INFO stats for the admin dashboard, or nil if the configured cache store isn't Redis-backed
+  # (e.g. the test environment's :memory_store). A hash with an 'error' key is returned if the stats
+  # can't be fetched (Redis unreachable) so the panel can report it rather than 500.
+  def redis_cache_stats
+    return nil unless Rails.cache.respond_to?(:redis_memory_stats)
+
+    Rails.cache.redis_memory_stats
+  rescue StandardError => e
+    { 'error' => e.message }
+  end
 
   def check_valid_email(email_address, field)
     if email_address.blank? || email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/
