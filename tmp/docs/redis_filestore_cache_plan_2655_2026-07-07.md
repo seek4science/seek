@@ -415,11 +415,18 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
       Documented the invariant and the miss-only cost in a code comment above `write_to_redis` /
       `write_to_file`; the "no stale duplicate after a threshold crossing" unit test already asserts
       the invariant.
-- [ ] **[M2]** `delete_matched` pulls the entire `cache:*` namespace to the client and filters in
-      Ruby (`String#match?`), O(all cache keys) per call — because it deliberately supports Regexp
-      matchers. Both call sites (`content_blob.rb:321`, `dashboard_stats.rb`) hit this. For the
-      String/glob case, translate to a server-side Redis `MATCH` and only fall back to the full scan
-      for Regexp matchers — worth doing if either call site proves hot.
+- [x] **[M2]** `delete_matched` pulled the entire `cache:*` namespace to the client and filtered in
+      Ruby, O(all cache keys) per call. **Fixed** by narrowing the server-side `SCAN` with a derived
+      `MATCH` pattern: extract the literal substring every matching key is *guaranteed* to contain
+      (`guaranteed_literal_substring` — leading literal run, dropping a quantified trailing char) and
+      scan `"<prefix>*<literal>*"`, so Redis pre-filters. The exact Ruby matcher is still applied to
+      the (now much smaller) candidate set, so semantics and both-backend consistency are unchanged —
+      the MATCH is a strict *superset*, never tighter, so no key that should be deleted is skipped.
+      Works for both real call sites (`"st-match-#{id}*"` → `*st-match-<id>*`, `/admin_dashboard_stats/`
+      → `*admin_dashboard_stats*`); falls back to the old full-namespace scan when no literal can be
+      extracted (e.g. an anchored/leading-metacharacter regex). Covered by new unit tests
+      (`redis_with_file_overflow_store_test.rb`: prefilter-active deletion, literal extraction incl.
+      the quantifier-drop and no-literal fallback cases).
 - [ ] **[L1]** `delete_matched` treats a String matcher as a Ruby regex (unanchored), not a Redis
       glob — so `"st-match-12*"` also deletes `st-match-13…`. Faithful to the old FileStore
       behaviour (not a regression) but now cemented into the Redis path; worth a call-site comment or
@@ -445,3 +452,26 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
 - [ ] **[I3]** container rename `seek-session-store` → `seek-redis` is a minor external-compat break
       for any out-of-repo ops tooling that references the old name. Worth a line in the
       release/upgrade notes.
+
+## Test-infrastructure note — running the store tests without a live Redis (revisit later)
+
+- [ ] **Let the store tests run without a live Redis.**
+`test/unit/redis_with_file_overflow_store_test.rb` requires a real Redis (`redis://localhost:6379/15`)
+for the whole file — `setup` builds a `RedisCacheStore` and `teardown` calls `clear`, so even the
+pure-logic tests inherit the dependency. CI already runs `redis:8.6-alpine`, so this is fine there;
+it only bites when running the suite locally without Redis. Options considered, to revisit if it
+becomes a pain:
+
+- **VCR cassettes — not applicable.** VCR records at the HTTP layer (via WebMock); the `redis` gem
+  speaks the RESP protocol over a raw TCP socket, which WebMock/VCR don't intercept. (It's WebMock's
+  `allow_localhost: true` that lets the real Redis connection through in tests today.)
+- **In-memory fake gem.** `mock_redis` (0.55.0, current, tracks redis-rb 5.x) is the only viable
+  candidate — `fakeredis` (0.9.2) is stale and won't work with this project's `redis 5.4.1`. Neither
+  is currently a project dependency. Caveats: (1) wiring a `MockRedis` into `RedisCacheStore` isn't
+  trivial since AS drives its client through `redis-client` internally — needs verifying, not
+  assuming; (2) fidelity gap on exactly the behaviours this store leans on (`SCAN` cursor batching,
+  `UNLINK`, `maxmemory`/`allkeys-lru` eviction), so a green test against the fake could mask a real
+  -Redis failure. Adds a test dependency for questionable benefit given CI has a real server.
+- **Cheapest win (no new dependency).** Split the two pure-string tests (`guaranteed_literal_substring`,
+  `redis_scan_pattern`) into a sibling test class that doesn't construct the Redis store in `setup`,
+  so at least the matcher-derivation logic runs anywhere. Recommended if/when this is worth doing.

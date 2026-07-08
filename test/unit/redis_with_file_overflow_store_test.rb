@@ -87,6 +87,39 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
     assert @store.exist?('other')
   end
 
+  test 'delete_matched still deletes correctly when the server-side prefilter is active' do
+    # The prefilter narrows the SCAN to keys containing the matcher's literal substring; keys that
+    # do not contain it must be left untouched, and matching keys must still go regardless of which
+    # backend they landed in.
+    @store.write('st-match-42-a', 'x')                    # redis
+    @store.write('st-match-42-b', 'x' * (MAX_SIZE * 2))   # disk
+    @store.write('st-match-99-a', 'x')                    # different id, not matched by the literal
+    @store.write('unrelated-key', 'x')
+
+    @store.delete_matched('st-match-42-*')
+
+    refute @store.exist?('st-match-42-a')
+    refute @store.exist?('st-match-42-b')
+    assert @store.exist?('st-match-99-a')
+    assert @store.exist?('unrelated-key')
+  end
+
+  test 'guaranteed_literal_substring drops a quantified trailing character' do
+    # 'st-match-12*' as a regex source is st-match-12 followed by zero-or-more '3's... i.e. the
+    # trailing char before a quantifier is not guaranteed, so it must be dropped from the prefilter.
+    assert_equal 'st-match-12', @store.send(:guaranteed_literal_substring, 'st-match-123*')
+    assert_equal 'st-match-1', @store.send(:guaranteed_literal_substring, 'st-match-1-*')
+    assert_equal 'admin_dashboard_stats', @store.send(:guaranteed_literal_substring, /admin_dashboard_stats/)
+    # A leading regex anchor/metacharacter yields no usable literal, forcing a full-namespace scan.
+    assert_nil @store.send(:guaranteed_literal_substring, /^foo/)
+  end
+
+  test 'redis_scan_pattern falls back to a full namespace scan without a usable literal' do
+    assert_equal 'test-cache:*', @store.send(:redis_scan_pattern, /^foo/, 'test-cache:')
+    assert_equal 'test-cache:*admin_dashboard_stats*',
+                 @store.send(:redis_scan_pattern, /admin_dashboard_stats/, 'test-cache:')
+  end
+
   test 'an entry already on disk in the plain FileStore format is read back cleanly' do
     @file_store.write('legacy-key', 'legacy-value')
 

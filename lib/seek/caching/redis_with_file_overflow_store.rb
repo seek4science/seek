@@ -157,9 +157,45 @@ module Seek
 
       def delete_matched_in_redis(matcher, _options)
         prefix = redis_namespace_prefix
-        scan_pattern = prefix ? "#{prefix}*" : '*'
+        scan_pattern = redis_scan_pattern(matcher, prefix)
 
         @redis_store.redis.then { |c| scan_and_unlink(c, scan_pattern, prefix, matcher) }
+      end
+
+      # Narrow the server-side SCAN so Redis filters most keys itself instead of shipping the whole
+      # namespace to the client to be filtered in Ruby (matching_redis_keys still applies the exact
+      # matcher afterwards, so this only shrinks the candidate set - it never decides the result).
+      # The MATCH pattern must be a *superset* of what the matcher accepts: it can be looser, never
+      # tighter, or we'd skip keys that should be deleted. We extract a literal substring that every
+      # matching key is guaranteed to contain and let Redis pre-filter on "<prefix>*<literal>*"; if
+      # none can be extracted we scan the whole namespace ("<prefix>*"), exactly as before.
+      def redis_scan_pattern(matcher, prefix)
+        base = prefix || ''
+        literal = guaranteed_literal_substring(matcher)
+        return "#{base}*" if literal.nil? || literal.empty?
+
+        "#{base}*#{redis_glob_escape(literal)}*"
+      end
+
+      # Longest leading run of plain-literal characters guaranteed to appear in every string the
+      # matcher accepts. Stops at the first regex-special character; if that character is a
+      # quantifier (`*`, `?`, `{`) the preceding character is optional/variable and is dropped. A
+      # String matcher is treated as a regex source, mirroring how String#match? (and FileStore's
+      # delete_matched) interpret it. Returns nil when nothing literal can be guaranteed, which
+      # falls back to a full-namespace scan.
+      def guaranteed_literal_substring(matcher)
+        source = matcher.is_a?(Regexp) ? matcher.source : matcher.to_s
+        literal = source[/\A[A-Za-z0-9_\-\/: ]+/]
+        return nil if literal.nil?
+
+        literal = literal[0..-2] if ['*', '?', '{'].include?(source[literal.length])
+        literal
+      end
+
+      # Escape the Redis glob metacharacters so the extracted literal matches itself literally in
+      # the SCAN MATCH pattern.
+      def redis_glob_escape(str)
+        str.gsub(/[\\*?\[\]]/) { |c| "\\#{c}" }
       end
     end
   end
