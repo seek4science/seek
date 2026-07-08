@@ -339,9 +339,18 @@ Steps 1–6 each land their own CI coverage alongside the code they test, so thi
 cross-cutting pass, not where testing starts:
 
 - [ ] Full CI suite green, including all the tests added incrementally in Steps 1–6.
-- [ ] End-to-end integration test spanning the whole path: write an item just under and just over
-      the configured threshold through a real call site (not the store directly), confirm correct
-      backend placement end-to-end and that only the oversized write logs an overflow entry.
+- [x] End-to-end integration test spanning the whole path
+      (`test/integration/redis_overflow_cache_test.rb`, 5 tests): builds the store via `.build` and
+      installs it as `Rails.cache` exactly as production/development do, then drives the real
+      `Rails.cache` mechanism rather than the store directly — small value → Redis, incompressible
+      large value → disk **and** an overflow log line; the threshold read live from `Seek::Config`
+      on every write (same key routed to disk under a tiny threshold, to Redis under a large one, with
+      the stale copy removed); structured-value round-trip + delete; `clear` empties both backends
+      while leaving a `session:`-style key in another Redis namespace intact; and `delete_matched`
+      exercised through the real `ContentBlob#clear_sample_type_matches` call site against the live
+      overflow store. Closes review finding **L5**. (Uses an incompressible `SecureRandom.hex`
+      payload where disk placement is asserted, since a repetitive value would compress below the
+      threshold and land in Redis.)
 - [ ] Manual verification (`/verify`): exercise the spreadsheet-explore view, notebook rendering,
       RightField extraction, and ontology browsing; confirm large payloads land on disk under
       `tmp/cache` and small/frequent values (dashboard stats, settings, list-item titles) land in
@@ -400,10 +409,12 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
       against this, we treat `0` as a legitimate way to turn Redis caching off entirely (everything
       on the filesystem) — the admin help text now documents this behaviour explicitly so it reads
       as an intentional switch, not a silent misconfiguration.
-- [ ] **[L5] / Step 7** the store is never exercised as `Rails.cache` in the suite — test env stays
-      on `:memory_store`, so every real call site runs against `MemoryStore` in CI. Add one
-      end-to-end test driving a real call site through the overflow store (also exercises the
-      M1/M2/L1 paths for real). Closes the Step 7 integration gap.
+- [x] **[L5] / Step 7** the store was never exercised as `Rails.cache` in the suite (test env stays
+      on `:memory_store`). **Fixed** by `test/integration/redis_overflow_cache_test.rb`, which installs
+      the real overflow store as `Rails.cache` and drives it through the `Rails.cache` API and the
+      `ContentBlob#clear_sample_type_matches` call site — exercising the threshold routing, overflow
+      logging, double key-normalisation, namespace-scoped `clear`, and `delete_matched` for real. See
+      Step 7 above.
 - [x] **[M1]** every small cache write does a filesystem `stat` — `write_to_redis` calls
       `FileStore#delete_entry` (→ `File.exist?`) to clear a stale disk copy. **Decision: keep it.**
       The review's option (c) (drop the pre-delete, rely on read-checks-Redis-first) is actually a
