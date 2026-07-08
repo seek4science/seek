@@ -26,7 +26,7 @@ module HasSharedAttributeValidation
 
   def validate_one_title_attribute_present
     unless (count = shared_attributes.select(&:is_title).count) == 1
-      errors.add(shared_attributes_name, "There must be 1 attribute which is the title, currently there are #{count}")
+      errors.add(shared_attributes_name, "There must be 1 attribute which is the title, currently there are #{count}.")
     end
   end
 

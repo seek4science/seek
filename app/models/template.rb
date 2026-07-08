@@ -45,60 +45,31 @@ class Template < ApplicationRecord
     end
   end
 
-  def validate_template_attributes
-    if attributes_with_empty_isa_tag.any?
-      attributes_with_empty_isa_tag.map do |attribute|
-        errors.add("[#{:template_attributes}]:", "Attribute '#{attribute.title}' is missing an ISA tag")
-      end
-  def validate_template_level
-    unless Seek::ISATemplates::TemplateLevel.valid?(level)
-      errors.add :level, "is not a valid #{t('template')} level"
-    end
-  end
-
-
-    if test_tag_occurences.any?
-      test_tag_occurences.map do |tag|
-        attributes_with_duplicate_tags = template_attributes.select { |tat| tat.isa_tag&.title == tag }.map(&:title)
-        errors.add("[#{:template_attributes}]:",
-                   "The '#{tag}' ISA Tag was used in these attributes => #{attributes_with_duplicate_tags.inspect}. This ISA tag is not allowed to be used more then once!")
-      end
-    end
-
-    test_input_occurence
-    test_attribute_title_uniqueness
-  end
-
   def validate_no_attributes_with_empty_isa_tag
     template_attributes.each do |attribute|
       if attribute.isa_tag_id.blank?
-        errors.add("[#{:template_attributes}]:", "Attribute '#{attribute.title}' is missing an ISA tag")
+        errors.add(:template_attributes, "Attribute '#{attribute.title}' is missing an ISA tag")
       end
     end
   end
 
-  def attributes_with_empty_isa_tag
-    template_attributes.select { |ta| ta.isa_tag_id.blank? }
-  end
+  def validate_isa_tags
+    tags_for_level = ISATag.allowed_isa_tags_for_level(level)
+    tags_exactly_one = tags_for_level.select { |tag| Seek::ISA::TagType.exactly_one?(tag&.title) }
 
-  def test_tag_occurences
-    %w[source protocol sample data_file other_material].map do |tag|
-      tag if template_attributes.reject { |ta| ta.title.include?('Input') }.map(&:isa_tag).compact.map(&:title).count(tag) > 1
-    end.compact
-  end
+    template_attributes.each do |attribute|
+      isa_tag = attribute.isa_tag
 
-  def test_input_occurence
-    return if template_attributes.map(&:title).map(&:downcase).compact.count('input') <= 1
+      # Test for invalid ISA tags
+      unless tags_for_level.pluck(:title).include? isa_tag.title
+        errors.add(:template_attributes, "ISA Tag '#{isa_tag.title}' for attribute '#{attribute.title}' is not allowed.")
+      end
+    end
 
-    errors.add(:base, '[Template attribute]: You are not allowed to have more than one Input attribute.')
-  end
-
-  def test_attribute_title_uniqueness
-    template_attribute_titles = template_attributes.map(&:title).uniq
-    template_attribute_titles.map do |tat|
-      if template_attributes.select { |ta| ta.title.downcase == tat.downcase }.map(&:title).count > 1
-        errors.add(:template_attributes, "Attribute names must be unique, there are duplicates of #{tat}")
-        return tat
+    # Test for ISA tags that are allowed to be added only once
+    tags_exactly_one.each do |tag|
+      unless (count = template_attributes.select { |ta| ta.isa_tag.title == tag.title }.count) == 1
+        errors.add(:template_attributes, "You must have exactly one attribute with a '#{tag.title}' ISA Tag. Currently, #{count} attributes found.")
       end
     end
   end
