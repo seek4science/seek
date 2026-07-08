@@ -427,10 +427,21 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
       extracted (e.g. an anchored/leading-metacharacter regex). Covered by new unit tests
       (`redis_with_file_overflow_store_test.rb`: prefilter-active deletion, literal extraction incl.
       the quantifier-drop and no-literal fallback cases).
-- [ ] **[L1]** `delete_matched` treats a String matcher as a Ruby regex (unanchored), not a Redis
-      glob — so `"st-match-12*"` also deletes `st-match-13…`. Faithful to the old FileStore
-      behaviour (not a regression) but now cemented into the Redis path; worth a call-site comment or
-      anchoring if anyone tightens it.
+- [x] **[L1]** Investigating the unanchored-regex footgun revealed the primary call site was worse
+      than the review thought: `content_blob#clear_sample_type_matches` used `"st-match-#{id}*"` (a
+      **hyphen**), but the cached match results live under an *array* key
+      (`['st-match', blob, content_blob, …]`, `sample_type_template_concerns.rb:48`) that normalizes
+      to `st-match/content_blobs/<id>-…` (a **slash** then the blob `cache_key`). Confirmed
+      empirically that the old pattern matched **nothing** — a pre-existing no-op left behind when the
+      key was refactored to an array. **Fixed** the call site to match this blob's
+      `content_blobs/<id>-` segment anywhere within an `st-match/` key (`%r{st-match/.*content_blobs/#{id}-}`),
+      which covers the blob appearing in either the matched-blob or the sample-type-template position;
+      the trailing `-` bounds the id so blob 12 doesn't also clear blob 120. Added a `content_blob_test`
+      asserting a real array-key entry is cleared from either position and an unrelated entry is left
+      intact. (The dashboard_stats call site, `/admin_dashboard_stats/`, was already correct — its
+      keys really are prefixed that way.) The general "String matcher = unanchored Ruby regex, not a
+      glob" property of `delete_matched` remains, faithful to FileStore, but no live call site now
+      relies on it.
 - [ ] **[L2]** `delete_matched` assumes a single Redis node (`@redis_store.redis`), where the
       original iterated `Redis::Distributed#nodes`. No practical impact on SEEK's single-`REDIS_URL`
       setup, but strictly less robust than what it replaced.

@@ -185,7 +185,7 @@ module Seek
       # falls back to a full-namespace scan.
       def guaranteed_literal_substring(matcher)
         source = matcher.is_a?(Regexp) ? matcher.source : matcher.to_s
-        literal = source[/\A[A-Za-z0-9_\-\/: ]+/]
+        literal = source[%r{\A[A-Za-z0-9_\-/: ]+}]
         return nil if literal.nil?
 
         literal = literal[0..-2] if ['*', '?', '{'].include?(source[literal.length])
