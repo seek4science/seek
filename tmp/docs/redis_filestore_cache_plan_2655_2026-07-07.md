@@ -314,6 +314,12 @@ covering, but not with the same mechanism.
       — offset 4 is distinct from `RegularMaintenanceJob`/`AuthLookupMaintenanceJob` (offset 1),
       `LifeMonitorStatusJob` (offset 2), and `Galaxy::ToolMap` (offset 3). Verified with
       `bundle exec whenever` that it generates a correct, distinctly-timed crontab entry.
+- [x] Updated `test/integration/schedule_test.rb` to account for the new runner — the existing
+      `should read schedule file` test pops each expected runner and asserts none are left over, so a
+      new scheduled job must be registered there or the test fails ("Found untested runner(s)"). This
+      was missed initially and only surfaced in CI (run 28936858354) because Step 6 landed after the
+      earlier green run; added the `CacheOverflowCleanupJob.perform_later` expectation
+      (`[1.day, { at: '4:00am' }]`).
 - [x] Disk-space monitoring note (no separate ops runbook exists in this repo, so recorded here):
       TTL + daily cleanup bounds the overflow directory's growth but isn't instantaneous — between
       sweeps, disk usage can still climb. Worth an alert threshold on the `tmp/cache` filesystem

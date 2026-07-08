@@ -54,6 +54,11 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     assert tool_map_refresh
     assert_equal [1.day, { at: '3:00am' }], tool_map_refresh[:every]
 
+    # CacheOverflowCleanupJob
+    cache_cleanup = pop_task(runners, "CacheOverflowCleanupJob.perform_later")
+    assert cache_cleanup
+    assert_equal [CacheOverflowCleanupJob::RUN_PERIOD, { at: '4:00am' }], cache_cleanup[:every]
+
     # Data dumps
     data_dump = pop_task(runners, 'Seek::BioSchema::DataDump.generate_dumps')
     assert data_dump
