@@ -462,10 +462,18 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
 - [ ] **[L2]** `delete_matched` assumes a single Redis node (`@redis_store.redis`), where the
       original iterated `Redis::Distributed#nodes`. No practical impact on SEEK's single-`REDIS_URL`
       setup, but strictly less robust than what it replaced.
-- [ ] **[L3]** payload is serialized twice per write — once in `write_entry` to measure `bytesize`,
-      then again by the child store. Avoidable CPU on the large-overflow path specifically; also the
-      size comparison silently depends on parent and child stores sharing coder/compress settings.
-      Worth a comment noting that invariant.
+- [x] **[L3]** payload was serialized twice per write — once in `write_entry` to measure `bytesize`,
+      then again by the child store's own `write_entry`. **Fixed** by serializing once and handing the
+      payload straight to each backend's `write_serialized_entry` (both `RedisCacheStore` and
+      `FileStore` expose it), so an oversized value (spreadsheet XML / notebook HTML) is no longer
+      Marshalled + gzipped twice. Also makes routing exact — the measured size is now precisely the
+      stored payload. Verified empirically that all three stores share a coder
+      (`Marshal71WithFallback` + `Zlib`, 1KB threshold) and a parent-serialized payload loads under
+      either backend; documented the shared-coder invariant in a comment (the review's suggestion) —
+      it's now a storage-correctness dependency, not just a routing one, and `.build` guarantees it by
+      constructing all three with defaults. New unit tests stub each backend's re-serializing
+      `write_entry` to `flunk` if reached, proving the write goes through `write_serialized_entry` while
+      the value still round-trips.
 - [ ] **[L4]** `settings_cache_store` is now a plain `RedisCacheStore` on the request hot path — a
       Redis blip means a per-request DB read for settings until recovery (degrades safely, but a new
       network coupling worth noting for capacity/latency planning).

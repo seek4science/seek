@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'tmpdir'
+require 'minitest/mock'
 
 class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
   MAX_SIZE = 200
@@ -45,6 +46,25 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
 
     assert @store.delete('large-key')
     refute @file_store.exist?('large-key')
+  end
+
+  test 'a redis-bound write serializes once and does not re-serialize in the backend' do
+    # write_entry serializes to measure size, then hands the payload to write_serialized_entry;
+    # the re-serializing write_entry path on the backend must not be reached.
+    @redis_store.stub(:write_entry, ->(*_a, **_k) { flunk 'redis backend re-serialized via write_entry' }) do
+      @store.write('serialize-once', 'a value')
+    end
+    assert @redis_store.exist?('serialize-once')
+    assert_equal 'a value', @store.read('serialize-once')
+  end
+
+  test 'an overflow write serializes once and does not re-serialize in the backend' do
+    large_value = 'x' * (MAX_SIZE * 2)
+    @file_store.stub(:write_entry, ->(*_a, **_k) { flunk 'file backend re-serialized via write_entry' }) do
+      @store.write('overflow-once', large_value)
+    end
+    assert @file_store.exist?('overflow-once')
+    assert_equal large_value, @store.read('overflow-once')
   end
 
   test 'a key crossing the size threshold does not leave a stale duplicate' do

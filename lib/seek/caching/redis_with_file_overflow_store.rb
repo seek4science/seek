@@ -75,14 +75,26 @@ module Seek
         @file_store.send(:read_entry, file_key, **options)
       end
 
+      # Serialize the entry once, here, rather than letting the chosen backend re-serialize it. The
+      # backends' own write_entry would call serialize_entry again, so an oversized value (the
+      # overflow case - spreadsheet XML, notebook HTML) would otherwise be Marshalled and gzipped
+      # twice per write. Serializing once also makes the routing decision exact: the byte size we
+      # compare against the threshold is precisely the payload we store.
+      #
+      # This depends on an invariant: this store and both backends must share the same coder and
+      # compression settings, so the payload produced here is read back correctly by whichever
+      # backend's coder loads it. .build guarantees this - all three are constructed with defaults
+      # (Marshal + Zlib, 1KB compress threshold) and .build exposes no way to customise a coder. If
+      # a custom :coder/:compress is ever passed to one store but not the others, this reuse (and the
+      # size comparison) would break; keep them in lockstep.
       def write_entry(key, entry, **options)
         payload = serialize_entry(entry, **options)
 
         if payload.bytesize <= max_redis_item_size
-          write_to_redis(key, entry, **options)
+          write_to_redis(key, payload, **options)
         else
           log_overflow(key, payload.bytesize)
-          write_to_file(key, entry, **options)
+          write_to_file(key, payload, **options)
         end
       end
 
@@ -102,14 +114,14 @@ module Seek
       # The cost of the FileStore pre-delete (one File.exist? stat) is only paid on a cache *miss*,
       # since writes only happen when fetch misses - steady-state cache *hits* return from Redis in
       # read_entry without ever touching the filesystem.
-      def write_to_redis(key, entry, **options)
+      def write_to_redis(key, payload, **options)
         @file_store.send(:delete_entry, @file_store.send(:normalize_key, key, options), **options)
-        @redis_store.send(:write_entry, @redis_store.send(:normalize_key, key, options), entry, **options)
+        @redis_store.send(:write_serialized_entry, @redis_store.send(:normalize_key, key, options), payload, **options)
       end
 
-      def write_to_file(key, entry, **options)
+      def write_to_file(key, payload, **options)
         @redis_store.send(:delete_entry, @redis_store.send(:normalize_key, key, options), **options)
-        @file_store.send(:write_entry, @file_store.send(:normalize_key, key, options), entry, **options)
+        @file_store.send(:write_serialized_entry, @file_store.send(:normalize_key, key, options), payload, **options)
       end
 
       def delete_entry(key, **options)
