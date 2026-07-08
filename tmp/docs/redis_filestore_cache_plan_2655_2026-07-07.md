@@ -388,3 +388,54 @@ since it only shows up under real memory pressure.
       the manual simulation above instead, plus the existing session-store tests (unaffected by
       this step, since nothing here changes session code, only capacity planning and monitoring
       around the store it already uses).
+
+## Review findings (to address)
+
+Full write-up: `redis_filestore_cache_review_2655_2026-07-07.md` (review of `main...redis-cache-store-2655`,
+Steps 1–6). None are blockers; listed here in the suggested order to work through. Severity:
+**[M]** medium (fix before prod reliance), **[L]** low, **[I]** informational / pre-existing.
+
+- [ ] **[M3]** `cache_max_redis_item_size` has no floor — confirmed empirically that a blank admin
+      field stores `""` → `to_i` → `0`, so **every** entry overflows to disk and the Redis tier is
+      silently disabled (`admin_controller.rb:354` sets it unconditionally). Validate/clamp a
+      minimum on save, and/or treat a non-positive configured value as "use the default" in the
+      store. Highest-value quick fix.
+- [ ] **[L5] / Step 7** the store is never exercised as `Rails.cache` in the suite — test env stays
+      on `:memory_store`, so every real call site runs against `MemoryStore` in CI. Add one
+      end-to-end test driving a real call site through the overflow store (also exercises the
+      M1/M2/L1 paths for real). Closes the Step 7 integration gap.
+- [ ] **[M1]** every small cache write does a filesystem `stat` — `write_to_redis` calls
+      `FileStore#delete_entry` (→ `File.exist?`) on the hot path to clear a stale disk copy that is
+      almost never there (`redis_with_file_overflow_store.rb:93-96`). Decide explicitly: keep it, or
+      drop the pre-delete on the write-to-Redis path (read already checks Redis first, so a stale
+      file copy would never be served) and let TTL + `cleanup` reap it.
+- [ ] **[M2]** `delete_matched` pulls the entire `cache:*` namespace to the client and filters in
+      Ruby (`String#match?`), O(all cache keys) per call — because it deliberately supports Regexp
+      matchers. Both call sites (`content_blob.rb:321`, `dashboard_stats.rb`) hit this. For the
+      String/glob case, translate to a server-side Redis `MATCH` and only fall back to the full scan
+      for Regexp matchers — worth doing if either call site proves hot.
+- [ ] **[L1]** `delete_matched` treats a String matcher as a Ruby regex (unanchored), not a Redis
+      glob — so `"st-match-12*"` also deletes `st-match-13…`. Faithful to the old FileStore
+      behaviour (not a regression) but now cemented into the Redis path; worth a call-site comment or
+      anchoring if anyone tightens it.
+- [ ] **[L2]** `delete_matched` assumes a single Redis node (`@redis_store.redis`), where the
+      original iterated `Redis::Distributed#nodes`. No practical impact on SEEK's single-`REDIS_URL`
+      setup, but strictly less robust than what it replaced.
+- [ ] **[L3]** payload is serialized twice per write — once in `write_entry` to measure `bytesize`,
+      then again by the child store. Avoidable CPU on the large-overflow path specifically; also the
+      size comparison silently depends on parent and child stores sharing coder/compress settings.
+      Worth a comment noting that invariant.
+- [ ] **[L4]** `settings_cache_store` is now a plain `RedisCacheStore` on the request hot path — a
+      Redis blip means a per-request DB read for settings until recovery (degrades safely, but a new
+      network coupling worth noting for capacity/latency planning).
+- [ ] **[I1]** `clear` / deploy-script `seek:clear_cache` wipes all of `tmp/cache`, including
+      `bootsnap` and sprockets caches → slower next boot. Pre-existing (old config was also
+      `:file_store, "tmp/cache"`) and deploys already run `tmp:clear` first, so no new harm. If it
+      ever matters, point the overflow FileStore at a dedicated subdir (e.g. `tmp/cache/rails-cache`).
+- [ ] **[I2] / Step 8** `maxmemory 512mb` is a shared, hardcoded, unvalidated budget across
+      sessions + settings-cache + main cache with `allkeys-lru` — cache pressure can evict session
+      keys. Size it against the real working set and surface `evicted_keys` (already tracked in
+      Step 8).
+- [ ] **[I3]** container rename `seek-session-store` → `seek-redis` is a minor external-compat break
+      for any out-of-repo ops tooling that references the old name. Worth a line in the
+      release/upgrade notes.
