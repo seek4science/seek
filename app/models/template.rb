@@ -14,7 +14,8 @@ class Template < ApplicationRecord
   validates :title, uniqueness: { scope: %i[group version] }
   validates :level, presence: true
   validate :validate_template_level
-  validate :validate_template_attributes
+  validate :validate_no_attributes_with_empty_isa_tag, if: -> { errors.blank? }
+  validate :validate_isa_tags, if: -> { errors.blank? }
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
   scope :for_sample_type_creation, -> { where.not(group: Seek::ISATemplates::TemplateGroup::EXCLUDED_FROM_SAMPLE_TYPE_CREATION) }
