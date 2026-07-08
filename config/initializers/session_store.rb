@@ -1,6 +1,13 @@
 # Be sure to restart your server when you modify this file.
 
-session_url = "#{ENV.fetch('REDIS_URL', 'redis://localhost:6379/0')}/session"
+redis_host = ENV.fetch('REDIS_HOST', 'localhost')
+redis_password = ENV.fetch('REDIS_PASSWORD', nil)
+session_url =
+  if redis_password.present?
+    "redis://:#{CGI::escape(redis_password)}@#{redis_host}:6379/0/session"
+  else
+    "redis://#{redis_host}:6379/0/session"
+  end
 
 session_options = {
   servers: [session_url],
