@@ -404,11 +404,17 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
       on `:memory_store`, so every real call site runs against `MemoryStore` in CI. Add one
       end-to-end test driving a real call site through the overflow store (also exercises the
       M1/M2/L1 paths for real). Closes the Step 7 integration gap.
-- [ ] **[M1]** every small cache write does a filesystem `stat` — `write_to_redis` calls
-      `FileStore#delete_entry` (→ `File.exist?`) on the hot path to clear a stale disk copy that is
-      almost never there (`redis_with_file_overflow_store.rb:93-96`). Decide explicitly: keep it, or
-      drop the pre-delete on the write-to-Redis path (read already checks Redis first, so a stale
-      file copy would never be served) and let TTL + `cleanup` reap it.
+- [x] **[M1]** every small cache write does a filesystem `stat` — `write_to_redis` calls
+      `FileStore#delete_entry` (→ `File.exist?`) to clear a stale disk copy. **Decision: keep it.**
+      The review's option (c) (drop the pre-delete, rely on read-checks-Redis-first) is actually a
+      latent correctness bug: a stable key can move backends between writes, and once the fresh copy
+      is evicted (`allkeys-lru`) or TTL-expires, a read falls through to the surviving stale copy in
+      the other backend and serves an out-of-date value — so the cross-backend delete is a
+      correctness invariant. The cost is also smaller than it first looks: writes only happen on a
+      cache *miss*, and steady-state *hits* return from Redis without touching the filesystem at all.
+      Documented the invariant and the miss-only cost in a code comment above `write_to_redis` /
+      `write_to_file`; the "no stale duplicate after a threshold crossing" unit test already asserts
+      the invariant.
 - [ ] **[M2]** `delete_matched` pulls the entire `cache:*` namespace to the client and filters in
       Ruby (`String#match?`), O(all cache keys) per call — because it deliberately supports Regexp
       matchers. Both call sites (`content_blob.rb:321`, `dashboard_stats.rb`) hit this. For the

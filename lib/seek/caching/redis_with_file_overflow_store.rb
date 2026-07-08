@@ -90,6 +90,18 @@ module Seek
         @max_redis_item_size.respond_to?(:call) ? @max_redis_item_size.call : @max_redis_item_size
       end
 
+      # Deleting the entry from the non-chosen backend before writing to the chosen one is a
+      # correctness invariant, not just tidiness. A key can legitimately move backends between
+      # writes (e.g. a stable key whose value grows past, or shrinks below, the threshold). If the
+      # old copy in the other backend were left in place, reads would usually still be correct
+      # (read_entry checks Redis first), but only until the fresh copy disappears: Redis evicts
+      # under maxmemory allkeys-lru, or either copy TTL-expires. A read that then falls through to
+      # the surviving stale copy in the other backend would serve an out-of-date value. Removing it
+      # here closes that window.
+      #
+      # The cost of the FileStore pre-delete (one File.exist? stat) is only paid on a cache *miss*,
+      # since writes only happen when fetch misses - steady-state cache *hits* return from Redis in
+      # read_entry without ever touching the filesystem.
       def write_to_redis(key, entry, **options)
         @file_store.send(:delete_entry, @file_store.send(:normalize_key, key, options), **options)
         @redis_store.send(:write_entry, @redis_store.send(:normalize_key, key, options), entry, **options)
