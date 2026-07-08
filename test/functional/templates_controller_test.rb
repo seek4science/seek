@@ -25,8 +25,9 @@ class TemplatesControllerTest < ActionController::TestCase
     @registered_sample_multi_attribute_type = SampleAttributeType.find_by(title: "Registered Sample List") || FactoryBot.create(:sample_multi_sample_attribute_type, title: "Registered Sample List")
     @controlled_vocab_type = SampleAttributeType.find_by(title: "Controlled Vocabulary") || FactoryBot.create(:controlled_vocab_attribute_type, title: "Controlled Vocabulary")
     @controlled_vocab_list_type = SampleAttributeType.find_by(title: "Controlled Vocabulary List") || FactoryBot.create(:cv_list_attribute_type, title: "Controlled Vocabulary List")
-    @default_isa_tag = FactoryBot.create(:default_isa_tag)
-    @input_isa_tag = FactoryBot.create(:input_isa_tag)
+    @input_isa_tag = ISATag.find_by(title: 'input') || FactoryBot.create(:input_isa_tag)
+    @source_isa_tag = ISATag.find_by(title: 'source') || FactoryBot.create(:source_isa_tag)
+    @source_characteristic_isa_tag = ISATag.find_by(title: 'source_characteristic') || FactoryBot.create(:source_characteristic_isa_tag)
   end
 
   teardown do
@@ -57,8 +58,9 @@ class TemplatesControllerTest < ActionController::TestCase
                                               ontology_version: '0.1.1',
                                               description: 'attribute1 description',
                                               sample_attribute_type_id: @string_type.id,
+                                              is_title: true,
                                               _destroy: '0',
-                                              isa_tag_id: @default_isa_tag
+                                              isa_tag_id: @source_isa_tag
                                             },
                                             '1' => {
                                               pos: '2',
@@ -69,7 +71,7 @@ class TemplatesControllerTest < ActionController::TestCase
                                               description: 'attribute2 description',
                                               sample_attribute_type_id: @int_type.id,
                                               _destroy: '0',
-                                              isa_tag_id: @default_isa_tag
+                                              isa_tag_id: @source_characteristic_isa_tag
                                             }
                                           }
                                         }
@@ -178,26 +180,26 @@ class TemplatesControllerTest < ActionController::TestCase
   test 'should show private template to the contributor' do
     p = FactoryBot.create :person
     login_as p.user
-    template = FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS), contributor: p)
+    template = FactoryBot.create(:min_template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS), contributor: p)
     get :show, params: { id: template }
     assert_response :success
   end
 
   test 'should not show private template to other users' do
-    template = FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS))
+    template = FactoryBot.create(:min_template, policy: FactoryBot.create(:policy, access_type: Policy::NO_ACCESS))
     get :show, params: { id: template }
     assert_response :forbidden
   end
 
   test 'should show public template to all users' do
-    template = FactoryBot.create(:template, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    template = FactoryBot.create(:min_template, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
     login_as FactoryBot.create(:user)
     get :show, params: { id: template }
     assert_response :success
   end
 
   test 'authlookup item queued if creator changed' do
-    template = FactoryBot.create(:template)
+    template = FactoryBot.create(:min_template)
     login_as(template.contributor)
     creator = FactoryBot.create(:person)
 
@@ -300,8 +302,8 @@ class TemplatesControllerTest < ActionController::TestCase
       assert_select "select#template_template_attributes_attributes_#{i}_isa_tag_id.disabled"
     end
 
-    inherited_template.template_attributes << FactoryBot.create(:template_attribute, title: 'Extra attribute', isa_tag: FactoryBot.create(:source_characteristic_isa_tag), sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), pos: 4)
-    inherited_template.reload
+    inherited_template.template_attributes << FactoryBot.build(:template_attribute, title: 'Extra attribute', isa_tag: FactoryBot.create(:source_characteristic_isa_tag), sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), pos: 4)
+    inherited_template.save!
 
     assert inherited_template.template_attributes.last.title == 'Extra attribute'
     refute inherited_template.template_attributes.last.inherited?
@@ -403,6 +405,7 @@ class TemplatesControllerTest < ActionController::TestCase
 
     sample_isa_tag = FactoryBot.create(:sample_isa_tag)
     sample_characteristic_isa_tag = FactoryBot.create(:sample_characteristic_isa_tag)
+    protocol_isa_tag = FactoryBot.create(:protocol_isa_tag)
 
     input_sample_attribute = {
       pos: '1',
@@ -443,6 +446,17 @@ class TemplatesControllerTest < ActionController::TestCase
       _destroy: '0'
     }
 
+    protocol_attribute = {
+      pos: '4',
+      title: 'Protocol',
+      required: '1',
+      short_name: 'attribute4 short name',
+      description: 'attribute4 description',
+      sample_attribute_type_id: @string_type.id,
+      isa_tag_id: protocol_isa_tag.id,
+      _destroy: '0'
+    }
+
     correct_sample_collection_template_params = { title: 'Correct Sample collection template',
                                                   project_ids: @project_ids,
                                                   level: 'study sample',
@@ -453,7 +467,8 @@ class TemplatesControllerTest < ActionController::TestCase
                                                   template_attributes_attributes: {
                                                     '0' => input_sample_attribute,
                                                     '1' => collected_sample_attribute,
-                                                    '2' => sample_characteristic_attribute
+                                                    '2' => sample_characteristic_attribute,
+                                                    '3' => protocol_attribute
                                                   } }
 
     assert_difference('Template.count', 1) do
@@ -719,7 +734,7 @@ class TemplatesControllerTest < ActionController::TestCase
 
   def create_template_from_parent_template(parent_template, person= @person, linked_sample_type= nil)
     child_template_attributes = parent_template.template_attributes.map do |ta|
-      FactoryBot.create(:template_attribute, parent_attribute_id: ta.id, title: ta.title, isa_tag_id: ta.isa_tag_id, sample_attribute_type: ta.sample_attribute_type, is_title: ta.is_title, required: ta.required, sample_controlled_vocab: ta.sample_controlled_vocab, pos: ta.pos)
+      FactoryBot.build(:template_attribute, parent_attribute_id: ta.id, title: ta.title, isa_tag_id: ta.isa_tag_id, sample_attribute_type: ta.sample_attribute_type, is_title: ta.is_title, required: ta.required, sample_controlled_vocab: ta.sample_controlled_vocab, pos: ta.pos)
     end
     FactoryBot.create(:template, contributor: person, template_attributes: child_template_attributes, parent_id: parent_template.id)
   end
