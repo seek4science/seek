@@ -459,9 +459,12 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
       keys really are prefixed that way.) The general "String matcher = unanchored Ruby regex, not a
       glob" property of `delete_matched` remains, faithful to FileStore, but no live call site now
       relies on it.
-- [ ] **[L2]** `delete_matched` assumes a single Redis node (`@redis_store.redis`), where the
-      original iterated `Redis::Distributed#nodes`. No practical impact on SEEK's single-`REDIS_URL`
-      setup, but strictly less robust than what it replaced.
+- [~] **[L2] Deferred (won't fix now)** `delete_matched` assumes a single Redis node
+      (`@redis_store.redis`), where the original iterated `Redis::Distributed#nodes`. SEEK uses a
+      single `REDIS_URL`, so this can't bite today; deliberately skipped until/unless a clustered
+      Redis is actually introduced, at which point the fix is a one-liner (iterate
+      `c.respond_to?(:nodes) ? c.nodes : [c]` and scan each node, mirroring
+      `RedisCacheStore#delete_matched`).
 - [x] **[L3]** payload was serialized twice per write — once in `write_entry` to measure `bytesize`,
       then again by the child store's own `write_entry`. **Fixed** by serializing once and handing the
       payload straight to each backend's `write_serialized_entry` (both `RedisCacheStore` and
