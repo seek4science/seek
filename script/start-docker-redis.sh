@@ -16,15 +16,15 @@ then
     exit 1
 fi
 
-if ! (docker volume ls | grep -q seek-redis-data)
+if ! (docker volume ls | grep -q seek-redis-data-volume)
 then
-  echo "creating seek-redis-data"
-  docker volume create --name=seek-redis-data
+  echo "creating seek-redis-data-volume"
+  docker volume create --name=seek-redis-data-volume
 fi
 
 docker rm seek-redis > /dev/null 2>&1 || true
 echo "creating and starting seek-redis container"
-docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data:/data" redis:8.6-alpine redis-server --appendonly yes --maxmemory "${SEEK_REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
+docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" redis:8.6-alpine redis-server --appendonly yes --maxmemory "${SEEK_REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
 
 echo "waiting for Redis to be ready ..."
 retries=0

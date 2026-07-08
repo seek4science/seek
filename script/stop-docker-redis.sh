@@ -19,4 +19,4 @@ fi
 echo "stopping and removing seek-redis container"
 docker stop seek-redis > /dev/null 2>&1 || true
 docker rm seek-redis > /dev/null
-echo "stopped (the seek-redis-data volume is kept)"
+echo "stopped (the seek-redis-data-volume volume is kept)"

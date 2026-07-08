@@ -19,11 +19,11 @@ then
     docker rm seek-redis > /dev/null
 fi
 
-echo "removing seek-redis-data"
-docker volume rm seek-redis-data > /dev/null 2>&1 || true
+echo "removing seek-redis-data-volume"
+docker volume rm seek-redis-data-volume > /dev/null 2>&1 || true
 
-echo "recreating seek-redis-data"
-docker volume create --name=seek-redis-data > /dev/null
+echo "recreating seek-redis-data-volume"
+docker volume create --name=seek-redis-data-volume > /dev/null
 
 "$(dirname "$0")/start-docker-redis.sh"
 

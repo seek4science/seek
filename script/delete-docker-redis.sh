@@ -16,7 +16,7 @@ then
     exit 1
 fi
 
-echo "deleting seek-redis container and seek-redis-data volume"
+echo "deleting seek-redis container and seek-redis-data-volume volume"
 if docker ps -a | grep -qw seek-redis
 then
     docker rm seek-redis > /dev/null
@@ -24,5 +24,5 @@ then
 else
     echo "container seek-redis does not exist, skipping"
 fi
-docker volume rm seek-redis-data > /dev/null 2>&1 || true
+docker volume rm seek-redis-data-volume > /dev/null 2>&1 || true
 echo "deleted volume"
