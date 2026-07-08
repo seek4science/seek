@@ -1,8 +1,8 @@
 # Sweeps the filesystem side of Rails.cache (the RedisWithFileOverflowStore overflow path) for
 # expired entries. Redis needs no equivalent sweep - it expires keys natively - but this is also
-# a convenient, already-scheduled place to log Redis memory stats for ops visibility (Step 8:
-# evicted_keys rising is the signal that the shared Redis instance is under enough memory pressure
-# that session keys could, in principle, start being evicted too).
+# a convenient, already-scheduled place to log Redis memory stats for ops visibility: evicted_keys
+# rising is the signal that the shared Redis instance is under enough memory pressure that session
+# keys could, in principle, start being evicted too.
 class CacheOverflowCleanupJob < ApplicationJob
   RUN_PERIOD = 1.day.freeze
 

@@ -1,8 +1,8 @@
 require 'test_helper'
 
-# Guards the large-item Rails.cache.fetch call sites identified in Step 6 of the Redis/FileStore
-# caching plan (#2655) against losing their expires_in - without it, FileStore#cleanup has nothing
-# to reap for entries that overflow to disk, and disk usage grows unbounded.
+# Guards the large-item Rails.cache.fetch call sites (those whose values overflow to disk) against
+# losing their expires_in - without it, FileStore#cleanup has nothing to reap for entries that
+# overflow to disk, and disk usage grows unbounded.
 class CacheOverflowCallSitesTest < ActiveSupport::TestCase
   CALL_SITES = {
     'lib/seek/templates/reader.rb' => /Rails\.cache\.fetch\("blob_ss_xml-.*expires_in:/,

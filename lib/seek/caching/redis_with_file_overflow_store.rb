@@ -9,7 +9,7 @@ module Seek
       # Builds the store the way config/environments/production.rb and development.rb do.
       # max_redis_item_size is a Proc so it re-reads Seek::Config.cache_max_redis_item_size on
       # every write rather than baking in a value captured once at boot - the setting is meant to
-      # be tunable from the admin UI without a restart (Step 2), and reading it eagerly here would
+      # be tunable from the admin UI without a restart, and reading it eagerly here would
       # also mean touching the database while config/environments/*.rb is still being evaluated,
       # before Seek:: constants are even autoloadable (confirmed empirically - referencing Seek::
       # anything that early raises NameError).
@@ -52,12 +52,12 @@ module Seek
 
       # Redis expires keys natively (RedisCacheStore#cleanup is itself a no-op that raises
       # NotImplementedError via the base class - "manual cleanup is not supported"), so only the
-      # file side needs a sweep. Used by CacheOverflowCleanupJob (Step 6).
+      # file side needs a sweep. Used by CacheOverflowCleanupJob.
       def cleanup(options = nil)
         @file_store.cleanup(options)
       end
 
-      # Ops visibility for the shared-instance eviction tradeoff (Step 1/Step 8): used_memory shows
+      # Ops visibility for the shared-instance eviction tradeoff: used_memory shows
       # how full the instance is against maxmemory, and evicted_keys is the signal that Redis has
       # started discarding keys under maxmemory-policy - including, in principle, session keys.
       # expired_keys (natural TTL expiry - healthy) is included alongside so a reader can tell the

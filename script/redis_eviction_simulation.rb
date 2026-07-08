@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# Redis eviction simulation for the shared cache + sessions instance (issue #2655, Step 8).
+# Redis eviction simulation for the shared cache + sessions instance (issue #2655).
 #
 # SEEK runs Rails.cache and user sessions on ONE Redis instance with `maxmemory-policy allkeys-lru`.
 # maxmemory is instance-wide, so under memory pressure Redis is free to evict session keys, not just

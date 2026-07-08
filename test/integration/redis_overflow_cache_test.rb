@@ -6,8 +6,8 @@ require 'securerandom'
 # production.rb / development.rb wire it: built via .build (Redis 'cache' namespace + a FileStore),
 # with the size threshold read live from Seek::Config through a Proc. The per-store unit tests
 # (test/unit/redis_with_file_overflow_store_test.rb) inject backends and call the store directly;
-# these drive the real Rails.cache mechanism and a real model call site instead, covering the
-# integration gap the review flagged as L5 / Step 7.
+# these drive the real Rails.cache mechanism and a real model call site instead, covering the gap
+# where the store would otherwise only ever be exercised in isolation, never as the live Rails.cache.
 #
 # Requires a reachable Redis (the CI workflow already runs redis:8.6-alpine on localhost:6379); the
 # store's own unit tests have the same requirement.
