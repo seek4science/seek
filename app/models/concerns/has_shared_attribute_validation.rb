@@ -7,7 +7,6 @@ module HasSharedAttributeValidation
     validates :title, presence: true
     validates :title, length: { maximum: 255 }
     validates :description, length: { maximum: 65_535 }
-    validates :contributor, presence: true
     validates :projects, presence: true, projects: { self: true }
     validate :validate_one_title_attribute_present,
              :validate_attribute_title_unique,
