@@ -47,7 +47,7 @@
   </div>
 
   <%= admin_text_setting(:cache_max_redis_item_size, Seek::Config.cache_max_redis_item_size,
-                         'Maximum Redis cache item size', 'The size limit (in bytes) above which an item is stored on the filesystem cache instead of Redis.',
+                         'Maximum Redis cache item size', 'The size limit (in bytes) above which an item is stored on the filesystem cache instead of Redis. Set to 0 to disable Redis caching entirely and store all items on the filesystem.',
                          :onkeypress => "javascript: return onlyNumbers(event);") %>
 
   <h2>Sandbox settings</h2>

@@ -395,11 +395,11 @@ Full write-up: `redis_filestore_cache_review_2655_2026-07-07.md` (review of `mai
 Steps 1–6). None are blockers; listed here in the suggested order to work through. Severity:
 **[M]** medium (fix before prod reliance), **[L]** low, **[I]** informational / pre-existing.
 
-- [ ] **[M3]** `cache_max_redis_item_size` has no floor — confirmed empirically that a blank admin
-      field stores `""` → `to_i` → `0`, so **every** entry overflows to disk and the Redis tier is
-      silently disabled (`admin_controller.rb:354` sets it unconditionally). Validate/clamp a
-      minimum on save, and/or treat a non-positive configured value as "use the default" in the
-      store. Highest-value quick fix.
+- [x] **[M3]** `cache_max_redis_item_size` has no floor — a blank/`0` value (`admin_controller.rb:354`
+      sets it unconditionally, `to_i`s to `0`) routes **every** entry to disk. Rather than guard
+      against this, we treat `0` as a legitimate way to turn Redis caching off entirely (everything
+      on the filesystem) — the admin help text now documents this behaviour explicitly so it reads
+      as an intentional switch, not a silent misconfiguration.
 - [ ] **[L5] / Step 7** the store is never exercised as `Rails.cache` in the suite — test env stays
       on `:memory_store`, so every real call site runs against `MemoryStore` in CI. Add one
       end-to-end test driving a real call site through the overflow store (also exercises the
