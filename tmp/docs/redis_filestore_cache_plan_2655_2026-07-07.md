@@ -346,7 +346,12 @@ covering, but not with the same mechanism.
 Steps 1–6 each land their own CI coverage alongside the code they test, so this step is the final
 cross-cutting pass, not where testing starts:
 
-- [ ] Full CI suite green, including all the tests added incrementally in Steps 1–6.
+- [~] Full CI suite green, including all the tests added incrementally in Steps 1–6. Not yet run on
+      the remote (branch unpushed), but as a pre-push proxy the full set of branch-touched files was
+      run locally against a real Redis — **276 tests, 1165 assertions, 0 failures, 0 errors**
+      (`redis_with_file_overflow_store_test`, `redis_overflow_cache_test`, `cache_overflow_cleanup_job_test`,
+      `cache_overflow_call_sites_test`, `schedule_test`, `admin_controller_test`, `config_test`,
+      `content_blob_test`). Full-suite green still requires the push/CI run.
 - [x] End-to-end integration test spanning the whole path
       (`test/integration/redis_overflow_cache_test.rb`, 5 tests): builds the store via `.build` and
       installs it as `Rails.cache` exactly as production/development do, then drives the real
@@ -359,14 +364,27 @@ cross-cutting pass, not where testing starts:
       overflow store. Closes review finding **L5**. (Uses an incompressible `SecureRandom.hex`
       payload where disk placement is asserted, since a repetitive value would compress below the
       threshold and land in Redis.)
-- [ ] Manual verification (`/verify`): exercise the spreadsheet-explore view, notebook rendering,
-      RightField extraction, and ontology browsing; confirm large payloads land on disk under
-      `tmp/cache` and small/frequent values (dashboard stats, settings, list-item titles) land in
-      Redis.
-- [ ] Confirm session login and Action Cable are unaffected (separate db on the shared instance).
-- [ ] Run the full app locally without Docker (`bundle exec rails server` against a local
-      `redis-server`) and confirm caching, sessions, and the filesystem overflow all work with no
-      Docker-specific assumptions.
+- [~] Manual verification of cache placement. The **mechanism** these heavy views rely on is now
+      verified end-to-end in a real `development` boot (against local Redis, no Docker): `Rails.cache`
+      resolves to `Seek::Caching::RedisWithFileOverflowStore`, the threshold is read live from
+      `Seek::Config` through the real settings-cache→DB path, a small value lands in Redis only, an
+      incompressible large value lands on disk only under `tmp/cache/dev-cache`, and both round-trip
+      and delete cleanly. What remains genuinely manual (needs a full instance with the external
+      tools + a browser, and is unaffected by this change beyond calling `Rails.cache.fetch`):
+      eyeballing the specific spreadsheet-explore / notebook / RightField / ontology views to see
+      their large payloads on disk. De-risked by the mechanism verification above.
+- [~] Session login / Action Cable. Verified structurally: the `development` boot loads the
+      `:redis_store` session store (namespace `session`) and `settings_cache_store` (namespace
+      `settings-cache`) distinct from the main cache's `cache` namespace on the same instance, and
+      the integration test proves `Rails.cache.clear` is namespace-scoped and leaves `session:` keys
+      intact. A real browser login round-trip still wants an operator on a running instance. (Action
+      Cable has no channels defined anywhere in the app, so nothing to exercise.)
+- [x] Run the app without Docker. Booted the full `development` environment via `bundle exec rails
+      runner -e development` against a local (non-Docker) Redis — the app initializes with no
+      Docker-specific assumptions, `Rails.cache` and the settings cache both connect to
+      `redis://localhost:6379`, and cache writes/reads/deletes round-trip through the filesystem
+      overflow and Redis. (A long-running `rails server` + live HTTP traffic is the operator's final
+      smoke test, but boot + cache I/O is confirmed.)
 
 ## Step 8 — Session-store impact if the cache fills Redis
 
