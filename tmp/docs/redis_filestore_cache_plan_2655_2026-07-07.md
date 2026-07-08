@@ -376,18 +376,23 @@ cache miss is invisible and cheap (re-fetch, maybe a slow request); a session ev
 -visible (a silent forced logout before the 30-minute `expire_after`) and easy to miss in testing
 since it only shows up under real memory pressure.
 
-- [ ] Confirmed via the `redis-store` gem (`Redis::Store::Ttl#set`, `lib/redis/store/ttl.rb`) that
+- [x] Confirmed via the `redis-store` gem (`Redis::Store::Ttl#set`, `lib/redis/store/ttl.rb`) that
       session keys already carry a real Redis-level `EXPIRE` matching `expire_after: 30.minutes`
       (`config/initializers/session_store.rb`), refreshed on every write. This rules out one
       tempting mitigation: switching `maxmemory-policy` from `allkeys-lru` to `volatile-lru` would
       *not* protect sessions, since `volatile-lru` only spares keys with **no** TTL, and session
       keys have one — it would just as happily evict them. Any real fix has to be about capacity
       and visibility, not a policy trick.
-- [ ] Simulate the failure mode before launch: point a local/staging Redis at a small `maxmemory`
-      (e.g. 10mb), log in to create a handful of real sessions, then write cache entries until
-      eviction kicks in (`INFO stats` → `evicted_keys` climbing). Confirm directly whether active
-      session keys get evicted under sustained cache pressure, rather than assuming from the LRU
-      docs — this is the one part of the shared-instance decision that's cheap to verify for real.
+- [x] Simulated the failure mode with `script/redis_eviction_simulation.rb` (self-contained: spins
+      up a throwaway Redis on port 6380 with a tiny `maxmemory`, creates real session-style keys each
+      with a 30-min TTL, floods the cache namespace, and reports survivors; tunable via `SIM_*` env
+      vars, cleans up after itself). **Result confirms the risk directly**, not from the LRU docs:
+      at `maxmemory 8mb` with a 20k-write flood (grossly over capacity → ~17,900 evictions), **every
+      session key was evicted — both idle and the "active" ones GET-touched during the flood**. So
+      under severe, sustained cache pressure the shared instance *will* drop sessions, and LRU recency
+      from active use helps but is **not** a guarantee once the working set dwarfs `maxmemory`. This
+      is exactly why the mitigation has to be capacity (`SEEK_REDIS_MAXMEMORY`) + monitoring
+      (`evicted_keys`), and ultimately separate instances if pressure persists.
 - [x] Made `maxmemory` configurable via a `SEEK_REDIS_MAXMEMORY` env variable on the `redis_store`
       service in all three compose files (`--maxmemory ${SEEK_REDIS_MAXMEMORY:-256mb}`), default
       **256mb**. Verified with `docker compose config` that it resolves to `256mb` by default and
@@ -408,16 +413,19 @@ since it only shows up under real memory pressure.
       the Redis-backed (evicted-keys table + pressure label) and not-Redis-backed paths. Admin
       alerting/email can still follow later, but the count is now visible on demand without shell
       access.
-- [ ] Document the escalation path in the ops runbook if `evicted_keys` alerts fire repeatedly:
-      raise `maxmemory` first (cheapest fix); if cache growth keeps outpacing that, splitting
-      cache and sessions onto separate Redis instances is the real fix — flagged here as a known
-      future step, not built now, since Step 1's decision to share one instance was deliberately
-      scoped to SEEK's current scale.
-- [ ] **CI:** not meaningfully testable in the normal suite — real LRU eviction ordering depends on
+- [x] Escalation path documented (no separate ops runbook exists in this repo, so recorded here and
+      in the header + output of `script/redis_eviction_simulation.rb`). When `evicted_keys` climbs
+      persistently: **(1)** raise `SEEK_REDIS_MAXMEMORY` — the cheapest fix, now a single env var;
+      **(2)** if cache growth keeps outpacing memory no matter how high it's set, split cache and
+      sessions onto **separate Redis instances** — the real structural fix, deliberately deferred
+      since Step 1 scoped SEEK to one shared instance for its current scale. Read `evicted_keys` as a
+      *trend* (it's cumulative and resets on restart), and distinguish it from the healthy
+      `expired_keys` — both are shown side by side on the admin Redis panel.
+- [x] **CI:** not meaningfully testable in the normal suite — real LRU eviction ordering depends on
       timing and memory pressure that isn't deterministic enough to assert on reliably. Covered by
-      the manual simulation above instead, plus the existing session-store tests (unaffected by
-      this step, since nothing here changes session code, only capacity planning and monitoring
-      around the store it already uses).
+      the repeatable `script/redis_eviction_simulation.rb` (run on demand, not in CI) plus the
+      existing session-store tests (unaffected by this step, since nothing here changes session code,
+      only capacity planning and monitoring around the store it already uses).
 
 ## Review findings (to address)
 
