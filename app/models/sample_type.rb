@@ -47,6 +47,7 @@ class SampleType < ApplicationRecord
 
   scope :without_template, -> { where(template_id: nil) }
 
+  validates :contributor, presence: true
   validate :validate_attribute_accessor_names_unique,
            :validate_against_editing_constraints,
            :validate_sample_type_is_not_locked
