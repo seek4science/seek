@@ -14,7 +14,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
 
     assert_select "input#investigation_extended_metadata_attributes_data_age[name=?]","investigation[extended_metadata_attributes][data][age]"
     assert_select "input#investigation_extended_metadata_attributes_data_name[name=?]","investigation[extended_metadata_attributes][data][name]"
-    assert_select "input#investigation_extended_metadata_attributes_data_date[name=?]","investigation[extended_metadata_attributes][data][date]"
+    assert_select "input#investigation_extended_metadata_attributes_data_datetime[name=?]","investigation[extended_metadata_attributes][data][datetime]"
 
   end
 
@@ -42,7 +42,7 @@ class ExtendedMetadataTypesControllerTest < ActionController::TestCase
     assert_select 'small', 1
     assert_select 'p.help-block', 1
     assert_select 'label',  text:'Biological age', count:1
-    assert_select 'label',  text:'Date', count:1
+    assert_select 'label',  text:'Datetime', count:1
   end
 
   test 'administer' do

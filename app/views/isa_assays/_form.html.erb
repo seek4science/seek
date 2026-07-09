@@ -73,7 +73,7 @@
 
 
 <script>
-    const templates = <%= load_templates().to_json.html_safe %>
+    const templates = <%= load_templates(true).to_json.html_safe %>
     const initTemplateModal = function(field_name) {
       Templates.context.description_elem = `#isa_assay_${field_name}_description`
       Templates.context.suffix = "_" + field_name

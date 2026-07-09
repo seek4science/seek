@@ -78,17 +78,12 @@ class ISAAssay
     missing_tag_attributes = @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }
     missing_tag_attributes.each do |attribute|
       errors.add(:base,
-                 "[Sample type]: Attribute '#{attribute.title}' is missing an ISA Tag.")
+                  "[Sample type]: Should have exactly one attribute with the 'input' ISA Tag.")
     end
 
-    # The Sample type must have at exactly one attribute with these ISA tags:
-    # - PROTOCOL
-    # - INPUT
-    [Seek::ISA::TagType::PROTOCOL, Seek::ISA::TagType::INPUT].each do |tag_type|
-      sample_type_tag_types = @sample_type.sample_attributes.select { |a| a.isa_tag&.title == tag_type }
-      unless sample_type_tag_types.one?
-        errors.add(:base, "[Sample type]: Should have exactly one attribute with the '#{tag_type}' ISA tag selected")
-      end
+    if @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
+      errors.add(:base,
+                  "[Sample type]: All attributes should have an ISA Tag.")
     end
 
     # The Sample type must have exactly one attribute with one of the ISA tags:

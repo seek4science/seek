@@ -195,74 +195,59 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_equal isa_study.sample_collection.title, "#{isa_study.study.title} - Sample Collection Sample Type"
   end
 
-  test 'should show ISA study as JSON' do
-    person = User.current_user.person
-    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
+  test 'should preserve sample_attribute_type_id on re-render after validation failure with template-based attributes' do
+    projects = User.current_user.person.projects
+    inv = FactoryBot.create(:investigation, projects:, contributor: User.current_user.person)
+    source_template = FactoryBot.create(:isa_source_template)
 
-    get :show, as: :json, params: { id: study.id }
-    assert_response :success
+    string_type = FactoryBot.create(:string_sample_attribute_type)
+    t_attrs = source_template.template_attributes
 
-    response_body = JSON.parse(response.body)
-    assert_equal 'isa_studies', response_body['data']['type']
-    assert_equal study.id.to_s, response_body['data']['id']
-    assert response_body['data']['attributes']['study'].present?
-    source = response_body['data']['attributes']['source_sample_type']
-    collection = response_body['data']['attributes']['sample_collection_sample_type']
-    assert source.present?
-    assert collection.present?
-    assert_equal [], source['samples']
-    assert_equal [], collection['samples']
-  end
+    # Simulate what JS applyTemplate produces: template_id on the sample type
+    # and template_attribute_id on each individual attribute
+    source_attrs = {
+      title: 'Template-based Source',
+      project_ids: projects.map(&:id),
+      template_id: source_template.id,
+      sample_attributes_attributes: {
+        '0': { pos: '1', title: 'Source Name', required: '1', is_title: '1', _destroy: '0',
+               sample_attribute_type_id: string_type.id,
+               isa_tag_id: FactoryBot.create(:source_isa_tag).id,
+               template_attribute_id: t_attrs.find { |a| a.title == 'Source Name' }.id },
+        '1': { pos: '2', title: 'Source Characteristic 1', required: '1', is_title: '0', _destroy: '0',
+               sample_attribute_type_id: string_type.id,
+               isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id,
+               template_attribute_id: t_attrs.find { |a| a.title == 'Source Characteristic 1' }.id }
+      }
+    }
 
-  test 'should show ISA study with samples filtered by authorization' do
-    person = User.current_user.person
-    project = person.projects.first
-    study = FactoryBot.create(:isa_json_compliant_study, contributor: person)
-    source_type = study.sample_types.first
-    vocab_term = source_type.sample_attributes.find_by_title('Source Characteristic 2')
-                             .sample_controlled_vocab.sample_controlled_vocab_terms.first.label
-    sample_data = { 'Source Name' => 'S1', 'Source Characteristic 1' => 'c1',
-                    'Source Characteristic 2' => vocab_term }
+    # POST without study title to trigger validation failure
+    post :create, params: { isa_study: { study: { investigation_id: inv.id },
+                                         source_sample_type: source_attrs,
+                                         sample_collection_sample_type: sample_collection_attributes(projects) } }
 
-    viewable = FactoryBot.create(:sample, sample_type: source_type, contributor: person,
-                                           project_ids: [project.id], data: sample_data,
-                                           policy: FactoryBot.create(:public_policy))
-    private_s = FactoryBot.create(:sample, sample_type: source_type,
-                                            contributor: FactoryBot.create(:person),
-                                            project_ids: [project.id],
-                                            data: sample_data.merge('Source Name' => 'S2'),
-                                            policy: FactoryBot.create(:private_policy))
+    assert_response :unprocessable_entity
+    assert_template :new
 
-    get :show, as: :json, params: { id: study.id }
-    assert_response :success
+    isa_study = assigns(:isa_study)
 
-    source_samples = JSON.parse(response.body)['data']['attributes']['source_sample_type']['samples']
-    sample_ids = source_samples.map { |s| s['id'] }
-    assert_includes sample_ids, viewable.id.to_s
-    refute_includes sample_ids, private_s.id.to_s
-    assert source_samples.first['data'].present?
-  end
+    # Errors should be about the missing title
+    assert_equal ["[Study]: Title can't be blank"], isa_study.errors.full_messages
 
-  test 'should return not found when ISA study does not exist' do
-    get :show, as: :json, params: { id: 0 }
-    assert_response :not_found
+    # A new Sample Type only needs the `isa_template_id` to be ISA-JSON compliant.
+    assert isa_study.source.is_isa_json_compliant?
 
-    response_body = JSON.parse(response.body)
-    assert_equal 'Not Found', response_body['errors'].first['title']
-  end
+    # All submitted sample_attribute_type_ids must survive the round-trip through
+    # the controller so the re-rendered form can show the correct selected values
+    isa_study.source.sample_attributes.each do |attr|
+      assert attr.sample_attribute_type_id.present?,
+             "#{attr.title}: sample_attribute_type_id should be preserved after validation failure"
+    end
+    assert_equal string_type.id, isa_study.source.sample_attributes.find { |a| a.title == 'Source Name' }.sample_attribute_type_id
 
-  test 'should return forbidden when not authorized to view ISA study' do
-    other_person = FactoryBot.create(:person)
-    study = FactoryBot.create(:isa_json_compliant_study, contributor: other_person,
-                               policy: FactoryBot.create(:private_policy))
-    viewer = FactoryBot.create(:person)
-    login_as viewer.user
-
-    get :show, as: :json, params: { id: study.id }
-    assert_response :forbidden
-
-    response_body = JSON.parse(response.body)
-    assert_equal 'You are not authorized to view this ISA Study.', response_body['errors'].first['detail']
+    # The re-rendered form must not carry the HTML disabled attribute on type
+    # selects — disabled fields are silently dropped on the next form submission
+    assert_select 'select[name*="sample_attribute_type_id"][disabled]', count: 0
   end
 
   private

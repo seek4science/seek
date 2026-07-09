@@ -47,8 +47,8 @@ bundle exec rake seek:upgrade      # Post-migration data upgrades
 ### Search / Solr
 
 ```bash
-bundle exec rake sunspot:solr:start   # Start Solr
-bundle exec rake sunspot:solr:stop
+script/start-docker-solr.sh           # Start Solr via Docker
+script/stop-docker-solr.sh            # Stop Solr via Docker
 bundle exec rake seek:reindex_all     # Rebuild Solr index
 ```
 
