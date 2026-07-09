@@ -56,12 +56,10 @@ services:
   redis_store:
     image: redis:8.6-alpine
     container_name: seek-redis
-    # Shell form so $$REDIS_PASSWORD and $$REDIS_MAXMEMORY both expand at runtime from the container
-    # env (docker/redis.env) - Compose does not read a service env_file for its own ${...} interpolation.
     command:
       - sh
       - -c
-      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$${REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
+      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$$REDIS_MAXMEMORY" --maxmemory-policy allkeys-lru
     env_file:
       - docker/redis.env
     volumes:

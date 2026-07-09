@@ -10,9 +10,9 @@ x-shared:
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
       RAILS_RELATIVE_URL_ROOT: "/seek"
-      REDIS_HOST: redis_store
     env_file:
       - docker/db.env
+      - docker/redis.env
     volumes:
       - seek-filestore:/seek/filestore
       - seek-cache:/seek/tmp/cache
@@ -56,20 +56,20 @@ services:
     image: redis:8.6-alpine
     container_name: seek-redis
     command:
-      [
-        "redis-server",
-        "--appendonly",
-        "yes",
-        "--maxmemory",
-        "${REDIS_MAXMEMORY:-256mb}",
-        "--maxmemory-policy",
-        "allkeys-lru",
-      ]
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$$REDIS_MAXMEMORY" --maxmemory-policy allkeys-lru
+    env_file:
+      - docker/redis.env
     volumes:
       - seek-redis-data:/data
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"
+        ]
       interval: 5s
       timeout: 3s
       retries: 5
