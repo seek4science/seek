@@ -10,7 +10,7 @@ x-shared:
       SOLR_HOST: solr
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
       RAILS_RELATIVE_URL_ROOT: "/seek"
-      REDIS_URL: redis://redis_store:6379/0
+      REDIS_HOST: redis_store
     env_file:
       - docker/db.env
     volumes:

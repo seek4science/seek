@@ -1,3 +1,5 @@
+require_relative '../redis_config'
+
 module Seek
   module Caching
     # A cache store that writes small entries to a RedisCacheStore and overflows entries larger
@@ -15,7 +17,7 @@ module Seek
       # anything that early raises NameError).
       def self.build(file_cache_path)
         redis_store = ActiveSupport::Cache::RedisCacheStore.new(
-          url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/0'),
+          url: Seek::RedisConfig.url,
           namespace: 'cache'
         )
         file_store = ActiveSupport::Cache::FileStore.new(file_cache_path)
