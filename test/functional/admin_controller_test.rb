@@ -177,9 +177,20 @@ class AdminControllerTest < ActionController::TestCase
     assert_select "input[name=?]", 'cache_max_redis_item_size'
   end
 
-  test 'update cache_max_redis_item_size' do
-    post :update_settings, params: { cache_max_redis_item_size: '2097152' }
-    assert_equal 2097152, Seek::Config.cache_max_redis_item_size
+  test 'update cache_max_redis_item_size converts KB to bytes' do
+    post :update_settings, params: { cache_max_redis_item_size: '2048' }
+    assert_equal 2048 * 1024, Seek::Config.cache_max_redis_item_size
+  end
+
+  test 'update max_cachable_size and hard_max_cachable_size convert KB to bytes' do
+    post :update_settings, params: { max_cachable_size: '20480', hard_max_cachable_size: '102400' }
+    assert_equal 20480 * 1024, Seek::Config.max_cachable_size
+    assert_equal 102400 * 1024, Seek::Config.hard_max_cachable_size
+  end
+
+  test 'update cache_max_redis_item_size accepts a fractional KB value' do
+    post :update_settings, params: { cache_max_redis_item_size: '9765.6' }
+    assert_equal (9765.6 * 1024).round, Seek::Config.cache_max_redis_item_size
   end
 
   test 'should input integer' do

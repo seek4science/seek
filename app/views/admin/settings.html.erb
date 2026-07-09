@@ -37,18 +37,18 @@
                                  "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
                                  onchange: toggle_appear_javascript('cache_remote_block')) %>
       <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
-        <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
-                               'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
-                               :onkeypress => "javascript: return onlyNumbers(event);") %>
-        <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
-                               'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
-                               :onkeypress => "javascript: return onlyNumbers(event);") %>
+        <%= admin_text_setting(:max_cachable_size, bytes_to_kb(Seek::Config.max_cachable_size),
+                               'Maximum file size', 'The size limit (in KB) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
+                               :onkeypress => "javascript: return onlyFloatNumbers(event);") %>
+        <%= admin_text_setting(:hard_max_cachable_size, bytes_to_kb(Seek::Config.hard_max_cachable_size),
+                               'Hard maximum file size', 'The hard remote file size limit (in KB). SEEK will not download files over this size regardless of user preference.',
+                               :onkeypress => "javascript: return onlyFloatNumbers(event);") %>
       </div>
   </div>
 
-  <%= admin_text_setting(:cache_max_redis_item_size, Seek::Config.cache_max_redis_item_size,
-                         'Maximum Redis cache item size', 'The size limit (in bytes) above which an item is stored on the filesystem cache instead of Redis. Set to 0 to disable Redis caching entirely and store all items on the filesystem.',
-                         :onkeypress => "javascript: return onlyNumbers(event);") %>
+  <%= admin_text_setting(:cache_max_redis_item_size, bytes_to_kb(Seek::Config.cache_max_redis_item_size),
+                         'Maximum Redis cache item size', 'The size limit (in KB) above which an item is stored on the filesystem cache instead of Redis. Set to 0 to disable Redis caching entirely and store all items on the filesystem.',
+                         :onkeypress => "javascript: return onlyFloatNumbers(event);") %>
 
   <h2>Sandbox settings</h2>
 

@@ -349,9 +349,10 @@ class AdminController < ApplicationController
     Seek::Config.show_as_external_link_enabled = string_to_boolean params[:show_as_external_link_enabled]
     Seek::Config.block_file_uploads = string_to_boolean params[:block_file_uploads]
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
-    Seek::Config.max_cachable_size = params[:max_cachable_size]
-    Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
-    Seek::Config.cache_max_redis_item_size = params[:cache_max_redis_item_size]
+    # These fields are entered in whole KB on the settings form but stored in bytes.
+    Seek::Config.max_cachable_size = helpers.kb_to_bytes(params[:max_cachable_size])
+    Seek::Config.hard_max_cachable_size = helpers.kb_to_bytes(params[:hard_max_cachable_size])
+    Seek::Config.cache_max_redis_item_size = helpers.kb_to_bytes(params[:cache_max_redis_item_size])
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
     Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
