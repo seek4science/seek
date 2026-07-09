@@ -69,7 +69,7 @@ class ISAAssaySerializer < SimpleBaseSerializer
   end
 
   def serialize_viewable_samples(sample_type)
-    sample_type.samples.select(&:can_view?).map do |sample|
+    sample_type.samples.authorized_for('view').map do |sample|
       { id: sample.id.to_s, title: sample.title, data: sample.data.to_hash }
     end
   end
