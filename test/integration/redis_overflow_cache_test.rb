@@ -9,13 +9,16 @@ require 'securerandom'
 # these drive the real Rails.cache mechanism and a real model call site instead, covering the gap
 # where the store would otherwise only ever be exercised in isolation, never as the live Rails.cache.
 #
-# Requires a reachable Redis (the CI workflow already runs redis:8.6-alpine on localhost:6379); the
-# store's own unit tests have the same requirement.
+# Requires a reachable Redis (the CI workflow already runs redis:8.6-alpine on localhost:6379) and
+# skips when none is available. The store's own unit tests run against an in-memory MockRedis and
+# have no such requirement, so this is the only place the store meets a real Redis - which is why the
+# live INFO fields (e.g. maxmemory_policy, a genuine used_memory) are asserted here.
 class RedisOverflowCacheTest < ActiveSupport::TestCase
   setup do
     @tmp_dir = Dir.mktmpdir
     @original_cache = Rails.cache
     @store = Seek::Caching::RedisWithFileOverflowStore.build(@tmp_dir)
+    skip('these tests need a running Redis server') unless redis_available?
     Rails.cache = @store
     @store.clear
   end
@@ -127,5 +130,24 @@ class RedisOverflowCacheTest < ActiveSupport::TestCase
       refute Rails.cache.exist?(key),
              'clearing sample-type matches should remove the entry through the real overflow store'
     end
+  end
+
+  test 'redis_memory_stats reports live figures read from the Redis server' do
+    stats = @store.redis_memory_stats
+
+    # A real Redis reports actual memory use and its configured eviction policy; a mock cannot supply
+    # these, so asserting them here is what pins the stats to a genuine server.
+    assert stats['used_memory'].to_i.positive?, 'used_memory should be a real, non-zero figure'
+    assert stats.key?('maxmemory_policy'), 'maxmemory_policy comes only from a live Redis INFO'
+    assert stats.key?('evicted_keys')
+    assert stats.key?('keyspace_hits')
+  end
+
+  private
+
+  def redis_available?
+    @store.redis_memory_stats.present?
+  rescue StandardError
+    false
   end
 end

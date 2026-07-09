@@ -1,12 +1,18 @@
 require 'test_helper'
 require 'tmpdir'
 require 'minitest/mock'
+require 'mock_redis'
 
+# The store's own logic (size-threshold routing, the cross-backend stale-copy invariant,
+# delete_matched pattern building, etc.) is backend-agnostic, so these run against an in-memory
+# MockRedis and need no live Redis server. End-to-end coverage against a real Redis - including
+# INFO fields a mock cannot supply - lives in test/integration/redis_overflow_cache_test.rb.
 class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
   MAX_SIZE = 200
 
   def setup
-    @redis_store = ActiveSupport::Cache::RedisCacheStore.new(url: 'redis://localhost:6379/15',
+    @mock_redis = MockRedis.new
+    @redis_store = ActiveSupport::Cache::RedisCacheStore.new(redis: @mock_redis,
                                                              namespace: 'test-cache')
     @tmp_dir = Dir.mktmpdir
     @file_store = ActiveSupport::Cache::FileStore.new(@tmp_dir)
@@ -177,7 +183,9 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
   end
 
   test 'clear does not wipe keys outside the redis namespace' do
-    unrelated = ActiveSupport::Cache::RedisCacheStore.new(url: 'redis://localhost:6379/15',
+    # A second cache store sharing the same Redis instance but under a different namespace, standing
+    # in for the session namespace that lives alongside the cache on the shared instance.
+    unrelated = ActiveSupport::Cache::RedisCacheStore.new(redis: @mock_redis,
                                                           namespace: 'unrelated')
     unrelated.write('session-like-key', 'do-not-touch')
 
@@ -217,21 +225,5 @@ class RedisWithFileOverflowStoreTest < ActiveSupport::TestCase
     store.write('proc-key', 'x' * (MAX_SIZE * 2))
     assert @redis_store.exist?('proc-key')
     refute @file_store.exist?('proc-key')
-  end
-
-  test 'build constructs a working store the same way production.rb and development.rb do' do
-    with_config_value(:cache_max_redis_item_size, MAX_SIZE) do
-      dir = Dir.mktmpdir
-      built_store = Seek::Caching::RedisWithFileOverflowStore.build(dir)
-
-      built_store.write('build-small-key', 'x')
-      built_store.write('build-large-key', 'x' * (MAX_SIZE * 2))
-
-      assert_equal 'x', built_store.read('build-small-key')
-      assert_equal 'x' * (MAX_SIZE * 2), built_store.read('build-large-key')
-
-      built_store.clear
-      FileUtils.remove_entry(dir)
-    end
   end
 end

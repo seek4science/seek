@@ -135,6 +135,7 @@ end
 group :test do
   gem 'database_cleaner'
   gem 'minitest', '~> 5.4'
+  gem 'mock_redis'
   gem 'minitest-reporters'
   gem 'rails-controller-testing'
   gem 'rails-perftest'

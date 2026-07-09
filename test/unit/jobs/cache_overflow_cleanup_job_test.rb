@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'tmpdir'
+require 'mock_redis'
 
 class CacheOverflowCleanupJobTest < ActiveSupport::TestCase
   MAX_SIZE = 200
@@ -9,7 +10,7 @@ class CacheOverflowCleanupJobTest < ActiveSupport::TestCase
   end
 
   test 'removes only expired entries from the file overflow side' do
-    redis_store = ActiveSupport::Cache::RedisCacheStore.new(url: 'redis://localhost:6379/15',
+    redis_store = ActiveSupport::Cache::RedisCacheStore.new(redis: MockRedis.new,
                                                             namespace: 'test-cache-overflow-job')
     tmp_dir = Dir.mktmpdir
     file_store = ActiveSupport::Cache::FileStore.new(tmp_dir)
@@ -36,7 +37,7 @@ class CacheOverflowCleanupJobTest < ActiveSupport::TestCase
   end
 
   test 'logs redis memory stats when the store supports it' do
-    redis_store = ActiveSupport::Cache::RedisCacheStore.new(url: 'redis://localhost:6379/15',
+    redis_store = ActiveSupport::Cache::RedisCacheStore.new(redis: MockRedis.new,
                                                             namespace: 'test-cache-overflow-job')
     tmp_dir = Dir.mktmpdir
     store = Seek::Caching::RedisWithFileOverflowStore.new(redis_store: redis_store,

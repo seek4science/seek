@@ -536,7 +536,16 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
 
 ## Test-infrastructure note — running the store tests without a live Redis (revisit later)
 
-- [ ] **Let the store tests run without a live Redis.**
+- [x] **Let the store tests run without a live Redis.** Done: `mock_redis` (0.55.0) added to the
+`:test` group, and the store's unit tests (`test/unit/redis_with_file_overflow_store_test.rb`,
+`test/unit/jobs/cache_overflow_cleanup_job_test.rb`) now inject an in-memory `MockRedis` — so the whole
+unit stage runs with no external server. The `MockRedis`-into-`RedisCacheStore` wiring was verified
+empirically (routing, `SCAN`+`UNLINK` `delete_matched`, namespace-safe `clear`, and `INFO`). The
+fidelity gap — live `INFO` fields such as `maxmemory_policy` and a genuine `used_memory` that a mock
+cannot supply — is now asserted in `test/integration/redis_overflow_cache_test.rb`, which builds the
+store as `Rails.cache` against a real Redis and skips (rdf-triple-store style) when none is reachable.
+The original analysis is kept below for the record.
+
 `test/unit/redis_with_file_overflow_store_test.rb` requires a real Redis (`redis://localhost:6379/15`)
 for the whole file — `setup` builds a `RedisCacheStore` and `teardown` calls `clear`, so even the
 pure-logic tests inherit the dependency. CI already runs `redis:8.6-alpine`, so this is fine there;
