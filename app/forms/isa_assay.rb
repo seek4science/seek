@@ -4,7 +4,8 @@ class ISAAssay
   attr_accessor :assay, :sample_type, :input_sample_type_id
 
   validates_presence_of :assay
-  validate :validate_objects
+  validate :validate_assay
+  validate :validate_sample_type, if: -> { errors.blank? && !@assay.is_assay_stream? }
 
   def initialize(params = {})
     @assay = Assay.new(params[:assay] || {})
@@ -53,37 +54,36 @@ class ISAAssay
 
   private
 
-  def validate_objects
-    @assay.errors.each { |e| errors.add(:base, "[Assay]: #{e.full_message}") } unless @assay.valid?
+  def validate_assay
+    @assay.errors.each { |e| errors.add(:assay, "#{e.full_message}") } unless @assay.valid?
 
     if @assay.new_record? && @assay.next_linked_child_assay&.sample_type&.samples&.any?
       next_assay_id = @assay.next_linked_child_assay.id
       next_assay_title = @assay.next_linked_child_assay.title
-      errors.add(:base, "[Assay]: Not allowed to create an assay before assay '#{next_assay_id} - #{next_assay_title}'. It has samples linked to it.")
+      errors.add(:assay, "Not allowed to create an assay before assay '#{next_assay_id} - #{next_assay_title}'. It has samples linked to it.")
     end
 
-    return if @assay.is_assay_stream?
+  end
 
-    errors.add(:base, '[Assay]: The assay is missing a sample type.') if @sample_type.nil?
-
-    return unless @sample_type
+  def validate_sample_type
+    errors.add(:sample_type, 'Sample type is missing!') if @sample_type.nil?
 
     # In case of an experimental Assay, it must  have an input sample type
     errors.add(:base, '[Input Assay]: Input Assay is not provided') if @input_sample_type_id.blank?
 
-    # Add generic Sample type errors
-    @sample_type.errors.full_messages.each { |e| errors.add(:base, "[Sample type]: #{e}") } unless @sample_type.valid?
+    # Add Sample type generic validation errors
+    @sample_type.errors.full_messages.each { |e| errors.add(:sample_type, "#{e}") } unless @sample_type.valid?
+
+    if @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
+      errors.add(:sample_type,
+                 "All attributes should have an ISA Tag.")
+    end
 
     # All Sample Attributes must have an ISA tag
     missing_tag_attributes = @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }
     missing_tag_attributes.each do |attribute|
-      errors.add(:base,
-                  "[Sample type]: Should have exactly one attribute with the 'input' ISA Tag.")
-    end
-
-    if @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
-      errors.add(:base,
-                  "[Sample type]: All attributes should have an ISA Tag.")
+      errors.add(:sample_type,
+                 "[Sample type]: Should have exactly one attribute with the 'input' ISA Tag.")
     end
 
     # The Sample type must have exactly one attribute with one of the ISA tags:
@@ -94,8 +94,8 @@ class ISAAssay
     end
 
     unless assay_sample_or_datafile_attributes.one?
-      errors.add(:base,
-                  "[Sample type]: Should have exactly one attribute with the 'data_file' or 'other_material' ISA tag selected")
+      errors.add(:sample_type,
+                 "Should have exactly one attribute with the 'data_file' or 'other_material' ISA tag selected")
     end
 
     # The input attribute must conform to these restrictions:
@@ -104,7 +104,7 @@ class ISAAssay
     # - Sample attribute type must be 'Registered Sample List'
     if @sample_type.sample_attributes.detect { |attribute| attribute.input_attribute? }.nil?
       attribute_type_title = SampleAttributeType.find_by(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)&.title
-      errors.add(:base, "[Sample type '#{@sample_type.title}']: No valid input attribute detected! A valid input attribute must have an '#{Seek::ISA::TagType::INPUT}' ISA tag, have 'input' in the title and must be of type '#{attribute_type_title}'.")
+      errors.add(:sample_type, "No valid input attribute detected! A valid input attribute must have an '#{Seek::ISA::TagType::INPUT}' ISA tag, have 'input' in the title and must be of type '#{attribute_type_title}'.")
     end
   end
 end
