@@ -133,7 +133,7 @@ class AssetTest < ActiveSupport::TestCase
     refute FactoryBot.create(:publication).supports_spreadsheet_explore?
     refute FactoryBot.create(:collection).supports_spreadsheet_explore?
     refute FactoryBot.create(:sample).supports_spreadsheet_explore?
-    refute FactoryBot.create(:template).supports_spreadsheet_explore?
+    refute FactoryBot.create(:min_template).supports_spreadsheet_explore?
   end
 
   test 'tech type titles' do

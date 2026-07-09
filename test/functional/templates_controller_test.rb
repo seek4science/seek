@@ -786,6 +786,6 @@ class TemplatesControllerTest < ActionController::TestCase
     child_template_attributes = parent_template.template_attributes.map do |ta|
       FactoryBot.build(:template_attribute, parent_attribute_id: ta.id, title: ta.title, isa_tag_id: ta.isa_tag_id, sample_attribute_type: ta.sample_attribute_type, is_title: ta.is_title, required: ta.required, sample_controlled_vocab: ta.sample_controlled_vocab, pos: ta.pos)
     end
-    FactoryBot.create(:template, contributor: person, template_attributes: child_template_attributes, parent_id: parent_template.id)
+    FactoryBot.create(:min_template, contributor: person, template_attributes: child_template_attributes, parent_id: parent_template.id)
   end
 end
