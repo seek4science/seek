@@ -4,7 +4,6 @@ class TemplatesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
-  include GeneralAuthorizationTestCases
 
   setup do
     @old_setting = Seek::Config.isa_json_compliance_enabled
@@ -34,6 +33,57 @@ class TemplatesControllerTest < ActionController::TestCase
     Seek::Config.isa_json_compliance_enabled = @old_setting
     Seek::Util.clear_cached
   end
+
+  # Replacement for the test from GeneralAuthorizationTestCases, as the bare :template factory does not
+  # satisfy the 'must have exactly one title attribute' validation, unlike :min_template.
+  test 'private item not accessible publicly' do
+    item = FactoryBot.create(:min_template, policy: FactoryBot.create(:private_policy))
+
+    logout
+
+    get :show, params: { id: item.id }
+    assert_response :forbidden
+
+    if @controller.class.api_actions.include?(:show)
+      get :show, params: { id: item.id, format: 'json' }
+      assert_response :forbidden
+    end
+  end
+
+  test 'private item not accessible by another user' do
+    another_user = FactoryBot.create :user
+
+    item = FactoryBot.create(:min_template, policy: FactoryBot.create(:private_policy))
+
+    login_as(another_user)
+
+    get :show, params: { id: item.id }
+    assert_response :forbidden
+
+    if @controller.class.api_actions.include?(:show)
+      get :show, params: { id: item.id, format: 'json' }
+      assert_response :forbidden
+    end
+  end
+
+  test 'private item accessible by owner' do
+    item = FactoryBot.create(:min_template, policy: FactoryBot.create(:private_policy))
+
+    contributor = item.contributor
+
+    login_as(contributor)
+
+    get :show, params: { id: item.id }
+    assert_response :success
+    assert_nil flash[:error]
+
+    if @controller.class.api_actions.include?(:show)
+      get :show, params: { id: item.id, format: 'json' }
+      assert_response :success
+    end
+  end
+
+  ########################################################
 
   test 'should get new' do
     get :new
