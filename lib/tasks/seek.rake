@@ -7,10 +7,13 @@ require 'active_record/fixtures'
 require 'csv'
 
 namespace :seek do
-  desc 'Clears Rails.cache - required alongside tmp:cache:clear since that only clears the filesystem overflow, not the Redis-backed cache'
+  desc 'Clears Rails.cache and the settings cache - required alongside tmp:cache:clear since that only clears the filesystem overflow, not the Redis-backed caches'
   task(clear_cache: :environment) do
     Rails.cache.clear
-    puts 'Rails.cache cleared'
+    # The settings cache lives in its own store/namespace (a RedisCacheStore since #2655), so
+    # Rails.cache.clear does not reach it - clear it explicitly so a deploy gets a cold settings cache.
+    Seek::Config.clear_cache
+    puts 'Rails.cache and settings cache cleared'
   end
 
   desc 'Creates background jobs to rebuild all authorization lookup table for all items.'
