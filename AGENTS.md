@@ -61,8 +61,9 @@ script/reset-docker-redis.sh          # Wipe and restart Redis (clears cache AND
 script/delete-docker-redis.sh         # Remove the stopped container and its data volume
 ```
 
-`SEEK_REDIS_MAXMEMORY` (default `256mb`) sets the `maxmemory` limit for both the script and Docker
-Compose. Redis backs both `Rails.cache` and sessions on one instance (`allkeys-lru`).
+`REDIS_MAXMEMORY` (default `256mb`) sets the `maxmemory` limit. For `docker-compose.yml` it is read
+from `docker/redis.env`; for the scripts and the other compose variants it is a host env var. Redis
+backs both `Rails.cache` and sessions on one instance (`allkeys-lru`).
 
 ### Linting
 

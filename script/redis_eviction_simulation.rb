@@ -100,6 +100,6 @@ else
   puts 'CONCLUSION: sessions WERE evicted under sustained cache pressure - the shared-instance risk is real.'
   puts "  active lost: #{SESSIONS - active_alive}, idle lost: #{SESSIONS - idle_alive} " \
        '(touching active sessions helps under LRU but is not a guarantee).'
-  puts '  Mitigation: raise SEEK_REDIS_MAXMEMORY; if pressure persists, split cache and sessions ' \
+  puts '  Mitigation: raise REDIS_MAXMEMORY; if pressure persists, split cache and sessions ' \
        'onto separate Redis instances.'
 end

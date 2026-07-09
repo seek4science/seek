@@ -102,7 +102,7 @@ that's already there rather than invent a db-swapping scheme:
       Step 5 — mirroring how sessions already separate themselves with a namespace, just via a
       constructor option instead of the `redis-store` URL-suffix trick.
 - [x] Set `maxmemory` and `maxmemory-policy allkeys-lru` on the existing `redis_store` service in
-      `docker-compose.yml` — no new service needed. `maxmemory` is set from a `SEEK_REDIS_MAXMEMORY`
+      `docker-compose.yml` — no new service needed. `maxmemory` is set from a `REDIS_MAXMEMORY`
       env variable defaulting to `256mb` (see Step 8), so it can be right-sized without editing the
       compose file.
 - [x] Document the shared-instance tradeoff explicitly: `maxmemory-policy` applies
@@ -409,12 +409,12 @@ since it only shows up under real memory pressure.
       session key was evicted — both idle and the "active" ones GET-touched during the flood**. So
       under severe, sustained cache pressure the shared instance *will* drop sessions, and LRU recency
       from active use helps but is **not** a guarantee once the working set dwarfs `maxmemory`. This
-      is exactly why the mitigation has to be capacity (`SEEK_REDIS_MAXMEMORY`) + monitoring
+      is exactly why the mitigation has to be capacity (`REDIS_MAXMEMORY`) + monitoring
       (`evicted_keys`), and ultimately separate instances if pressure persists.
-- [x] Made `maxmemory` configurable via a `SEEK_REDIS_MAXMEMORY` env variable on the `redis_store`
-      service in all three compose files (`--maxmemory ${SEEK_REDIS_MAXMEMORY:-256mb}`), default
+- [x] Made `maxmemory` configurable via a `REDIS_MAXMEMORY` env variable on the `redis_store`
+      service in all three compose files (`--maxmemory ${REDIS_MAXMEMORY:-256mb}`), default
       **256mb**. Verified with `docker compose config` that it resolves to `256mb` by default and
-      honours an override (e.g. `SEEK_REDIS_MAXMEMORY=1gb`). This replaces the earlier hardcoded
+      honours an override (e.g. `REDIS_MAXMEMORY=1gb`). This replaces the earlier hardcoded
       `512mb` (review finding I2) so an operator can right-size the shared instance without editing
       the compose file — headroom should still be chosen from a measured peak (concurrent active
       sessions × average serialized session size, plus the expected cache working set, plus a safety
@@ -433,7 +433,7 @@ since it only shows up under real memory pressure.
       access.
 - [x] Escalation path documented (no separate ops runbook exists in this repo, so recorded here and
       in the header + output of `script/redis_eviction_simulation.rb`). When `evicted_keys` climbs
-      persistently: **(1)** raise `SEEK_REDIS_MAXMEMORY` — the cheapest fix, now a single env var;
+      persistently: **(1)** raise `REDIS_MAXMEMORY` — the cheapest fix, now a single env var;
       **(2)** if cache growth keeps outpacing memory no matter how high it's set, split cache and
       sessions onto **separate Redis instances** — the real structural fix, deliberately deferred
       since Step 1 scoped SEEK to one shared instance for its current scale. Read `evicted_keys` as a
@@ -526,7 +526,7 @@ Steps 1–6). None are blockers; listed here in the suggested order to work thro
       `:file_store, "tmp/cache"`) and deploys already run `tmp:clear` first, so no new harm. If it
       ever matters, point the overflow FileStore at a dedicated subdir (e.g. `tmp/cache/rails-cache`).
 - [x] **[I2] / Step 8** `maxmemory` was a hardcoded `512mb` shared across sessions + settings-cache
-      + main cache with `allkeys-lru`. **Addressed** — now set from `SEEK_REDIS_MAXMEMORY` (default
+      + main cache with `allkeys-lru`. **Addressed** — now set from `REDIS_MAXMEMORY` (default
       `256mb`) in all three compose files, so it's operator-tunable without editing compose (Step
       8.2). The remaining half — sizing it against a real working set and surfacing `evicted_keys` —
       stays with the operational Step 8 items.

@@ -61,7 +61,7 @@ services:
         "--appendonly",
         "yes",
         "--maxmemory",
-        "${SEEK_REDIS_MAXMEMORY:-256mb}",
+        "${REDIS_MAXMEMORY:-256mb}",
         "--maxmemory-policy",
         "allkeys-lru",
       ]

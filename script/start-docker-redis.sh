@@ -24,7 +24,7 @@ fi
 
 docker rm seek-redis > /dev/null 2>&1 || true
 echo "creating and starting seek-redis container"
-docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" redis:8.6-alpine redis-server --appendonly yes --maxmemory "${SEEK_REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
+docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" redis:8.6-alpine redis-server --appendonly yes --maxmemory "${REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
 
 echo "waiting for Redis to be ready ..."
 retries=0
