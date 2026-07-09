@@ -52,7 +52,7 @@ module HasSharedAttributeValidation
     end
   end
 
-  # fixes the consistency of the attribute controlled vocabs where the attrcibute doesn't match.
+  # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
   # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
   # rather than clearing the selected vocab each time
   def resolve_controlled_vocabs_inconsistencies
