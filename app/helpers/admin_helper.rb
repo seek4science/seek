@@ -5,7 +5,7 @@ module AdminHelper
 
     safe_join(adaptors.collect do |adaptor|
       key = adaptor.key
-      enabled = current.dig(key, 'enabled') || true
+      enabled = (current[key] || {}).with_indifferent_access.fetch('enabled', true)
       description = "Whether the #{adaptor.name} external search is active"
       admin_checkbox_setting("external_search_adaptors[#{key}][enabled]", 1, enabled, adaptor.name, description)
     end)

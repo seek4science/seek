@@ -39,6 +39,27 @@ class LinkingSamplesUpdateJobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'perform with a singly linked (non-multi) sample attribute' do
+    project = @person.projects.first
+    linked_type = FactoryBot.create(:linked_sample_type, project_ids: [project.id])
+    patient_type = linked_type.sample_attributes.detect { |a| a.title == 'patient' }.linked_sample_type
+
+    patient, linking_sample = disable_authorization_checks do
+      patient = Sample.create!(sample_type: patient_type, project_ids: [project.id],
+                                data: { 'full name' => 'Fred Bloggs', age: 44 })
+      linking_sample = Sample.create!(sample_type: linked_type, project_ids: [project.id],
+                                       data: { title: 'linking_sample', patient: patient.id })
+      [patient, linking_sample]
+    end
+
+    patient.set_attribute_value('full name', 'Dolly Parton')
+    disable_authorization_checks { patient.save! }
+
+    LinkingSamplesUpdateJob.perform_now(patient)
+
+    assert_equal 'Dolly Parton', Sample.find(linking_sample.id).get_attribute_value(:patient)[:title]
+  end
+
   def create_linked_samples
     project = @person.projects.first
 

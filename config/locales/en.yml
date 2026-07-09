@@ -369,3 +369,4 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
     errors:
       general: An error occurred whilst fetching the citation
       invalid_style: Invalid citation style
+      invalid_cff: "Couldn't extract the citation from the provided CFF file:"

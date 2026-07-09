@@ -123,7 +123,6 @@ Templates.mapData = (data) =>
     item.pid,
     item.pos,
     item.isa_tag_id,
-    item.isa_tag_title,
     item.linked_sample_type_id,
     item.template_attribute_id
   ]);
@@ -189,13 +188,13 @@ function updateIsaTagSelect(template_level, attribute_row) {
   const isa_tags = get_filtered_isa_tags(template_level);
 
   // Remove all options first from the select items that were not disabled, except blank one
-  $j(attribute_row).find('select[data-attr="isa_tag_title"]:not(:disabled) option:not([value=""])').each(function() {
+  $j(attribute_row).find('select[data-attr="isa_tag_id"]:not(:disabled):not(.disabled) option:not([value=""])').each(function() {
     $j(this).remove();
   });
 
   // Append filtered option to a new attribute row
   $j.each(isa_tags, function (i, tag) {
-    $j(attribute_row).find('select[data-attr="isa_tag_title"]:not(:disabled)').append($j('<option>', {
+    $j(attribute_row).find('select[data-attr="isa_tag_id"]:not(:disabled):not(.disabled)').append($j('<option>', {
       value: tag.value,
       text: tag.text
     }));
@@ -249,18 +248,18 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="type"]').val(row[3]);
     if (appliedToSampleType) $j(newRow).find('[data-attr="type"]').addClass("disabled");
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
-    if (appliedToSampleType) $j(newRow).find('[data-attr="cv_id"]').parent().addClass("disabled");
+    if (appliedToSampleType)
+      $j(newRow).find('[data-attr="cv_id"]').parent().addClass("disabled");
     $j(newRow).find('[data-attr="allow_cv_free_text"]').prop("checked", row[5]);
     if (appliedToSampleType) $j(newRow)
-                                .find('[data-attr="allow_cv_free_text"]')
-                                .addClass("disabled");
+                                .find('input[type="checkbox"][data-attr="allow_cv_free_text"]')
+                                .prop("disabled", true);
     $j(newRow).find('[data-attr="unit"]').val(row[6]);
     if (appliedToSampleType)  $j(newRow).find('[data-attr="unit"]').addClass("disabled");
     $j(newRow).find('[data-attr="pid"]').val(row[9]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[11]);
-    $j(newRow).find('[data-attr="isa_tag_title"]').val(row[11]);
     $j(newRow)
-        .find('[data-attr="isa_tag_title"]')
+        .find('[data-attr="isa_tag_id"]')
         .addClass("disabled");
     $j(newRow).find('[data-attr="template_attribute_id"]').val(row[14]); // In case of a sample type
     $j(newRow).find('[data-attr="parent_attribute_id"]').val(row[14]); // In case of a template

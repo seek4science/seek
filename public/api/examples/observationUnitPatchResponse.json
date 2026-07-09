@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "3053",
+              "id": "1022252612",
               "type": "projects"
             },
             "access": "edit"
@@ -17,13 +17,13 @@
       },
       "discussion_links": [
         {
-          "id": "98",
+          "id": "66",
           "label": "Google",
           "url": "http://google.com"
         }
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "316",
+        "extended_metadata_type_id": "76",
         "attribute_map": {
           "name": "unit 2",
           "strain": "strain 2"
@@ -36,14 +36,14 @@
         "tag2",
         "tag3"
       ],
-      "created_at": "2026-03-19T16:44:16.445Z",
-      "updated_at": "2026-03-19T16:44:16.553Z",
+      "created_at": "2026-06-16T14:28:32.176Z",
+      "updated_at": "2026-06-16T14:28:32.284Z",
       "creators": [
         {
-          "profile": "/people/3016",
+          "profile": "/people/1039988561",
           "family_name": "Last",
-          "given_name": "Person2552",
-          "affiliation": "An Institution: 3040",
+          "given_name": "Person1807",
+          "affiliation": "An Institution: 2096",
           "orcid": null
         }
       ],
@@ -53,7 +53,7 @@
       "creators": {
         "data": [
           {
-            "id": "3016",
+            "id": "1039988561",
             "type": "people"
           }
         ]
@@ -61,7 +61,7 @@
       "submitter": {
         "data": [
           {
-            "id": "3014",
+            "id": "1039988559",
             "type": "people"
           }
         ]
@@ -69,11 +69,11 @@
       "people": {
         "data": [
           {
-            "id": "3016",
+            "id": "1039988561",
             "type": "people"
           },
           {
-            "id": "3014",
+            "id": "1039988559",
             "type": "people"
           }
         ]
@@ -81,21 +81,21 @@
       "projects": {
         "data": [
           {
-            "id": "3053",
+            "id": "1022252612",
             "type": "projects"
           }
         ]
       },
       "study": {
         "data": {
-          "id": "462",
+          "id": "1060385257",
           "type": "studies"
         }
       },
       "samples": {
         "data": [
           {
-            "id": "198",
+            "id": "190",
             "type": "samples"
           }
         ]
@@ -103,7 +103,7 @@
       "data_files": {
         "data": [
           {
-            "id": "174",
+            "id": "883654476",
             "type": "data_files"
           }
         ]
@@ -113,11 +113,11 @@
       "self": "/observation_units/32"
     },
     "meta": {
-      "created": "2026-03-19T16:44:16.445Z",
-      "modified": "2026-03-19T16:44:16.553Z",
+      "created": "2026-06-16T14:28:32.176Z",
+      "modified": "2026-06-16T14:28:32.284Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "cab452d0-05e0-013f-f2a8-00155d52079b"
+      "uuid": "7e7e5750-b24f-44ad-9f54-d275b230e59c"
     }
   },
   "jsonapi": {

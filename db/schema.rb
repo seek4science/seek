@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_22_131727) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -1897,6 +1897,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_22_131727) do
     t.string "deleted_contributor"
     t.bigint "observation_unit_id"
     t.string "external_identifier", limit: 2048
+    t.index ["originating_data_file_id"], name: "index_samples_on_originating_data_file_id"
+    t.index ["sample_type_id"], name: "index_samples_on_sample_type_id"
   end
 
   create_table "saved_searches", id: :integer, force: :cascade do |t|
