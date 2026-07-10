@@ -665,4 +665,58 @@ class ConfigTest < ActiveSupport::TestCase
     result = Seek::Config.external_search_adaptors
     assert_equal setting, result
   end
+
+  test 'settings default whilst the table is legitimately absent, then read from the database once it exists' do
+    Seek::Config.default :test_bootstrap_setting, 'the default'
+
+    # Simulate the pre-schema state during db:setup: the database is reachable but the table does not exist
+    reset_settings_table_memo
+    Settings.define_singleton_method(:table_exists?) { false }
+    begin
+      refute Seek::Config.settings_table_available?
+      # reads use the default, and writes update the in-memory defaults rather than hitting the database
+      assert_equal 'the default', Seek::Config.get_value(:test_bootstrap_setting)
+      Seek::Config.set_value(:test_bootstrap_setting, 'set during bootstrap')
+      assert_equal 'set during bootstrap', Seek::Config.get_default_value(:test_bootstrap_setting)
+    ensure
+      Settings.singleton_class.send(:remove_method, :table_exists?)
+    end
+
+    # Once the table exists, values come from the database
+    Seek::Config.set_value(:test_bootstrap_setting, 'the stored value')
+    assert Seek::Config.settings_table_available?
+    assert_equal 'the stored value', Seek::Config.get_value(:test_bootstrap_setting)
+  end
+
+  test 'reads fail fast when the database is unreachable, rather than silently serving defaults' do
+    Seek::Config.default :test_bootstrap_setting, 'the default'
+
+    reset_settings_table_memo
+    Settings.define_singleton_method(:table_exists?) { raise ActiveRecord::ConnectionNotEstablished, 'boom' }
+    begin
+      # a genuine outage must raise, not return the default, so wrong settings are never served or saved
+      assert_raises(ActiveRecord::ConnectionNotEstablished) { Seek::Config.settings_table_available? }
+      assert_raises(ActiveRecord::ConnectionNotEstablished) { Seek::Config.get_value(:test_bootstrap_setting) }
+      assert_raises(ActiveRecord::ConnectionNotEstablished) { Seek::Config.set_value(:test_bootstrap_setting, 'x') }
+      # the failed check must not be memoized, so the process recovers once the database is back
+      refute Seek::Config.instance_variable_get(:@settings_table_available)
+    ensure
+      Settings.singleton_class.send(:remove_method, :table_exists?)
+    end
+
+    assert Seek::Config.settings_table_available?
+  end
+
+  private
+
+  # @settings_table_available is a process-level instance variable on Seek::Config, so reset it between tests
+  # that simulate an outage to avoid leaking into other tests.
+  def reset_settings_table_memo
+    Seek::Config.instance_variable_set(:@settings_table_available, nil)
+  end
+
+  def teardown
+    reset_settings_table_memo
+    super
+  end
 end

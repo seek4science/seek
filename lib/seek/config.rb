@@ -495,41 +495,47 @@ module Seek
       val
     end
 
-    use_db = begin
-      Settings.table_exists?
-    rescue StandardError
-      false
+    # Whether the settings database table exists and should be read from.
+    #
+    # Returns true if the table exists (memoized once found), or false if it is legitimately absent - i.e.
+    # the database is reachable but the table has not been created yet, as during db:setup before the schema
+    # is loaded - in which case defaults are used. If the database itself is unreachable, Settings.table_exists?
+    # raises and the error is allowed to propagate, so a process never silently serves default configuration
+    # values in place of the real stored settings (which could, for example, expose disabled features or apply
+    # the wrong policy). A boot that hits this simply fails and is retried, rather than being poisoned for its
+    # whole lifetime; and because a failed check is not memoized, reads recover on their own once the database
+    # is reachable again.
+    def settings_table_available?
+      return true if @settings_table_available
+
+      @settings_table_available = true if Settings.table_exists?
+      !!@settings_table_available
     end
 
-    if use_db
-      def get_value(setting, conversion = nil)
-        val = Settings.defaults[setting.to_s]
-        if Thread.current[:use_settings_cache]
-          begin
-            result = settings_cache[setting]
-          rescue Errno::ENOENT => e
-            Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
-            result = Settings.global.fetch(setting)
-          end
-        else
+    def get_value(setting, conversion = nil)
+      return get_default_value(setting, conversion) unless settings_table_available?
+
+      val = Settings.defaults[setting.to_s]
+      if Thread.current[:use_settings_cache]
+        begin
+          result = settings_cache[setting]
+        rescue Errno::ENOENT => e
+          Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
           result = Settings.global.fetch(setting)
         end
-        val = result.value if result
-        val = val.send(conversion) if conversion && val
-        val
+      else
+        result = Settings.global.fetch(setting)
       end
+      val = result.value if result
+      val = val.send(conversion) if conversion && val
+      val
+    end
 
-      def set_value(setting, val, conversion = nil)
-        val = val.send(conversion) if conversion && val
+    def set_value(setting, val, conversion = nil)
+      val = val.send(conversion) if conversion && val
+      if settings_table_available?
         Settings.global[setting] = val
-      end
-    else
-      def get_value(setting, conversion = nil)
-        get_default_value(setting, conversion)
-      end
-
-      def set_value(setting, val, conversion = nil)
-        val = val.send(conversion) if conversion && val
+      else
         Settings.defaults[setting.to_sym] = val
       end
     end
