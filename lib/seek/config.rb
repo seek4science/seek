@@ -497,19 +497,21 @@ module Seek
 
     # Whether the settings database table exists and should be read from.
     #
-    # Returns true if the table exists (memoized once found), or false if it is legitimately absent - i.e.
-    # the database is reachable but the table has not been created yet, as during db:setup before the schema
-    # is loaded - in which case defaults are used. If the database itself is unreachable, Settings.table_exists?
-    # raises and the error is allowed to propagate, so a process never silently serves default configuration
-    # values in place of the real stored settings (which could, for example, expose disabled features or apply
-    # the wrong policy). A boot that hits this simply fails and is retried, rather than being poisoned for its
-    # whole lifetime; and because a failed check is not memoized, reads recover on their own once the database
-    # is reachable again.
+    # Defaults are used only when there are provably no stored settings to lose: either the database is
+    # reachable but the table has not been created yet (table_exists? returns false, as during db:setup before
+    # the schema is loaded), or the database itself does not exist yet (NoDatabaseError, e.g. a fresh checkout
+    # before db:create). Any other failure means the database exists but is unreachable, and is allowed to
+    # propagate, so a process never silently serves default configuration values in place of the real stored
+    # settings (which could, for example, expose disabled features or apply the wrong policy). A boot that hits
+    # this simply fails and is retried, rather than being poisoned for its whole lifetime; and because neither
+    # falsey case is memoized, reads recover on their own once the database is reachable again.
     def settings_table_available?
       return true if @settings_table_available
 
       @settings_table_available = true if Settings.table_exists?
       !!@settings_table_available
+    rescue ActiveRecord::NoDatabaseError
+      false
     end
 
     def get_value(setting, conversion = nil)

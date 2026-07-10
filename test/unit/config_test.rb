@@ -707,6 +707,23 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.settings_table_available?
   end
 
+  test 'settings default when the database itself does not exist yet, rather than failing' do
+    Seek::Config.default :test_bootstrap_setting, 'the default'
+
+    # A fresh checkout before db:create: the database does not exist, so there are no stored settings to lose
+    reset_settings_table_memo
+    Settings.define_singleton_method(:table_exists?) { raise ActiveRecord::NoDatabaseError, 'no database' }
+    begin
+      refute Seek::Config.settings_table_available?
+      assert_equal 'the default', Seek::Config.get_value(:test_bootstrap_setting)
+    ensure
+      Settings.singleton_class.send(:remove_method, :table_exists?)
+    end
+
+    # Once the database and table exist, values come from the database again
+    assert Seek::Config.settings_table_available?
+  end
+
   private
 
   # @settings_table_available is a process-level instance variable on Seek::Config, so reset it between tests
