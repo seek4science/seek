@@ -74,21 +74,20 @@ class ISAAssay
     # Add Sample type generic validation errors
     @sample_type.errors.full_messages.each { |e| errors.add(:sample_type, "#{e}") } unless @sample_type.valid?
 
+    # All Sample Attributes must have an ISA tag
     if @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
       errors.add(:sample_type,
                  "All attributes should have an ISA Tag.")
     end
 
-    # All Sample Attributes must have an ISA tag
-    missing_tag_attributes = @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }
-    missing_tag_attributes.each do |attribute|
-      errors.add(:sample_type,
-                 "[Sample type]: Should have exactly one attribute with the 'input' ISA Tag.")
+    # The Sample type must have exactly one attribute with a 'protocol' ISA tag
+    unless @sample_type.sample_attributes.select { |a| a.isa_tag.isa_protocol? }.one?
+      errors.add(:sample_type, "Should have exactly one attribute with the 'protocol' ISA Tag.")
     end
 
     # The Sample type must have exactly one attribute with one of the ISA tags:
-    # - OTHER_MATERIAL
-    # - DATA_FILE
+    # - other_material
+    # - data_file
     assay_sample_or_datafile_attributes = @sample_type.sample_attributes.select do |a|
       a.isa_tag&.isa_other_material? || a.isa_tag&.isa_data_file?
     end
@@ -99,7 +98,7 @@ class ISAAssay
     end
 
     # The input attribute must conform to these restrictions:
-    # - Input ISA tag
+    # - 'input' ISA tag
     # - 'input' in the title
     # - Sample attribute type must be 'Registered Sample List'
     if @sample_type.sample_attributes.detect { |attribute| attribute.input_attribute? }.nil?
