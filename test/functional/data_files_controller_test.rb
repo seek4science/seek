@@ -1277,6 +1277,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'explore csv with non utf-8 encoding' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy),
+                                       content_blob: FactoryBot.create(:iso_8859_1_csv_content_blob))
+    get :explore, params: { id: df }
+    assert_response :success
+    assert_select 'div#spreadsheet_1 table.sheet td', text: /Temp/
+  end
+
   test 'explore spreadsheet with error logs' do
     data = FactoryBot.create :spreadsheet_with_error_logs_datafile, policy: FactoryBot.create(:public_policy)
     get :explore, params: { id: data }
