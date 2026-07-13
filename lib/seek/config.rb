@@ -503,13 +503,10 @@ module Seek
     # before db:create). Any other failure means the database exists but is unreachable, and is allowed to
     # propagate, so a process never silently serves default configuration values in place of the real stored
     # settings (which could, for example, expose disabled features or apply the wrong policy). A boot that hits
-    # this simply fails and is retried, rather than being poisoned for its whole lifetime; and because neither
-    # falsey case is memoized, reads recover on their own once the database is reachable again.
+    # this simply fails and is retried, rather than being poisoned for its whole lifetime; and because a false
+    # result never sticks (only true is memoized), reads recover on their own once the database is reachable again.
     def settings_table_available?
-      return true if @settings_table_available
-
-      @settings_table_available = true if Settings.table_exists?
-      !!@settings_table_available
+      @settings_table_available ||= Settings.table_exists?
     rescue ActiveRecord::NoDatabaseError
       false
     end
