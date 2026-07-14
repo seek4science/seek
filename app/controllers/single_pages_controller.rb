@@ -27,11 +27,11 @@ class SinglePagesController < ApplicationController
   def dynamic_table_data
     data = []
     if params[:sample_type_id]
-      sample_type = SampleType.authorized_for('view').detect { |st| st.id.to_s == params[:sample_type_id].to_s } if params[:sample_type_id]
-      data = helpers.dt_data(sample_type)[:rows]
+      sample_type = SampleType.where(id: params[:sample_type_id]).authorized_for('view').first
+      data = helpers.dt_data(sample_type)[:rows] unless sample_type.nil?
     elsif params[:study_id]
-      study = Study.authorized_for('view').detect { |s| s.id.to_s == params[:study_id].to_s } if params[:study_id]
-      assay = Assay.authorized_for('view').detect { |a| a.id.to_s == params[:assay_id].to_s } if params[:assay_id]
+      study = Study.where(id: params[:study_id]).authorized_for('view').first
+      assay = Assay.where(id: params[:assay_id]).authorized_for('view').first if params[:assay_id]
 
       unless study.nil? and assay.nil?
         data = helpers.dt_aggregated(study, assay)[:rows]
