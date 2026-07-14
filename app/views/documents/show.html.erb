@@ -23,6 +23,8 @@
           </div>
         </div>
 
+        <%= rendered_asset_view(@display_document) %>
+
         <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @document } %>
         <%= render :partial=>"general/isa_graph", :locals => {:root_item => @document, :deep => true, :include_parents => true} %>
       </div>
