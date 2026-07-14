@@ -42,6 +42,7 @@ module Seek
     def self.cff_to_csl(blob)
       Rails.cache.fetch("citation-cff-#{blob.cache_key}") do
         read_cff(blob) do |cff|
+          cff.validate!(fail_on_filename: false)
           BibTeX.parse(cff.to_bibtex).to_citeproc.first
         end
       end

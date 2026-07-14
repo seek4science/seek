@@ -911,6 +911,17 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute File.exist?(txt_path)
   end
 
+  test 'extract_csv transcodes non utf-8 content' do
+    # ISO-8859-1 encoded CSV contains bytes that are invalid as UTF-8 (e.g. the degree symbol)
+    blob = FactoryBot.create(:iso_8859_1_csv_content_blob)
+    refute File.read(blob.filepath).valid_encoding?, 'fixture should contain invalid UTF-8 bytes'
+
+    csv = blob.extract_csv
+    assert csv.valid_encoding?, 'extract_csv should return valid UTF-8'
+    # should not raise CSV::InvalidEncodingError
+    assert_nothing_raised { CSV.parse(csv, quote_char: "\x00") }
+  end
+
   test 'tmp_io_objects in tmp dir are deleted' do
     file = Tempfile.new('testing-content-blob')
     file.write('test test test')

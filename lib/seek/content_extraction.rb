@@ -88,7 +88,12 @@ module Seek
       # CSV/TSV content is text, so relabel it as UTF-8 to match the previous file-based
       # read. Otherwise downstream operations like String#unicode_normalize fail with
       # "Unicode Normalization not appropriate for ASCII-8BIT".
-      data_io_object.read.force_encoding(Encoding::UTF_8)
+      content = data_io_object.read.force_encoding(Encoding::UTF_8)
+      # Some CSV files are not UTF-8 (e.g. ISO-8859-1/Latin-1), which would cause
+      # CSV parsing to raise CSV::InvalidEncodingError. Fall back to interpreting
+      # the bytes as ISO-8859-1 and transcode to UTF-8 when they aren't valid UTF-8.
+      content = content.encode('UTF-8', 'ISO-8859-1') unless content.valid_encoding?
+      content
     end
 
     def to_spreadsheet_xml
@@ -130,7 +135,6 @@ module Seek
       Seek::Errors::ExceptionForwarder.send_notification(e, data: { content_blob: self, asset: asset })
       Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
     end
-
 
     def resolve_sheet_name_to_index(sheet_name)
       doc = LibXML::XML::Parser.string(to_spreadsheet_xml).parse
