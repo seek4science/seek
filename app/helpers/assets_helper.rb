@@ -37,7 +37,7 @@ module AssetsHelper
 
   # will render a view of the asset, if available. For example, a slideshare based asset could give a embedded slideshare view
   def rendered_asset_view(asset)
-    return '' unless asset.can_download?
+    return '' unless asset.content_blob && asset.can_download?
 
     our_renderer = Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob)
     if our_renderer.external_embed? && !cookie_consent.allow_embedding?
