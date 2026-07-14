@@ -27,12 +27,15 @@ class SinglePagesController < ApplicationController
   def dynamic_table_data
     data = []
     if params[:sample_type_id]
-      sample_type = SampleType.find(params[:sample_type_id]) if params[:sample_type_id]
+      sample_type = SampleType.authorized_for('view').detect { |st| st.id.to_s == params[:sample_type_id].to_s } if params[:sample_type_id]
       data = helpers.dt_data(sample_type)[:rows]
     elsif params[:study_id]
-      study = Study.find(params[:study_id]) if params[:study_id]
-      assay = Assay.find(params[:assay_id]) if params[:assay_id]
-      data = helpers.dt_aggregated(study, assay)[:rows]
+      study = Study.authorized_for('view').detect { |s| s.id.to_s == params[:study_id].to_s } if params[:study_id]
+      assay = Assay.authorized_for('view').detect { |a| a.id.to_s == params[:assay_id].to_s } if params[:assay_id]
+
+      unless study.nil? and assay.nil?
+        data = helpers.dt_aggregated(study, assay)[:rows]
+      end
     end
     data = data.map { |row| row.unshift('') } if params[:rows_pad]
     render json: { data: }
