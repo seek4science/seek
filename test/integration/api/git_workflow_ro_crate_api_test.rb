@@ -150,7 +150,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
         assert_equal '1.0.0', assigns(:workflow).git_version.name
         assert_equal 'sort-and-change-case', assigns(:workflow).title
-        assert_equal 'https://example.com/my-workflow', assigns(:workflow).source_link_url
+        assert_equal 'https://example.com/my-workflow/', assigns(:workflow).source_link_url
         assert assigns(:workflow).git_version.total_size > 100
         assert_equal 'sort-and-change-case.ga', assigns(:workflow).ro_crate.main_workflow.id
       end
@@ -171,7 +171,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
         assert_equal '3.2', assigns(:workflow).git_version.name
         assert_equal 'sort-and-change-case', assigns(:workflow).title
-        assert_equal 'https://example.com/my-workflow', assigns(:workflow).source_link_url
+        assert_equal 'https://example.com/my-workflow/', assigns(:workflow).source_link_url
         assert assigns(:workflow).git_version.total_size > 100
         assert_equal 'sort-and-change-case.ga', assigns(:workflow).ro_crate.main_workflow.id
       end
@@ -242,7 +242,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'duplicate version ignored when submitting RO-Crate' do
-    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow/', contributor: current_person)
     disable_authorization_checks { workflow.git_version.update!(name: '1.0.0') }
 
     assert_no_difference('Workflow.count') do
@@ -264,7 +264,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'duplicate numeric version ignored when submitting RO-Crate' do
-    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow/', contributor: current_person)
     disable_authorization_checks { workflow.git_version.update!(name: '3.2') }
 
     assert_no_difference('Workflow.count') do
@@ -286,8 +286,8 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot submit RO-Crate with ambiguous matching ID' do
-    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
-    workflow2 = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+    workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow/', contributor: current_person)
+    workflow2 = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow/', contributor: current_person)
 
     assert_no_difference('Workflow.count') do
       assert_no_difference('Git::Version.count') do
