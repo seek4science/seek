@@ -19,7 +19,14 @@
 - **LinkingSamplesUpdateJob crash** — Fixed a crash in the background job that updates linked samples when an attribute is singly-linked (#2652)
 - **Non-UTF-8 CSV files causing error when exploring** — CSV files with non-UTF-8 encodings are now handled gracefully instead of raising an unhandled error (#2669)
 - **Nil error with no authors in CITATION.cff** — Fixed a crash when a CITATION.cff file contains no authors (#2639)
+- **Registered Data file/Strain/SOP missing from experiment view** — Fixed registered assets (Data file, Strain, SOP) not appearing correctly in the DataHub experiment view (#2671)
 
 ## Infrastructure & Dependencies
 
 - concurrent-ruby security bump
+- oauth2 updated
+- zlib updated
+- supercronic updated
+
+---
+Full list of changes: https://github.com/seek4science/seek/milestone/35?closed=1
