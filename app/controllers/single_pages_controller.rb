@@ -31,10 +31,12 @@ class SinglePagesController < ApplicationController
       data = helpers.dt_data(sample_type)[:rows] unless sample_type.nil?
     elsif params[:study_id]
       study = Study.where(id: params[:study_id]).authorized_for('view').first
-      assay = Assay.where(id: params[:assay_id]).authorized_for('view').first if params[:assay_id]
 
-      unless study.nil? and assay.nil?
-        data = helpers.dt_aggregated(study, assay)[:rows]
+      if params[:assay_id]
+        assay = Assay.where(id: params[:assay_id]).authorized_for('view').first
+        data = helpers.dt_aggregated(study, assay)[:rows] unless assay.nil?
+      elsif !study.nil?
+        data = helpers.dt_aggregated(study)[:rows]
       end
     end
     data = data.map { |row| row.unshift('') } if params[:rows_pad]
