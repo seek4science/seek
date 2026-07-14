@@ -10,7 +10,7 @@ class SinglePagesController < ApplicationController
                 only: %i[show index project_folders]
   before_action :isa_json_compliance_enabled?
   before_action :check_user_logged_in,
-                except: %i[ show index ]
+                except: %i[ show index dynamic_table_data ]
   respond_to :html, :js
 
   def show
