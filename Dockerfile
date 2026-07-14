@@ -8,8 +8,8 @@ ENV APP_DIR=/seek \
     BUNDLE_WITHOUT="development"
 
 # Supercronic variables
-ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.46/supercronic-linux-amd64 \
-    SUPERCRONIC_SHA1SUM=5bcefed628e32adc08e32634db2d10e9230dbca0 \
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.47/supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=712d2ece75da6f6e530192a151488578153e4e96 \
     SUPERCRONIC=supercronic-linux-amd64
 
 
