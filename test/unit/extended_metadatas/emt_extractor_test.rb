@@ -104,7 +104,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
-      assert_match /Failed to parse JSON file: 784: unexpected token at/, error.message
+      assert_match /Failed to parse JSON file: expected object key, got EOF at line 5 column 1/, error.message
     end
   end
 
