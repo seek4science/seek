@@ -747,7 +747,7 @@ function cvListObjectsInput(column, data, options, url, multiInput) {
 function simpleObjectsInput(column, data, options, url, multiInput) {
   const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`);
   if (options.readonly) {
-    return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
+    return data.map((e) => `<span title="ID: ${sanitizeData(e.id)}" class="badge">${sanitizeData(e.title)}</span>`).join(" ");
   } else {
     const typeaheadTemplate = 'typeahead/single_pages_samples';
     const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();
