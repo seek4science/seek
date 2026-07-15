@@ -1,0 +1,50 @@
+<%
+  # Mirrors config/schedule.rb's `offset` helper: applies the configured
+  # Seek::Config.regular_job_offset (minutes) on top of a base hour, to avoid
+  # multiple periodic jobs firing at exactly the same moment. Whenever/cron only
+  # honours this "at:" offset for day/week/month-frequency jobs (not hour-frequency
+  # ones), which is why only some of the entries below use it - matching the
+  # cron schedule actually produced by `bundle exec whenever` today.
+  def offset_cron(off_hours)
+    off_minutes = Seek::Config.regular_job_offset || 0
+    time = Time.utc(2000, 1, 1, off_hours, 0) + off_minutes.minutes
+    "#{time.min} #{time.hour}"
+  end
+%>
+# Recurring entries for the subset of config/schedule.rb that are pure ActiveJob
+# enqueues (see SOLID_QUEUE_MIGRATION_PLAN.md Phase 1). Everything else in
+# config/schedule.rb (rake tasks, shell commands, non-job class methods) is not
+# an ActiveJob and stays on whenever/cron.
+production:
+  periodic_subscription_email_daily:
+    class: PeriodicSubscriptionEmailJob
+    args: [ daily ]
+    schedule: "<%= offset_cron(0) %> * * *"
+  periodic_subscription_email_weekly:
+    class: PeriodicSubscriptionEmailJob
+    args: [ weekly ]
+    schedule: "<%= offset_cron(0) %> 1,8,15,22 * *"
+  periodic_subscription_email_monthly:
+    class: PeriodicSubscriptionEmailJob
+    args: [ monthly ]
+    schedule: "<%= offset_cron(0) %> 1 * *"
+  regular_maintenance:
+    class: RegularMaintenanceJob
+    schedule: "0 */4 * * *"
+  auth_lookup_maintenance:
+    class: AuthLookupMaintenanceJob
+    schedule: "0 */8 * * *"
+  life_monitor_status:
+    class: LifeMonitorStatusJob
+    schedule: "<%= offset_cron(2) %> * * *"
+  news_feed_refresh:
+    class: NewsFeedRefreshJob
+    priority: 3
+    schedule: "*/<%= Seek::Config.home_feeds_cache_timeout %> * * * *"
+  queue_timed_jobs:
+    command: "ApplicationJob.queue_timed_jobs"
+    schedule: "*/10 * * * *"
+
+# No recurring entries for development/test - matches solid_queue's own default
+# template convention and avoids periodic jobs (subscription emails, etc.) firing
+# unexpectedly on a local machine when `bin/jobs` is run for testing.

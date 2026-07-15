@@ -1,0 +1,67 @@
+# Worker topology mirrors QueueNames / Seek::Workers.active_queues (see lib/seek/workers.rb):
+# one worker per queue, gated by the same Seek::Config feature flags, so that a queue only
+# gets a worker if the corresponding feature is enabled - same as the current DelayedJob setup.
+#
+# Threads are deliberately set to 1 per queue for now. The Phase 0 thread-safety audit in
+# SOLID_QUEUE_MIGRATION_PLAN.md found two pieces of process-global mutable state
+# (User.current_user, $authorization_checks_disabled) that are only safe today because
+# DelayedJob workers are separate single-threaded OS processes. Do not raise these thread
+# counts until those globals are made properly thread-local.
+default: &default
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+  workers:
+    - queues: <%= QueueNames::DEFAULT %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    - queues: <%= QueueNames::MAILERS %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    <% if Seek::Config.auth_lookup_enabled %>
+    - queues: <%= QueueNames::AUTH_LOOKUP %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    <% end %>
+    <% if Seek::Config.cache_remote_files %>
+    - queues: <%= QueueNames::REMOTE_CONTENT %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    <% end %>
+    <% if Seek::Config.samples_enabled %>
+    - queues: <%= QueueNames::SAMPLES %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    <% end %>
+    <% if Seek::Config.solr_enabled %>
+    - queues: <%= QueueNames::INDEXING %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    <% end %>
+    <% if Seek::Config.isa_json_compliance_enabled %>
+    - queues: <%= QueueNames::TEMPLATES %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    <% end %>
+    <% if Seek::Config.data_files_enabled %>
+    - queues: <%= QueueNames::DATAFILES %>
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+    <% end %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
