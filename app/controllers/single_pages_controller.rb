@@ -27,13 +27,23 @@ class SinglePagesController < ApplicationController
   def dynamic_table_data
     data = []
     if params[:sample_type_id]
-      sample_type = SampleType.where(id: params[:sample_type_id]).authorized_for('view').first
+      # Sample type must belong to the current project
+      # User must have at least viewing permission
+      sample_type = SampleType.where(id: params[:sample_type_id]).joins(:projects)
+                              .where(projects: { id: params[:id] }).authorized_for('view').first
       data = helpers.dt_data(sample_type)[:rows] unless sample_type.nil?
     elsif params[:study_id]
-      study = Study.where(id: params[:study_id]).authorized_for('view').first
+      # Study must belong to the current project
+      # User must have at least viewing permission
+      study = Study.where(id: params[:study_id]).joins(:projects)
+                   .where(projects: { id: params[:id] }).authorized_for('view').first
 
       if params[:assay_id]
-        assay = Assay.where(id: params[:assay_id]).authorized_for('view').first
+        # Assay must belong to the current study
+        # Assay must belong to the current project
+        # User must have at least viewing permission
+        assay = Assay.where(id: params[:assay_id], study_id: params[:study_id]).joins(:projects)
+                     .where(projects: { id: params[:id] }).authorized_for('view').first
         data = helpers.dt_aggregated(study, assay)[:rows] unless assay.nil?
       elsif !study.nil?
         data = helpers.dt_aggregated(study)[:rows]
