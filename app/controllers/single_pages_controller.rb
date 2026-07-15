@@ -29,14 +29,20 @@ class SinglePagesController < ApplicationController
     if params[:sample_type_id]
       # Sample type must belong to the current project
       # User must have at least viewing permission
-      sample_type = SampleType.where(id: params[:sample_type_id]).joins(:projects)
-                              .where(projects: { id: params[:id] }).authorized_for('view').first
+      sample_type = SampleType.where(id: params[:sample_type_id])
+                              .joins(:projects)
+                              .where(projects: { id: params[:id] })
+                              .authorized_for('view')
+                              .first
       data = helpers.dt_data(sample_type)[:rows] unless sample_type.nil?
     elsif params[:study_id]
       # Study must belong to the current project
       # User must have at least viewing permission
-      study = Study.where(id: params[:study_id]).joins(:projects)
-                   .where(projects: { id: params[:id] }).authorized_for('view').first
+      study = Study.where(id: params[:study_id])
+                   .joins(:projects)
+                   .where(projects: { id: params[:id] })
+                   .authorized_for('view')
+                   .first
 
       if params[:assay_id]
         # Assay must belong to the current study
