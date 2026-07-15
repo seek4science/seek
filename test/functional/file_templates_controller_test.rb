@@ -48,7 +48,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should show inline content preview for pdf file template' do
-    pdf_ft = FactoryBot.create(:api_pdf_file_template, policy: FactoryBot.create(:downloadable_public_policy))
+    pdf_ft = FactoryBot.create(:file_template, content_blob: FactoryBot.create(:pdf_content_blob),
+                                policy: FactoryBot.create(:downloadable_public_policy))
     get :show, params: { id: pdf_ft.id }
     assert_response :success
     assert_select 'div.renderer iframe', count: 1
