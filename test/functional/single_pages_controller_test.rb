@@ -86,22 +86,31 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'dynamic table data should not have unauthorized items' do
-    source = FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:private_policy))
-    sample = FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, linked_samples: [source],
+    first_source = FactoryBot.create(:isa_source, contributor: @member, sample_type: @source_sample_type, policy: FactoryBot.create(:private_policy))
+    _second_source = FactoryBot.create(:isa_source, contributor: @member, sample_type: @source_sample_type, policy: FactoryBot.create(:private_policy))
+    sample = FactoryBot.create(:isa_sample, contributor: @member, sample_type: @sample_collection_sample_type, linked_samples: [first_source],
                                policy: FactoryBot.create(:private_policy))
-    FactoryBot.create(:isa_material_assay_sample, sample_type: @material_assay_sample_type, linked_samples: [sample],
+    FactoryBot.create(:isa_material_assay_sample, contributor: @member, sample_type: @material_assay_sample_type, linked_samples: [sample],
                       policy: FactoryBot.create(:private_policy))
 
     logout
+
+    # Since Study and Assay samples are private, nothing should be returned
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: @assay.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 1, json['data'].length
+    assert json['data'].flatten.all? { |value| value == '#HIDDEN' }
 
     get :dynamic_table_data, params: { id: @project.id, study_id: @study.id }
 
     assert_response :success
     json = JSON.parse(response.body)
     refute json.key?('error')
-    # Since Study and Assay are unauthorized, nothing should be returned
-    assert_equal 0, json['data'].length
-    assert json['data'].flatten.all? { |value| value == '#HIDDEN' }
+    assert_equal 2, json['data'].length
+    assert json['data'].flatten.all? { |value| value == '#HIDDEN' || value.blank? }
   end
 
   test 'dynamic table data should not contain unauthorized samples' do
@@ -133,7 +142,9 @@ class SinglePagesControllerTest < ActionController::TestCase
     source = FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
     sample = FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, linked_samples: [source],
                       policy: FactoryBot.create(:public_policy))
-    FactoryBot.create(:isa_material_assay_sample, sample_type: @material_assay_sample_type, linked_samples: [sample],
+    private_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: @study, assay_stream: @assay.assay_stream, linked_sample_type: @sample_collection_sample_type, contributor: @member, policy: FactoryBot.create(:private_policy))
+    private_assay_sample_type = private_assay.sample_type
+    FactoryBot.create(:isa_material_assay_sample, sample_type: private_assay_sample_type, linked_samples: [sample],
                       policy: FactoryBot.create(:public_policy))
 
     logout
@@ -168,7 +179,7 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'should return dynamic table data for a public sample type' do
-    FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:isa_source, contributor: @member, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
 
     logout
 
@@ -181,31 +192,34 @@ class SinglePagesControllerTest < ActionController::TestCase
   end
 
   test 'dynamic table data should not error out for an unauthorized sample type' do
-    FactoryBot.create(:isa_source, sample_type: @source_sample_type, projects: [@project], policy: FactoryBot.create(:private_policy), contributor: @member)
+    private_study = FactoryBot.create(:isa_json_compliant_study, contributor: @member, investigation: @investigation, policy: FactoryBot.create(:private_policy))
+    private_source_sample_type = private_study.sample_types.first
+    FactoryBot.create(:isa_source, sample_type: private_source_sample_type, projects: [@project], policy: FactoryBot.create(:private_policy), contributor: @member)
 
-    # Authorized person
-    get :dynamic_table_data, params: { id: @project.id, sample_type_id: @source_sample_type.id }
+    # Authorized person sees the source with its metadata
+    get :dynamic_table_data, params: { id: @project.id, sample_type_id: private_source_sample_type.id }
 
     assert_response :success
     json = JSON.parse(response.body)
     refute json.key?('error')
     assert_equal 1, json['data'].size
+    refute json['data'].flatten.include?('#HIDDEN')
 
-    # Unauthenticated user
+    # Unauthenticated user does not get to see any sources
     logout
 
-    get :dynamic_table_data, params: { id: @project.id, sample_type_id: @source_sample_type.id }
+    get :dynamic_table_data, params: { id: @project.id, sample_type_id: private_source_sample_type.id }
 
     assert_response :success
     json = JSON.parse(response.body)
     refute json.key?('error')
     assert_equal [], json['data']
 
+    # Unauthorized user does not get to see any sources
     unauthorized_person = FactoryBot.create(:person)
 
-    # Unauthorized user
     login_as(unauthorized_person)
-    get :dynamic_table_data, params: { id: @project.id, sample_type_id: @source_sample_type.id }
+    get :dynamic_table_data, params: { id: @project.id, sample_type_id: private_source_sample_type.id }
 
     assert_response :success
     json = JSON.parse(response.body)
@@ -217,7 +231,7 @@ class SinglePagesControllerTest < ActionController::TestCase
     other_project = FactoryBot.create(:project)
     FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
 
-    get :dynamic_table_data, params: { id: @project.id, sample_type_id: @source_sample_type.id }
+    get :dynamic_table_data, params: { id: other_project.id, sample_type_id: @source_sample_type.id }
 
     assert_response :success
     json = JSON.parse(response.body)
