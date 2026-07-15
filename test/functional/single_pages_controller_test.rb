@@ -149,7 +149,7 @@ class SinglePagesControllerTest < ActionController::TestCase
 
     logout
 
-    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: @assay.id }
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: private_assay.id }
 
     assert_response :success
     json = JSON.parse(response.body)
@@ -165,6 +165,7 @@ class SinglePagesControllerTest < ActionController::TestCase
     FactoryBot.create(:isa_material_assay_sample, sample_type: @material_assay_sample_type, linked_samples: [sample],
                       policy: FactoryBot.create(:public_policy))
 
+    @study.update!(policy: FactoryBot.create(:private_policy))
     logout
 
     get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: @assay.id }
@@ -265,7 +266,7 @@ class SinglePagesControllerTest < ActionController::TestCase
 
     other_source = FactoryBot.create(:isa_source, sample_type: other_source_sample_type, policy: FactoryBot.create(:public_policy))
     other_sample = FactoryBot.create(:isa_sample, sample_type: other_sample_collection_sample_type, linked_samples: [other_source],
-                                     policy: FactoryBot.create(:public_policy), linked_samples: [other_source])
+                                     policy: FactoryBot.create(:public_policy))
 
     source = FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
     sample = FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, linked_samples: [source],
