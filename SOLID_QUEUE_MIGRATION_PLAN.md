@@ -16,7 +16,7 @@ Replace `delayed_job_active_record` with `solid_queue` as the `ActiveJob` backen
 - `docker/start_workers.sh`, `script/check_worker_pids.sh`, `rake seek:workers:start/stop` — process management and Docker healthcheck, all delayed_job-specific (parse `tmp/pids/delayed_job.*.pid`).
 - `config/schedule.rb` (via `whenever` gem) — cron-driven scheduling. Some entries just call `.perform_later`/`.queue_job` on a job (candidates for Solid Queue's recurring jobs), others run rake tasks, shell commands, or plain class methods that aren't jobs at all (`Galaxy::ToolMap.instance.refresh`, `kill-long-running-soffice.sh`, `sitemap:refresh`, `db:sessions:batch_trim`) — these can't move to Solid Queue and will stay on `whenever`/cron.
 - `app/jobs/application_job.rb` — custom `queue_job`/`follow_on_job?`/duplicate-avoidance logic layered on top of `enqueue`, plus manual exception reporting via `Seek::Errors::ExceptionForwarder` (no automatic retries: `max_attempts = 1`).
-- Test env uses `queue_adapter = :test`; unit tests optionally run against SQLite (`database.github.sqlite3.yml`) as well as MySQL.
+- Test env uses `queue_adapter = :test`; unit tests optionally run against SQLite (`database.github.sqlite3.yml`) as well as MySQL. The `pg` gem is also already in the `Gemfile`, so Postgres is a supported adapter alongside `mysql2` and `sqlite3`.
 - Admin UI surfaces delayed_job internals directly: `app/views/admin/_restart_buttons.html.erb` shows expected vs. running worker processes (`Seek::Workers.active_queues.count`, `Seek::Util.delayed_job_pids`) and a "Restart background job workers" button (`restart_delayed_job_admin_path` → `rake seek:workers:restart`); `app/views/admin/stats/_job_queue.html.erb` lists `Delayed::Job` rows (priority, queue, attempts, run/locked/failed times, handler, last error) with a "Clear failed jobs" button (`AdminController#clear_failed_jobs` → `Delayed::Job.where('failed_at IS NOT NULL').destroy_all`).
 
 ## Key risks identified
@@ -33,18 +33,19 @@ Replace `delayed_job_active_record` with `solid_queue` as the `ActiveJob` backen
 
 ### Phase 0 — Audit & decisions
 - [ ] Audit job classes for thread-safety (Rugged/git jobs, HTTP clients, image/ImageMagick calls, Sunspot session use) to decide safe per-queue thread pool sizes.
-- [ ] Decide: shared app database vs. separate `solid_queue` database (isolation vs. added `config/database*.yml` complexity across the three existing DB config files).
+- [x] Database: Solid Queue tables will live in the **shared** app database for now, not a separate database — no changes needed to `config/database.yml`'s single-database structure at this stage. A dedicated queue database can be revisited later if isolation becomes necessary.
+- [x] Must support all three database adapters SEEK already supports: **MySQL** (`mysql2`, primary), **SQLite** (`sqlite3`, test/dev), and **Postgres** (`pg`, already in the `Gemfile`) — Solid Queue supports all three, so this constrains testing/verification (Phase 2) to cover all three, but doesn't rule anything out.
 - [ ] Decide: replicate today's "one queue per active feature flag" topology 1:1, or consolidate (e.g. wildcard queue matching) as part of this migration.
 - [ ] Confirm Rails/Ruby versions already satisfy Solid Queue's requirements (Gemfile currently pins Rails 8.1.3 — fine; note discrepancy with AGENTS.md which still says 7.2, worth a docs fix separately).
 
 ### Phase 1 — Add Solid Queue alongside DelayedJob (no cutover yet)
-- [ ] Add `solid_queue` gem, run install generator, add migrations for the queue database(s).
+- [ ] Add `solid_queue` gem, run install generator, add migrations for the queue tables in the shared database.
 - [ ] Write `config/queue.yml` mirroring `QueueNames`/`Seek::Workers.active_queues`, gated by `Seek::Config` where needed.
 - [ ] Write `config/recurring.yml` for the subset of `config/schedule.rb` entries that are pure job enqueues (`PeriodicSubscriptionEmailJob`, `RegularMaintenanceJob`, `AuthLookupMaintenanceJob`, `LifeMonitorStatusJob`, `NewsFeedRefreshJob`, `ApplicationJob.queue_timed_jobs`). Leave non-job entries in `config/schedule.rb`/`whenever`.
 - [ ] Reconcile retry/failure behaviour in `ApplicationJob` with Solid Queue equivalents (`retry_on`/`discard_on`, failed-execution inspection) to preserve current fail-fast + exception-forwarding semantics.
 
 ### Phase 2 — Local/dev verification
-- [ ] Run full job-related test suite (unit + functional + integration) against `queue_adapter = :solid_queue` in a local/dev environment.
+- [ ] Run full job-related test suite (unit + functional + integration) against `queue_adapter = :solid_queue` in a local/dev environment, across all three supported database adapters (MySQL, Postgres, SQLite).
 - [ ] Manually exercise representative jobs from each queue (mailers, indexing, datafiles, remotecontent, samples, templates, authlookup, default), including a Rugged/git-backed job, under real threaded concurrency.
 
 ### Phase 3 — Infra rework
@@ -57,12 +58,12 @@ Replace `delayed_job_active_record` with `solid_queue` as the `ActiveJob` backen
 
 ### Phase 4 — Cutover (deploy Solid Queue with an empty queue)
 - [ ] Flip `config.active_job.queue_adapter` to `:solid_queue` and deploy. No migration task is required for this step — Solid Queue simply starts from an empty queue and handles everything enqueued from that point on.
-- [ ] Any rows still sitting in `delayed_jobs` at the moment of cutover are left alone (not processed) until Phase 5. To keep this backlog small/manageable, prefer deploying this phase at a point where the `delayed_jobs` queue is naturally near-empty (checked via the admin job queue stats page, updated in Phase 3) rather than requiring it to be exactly zero.
+- [ ] `delayed_jobs` is assumed to be empty by the time this phase happens — no monitoring, alerting, or manual checking of the old queue is needed between Phase 4 and Phase 5. If that assumption ever turns out to be wrong for a given deployment, Phase 5's migration task (which reads whatever remains) still covers it.
 - [ ] Verify in production: recurring jobs (`config/recurring.yml`) firing correctly, each queue (mailers, indexing, datafiles, remotecontent, samples, templates, authlookup, default) processing new jobs, admin pages (Phase 3) showing real Solid Queue state.
 - [ ] `delayed_job_active_record` gem, `delayed_jobs` table/schema, and `lib/seek/workers.rb`/old Docker scripts remain in the codebase (unused for new jobs going forward) — kept both as a rollback safety net and because the pre-existing rows still need Phase 5 to run.
 
 ### Phase 5 — Migrate historical `delayed_jobs` rows (later, separate release)
-- [ ] Write a `migrate_delayed_jobs_to_solid_queue` rake task that reads all remaining rows from `delayed_jobs` (left over from before the Phase 4 cutover) and re-enqueues equivalent jobs into Solid Queue (mapping queue, `run_at`, priority, attempts).
+- [ ] Write a `migrate_delayed_jobs_to_solid_queue` rake task that reads all remaining rows from `delayed_jobs` (left over from before the Phase 4 cutover) and re-enqueues equivalent jobs into Solid Queue (mapping queue, `run_at`, priority, attempts). Rows that are locked (`locked_at`/`locked_by` set) are requeued as normal — i.e. effectively unlocked and migrated like any other pending row. Rows that are already failed (`failed_at` set) are deleted rather than migrated, not re-enqueued into Solid Queue.
 - [ ] Wire it into the existing upgrade-task mechanism in `lib/tasks/seek_upgrades.rake`, following the established pattern: add it to the `upgrade_version_tasks` list for the release it ships in, wrapped in `only_once('seek:migrate_delayed_jobs_to_solid_queue <version>')` (same pattern as `update_rdf`'s `only_once('seek:update_rdf 1.18.0')`) so it runs exactly once, driven by `ActivityLog`, the next time `rake seek:upgrade` is run. Because this can land in a later release than Phase 4, no code changes to the adapter are needed at this point — it's purely a data migration.
 - [ ] After this runs (and has been confirmed to have picked up everything), `delayed_jobs` no longer needs to be checked/read by anything — clears the way for Phase 6.
 
@@ -70,13 +71,9 @@ Replace `delayed_job_active_record` with `solid_queue` as the `ActiveJob` backen
 - [ ] Once Solid Queue has been running in production for a full release cycle with no need to fall back, and Phase 5's migration has run, remove `delayed_job_active_record` gem, `config/initializers/delayed_job_config.rb`, `lib/seek/workers.rb`, old Docker scripts, and the `delayed_jobs` table.
 - [ ] Update `AGENTS.md`/`CLAUDE.md` background-jobs section to describe Solid Queue instead of delayed_job.
 
-## Open questions (need input before/at Phase 0)
+## Open questions
 
-- Shared vs. separate database for Solid Queue tables?
-- Any hard requirement to keep MySQL *and* SQLite parity for the queue backend in test/dev, or is SQLite acceptable as test-only with reduced concurrency guarantees?
-- Target thread pool sizes per queue, or start conservative (1 thread each, matching current behaviour) and tune later?
-- How long is it acceptable for the Phase 4 → Phase 5 gap to be, and should anything monitor/alert on the size of the stranded `delayed_jobs` backlog during that window?
-- What should the Phase 5 migration task do with `delayed_jobs` rows that are locked/failed/mid-attempt when it runs?
+- Target thread pool sizes per queue — not something to decide up front; determined by the outcome of the Phase 0 thread-safety audit (start conservative, i.e. 1 thread per queue matching current behaviour, for anything the audit doesn't clear for higher concurrency).
 
 ## Rollback plan
 
