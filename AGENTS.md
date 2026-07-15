@@ -12,8 +12,7 @@ FAIRDOM-SEEK (v1.18) is a Rails 7.2 / Ruby 3.3 web platform for sharing scientif
 
 ```bash
 bundle exec rails server          # Start the app (default: port 3000)
-bundle exec rake seek:workers:start  # Start delayed_job background workers
-bundle exec rake seek:workers:stop
+bundle exec bin/jobs               # Start Solid Queue background workers
 ```
 
 ### Testing
@@ -101,7 +100,7 @@ The REST API uses `active_model_serializers` with `BaseSerializer` (`app/seriali
 
 ### Background Jobs
 
-All async work uses `delayed_job` (ActiveRecord backend). Jobs are in `app/jobs/`. Start/stop workers via `rake seek:workers:start/stop`. Key jobs: `AuthLookupUpdateJob`, `ReindexingJob`, subscription email jobs, RDF generation.
+All async work uses `Solid Queue` (`solid_queue` gem, tables in the primary database). Jobs are in `app/jobs/`. Worker/dispatcher/scheduler processes are started via `bin/jobs` (see `config/queue.yml` for topology, `config/recurring.yml` for scheduled jobs); `script/run_solid_queue.sh` wraps this with automatic restart-on-exit for deployment. Key jobs: `AuthLookupUpdateJob`, `ReindexingJob`, subscription email jobs, RDF generation. (Migrating from `delayed_job`, see `SOLID_QUEUE_MIGRATION_PLAN.md` - the `delayed_job_active_record` gem and its tables remain installed as a rollback safety net until that migration's later cleanup phase.)
 
 ### Semantic / RDF
 

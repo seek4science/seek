@@ -4,8 +4,9 @@ class ApplicationStatus < ApplicationRecord
     before_create :validate_singleton
 
     def refresh
+        alive_since = SolidQueue.process_alive_threshold.ago
         update(
-            running_jobs: Seek::Util.delayed_job_pids.count
+            running_jobs: SolidQueue::Process.where('last_heartbeat_at > ?', alive_since).count
          )
     end
 

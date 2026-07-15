@@ -34,7 +34,7 @@ class StatisticsControllerTest < ActionController::TestCase
           get :application_status
         end
         assert_response :success
-        assert_match(/Euro SEEK is running \| search is enabled \| [0-9] delayed jobs running/, @response.body)
+        assert_match(/Euro SEEK is running \| search is enabled \| [0-9]+ background job worker processes running/, @response.body)
       end
     end
   end

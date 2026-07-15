@@ -30,37 +30,24 @@
           for example to handle solr reindexing or send subscription emails.
           When certain settings such as <strong>'search enabled'</strong>, or changing code,
           you will need to restart these processes.
-          <%= button_to('Restart background job workers', restart_delayed_job_admin_path,
-                        class: 'btn btn-danger', id: 'restart_delayed_job',
+          <%= button_to('Restart background job workers', restart_job_workers_admin_path,
+                        class: 'btn btn-danger', id: 'restart_job_workers',
                         data: { confirm: 'Are you sure you want to restart the background job workers?', disable_with: 'Restarting...' }) %>
         </p>
       </div>
 
       <div class="col-sm-4">
         <h4>
-          Background processes
-          <div class="subtle">
-            <%= Seek::Workers.active_queues.count %> expected
-          </div>
+          Solid Queue supervisor
         </h4>
 
         <% begin %>
-            <% pids = Seek::Util.delayed_job_pids %>
-            <% if pids.any? %>
-                <ol>
-                  <% pids.each do |pid| %>
-                      <li>
-                        <% if pid.running? %>
-                            <span class="text-success">Running</span>
-                            <span class="text-muted">(Process ID: <%= pid.pid -%>)</span>
-                        <% else %>
-                            <span class="text-warning">Not running</span>
-                        <% end %>
-                      </li>
-                  <% end %>
-                </ol>
+            <% pid = Seek::Util.solid_queue_supervisor_pid %>
+            <% if pid %>
+                <span class="text-success">Running</span>
+                <span class="text-muted">(Process ID: <%= pid -%>)</span>
             <% else %>
-                <span class="none_text">No background processes running</span>
+                <span class="none_text">No background process running</span>
             <% end %>
         <% rescue StandardError => e %>
             <span class="text-danger">Unable to determine current status - <%= e.message %></span>

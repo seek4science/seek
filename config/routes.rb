@@ -170,7 +170,7 @@ SEEK::Application.routes.draw do
       post :update_home_settings
       post :delete_carousel_form
       post :restart_server
-      post :restart_delayed_job
+      post :restart_job_workers
       post :update_admins
       post :update_rebrand
       post :test_email_configuration

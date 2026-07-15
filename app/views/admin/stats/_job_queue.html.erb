@@ -1,14 +1,14 @@
 <%
    queue = AuthLookupUpdateQueue.all.to_a | ReindexingQueue.all.to_a | RdfGenerationQueue.all.to_a
    queue = queue.sort_by(&:created_at)
-   delayed_jobs = Delayed::Job.order(locked_at: :desc, created_at: :asc)
+   solid_queue_jobs = SolidQueue::Job.where(finished_at: nil).order(created_at: :asc)
 %>
 
 <h4>
-  Total delayed jobs waiting = <%= delayed_jobs.count -%>
+  Total solid queue jobs waiting = <%= solid_queue_jobs.count -%>
 </h4>
 
-<% if Delayed::Job.where('failed_at IS NOT NULL').count > 0 %>
+<% if SolidQueue::Job.failed.count > 0 %>
   <%= button_link_to "Clear failed jobs", 'destroy', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
 <% end %>
 
@@ -19,34 +19,32 @@
         <th>Time created</th>
         <th>Priority</th>
         <th>Queue</th>
-        <th>Attempts</th>
-        <th>Run at</th>
-        <th>Locked at</th>
-        <th>Failed at</th>
-        <th>Handler</th>
+        <th>Class</th>
+        <th>Scheduled at</th>
+        <th>Failed</th>
       </tr>
     </thead>
     <tbody>
-      <% delayed_jobs.each do |item| %>
+      <% solid_queue_jobs.each do |item| %>
           <tr>
             <td><%= date_as_string(item.created_at,true) -%></td>
             <td><%= item.priority -%></td>
-            <td><%= item.queue -%></td>
-            <td><%= item.attempts -%></td>
-            <td><%= date_as_string(item.run_at,true) -%></td>
-            <td><%= date_as_string(item.locked_at,true) -%></td>
+            <td><%= item.queue_name -%></td>
+            <td><%= item.class_name -%></td>
+            <td><%= date_as_string(item.scheduled_at,true) -%></td>
             <td>
-              <%= item.failed_at.nil? ? date_as_string(item.failed_at,true) : link_to(date_as_string(item.failed_at,true), '#', onclick: "$j('#last_error_#{item.id}').fadeIn(); return false;") -%>
+              <% if item.failed_execution %>
+                <%= link_to 'Yes', '#', onclick: "$j('#last_error_#{item.id}').fadeIn(); return false;" %>
+              <% end %>
             </td>
-            <td><%= item.handler -%></td>
           </tr>
-          <% unless item.last_error.nil? -%>
+          <% if item.failed_execution -%>
               <tr id='<%= "last_error_#{item.id}" -%>' style="display:none;">
-                <td colspan="7">
-                  <pre><%= item.last_error -%></pre>
+                <td colspan="6">
+                  <pre><%= item.failed_execution.error -%></pre>
                 </td>
               </tr>
-          <% end %>
+          <% end -%>
       <% end -%>
     </tbody>
   </table>

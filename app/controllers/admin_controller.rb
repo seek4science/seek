@@ -1,5 +1,3 @@
-require 'delayed/command'
-
 class AdminController < ApplicationController
   include CommonSweepers
 
@@ -374,8 +372,8 @@ class AdminController < ApplicationController
     redirect_with_status(error, 'server')
   end
 
-  def restart_delayed_job
-    command = "bundle exec rake seek:workers:restart"
+  def restart_job_workers
+    command = "kill -TERM $(cat #{SolidQueue.supervisor_pidfile})"
     error = execute_command(command)
     redirect_with_status(error, 'background job workers')
   end
@@ -385,17 +383,6 @@ class AdminController < ApplicationController
     flash[:notice] = "Cache cleared"
     respond_to do |format|
       format.html { render :index}
-    end
-  end
-
-  # give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
-  def wait_for_delayed_job_to_start
-    sleep(0.5)
-    pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids", 'delayed_job.0')
-    count = 0
-    while !pid.running? && (count < 10)
-      sleep(0.5)
-      count += 1
     end
   end
 
@@ -623,9 +610,9 @@ class AdminController < ApplicationController
     return array.slice(0,index) + array.slice(index+1,array.length)
   end
 
-  # this destroys any failed Delayed::Jobs
+  # this destroys any failed SolidQueue::Jobs
   def clear_failed_jobs
-    Delayed::Job.where('failed_at IS NOT NULL').destroy_all
+    SolidQueue::Job.failed.destroy_all
     respond_to do |format|
       format.json { head :ok }
     end

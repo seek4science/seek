@@ -19,13 +19,15 @@ bundle install --deployment --without development test
 echo "${GREEN}pip install${NC}"
 python`cat .python-version` -m pip install -r requirements.txt
 
-bundle exec rake seek:workers:stop
+if [ -f tmp/pids/solid_queue_runner.pid ]; then
+  kill -TERM $(cat tmp/pids/solid_queue_runner.pid) 2>/dev/null || true
+fi
 
 echo "${GREEN} seek:upgrade${NC}"
 bundle exec rake seek:upgrade
 
 sleep 5 # small delay to make sure SOLR has started up and ready
-bundle exec rake seek:workers:start &
+script/run_solid_queue.sh &
 
 echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while

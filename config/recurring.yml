@@ -44,6 +44,9 @@ production:
   queue_timed_jobs:
     command: "ApplicationJob.queue_timed_jobs"
     schedule: "*/10 * * * *"
+  clear_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
 
 # No recurring entries for development/test - matches solid_queue's own default
 # template convention and avoids periodic jobs (subscription emails, etc.) firing

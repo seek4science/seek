@@ -32,7 +32,7 @@ class ApplicationStatusTest < ActiveSupport::TestCase
     app = ApplicationStatus.instance
     app.refresh
     app.reload
-    assert_equal Seek::Util.delayed_job_pids.count, app.running_jobs
+    assert_equal SolidQueue::Process.where('last_heartbeat_at > ?', SolidQueue.process_alive_threshold.ago).count, app.running_jobs
     assert_equal Seek::Config.solr_enabled, app.search_enabled
   end
 

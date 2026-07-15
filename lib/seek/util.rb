@@ -140,12 +140,19 @@ module Seek
       ActiveRecord::Base.connection.instance_values['config'][:adapter]
     end
 
-    def self.delayed_job_pids
-      directory = "#{Rails.root}/tmp/pids"
-      Daemons::PidFile.find_files(directory, 'delayed_job', false, '').collect do |path|
-        file = path.sub("#{directory}/", '').sub('.pid', '')
-        Daemons::PidFile.new(directory, file)
-      end
+    # The pid of the running Solid Queue supervisor, if its pidfile (config/initializers/solid_queue.rb)
+    # exists and the process is still alive, otherwise nil.
+    def self.solid_queue_supervisor_pid
+      path = SolidQueue.supervisor_pidfile
+      return nil unless path && File.exist?(path)
+
+      pid = File.read(path).strip.to_i
+      return nil unless pid.positive?
+
+      Process.kill(0, pid)
+      pid
+    rescue Errno::ESRCH, Errno::EPERM
+      nil
     end
 
     # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed

@@ -29,14 +29,14 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'non admin cannot restart the delayed job' do
+  test 'non admin cannot restart the job workers' do
     login_as(FactoryBot.create(:user))
-    post :restart_delayed_job
+    post :restart_job_workers
     refute_nil flash[:error]
   end
 
-  test 'admin can restart the delayed job' do
-    post :restart_delayed_job
+  test 'admin can restart the job workers' do
+    post :restart_job_workers
     assert_nil flash[:error]
   end
 
@@ -257,20 +257,19 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'job statistics stats' do
-    Delayed::Job.destroy_all
-    dj = Delayed::Job.create(run_at: '2010 September 12', locked_at: '2010 September 13', failed_at: nil)
-    dj.created_at = '2010 September 11'
-    assert dj.save
+    SolidQueue::Job.destroy_all
+    job = SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob', scheduled_at: '2010 September 12')
+    job.update_column(:created_at, '2010 September 11')
 
     get :get_stats, xhr: true, params: { page: 'job_queue' }
     assert_response :success
 
-    assert_select 'h4', text: 'Total delayed jobs waiting = 1'
+    assert_select 'h4', text: 'Total solid queue jobs waiting = 1'
     assert_select 'tr' do
       assert_select 'td', text: /11th Sep 2010 at/, count: 1
       assert_select 'td', text: /12th Sep 2010 at/, count: 1
-      assert_select 'td', text: /13th Sep 2010 at/, count: 1
-      assert_select "td > span[class='none_text']", text: /No date defined/, count: 1
+      assert_select 'td', text: 'default', count: 1
+      assert_select 'td', text: 'TestJob', count: 1
     end
   end
 
@@ -425,41 +424,41 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'clear failed jobs' do
-    Delayed::Job.destroy_all
-    job = Delayed::Job.create!
-    job.update_column(:failed_at,Time.now)
-    Delayed::Job.create!
-    assert_equal 2,Delayed::Job.count
-    assert_difference('Delayed::Job.count',-1) do
+    SolidQueue::Job.destroy_all
+    job = SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    SolidQueue::FailedExecution.create!(job: job, error: 'boom')
+    SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    assert_equal 2, SolidQueue::Job.count
+    assert_difference('SolidQueue::Job.count', -1) do
       post :clear_failed_jobs, format: 'json'
     end
 
-    assert_equal 1,Delayed::Job.count
-    assert_equal 0,Delayed::Job.where('failed_at IS NOT NULL').count
+    assert_equal 1, SolidQueue::Job.count
+    assert_equal 0, SolidQueue::Job.failed.count
   end
 
   test 'admin required to clear failed jobs' do
     logout
     person = FactoryBot.create(:person)
 
-    Delayed::Job.destroy_all
-    job = Delayed::Job.create!
-    job.update_column(:failed_at,Time.now)
-    Delayed::Job.create!
-    assert_equal 2,Delayed::Job.count
+    SolidQueue::Job.destroy_all
+    job = SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    SolidQueue::FailedExecution.create!(job: job, error: 'boom')
+    SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    assert_equal 2, SolidQueue::Job.count
 
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_difference('SolidQueue::Job.count') do
       post :clear_failed_jobs, format: 'json'
     end
 
     login_as(person)
 
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_difference('SolidQueue::Job.count') do
       post :clear_failed_jobs, format: 'json'
     end
 
-    assert_equal 2,Delayed::Job.count
-    assert_equal 1,Delayed::Job.where('failed_at IS NOT NULL').count
+    assert_equal 2, SolidQueue::Job.count
+    assert_equal 1, SolidQueue::Job.failed.count
   end
 
   test 'update branding' do

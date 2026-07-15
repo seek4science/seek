@@ -94,7 +94,7 @@ services:
       start_period: 20s
 
   seek_workers:
-    # The SEEK delayed job workers
+    # The SEEK Solid Queue workers
     <<: *seek_base
     container_name: seek-workers
     environment:

@@ -1,6 +1,7 @@
-# Worker topology mirrors QueueNames / Seek::Workers.active_queues (see lib/seek/workers.rb):
-# one worker per queue, gated by the same Seek::Config feature flags, so that a queue only
-# gets a worker if the corresponding feature is enabled - same as the current DelayedJob setup.
+# Worker topology mirrors QueueNames / the old Seek::Workers.active_queues (removed in #2656
+# Phase 3, see SOLID_QUEUE_MIGRATION_PLAN.md): one worker per queue, gated by the same
+# Seek::Config feature flags, so that a queue only gets a worker if the corresponding feature
+# is enabled - same as the old DelayedJob setup.
 #
 # Threads are deliberately set to 1 per queue for now. The Phase 0 thread-safety audit in
 # SOLID_QUEUE_MIGRATION_PLAN.md found two pieces of process-global mutable state
