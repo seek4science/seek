@@ -29,51 +29,10 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unle
 
 set :output, "#{path}/log/schedule.log"
 
-MIDNIGHT = Time.now.midnight
-# Apply a static offset, plus an optional configured offset, to run times of periodic jobs.
-# This is to avoid them all occurring at the same time and overloading the server.
-def offset(off_hours)
-  off_minutes = Seek::Config.regular_job_offset || 0
-  (MIDNIGHT + off_hours.hours + off_minutes.minutes).strftime("%-l:%M%P")
-end
-
-PeriodicSubscriptionEmailJob::DELAYS.each do |frequency, period|
-  every period, at: offset(0) do
-    runner "PeriodicSubscriptionEmailJob.new('#{frequency}').queue_job"
-  end
-end
-
-every RegularMaintenanceJob::RUN_PERIOD, at: offset(1) do
-  runner "RegularMaintenanceJob.perform_later"
-end
-
-every AuthLookupMaintenanceJob::RUN_PERIOD, at: offset(1) do
-  runner "AuthLookupMaintenanceJob.perform_later"
-end
-
-every LifeMonitorStatusJob::PERIOD, at: offset(2) do
-  runner "LifeMonitorStatusJob.perform_later"
-end
-
-every Seek::Config.home_feeds_cache_timeout.minutes do # Crontab will need to be regenerated if this changes...
-  runner "NewsFeedRefreshJob.set(priority: 3).perform_later"
-end
-
-every 10.minutes do
-  runner "ApplicationJob.queue_timed_jobs"
-end
-
-every 1.minute do
-  runner 'ApplicationStatus.instance.refresh'
-end
-
-every 1.day, at: offset(3) do
-  runner 'Galaxy::ToolMap.instance.refresh'
-end
-
-every 1.day, at: '12:10 am' do
-  runner "Seek::BioSchema::DataDump.generate_dumps"
-end
+# Everything that's an ActiveJob enqueue or a plain Ruby method call now lives in
+# config/recurring.yml, run by Solid Queue's own scheduler (see
+# SOLID_QUEUE_MIGRATION_PLAN.md). Only rake tasks and shell commands remain here,
+# since neither maps onto recurring.yml's `class:`/`command:` mechanisms.
 
 # Generate a new sitemap...
 every 1.day, at: '12:45 am' do
