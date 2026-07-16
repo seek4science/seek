@@ -1,7 +1,7 @@
 <%
    queue = AuthLookupUpdateQueue.all.to_a | ReindexingQueue.all.to_a | RdfGenerationQueue.all.to_a
    queue = queue.sort_by(&:created_at)
-   solid_queue_jobs = SolidQueue::Job.where(finished_at: nil).order(created_at: :asc)
+   solid_queue_jobs = SolidQueue::Job.where(finished_at: nil).includes(:failed_execution).order(created_at: :asc)
 %>
 
 <h4>
@@ -26,6 +26,7 @@
     </thead>
     <tbody>
       <% solid_queue_jobs.each do |item| %>
+          <% failure = item.failed_execution %>
           <tr>
             <td><%= date_as_string(item.created_at,true) -%></td>
             <td><%= item.priority -%></td>
@@ -33,15 +34,17 @@
             <td><%= item.class_name -%></td>
             <td><%= date_as_string(item.scheduled_at,true) -%></td>
             <td>
-              <% if item.failed_execution %>
+              <% if failure %>
                 <%= link_to 'Yes', '#', onclick: "$j('#last_error_#{item.id}').fadeIn(); return false;" %>
               <% end %>
             </td>
           </tr>
-          <% if item.failed_execution -%>
+          <% if failure -%>
               <tr id='<%= "last_error_#{item.id}" -%>' style="display:none;">
                 <td colspan="6">
-                  <pre><%= item.failed_execution.error -%></pre>
+                  <%# failed_execution.error is a JSON hash (exception_class/message/backtrace),
+                      so format it into a readable string rather than dumping the raw hash %>
+                  <pre><%= [ "#{failure.exception_class}: #{failure.message}", *failure.backtrace ].join("\n") -%></pre>
                 </td>
               </tr>
           <% end -%>
