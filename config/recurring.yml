@@ -1,14 +1,21 @@
 <%
   # Mirrors config/schedule.rb's `offset` helper: applies the configured
   # Seek::Config.regular_job_offset (minutes) on top of a base hour, to avoid
-  # multiple periodic jobs firing at exactly the same moment. Whenever/cron only
-  # honours this "at:" offset for day/week/month-frequency jobs (not hour-frequency
-  # ones), which is why only some of the entries below use it - matching the
-  # cron schedule actually produced by `bundle exec whenever` today.
+  # multiple periodic jobs firing at exactly the same moment - matching the cron
+  # schedule `bundle exec whenever` produced from the old schedule.rb.
+  #
+  # For day/week/month-frequency jobs whenever applied both the hour and the minute
+  # of the `at:` time (offset_cron below). For hour-frequency jobs it kept the
+  # repeating hour field (*/N) and applied only the minute (offset_minute below).
   def offset_cron(off_hours)
     off_minutes = Seek::Config.regular_job_offset || 0
     time = Time.utc(2000, 1, 1, off_hours, 0) + off_minutes.minutes
     "#{time.min} #{time.hour}"
+  end
+
+  def offset_minute
+    off_minutes = Seek::Config.regular_job_offset || 0
+    (Time.utc(2000, 1, 1, 0, 0) + off_minutes.minutes).min
   end
 %>
 # Recurring entries for scheduled jobs and tasks that map onto Solid Queue, via either a
@@ -35,10 +42,10 @@ production:
     schedule: "<%= offset_cron(0) %> 1 * *"
   regular_maintenance:
     class: RegularMaintenanceJob
-    schedule: "0 */4 * * *"
+    schedule: "<%= offset_minute %> */4 * * *"
   auth_lookup_maintenance:
     class: AuthLookupMaintenanceJob
-    schedule: "0 */8 * * *"
+    schedule: "<%= offset_minute %> */8 * * *"
   life_monitor_status:
     class: LifeMonitorStatusJob
     schedule: "<%= offset_cron(2) %> * * *"

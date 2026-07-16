@@ -68,8 +68,10 @@ class RecurringTest < ActiveSupport::TestCase
       assert_equal '43 0 * * *', positive_offset[:periodic_subscription_email_daily][:schedule]
       assert_equal '43 2 * * *', positive_offset[:life_monitor_status][:schedule]
       assert_equal '43 3 * * *', positive_offset[:galaxy_tool_map_refresh][:schedule]
-      # hour-frequency jobs don't get the offset applied - matches whenever's quirk (see comment in recurring.yml)
-      assert_equal '0 */4 * * *', positive_offset[:regular_maintenance][:schedule]
+      # hour-frequency jobs keep the */N hour field but still get the minute offset applied,
+      # matching what whenever produced from `every N.hours, at: offset(...)`
+      assert_equal '43 */4 * * *', positive_offset[:regular_maintenance][:schedule]
+      assert_equal '43 */8 * * *', positive_offset[:auth_lookup_maintenance][:schedule]
     end
 
     with_config_value(:regular_job_offset, -237) do
@@ -77,6 +79,8 @@ class RecurringTest < ActiveSupport::TestCase
       assert_equal '3 20 * * *', negative_offset[:periodic_subscription_email_daily][:schedule]
       assert_equal '3 22 * * *', negative_offset[:life_monitor_status][:schedule]
       assert_equal '3 23 * * *', negative_offset[:galaxy_tool_map_refresh][:schedule]
+      assert_equal '3 */4 * * *', negative_offset[:regular_maintenance][:schedule]
+      assert_equal '3 */8 * * *', negative_offset[:auth_lookup_maintenance][:schedule]
     end
   end
 
