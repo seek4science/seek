@@ -186,6 +186,12 @@ FactoryBot.define do
     original_filename { 'csv_test.csv' }
     data { File.new("#{Rails.root}/test/fixtures/files/csv_test.csv", 'rb').read }
   end
+
+  factory(:iso_8859_1_csv_content_blob, parent: :content_blob) do
+    content_type { 'text/csv' }
+    original_filename { 'iso-8859-1.csv' }
+    data { File.new("#{Rails.root}/test/fixtures/files/iso-8859-1.csv", 'rb').read }
+  end
   
   factory(:tsv_content_blob, parent: :content_blob) do
     content_type { 'text/tab-separated-values' }
