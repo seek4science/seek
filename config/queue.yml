@@ -8,6 +8,12 @@
 # (User.current_user, $authorization_checks_disabled) that are only safe today because
 # DelayedJob workers are separate single-threaded OS processes. Do not raise these thread
 # counts until those globals are made properly thread-local.
+#
+# polling_interval defaults to 1s per worker (Solid Queue's own gem default is 0.1s, but with
+# one worker process per queue - rather than Solid Queue's stock single wildcard-queue worker -
+# that multiplies into a lot of continuous, mostly-empty poll queries; see
+# SOLID_QUEUE_MIGRATION_PLAN.md). AUTH_LOOKUP is polled faster (0.5s) since it's the highest
+# frequency, most latency-sensitive queue (see AuthLookupUpdateJob's follow_on_job? re-queuing).
 default: &default
   dispatchers:
     - polling_interval: 1
@@ -16,11 +22,11 @@ default: &default
     - queues: <%= QueueNames::DEFAULT %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     - queues: <%= QueueNames::MAILERS %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     # config/recurring.yml entries with a `command:` and no `class:` (e.g. clear_finished_jobs,
     # application_status_refresh) are run by SolidQueue::RecurringJob, whose own queue_as is
     # `solid_queue_recurring` - none of our named QueueNames queues. Without a worker for it here,
@@ -28,42 +34,42 @@ default: &default
     - queues: solid_queue_recurring
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     <% if Seek::Config.auth_lookup_enabled %>
     - queues: <%= QueueNames::AUTH_LOOKUP %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 0.5
     <% end %>
     <% if Seek::Config.cache_remote_files %>
     - queues: <%= QueueNames::REMOTE_CONTENT %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     <% end %>
     <% if Seek::Config.samples_enabled %>
     - queues: <%= QueueNames::SAMPLES %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     <% end %>
     <% if Seek::Config.solr_enabled %>
     - queues: <%= QueueNames::INDEXING %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     <% end %>
     <% if Seek::Config.isa_json_compliance_enabled %>
     - queues: <%= QueueNames::TEMPLATES %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     <% end %>
     <% if Seek::Config.data_files_enabled %>
     - queues: <%= QueueNames::DATAFILES %>
       threads: 1
       processes: 1
-      polling_interval: 0.1
+      polling_interval: 1
     <% end %>
 
 development:
