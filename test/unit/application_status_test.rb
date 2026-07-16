@@ -32,8 +32,22 @@ class ApplicationStatusTest < ActiveSupport::TestCase
     app = ApplicationStatus.instance
     app.refresh
     app.reload
-    assert_equal SolidQueue::Process.where('last_heartbeat_at > ?', SolidQueue.process_alive_threshold.ago).count, app.running_jobs
+    alive_since = SolidQueue.process_alive_threshold.ago
+    expected = SolidQueue::Process.where(kind: 'Worker').where('last_heartbeat_at > ?', alive_since).count
+    assert_equal expected, app.running_jobs
     assert_equal Seek::Config.solr_enabled, app.search_enabled
+  end
+
+  test 'refresh only counts workers, not other solid queue process kinds' do
+    common = { hostname: 'test', last_heartbeat_at: Time.current, supervisor_id: nil, metadata: {} }
+    SolidQueue::Process.create!(**common, kind: 'Worker', name: 'worker-1', pid: 1)
+    SolidQueue::Process.create!(**common, kind: 'Dispatcher', name: 'dispatcher-1', pid: 2)
+    SolidQueue::Process.create!(**common, kind: 'Supervisor', name: 'supervisor-1', pid: 3)
+
+    app = ApplicationStatus.instance
+    app.refresh
+    app.reload
+    assert_equal 1, app.running_jobs
   end
 
   test 'search_enabled' do

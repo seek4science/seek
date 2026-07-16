@@ -38,7 +38,7 @@
 
       <div class="col-sm-4">
         <h4>
-          Solid Queue supervisor
+          Background job workers
         </h4>
 
         <% begin %>
@@ -46,6 +46,17 @@
             <% if pid %>
                 <span class="text-success">Running</span>
                 <span class="text-muted">(Process ID: <%= pid -%>)</span>
+
+                <% alive_since = SolidQueue.process_alive_threshold.ago %>
+                <% active_queues = SolidQueue::Process.where(kind: 'Worker').where('last_heartbeat_at > ?', alive_since).filter_map { |p| p.metadata['queues'] }.sort %>
+                <p class="text-muted" style="margin-top: 10px; margin-bottom: 0;">
+                  Active queues (<%= active_queues.count -%>):
+                </p>
+                <ul style="margin-bottom: 0;">
+                  <% active_queues.each do |queue_name| %>
+                      <li><%= queue_name -%></li>
+                  <% end %>
+                </ul>
             <% else %>
                 <span class="none_text">No background process running</span>
             <% end %>
