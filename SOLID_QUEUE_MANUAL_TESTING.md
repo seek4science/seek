@@ -1,8 +1,7 @@
 # Manual Testing Guide: Solid Queue (#2656)
 
-Companion to `SOLID_QUEUE_MIGRATION_PLAN.md`. This is a walkthrough for manually exercising
-Solid Queue on a local/dev checkout of this branch, both to verify it works and to build a
-feel for how the pieces fit together before relying on it in production.
+A walkthrough for manually exercising Solid Queue on a local/dev checkout, both to verify it
+works and to build a feel for how the pieces fit together before relying on it in production.
 
 ## How it works, in brief
 
@@ -183,12 +182,11 @@ script/check_worker_pids.sh
 
 ## 7. Cross-database sanity check (optional)
 
-The migration supports MySQL (default), SQLite, and Postgres. If you want to confirm Solid
-Queue's tables/behaviour on a non-default adapter, point `DATABASE_URL` at a scratch SQLite or
+Solid Queue's tables/schema support MySQL (default), SQLite, and Postgres. If you want to
+confirm behaviour on a non-default adapter, point `DATABASE_URL` at a scratch SQLite or
 Postgres database, `bundle exec rake db:schema:load`, and repeat step 2 against it. Not
-necessary for routine testing — this was already verified adapter-by-adapter in Phase 2 of the
-migration plan — just useful if you're touching queue-table-related code and want to double
-check you haven't introduced an adapter-specific assumption.
+necessary for routine testing — just useful if you're touching queue-table-related code and
+want to double check you haven't introduced an adapter-specific assumption.
 
 ## Useful console snippets
 

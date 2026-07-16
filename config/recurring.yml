@@ -11,17 +11,15 @@
     "#{time.min} #{time.hour}"
   end
 %>
-# Recurring entries for the subset of config/schedule.rb that map onto Solid Queue,
-# via either a `class:` entry (an ActiveJob class, enqueued with `perform_later`) or a
-# `command:` entry (arbitrary Ruby, run via SolidQueue::RecurringJob#perform's `eval` -
-# not limited to ActiveJob calls, e.g. clear_finished_jobs/application_status_refresh
-# below are plain class method calls). `command:`-only entries (no `class:`) enqueue
-# onto the `solid_queue_recurring` queue (SolidQueue::RecurringJob's own queue_as),
-# which is why config/queue.yml has a dedicated worker for it - see
-# SOLID_QUEUE_MIGRATION_PLAN.md for the bug this fixed. rake tasks (sitemap:refresh,
-# db:sessions:batch_trim) and the Docker-only shell command
-# (kill-long-running-soffice.sh) map onto neither mechanism, so they stay on
-# whenever/cron.
+# Recurring entries for scheduled jobs and tasks that map onto Solid Queue, via either a
+# `class:` entry (an ActiveJob class, enqueued with `perform_later`) or a `command:` entry
+# (arbitrary Ruby, run via SolidQueue::RecurringJob#perform's `eval` - not limited to ActiveJob
+# calls, e.g. clear_finished_jobs/application_status_refresh below are plain class method
+# calls). `command:`-only entries (no `class:`) enqueue onto the `solid_queue_recurring` queue
+# (SolidQueue::RecurringJob's own queue_as), which is why config/queue.yml has a dedicated
+# worker for it. rake tasks (sitemap:refresh, db:sessions:batch_trim) and the Docker-only shell
+# command (kill-long-running-soffice.sh) map onto neither mechanism, so they stay on
+# whenever/cron (see config/schedule.rb).
 production:
   periodic_subscription_email_daily:
     class: PeriodicSubscriptionEmailJob

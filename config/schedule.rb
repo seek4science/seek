@@ -29,10 +29,9 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unle
 
 set :output, "#{path}/log/schedule.log"
 
-# Everything that's an ActiveJob enqueue or a plain Ruby method call now lives in
-# config/recurring.yml, run by Solid Queue's own scheduler (see
-# SOLID_QUEUE_MIGRATION_PLAN.md). Only rake tasks and shell commands remain here,
-# since neither maps onto recurring.yml's `class:`/`command:` mechanisms.
+# Everything that's an ActiveJob enqueue or a plain Ruby method call lives in
+# config/recurring.yml, run by Solid Queue's own scheduler. Only rake tasks and shell commands
+# remain here, since neither maps onto recurring.yml's `class:`/`command:` mechanisms.
 
 # Generate a new sitemap...
 every 1.day, at: '12:45 am' do

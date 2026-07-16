@@ -100,7 +100,7 @@ The REST API uses `active_model_serializers` with `BaseSerializer` (`app/seriali
 
 ### Background Jobs
 
-All async work uses `Solid Queue` (`solid_queue` gem, tables in the primary database). Jobs are in `app/jobs/`. Worker/dispatcher/scheduler processes are started via `bin/jobs` (see `config/queue.yml` for topology, `config/recurring.yml` for scheduled jobs); `script/run_solid_queue.sh` wraps this with automatic restart-on-exit for deployment. Key jobs: `AuthLookupUpdateJob`, `ReindexingJob`, subscription email jobs, RDF generation. (Migrating from `delayed_job`, see `SOLID_QUEUE_MIGRATION_PLAN.md` - the `delayed_job_active_record` gem and its tables remain installed as a rollback safety net until that migration's later cleanup phase.)
+All async work uses `Solid Queue` (`solid_queue` gem, tables in the primary database). Jobs are in `app/jobs/`. Worker/dispatcher/scheduler processes are started via `bin/jobs` (see `config/queue.yml` for topology, `config/recurring.yml` for scheduled jobs); `script/run_solid_queue.sh` wraps this with automatic restart-on-exit for deployment. Key jobs: `AuthLookupUpdateJob`, `ReindexingJob`, subscription email jobs, RDF generation. (Migrated from `delayed_job` - the `delayed_job_active_record` gem and its tables remain installed as a rollback safety net for now.)
 
 ### Semantic / RDF
 

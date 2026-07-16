@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-# Adds Solid Queue's tables to the primary database (shared, not a separate
-# queue database) per the #2656 migration plan (SOLID_QUEUE_MIGRATION_PLAN.md,
-# Phase 0/1). Table definitions mirror solid_queue 1.4.0's bundled
-# db/queue_schema.rb, translated into a regular migration.
+# Adds Solid Queue's tables to the primary database (shared, not a separate queue database).
+# Table definitions mirror solid_queue 1.4.0's bundled db/queue_schema.rb, translated into a
+# regular migration.
 class CreateSolidQueueTables < ActiveRecord::Migration[7.1]
   def change
     create_table :solid_queue_jobs do |t|

@@ -112,8 +112,7 @@ class RecurringTest < ActiveSupport::TestCase
 
         # class: entries use that job class's own queue_as; command:-only entries fall back to
         # SolidQueue::RecurringJob's queue_as (:solid_queue_recurring) - both need a worker
-        # configured in config/queue.yml, or the task enqueues but is never picked up (see
-        # SOLID_QUEUE_MIGRATION_PLAN.md for the bug this test guards against).
+        # configured in config/queue.yml, or the task enqueues but is never picked up.
         job_class = options[:class]&.safe_constantize || SolidQueue::RecurringJob
         assert_includes configured_queues, job_class.queue_name,
                         "#{key} enqueues onto '#{job_class.queue_name}', which has no worker in config/queue.yml"

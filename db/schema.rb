@@ -2054,7 +2054,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_15_145804) do
   # MySQL's DROP TABLE doesn't actually support CASCADE (the keyword is accepted but has no
   # effect - see https://dev.mysql.com/doc/refman/8.4/en/drop-table.html), so a table with an
   # active foreign key pointing at it can't be dropped until the referencing table is dropped
-  # first. See SOLID_QUEUE_MIGRATION_PLAN.md.
+  # first.
   create_table "solid_queue_jobs", force: :cascade do |t|
     t.string "queue_name", null: false
     t.string "class_name", null: false
