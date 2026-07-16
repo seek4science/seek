@@ -1,5 +1,9 @@
 # FAIRDOM-SEEK 1.18.1 Release Notes
 
+## New Features
+
+- **Inline content preview on SOP, Document, DataFile and FileTemplate pages** — The inline document preview (which embeds file content directly on the show page, converting Office files to PDF when conversion is enabled) previously only appeared on Presentation pages. It is now also shown on SOP, Document, DataFile, and FileTemplate pages (#2661, #2673)
+
 ## Improvements
 
 - **CFF file validated before bibtex conversion** — CITATION.cff files are now validated before attempting to convert to BibTeX, giving a clear error rather than a cryptic failure (#2640)
@@ -9,6 +13,7 @@
 - **Units for global ISA templates** — Units can now be configured on attributes in global ISA sample type templates (#2622)
 - **Unit locking in sample types** — Units on sample type attributes can now be locked down to prevent users from changing them (#2489)
 - **Fail fast on database unavailability at startup** — SEEK now raises an error immediately if the database is unreachable when configuration loads, rather than silently falling back to defaults and causing confusing behaviour (#2667)
+- **ROR link on institution show page** — Institution show pages now display a link to the full ROR profile URL rather than just showing the ROR ID (#2659)
 
 ## Bug Fixes
 
@@ -20,9 +25,12 @@
 - **Non-UTF-8 CSV files causing error when exploring** — CSV files with non-UTF-8 encodings are now handled gracefully instead of raising an unhandled error (#2669)
 - **Nil error with no authors in CITATION.cff** — Fixed a crash when a CITATION.cff file contains no authors (#2639)
 - **Registered Data file/Strain/SOP missing from experiment view** — Fixed registered assets (Data file, Strain, SOP) not appearing correctly in the DataHub experiment view (#2671)
+- **Missing content blob causing error on asset preview** — Added a guard so that asset pages with inline preview no longer crash when the content blob file is absent from disk (#2678)
+- **ISA tag title missing from creation wizard** — Restored the ISA tag title that was inadvertently removed from the ISA creation step (#2665)
 
 ## Infrastructure & Dependencies
 
+- Protocol type controlled vocabulary updated (#2676)
 - concurrent-ruby security bump
 - oauth2 updated
 - zlib updated
