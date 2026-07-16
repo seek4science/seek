@@ -1983,24 +1983,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_15_145804) do
     t.index ["job_id"], name: "index_solid_queue_failed_executions_on_job_id", unique: true
   end
 
-  create_table "solid_queue_jobs", force: :cascade do |t|
-    t.string "queue_name", null: false
-    t.string "class_name", null: false
-    t.text "arguments"
-    t.integer "priority", default: 0, null: false
-    t.string "active_job_id"
-    t.datetime "scheduled_at"
-    t.datetime "finished_at"
-    t.string "concurrency_key"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["active_job_id"], name: "index_solid_queue_jobs_on_active_job_id"
-    t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
-    t.index ["finished_at"], name: "index_solid_queue_jobs_on_finished_at"
-    t.index ["queue_name", "finished_at"], name: "index_solid_queue_jobs_for_filtering"
-    t.index ["scheduled_at", "finished_at"], name: "index_solid_queue_jobs_for_alerting"
-  end
-
   create_table "solid_queue_pauses", force: :cascade do |t|
     t.string "queue_name", null: false
     t.datetime "created_at", null: false
@@ -2064,6 +2046,31 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_15_145804) do
     t.datetime "created_at", null: false
     t.index ["job_id"], name: "index_solid_queue_scheduled_executions_on_job_id", unique: true
     t.index ["scheduled_at", "priority", "job_id"], name: "index_solid_queue_dispatch_all"
+  end
+
+  # solid_queue_jobs is deliberately placed after every solid_queue_* table that holds a
+  # foreign key referencing it (rather than in alphabetical order), so that db:schema:load
+  # can safely drop-and-recreate on a MySQL database that already has the schema loaded.
+  # MySQL's DROP TABLE doesn't actually support CASCADE (the keyword is accepted but has no
+  # effect - see https://dev.mysql.com/doc/refman/8.4/en/drop-table.html), so a table with an
+  # active foreign key pointing at it can't be dropped until the referencing table is dropped
+  # first. See SOLID_QUEUE_MIGRATION_PLAN.md.
+  create_table "solid_queue_jobs", force: :cascade do |t|
+    t.string "queue_name", null: false
+    t.string "class_name", null: false
+    t.text "arguments"
+    t.integer "priority", default: 0, null: false
+    t.string "active_job_id"
+    t.datetime "scheduled_at"
+    t.datetime "finished_at"
+    t.string "concurrency_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active_job_id"], name: "index_solid_queue_jobs_on_active_job_id"
+    t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
+    t.index ["finished_at"], name: "index_solid_queue_jobs_on_finished_at"
+    t.index ["queue_name", "finished_at"], name: "index_solid_queue_jobs_for_filtering"
+    t.index ["scheduled_at", "finished_at"], name: "index_solid_queue_jobs_for_alerting"
   end
 
   create_table "solid_queue_semaphores", force: :cascade do |t|
