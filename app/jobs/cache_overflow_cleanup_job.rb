@@ -4,8 +4,6 @@
 # rising is the signal that the shared Redis instance is under enough memory pressure that session
 # keys could, in principle, start being evicted too.
 class CacheOverflowCleanupJob < ApplicationJob
-  RUN_PERIOD = 1.day.freeze
-
   def perform
     Rails.cache.cleanup
     log_redis_memory_stats

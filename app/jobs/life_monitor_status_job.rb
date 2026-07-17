@@ -1,6 +1,4 @@
 class LifeMonitorStatusJob < ApplicationJob
-  PERIOD = 1.day.freeze
-
   def perform(offset = 0)
     return unless Seek::Config.life_monitor_enabled
     token = LifeMonitor::Oauth2::Client.new.get_token
