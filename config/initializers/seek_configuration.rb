@@ -207,6 +207,7 @@ def load_seek_config_defaults!
   Seek::Config.default :cache_remote_files, true
   Seek::Config.default :max_cachable_size, 20 * 1024 * 1024
   Seek::Config.default :hard_max_cachable_size, 100 * 1024 * 1024
+  Seek::Config.default :cache_max_redis_item_size, 1 * 1024 * 1024
 
   Seek::Config.default :orcid_required, false
 

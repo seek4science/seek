@@ -55,11 +55,11 @@ services:
 
   redis_store:
     image: redis:8.6-alpine
-    container_name: seek-session-store
+    container_name: seek-redis
     command:
       - sh
       - -c
-      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"
+      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$$REDIS_MAXMEMORY" --maxmemory-policy allkeys-lru
     env_file:
       - docker/redis.env
     volumes:

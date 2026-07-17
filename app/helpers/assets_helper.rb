@@ -44,7 +44,7 @@ module AssetsHelper
       # If embedding external content is not allowed, then server a link instead
       content = "This embedded content is blocked due to your cookie settings"
     else
-      content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
+      content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}", expires_in: 30.days) do
         our_renderer.render
       end
     end

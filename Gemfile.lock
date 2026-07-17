@@ -499,6 +499,8 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
+    mock_redis (0.55.0)
+      redis (~> 5)
     msgpack (1.8.0)
     multi_json (1.16.0)
     multi_xml (0.9.1)
@@ -1128,6 +1130,7 @@ DEPENDENCIES
   minitar
   minitest (~> 5.4)
   minitest-reporters
+  mock_redis
   mutex_m
   mysql2
   net-ftp
