@@ -30,6 +30,10 @@ class RecurringTest < ActiveSupport::TestCase
     assert_equal 'AuthLookupMaintenanceJob', auth[:class]
     assert_equal '0 */8 * * *', auth[:schedule]
 
+    cache_cleanup = pop_task(:cache_overflow_cleanup)
+    assert_equal 'CacheOverflowCleanupJob', cache_cleanup[:class]
+    assert_equal '0 4 * * *', cache_cleanup[:schedule]
+
     life_monitor = pop_task(:life_monitor_status)
     assert_equal 'LifeMonitorStatusJob', life_monitor[:class]
     assert_equal '0 2 * * *', life_monitor[:schedule]
@@ -68,6 +72,7 @@ class RecurringTest < ActiveSupport::TestCase
       assert_equal '43 0 * * *', positive_offset[:periodic_subscription_email_daily][:schedule]
       assert_equal '43 2 * * *', positive_offset[:life_monitor_status][:schedule]
       assert_equal '43 3 * * *', positive_offset[:galaxy_tool_map_refresh][:schedule]
+      assert_equal '43 4 * * *', positive_offset[:cache_overflow_cleanup][:schedule]
       # hour-frequency jobs keep the */N hour field but still get the minute offset applied,
       # matching what whenever produced from `every N.hours, at: offset(...)`
       assert_equal '43 */4 * * *', positive_offset[:regular_maintenance][:schedule]
@@ -79,6 +84,7 @@ class RecurringTest < ActiveSupport::TestCase
       assert_equal '3 20 * * *', negative_offset[:periodic_subscription_email_daily][:schedule]
       assert_equal '3 22 * * *', negative_offset[:life_monitor_status][:schedule]
       assert_equal '3 23 * * *', negative_offset[:galaxy_tool_map_refresh][:schedule]
+      assert_equal '3 0 * * *', negative_offset[:cache_overflow_cleanup][:schedule]
       assert_equal '3 */4 * * *', negative_offset[:regular_maintenance][:schedule]
       assert_equal '3 */8 * * *', negative_offset[:auth_lookup_maintenance][:schedule]
     end

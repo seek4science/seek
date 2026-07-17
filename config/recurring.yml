@@ -46,6 +46,9 @@ production:
   auth_lookup_maintenance:
     class: AuthLookupMaintenanceJob
     schedule: "<%= offset_minute %> */8 * * *"
+  cache_overflow_cleanup:
+    class: CacheOverflowCleanupJob
+    schedule: "<%= offset_cron(4) %> * * *"
   life_monitor_status:
     class: LifeMonitorStatusJob
     schedule: "<%= offset_cron(2) %> * * *"

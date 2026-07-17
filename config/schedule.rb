@@ -33,10 +33,6 @@ set :output, "#{path}/log/schedule.log"
 # config/recurring.yml, run by Solid Queue's own scheduler. Only rake tasks and shell commands
 # remain here, since neither maps onto recurring.yml's `class:`/`command:` mechanisms.
 
-every CacheOverflowCleanupJob::RUN_PERIOD, at: offset(4) do
-  runner "CacheOverflowCleanupJob.perform_later"
-end
-
 # Generate a new sitemap...
 every 1.day, at: '12:45 am' do
   rake "-s sitemap:refresh"
