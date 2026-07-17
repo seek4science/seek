@@ -764,6 +764,20 @@ class SopsControllerTest < ActionController::TestCase
     Seek::Config.pdf_conversion_enabled = tmp
   end
 
+  test 'should show inline content preview for pdf sop' do
+    pdf_sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    get :show, params: { id: pdf_sop.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
+  end
+
+  test 'should not show inline content preview when sop cannot be downloaded' do
+    pdf_sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :show, params: { id: pdf_sop.id }
+    assert_response :success
+    assert_select 'div.renderer', count: 0
+  end
+
   test 'show explore button' do
     sop = FactoryBot.create(:small_test_spreadsheet_sop)
     login_as(sop.contributor.user)

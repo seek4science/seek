@@ -126,6 +126,8 @@ max_cachable_size:
   convert: :to_i
 hard_max_cachable_size:
   convert: :to_i
+cache_max_redis_item_size:
+  convert: :to_i
 tag_threshold:
   convert: :to_i
 max_visible_tags:

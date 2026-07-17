@@ -47,6 +47,13 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should show inline content preview for pdf document' do
+    pdf_doc = FactoryBot.create(:api_pdf_document, policy: FactoryBot.create(:downloadable_public_policy))
+    get :show, params: { id: pdf_doc.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
+  end
+
   test 'should not show hidden document' do
     hidden_doc = FactoryBot.create(:private_document)
 

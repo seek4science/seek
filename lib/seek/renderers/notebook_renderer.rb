@@ -10,7 +10,7 @@ module Seek
       end
 
       def render_standalone
-        Rails.cache.fetch("notebook-#{blob.cache_key}") do
+        Rails.cache.fetch("notebook-#{blob.cache_key}", expires_in: 30.days) do
           generate_notebook_html
         end
       end
