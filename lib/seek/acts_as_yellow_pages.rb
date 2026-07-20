@@ -33,7 +33,7 @@ module Seek #:nodoc:
               locations
             end
           end
-        end if Seek::Config.solr_enabled
+        end
 
         class_eval do
           extend Seek::ActsAsYellowPages::SingletonMethods

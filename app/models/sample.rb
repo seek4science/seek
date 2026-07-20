@@ -3,14 +3,12 @@ class Sample < ApplicationRecord
   include Seek::BioSchema::Support
   include Seek::JSONMetadata::Serialization
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :attribute_values do
-        attribute_values_for_search
-      end
-      text :sample_type do
-        sample_type.title
-      end
+  searchable(auto_index: false) do
+    text :attribute_values do
+      attribute_values_for_search
+    end
+    text :sample_type do
+      sample_type.title
     end
   end
 
