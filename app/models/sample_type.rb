@@ -2,10 +2,8 @@ class SampleType < ApplicationRecord
   # attr_accessible :title, :uuid, :sample_attributes_attributes,
   #                 :description, :uploaded_template, :project_ids, :tags
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :attribute_search_terms
-    end
+  searchable(auto_index: false) do
+    text :attribute_search_terms
   end
 
   include Seek::ActsAsAsset::Searching
