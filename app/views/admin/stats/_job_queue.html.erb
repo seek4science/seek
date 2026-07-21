@@ -5,7 +5,7 @@
 %>
 
 <h4>
-  Total solid queue jobs waiting = <%= solid_queue_jobs.count -%>
+  Total jobs waiting = <%= solid_queue_jobs.count -%>
 </h4>
 
 <% if SolidQueue::Job.failed.count > 0 %>
