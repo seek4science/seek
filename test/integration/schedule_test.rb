@@ -5,25 +5,17 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     @schedule = Whenever::Test::Schedule.new(file: 'config/schedule.rb')
   end
 
-  test 'should read schedule file' do
-    rake_jobs = @schedule.jobs[:rake]
+  test 'schedule file defines no application jobs - those live in config/recurring.yml' do
+    # All periodic application work moved to config/recurring.yml (see RecurringTest). Only OS-level
+    # shell maintenance remains here, so there should be no rake or runner jobs. This also guards
+    # against a repeat of the #2656 bug where entries were added to recurring.yml but left here too,
+    # running twice (once via cron, once via Solid Queue).
+    assert_empty @schedule.jobs[:rake], 'config/schedule.rb should have no rake jobs'
+    assert_empty @schedule.jobs[:runner], 'config/schedule.rb should have no runner jobs'
 
-    sitemap = pop_task(rake_jobs, '-s sitemap:refresh')
-    assert sitemap
-    assert_equal [1.day, { at: '12:45 am' }], sitemap[:every]
-
-    sessions_trim = pop_task(rake_jobs, 'db:sessions:batch_trim')
-    assert sessions_trim
-    assert_equal [1.day, { at: '1:15 am' }], sessions_trim[:every]
-
-    assert_empty rake_jobs, 'Found untested rake job(s) in schedule'
-
-    # Everything that's an ActiveJob enqueue or a plain Ruby method call belongs in
-    # config/recurring.yml (see RecurringTest), not here - this guards against a repeat
-    # of the bug found in #2656 where entries were added to recurring.yml but never
-    # removed from here, so they ran twice (once via cron, once via Solid Queue).
-    assert_empty @schedule.jobs[:runner], 'config/schedule.rb should have no runner jobs - ' \
-      'move ActiveJob/plain-Ruby entries to config/recurring.yml instead'
+    # The only remaining entry is the Docker-only soffice reaper, which is not scheduled outside
+    # Docker.
+    assert_empty @schedule.jobs[:command], 'config/schedule.rb should schedule no commands outside Docker'
   end
 
   test 'kill-long-running-soffice command is only scheduled when using docker' do
@@ -37,6 +29,10 @@ class ScheduleTest < ActionDispatch::IntegrationTest
       soffice = pop_task(docker_schedule.jobs[:command], 'sh /seek/script/kill-long-running-soffice.sh')
       assert soffice
       assert_equal [10.minutes], soffice[:every]
+
+      # still no application jobs, even under docker
+      assert_empty docker_schedule.jobs[:rake], 'config/schedule.rb should have no rake jobs under docker'
+      assert_empty docker_schedule.jobs[:runner], 'config/schedule.rb should have no runner jobs under docker'
     ensure
       File.delete(docker_flag_path) if File.exist?(docker_flag_path)
     end

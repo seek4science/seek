@@ -24,9 +24,9 @@
 # calls, e.g. clear_finished_jobs/application_status_refresh below are plain class method
 # calls). `command:`-only entries (no `class:`) enqueue onto the `solid_queue_recurring` queue
 # (SolidQueue::RecurringJob's own queue_as), which is why config/queue.yml has a dedicated
-# worker for it. rake tasks (sitemap:refresh, db:sessions:batch_trim) and the Docker-only shell
-# command (kill-long-running-soffice.sh) map onto neither mechanism, so they stay on
-# whenever/cron (see config/schedule.rb).
+# worker for it. All periodic application jobs live here now; the only thing left on whenever/cron
+# (config/schedule.rb) is OS-level process reaping (kill-long-running-soffice.sh) that isn't an
+# ActiveJob or Ruby call.
 production:
   periodic_subscription_email_daily:
     class: PeriodicSubscriptionEmailJob
@@ -71,6 +71,9 @@ production:
   bioschema_data_dump_generate:
     command: "Seek::BioSchema::DataDump.generate_dumps"
     schedule: "10 0 * * *"
+  sitemap_refresh:
+    class: SitemapRefreshJob
+    schedule: "45 0 * * *"
 
 # No recurring entries for development/test - matches solid_queue's own default
 # template convention and avoids periodic jobs (subscription emails, etc.) firing

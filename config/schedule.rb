@@ -29,23 +29,15 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unle
 
 set :output, "#{path}/log/schedule.log"
 
-# Everything that's an ActiveJob enqueue or a plain Ruby method call lives in
-# config/recurring.yml, run by Solid Queue's own scheduler. Only rake tasks and shell commands
-# remain here, since neither maps onto recurring.yml's `class:`/`command:` mechanisms.
+# All periodic *application* jobs now live in config/recurring.yml, run by Solid Queue's own
+# scheduler (see RecurringTest). Only genuine OS/shell maintenance that doesn't map onto an
+# ActiveJob or Ruby call remains here on whenever/cron.
 
-# Generate a new sitemap...
-every 1.day, at: '12:45 am' do
-  rake "-s sitemap:refresh"
-end
-
-# not safe to automatically add in a non containerised environment
+# Reap LibreOffice (soffice.bin) processes left running longer than 30 minutes by document
+# conversion. This is process reaping at the container level, not application logic, so it stays on
+# cron rather than moving to a Solid Queue recurring job. Only added in a containerised environment.
 if Seek::Docker.using_docker?
   every 10.minutes do
     command "sh /seek/script/kill-long-running-soffice.sh"
   end
-end
-
-# trim sessions
-every 1.day, at: '1:15 am' do
-  rake 'db:sessions:batch_trim'
 end

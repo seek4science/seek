@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class RecurringTest < ActiveSupport::TestCase
   setup do
@@ -62,6 +63,10 @@ class RecurringTest < ActiveSupport::TestCase
     data_dump = pop_task(:bioschema_data_dump_generate)
     assert_equal 'Seek::BioSchema::DataDump.generate_dumps', data_dump[:command]
     assert_equal '10 0 * * *', data_dump[:schedule]
+
+    sitemap = pop_task(:sitemap_refresh)
+    assert_equal 'SitemapRefreshJob', sitemap[:class]
+    assert_equal '45 0 * * *', sitemap[:schedule]
 
     assert_empty @tasks, "Found untested recurring task(s): #{@tasks.keys.join(', ')}"
   end
@@ -135,10 +140,17 @@ class RecurringTest < ActiveSupport::TestCase
       with_config_value(:openbis_enabled, true) do
         VCR.use_cassette('galaxy/fetch_tools_trimmed') do
           VCR.use_cassette('bio_tools/fetch_galaxy_tool_names') do
-            perform_enqueued_jobs do
-              assert_nothing_raised do
-                @tasks.each do |key, options|
-                  SolidQueue::RecurringTask.from_configuration(key.to_s, **options).enqueue(at: Time.current)
+            # SitemapRefreshJob generates files and pings search engines over HTTP; stub both so this
+            # test doesn't write sitemaps or make real network requests (SitemapRefreshJobTest covers
+            # that it calls them).
+            SitemapGenerator::Interpreter.stub(:run, nil) do
+              SitemapGenerator::Sitemap.stub(:ping_search_engines, nil) do
+                perform_enqueued_jobs do
+                  assert_nothing_raised do
+                    @tasks.each do |key, options|
+                      SolidQueue::RecurringTask.from_configuration(key.to_s, **options).enqueue(at: Time.current)
+                    end
+                  end
                 end
               end
             end
