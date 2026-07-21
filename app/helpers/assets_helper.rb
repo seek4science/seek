@@ -43,6 +43,9 @@ module AssetsHelper
     if our_renderer.external_embed? && !cookie_consent.allow_embedding?
       # If embedding external content is not allowed, then server a link instead
       content = "This embedded content is blocked due to your cookie settings"
+    elsif !our_renderer.external_embed? && !asset.content_blob.file_exists?
+      # The renderer needs the local file content, but it is missing from the filestore
+      content = ''
     else
       content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}", expires_in: 30.days) do
         our_renderer.render
