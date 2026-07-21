@@ -24,6 +24,7 @@ require 'integration/api/read_api_test_suite'
 require 'integration/api/write_api_test_suite'
 require 'rdf_test_cases'
 require 'rack_test_cookie_jar_extensions'
+require 'single_page_test_utils'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,
@@ -146,6 +147,18 @@ class ActiveSupport::TestCase
     Seek::Config.clear_temporary_filestore
   end
 
+  # Swaps Rails.logger for a Logger writing to a StringIO for the duration of the block, returning
+  # everything logged as a String.
+  def capture_log
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = original_logger
+  end
+
   def clear_current_user
     User.current_user = nil
   end
@@ -255,6 +268,15 @@ class ActiveSupport::TestCase
 
   def open_fixture_file(path)
     File.open(File.join(Rails.root, 'test', 'fixtures', 'files', *path.split('/')))
+  end
+
+  def disable_std_output
+    @original_std_out = $stdout
+    $stdout = File.open(File::NULL, 'w')
+  end
+
+  def enable_std_output
+    $stdout = @original_std_out
   end
 end
 

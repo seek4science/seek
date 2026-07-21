@@ -78,9 +78,12 @@
         "Registered Sample",
         "Registered Sample List",
         "Controlled Vocabulary",
+        "Controlled Vocabulary List",
         "URI",
         "Registered Data file",
-        "ENA custom date"
+        "ENA custom date",
+        "Registered SOP",
+        "Registered Strain"
       ]
     },
     "allowCVFreeText": {
@@ -130,6 +133,16 @@
       "anyOf": [
         {
           "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unit": {
+      "anyOf": [
+        {
+          "type": "string"
         },
         {
           "type": "null"

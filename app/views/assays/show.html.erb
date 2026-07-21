@@ -105,13 +105,14 @@
           <%= render partial: 'data_model_relationships' %>
         <% end %>
 
+        <%= render partial: 'assets/special_auth_code_display', locals: { resource: @assay } %>
 
         <%= render partial: 'general/isa_graph', locals: { root_item: @assay, options: { depth: 4 } } %>
 
       </div>
 
       <div class="col-md-3 col-sm-4">
-        <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @assay } %>
+        <%= render partial: 'assets/resource_main_content_right', locals: { resource: @assay } %>
       </div>
     </div>
   <% end %>

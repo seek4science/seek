@@ -8,10 +8,13 @@ module Seek
         include ActionView::Helpers::SanitizeHelper
         include Seek::Util.routes
 
-        attr_reader :resource
+        attr_reader :resource, :additional_context, :parent_resource
 
         def initialize(resource)
           @resource = resource
+          @additional_context = {}
+          # ensures the parent resource, whether the resource is a version or already the current parent
+          @parent_resource = resource.is_a_version? ? resource.parent : resource
         end
 
         def mappings
@@ -26,7 +29,10 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          Seek::BioSchema::Serializer::SCHEMA_ORG
+          {
+            '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+            dct: Seek::BioSchema::Serializer::DCT
+          }
         end
 
         # The schema.org @type .
@@ -73,20 +79,29 @@ module Seek
           private
 
           # to be used to easily define a method that relates to a property and handles a collection.
-          # To be used within the Decorator class to define the method name, and the collection to be used.
+          # To be used within the Decorator class to define the method name (or methods if expressed as an array), and the collection to be used.
           # This results in an array of Hash objects containing the minimal definition JSON. For example
           #   associated_items member: :people
           #   create a method 'member' that returns a collection of Hash objects containing the
           #   minimal definition for each item resulting from calling 'people' on the resource
+          #   returns nil if no methods match, otherwise returns an array even if empty
+          # Also adds to the additional_context the context for each item in the associated resources
           def associated_items(**pairs)
-            pairs.each do |method, collection|
+            pairs.each do |method, collections|
               define_method(method) do
-                mini_definitions(send(collection)) if respond_to?(collection)
+                valid_methods = Array(collections).select{ |c| respond_to?(c) }
+                return nil if valid_methods.empty?
+
+                valid_methods.map do |collection|
+                  items = send(collection)
+                  @additional_context.merge!(additional_contexts(items))
+                  mini_definitions(items)
+                end.flatten.compact
               end
             end
           end
 
-          # used to define the mapping between the method to be call, and the property
+          # used to define the mapping between the method to be called, and the property
           # for e.g
           #   schema_mappings doi: :identifier
           # calls the method 'doi' on the decorator, and then the value will be used with the schema.org property
@@ -114,6 +129,19 @@ module Seek
             mini_col << Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
           mini_col
+        end
+
+        def additional_contexts(collection)
+          return {} if collection.empty?
+
+          ctx = {}
+          collection.each do |item|
+            next if item.respond_to?(:public?) && !item.public?
+
+            decorator = Seek::BioSchema::ResourceDecorators::Factory.instance.get(item)
+            ctx.merge!(decorator.context)
+          end
+          ctx
         end
 
         def respond_to_missing?(name, include_private = false)

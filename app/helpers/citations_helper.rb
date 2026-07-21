@@ -12,6 +12,9 @@ module CitationsHelper
 
   def render_cff_citation(blob, style)
     Seek::Citations.from_cff(blob, style)
+  rescue ::CFF::ValidationError => exception
+    safe_join [t('citations.errors.invalid_cff'),
+               content_tag(:ul, safe_join(exception.errors.map { |e| content_tag(:li, e.message) }))]
   rescue Seek::Citations::InvalidStyleException
     t('citations.errors.invalid_style')
   rescue JSON::ParserError, RestClient::Exception

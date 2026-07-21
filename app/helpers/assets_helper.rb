@@ -37,14 +37,17 @@ module AssetsHelper
 
   # will render a view of the asset, if available. For example, a slideshare based asset could give a embedded slideshare view
   def rendered_asset_view(asset)
-    return '' unless asset.can_download?
+    return '' unless asset.content_blob && asset.can_download?
 
     our_renderer = Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob)
     if our_renderer.external_embed? && !cookie_consent.allow_embedding?
       # If embedding external content is not allowed, then server a link instead
       content = "This embedded content is blocked due to your cookie settings"
+    elsif !our_renderer.external_embed? && !asset.content_blob.file_exists?
+      # The renderer needs the local file content, but it is missing from the filestore
+      content = ''
     else
-      content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
+      content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}", expires_in: 30.days) do
         our_renderer.render
       end
     end
@@ -140,12 +143,18 @@ module AssetsHelper
   end
 
   def show_resource_path(resource)
+    path_options = {}
+    # Only include code parameter on show pages, not on index/list pages
+    # Check if we're on an index action - if so, don't include code
+    is_index_page = defined?(action_name) && action_name == 'index'
+    path_options[:code] = params[:code] if params[:code].present? && !is_index_page
+
     if resource.is_a_version?
-      polymorphic_path(resource.parent, version: resource.version)
+      polymorphic_path(resource.parent, { version: resource.version }.merge(path_options))
     elsif resource.is_a?(Snapshot)
-      polymorphic_path([resource.resource, resource])
+      polymorphic_path([resource.resource, resource], path_options)
     else
-      polymorphic_path(resource)
+      polymorphic_path(resource, path_options)
     end
   end
 
@@ -188,6 +197,66 @@ module AssetsHelper
   # code is for authorization of temporary link
   def can_view_asset?(asset, code = params[:code], can_view = asset.can_view?)
     can_view || (code && asset.auth_by_code?(code))
+  end
+
+  # Determines if code should be included for ISA hierarchy navigation
+  # Code only propagates DOWNWARD (to children), not UPWARD (to parents)
+  def should_include_code_for_isa_link?(target_resource)
+    return false unless params[:code].present?
+
+    # Don't include code on index/list pages
+    return false if defined?(action_name) && action_name == 'index'
+
+    return true unless defined?(controller_name) && defined?(instance_variable_get)
+
+    # Get the current resource being viewed
+    current_resource = case controller_name
+                       when 'investigations'
+                         instance_variable_get('@investigation')
+                       when 'studies'
+                         instance_variable_get('@study')
+                       when 'assays'
+                         instance_variable_get('@assay')
+                       when 'observation_units'
+                         instance_variable_get('@observation_unit')
+                       else
+                         nil
+                       end
+
+    return true if current_resource.nil?
+
+    # Determine if target is a parent (don't include code) or child/sibling (include code)
+    is_parent_of_current?(target_resource, current_resource) ? false : true
+  end
+
+  # Check if target_resource is a parent of current_resource in ISA hierarchy
+  def is_parent_of_current?(target, current)
+    return false if target.nil? || current.nil?
+
+    # If current is a Study, check if target is its Investigation
+    if current.is_a?(Study) && target.is_a?(Investigation)
+      return current.investigation == target
+    end
+
+    # If current is an Assay, check if target is its Study or Investigation
+    if current.is_a?(Assay)
+      if target.is_a?(Study)
+        return current.study == target
+      elsif target.is_a?(Investigation)
+        return current.investigation == target
+      end
+    end
+
+    # If current is an ObservationUnit, check if target is its Study or Investigation
+    if current.is_a?(ObservationUnit)
+      if target.is_a?(Study)
+        return current.study == target
+      elsif target.is_a?(Investigation)
+        return current.investigation == target
+      end
+    end
+
+    false
   end
 
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
@@ -369,5 +438,18 @@ module AssetsHelper
     by_text = item.contributor.nil? ? '' : " by #{item.contributor.name}"
     tooltip_txt = "#{item_type.humanize}: \"#{item.title}\"#{by_text}"
     list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt, 34)
+  end
+
+  def upload_box_text(asset_name, action_text, hide_remote, hide_local)
+    if hide_remote && hide_local
+      'Both uploading a file or registering a URL to a remote file or web page are currently unavailable.'
+    elsif hide_remote
+      action_text ||= "register #{asset_name.indefinite_article} #{asset_name}"
+      "You can #{action_text} by selecting a file."
+    elsif hide_local
+      "You can register #{asset_name.indefinite_article} #{asset_name} by registering a URL to a remote file or web page."
+    else
+      "You can register #{asset_name.indefinite_article} #{asset_name} by either directly uploading a file#{' or zipped folder' if asset_name == 'Data file'}, or registering a URL to a remote file or web page."
+    end
   end
 end

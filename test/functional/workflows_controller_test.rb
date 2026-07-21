@@ -1748,6 +1748,23 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'download', log.action
   end
 
+  test 'should not have dropdown download button if there is no main workflow path' do
+    workflow = FactoryBot.create :workflow, policy: FactoryBot.create(:public_policy)
+
+    get :show, params: { id: workflow }
+
+    assert_select '#download-group', count: 1
+    assert_select '#download-group .dropdown-toggle', count: 0
+  end
+
+  test 'should have dropdown download button if there is a main workflow path' do
+    workflow = FactoryBot.create :ro_crate_git_workflow, policy: FactoryBot.create(:public_policy)
+
+    get :show, params: { id: workflow }
+
+    assert_select '#download-group .dropdown-toggle', count: 1
+  end
+
   test 'lists doi in index in table view' do
     Workflow.delete_all
 
@@ -1785,6 +1802,20 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: workflow }
     assert_response :success
     assert_select '#citation', text: /van der Real Person, O\. T\./, count: 1
+  end
+
+  test 'can display citation errors for workflow with invalid CFF' do
+    workflow = FactoryBot.create(:local_git_workflow, policy: FactoryBot.create(:public_policy))
+
+    gv = workflow.latest_git_version
+    disable_authorization_checks do
+      gv.add_file('CITATION.cff', open_fixture_file('invalid_CITATION.cff'))
+      disable_authorization_checks { gv.save! }
+    end
+
+    get :show, params: { id: workflow }
+    assert_response :success
+    assert_select '#citation', text: /Couldn't extract the citation from the provided CFF file:"authors" wasn't supplied\./, count: 1
   end
 
   test 'display test status with link to LifeMonitor on show page' do

@@ -1,5 +1,3 @@
-require 'uuid'
-
 class NotifieeInfo < ApplicationRecord
   belongs_to :notifiee,:polymorphic=>true
   validates_presence_of :notifiee
@@ -11,7 +9,7 @@ class NotifieeInfo < ApplicationRecord
   
   def check_unique_key
     if self.unique_key.nil? || self.unique_key.blank?
-      self.unique_key = UUID.generate
+      self.unique_key = SecureRandom.uuid
     end
   end    
   

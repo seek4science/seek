@@ -43,16 +43,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u', Seek::Config.seek_video_link
   end
 
-  test 'external search' do
-    with_config_value :external_search_enabled, true do
-      assert Seek::Config.external_search_enabled
-    end
-
-    with_config_value :external_search_enabled, false do
-      assert !Seek::Config.external_search_enabled
-    end
-  end
-
   test 'denylisted feeds' do
     Seek::Config.denylisted_feeds = { 'http://google.com' => Time.parse('1 Sep 2014'), 'http://fish.com' => Time.parse('1 June 2014') }
     assert_equal Time.parse('1 Sep 2014'), Seek::Config.denylisted_feeds['http://google.com']
@@ -465,6 +455,14 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
+  test 'cache_max_redis_item_size default and persistence' do
+    assert_equal 1 * 1024 * 1024, Seek::Config.default_cache_max_redis_item_size
+    with_config_value(:cache_max_redis_item_size, '2097152') do
+      assert_equal 2097152, Seek::Config.cache_max_redis_item_size
+      assert_equal Integer, Seek::Config.cache_max_redis_item_size.class
+    end
+  end
+
   test 'attr encrypted key' do
     assert_equal "#{Rails.root}/tmp/testing-filestore/attr_encrypted/key", Seek::Config.attr_encrypted_key_path
     FileUtils.rm(Seek::Config.attr_encrypted_key_path) if File.exist?(Seek::Config.attr_encrypted_key_path)
@@ -665,5 +663,85 @@ class ConfigTest < ActiveSupport::TestCase
     with_config_value(:nels_api_url, 'not a url') do
       assert_nil Seek::Config.nels_sbi_url
     end
+  end
+
+  test 'external_search_adaptors' do
+    setting = { 'tess' => { 'enabled' => false },
+                'biomodels' => { 'enabled' => true } }
+    Seek::Config.external_search_adaptors = setting
+
+    result = Seek::Config.external_search_adaptors
+    assert_equal setting, result
+  end
+
+  test 'settings default whilst the table is legitimately absent, then read from the database once it exists' do
+    Seek::Config.default :test_bootstrap_setting, 'the default'
+
+    # Simulate the pre-schema state during db:setup: the database is reachable but the table does not exist
+    reset_settings_table_memo
+    Settings.define_singleton_method(:table_exists?) { false }
+    begin
+      refute Seek::Config.settings_table_available?
+      # reads use the default, and writes update the in-memory defaults rather than hitting the database
+      assert_equal 'the default', Seek::Config.get_value(:test_bootstrap_setting)
+      Seek::Config.set_value(:test_bootstrap_setting, 'set during bootstrap')
+      assert_equal 'set during bootstrap', Seek::Config.get_default_value(:test_bootstrap_setting)
+    ensure
+      Settings.singleton_class.send(:remove_method, :table_exists?)
+    end
+
+    # Once the table exists, values come from the database
+    Seek::Config.set_value(:test_bootstrap_setting, 'the stored value')
+    assert Seek::Config.settings_table_available?
+    assert_equal 'the stored value', Seek::Config.get_value(:test_bootstrap_setting)
+  end
+
+  test 'reads fail fast when the database is unreachable, rather than silently serving defaults' do
+    Seek::Config.default :test_bootstrap_setting, 'the default'
+
+    reset_settings_table_memo
+    Settings.define_singleton_method(:table_exists?) { raise ActiveRecord::ConnectionNotEstablished, 'boom' }
+    begin
+      # a genuine outage must raise, not return the default, so wrong settings are never served or saved
+      assert_raises(ActiveRecord::ConnectionNotEstablished) { Seek::Config.settings_table_available? }
+      assert_raises(ActiveRecord::ConnectionNotEstablished) { Seek::Config.get_value(:test_bootstrap_setting) }
+      assert_raises(ActiveRecord::ConnectionNotEstablished) { Seek::Config.set_value(:test_bootstrap_setting, 'x') }
+      # the failed check must not be memoized, so the process recovers once the database is back
+      refute Seek::Config.instance_variable_get(:@settings_table_available)
+    ensure
+      Settings.singleton_class.send(:remove_method, :table_exists?)
+    end
+
+    assert Seek::Config.settings_table_available?
+  end
+
+  test 'settings default when the database itself does not exist yet, rather than failing' do
+    Seek::Config.default :test_bootstrap_setting, 'the default'
+
+    # A fresh checkout before db:create: the database does not exist, so there are no stored settings to lose
+    reset_settings_table_memo
+    Settings.define_singleton_method(:table_exists?) { raise ActiveRecord::NoDatabaseError, 'no database' }
+    begin
+      refute Seek::Config.settings_table_available?
+      assert_equal 'the default', Seek::Config.get_value(:test_bootstrap_setting)
+    ensure
+      Settings.singleton_class.send(:remove_method, :table_exists?)
+    end
+
+    # Once the database and table exist, values come from the database again
+    assert Seek::Config.settings_table_available?
+  end
+
+  private
+
+  # @settings_table_available is a process-level instance variable on Seek::Config, so reset it between tests
+  # that simulate an outage to avoid leaking into other tests.
+  def reset_settings_table_memo
+    Seek::Config.instance_variable_set(:@settings_table_available, nil)
+  end
+
+  def teardown
+    reset_settings_table_memo
+    super
   end
 end

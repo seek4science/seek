@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -204,6 +204,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "doi"
+    t.text "datacite_metadata"
   end
 
   create_table "asset_links", force: :cascade do |t|
@@ -566,6 +567,12 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.index ["user_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_can_view"
   end
 
+  create_table "event_types", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.index ["title"], name: "index_event_types_on_title", unique: true
+  end
+
   create_table "events", id: :integer, force: :cascade do |t|
     t.datetime "start_date"
     t.datetime "end_date"
@@ -583,6 +590,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.string "uuid"
     t.string "deleted_contributor"
     t.string "time_zone"
+    t.integer "location_type"
+    t.bigint "event_type_id"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
@@ -1888,6 +1897,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.string "deleted_contributor"
     t.bigint "observation_unit_id"
     t.string "external_identifier", limit: 2048
+    t.index ["originating_data_file_id"], name: "index_samples_on_originating_data_file_id"
+    t.index ["sample_type_id"], name: "index_samples_on_sample_type_id"
   end
 
   create_table "saved_searches", id: :integer, force: :cascade do |t|
@@ -1897,15 +1908,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_12_154812) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "include_external_search", default: false
-  end
-
-  create_table "sessions", id: :integer, force: :cascade do |t|
-    t.string "session_id", null: false
-    t.text "data", limit: 16777215
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["session_id"], name: "index_sessions_on_session_id"
-    t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
   create_table "settings", id: :integer, force: :cascade do |t|

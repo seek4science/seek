@@ -189,11 +189,13 @@ class SopsControllerTest < ActionController::TestCase
         post :create, params: { sop: sop_details, content_blobs: [blob], policy_attributes: valid_sharing }
       end
     end
-    assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin).person, assigns(:sop).contributor
-    assert !assigns(:sop).content_blob.url.blank?
-    assert_equal 'sysmo-db-logo-grad2.png', assigns(:sop).content_blob.original_filename
-    assert_equal 'image/png', assigns(:sop).content_blob.content_type
+    sop = assigns(:sop)
+    assert_redirected_to sop_path(sop)
+    assert_equal users(:quentin).person, sop.contributor
+    refute sop.content_blob.url.blank?
+    assert_equal 'sysmo-db-logo-grad2.png', sop.content_blob.original_filename
+    assert_equal 'image/png', sop.content_blob.content_type
+    assert sop.content_blob.make_local_copy?
   end
 
   test 'should show sop' do
@@ -361,9 +363,8 @@ class SopsControllerTest < ActionController::TestCase
 
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
-    # create new version
-    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('little_file_v2.txt', 'text/plain') }] }
-    assert_redirected_to sop_path(assigns(:sop))
+    little_blob = FactoryBot.create(:little_file_v2_content_blob)
+    FactoryBot.create(:sop_version_with_blob, sop: s, content_blob: little_blob)
 
     s = Sop.find(s.id)
     assert_equal 2, s.versions.size
@@ -761,6 +762,20 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'a.disabled', text: /View content/, count: 1
 
     Seek::Config.pdf_conversion_enabled = tmp
+  end
+
+  test 'should show inline content preview for pdf sop' do
+    pdf_sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:all_sysmo_downloadable_policy))
+    get :show, params: { id: pdf_sop.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
+  end
+
+  test 'should not show inline content preview when sop cannot be downloaded' do
+    pdf_sop = FactoryBot.create(:pdf_sop, policy: FactoryBot.create(:publicly_viewable_policy))
+    get :show, params: { id: pdf_sop.id }
+    assert_response :success
+    assert_select 'div.renderer', count: 0
   end
 
   test 'show explore button' do
@@ -1169,10 +1184,9 @@ class SopsControllerTest < ActionController::TestCase
 
     sop = FactoryBot.create(:sop, contributor: @user.person)
 
-    assert_difference('Sop::Version.count', 1) do
-      post :create_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'version 2' }
-    end
+    FactoryBot.create(:sop_version_with_blob, sop: sop)
 
+    sop.reload
     assert_equal 2, sop.versions.size
 
     post :edit_version, params: { id: sop.id, version: 1, visibility: 'registered_users' }
@@ -1774,7 +1788,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal AssetLink::DISCUSSION, sop.discussion_links.first.link_type
   end
 
-  test 'create, update and show a sop with extended metadata' do
+  test 'create a sop with extended metadata' do
     cmt = FactoryBot.create(:simple_sop_extended_metadata_type)
 
     person = FactoryBot.create(:person)
@@ -1801,8 +1815,20 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a sop with extended metadata' do
+    cmt = FactoryBot.create(:simple_sop_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    sop = FactoryBot.create(:sop, contributor: person, policy: FactoryBot.create(:public_policy),
+                            extended_metadata: cm)
 
     get :show, params: { id: sop }
     assert_response :success

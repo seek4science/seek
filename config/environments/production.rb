@@ -1,4 +1,6 @@
 require "active_support/core_ext/integer/time"
+require_relative "../../lib/seek/caching/redis_with_file_overflow_store"
+require_relative "../../lib/seek/redis_config"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -59,8 +61,11 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
-  config.cache_store = :file_store, "#{Rails.root}/tmp/cache"
-  config.settings_cache_store = ActiveSupport::Cache::FileStore.new("#{Rails.root}/tmp/cache/settings-cache")
+  config.cache_store = Seek::Caching::RedisWithFileOverflowStore.build("#{Rails.root}/tmp/cache")
+  config.settings_cache_store = ActiveSupport::Cache::RedisCacheStore.new(
+    url: Seek::RedisConfig.url,
+    namespace: 'settings-cache'
+  )
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque

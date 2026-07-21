@@ -40,8 +40,8 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
   # 30 rules of ISA: https://isa-specs.readthedocs.io/en/latest/isajson.html#content-rules
 
   # 1
-  test 'Files SHOULD be encoded using UTF-8' do
-    assert_equal @response.body.encoding.name, 'UTF-8'
+  test 'Files SHOULD contain valid UTF-8 content' do
+    assert @response.body.force_encoding('UTF-8').valid_encoding?
   end
 
   # 2

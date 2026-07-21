@@ -45,7 +45,7 @@ SEEK::Application.routes.draw do
   end
 
   concern :has_dashboard do |stats_options|
-    resources :stats, stats_options.reverse_merge(only: []) do
+    resources :stats, **stats_options.reverse_merge(only: []) do
       collection do
         get :dashboard
         get :contributions
@@ -94,6 +94,8 @@ SEEK::Application.routes.draw do
     member do
       get :mint_doi_confirm
       post :mint_doi
+      get :retract_doi_confirm
+      post :retract_doi
     end
   end
 
@@ -809,8 +811,8 @@ SEEK::Application.routes.draw do
       get :batch_sharing_permission_preview
       post :batch_change_permission_for_selected_items
       post :batch_sharing_permission_changed
-      post :export_to_excel, action: :export_to_excel
-      get :download_samples_excel, action: :download_samples_excel
+      post :export_to_spreadsheet
+      get :download_spreadsheet
       post :upload_samples, action: :upload_samples
     end
   end

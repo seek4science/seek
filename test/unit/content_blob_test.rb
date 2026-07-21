@@ -515,7 +515,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     content = File.open(content_blob.filepath('txt'), 'rb').read
 
-    assert content.mb_chars.unicode_normalize(:nfd).include?('This is a rtf format')
+    assert content.force_encoding('UTF-8').unicode_normalize(:nfd).include?('This is a rtf format')
   end
 
   test 'convert_office should convert txt to pdf' do
@@ -712,6 +712,16 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute blob.file_exists?
   end
 
+  test "won't follow redirect and fetch local file" do
+    stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'file:///etc/passwd' }, status: 302)
+    blob = FactoryBot.create(:url_content_blob)
+    refute blob.file_exists?
+    assert_raise Addressable::URI::InvalidURIError do
+      blob.retrieve
+    end
+    refute blob.file_exists?
+  end
+
   test 'raises exception on bad response code when downloading remote content' do
     stub_request(:head, 'http://www.abc.com').to_return(
       headers: { content_length: 500, content_type: 'text/plain' }, status: 200
@@ -899,6 +909,17 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute File.exist?(txt_path)
   end
 
+  test 'extract_csv transcodes non utf-8 content' do
+    # ISO-8859-1 encoded CSV contains bytes that are invalid as UTF-8 (e.g. the degree symbol)
+    blob = FactoryBot.create(:iso_8859_1_csv_content_blob)
+    refute File.read(blob.filepath).valid_encoding?, 'fixture should contain invalid UTF-8 bytes'
+
+    csv = blob.extract_csv
+    assert csv.valid_encoding?, 'extract_csv should return valid UTF-8'
+    # should not raise CSV::InvalidEncodingError
+    assert_nothing_raised { CSV.parse(csv, quote_char: "\x00") }
+  end
+
   test 'tmp_io_objects in tmp dir are deleted' do
     file = Tempfile.new('testing-content-blob')
     file.write('test test test')
@@ -937,6 +958,18 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'does not enqueue remote content fetching job if file uploads blocked' do
+    content_blob = FactoryBot.build(:url_content_blob, make_local_copy: true)
+    with_config_value(:block_file_uploads, true) do
+      assert_no_difference('Task.count') do
+        assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
+          content_blob.save!
+          refute content_blob.remote_content_fetch_task.pending?
+        end
+      end
+    end
+  end
+
   test 'does not enqueue remote content fetching job for local content blob' do
     content_blob = FactoryBot.build(:content_blob)
     assert_no_difference('Task.count') do
@@ -957,5 +990,38 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert FactoryBot.create(:image_content_blob).is_image_convertable?
     refute FactoryBot.create(:svg_content_blob).is_image_convertable?
     refute FactoryBot.create(:pdf_content_blob).is_image_convertable?
+  end
+
+  test 'not cachable if file uploads blocked' do
+    blob = FactoryBot.build(:url_content_blob, make_local_copy: true, file_size: 12)
+    with_config_value(:block_file_uploads, false) do
+      assert blob.cachable?
+    end
+    with_config_value(:block_file_uploads, true) do
+      refute blob.cachable?
+    end
+  end
+
+  test 'clear_sample_type_matches clears cached match results for this blob in either key position' do
+    blob = FactoryBot.create(:content_blob)
+    template_blob = FactoryBot.create(:content_blob)
+    other_blob = FactoryBot.create(:content_blob)
+    jvm = Seek::Config.jvm_memory_allocation
+    max_size = Seek::Config.max_extractable_spreadsheet_size
+
+    # mirrors the array key SampleType#matches_content_blob? caches under
+    template_position_key = ['st-match', blob, template_blob, jvm, max_size] # template_blob is the sample-type template
+    matched_position_key = ['st-match', template_blob, other_blob, jvm, max_size] # template_blob is the matched blob
+    unrelated_key = ['st-match', blob, other_blob, jvm, max_size] # no template_blob involved
+
+    [template_position_key, matched_position_key, unrelated_key].each { |k| Rails.cache.write(k, true) }
+
+    template_blob.original_filename = "#{template_blob.original_filename}-changed"
+    assert template_blob.changed?
+    template_blob.send(:clear_sample_type_matches)
+
+    refute Rails.cache.exist?(template_position_key), 'should clear entry where the blob is the sample-type template'
+    refute Rails.cache.exist?(matched_position_key), 'should clear entry where the blob is the one being matched'
+    assert Rails.cache.exist?(unrelated_key), 'should not clear entries that do not involve the blob'
   end
 end

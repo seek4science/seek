@@ -47,6 +47,14 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should show inline content preview for pdf document' do
+    pdf_doc = FactoryBot.create(:document, content_blob: FactoryBot.create(:pdf_content_blob),
+                                 policy: FactoryBot.create(:downloadable_public_policy))
+    get :show, params: { id: pdf_doc.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
+  end
+
   test 'should not show hidden document' do
     hidden_doc = FactoryBot.create(:private_document)
 
@@ -79,13 +87,62 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_difference('Document.count') do
         assert_difference('Document::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
+            post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]},
+                                    content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
           end
         end
       end
     end
 
     assert_redirected_to document_path(assigns(:document))
+  end
+
+  test 'should not create document with blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+
+      assert_no_difference('ActivityLog.count') do
+        assert_no_difference('Document.count') do
+          assert_no_difference('Document::Version.count') do
+            assert_no_difference('ContentBlob.count') do
+              post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
+            end
+          end
+        end
+      end
+      assert_equal 'Data upload is not allowed. Please provide a URL to the data instead.', flash[:error]
+      assert_redirected_to documents_path
+    end
+  end
+
+  test 'should create document from url with blocked file uploads' do
+    stub_request(:head, 'http://fish.com').to_return(status: 200, body: '',
+                                                     headers: { content_type: 'text/html', content_length: '555' })
+    with_config_value(:block_file_uploads, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+
+      blob = valid_url_content_blob
+
+      # ensure these are ignored and forced to not make a copy
+      blob[:make_local_copy] = '1'
+
+      assert_difference('ActivityLog.count') do
+        assert_difference('Document.count') do
+          assert_difference('Document::Version.count') do
+            assert_difference('ContentBlob.count') do
+              post :create, params: { document: { title: 'Document', project_ids: [person.projects.first.id]}, content_blobs: [blob], policy_attributes: valid_sharing }
+            end
+          end
+        end
+      end
+      document = assigns(:document)
+      assert_redirected_to document_path(document)
+
+      # these are always the case if uploads are blocked
+      refute document.content_blob.make_local_copy?
+    end
   end
 
   test 'should create document version' do
@@ -108,7 +165,108 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 'new version!', assigns(:document).latest_version.revision_comments
   end
 
-  test 'create, update and show a document with extended metadata' do
+  test 'should not create document version with blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      document = FactoryBot.create(:document)
+      login_as(document.contributor)
+
+      assert_no_difference('ActivityLog.count') do
+        assert_no_difference('Document.count') do
+          assert_no_difference('Document::Version.count') do
+            assert_no_difference('ContentBlob.count') do
+              post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('little_file.txt') }], revision_comments: 'new version!' }
+            end
+          end
+        end
+      end
+      assert_equal 'Data upload is not allowed. Please provide a URL to the data instead.', flash[:error]
+      assert_redirected_to documents_path
+    end
+  end
+
+  test 'should create document version from url with blocked file uploads' do
+    stub_request(:head, 'http://fish.com').to_return(status: 200, body: '',
+                                                     headers: { content_type: 'text/html', content_length: '555' })
+    with_config_value(:block_file_uploads, true) do
+      document = FactoryBot.create(:document)
+      login_as(document.contributor)
+
+      assert_difference('ActivityLog.count') do
+        assert_no_difference('Document.count') do
+          assert_difference('Document::Version.count') do
+            assert_difference('ContentBlob.count') do
+              post :create_version, params: { id: document.id, content_blobs: [valid_url_content_blob], revision_comments: 'new version!' }
+            end
+          end
+        end
+      end
+
+      assert_redirected_to document_path(assigns(:document))
+      assert_equal 2, assigns(:document).version
+      assert_equal 2, assigns(:document).versions.count
+      assert_equal 'new version!', assigns(:document).latest_version.revision_comments
+    end
+  end
+
+  test 'local upload option removed with blocked file uploads' do
+    with_config_value(:block_file_uploads, true) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+
+      get :new
+
+      assert_response :success
+      assert_select '.panel-body' do
+        expected = 'You can register a Document by registering a URL to a remote file or web page.'
+        assert_select 'p', text: expected
+        assert_select 'div[role=?]', 'tabpanel' do
+          assert_select 'ul[role=?]', 'tablist' do
+            assert_select 'a[data-tab-target=?]', 'local-file', count: 0
+            assert_select 'li.upload-field-tab.active' do
+              assert_select 'a[data-tab-target=?]', 'remote-url', count: 1
+            end
+          end
+          assert_select '.tab-content' do
+            assert_select 'div[data-tab-id=?]', 'local-file', count: 0
+            assert_select 'input[type=file]', count: 0
+            assert_select 'div[data-tab-id=?].active', 'remote-url', count: 1
+            assert_select 'input[name="content_blobs[][data_url]"]', count: 1
+          end
+        end
+      end
+    end
+  end
+
+  test 'local upload option available without blocked file uploads' do
+    with_config_value(:block_file_uploads, false) do
+      person = FactoryBot.create(:person)
+      login_as(person)
+
+      get :new
+
+      assert_response :success
+      assert_select '.panel-body' do
+        expected='You can register a Document by either directly uploading a file, or registering a URL to a remote file or web page.'
+        assert_select 'p', text: expected
+        assert_select 'div[role=?]', 'tabpanel' do
+          assert_select 'ul[role=?]', 'tablist' do
+            assert_select 'a[data-tab-target=?]', 'local-file', count: 1
+            assert_select 'li.upload-field-tab' do
+              assert_select 'a[data-tab-target=?]', 'remote-url', count: 1
+            end
+          end
+          assert_select '.tab-content' do
+            assert_select 'div[data-tab-id=?]', 'local-file', count: 1
+            assert_select 'input[type=file]', count: 1
+            assert_select 'div[data-tab-id=?]', 'remote-url', count: 1
+            assert_select 'input[name="content_blobs[][data_url]"]', count: 1
+          end
+        end
+      end
+    end
+  end
+
+  test 'create a document with extended metadata' do
     cmt = FactoryBot.create(:simple_document_extended_metadata_type)
 
     person = FactoryBot.create(:person)
@@ -137,8 +295,20 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a document with extended metadata' do
+    cmt = FactoryBot.create(:simple_document_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    document = FactoryBot.create(:document, contributor: person, policy: FactoryBot.create(:public_policy),
+                                 extended_metadata: cm)
 
     get :show, params: { id: document }
     assert_response :success
@@ -1539,5 +1709,9 @@ class DocumentsControllerTest < ActionController::TestCase
 
   def valid_content_blob
     { data: fixture_file_upload('a_pdf_file.pdf'), data_url: '' }
+  end
+
+  def valid_url_content_blob
+    { data_url: 'http://fish.com' }
   end
 end

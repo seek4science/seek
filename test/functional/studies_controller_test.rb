@@ -605,8 +605,8 @@ class StudiesControllerTest < ActionController::TestCase
     # check sharing form exists
     assert_select 'div#sharing_form', count:1
 
-    #no sharing link, not for Investigation, Study and Assay
-    assert_select 'div#temporary_links', count:0
+    # check temporary sharing links section exists
+    assert_select 'div#temporary_links', count:1
 
     assert_select 'div#author-form', count:1
   end
@@ -710,7 +710,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
     # test update
     old_id = cm.id
@@ -2140,5 +2140,421 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     get :edit, params: { id: study.id }
     assert_response :success
+  end
+
+  # Tests for temporary link (special auth code) functionality
+
+  test 'should create temporary link for study' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    assert_difference('SpecialAuthCode.count', 1) do
+      post :manage_update, params: {
+        id: study.id,
+        study: {
+          title: study.title,
+          investigation_id: investigation.id,
+          special_auth_codes_attributes: {
+            '0' => {
+              code: SecureRandom.base64(30),
+              expiration_date: (Date.today + 7.days).to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    assert_redirected_to study_path(study)
+
+    study.reload
+    assert_equal 1, study.special_auth_codes.count
+
+    code = study.special_auth_codes.first
+    assert_not_nil code.code
+    assert_equal 40, code.code.length
+    assert code.expiration_date > Date.today
+  end
+
+  test 'should update existing temporary link for study' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    initial_code = nil
+    disable_authorization_checks do
+      initial_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    new_expiration = Date.today + 14.days
+
+    assert_no_difference('SpecialAuthCode.count') do
+      post :manage_update, params: {
+        id: study.id,
+        study: {
+          title: study.title,
+          investigation_id: investigation.id,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: initial_code.id,
+              code: initial_code.code,
+              expiration_date: new_expiration.to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    initial_code.reload
+    assert_equal new_expiration, initial_code.expiration_date
+  end
+
+  test 'should revoke temporary link for study' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    code = nil
+    disable_authorization_checks do
+      code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert_difference('SpecialAuthCode.count', -1) do
+      post :manage_update, params: {
+        id: study.id,
+        study: {
+          title: study.title,
+          investigation_id: investigation.id,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: code.id,
+              _destroy: '1'
+            }
+          }
+        }
+      }
+    end
+
+    study.reload
+    assert_equal 0, study.special_auth_codes.count
+  end
+
+  test 'temporary link code is saved to database for study with correct attributes' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    expiration_date = Date.today + 10.days
+
+    post :manage_update, params: {
+      id: study.id,
+      study: {
+        title: study.title,
+        investigation_id: investigation.id,
+        special_auth_codes_attributes: {
+          '0' => {
+            code: SecureRandom.base64(30),
+            expiration_date: expiration_date.to_s,
+            _destroy: '0'
+          }
+        }
+      }
+    }
+
+    # Query database directly
+    code = SpecialAuthCode.where(
+      asset_type: 'Study',
+      asset_id: study.id
+    ).first
+
+    assert_not_nil code
+    assert_equal 'Study', code.asset_type
+    assert_equal study.id, code.asset_id
+    assert_equal expiration_date, code.expiration_date
+    assert_equal 40, code.code.length
+  end
+
+  # ===============================================
+  # Code-Based Authorization Controller Tests
+  # ===============================================
+
+  test 'study accessible with valid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    auth_code = nil
+    disable_authorization_checks do
+      auth_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: study.id, code: auth_code.code }
+    assert_response :success
+    assert_select 'h1', text: study.title
+  end
+
+  test 'study accessible with parent investigation code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    inv_code = nil
+    disable_authorization_checks do
+      inv_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: study.id, code: inv_code.code }
+    assert_response :success
+    assert_select 'h1', text: study.title
+  end
+
+  test 'study not accessible with child assay code - no upward propagation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    assay_code = nil
+    disable_authorization_checks do
+      assay_code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    # Try to access study with assay code - should fail
+    get :show, params: { id: study.id, code: assay_code.code }
+    assert_response :forbidden
+  end
+
+  test 'study not accessible with invalid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    logout
+
+    get :show, params: { id: study.id, code: 'invalid_code' }
+    assert_response :forbidden
+  end
+
+  # batch MIAPPE upload tests
+
+  test 'batch_uploader renders when miappe type exists' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    get :batch_uploader
+    assert_response :success
+    assert_select 'form'
+  end
+
+  test 'batch_uploader renders unavailable message when miappe type does not exist' do
+    get :batch_uploader
+    assert_response :success
+    assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+  end
+
+  test 'batch_uploader renders unavailable when file uploads blocked' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    with_config_value(:block_file_uploads, true) do
+      get :batch_uploader
+      assert_response :success
+      assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+    end
+  end
+
+  test 'preview_content without file shows error' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    post :preview_content, params: { content_blobs: [{}] }
+    assert_response :success
+    assert_template 'studies/batch_uploader'
+    assert_equal 'Please select a file to upload or provide a URL to the data.', flash.now[:error]
+  end
+
+  test 'preview_content with valid zip shows preview' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
+    post :preview_content, params: { content_blobs: [{ data: zip_file }] }
+    assert_response :success
+    assert_template 'studies/batch_preview'
+    assert_equal 3, assigns(:studies).count
+
+    # three study rows in the table
+    assert_select 'tbody tr', count: 3
+
+    # each MIAPPE study ID appears as a readonly input
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-F"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-I"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-UK"]'
+
+    # study title populated in each title textarea
+    assert_select 'textarea[name="studies[title][]"]', count: 3,
+                  text: 'Clonal test of mapping pedigree 0504B in nursery'
+
+    # form submits to batch_create
+    assert_select "form[action='#{batch_create_studies_path}']"
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
+  test 'batch_create creates studies' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    study_params = batch_create_study_params(investigation)
+    assert_difference('Study.count', 1) do
+      post :batch_create, params: study_params
+    end
+    assert_redirected_to studies_path
+  end
+
+  test 'batch_create with existing_studies destroys old study and its dependents' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    old_study = FactoryBot.create(:study, investigation: investigation, contributor: person)
+    old_assay = FactoryBot.create(:assay, study: old_study, contributor: person)
+    old_assay_asset = FactoryBot.create(:assay_asset, assay: old_assay)
+
+    existing_study_json = { id: old_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: old_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    assert_difference('Study.count', 0) do  # one created, one destroyed
+      post :batch_create, params: params
+    end
+    assert_redirected_to studies_path
+
+    refute Study.exists?(old_study.id), 'old study should be destroyed'
+    refute Assay.exists?(old_assay.id), 'old assay should be destroyed'
+    refute AssayAsset.exists?(old_assay_asset.id), 'old assay_asset should be destroyed'
+  end
+
+  test 'batch_create with existing_studies does not destroy a study the user cannot manage' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    other_person = FactoryBot.create(:person)
+    other_investigation = FactoryBot.create(:investigation, contributor: other_person)
+    other_study = FactoryBot.create(:study, investigation: other_investigation,
+                                    contributor: other_person,
+                                    policy: FactoryBot.create(:private_policy))
+
+    existing_study_json = { id: other_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: other_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    post :batch_create, params: params
+
+    assert Study.exists?(other_study.id), 'unauthorized study should not be destroyed'
+    assert flash[:error].present?
+  end
+
+  test 'batch_create assigns data files to the investigation projects' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    upload_dir = StudyBatchUpload.upload_directory(User.current_user)
+    FileUtils.mkdir_p(upload_dir.join('data'))
+    File.write(upload_dir.join('data', 'test_data.csv'), "col1,col2\nval1,val2\n")
+
+    params = batch_create_study_params(investigation).deep_merge(
+      studies: { data_files: ['test_data'], data_file_description: ['Test data'] }
+    )
+
+    assert_difference('DataFile.count', 1) do
+      post :batch_create, params: params
+    end
+    assert_equal investigation.projects.sort, DataFile.last.projects.sort
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
+  test 'batch_create with missing MIAPPE fields and data files specified does not raise' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    # omit mandatory MIAPPE fields so the study fails compliance and is not saved,
+    # leaving no ExtendedMetadata row for create_batch_assay_asset to look up
+    params = {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: [''],
+        description: [''],
+        id: ['MISSING-001'],
+        startDate: [''],
+        endDate: [''],
+        contactInstitution: [''],
+        geographicLocationCountry: [''],
+        experimentalSiteName: [''],
+        latitude: [''], longitude: [''], altitude: [''],
+        descriptionOfTheExperimentalDesign: [''],
+        typeOfExperimentalDesign: [''],
+        observationUnitLevelHierarchy: [''],
+        observationUnitDescription: [''],
+        descriptionOfGrowthFacility: [''],
+        typeOfGrowthFacility: [''],
+        culturalPractices: [''],
+        data_files: ['some_data_file'],
+        data_file_description: [''],
+        license: 'CC-BY-4.0'
+      }
+    }
+    assert_no_difference('Study.count') do
+      post :batch_create, params: params
+    end
+    assert_redirected_to batch_uploader_studies_path
+    assert flash[:error].present?
+  end
+
+  private
+
+  def batch_create_study_params(investigation)
+    {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: ['Test MIAPPE Study'],
+        description: ['A test description'],
+        id: ['TEST-001'],
+        startDate: ['2023-01-01'],
+        endDate: ['2023-12-31'],
+        contactInstitution: ['Test Institute'],
+        geographicLocationCountry: ['Germany'],
+        experimentalSiteName: ['Test Site'],
+        latitude: ['51.5'],
+        longitude: ['9.9'],
+        altitude: ['100'],
+        descriptionOfTheExperimentalDesign: ['Randomised block design'],
+        typeOfExperimentalDesign: ['CO_715:0000145'],
+        observationUnitLevelHierarchy: ['block>plot'],
+        observationUnitDescription: ['Block of 30 plots'],
+        descriptionOfGrowthFacility: ['Open field'],
+        typeOfGrowthFacility: ['CO_715:0000162'],
+        culturalPractices: ['Irrigation'],
+        data_files: [''],
+        data_file_description: [''],
+        license: 'CC-BY-4.0'
+      }
+    }
   end
 end

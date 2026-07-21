@@ -11,6 +11,7 @@ x-shared:
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
     env_file:
       - docker/db.env
+      - docker/redis.env
       - docker/virtuoso.env
     volumes:
       - seek-filestore:/seek/filestore
@@ -19,7 +20,7 @@ x-shared:
       db:
         condition: service_healthy
       solr:
-        condition: service_started
+        condition: service_healthy
       virtuoso:
         condition: service_started
 
@@ -28,7 +29,14 @@ services:
     # Database implementation, in this case MySQL
     image: mysql:8.4
     container_name: seek-mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-error-verbosity=1
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --log-error-verbosity=1
+      # Optional: Enable mysql_native_password if needed for legacy apps
+      # - --mysql-native-password=ON
+      # Optional: restrict foreign keys if needed
+      # - --restrict-fk-on-non-standard-key=OFF
     restart: always
     stop_grace_period: 1m30s
     env_file:
@@ -36,9 +44,36 @@ services:
     volumes:
       - seek-mysql-db:/var/lib/mysql
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent" ]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u $$MYSQL_USER -p$$MYSQL_PASSWORD --silent",
+        ]
       interval: 10s
       timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  redis_store:
+    image: redis:8.6-alpine
+    container_name: seek-redis
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$$REDIS_MAXMEMORY" --maxmemory-policy allkeys-lru
+    env_file:
+      - docker/redis.env
+    volumes:
+      - seek-redis-data:/data
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"
+        ]
+      interval: 5s
+      timeout: 3s
       retries: 5
       start_period: 20s
 
@@ -53,7 +88,7 @@ services:
       <<: *seek_base_env
       NO_ENTRYPOINT_WORKERS: 1
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -69,18 +104,25 @@ services:
     command: docker/start_workers.sh
 
   solr:
-    image: fairdom/seek-solr:8.11
+    image: solr:9.10.1
     container_name: seek-solr
     restart: always
     environment:
       SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
       - seek-solr-data:/var/solr/
+      - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/seek/admin/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
       - seek
-      - /opt/solr/server/solr/configsets/seek_config 
+      - /opt/solr/server/solr/configsets/seek_config
 
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.15
@@ -94,10 +136,10 @@ services:
     volumes:
       - seek-virtuoso-data:/database
 
-
 volumes:
   seek-filestore:
   seek-mysql-db:
   seek-solr-data:
   seek-cache:
   seek-virtuoso-data:
+  seek-redis-data:

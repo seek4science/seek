@@ -145,19 +145,16 @@ class PublicationsController < ApplicationController
     key = params[:key]
     protocol = params[:protocol]
 
-    if params[:publication][:publication_type_id].blank?
-      @error = "Please choose a publication type."
-    else
-      doi = nil
-      pubmed_id = nil
-      if protocol == 'pubmed' && key.present?
-        pubmed_id = key
-      elsif protocol == 'doi' && key.present?
-        doi = key
-      end
-      pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
-      result = get_data(@publication, pubmed_id, doi)
+    doi = nil
+    pubmed_id = nil
+    if protocol == 'pubmed' && key.present?
+      pubmed_id = key
+    elsif protocol == 'doi' && key.present?
+      doi = key
     end
+    pubmed_id, doi = preprocess_pubmed_or_doi pubmed_id, doi
+    result = get_data(@publication, pubmed_id, doi)
+    @publication_type_missing = @publication.publication_type.nil?
     @error = @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if @error.present?
       @error_text = @error
@@ -590,7 +587,7 @@ class PublicationsController < ApplicationController
         text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
       end
 
-      codepoints = text.mb_chars.unicode_normalize(:nfd).split(//u)
+      codepoints = text.unicode_normalize(:nfd).split(//u)
       ascii = codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
 
       last_name_matches = Person.where(last_name: ascii)

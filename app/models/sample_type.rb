@@ -2,10 +2,8 @@ class SampleType < ApplicationRecord
   # attr_accessible :title, :uuid, :sample_attributes_attributes,
   #                 :description, :uploaded_template, :project_ids, :tags
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :attribute_search_terms
-    end
+  searchable(auto_index: false) do
+    text :attribute_search_terms
   end
 
   include Seek::ActsAsAsset::Searching
@@ -18,8 +16,6 @@ class SampleType < ApplicationRecord
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
 
-  include Seek::Annotatable
-
   include Seek::Permissions::SpecialContributors
 
   acts_as_uniquely_identifiable
@@ -28,6 +24,7 @@ class SampleType < ApplicationRecord
   has_external_identifier # to be replaced with acts_as_asset when sharing permissions are adding in upcoming pull request
 
   acts_as_asset
+  has_annotation_type :sample_type_tag, method_name: :tags
 
   has_many :samples, inverse_of: :sample_type
 
@@ -61,8 +58,6 @@ class SampleType < ApplicationRecord
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
   grouped_pagination
-
-  has_annotation_type :sample_type_tag, method_name: :tags
 
   has_task :sample_metadata_update
   def investigations
@@ -108,8 +103,16 @@ class SampleType < ApplicationRecord
   end
 
   def is_isa_json_compliant?
-    has_only_isa_json_compliant_investigations = studies.map(&:investigation).compact.all?(&:is_isa_json_compliant?) || assays.map(&:investigation).compact.all?(&:is_isa_json_compliant?)
-    (studies.any? || assays.any?) && has_only_isa_json_compliant_investigations && !isa_template.nil?
+    # At creation time the link with assays / studies does not exist yet.
+    # That would mean that 'new' Sample Types are by definition never ISA-JSON compliant.
+    # For this reason, we need to be a bit more lenient at creation time.
+    if self.new_record?
+      isa_template.present?
+    else
+      return false if investigations.blank?
+
+      (studies.any? || assays.any?) && investigations.all? { |inv| inv.is_isa_json_compliant } && isa_template.present?
+    end
   end
 
   def locked?

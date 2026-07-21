@@ -99,6 +99,14 @@ module Seek
         end
       end
 
+      def allow_change_at_creation?(attr)
+        if @sample_type.new_record?
+          !(attr.is_a?(SampleAttribute) && inherited?(attr))
+        else
+          true
+        end
+      end
+
       def refresh_cache
         do_analysis
       end

@@ -27,8 +27,15 @@ module Git
     end
 
     def fetch
-      git_base.remotes['origin'].fetch
+      remote = git_base.remotes['origin']
+      remote.fetch(remote.fetch_refspecs + ['+refs/tags/*:refs/tags/*'])
       touch(:last_fetch)
+    end
+
+    def close
+      git_base.close
+      @git_base = nil
+      self
     end
 
     def remote_refs

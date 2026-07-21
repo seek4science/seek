@@ -17,7 +17,7 @@ echo "${GREEN}bundle install${NC}"
 bundle install --deployment --without development test
 
 echo "${GREEN}pip install${NC}"
-python3.9 -m pip install -r requirements.txt
+python`cat .python-version` -m pip install -r requirements.txt
 
 bundle exec rake seek:workers:stop
 
@@ -36,4 +36,5 @@ bundle exec whenever --update-crontab &
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt
 bundle exec rake tmp:clear
+bundle exec rake seek:clear_cache
 git checkout db/schema.rb

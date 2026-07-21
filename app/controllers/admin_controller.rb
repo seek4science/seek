@@ -106,6 +106,14 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
+    # Per-adaptor external search toggles (map: key => {'enabled' =>boolean})
+    if params.key?(:external_search_adaptors)
+      adaptor_settings = {}
+      params[:external_search_adaptors].each do |k, v|
+        adaptor_settings[k] = { 'enabled' => ['1', 'true', true].include?(v['enabled']) }
+      end
+      Seek::Config.external_search_adaptors = adaptor_settings
+    end
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
     Seek::Config.max_filters = params[:max_filters]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
@@ -338,9 +346,13 @@ class AdminController < ApplicationController
     Seek::Config.auth_lookup_update_batch_size = params[:auth_lookup_update_batch_size]
 
     Seek::Config.allow_private_address_access = string_to_boolean params[:allow_private_address_access]
+    Seek::Config.show_as_external_link_enabled = string_to_boolean params[:show_as_external_link_enabled]
+    Seek::Config.block_file_uploads = string_to_boolean params[:block_file_uploads]
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
-    Seek::Config.max_cachable_size = params[:max_cachable_size]
-    Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
+    # These fields are entered in whole KB on the settings form but stored in bytes.
+    Seek::Config.max_cachable_size = helpers.kb_to_bytes(params[:max_cachable_size])
+    Seek::Config.hard_max_cachable_size = helpers.kb_to_bytes(params[:hard_max_cachable_size])
+    Seek::Config.cache_max_redis_item_size = helpers.kb_to_bytes(params[:cache_max_redis_item_size])
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
     Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
@@ -473,6 +485,8 @@ class AdminController < ApplicationController
         render partial: 'admin/stats/storage_usage_stats'
       when 'snapshot_and_doi_stats'
         render partial: 'admin/stats/snapshot_and_doi_stats'
+      when 'redis_stats'
+        render partial: 'admin/stats/redis_stats', locals: { stats: redis_cache_stats }
       when 'none'
         render html: ''
       else
@@ -622,6 +636,17 @@ class AdminController < ApplicationController
   end
 
   private
+
+  # Redis INFO stats for the admin dashboard, or nil if the configured cache store isn't Redis-backed
+  # (e.g. the test environment's :memory_store). A hash with an 'error' key is returned if the stats
+  # can't be fetched (Redis unreachable) so the panel can report it rather than 500.
+  def redis_cache_stats
+    return nil unless Rails.cache.respond_to?(:redis_memory_stats)
+
+    Rails.cache.redis_memory_stats
+  rescue StandardError => e
+    { 'error' => e.message }
+  end
 
   def check_valid_email(email_address, field)
     if email_address.blank? || email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/

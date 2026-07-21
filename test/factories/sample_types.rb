@@ -253,17 +253,36 @@ FactoryBot.define do
     end
   end
 
+  factory(:typed_rdf_sample_type, parent: :sample_type) do
+    title { 'typed rdf sample type' }
+    association :policy, factory: :public_policy
+    after(:build) do |type, _eval|
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title: 'Title', sample_type: type, is_title: true)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:integer_sample_attribute_type), title: 'Count', pid: 'http://example.org/count', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:float_sample_attribute_type), title: 'Weight', pid: 'http://example.org/weight', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:boolean_sample_attribute_type), title: 'Flag', pid: 'http://example.org/flag', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:date_sample_attribute_type), title: 'Collected on', pid: 'http://example.org/collectedOn', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:datetime_sample_attribute_type), title: 'Recorded at', pid: 'http://example.org/recordedAt', sample_type: type)
+    end
+  end
+
   factory(:fairdatastation_test_case_sample_type, parent: :sample_type) do
     title { 'fair data station test case'}
     association :policy, factory: :public_policy
     after(:build) do |type, eval|
-      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', sample_type: type, is_title: true)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Title', pid:'http://schema.org/name', required: true, sample_type: type, is_title: true)
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Description', sample_type: type)
 
       type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Bio safety level', pid:'http://fairbydesign.nl/ontology/biosafety_level', sample_type: type)
-      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', sample_type: type)
-      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Organism ncbi id', pid:'http://purl.uniprot.org/core/organism', sample_type: type)
-      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Collection date', pid:'https://w3id.org/mixs/0000011', sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), title:'Scientific name', pid:'http://gbol.life/0.1/scientificName', required: true, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute,
+                                                  sample_attribute_type: FactoryBot.create(:string_sample_attribute_type),
+                                                  title: 'Organism ncbi id', pid: 'http://purl.uniprot.org/core/organism',
+                                                  required: true, sample_type: type)
+      type.sample_attributes << FactoryBot.build(:sample_attribute,
+                                                  sample_attribute_type: FactoryBot.create(:string_sample_attribute_type),
+                                                  title: 'Collection date', pid: 'https://w3id.org/mixs/0000011',
+                                                  sample_type: type)
     end
   end
 end

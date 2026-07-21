@@ -7,7 +7,69 @@
 
   tasks:
 
+    ########## Initial check for the OS
+
+    - name: Ensure this play runs only on Ubuntu 22.04/24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_release in ["jammy", "noble"]
+        fail_msg: "This Ansible playbook is intended for Ubuntu 22.04 (jammy) or 24.04 (noble)."
+
     ########## Update and install dependencies
+
+    - name: Install prerequisites for Redis APT repository
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        name:
+          - lsb-release
+          - curl
+          - gpg
+        state: present
+        update_cache: yes
+      tags: [ packages ]
+
+    - name: Download Redis APT repo GPG key (armored)
+      become: true
+      become_user: root
+      ansible.builtin.get_url:
+        url: https://packages.redis.io/gpg
+        dest: /usr/share/keyrings/redis-archive-keyring.gpg.asc
+        mode: "0644"
+      register: redis_key_download
+      tags: redis
+
+    - name: Dearmor Redis key into keyring
+      become: true
+      become_user: root
+      ansible.builtin.command:
+        cmd: gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg /usr/share/keyrings/redis-archive-keyring.gpg.asc
+      when: redis_key_download.changed
+      tags: redis
+
+    - name: Add official Redis APT repository
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb {{ ansible_distribution_release }} main"
+        filename: redis
+        state: present
+      tags: redis
+      # This follows Redis' documented APT repo setup. [1](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/apt/)
+
+    - name: Pin Redis packages to 8.6.x
+      become: true
+      become_user: root
+      ansible.builtin.copy:
+        dest: /etc/apt/preferences.d/redis-8.6
+        mode: "0644"
+        content: |
+          Package: redis redis-server redis-sentinel redis-tools
+          Pin: version 6:8.6.*
+          Pin-Priority: 1001
+      tags: redis
+      # Pinning to a version line via APT preferences is the approach Redis documents. [1](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/apt/)
 
     - name: Update all packages to their latest version
       become: true
@@ -18,44 +80,70 @@
         state: latest
       tags: packages
 
-    - name: Install a list of packages
+    - name: Install list of dependencies
       become: true
       become_user: root
       ansible.builtin.apt:
+        state: present
+        update_cache: yes
         pkg:
+        - autoconf
+        - automake
+        - bison
         - build-essential
         - cmake
+        - gawk
         - git
         - graphviz
         - imagemagick
         - libcurl4-gnutls-dev
+        - libffi-dev
+        - libgdbm-dev
         - libgmp-dev
         - libmagick++-dev
         - libmysqlclient-dev
+        - libncurses5-dev
         - libpq-dev
         - libreadline-dev
         - libreoffice
+        - libsqlite3-dev
         - libssl-dev
         - libxml++2.6-dev
         - libxslt1-dev
+        - libyaml-dev
         - mysql-server
         - nodejs
         - openjdk-11-jdk
         - openssh-server
         - poppler-utils
-        - zip
-        - autoconf
-        - automake
-        - bison
-        - curl
-        - gawk
-        - libffi-dev
-        - libgdbm-dev
-        - libncurses5-dev
-        - libsqlite3-dev
-        - libyaml-dev
+        - redis-sentinel
+        - redis-server
+        - redis-tools
         - sqlite3
+        - zip
       tags: packages
+
+    - name: Ensure Redis is enabled and started
+      become: true
+      become_user: root
+      ansible.builtin.service:
+        name: redis-server
+        state: started
+        enabled: yes
+      tags:
+        - redis
+        - redis-server
+
+    - name: Wait for Redis in service container to respond to PING (localhost:6379)
+      become: true
+      become_user: root
+      ansible.builtin.command: redis-cli -h 127.0.0.1 -p 6379 ping
+      register: redis_ping
+      changed_when: false
+      retries: 20
+      delay: 3
+      until: redis_ping.stdout is search("PONG")
+      tags: redis
 
     - name: Correct java version selected
       become: true
@@ -165,7 +253,18 @@
 
     ########## Install python tools
 
-    - name: Add repository to install python3.9
+    - name: Read python version from .python-version file
+      ansible.builtin.slurp:
+        src: '{{git_dest}}/SEEK/.python-version'
+      register: python_version_file
+      tags: python
+
+    - name: Set python version fact
+      ansible.builtin.set_fact:
+        python_version: "{{ python_version_file.content | b64decode | trim }}"
+      tags: python
+
+    - name: Add repository to install python
       become: true
       become_user: root
       ansible.builtin.apt_repository:
@@ -181,9 +280,9 @@
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - python3.9-dev
-        - python3.9-distutils
+        - python{{ python_version }}-dev
         - python3-pip
+        - python{{ python_version }}-venv
         - python3-pymysql
       tags:
         - python
@@ -192,9 +291,8 @@
     - name: Install SEEK's python requirements
       shell: bash -lc "{{ item }}"
       with_items:
-        - python3.9 -m pip install --upgrade pip
-        - python3.9 -m pip install setuptools==58
-        - python3.9 -m pip install -r requirements.txt
+        - python{{ python_version }} -m ensurepip --upgrade --default-pip
+        - python{{ python_version }} -m pip install -r requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
       tags:

@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class AdminControllerTest < ActionController::TestCase
 
@@ -170,6 +171,28 @@ class AdminControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'settings form includes cache_max_redis_item_size field' do
+    get :settings
+    assert_response :success
+    assert_select "input[name=?]", 'cache_max_redis_item_size'
+  end
+
+  test 'update cache_max_redis_item_size converts KB to bytes' do
+    post :update_settings, params: { cache_max_redis_item_size: '2048' }
+    assert_equal 2048 * 1024, Seek::Config.cache_max_redis_item_size
+  end
+
+  test 'update max_cachable_size and hard_max_cachable_size convert KB to bytes' do
+    post :update_settings, params: { max_cachable_size: '20480', hard_max_cachable_size: '102400' }
+    assert_equal 20480 * 1024, Seek::Config.max_cachable_size
+    assert_equal 102400 * 1024, Seek::Config.hard_max_cachable_size
+  end
+
+  test 'update cache_max_redis_item_size accepts a fractional KB value' do
+    post :update_settings, params: { cache_max_redis_item_size: '9765.6' }
+    assert_equal (9765.6 * 1024).round, Seek::Config.cache_max_redis_item_size
+  end
+
   test 'should input integer' do
     post :update_home_settings, params: { tag_threshold: '', max_visible_tags: '20' }
     refute_nil flash[:error]
@@ -225,6 +248,25 @@ class AdminControllerTest < ActionController::TestCase
   test 'get auth consistency stats' do
     get :get_stats, xhr: true, params: { page: 'auth_consistency' }
     assert_response :success
+  end
+
+  test 'redis cache stats reports when the cache is not redis-backed' do
+    # the test environment uses :memory_store, which has no redis_memory_stats
+    get :get_stats, xhr: true, params: { page: 'redis_stats' }
+    assert_response :success
+    assert_select 'p.none_text', text: /does not use Redis/
+  end
+
+  test 'redis cache stats renders evicted keys when the cache is redis-backed' do
+    fake_stats = { 'used_memory_human' => '2.50M', 'maxmemory_human' => '256.00M',
+                   'maxmemory_policy' => 'allkeys-lru', 'evicted_keys' => '42',
+                   'expired_keys' => '1000', 'keyspace_hits' => '5000', 'keyspace_misses' => '250' }
+    @controller.stub(:redis_cache_stats, fake_stats) do
+      get :get_stats, xhr: true, params: { page: 'redis_stats' }
+    end
+    assert_response :success
+    assert_select 'table#redis-stats'
+    assert_select 'span.label-warning', text: /memory pressure/
   end
 
   test 'The configuration should stay the same after test_email_configuration' do
@@ -701,4 +743,117 @@ class AdminControllerTest < ActionController::TestCase
 
     assert flash[:error].blank?
   end
+
+  test 'should update external search adaptors settings' do
+    # Get available adaptors from YAML files
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    # Build params to disable all adaptors
+    adaptors_params = {}
+    setting = {}
+    adaptors.each do |adaptor|
+      adaptors_params[adaptor.key] = { 'enabled' => '0' } # Disabled
+      setting[adaptor.key] = { 'enabled' => true }
+    end
+
+    with_config_value(:external_search_adaptors, setting) do
+      refute Seek::ExternalSearch.instance.search_adaptors.empty?
+
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
+
+      # Verify settings were saved
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, _value|
+        # The controller converts '0' to false and '1' to true
+        assert_equal false, saved_config[key]['enabled'], "Adaptor #{key} should be disabled"
+      end
+
+      # checking the caching has been cleared
+      assert Seek::ExternalSearch.instance.search_adaptors.empty?
+    end
+  end
+
+  test 'should enable external search adaptors via update_settings' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    # Build params to enable all adaptors
+    adaptors_params = {}
+    setting = {}
+    adaptors.each do |adaptor|
+      adaptors_params[adaptor.key] = { 'enabled' => '1' } # Enabled
+      setting[adaptor.key] = { 'enabled' => false }
+    end
+
+    with_config_value(:external_search_adaptors, setting) do
+      assert Seek::ExternalSearch.instance.search_adaptors.empty?
+
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
+
+      # Verify settings were saved
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, _value|
+        assert_equal true, saved_config[key]['enabled'], "Adaptor #{key} should be enabled"
+      end
+
+      refute Seek::ExternalSearch.instance.search_adaptors.empty?
+    end
+  end
+
+  test 'should handle mixed enabled/disabled adaptors in update_settings' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    adaptors_params = {}
+    adaptors.each_with_index do |adaptor, idx|
+      adaptors_params[adaptor.key] = { 'enabled' => idx.even? ? '1' : '0' }
+    end
+
+    with_config_value(:external_search_adaptors, {}) do
+      post :update_features_enabled, params: { external_search_adaptors: adaptors_params }
+
+      saved_config = Seek::Config.external_search_adaptors
+      adaptors_params.each do |key, value|
+        expected = value['enabled'] == '1'
+        assert_equal expected, saved_config[key]['enabled'], "Adaptor #{key} should be #{expected ? 'enabled' : 'disabled'}"
+      end
+    end
+  end
+
+  test 'features enabled page displays external search adaptors' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    get :features_enabled
+    assert_response :success
+
+    # Verify page mentions adaptors
+    assert_select 'div#external-search-details' do
+      # Verify each adaptor name appears on the page
+      adaptors.each do |adaptor|
+        assert_select 'div.checkbox label.admin-checkbox', text: adaptor.name
+        assert_select 'p.help-block', text:/Whether the #{adaptor.name} external search is active/
+      end
+    end
+  end
+
+  test 'features enabled page shows disabled search adaptors as unchecked' do
+    adaptors = Seek::ExternalSearch.instance.search_adaptors('all', include_disabled: true)
+    fail 'No adaptors configured' if adaptors.empty?
+
+    setting = adaptors.each_with_object({}) { |a, h| h[a.key] = { 'enabled' => false } }
+    with_config_value(:external_search_adaptors, setting) do
+      get :features_enabled
+      assert_response :success
+
+      assert_select 'div#external-search-details' do
+        adaptors.each do |adaptor|
+          assert_select "input[type='checkbox'][name='external_search_adaptors[#{adaptor.key}][enabled]'][checked]", count: 0
+        end
+      end
+    end
+  end
+
+
 end

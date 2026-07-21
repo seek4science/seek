@@ -16,6 +16,7 @@ module Git
     before_validation :set_default_visibility, on: :create
     before_validation :assign_contributor, on: :create
     before_save :set_commit, unless: -> { ref.blank? }
+    before_save :lock_remote_versions
     after_create :set_resource_version
     after_create :set_git_repository_resource
 
@@ -58,10 +59,10 @@ module Git
     end
 
     def mutable?
-      if persisted?
-        super
-      else
+      if new_record? && mutable.nil?
         git_repository&.remote.blank?
+      else
+        super
       end
     end
 
@@ -357,6 +358,10 @@ module Git
 
     def set_resource_version
       resource.update_column(:version, version)
+    end
+
+    def lock_remote_versions
+      self.mutable = false unless git_repository&.remote.blank?
     end
   end
 end

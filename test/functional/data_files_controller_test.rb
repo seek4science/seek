@@ -378,11 +378,15 @@ class DataFilesControllerTest < ActionController::TestCase
       df = assigns(:data_file)
       assert_equal Policy::NO_ACCESS, df.policy.access_type
       assert df.policy.permissions.empty?
-
-      # check it doesn't create an error when retreiving the index
-      get :index
-      assert_response :success
     end
+  end
+
+  test 'should show inline content preview for pdf data file' do
+    pdf_data_file = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:pdf_content_blob),
+                                       policy: FactoryBot.create(:downloadable_public_policy))
+    get :show, params: { id: pdf_data_file.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
   end
 
   test 'should show data file' do
@@ -710,7 +714,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :download, params: { id: data_files(:url_based_data_file) }
     end
-    assert_not_empty @response.body
+    assert_equal File.size("#{Rails.root}/test/fixtures/files/file_picture.png"), @response.body.to_a.join.bytesize
     assert_response :success
   end
 
@@ -1277,6 +1281,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'explore csv with non utf-8 encoding' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy),
+                                       content_blob: FactoryBot.create(:iso_8859_1_csv_content_blob))
+    get :explore, params: { id: df }
+    assert_response :success
+    assert_select 'div#spreadsheet_1 table.sheet td', text: /Temp/
+  end
+
   test 'explore spreadsheet with error logs' do
     data = FactoryBot.create :spreadsheet_with_error_logs_datafile, policy: FactoryBot.create(:public_policy)
     get :explore, params: { id: data }
@@ -1772,7 +1784,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'get data_file as json' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy), title: 'fish flop', description: 'testing json description')
-    get :show, params: { id: df, format: 'json' }
+    get :show, params: { id: df }, format: :json
     assert_response :success
     json = JSON.parse(response.body)
     assert_equal df.id, json['data']['id'].to_i
@@ -1784,7 +1796,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'get data_file as json returns error if feature disabled' do
     df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
     with_config_value(:data_files_enabled, false) do
-      get :show, params: { id: df, format: 'json' }
+      get :show, params: { id: df }, format: :json
       assert_response :unprocessable_entity
       json = JSON.parse(response.body)
       assert_equal 'Data files are disabled', json['title']
@@ -1845,16 +1857,17 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'landing page for deleted private_item which DOI was minted' do
-    comment = 'the paper was restracted'
+    doi_citation_mock
+    comment = 'the paper was retracted'
     klass = 'DataFile'
     id = 123
     version = 1
     AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::MINT)
-    AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::DELETE, comment: comment)
+    AssetDoiLog.create(asset_type: klass, asset_id: id, asset_version: version, action: AssetDoiLog::DELETE, comment: comment, doi: '10.5072/test')
     assert AssetDoiLog.was_doi_minted_for?(klass, id, version)
     get :show, params: { id: id, version: version }
-    assert_response :not_found
-    assert_select 'p[class=comment]', text: /#{comment}/
+    assert_response :gone
+    assert_select 'p.comment', text: /#{comment}/
   end
 
   test 'should create cache job for small file' do
@@ -1885,6 +1898,38 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'text/plain', blob.content_type
     assert_equal 100, blob.file_size
     assert blob.remote_content_fetch_task&.pending?
+  end
+
+  test 'should not create cache job for file if uploads are blocked' do
+    mock_http
+    params = { data_file: {
+      title: 'Small File',
+      project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                 data_url: 'http://mockedlocation.com/small.txt',
+                                 make_local_copy: '0'
+                               }],
+               policy_attributes: valid_sharing }
+
+    with_config_value(:block_file_uploads, true) do
+      assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
+        assert_difference('DataFile.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params: params
+          end
+        end
+      end
+
+      assert_redirected_to data_file_path(assigns(:data_file))
+      blob = assigns(:data_file).content_blob
+      refute blob.cachable?
+      refute blob.url.blank?
+      assert_equal 'small.txt', blob.original_filename
+      assert_equal 'text/plain', blob.content_type
+      assert_equal 100, blob.file_size
+      refute blob.remote_content_fetch_task&.pending?
+    end
   end
 
   test 'should not create cache job if setting disabled' do
@@ -3164,7 +3209,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
-    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s }, format: 'js'
+    post :rightfield_extraction_ajax, params: { content_blob_id: content_blob.id.to_s }, format: :js
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -3191,7 +3236,7 @@ class DataFilesControllerTest < ActionController::TestCase
     post :rightfield_extraction_ajax, params: {
         content_blob_id: content_blob.id.to_s,
         data_file: {assay_assets_attributes:[{assay_id:assay.id.to_s}]}
-    }, format: 'js'
+    }, format: :js
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -3560,7 +3605,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
     get :show, params: { id: df }
     assert_response :success
@@ -3977,7 +4022,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     register_content_blob(skip_provide_metadata:true)
 
-    get :provide_metadata, params: { assay_ids:[assay3.id] }
+    get :provide_metadata, params: { assay_ids:[assay3.id] }, format: :html
     assert_response :success
 
     #assay 3 is not allowed
@@ -4176,18 +4221,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a.btn[data-lightbox]', count: 1
   end
 
-  # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
-  # this replicates the old behaviour and result of calling #new
   def register_content_blob(skip_provide_metadata:false)
-
-    blob = {data: picture_file}
-    assert_difference('ContentBlob.count') do
-      post :create_content_blob, params: { content_blobs: [blob] }
-    end
-    content_blob_id = assigns(:data_file).content_blob.id
+    content_blob = FactoryBot.create(:image_content_blob)
+    content_blob_id = content_blob.id
     session[:uploaded_content_blob_id] = content_blob_id.to_s
-    post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s, format:'js' }
-    get :provide_metadata unless skip_provide_metadata
+    post :rightfield_extraction_ajax, params: { content_blob_id:content_blob_id.to_s }, format: :js
+    get :provide_metadata, format: :html unless skip_provide_metadata
   end
 
   test 'manage menu item appears according to permission' do

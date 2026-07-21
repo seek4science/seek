@@ -14,6 +14,7 @@ module Seek
           handler = @content_blob.remote_content_handler
           if handler
             @info = handler.info
+            @info = allow_copy?(@info)
             if @info[:code]
               if @info[:code] == 200
                 handle_good_http_response(handler)
@@ -25,7 +26,7 @@ module Seek
             @type = 'warning'
             @warning_msg = "Unhandled URL scheme: #{uri.scheme}. The given URL will be presented as a clickable link."
           end
-        rescue URI::InvalidURIError
+        rescue URI::InvalidURIError, ArgumentError
           @type = 'override'
           @error_msg = 'The URL appears to be invalid.'
         rescue OpenSSL::OpenSSLError
@@ -44,6 +45,14 @@ module Seek
       end
 
       private
+
+      def allow_copy?(info)
+        allow_copy = !Seek::Config.block_file_uploads
+        allow_copy = allow_copy && (info[:file_size].blank? || (info[:file_size] <= Seek::Config.hard_max_cachable_size))
+        info.merge!(allow_copy: allow_copy)
+        info.merge!(blocked_file_uploads: Seek::Config.block_file_uploads)
+        info
+      end
 
       def handle_good_http_response(handler)
         if handler.is_a?(Seek::DownloadHandling::GithubHTTPHandler)

@@ -39,3 +39,9 @@ test/
 .bundle
 coverage/
 .codeclimate.yml
+.ruby-lsp
+
+# AI
+.claude
+AGENTS.md
+CLAUDE.md
