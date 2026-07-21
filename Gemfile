@@ -54,6 +54,8 @@ gem 'loofah'
 gem 'mechanize'
 gem 'metainspector'
 gem 'mimemagic'
+# Experimental: web dashboard for inspecting/managing Solid Queue jobs (on the mission-control branch)
+gem 'mission_control-jobs'
 gem 'mutex_m'
 gem 'mysql2'
 gem 'net-ftp'
