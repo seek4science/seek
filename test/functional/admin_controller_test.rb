@@ -306,7 +306,7 @@ class AdminControllerTest < ActionController::TestCase
     get :get_stats, xhr: true, params: { page: 'job_queue' }
     assert_response :success
 
-    assert_select 'h4', text: 'Total solid queue jobs waiting = 1'
+    assert_select 'h4', text: 'Total jobs waiting = 1'
     assert_select 'tr' do
       assert_select 'td', text: /11th Sep 2010 at/, count: 1
       assert_select 'td', text: /12th Sep 2010 at/, count: 1
