@@ -26,9 +26,6 @@ if [ -f tmp/pids/solid_queue_supervisor.pid ]; then
   kill -TERM $(cat tmp/pids/solid_queue_supervisor.pid) 2>/dev/null || true
 fi
 
-echo "${GREEN} update crontab${NC}"
-bundle exec whenever --update-crontab
-
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt
 bundle exec rake tmp:clear

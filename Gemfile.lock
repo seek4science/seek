@@ -185,7 +185,6 @@ GEM
     cff (1.3.0)
       json_schema (~> 0.20.4)
       language_list (~> 1.2.1)
-    chronic (0.10.2)
     citeproc (1.1.0)
       date
       forwardable
@@ -1052,10 +1051,6 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    whenever (1.0.0)
-      chronic (>= 0.6.3)
-    whenever-test (1.0.1)
-      whenever
     will_paginate (4.0.1)
     yaml-ld (0.0.3)
       json-ld (~> 3.3)
@@ -1219,8 +1214,6 @@ DEPENDENCIES
   vcr
   web-console
   webmock
-  whenever
-  whenever-test
   will_paginate
   yaml_db
   zenodo-client!

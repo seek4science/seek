@@ -105,7 +105,6 @@ gem 'sunspot_rails'
 gem 'terrapin'
 gem 'terser'
 gem 'validate_url'
-gem 'whenever', require: false
 gem 'will_paginate'
 gem 'yaml_db'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
@@ -145,7 +144,6 @@ group :test do
   gem 'test-prof'
   gem 'selenium-webdriver', '~> 4.44'
   gem 'vcr'
-  gem 'whenever-test'
 end
 
 group :test, :development do

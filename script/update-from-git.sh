@@ -32,9 +32,6 @@ script/run_solid_queue.sh &
 echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while
 
-echo "${GREEN} update crontab${NC}"
-bundle exec whenever --update-crontab &
-
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt
 bundle exec rake tmp:clear

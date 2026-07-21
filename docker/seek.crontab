@@ -1,0 +1,10 @@
+# Crontab for supercronic, started by setup_and_start_cron in docker/shared_functions.sh.
+#
+# All periodic *application* work lives in config/recurring.yml and is run by Solid Queue's own
+# scheduler - not here. This file is only for OS-level shell maintenance that doesn't map onto an
+# ActiveJob or Ruby call.
+#
+# Reap LibreOffice (soffice.bin) processes left running longer than 30 minutes by document
+# conversion. This runs inside the SEEK container(s) only (cron is only started under Docker), which
+# preserves the previous Docker-only behaviour of this reaper.
+*/10 * * * * sh /seek/script/kill-long-running-soffice.sh
