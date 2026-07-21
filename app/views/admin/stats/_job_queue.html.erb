@@ -8,6 +8,8 @@
   Total jobs waiting = <%= solid_queue_jobs.count -%>
 </h4>
 
+<p><%= link_to 'Open the Job queue dashboard', mission_control_jobs_path %> for a fuller view of queues, failed and scheduled jobs.</p>
+
 <% if SolidQueue::Job.failed.count > 0 %>
   <%= button_link_to "Clear failed jobs", 'destroy', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
 <% end %>

@@ -8,6 +8,9 @@ SEEK::Application.routes.draw do
   end
   mount MagicLamp::Genie, at: (SEEK::Application.config.relative_url_root || '/') + 'magic_lamp' if defined?(MagicLamp)
   # mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
+  # Experimental Solid Queue dashboard (mission-control branch), gated behind admin auth via
+  # MissionControlJobsController / config/initializers/mission_control.rb
+  mount MissionControl::Jobs::Engine, at: (SEEK::Application.config.relative_url_root || '/') + 'jobs' if defined?(MissionControl::Jobs::Engine)
 
   # TRS
   namespace :ga4gh do
