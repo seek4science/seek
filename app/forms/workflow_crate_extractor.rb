@@ -88,10 +88,14 @@ class WorkflowCrateExtractor
 
   def extract_crate
     do_validation = false
-    Zip::File.open(ro_crate[:data].path) do |zip_file|
-      zip_file.each do |entry|
-        do_validation = true if entry.name == 'ro-crate-metadata.json'
+    begin
+      Zip::File.open(ro_crate[:data].path) do |zip_file|
+        zip_file.each do |entry|
+          do_validation = true if entry.name == 'ro-crate-metadata.json'
+        end
       end
+    rescue Zip::Error
+      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
     end
 
     # The validation library does not support version 1.0 crates
