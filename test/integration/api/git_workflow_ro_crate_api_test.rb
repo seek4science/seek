@@ -242,7 +242,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can submit RO-Crate that adds a version to an existing remote workflow' do
-    workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+    workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow/', contributor: current_person)
 
     assert_no_difference('Workflow.count') do
       assert_difference('Git::Version.count', 1) do
