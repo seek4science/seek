@@ -105,6 +105,7 @@ class WorkflowCrateExtractor
         until (line = stdout.gets).nil?
           errors.add(:base, line.strip)
         end
+        stdout.close
       end
 
       return if errors.any?
