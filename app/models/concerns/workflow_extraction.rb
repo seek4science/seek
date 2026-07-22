@@ -131,7 +131,7 @@ module WorkflowExtraction
       end
 
       remotes.each do |path, url|
-        crate.add_external_file(url)
+        crate.add_external_file(url, localPath: path)
       end
 
       crate['datePublished'] = git_version.commit_object&.time
