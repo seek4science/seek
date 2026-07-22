@@ -210,6 +210,11 @@ module WorkflowExtraction
         # TODO: Find a way to do this in populate_ro_crate (Without tmpdir disappearing when it comes to writing)
         if should_generate_crate? && is_git_versioned?
           git_version.in_temp_dir do |tmpdir|
+            crate.entities.each do |entity|
+              if !entity.nil? && entity.type == 'File' && entity.external? && !entity['localPath'].nil?
+                File.delete(File.join(tmpdir, entity['localPath']))
+              end
+            end
             crate.add_all(tmpdir, false, include_hidden: true)
             yield crate
           end
