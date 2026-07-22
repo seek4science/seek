@@ -7,7 +7,7 @@ gem 'active_model_serializers'
 gem 'activerecord-import'
 gem 'acts-as-taggable-on'
 gem 'addressable'
-gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b' #necessary for newer hashie dependency, original api_smith is no longer active
+gem 'api_smith', git: 'https://github.com/youroute/api_smith.git', ref: '1fb428cebc17b9afab25ac9f809bde87b0ec315b' # necessary for newer hashie dependency, original api_smith is no longer active
 gem 'attr_encrypted'
 gem 'auto_strip_attributes'
 gem 'bibtex-ruby'
@@ -63,26 +63,26 @@ gem 'nokogiri'
 gem 'observer'
 gem 'omniauth'
 gem 'omniauth-github'
-gem 'omniauth-rails_csrf_protection'
 gem 'omniauth_openid_connect'
+gem 'omniauth-rails_csrf_protection'
 gem 'open4'
 gem 'openid_connect'
 gem 'openseek-api'
 gem 'pg'
-gem 'private_address_check'# Rails 5 upgrade
+gem 'private_address_check' # Rails 5 upgrade
 gem 'progress_bar'
 gem 'psych'
 gem 'puma'
 gem 'rack'
 gem 'rack-attack'
 gem 'rack-cors', require: 'rack/cors'
+gem 'rails_autolink'
 gem 'rails-html-sanitizer'
 gem 'rails-observers'
-gem 'rails_autolink'
 gem 'rdf-virtuoso'
-gem 'RedCloth'
 gem 'rdoc'
 gem 'recaptcha'
+gem 'RedCloth'
 gem 'remotipart'
 gem 'request_store'
 gem 'responders'
@@ -127,6 +127,7 @@ group :development do
   gem 'rails_best_practices'
   gem 'request-log-analyzer'
   gem 'rubocop', require: false
+  gem 'ruby-lsp'
   gem 'ruby-prof'
   gem 'stackprof'
   gem 'web-console'
@@ -135,6 +136,7 @@ end
 group :test do
   gem 'database_cleaner'
   gem 'minitest', '~> 5.4'
+  gem 'mock_redis'
   gem 'minitest-reporters'
   gem 'rails-controller-testing'
   gem 'rails-perftest'
@@ -153,10 +155,10 @@ group :test, :development do
   gem 'webmock'
 end
 
-gem "minitar"
-gem "bzip2-ffi"
-gem "seven-zip", require: 'seven_zip_ruby'
-gem "ruby-xz", require: 'xz'
+gem 'bzip2-ffi'
+gem 'minitar'
+gem 'ruby-xz', require: 'xz'
+gem 'seven-zip', require: 'seven_zip_ruby'
 
 gem "redis", "~> 5.4"
 gem "redis-actionpack", "~> 5.5"

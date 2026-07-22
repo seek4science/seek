@@ -8,9 +8,9 @@ ENV APP_DIR=/seek \
     BUNDLE_WITHOUT="development"
 
 # Supercronic variables
-ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64 \
-    SUPERCRONIC=supercronic-linux-amd64 \
-    SUPERCRONIC_SHA1SUM=048b95b48b708983effb2e5c935a1ef8483d9e3e
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.47/supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=712d2ece75da6f6e530192a151488578153e4e96 \
+    SUPERCRONIC=supercronic-linux-amd64
 
 
 # need to set the locale, otherwise some gems file to install

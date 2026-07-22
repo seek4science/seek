@@ -115,30 +115,6 @@ Kernel.class_eval do
   end
 end
 
-# Workaround: Rails won't fix scrub_env! to clear CONTENT_TYPE between requests
-# (https://github.com/rails/rails/issues/54582 — marked won't fix; the Rails team
-# considers multiple actions per controller test unsupported). A multipart POST's
-# Content-Type otherwise bleeds into subsequent requests, causing Rack's multipart
-# parser to raise EOFError on the empty body of a following GET.
-# TODO: remove this patch and refactor affected tests to use only one action each.
-module ActionController
-  class TestCase
-    module Behavior
-      private
-        def scrub_env!(env)
-          env.delete_if do |k, _|
-            k.start_with?("rack.request", "action_dispatch.request", "action_dispatch.rescue")
-          end
-          env["rack.input"] = StringIO.new
-          env.delete "CONTENT_LENGTH"
-          env.delete "RAW_POST_DATA"
-          env.delete "CONTENT_TYPE"
-          env
-        end
-    end
-  end
-end
-
 class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   include ActionMailer::TestHelper
@@ -169,6 +145,18 @@ class ActiveSupport::TestCase
   def clear_rails_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
+  end
+
+  # Swaps Rails.logger for a Logger writing to a StringIO for the duration of the block, returning
+  # everything logged as a String.
+  def capture_log
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = original_logger
   end
 
   def clear_current_user

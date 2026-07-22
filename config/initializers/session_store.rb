@@ -1,6 +1,10 @@
 # Be sure to restart your server when you modify this file.
 
-session_url = "#{ENV.fetch('REDIS_URL', 'redis://localhost:6379/0')}/session"
+require_relative '../../lib/seek/redis_config'
+
+# The session namespace lives on the same DB as the cache (Seek::RedisConfig.url), under the
+# /session path, so cache and sessions share one authenticated connection URL.
+session_url = "#{Seek::RedisConfig.url}/session"
 
 session_options = {
   servers: [session_url],

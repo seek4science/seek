@@ -7,7 +7,8 @@ module Seek
       include ActionView::Helpers::SanitizeHelper
       attr_reader :resource
 
-      SCHEMA_ORG = 'https://schema.org'
+      SCHEMA_ORG = 'https://schema.org/'.freeze
+      DCT = 'http://purl.org/dc/terms/'.freeze
 
       # initialise with a resource
       def initialize(resource)
@@ -23,6 +24,8 @@ module Seek
           representation['dct:conformsTo'] = { '@id' => resource_decorator.conformance }
         end
         representation = representation.merge(attributes_json)
+        # After attributes_json has been generated, additional context will be populated
+        representation['@context'].merge!(resource_decorator.additional_context)
         representation.deep_stringify_keys
       end
 

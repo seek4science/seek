@@ -307,6 +307,13 @@ div.renderer {
   text-align:center;
 }
 
+/* Cap the height of inline text/CSV previews so large files don't blow up the page */
+div.renderer > pre {
+  max-height: 40em;
+  overflow: auto;
+  text-align: left;
+}
+
 #snapshot-citation {
   font-size: small;
 }

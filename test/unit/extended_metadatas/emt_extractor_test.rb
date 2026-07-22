@@ -104,7 +104,7 @@ class EmtExtractorTest < ActiveSupport::TestCase
         Seek::ExtendedMetadataType::ExtendedMetadataTypeExtractor.extract_extended_metadata_type(invalid_emt_file)
       end
 
-      assert_match /Failed to parse JSON file: .+ at line \d+ column \d+/, error.message
+      assert_match /Failed to parse JSON file: expected object key, got EOF at/, error.message
     end
   end
 

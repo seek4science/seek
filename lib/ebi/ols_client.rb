@@ -14,7 +14,7 @@ module Ebi
         Rails.logger.debug("[OLS] Cache present for #{key}...")
       end
 
-      res = Rails.cache.fetch(key) do
+      res = Rails.cache.fetch(key, expires_in: 7.days) do
         url = "#{API_ROOT_URL}/ontologies/#{ontology_id}/terms/#{double_url_encode(term_iri)}"
 
         self_json = JSON.parse(RestClient.get(url, accept: :json))
@@ -61,7 +61,7 @@ module Ebi
       return @ontologies if @ontologies
 
       ontology_list = begin
-        Rails.cache.fetch('ebi_ontology_options') do
+        Rails.cache.fetch('ebi_ontology_options', expires_in: 7.days) do
           JSON.parse(RestClient.get("#{API_ROOT_URL}/ontologies?size=1000",
                                     accept: :json))
         end

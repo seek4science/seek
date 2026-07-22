@@ -80,12 +80,12 @@ class ISAAssay
 
     unless @sample_type.sample_attributes.select { |a| a.input_attribute? }.one?
       errors.add(:base,
-                  "[Sample type]: Should have exactly one attribute with the 'input' ISA Tag.".html_safe)
+                  "[Sample type]: Should have exactly one attribute with the 'input' ISA Tag.")
     end
 
     if @sample_type.sample_attributes.select { |a| a.isa_tag.nil? }.any?
       errors.add(:base,
-                  "[Sample type]: All attributes should have an ISA Tag.".html_safe)
+                  "[Sample type]: All attributes should have an ISA Tag.")
     end
 
     assay_sample_or_datafile_attributes = @sample_type.sample_attributes.select do |a|

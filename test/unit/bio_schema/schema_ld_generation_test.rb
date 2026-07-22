@@ -17,7 +17,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'DataCatalog',
       '@id' => 'http://fairyhub.org',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
@@ -56,6 +59,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         with_config_value(:site_base_host, 'http://fairyhub.org') do
           json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
           assert_equal expected, json
+          check_schema_org_terms(json)
         end
       end
     end
@@ -68,7 +72,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'DataCatalog',
       '@id' => 'http://fairyhub.org',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataCatalog::DATACATALOG_PROFILE },
@@ -107,6 +114,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        site_base_host: 'http://fairyhub.org') do
       json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
       assert_equal expected, json
+      check_schema_org_terms(json)
     end
   end
 
@@ -115,10 +123,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { @person.save! }
     institution = @person.institutions.first
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
-      'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE },
       'name' => @person.name,
       'givenName' => @person.first_name,
       'familyName' => @person.last_name,
@@ -138,6 +148,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(@person.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'data file' do
@@ -154,7 +165,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     publication = df.publications.first
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -198,6 +215,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(df.to_schema_ld)
     fine_json_comparison expected, json
     check_version(df.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'data file without content blob' do
@@ -218,7 +236,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     publication = df.publications.first
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -254,6 +278,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(df.to_schema_ld)
     fine_json_comparison expected, json
     check_version(df.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'dataset with weblink' do
@@ -271,7 +296,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     publication = df.publications.first
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'dct:conformsTo' => { '@id' => 'https://bioschemas.org/profiles/Dataset/1.0-RELEASE' },
@@ -308,6 +339,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(df.to_schema_ld)
     fine_json_comparison expected, json
     check_version(df.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'project' do
@@ -318,7 +350,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     institution = @project.institutions.first
     event = @project.events.first
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
+      },
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
       'name' => @project.title,
@@ -340,6 +378,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(@project.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'sample' do
@@ -352,7 +391,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'Sample' => Seek::BioSchema::ResourceDecorators::Sample::SAMPLE_TYPE
+      },
       '@type' => 'Sample',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Sample::SAMPLE_PROFILE },
       '@id' => "http://localhost:3000/samples/#{sample.id}",
@@ -360,9 +403,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/samples/#{sample.id}",
       'keywords' => 'keyword',
       'additionalProperty' => [
-        { '@type' => 'PropertyValue', 'name' => 'title', 'propertyId' => 'dc:title', 'value' => 'The Title' },
-        { '@type' => 'PropertyValue', 'name' => 'description', 'propertyId' => 'dc:description', 'value' => 'The Description' },
-        { '@type' => 'PropertyValue', 'name' => 'enzyme', 'propertyId' => 'http://purl.uniprot.org/core/enzyme', 'value' => 'EC 4.1.2.13' },
+        { '@type' => 'PropertyValue', 'name' => 'title', 'propertyID' => 'dc:title', 'value' => 'The Title' },
+        { '@type' => 'PropertyValue', 'name' => 'description', 'propertyID' => 'dc:description', 'value' => 'The Description' },
+        { '@type' => 'PropertyValue', 'name' => 'enzyme', 'propertyID' => 'http://purl.uniprot.org/core/enzyme', 'value' => 'EC 4.1.2.13' },
         { '@type' => 'PropertyValue', 'name' => 'weight', 'value' => '88700.2', 'unitCode' => 'g',
           'unitText' => 'gram' },
       ]
@@ -370,6 +413,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(sample.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'event' do
@@ -377,7 +421,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     data_file = event.data_files.first
     presentation = event.presentations.first
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
+      },
       '@id' => "http://localhost:3000/events/#{event.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE },
       '@type' => 'Event',
@@ -407,6 +457,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(event.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'document' do
@@ -418,7 +469,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'DigitalDocument',
       '@id' => "http://localhost:3000/documents/#{document.id}",
       'name' => 'This Document',
@@ -442,6 +496,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(document.to_schema_ld)
     fine_json_comparison expected, json
     check_version(document.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'document without contributor omits contributor from schema_ld' do
@@ -465,7 +520,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'PresentationDigitalDocument',
       '@id' => "http://localhost:3000/presentations/#{presentation.id}",
       'name' => 'This presentation',
@@ -488,6 +546,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     json = JSON.parse(presentation.to_schema_ld)
     fine_json_comparison expected, json
     check_version(presentation.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'workflow' do
@@ -539,7 +598,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'input' => Seek::BioSchema::ResourceDecorators::Workflow::INPUT_PROPERTY,
+        'output' => Seek::BioSchema::ResourceDecorators::Workflow::OUTPUT_PROPERTY,
+        'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE,
+        'FormalParameter' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_TYPE,
+        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE,
+        'computationalTool' => Seek::BioSchema::ResourceDecorators::Sop::COMPUTATIONAL_TOOL_PROPERTY
+      },
       '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
       '@id' => "http://localhost:3000/workflows/#{workflow.id}",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE },
@@ -647,6 +715,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     fine_json_comparison expected, json
     assert_equal expected, json
     check_version(workflow.latest_version, expected)
+    check_schema_org_terms(json)
   end
 
   test 'collection' do
@@ -672,7 +741,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     df1 = sel_assets[2]
     df2 = sel_assets[3]
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE,
+        'computationalTool' => Seek::BioSchema::ResourceDecorators::Sop::COMPUTATIONAL_TOOL_PROPERTY
+      },
       '@type' => 'Collection',
       '@id' => "http://localhost:3000/collections/#{collection.id}",
       'description' => 'A collection of very interesting things',
@@ -710,6 +784,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(collection.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'human_disease' do
@@ -720,7 +795,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Taxon',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::HumanDisease::TAXON_PROFILE },
       '@id' => "http://localhost:3000/human_diseases/#{human_disease.id}",
@@ -732,6 +810,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(human_disease.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'institution' do
@@ -744,7 +823,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'ResearchOrganization',
       '@id' => "http://localhost:3000/institutions/#{institution.id}",
       'name' => 'University of Manchester',
@@ -756,6 +838,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(institution.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
 
     # check without ror_id and department
     institution.update_columns(department:'', ror_id:nil)
@@ -763,6 +846,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected.delete('department')
     expected.delete('identifier')
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'organism' do
@@ -773,7 +857,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Taxon',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Organism::TAXON_PROFILE },
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
@@ -785,6 +872,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(organism.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'programme' do
@@ -795,7 +883,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'FundingScheme',
       '@id' => "http://localhost:3000/programmes/#{programme.id}",
       'description' => 'A very exciting programme',
@@ -805,6 +896,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(programme.to_schema_ld)
     assert_equal expected, json
+    check_schema_org_terms(json)
   end
 
   test 'version of data file' do
@@ -827,7 +919,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     publication = df.publications.first
 
     v1_expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -869,7 +967,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     v2_expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'hostInstitution' => Seek::BioSchema::ResourceDecorators::Event::HOST_INSTITUTION_PROPERTY,
+        'contact' => Seek::BioSchema::ResourceDecorators::Event::CONTACT_PROPERTY,
+        'eventType' => Seek::BioSchema::ResourceDecorators::Event::EVENT_TYPE_PROPERTY
+      },
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::DataFile::DATASET_PROFILE },
@@ -912,14 +1016,19 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(df.find_version(1).to_schema_ld)
-    fine_json_comparison v1_expected, json
+    assert_equal v1_expected, json
+    check_schema_org_terms(json)
     json = JSON.parse(df.find_version(2).to_schema_ld)
-    fine_json_comparison v2_expected, json
+    assert_equal v2_expected, json
+    check_schema_org_terms(json)
   end
 
   test 'dataset without data dump' do
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Dataset::DATASET_PROFILE },
       '@id' => 'http://localhost:3000/workflows',
@@ -941,6 +1050,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     with_config_value(:metadata_license, 'CC0-1.0') do
       json = JSON.parse(resource.to_schema_ld)
       assert_equal expected, json
+      check_schema_org_terms(json)
     end
   end
 
@@ -953,7 +1063,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     size = ActiveSupport::NumberHelper::NumberToHumanSizeConverter.new(dump.size, {}).convert
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
       '@type' => 'Dataset',
       'dct:conformsTo' => { '@id' => Seek::BioSchema::ResourceDecorators::Dataset::DATASET_PROFILE },
       '@id' => 'http://localhost:3000/workflows',
@@ -981,6 +1094,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       assert dump.exists?
       json = JSON.parse(resource.to_schema_ld)
       assert_equal expected, json
+      check_schema_org_terms(json)
     end
   end
 
@@ -998,7 +1112,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     publication = sop.publications.first
 
     expected = {
-      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT,
+        'ComputationalWorkflow' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE,
+        'input' => Seek::BioSchema::ResourceDecorators::Workflow::INPUT_PROPERTY,
+        'output' => Seek::BioSchema::ResourceDecorators::Workflow::OUTPUT_PROPERTY,
+        'FormalParameter' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_TYPE,
+        'LabProtocol' => Seek::BioSchema::ResourceDecorators::Sop::LAB_PROTOCOL_TYPE,
+        'computationalTool' => Seek::BioSchema::ResourceDecorators::Sop::COMPUTATIONAL_TOOL_PROPERTY
+      },
       '@type' => 'LabProtocol',
       '@id' => "http://localhost:3000/sops/#{sop.id}",
       'description' => 'How to run a simulation in GROMACS',
@@ -1022,7 +1145,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(sop.to_schema_ld)
-    fine_json_comparison expected, json
+    assert_equal expected, json
+    check_schema_org_terms(json)
     check_version(sop.latest_version, expected)
   end
 
@@ -1040,5 +1164,45 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   def fine_json_comparison(expected, json)
     expected.each { |k, v| assert_equal v, json[k], "mismatch with key #{k}" }
     json.each { |k, v| assert_equal v, expected[k], "mismatch with key #{k}" }
+  end
+
+  def schema_org_terms
+    @schema_org_terms ||= begin
+      schema_iris = Set.new
+      RDF::Vocab::SCHEMAS.each_entry do |entry|
+        schema_iris << entry.to_s
+      end
+      schema_iris
+    end
+  end
+
+  def check_schema_org_terms(actual)
+    result = JSON::LD::API.expand(actual)
+    terms = collect_schema_terms(result)
+
+    schema_terms = schema_org_terms
+    terms.each do |t|
+      assert schema_terms.include?(t), "Term #{t} is not a valid schema.org term"
+    end
+  end
+
+  def collect_schema_terms(json_array, terms: nil)
+    terms ||= Set.new
+    json_array.each do |node|
+      next unless node.is_a?(Hash)
+
+      Array(node['@type']).each { |t| terms << t if t.start_with?(Seek::BioSchema::Serializer::SCHEMA_ORG) }
+      node.each do |key, value|
+        next unless key.start_with?(Seek::BioSchema::Serializer::SCHEMA_ORG)
+
+        terms << key
+        Array(value).each do |v|
+          next unless v.is_a?(Hash)
+
+          collect_schema_terms([v], terms: terms)
+        end
+      end
+    end
+    terms
   end
 end

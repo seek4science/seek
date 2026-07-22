@@ -5,7 +5,7 @@ module AdminHelper
 
     safe_join(adaptors.collect do |adaptor|
       key = adaptor.key
-      enabled = current.dig(key, 'enabled') || true
+      enabled = (current[key] || {}).with_indifferent_access.fetch('enabled', true)
       description = "Whether the #{adaptor.name} external search is active"
       admin_checkbox_setting("external_search_adaptors[#{key}][enabled]", 1, enabled, adaptor.name, description)
     end)
@@ -45,6 +45,17 @@ module AdminHelper
     when 'delete'
       button_link_to('Delete', 'destroy', user_or_person, method: :delete, data: { confirm: "Are you sure you wish to delete this #{user_or_person.class.name}?" })
     end
+  end
+
+  # These size settings are stored in bytes but presented to the admin in KB (1 KB = 1024 bytes),
+  # rounded to at most 1 decimal place. A whole number is shown without a fractional part.
+  def bytes_to_kb(bytes)
+    kb = (bytes.to_i / 1024.0).round(1)
+    kb == kb.to_i ? kb.to_i : kb
+  end
+
+  def kb_to_bytes(kb)
+    (kb.to_f * 1024).round
   end
 
   def admin_text_setting(name, value, title, description = nil, options = {})
