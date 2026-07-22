@@ -9,7 +9,7 @@ args = parser.parse_args()
 
 if not zipfile.is_zipfile(args.filepath):
     print("Uploaded file is not a zip file")
-    sys.exit()
+    sys.exit(1)
 
 settings = services.ValidationSettings(
     rocrate_uri=args.filepath,
