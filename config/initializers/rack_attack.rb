@@ -1,8 +1,8 @@
 require_relative '../../lib/seek/redis_config'
 
-# Throttle counts are kept in Redis rather than in-process memory so that they are shared across
-# all app instances (web workers, multiple containers). With a memory store each instance counted
-# separately, so the effective limit was multiplied by the number of instances.
+# Throttle counts are kept in Redis so that all app instances (web workers, multiple containers)
+# share one count and a limit applies across the deployment as a whole. An in-process store would
+# count per instance, multiplying the effective limit by the number of instances.
 #
 # Tests use an in-memory store to avoid depending on a running Redis server.
 Rack::Attack.cache.store = if Rails.env.test?

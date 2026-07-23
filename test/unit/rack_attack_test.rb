@@ -2,11 +2,11 @@ require 'test_helper'
 require 'minitest/mock'
 require 'mock_redis'
 
-# Rack::Attack keeps its throttle counters in a cache store. That store used to be an in-process
-# MemoryStore, so each app instance counted independently and the effective limit was multiplied by
-# the number of instances (see config/initializers/rack_attack.rb). These tests drive the real
-# Rack::Attack middleware to check that a Redis-backed store shares counts across instances, and
-# that the initializer wires the store up the way each environment needs.
+# Rack::Attack keeps its throttle counters in a cache store, which SEEK points at the shared Redis
+# so that a limit applies across every app instance rather than per instance (see
+# config/initializers/rack_attack.rb). These tests drive the real Rack::Attack middleware to check
+# that a Redis-backed store shares counts between instances, and that the initializer wires the
+# store up the way each environment needs.
 class RackAttackTest < ActiveSupport::TestCase
   LIMIT = 3
 
@@ -65,7 +65,9 @@ class RackAttackTest < ActiveSupport::TestCase
     assert_equal 429, get
   end
 
-  test 'separate memory stores do not share counts, which is the behaviour being replaced' do
+  # The failure mode a shared store avoids: per-instance stores let each instance grant the full
+  # limit, so the deployment as a whole allows LIMIT * instances.
+  test 'separate in-process stores do not share counts' do
     throttle_by_ip
 
     (LIMIT + 1).times do
