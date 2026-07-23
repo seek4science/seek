@@ -2,10 +2,10 @@ require 'cgi'
 
 module Seek
   # Single source of truth for the Redis connection URL, built from REDIS_HOST and (optionally)
-  # REDIS_PASSWORD. The cache store, the settings cache and the session store all go through here so
-  # they connect to the same server and all authenticate when a password is set - previously the
-  # session store built an authenticated URL while the cache stores read a bare REDIS_URL, so a
-  # password-protected Redis broke the cache while leaving sessions working.
+  # REDIS_PASSWORD. The cache store, the settings cache, the session store and the Rack::Attack
+  # throttle counters all go through here, so they connect to the same server and all authenticate
+  # when a password is set. Anything else needing Redis should use this too rather than reading the
+  # environment directly, otherwise a password-protected Redis works for some of them and not others.
   #
   # Loaded via require_relative from config/environments/*.rb, which are evaluated before Zeitwerk
   # autoloading is available, so this must not reference autoloaded constants or ActiveSupport core
