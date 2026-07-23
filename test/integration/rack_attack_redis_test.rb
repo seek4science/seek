@@ -11,13 +11,17 @@ require 'test_helper'
 class RackAttackRedisTest < ActionDispatch::IntegrationTest
   LIMIT = 3
   PERIOD = 1.minute
+  CLIENT_IP = '10.0.0.1'.freeze
+  OTHER_IP = '10.0.0.2'.freeze
 
   setup do
     skip('these tests need a running Redis server') unless redis_available?
     Rack::Attack.clear_configuration
     Rack::Attack.throttle('integration/ip', limit: LIMIT, period: PERIOD, &:ip)
-    # A distinct IP per test run, so a counter left by an earlier run cannot affect this one.
-    @ip = "10.#{rand(256)}.#{rand(256)}.#{rand(256)}"
+    # Counters outlive the request that wrote them, so clear any left by an earlier run - otherwise
+    # a count carried over within the same period would throttle a client these tests expect to be
+    # under the limit. Only the rack-attack namespace is touched, not the cache or session keys.
+    store.clear
   end
 
   teardown do
@@ -36,11 +40,11 @@ class RackAttackRedisTest < ActionDispatch::IntegrationTest
   end
 
   # Rack::Attack's own key format, so the assertions look at the keys the middleware really writes.
-  def counter_key
-    "#{Rack::Attack.cache.prefix}:#{Time.now.to_i / PERIOD.to_i}:integration/ip:#{@ip}"
+  def counter_key(ip = CLIENT_IP)
+    "#{Rack::Attack.cache.prefix}:#{Time.now.to_i / PERIOD.to_i}:integration/ip:#{ip}"
   end
 
-  def request_status(ip: @ip)
+  def request_status(ip: CLIENT_IP)
     get '/', headers: { 'REMOTE_ADDR' => ip }
     response.status
   end
@@ -72,6 +76,6 @@ class RackAttackRedisTest < ActionDispatch::IntegrationTest
     (LIMIT + 1).times { request_status }
     assert_equal 429, request_status
 
-    refute_equal 429, request_status(ip: '10.99.99.99')
+    refute_equal 429, request_status(ip: OTHER_IP)
   end
 end
