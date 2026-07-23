@@ -7,6 +7,13 @@ module Seek
     end
 
     def index
+      # The filter panel's links are fetched separately via AJAX (see _resource_filtering.html.erb)
+      # so the combinatorial filter-link URLs aren't present in the initial page for crawlers to harvest.
+      if params[:filters_only].present? && request.xhr?
+        render partial: 'assets/resource_filtering_options', layout: false
+        return
+      end
+
       respond_to do |format|
         format.html
         format.json do
