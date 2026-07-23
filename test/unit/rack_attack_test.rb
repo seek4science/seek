@@ -6,7 +6,11 @@ require 'mock_redis'
 # so that a limit applies across every app instance rather than per instance (see
 # config/initializers/rack_attack.rb). These tests drive the real Rack::Attack middleware to check
 # that a Redis-backed store shares counts between instances, and that the initializer wires the
-# store up the way each environment needs.
+# store up correctly.
+#
+# The throttling logic itself is backend-agnostic, so these run against an in-memory MockRedis and
+# need no Redis server. Coverage of the configured store against a live Redis - the store the app
+# and the integration tests actually run with - is in test/integration/rack_attack_redis_test.rb.
 class RackAttackTest < ActiveSupport::TestCase
   LIMIT = 3
 
@@ -97,13 +101,13 @@ class RackAttackTest < ActiveSupport::TestCase
     (LIMIT + 1).times { assert_equal 200, get }
   end
 
-  test 'the test environment uses an in-memory store so no redis server is needed' do
+  test 'unit and functional tests get an in-memory store, so they need no redis server' do
     load Rails.root.join('config/initializers/rack_attack.rb')
 
     assert_instance_of ActiveSupport::Cache::MemoryStore, Rack::Attack.cache.store
   end
 
-  test 'other environments use a namespaced redis store built from the shared redis url' do
+  test 'other environments get a namespaced redis store built from the shared redis url' do
     Rails.env.stub(:test?, false) do
       load Rails.root.join('config/initializers/rack_attack.rb')
     end
@@ -111,7 +115,7 @@ class RackAttackTest < ActiveSupport::TestCase
     # Rack::Attack wraps the configured store in a delegating proxy.
     store = Rack::Attack.cache.store.__getobj__
     assert_instance_of ActiveSupport::Cache::RedisCacheStore, store
-    assert_equal 'rack-attack', store.options[:namespace]
+    assert_equal Seek::RackAttackStore::NAMESPACE, store.options[:namespace]
     expected = ActiveSupport::Cache::RedisCacheStore.new(url: Seek::RedisConfig.url)
     assert_equal expected.redis.with(&:id), store.redis.with(&:id)
   end
