@@ -302,4 +302,13 @@ class ActionController::TestCase
   setup do
     request.host = self.class._get_base_host
   end
+
+  # The filter panel's options are fetched separately via AJAX (see _resource_filtering.html.erb),
+  # so tests need to fetch that response separately to assert on filter-category/filter-option markup.
+  # Returns a parsed document that can be passed as the root to `assert_select`, e.g.
+  #   assert_select(get_filters_fragment(filter: { project: p.id }), '.filter-category') { ... }
+  def get_filters_fragment(extra_params = {})
+    get :index, xhr: true, params: { filters_only: 1 }.merge(extra_params)
+    Nokogiri::HTML::Document.parse(@response.body)
+  end
 end

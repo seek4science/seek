@@ -4,13 +4,12 @@
       Filters
       <button href="#" class="btn pull-right close" id="sidebar-close">&times</button>
     </h3>
-    <% @available_filters.each do |key, options| %>
-      <% filter = Seek::Filterer.new(controller_model).get_filter(key) %>
-      <% begin %>
-        <%= render partial: "filtering/#{filter.class.name.split('::').last.underscore}", locals: { key: key, options: options } %>
-      <% rescue ActionView::MissingTemplate %>
-        <%= render partial: 'filtering/filter', locals: { key: key, options: options } %>
-      <% end %>
-    <% end %>
+    <div class="index-filters-body" data-role="ajax-filters"
+         data-url="<%= url_for(page_and_sort_params.merge(filters_only: 1, page: nil)) %>">
+      <div class="index-filters-loading">Loading filters&hellip;</div>
+      <noscript>
+        <p>Filtering requires JavaScript to be enabled in your browser.</p>
+      </noscript>
+    </div>
   </div>
 <% end %>
