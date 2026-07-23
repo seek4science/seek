@@ -1,23 +1,16 @@
-require_relative '../../lib/seek/redis_config'
+require_relative '../../lib/seek/rack_attack_store'
 
 # Throttle counts are kept in Redis so that all app instances (web workers, multiple containers)
 # share one count and a limit applies across the deployment as a whole. An in-process store would
 # count per instance, multiplying the effective limit by the number of instances.
 #
-# Tests use an in-memory store to avoid depending on a running Redis server.
+# Unit and functional tests use an in-memory store, so they neither need a Redis server nor leave
+# counters behind in one. Integration tests run against the Redis store this builds - see
+# Seek::RackAttackStore and test/test_helper.rb.
 Rack::Attack.cache.store = if Rails.env.test?
                              ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
                            else
-                             ActiveSupport::Cache::RedisCacheStore.new(
-                               url: Seek::RedisConfig.url,
-                               namespace: 'rack-attack',
-                               # If Redis is unavailable the store returns nil rather than raising,
-                               # so requests are allowed through instead of erroring.
-                               error_handler: lambda { |method:, returning:, exception:|
-                                 Rails.logger.warn("Rack::Attack Redis cache error in #{method} " \
-                                                   "(returning #{returning.inspect}): #{exception.message}")
-                               }
-                             )
+                             Seek::RackAttackStore.build
                            end
 
 if Rails.env.production?

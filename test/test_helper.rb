@@ -304,6 +304,20 @@ if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(Fi
   FileUtils.rm_r(Seek::Config.filestore_path)
 end
 
+# Integration tests exercise the full stack, so they use the Redis-backed throttle store the app
+# actually runs with (the CI workflow provides a Redis server, which the session store needs
+# regardless). Unit and functional tests keep the in-memory store set up by the initializer.
+class ActionDispatch::IntegrationTest
+  setup do
+    @rack_attack_memory_store = Rack::Attack.cache.store
+    Rack::Attack.cache.store = Seek::RackAttackStore.build
+  end
+
+  teardown do
+    Rack::Attack.cache.store = @rack_attack_memory_store
+  end
+end
+
 class ActionController::TestCase
   def self._get_base_host
     # Cache host_with_port in a variable to avoid adding lots of overhead to each test
