@@ -9,6 +9,17 @@
   any = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
 %>
 
+<% if @spelling_suggestion.present? %>
+  <p class="spelling-suggestion">
+    <span class="glyphicon glyphicon-search"></span>
+    Did you mean
+    <%= link_to @spelling_suggestion,
+                search_path(search_query: @spelling_suggestion,
+                            search_type: params[:search_type],
+                            include_external_search: params[:include_external_search]) %>?
+  </p>
+<% end %>
+
 <% unless !logged_in? || params[:saved_search] %>
   <%= alert_box do %>
     <%= savable_search_icon(search_path, 24, { search_query: params[:search_query] || params[:q],

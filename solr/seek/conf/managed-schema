@@ -65,6 +65,17 @@
 
   <fieldType name="daterange" class="solr.DateRangeField" omitNorms="true"/>
 
+  <!-- Dictionary source for the spellcheck component. Deliberately plainer than
+       the "text" type - no n-gramming or word splitting, so that the terms
+       offered as suggestions are whole words as they appear in the content. -->
+  <fieldType name="spell" class="solr.TextField" positionIncrementGap="100">
+    <analyzer>
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+
   <!-- LatLonPointSpatialField replaces LatLonType (removed in Solr 7) -->
   <fieldType name="location" class="solr.LatLonPointSpatialField"/>
 
@@ -198,5 +209,12 @@
   <dynamicField name="*_llm" stored="false" type="location" multiValued="true" indexed="true"/>
   <dynamicField name="*_lls" stored="true" type="location" multiValued="false" indexed="true"/>
   <dynamicField name="*_llms" stored="true" type="location" multiValued="true" indexed="true"/>
+
+  <!-- Feeds the spellcheck component. Sunspot writes all full text into the
+       *_text dynamic fields, which are edge n-grammed and so unusable as a
+       spellcheck dictionary. -->
+  <field name="spellcheck_text" stored="false" type="spell" multiValued="true" indexed="true"/>
+  <copyField source="*_text" dest="spellcheck_text"/>
+  <copyField source="*_texts" dest="spellcheck_text"/>
 
 </schema>
