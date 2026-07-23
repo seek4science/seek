@@ -14,7 +14,7 @@ class Model < ApplicationRecord
     text :recommended_environment do
       recommended_environment.try(:title)
     end
-  end if Seek::Config.solr_enabled
+  end
 
   acts_as_asset
 

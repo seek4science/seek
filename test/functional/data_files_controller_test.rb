@@ -382,7 +382,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should show inline content preview for pdf data file' do
-    pdf_data_file = FactoryBot.create(:api_pdf_data_file, policy: FactoryBot.create(:downloadable_public_policy))
+    pdf_data_file = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:pdf_content_blob),
+                                       policy: FactoryBot.create(:downloadable_public_policy))
     get :show, params: { id: pdf_data_file.id }
     assert_response :success
     assert_select 'div.renderer iframe', count: 1
