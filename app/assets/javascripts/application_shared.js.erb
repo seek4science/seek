@@ -344,9 +344,6 @@ $j(document).ready(function () {
         return false;
     });
 
-    // The filter panel's links are loaded via AJAX instead of being rendered directly into the
-    // page, so that the combinatorial set of filter-link URLs isn't present in the initial HTML
-    // for simple (non-JS-executing) crawlers to harvest.
     $j('[data-role="ajax-filters"]').each(function () {
         var container = $j(this);
         var url = container.data('url');
