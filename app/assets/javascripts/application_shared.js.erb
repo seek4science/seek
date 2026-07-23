@@ -273,7 +273,65 @@ $j(document).ready(function () {
 
     new Clipboard('.clipboard-btn');
 
-    $j('.expand-filter-category-link').click(function () {
+    // Filter category "More..." toggle and date-filter widgets are initialized via a function
+    // (rather than bound once at document-ready) because the filter panel itself is loaded
+    // asynchronously below - the elements don't exist yet when the page first loads.
+    function initFilterWidgets(scope) {
+        scope = scope || document;
+
+        $j('[data-role="seek-date-filter"]', scope).each(function () {
+            var filter = $j(this);
+            var select = $j('[data-role="seek-date-filter-select"]', filter);
+            var custom = $j('[data-role="seek-date-filter-custom"]', filter);
+            var button = $j('[data-role="seek-date-filter-btn"]', filter);
+            var start = $j('[data-role="seek-date-filter-period-start"]', filter);
+            var end = $j('[data-role="seek-date-filter-period-end"]', filter);
+
+            if (select.val() === 'custom') {
+                custom.show();
+            } else {
+                custom.hide();
+            }
+
+            start.datetimepicker({ format: 'YYYY-MM-DD' });
+            end.datetimepicker({ format: 'YYYY-MM-DD' });
+
+            button.click(function () {
+                if (start.val()) {
+                    var val = start.val();
+                    if (end.val()) {
+                        val += ('/' + end.val());
+                    }
+                    window.location = filter.data('applyFilterUrl').replace('_date_',  val);
+                } else {
+                    alert("Please supply a start date");
+                    return false;
+                }
+            });
+
+            select.change(function () {
+                var val = $j(this).val();
+
+                if (val) {
+                    if (val === 'other') {
+                        return false;
+                    }
+                    if (val === 'custom') {
+                        custom.fadeIn();
+                    } else {
+                        custom.fadeOut();
+                        window.location = filter.data('applyFilterUrl').replace('_date_',  val);
+                    }
+                } else {
+                    custom.fadeOut();
+                    window.location = filter.data('removeFilterUrl');
+                }
+            });
+        });
+    }
+
+    // Delegated so it keeps working on the filter panel content loaded via AJAX below.
+    $j(document).on('click', '.expand-filter-category-link', function () {
         var cat = $j(this).parents(".filter-category");
         cat.toggleClass("collapsed");
 
@@ -284,57 +342,32 @@ $j(document).ready(function () {
         }
 
         return false;
-    })
+    });
 
-    $j('[data-role="seek-date-filter"]').each(function () {
-        var filter = $j(this);
-        var select = $j('[data-role="seek-date-filter-select"]', filter);
-        var custom = $j('[data-role="seek-date-filter-custom"]', filter);
-        var button = $j('[data-role="seek-date-filter-btn"]', filter);
-        var start = $j('[data-role="seek-date-filter-period-start"]', filter);
-        var end = $j('[data-role="seek-date-filter-period-end"]', filter);
-
-        if (select.val() === 'custom') {
-            custom.show();
-        } else {
-            custom.hide();
+    // The filter panel's links are loaded via AJAX instead of being rendered directly into the
+    // page, so that the combinatorial set of filter-link URLs isn't present in the initial HTML
+    // for simple (non-JS-executing) crawlers to harvest.
+    $j('[data-role="ajax-filters"]').each(function () {
+        var container = $j(this);
+        var url = container.data('url');
+        if (!url) {
+            return;
         }
 
-        start.datetimepicker({ format: 'YYYY-MM-DD' });
-        end.datetimepicker({ format: 'YYYY-MM-DD' });
-
-        button.click(function () {
-            if (start.val()) {
-                var val = start.val();
-                if (end.val()) {
-                    val += ('/' + end.val());
-                }
-                window.location = filter.data('applyFilterUrl').replace('_date_',  val);
-            } else {
-                alert("Please supply a start date");
-                return false;
-            }
-        });
-
-        select.change(function () {
-            var val = $j(this).val();
-
-            if (val) {
-                if (val === 'other') {
-                    return false;
-                }
-                if (val === 'custom') {
-                    custom.fadeIn();
-                } else {
-                    custom.fadeOut();
-                    window.location = filter.data('applyFilterUrl').replace('_date_',  val);
-                }
-            } else {
-                custom.fadeOut();
-                window.location = filter.data('removeFilterUrl');
+        $j.ajax({
+            url: url,
+            dataType: 'html',
+            success: function (html) {
+                container.html(html);
+                initFilterWidgets(container[0]);
+            },
+            error: function () {
+                container.find('.index-filters-loading').text('Could not load filters.');
             }
         });
     });
+
+    initFilterWidgets();
 
     // Show a summary with link to expand large sections of text
     $j('.auto-collapse').each(function () {
