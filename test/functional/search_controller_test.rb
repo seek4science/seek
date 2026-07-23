@@ -276,4 +276,63 @@ class SearchControllerTest < ActionController::TestCase
     assert assigns(:include_external_search)
     assert_select 'div#advanced-search input#include_external_search[type=checkbox][checked=checked]'
   end
+
+  test 'shows spelling suggestion when it differs from the query' do
+    FactoryBot.create_list(:public_document, 1)
+
+    with_spellcheck_collations(['collation', 'metabolomics']) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
+        get :index, params: { q: 'metabolomcs' }
+      end
+    end
+
+    assert_equal 'metabolomics', assigns(:spelling_suggestion)
+    assert_select 'p.spelling-suggestion' do
+      assert_select 'a[href=?]', search_path(search_query: 'metabolomics'), text: /metabolomics/
+    end
+  end
+
+  test 'no spelling suggestion when the collation matches the query' do
+    FactoryBot.create_list(:public_document, 1)
+
+    with_spellcheck_collations(['collation', 'Metabolomics']) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
+        get :index, params: { q: 'Metabolomics' }
+      end
+    end
+
+    assert_nil assigns(:spelling_suggestion)
+    assert_select 'p.spelling-suggestion', count: 0
+  end
+
+  test 'no spelling suggestion when solr offers no collation' do
+    FactoryBot.create_list(:public_document, 1)
+
+    with_spellcheck_collations([]) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
+        get :index, params: { q: 'metabolomics' }
+      end
+    end
+
+    assert_nil assigns(:spelling_suggestion)
+    assert_select 'p.spelling-suggestion', count: 0
+  end
+
+  private
+
+  # Stands in for the search Solr is asked to run purely for its spellcheck response
+  def with_spellcheck_collations(collations, &block)
+    search = Struct.new(:solr_spellcheck) do
+      def execute
+        self
+      end
+
+      # every other searchable type also runs through this stub, and finds nothing
+      def hits
+        []
+      end
+    end.new({ 'collations' => collations })
+
+    Sunspot.stub(:new_search, ->(*_args, &_blk) { search }, &block)
+  end
 end

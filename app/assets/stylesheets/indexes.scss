@@ -24,6 +24,22 @@
   width: 9em;
 }
 
+/* "Did you mean ...?" spelling suggestion at the top of the search results */
+.spelling-suggestion {
+  font-size: 20px;
+  margin-bottom: 15px;
+
+  .glyphicon {
+    color: $gray-light;
+    margin-right: 4px;
+  }
+
+  a {
+    font-weight: bold;
+    font-style: italic;
+  }
+}
+
 .list_item_content {
   font-size: 85%;
 }
