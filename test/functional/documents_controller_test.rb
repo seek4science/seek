@@ -1689,6 +1689,40 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal first_doc, assigns(:documents).first
   end
 
+  test 'filters can be obfuscated' do
+    project = FactoryBot.create(:project)
+    project_doc = FactoryBot.create(:public_document, created_at: 3.days.ago, projects: [project])
+    project_doc.annotate_with('awkward&id=1unsafe[]tag !', 'tag', project_doc.contributor)
+    disable_authorization_checks { project_doc.save! }
+    FactoryBot.create_list(:public_document, 5, projects: [project])
+
+    with_config_value(:obfuscate_filters, false) do
+      get :index
+
+      assert_select '.filter-category[data-filter-category="project"]' do
+        assert_select '.filter-category-title', text: 'Project'
+        assert_select "a.filter-option[title='#{project.title}']" do
+          assert_select '[href=?]', documents_path(filter: { project: project.id })
+          assert_select '.filter-option-label', text: project.title
+          assert_select '.filter-option-count', text: '6'
+        end
+      end
+    end
+
+    with_config_value(:obfuscate_filters, true) do
+      get :index
+
+      assert_select '.filter-category[data-filter-category="project"]' do
+        assert_select '.filter-category-title', text: 'Project'
+        assert_select "span.filter-option[title='#{project.title}']" do
+          assert_select '[data-filter-link=?]', Base64.urlsafe_encode64(documents_path(filter: { project: project.id }))
+          assert_select '.filter-option-label', text: project.title
+          assert_select '.filter-option-count', text: '6'
+        end
+      end
+    end
+  end
+
   private
 
   def valid_document
