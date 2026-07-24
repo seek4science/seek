@@ -277,6 +277,20 @@ class SearchControllerTest < ActionController::TestCase
     assert_select 'div#advanced-search input#include_external_search[type=checkbox][checked=checked]'
   end
 
+  test 'search query is passed to Solr with its original case' do
+    # Solr's analysers lowercase for matching; the query must keep its case so uppercase
+    # boolean operators (AND/OR/NOT) are recognised by edismax rather than downcased away.
+    FactoryBot.create_list(:public_document, 1)
+
+    received = []
+    Document.stub(:solr_cache, -> (q) { received << q; Document.pluck(:id) }) do
+      get :index, params: { q: 'cosmo OR headings' }
+    end
+
+    assert_includes received, 'cosmo OR headings'
+    refute_includes received, 'cosmo or headings'
+  end
+
   test 'shows spelling suggestion when it differs from the query' do
     FactoryBot.create_list(:public_document, 1)
 
