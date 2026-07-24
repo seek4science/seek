@@ -58,7 +58,7 @@ class SearchController < ApplicationController
 
     collation = Array(search.solr_spellcheck['collations']).last
     collation if collation.present? && collation.downcase != query.downcase
-  rescue RSolr::Error::Http, RSolr::Error::ConnectionRefused => e
+  rescue StandardError => e
     Rails.logger.warn("Unable to fetch spelling suggestions from Solr: #{e.message}")
     nil
   end
