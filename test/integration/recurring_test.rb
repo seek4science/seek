@@ -78,8 +78,7 @@ class RecurringTest < ActiveSupport::TestCase
       assert_equal '43 2 * * *', positive_offset[:life_monitor_status][:schedule]
       assert_equal '43 3 * * *', positive_offset[:galaxy_tool_map_refresh][:schedule]
       assert_equal '43 4 * * *', positive_offset[:cache_overflow_cleanup][:schedule]
-      # hour-frequency jobs keep the */N hour field but still get the minute offset applied,
-      # matching what whenever produced from `every N.hours, at: offset(...)`
+      # hour-frequency jobs keep the */N hour field but still get the minute offset applied
       assert_equal '43 */4 * * *', positive_offset[:regular_maintenance][:schedule]
       assert_equal '43 */8 * * *', positive_offset[:auth_lookup_maintenance][:schedule]
     end

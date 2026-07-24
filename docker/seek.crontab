@@ -5,6 +5,5 @@
 # ActiveJob or Ruby call.
 #
 # Reap LibreOffice (soffice.bin) processes left running longer than 30 minutes by document
-# conversion. This runs inside the SEEK container(s) only (cron is only started under Docker), which
-# preserves the previous Docker-only behaviour of this reaper.
+# conversion. This runs inside the SEEK container(s) only, since cron is only started under Docker.
 */10 * * * * sh /seek/script/kill-long-running-soffice.sh

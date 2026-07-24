@@ -1,12 +1,10 @@
 <%
-  # Mirrors config/schedule.rb's `offset` helper: applies the configured
-  # Seek::Config.regular_job_offset (minutes) on top of a base hour, to avoid
-  # multiple periodic jobs firing at exactly the same moment - matching the cron
-  # schedule `bundle exec whenever` produced from the old schedule.rb.
+  # Applies the configured Seek::Config.regular_job_offset (minutes) on top of a base
+  # hour, so periodic jobs don't all fire at exactly the same moment.
   #
-  # For day/week/month-frequency jobs whenever applied both the hour and the minute
-  # of the `at:` time (offset_cron below). For hour-frequency jobs it kept the
-  # repeating hour field (*/N) and applied only the minute (offset_minute below).
+  # offset_cron sets both the hour and minute fields for day/week/month-frequency jobs.
+  # offset_minute sets only the minute, leaving the repeating hour field (*/N) intact for
+  # hour-frequency jobs.
   def offset_cron(off_hours)
     off_minutes = Seek::Config.regular_job_offset || 0
     time = Time.utc(2000, 1, 1, off_hours, 0) + off_minutes.minutes
@@ -24,8 +22,8 @@
 # calls, e.g. clear_finished_jobs/application_status_refresh below are plain class method
 # calls). `command:`-only entries (no `class:`) enqueue onto the `solid_queue_recurring` queue
 # (SolidQueue::RecurringJob's own queue_as), which is why config/queue.yml has a dedicated
-# worker for it. All periodic application jobs live here now; the only thing left on whenever/cron
-# (config/schedule.rb) is OS-level process reaping (kill-long-running-soffice.sh) that isn't an
+# worker for it. All periodic application jobs live here; the only periodic work handled by cron
+# (docker/seek.crontab) is OS-level process reaping (kill-long-running-soffice.sh) that isn't an
 # ActiveJob or Ruby call.
 production:
   periodic_subscription_email_daily:

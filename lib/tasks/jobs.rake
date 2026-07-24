@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-# Solid Queue replacements for the `jobs:*` rake tasks that delayed_job's railtie defines.
+# Defines the `jobs:*` rake tasks against Solid Queue.
 #
-# The delayed_job gem is still installed (as a rollback safety net for the Solid Queue migration), so
-# it still contributes `jobs:work`, `jobs:workoff`, `jobs:clear` and `jobs:check` - all of which now
-# operate on the `delayed_jobs` table that nothing writes to any more. Rather than leave those as
-# silent no-ops, they are cleared here and redefined against Solid Queue. Rake tasks contributed by
-# gems are loaded before the application's own lib/tasks/*.rake, so the tasks are already defined by
-# the time this file runs; the guard keeps it working once delayed_job is eventually removed.
+# The delayed_job gem is a dependency and its railtie also contributes `jobs:work`, `jobs:workoff`,
+# `jobs:clear` and `jobs:check`. Gem rake tasks load before the application's own lib/tasks/*.rake,
+# so those definitions already exist by the time this file runs; each is cleared before being
+# redefined below. The guard keeps this working whether or not delayed_job is present.
 %w[work workoff clear check].each do |name|
   Rake::Task["jobs:#{name}"].clear if Rake::Task.task_defined?("jobs:#{name}")
 end
@@ -52,9 +50,8 @@ namespace :jobs do
     started_at = Time.now
     begin
       # A worker in `inline` mode runs in the current process and shuts itself down as soon as the ready
-      # queue is empty, waiting for its thread pool to drain first - which is exactly delayed_job's
-      # `workoff` behaviour. Jobs enqueued by the jobs being run are only picked up if they land before
-      # the queue empties, again matching delayed_job.
+      # queue is empty, waiting for its thread pool to drain first. Jobs enqueued by the jobs being run
+      # are only picked up if they land before the queue empties.
       worker = SolidQueue::Worker.new(queues: queues, threads: threads, polling_interval: 0.1)
       worker.mode = :inline
       worker.start
