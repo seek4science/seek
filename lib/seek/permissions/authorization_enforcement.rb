@@ -65,7 +65,7 @@ module Seek
       end
 
       def authorization_checks_enabled
-        !$authorization_checks_disabled && Seek::Config.authorization_checks_enabled
+        !authorization_checks_disabled? && Seek::Config.authorization_checks_enabled
       end
 
       def destroy_authorized?
