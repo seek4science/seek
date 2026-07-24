@@ -258,6 +258,7 @@ class ISAStudiesControllerTest < ActionController::TestCase
         '1': {
           pos: '1', title: 'Input', required: '1', is_title: '0',
           sample_attribute_type_id: FactoryBot.create(:sample_multi_sample_attribute_type).id,
+          isa_tag_id: FactoryBot.create(:input_isa_tag).id,
           linked_sample_type_id: 'self',
           _destroy: '0'
         },
