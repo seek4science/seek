@@ -903,7 +903,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_response :unprocessable_entity
     end
 
-    assert assigns(:crate_extractor).errors.added?(:ro_crate, 'could not be read: Local Data Entity not found in crate: concat_two_files.ga')
+    assert assigns(:crate_extractor).errors.added?(:base, 'ro-crate-1.1_12.1: The RO-Crate does not include the Data Entity \'concat_two_files.ga\' as part of its payload')
   end
 
   test 'can get edit paths page' do
