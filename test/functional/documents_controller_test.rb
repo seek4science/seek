@@ -1694,7 +1694,6 @@ class DocumentsControllerTest < ActionController::TestCase
     project_doc = FactoryBot.create(:public_document, created_at: 3.days.ago, projects: [project])
     project_doc.annotate_with('awkward&id=1unsafe[]tag !', 'tag', project_doc.contributor)
     disable_authorization_checks { project_doc.save! }
-    other_project = FactoryBot.create(:project)
     FactoryBot.create_list(:public_document, 5, projects: [project])
 
     with_config_value(:obfuscate_filters, false) do
