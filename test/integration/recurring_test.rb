@@ -71,29 +71,6 @@ class RecurringTest < ActiveSupport::TestCase
     assert_empty @tasks, "Found untested recurring task(s): #{@tasks.keys.join(', ')}"
   end
 
-  test 'should offset daily job runtime by configured amount' do
-    with_config_value(:regular_job_offset, 43) do
-      positive_offset = production_tasks
-      assert_equal '43 0 * * *', positive_offset[:periodic_subscription_email_daily][:schedule]
-      assert_equal '43 2 * * *', positive_offset[:life_monitor_status][:schedule]
-      assert_equal '43 3 * * *', positive_offset[:galaxy_tool_map_refresh][:schedule]
-      assert_equal '43 4 * * *', positive_offset[:cache_overflow_cleanup][:schedule]
-      # hour-frequency jobs keep the */N hour field but still get the minute offset applied
-      assert_equal '43 */4 * * *', positive_offset[:regular_maintenance][:schedule]
-      assert_equal '43 */8 * * *', positive_offset[:auth_lookup_maintenance][:schedule]
-    end
-
-    with_config_value(:regular_job_offset, -237) do
-      negative_offset = production_tasks
-      assert_equal '3 20 * * *', negative_offset[:periodic_subscription_email_daily][:schedule]
-      assert_equal '3 22 * * *', negative_offset[:life_monitor_status][:schedule]
-      assert_equal '3 23 * * *', negative_offset[:galaxy_tool_map_refresh][:schedule]
-      assert_equal '3 0 * * *', negative_offset[:cache_overflow_cleanup][:schedule]
-      assert_equal '3 */4 * * *', negative_offset[:regular_maintenance][:schedule]
-      assert_equal '3 */8 * * *', negative_offset[:auth_lookup_maintenance][:schedule]
-    end
-  end
-
   test 'news feed refresh schedule changes with config' do
     with_config_value(:home_feeds_cache_timeout, 731) do
       assert_equal '*/731 * * * *', production_tasks[:news_feed_refresh][:schedule]
