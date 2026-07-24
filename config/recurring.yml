@@ -1,3 +1,17 @@
+# Schedules use standard 5-field cron syntax, in UTC:
+#
+#   ┌───────────── minute        (0-59)
+#   │ ┌───────────── hour        (0-23)
+#   │ │ ┌───────────── day of month (1-31)
+#   │ │ │ ┌───────────── month     (1-12)
+#   │ │ │ │ ┌───────────── day of week (0-6, Sunday = 0)
+#   │ │ │ │ │
+#   * * * * *
+#
+# `*` means every value, `*/n` every nth value, and `a,b,c` a specific list. So "0 0 * * 0" is
+# midnight every Sunday, and "0 */4 * * *" is on the hour every 4 hours. (Fugit parses these, so a
+# few natural-language forms like "every hour at minute 12" also work.)
+#
 # Recurring entries for scheduled jobs and tasks that map onto Solid Queue, via either a
 # `class:` entry (an ActiveJob class, enqueued with `perform_later`) or a `command:` entry
 # (arbitrary Ruby, run via SolidQueue::RecurringJob#perform's `eval` - not limited to ActiveJob
@@ -18,7 +32,7 @@ production:
   periodic_subscription_email_weekly:
     class: PeriodicSubscriptionEmailJob
     args: [ weekly ]
-    schedule: "0 0 1,8,15,22 * *"
+    schedule: "0 0 * * 0"
   periodic_subscription_email_monthly:
     class: PeriodicSubscriptionEmailJob
     args: [ monthly ]

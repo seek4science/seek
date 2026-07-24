@@ -16,7 +16,7 @@ class RecurringTest < ActiveSupport::TestCase
     weekly = pop_task(:periodic_subscription_email_weekly)
     assert_equal 'PeriodicSubscriptionEmailJob', weekly[:class]
     assert_equal ['weekly'], weekly[:args]
-    assert_equal '0 0 1,8,15,22 * *', weekly[:schedule]
+    assert_equal '0 0 * * 0', weekly[:schedule]
 
     monthly = pop_task(:periodic_subscription_email_monthly)
     assert_equal 'PeriodicSubscriptionEmailJob', monthly[:class]
