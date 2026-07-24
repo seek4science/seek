@@ -280,7 +280,7 @@ class SearchControllerTest < ActionController::TestCase
   test 'search query is passed to Solr with its original case' do
     # Solr's analysers lowercase for matching; the query must keep its case so uppercase
     # boolean operators (AND/OR/NOT) are recognised by edismax rather than downcased away.
-    FactoryBot.create_list(:public_document, 1)
+    FactoryBot.create(:public_document)
 
     received = []
     Document.stub(:solr_cache, -> (q) { received << q; Document.pluck(:id) }) do
@@ -292,7 +292,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'shows spelling suggestion when it differs from the query' do
-    FactoryBot.create_list(:public_document, 1)
+    FactoryBot.create(:public_document)
 
     with_spellcheck_collations(['collation', 'metabolomics']) do
       Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
@@ -307,7 +307,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'no spelling suggestion when the collation matches the query' do
-    FactoryBot.create_list(:public_document, 1)
+    FactoryBot.create(:public_document)
 
     with_spellcheck_collations(['collation', 'Metabolomics']) do
       Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
@@ -320,7 +320,7 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   test 'no spelling suggestion when solr offers no collation' do
-    FactoryBot.create_list(:public_document, 1)
+    FactoryBot.create(:public_document)
 
     with_spellcheck_collations([]) do
       Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
