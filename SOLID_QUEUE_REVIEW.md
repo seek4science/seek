@@ -27,25 +27,27 @@ No leftover references to `Daemons`, `Seek::Workers`, `delayed_job_pids`, `RUN_P
 
 ## Findings
 
-### 1. Weekly digest email has a coverage gap near month boundaries (minor correctness)
+### 1. Weekly digest email has a coverage gap near month boundaries (minor correctness) — FIXED
 
-`config/recurring.yml` schedules `periodic_subscription_email_weekly` as
+`config/recurring.yml` scheduled `periodic_subscription_email_weekly` as
 `0 0 1,8,15,22 * *` (day-of-month), while the job computes its window as `1.week.ago`
-(`app/jobs/periodic_subscription_email_job.rb:7`). These don't line up at month end:
+(`app/jobs/periodic_subscription_email_job.rb:7`). These didn't line up at month end:
 
 - Day 22's run covers days 15–22.
 - Next run is day 1 of the following month, covering only the previous ~7 days (day 24/25 on).
-- So **activity on ~the 23rd–24th is never included in any weekly digest**, and days 29–31
-  never trigger a run at all.
+- So **activity on ~the 23rd–24th was never included in any weekly digest**, and days 29–31
+  never triggered a run at all.
 
-The old `every 1.week` schedule produced contiguous 7-day windows with no gap. The
-`recurring.yml` header comment claims this "matches the cron schedule whenever produced" —
-for the day/month-frequency jobs that's not quite accurate. If the intent is to preserve
-weekly behaviour, `0 0 * * 0` (Sunday) matches the fixed `1.week.ago` window cleanly.
+Correction to the original review note: this was **not** a regression introduced by the
+migration. `whenever`'s `every 1.week` genuinely emits `0 0 1,8,15,22 * *` (verified by running
+whenever 1.0.0's `Cron` class: `1.week` lands in its `1.day…1.month` bucket → `day_frequency 7`
+→ `comma_separated_timing(7, 31, 1)` → `1,8,15,22`), so the migration faithfully reproduced the
+long-standing — but buggy — schedule. The gap pre-dated this branch.
 
-**Action:** confirm the `1,8,15,22` choice was deliberate rather than an assumed equivalence.
-Note: `test/integration/recurring_test.rb` asserts `0 0 1,8,15,22 * *`, so any change means
-updating that test too.
+**Fixed** by switching the weekly schedule to `0 0 * * 0` (every Sunday), which tiles the fixed
+`1.week.ago` window with no gap or overlap, and updating the `test/integration/recurring_test.rb`
+assertion to match. Done as its own commit (a deliberate behaviour change to long-standing digest
+timing), separate from the faithful-migration commits.
 
 ### 2. Command-based recurring tasks now serialize on one worker thread (low / design note)
 
@@ -57,9 +59,18 @@ blocks the others.
 
 In particular `bioschema_data_dump_generate` (00:10 daily) can run for minutes and will
 stall the every-minute `application_status_refresh` behind it, and `clear_finished_jobs`
-deliberately `sleep`s 0.3s between batches on that same thread. Functionally fine, but a
-real change in concurrency behaviour — the heavier commands may eventually deserve their own
-queue/worker.
+deliberately `sleep`s 0.3s between batches on that same thread.
+
+**Assessment: probably not a real problem, leaving as-is.** The only concrete effect is that
+`application_status_refresh` (a ~0.14s status-cache refresh) can be delayed by a few minutes
+once a day, overnight, while the dump runs — i.e. a few minutes of status-cache staleness at
+night. Moving these to the default queue does *not* help: every queue is `threads: 1` (a hard
+constraint until the process-global `User.current_user` / `$authorization_checks_disabled` are
+made thread-local), so they'd still serialize, and would then contend with user-facing default
+jobs and lose the isolation the dedicated `solid_queue_recurring` queue gives them. If a case
+ever does need concurrency, the fix is a dedicated queue + worker for the heavy command (a
+recurring entry's `queue:` option routes it), not a higher thread count and not the default
+queue.
 
 ### 3. Minor edge cases (informational)
 
@@ -87,8 +98,8 @@ queue/worker.
 
 ## Overall
 
-Solid and well-tested. The one substantive suggestion is to double-check the weekly-digest
-schedule (#1); the rest are notes.
+Solid and well-tested. The one substantive suggestion — the weekly-digest schedule (#1) — has
+been fixed; the rest are notes.
 
 ## Not yet expanded (if a deeper pass is wanted)
 
