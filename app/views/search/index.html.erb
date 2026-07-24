@@ -11,7 +11,7 @@
 
 <% if @spelling_suggestion.present? %>
   <p class="spelling-suggestion">
-    <span class="glyphicon glyphicon-search"></span>
+    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
     Did you mean
     <%= link_to @spelling_suggestion,
                 search_path(search_query: @spelling_suggestion,
