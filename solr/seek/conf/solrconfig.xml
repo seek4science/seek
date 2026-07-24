@@ -504,7 +504,7 @@
   <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
     <lst name="spellchecker">
       <str name="name">default</str>
-      <str name="field">spellcheck_text</str>
+      <str name="field">spellcheck_dictionary</str>
       <str name="classname">solr.DirectSolrSpellChecker</str>
       <str name="distanceMeasure">internal</str>
       <float name="accuracy">0.5</float>
