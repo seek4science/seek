@@ -212,9 +212,10 @@
 
   <!-- Feeds the spellcheck component. Sunspot writes all full text into the
        *_text dynamic fields, which are edge n-grammed and so unusable as a
-       spellcheck dictionary. -->
-  <field name="spellcheck_text" stored="false" type="spell" multiValued="true" indexed="true"/>
-  <copyField source="*_text" dest="spellcheck_text"/>
-  <copyField source="*_texts" dest="spellcheck_text"/>
+       spellcheck dictionary. The name deliberately avoids a _text suffix so it
+       is not itself caught by the *_text copyField source glob below. -->
+  <field name="spellcheck_dictionary" stored="false" type="spell" multiValued="true" indexed="true"/>
+  <copyField source="*_text" dest="spellcheck_dictionary"/>
+  <copyField source="*_texts" dest="spellcheck_dictionary"/>
 
 </schema>
