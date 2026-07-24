@@ -423,7 +423,7 @@ $j(document).ready(function () {
     $j('span.filter-option').each(function () {
         const span = $j(this)[0];
         const a = document.createElement('a');
-        a.href = span.dataset['filterLink'];
+        a.href = atob(span.dataset['filterLink']);
         // Copy attributes
         for (const attr of span.attributes) {
             if (attr.name !== 'data-href') {

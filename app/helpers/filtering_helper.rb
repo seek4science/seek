@@ -10,7 +10,7 @@ module FilteringHelper
         content_tag(:span, filter.count, class: 'filter-option-count')
     }
     if Seek::Config.obfuscate_filters
-      content_tag('span', opts.merge('data-filter-link': link), &content)
+      content_tag('span', opts.merge('data-filter-link': Base64.urlsafe_encode64(link)), &content)
     else
       link_to(link, **opts, &content)
     end
