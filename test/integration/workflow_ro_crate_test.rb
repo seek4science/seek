@@ -60,9 +60,11 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
     remote1 = crate.get('http://internet.internet/file')
     assert remote1.is_a?(::ROCrate::File)
+    assert_equal remote1.properties['localPath'], 'blah.txt'
 
-    remote1 = crate.get('http://internet.internet/another_file')
-    assert remote1.is_a?(::ROCrate::File)
+    remote2 = crate.get('http://internet.internet/another_file')
+    assert remote2.is_a?(::ROCrate::File)
+    assert_equal remote2.properties['localPath'], 'blah2.txt'
   end
 
   test 'generate Workflow RO-Crate for repository containing symlink' do
