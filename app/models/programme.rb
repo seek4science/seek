@@ -2,12 +2,10 @@ class Programme < ApplicationRecord
   include Seek::Annotatable
   include Seek::Roles::Scope
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :funding_details
-      text :institutions do
-        institutions.compact.map(&:title)
-      end
+  searchable(auto_index: false) do
+    text :funding_details
+    text :institutions do
+      institutions.compact.map(&:title)
     end
   end
 

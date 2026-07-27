@@ -4,13 +4,11 @@ class Assay < ApplicationRecord
   belongs_to :assignee, class_name: 'Person'
 
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :organism_terms, :human_disease_terms, :assay_type_label, :technology_type_label
+  searchable(auto_index: false) do
+    text :organism_terms, :human_disease_terms, :assay_type_label, :technology_type_label
 
-      text :strains do
-        strains.compact.map(&:title)
-      end
+    text :strains do
+      strains.compact.map(&:title)
     end
   end
 

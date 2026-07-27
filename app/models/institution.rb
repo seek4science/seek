@@ -22,7 +22,7 @@ class Institution < ApplicationRecord
 
   searchable(auto_index: false) do
     text :city, :address
-  end if Seek::Config.solr_enabled
+  end
 
 
   def title
