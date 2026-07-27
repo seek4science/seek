@@ -2,11 +2,11 @@ require 'test_helper'
 
 class WorkflowClassTest < ActiveSupport::TestCase
   setup do
-    $authorization_checks_disabled = true
+    disable_authorization_checks!
   end
 
   teardown do
-    $authorization_checks_disabled = false
+    enable_authorization_checks!
   end
 
   test 'validate uniqueness of workflow class title' do

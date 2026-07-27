@@ -226,7 +226,7 @@ class Sample < ApplicationRecord
 
   # checks and validates whether new linked samples have view permission, but ignores existing ones
   def validate_added_linked_sample_permissions
-    return if $authorization_checks_disabled
+    return if authorization_checks_disabled?
     return if linked_samples.empty?
     previous_linked_samples = []
     previous_linked_samples = Sample.find(id).referenced_samples unless new_record?
