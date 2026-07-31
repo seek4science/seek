@@ -501,7 +501,7 @@ GEM
       ruby-progressbar
     mock_redis (0.55.0)
       redis (~> 5)
-    msgpack (1.8.0)
+    msgpack (1.8.2)
     multi_json (1.16.0)
     multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
