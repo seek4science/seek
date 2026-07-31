@@ -1,12 +1,18 @@
 module FilteringHelper
   include SessionsHelper
   def filter_link(key, filter, hidden: false, replace: false)
-    link_to(page_and_sort_params.merge({ page: nil, filter: filter.active ? without_filter(key, filter.value) : with_filter(key, filter.value, replace: replace) }),
-            title: filter.label,
-            rel: 'nofollow',
-            class: "filter-option#{' filter-option-active' if filter.active}#{' filter-option-hidden' if hidden}") do
+    link = url_for(page_and_sort_params.merge({ page: nil, filter: filter.active ? without_filter(key, filter.value) : with_filter(key, filter.value, replace: replace) }))
+    opts = { title: filter.label,
+             rel: 'nofollow',
+             class: "filter-option#{' filter-option-active' if filter.active}#{' filter-option-hidden' if hidden}" }
+    content = -> {
       content_tag(:span, filter.label, class: 'filter-option-label') +
-          content_tag(:span, filter.count, class: 'filter-option-count')
+        content_tag(:span, filter.count, class: 'filter-option-count')
+    }
+    if Seek::Config.obfuscate_filters
+      content_tag('span', opts.merge('data-filter-link': Base64.urlsafe_encode64(link)), &content)
+    else
+      link_to(link, **opts, &content)
     end
   end
 
