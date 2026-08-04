@@ -11,6 +11,7 @@
 
   <% if params[:code].present? %>
     <meta name="robots" content="noindex, nofollow"/>
+    <link rel="canonical" href="<%= current_url_without_code %>"/>
   <% end %>
 
   <%= schema_ld_script_block %>

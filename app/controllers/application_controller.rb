@@ -43,7 +43,8 @@ class ApplicationController < ActionController::Base
 
   helper :all
   helper_method %i[current_person is_condensed_view page_and_sort_params controller_model
-                   displaying_single_page? display_isa_graph? safe_class_lookup]
+                   displaying_single_page? display_isa_graph? safe_class_lookup
+                   current_url_without_code]
 
   layout Seek::Config.main_layout
 
@@ -660,14 +661,16 @@ class ApplicationController < ActionController::Base
     keys
   end
 
-  # URLs carrying a special authorization code (?code=...) contain a secret and
-  # must be kept out of search/AI indexes, and must not leak via the Referer header.
-  # The code is intentionally not validated - expired or invalid code URLs must not be indexed either.
   def prevent_indexing_of_auth_code_urls
     return if params[:code].blank?
 
     response.headers['X-Robots-Tag'] = 'noindex, nofollow'
     response.headers['Referrer-Policy'] = 'no-referrer'
+  end
+  
+  def current_url_without_code
+    query = request.query_parameters.except('code')
+    request.base_url + request.path + (query.any? ? "?#{query.to_query}" : '')
   end
 
   # Stop hosted user content from running scripts etc.
