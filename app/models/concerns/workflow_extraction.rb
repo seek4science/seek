@@ -131,7 +131,7 @@ module WorkflowExtraction
       end
 
       remotes.each do |path, url|
-        crate.add_external_file(url)
+        crate.add_external_file(url, localPath: path)
       end
 
       crate['datePublished'] = git_version.commit_object&.time
@@ -210,6 +210,12 @@ module WorkflowExtraction
         # TODO: Find a way to do this in populate_ro_crate (Without tmpdir disappearing when it comes to writing)
         if should_generate_crate? && is_git_versioned?
           git_version.in_temp_dir do |tmpdir|
+            crate.entities.each do |entity|
+              next unless !entity.nil? && entity.type == 'File' && entity.external? && !entity['localPath'].nil?
+
+              full_path = File.join(tmpdir, entity['localPath'])
+              File.delete(full_path) if File.zero?(full_path)
+            end
             crate.add_all(tmpdir, false, include_hidden: true)
             yield crate
           end
