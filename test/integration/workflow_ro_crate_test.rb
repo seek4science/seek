@@ -68,7 +68,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
 
     Zip::File.open(zip) do |zipfile|
       assert zipfile.find_entry('ro-crate-metadata.json')
-      refute zipfile.find_entry('blah.txt')
+      assert zipfile.find_entry('blah.txt')
       refute zipfile.find_entry('blah2.txt')
     end
   end
