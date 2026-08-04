@@ -1,0 +1,6 @@
+# Optional local overlay – copy to docker-compose.override.yml (gitignored).
+# Enables Person auto-create on OIDC login for demos; stock SEEK uses registration instead.
+services:
+  seek:
+    volumes:
+      - ./custom-config/initializers/custom_sessions.rb:/seek/config/initializers/custom_sessions.rb:ro

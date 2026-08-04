@@ -98,9 +98,8 @@ services:
       OMNIAUTH_OIDC_CLIENT_ID: '${OMNIAUTH_OIDC_CLIENT_ID:-your-client-id}'
       OMNIAUTH_OIDC_SECRET: '${OMNIAUTH_OIDC_SECRET:-your-client-secret}'
       OMNIAUTH_OIDC_SCOPE: '${OMNIAUTH_OIDC_SCOPE:-openid email profile}'
-      OMNIAUTH_OIDC_GROUPS: '${OMNIAUTH_OIDC_GROUPS:-realm_access.roles}'
-      OMNIAUTH_OIDC_ADMIN_KEYWORDS: '${OMNIAUTH_OIDC_ADMIN_KEYWORDS:-admin,administrator,owner,admins,owners}'
-      OMNIAUTH_OIDC_REDIRECT_URI: '${OMNIAUTH_OIDC_REDIRECT_URI:-http://localhost:3000/auth/oidc/callback}'
+      OMNIAUTH_OIDC_GROUPS_ENABLED: '${OMNIAUTH_OIDC_GROUPS_ENABLED:-false}'
+      OMNIAUTH_OIDC_GROUPS: '${OMNIAUTH_OIDC_GROUPS:-entitlement}'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
       interval: 30s
@@ -108,8 +107,10 @@ services:
       retries: 5
       start_period: 20s
     volumes:
+      # Local Docker convenience only (ENV→Seek::Config defaults + default Institution).
+      # Stock Admin → OmniAuth settings remain the source of truth once persisted.
+      # Person auto-create overlay: copy docker-compose.override.yml.example → docker-compose.override.yml
       - ./custom-config/initializers/seek_env_defaults.rb:/seek/config/initializers/seek_env_defaults.rb:ro
-      - ./custom-config/initializers/custom_sessions.rb:/seek/config/initializers/custom_sessions.rb:ro
       - ./custom-config/initializers/oidc_setup.rb:/seek/config/initializers/oidc_setup.rb:ro
 
   seek_workers:
@@ -147,12 +148,7 @@ services:
 
 volumes:
   seek-filestore:
-    external: true
   seek-mysql-db:
-    external: true
   seek-solr-data:
-    external: true
   seek-cache:
-    external: true
   seek-redis-data:
-    external: true

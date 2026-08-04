@@ -17,12 +17,18 @@ define_method(:load_seek_config_defaults!) do
   # Disable standard (password) login so only OIDC is presented.
   Settings.defaults[:standard_login_enabled] = false
 
-  # Drive all OIDC connection settings from ENV vars so the container is
-  # configured purely via docker-compose / .env. No upstream file is touched.
+  # Drive OIDC connection settings from ENV for container deploys.
+  # Admin/DB settings still win once persisted.
   Settings.defaults[:omniauth_enabled]        = ENV.fetch('OMNIAUTH_ENABLED', 'false') == 'true'
   Settings.defaults[:omniauth_oidc_enabled]   = ENV.fetch('OMNIAUTH_OIDC_ENABLED', 'false') == 'true'
   Settings.defaults[:omniauth_oidc_name]      = ENV.fetch('OMNIAUTH_OIDC_NAME', 'OpenID Connect Provider')
   Settings.defaults[:omniauth_oidc_issuer]    = ENV.fetch('OMNIAUTH_OIDC_ISSUER', '')
   Settings.defaults[:omniauth_oidc_client_id] = ENV.fetch('OMNIAUTH_OIDC_CLIENT_ID', '')
   Settings.defaults[:omniauth_oidc_secret]    = ENV.fetch('OMNIAUTH_OIDC_SECRET', '')
+  Settings.defaults[:omniauth_oidc_scope]     = ENV.fetch('OMNIAUTH_OIDC_SCOPE', 'openid email profile')
+
+  # Group claim → Project sync (in-tree Seek::Omniauth::OidcGroupProjectSync)
+  Settings.defaults[:omniauth_oidc_groups_enabled] = ENV.fetch('OMNIAUTH_OIDC_GROUPS_ENABLED',
+                                                               ENV.fetch('OMNIAUTH_OIDC_ENABLED', 'false')) == 'true'
+  Settings.defaults[:omniauth_oidc_groups_claim] = ENV.fetch('OMNIAUTH_OIDC_GROUPS', 'entitlement')
 end

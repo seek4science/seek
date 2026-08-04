@@ -37,9 +37,11 @@ RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
 FROM base AS builder
 
 # Install build dependencies
+# clang/libclang-dev required to compile selma (rb-sys/bindgen) on aarch64-linux
+# where no prebuilt native gem is published in Gemfile.lock.
 RUN PYTHON_VERSION=$(cat .python-version) && \
     apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential cmake \
+    apt-get install -y --no-install-recommends build-essential cmake clang libclang-dev \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
     libsqlite3-dev libssl-dev libxml++2.6-dev libxslt1-dev libyaml-dev \
     python${PYTHON_VERSION}-dev python3-pip python${PYTHON_VERSION}-venv && \

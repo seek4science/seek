@@ -430,9 +430,8 @@ module Seek
         }
       }
 
-      # Add scope if specified via environment variable
-      scope_env = ENV.fetch('OMNIAUTH_OIDC_SCOPE', 'openid email profile entitlement')
-      config[:scope] = scope_env.split unless scope_env.blank?
+      scope = omniauth_oidc_scope.to_s.strip
+      config[:scope] = scope.split unless scope.blank?
 
       config
     end

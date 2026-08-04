@@ -101,3 +101,5 @@ docker-compose.override.yml
 .devcontainer*
 .env
 TODO.md
+config/initializers/oidc_setup.rb
+config/initializers/seek_env_defaults.rb

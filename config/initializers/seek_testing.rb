@@ -138,6 +138,9 @@ def load_seek_testing_defaults!
       Settings.defaults[:omniauth_oidc_issuer] = 'https://example.com/oidc'
       Settings.defaults[:omniauth_oidc_client_id] = 'def'
       Settings.defaults[:omniauth_oidc_secret] = '789'
+      Settings.defaults[:omniauth_oidc_scope] = 'openid email profile'
+      Settings.defaults[:omniauth_oidc_groups_enabled] = false
+      Settings.defaults[:omniauth_oidc_groups_claim] = 'entitlement'
 
       Settings.defaults[:ga4gh_trs_api_enabled] = true
 
