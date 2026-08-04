@@ -211,9 +211,10 @@ module WorkflowExtraction
         if should_generate_crate? && is_git_versioned?
           git_version.in_temp_dir do |tmpdir|
             crate.entities.each do |entity|
-              if !entity.nil? && entity.type == 'File' && entity.external? && !entity['localPath'].nil?
-                File.delete(File.join(tmpdir, entity['localPath']))
-              end
+              next unless !entity.nil? && entity.type == 'File' && entity.external? && !entity['localPath'].nil?
+
+              full_path = File.join(tmpdir, entity['localPath'])
+              File.delete(full_path) if File.zero?(full_path)
             end
             crate.add_all(tmpdir, false, include_hidden: true)
             yield crate
