@@ -9,6 +9,10 @@
   <%= favicon_link_tag('favicon.png', :type => 'image/png') %>
   <%= csrf_meta_tag %>
 
+  <% if params[:code].present? %>
+    <meta name="robots" content="noindex, nofollow"/>
+  <% end %>
+
   <%= schema_ld_script_block %>
 
   <%= seek_stylesheet_tags %>
