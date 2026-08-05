@@ -36,13 +36,15 @@ class ApplicationController < ActionController::Base
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
   before_action :secure_user_content
+  before_action :prevent_indexing_of_auth_code_urls
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
   include FairSignposting
 
   helper :all
   helper_method %i[current_person is_condensed_view page_and_sort_params controller_model
-                   displaying_single_page? display_isa_graph? safe_class_lookup]
+                   displaying_single_page? display_isa_graph? safe_class_lookup
+                   current_url_without_code]
 
   layout Seek::Config.main_layout
 
@@ -657,6 +659,18 @@ class ApplicationController < ActionController::Base
       end
     end
     keys
+  end
+
+  def prevent_indexing_of_auth_code_urls
+    return if params[:code].blank?
+
+    response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+    response.headers['Referrer-Policy'] = 'no-referrer'
+  end
+  
+  def current_url_without_code
+    query = request.query_parameters.except('code')
+    request.base_url + request.path + (query.any? ? "?#{query.to_query}" : '')
   end
 
   # Stop hosted user content from running scripts etc.
