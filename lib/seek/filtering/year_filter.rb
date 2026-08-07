@@ -12,7 +12,9 @@ module Seek
 
         t = collection.arel_table
         arel = years.inject(nil) do |arel, year|
-          dt = Time.new(year.to_i)
+          year = year.to_i
+          return collection.none if year < 1000 || year > 9999
+          dt = Time.new(year)
           exp = t[field].gteq(dt.beginning_of_year).and(t[field].lteq(dt.end_of_year))
           arel ? arel.or(exp) : exp
         end
