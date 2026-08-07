@@ -13,9 +13,14 @@ module Seek
         t = collection.arel_table
         arel = years.inject(nil) do |arel, year|
           year = year.to_i
-          return collection.none if year < 1000 || year > 9999
-          dt = Time.new(year)
-          exp = t[field].gteq(dt.beginning_of_year).and(t[field].lteq(dt.end_of_year))
+          if year < 1000 || year > 9999
+            exp = Arel::Nodes::False.new # Basically a "no op". Equivalent of "1=0" in SQL, i.e.
+                                         #  it will return an empty set if it's the only condition,
+                                         #  or will do nothing if it's used in an "OR".
+          else
+            dt = Time.new(year)
+            exp = t[field].gteq(dt.beginning_of_year).and(t[field].lteq(dt.end_of_year))
+          end
           arel ? arel.or(exp) : exp
         end
 
