@@ -32,7 +32,7 @@ module Seek
         src = img['src'].strip
         return if src.start_with?('http')
 
-        img['src'] = URI.join('http://localhost:3000', '/workflows/3/git/1/raw/', src).to_s
+        img['src'] = URI.join(context[:base_url], context[:workflow_root], src).to_s
       end
     end
 
@@ -60,7 +60,12 @@ module Seek
     def self.render(markdown)
       markdown = markdown.encode('UTF-8', invalid: :replace, undef: :replace)
       return '' if markdown.blank?
-      MarkdownPipeline.call(markdown)[:output]
+
+      context = {
+        workflow_root: '/workflows/3/git/1/raw/',
+        base_url: 'http://localhost:3000'
+      }
+      MarkdownPipeline.call(markdown, context: context)[:output]
     end
 
     # Strips markdown tags from a string and returns plain text
