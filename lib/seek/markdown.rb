@@ -19,6 +19,23 @@ module Seek
       end
     end
 
+    class RelativeLinkFilter < HTMLPipeline::NodeFilter
+      SELECTOR = Selma::Selector.new(match_element: 'img')
+
+      def selector
+        SELECTOR
+      end
+
+      def handle_element(img)
+        return if img['src'].nil?
+
+        src = img['src'].strip
+        return if src.start_with?('http')
+
+        img['src'] = URI.join('http://localhost:3000', '/workflows/3/git/1/raw/', src).to_s
+      end
+    end
+
     MarkdownPipeline = HTMLPipeline.new(
       convert_filter: HTMLPipeline::ConvertFilter::MarkdownFilter.new(context: {
         markdown: {
@@ -26,7 +43,7 @@ module Seek
           extension: { tagfilter: true, table: true, strikethrough: true, autolink: true }
         }
       }),
-      node_filters: [LinkNofollowFilter.new]
+      node_filters: [LinkNofollowFilter.new, RelativeLinkFilter.new]
     )
 
     MarkdownPlainTextPipeline = HTMLPipeline.new(
