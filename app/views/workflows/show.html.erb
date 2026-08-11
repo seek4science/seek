@@ -25,7 +25,7 @@
           <% end %>
         </div>
 
-        <%= item_description(@display_workflow.description) %>
+        <%= render partial: "assets/item_description", locals: { description: @display_workflow.description, relative_root: '/workflows/3/git/1/raw/'}  %>
 
         <% begin %>
           <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
