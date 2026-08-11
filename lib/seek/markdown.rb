@@ -27,12 +27,12 @@ module Seek
       end
 
       def handle_element(img)
-        return if img['src'].nil?
+        return if img['src'].nil? || context[:relative_root].nil?
 
         src = img['src'].strip
         return if src.start_with?('http')
 
-        img['src'] = URI.join(context[:base_url], context[:workflow_root], src).to_s
+        img['src'] = Addressable::URI.join(context[:relative_root], src).to_s
       end
     end
 
@@ -57,13 +57,12 @@ module Seek
     )
 
     # Renders a markdown string to HTML
-    def self.render(markdown)
+    def self.render(markdown, relative_root = nil)
       markdown = markdown.encode('UTF-8', invalid: :replace, undef: :replace)
       return '' if markdown.blank?
 
       context = {
-        workflow_root: '/workflows/3/git/1/raw/',
-        base_url: 'http://localhost:3000'
+        relative_root: relative_root
       }
       MarkdownPipeline.call(markdown, context: context)[:output]
     end

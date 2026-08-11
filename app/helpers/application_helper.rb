@@ -211,8 +211,8 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end
 
-  def render_markdown(markdown)
-    Seek::Markdown.render(markdown)
+  def render_markdown(markdown, relative_root)
+    Seek::Markdown.render(markdown, relative_root)
   end
 
   def text_or_not_specified(text, options = {})
@@ -230,7 +230,7 @@ module ApplicationHelper
       if options[:markdown]
         # Convert `&gt;` etc. back to `>` so markdown blockquotes can be used.
         # The markdown renderer will cope with rogue `>`s that are not part of quotes.
-        res = render_markdown(CGI::unescapeHTML(res))
+        res = render_markdown(CGI::unescapeHTML(res), options[:markdown_relative_root])
       elsif options[:description] || options[:address]
         res = simple_format(res, {}, sanitize: false).html_safe
       end
