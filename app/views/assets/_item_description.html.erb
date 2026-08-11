@@ -1,11 +1,12 @@
 <%
   label ||= ""
   none_text ||= nil
+  relative_root ||= nil
 -%>
 
 <% unless label.blank? %>
     <b><%= label -%>:</b>
 <% end %>
 <div id="description" class="markdown-body seek-description">
-  <%= text_or_not_specified(description, description: true, auto_link: true, none_text: none_text, markdown: true, markdown_relative_root: '/workflows/3/git/1/raw/') %>
+  <%= text_or_not_specified(description, description: true, auto_link: true, none_text: none_text, markdown: true, markdown_relative_root: relative_root) %>
 </div>
