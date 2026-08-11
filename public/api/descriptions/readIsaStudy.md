@@ -1,0 +1,1 @@
+<a name="readIsaStudy"></a>The **readIsaStudy** operation returns an ISA Study — its study metadata, source sample type, and sample collection sample type — including the samples (visible to the authenticated user) within each sample type.

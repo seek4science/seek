@@ -1,0 +1,64 @@
+{
+  "data": {
+    "type": "isa_assays",
+    "attributes": {
+      "assay": {
+        "title": "A Material ISA Assay",
+        "description": "An ISA assay measuring other material outputs",
+        "study_id": "67",
+        "assay_class_id": "1",
+        "assay_stream_id": "150",
+        "assay_type_uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type",
+        "technology_type_uri": "http://jermontology.org/ontology/JERMOntology#Technology_type",
+        "policy": {
+          "access": "download",
+          "permissions": []
+        }
+      },
+      "sample_type": {
+        "title": "Material Assay Output",
+        "description": "Output sample type for the material assay",
+        "template_id": "3",
+        "sample_attributes": [
+          {
+            "title": "Input (Sample Name)",
+            "pos": 1,
+            "required": true,
+            "is_title": false,
+            "template_attribute_id": "6",
+            "sample_attribute_type": { "title": "SEEK Sample Multi" },
+            "linked_sample_type_id": "121",
+            "isa_tag_id": "11"
+          },
+          {
+            "title": "Other Material Name",
+            "pos": 2,
+            "required": true,
+            "is_title": true,
+            "sample_attribute_type": { "title": "String" },
+            "isa_tag_id": "6"
+          },
+          {
+            "title": "Processing Protocol",
+            "pos": 3,
+            "required": true,
+            "is_title": false,
+            "template_attribute_id": "7",
+            "sample_attribute_type": { "title": "String" },
+            "isa_tag_id": "5"
+          },
+          {
+            "title": "Material Characteristic",
+            "pos": 4,
+            "required": false,
+            "is_title": false,
+            "template_attribute_id": "8",
+            "sample_attribute_type": { "title": "String" },
+            "isa_tag_id": "7"
+          }
+        ]
+      },
+      "input_sample_type_id": "121"
+    }
+  }
+}

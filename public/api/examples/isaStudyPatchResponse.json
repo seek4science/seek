@@ -1,0 +1,129 @@
+{
+  "data": {
+    "id": "67",
+    "type": "isa_studies",
+    "attributes": {
+      "study": {
+        "id": "67",
+        "title": "An ISA-Compliant Study",
+        "description": "Updated description for the ISA study",
+        "experimentalists": null,
+        "other_creators": null,
+        "position": null
+      },
+      "source_sample_type": {
+        "id": "120",
+        "title": "Study Sources",
+        "description": "Source materials for the study",
+        "template_id": "1",
+        "sample_attributes": [
+          {
+            "id": "301",
+            "title": "Source Name",
+            "pos": 1,
+            "required": true,
+            "is_title": true,
+            "isa_tag_id": "1",
+            "template_attribute_id": "1",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "302",
+            "title": "Species",
+            "pos": 2,
+            "required": false,
+            "is_title": false,
+            "isa_tag_id": "2",
+            "template_attribute_id": "2",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          }
+        ],
+        "samples": []
+      },
+      "sample_collection_sample_type": {
+        "id": "121",
+        "title": "Study Sample Collection",
+        "description": "Collected samples for the study",
+        "template_id": "2",
+        "sample_attributes": [
+          {
+            "id": "303",
+            "title": "Sample Name",
+            "pos": 1,
+            "required": true,
+            "is_title": true,
+            "isa_tag_id": "3",
+            "template_attribute_id": "3",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "304",
+            "title": "Collection Protocol",
+            "pos": 2,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": "5",
+            "template_attribute_id": "4",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "305",
+            "title": "Input (Source Name)",
+            "pos": 3,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": "11",
+            "template_attribute_id": "5",
+            "sample_attribute_type": {
+              "id": "13",
+              "title": "SEEK Sample Multi"
+            },
+            "linked_sample_type_id": "120",
+            "unit": null,
+            "description": null,
+            "pid": null
+          }
+        ],
+        "samples": []
+      }
+    },
+    "meta": {
+      "created": "2026-03-19T16:35:39.211Z",
+      "modified": "2026-03-19T16:35:39.303Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "96696ec0-05df-013f-f2a8-00155d52079b"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}
