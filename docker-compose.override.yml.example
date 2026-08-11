@@ -1,6 +1,45 @@
-# Optional local overlay – copy to docker-compose.override.yml (gitignored).
-# Enables Person auto-create on OIDC login for demos; stock SEEK uses registration instead.
+# Optional local Docker overlay for OIDC demos
+#
+#   cp docker-compose.override.yml.example docker-compose.override.yml
+#   cp .env.example .env   # then edit secrets
+#
+# docker-compose.override.yml is gitignored. Do not put this in the upstream PR.
+#
+# Stock SEEK: enable OIDC via Admin → OmniAuth. This overlay only seeds defaults
+# from ENV and optionally auto-creates Person profiles for faster demos.
+
 services:
   seek:
+    environment:
+      OMNIAUTH_OIDC_DEFAULT_INSTITUTION: ${OMNIAUTH_OIDC_DEFAULT_INSTITUTION:-Default Institution}
+      OMNIAUTH_OIDC_DEFAULT_INSTITUTION_COUNTRY: ${OMNIAUTH_OIDC_DEFAULT_INSTITUTION_COUNTRY:-NL}
+      OMNIAUTH_OIDC_DEFAULT_INSTITUTION_CITY: ${OMNIAUTH_OIDC_DEFAULT_INSTITUTION_CITY:-}
+      OMNIAUTH_OIDC_DEFAULT_INSTITUTION_WEB: ${OMNIAUTH_OIDC_DEFAULT_INSTITUTION_WEB:-}
+      OMNIAUTH_ENABLED: ${OMNIAUTH_ENABLED:-true}
+      OMNIAUTH_OIDC_ENABLED: ${OMNIAUTH_OIDC_ENABLED:-true}
+      OMNIAUTH_OIDC_NAME: ${OMNIAUTH_OIDC_NAME:-OpenID Connect Provider}
+      OMNIAUTH_OIDC_ISSUER: ${OMNIAUTH_OIDC_ISSUER:-}
+      OMNIAUTH_OIDC_CLIENT_ID: ${OMNIAUTH_OIDC_CLIENT_ID:-}
+      OMNIAUTH_OIDC_SECRET: ${OMNIAUTH_OIDC_SECRET:-}
+      OMNIAUTH_OIDC_SCOPE: ${OMNIAUTH_OIDC_SCOPE:-openid email profile}
+      OMNIAUTH_OIDC_GROUPS_ENABLED: ${OMNIAUTH_OIDC_GROUPS_ENABLED:-false}
+      OMNIAUTH_OIDC_GROUPS: ${OMNIAUTH_OIDC_GROUPS:-entitlement}
     volumes:
-      - ./custom-config/initializers/custom_sessions.rb:/seek/config/initializers/custom_sessions.rb:ro
+      - ./custom-config/initializers/seek_env_defaults.rb:/seek/config/initializers/seek_env_defaults.rb:ro
+      - ./custom-config/initializers/oidc_setup.rb:/seek/config/initializers/oidc_setup.rb:ro
+      # Uncomment for Person auto-create (skips stock registration UX):
+      # - ./custom-config/initializers/custom_sessions.rb:/seek/config/initializers/custom_sessions.rb:ro
+
+  # Local convenience: create named volumes automatically (upstream compose uses external: true).
+  # Comment these out if you already manage external volumes.
+volumes:
+  seek-filestore:
+    external: false
+  seek-mysql-db:
+    external: false
+  seek-solr-data:
+    external: false
+  seek-cache:
+    external: false
+  seek-redis-data:
+    external: false

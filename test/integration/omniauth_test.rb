@@ -340,6 +340,42 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'OIDC login syncs groups claim to projects when enabled' do
+    institution = FactoryBot.create(:institution)
+    existing_user = FactoryBot.create(:person, institution: institution).user
+    existing_user.identities.create!(uid: 'google-auth2|357823572abcbde', provider: 'oidc')
+
+    OmniAuth.config.mock_auth[:oidc] = OmniAuth::AuthHash.new({
+      provider: 'oidc',
+      uid: 'google-auth2|357823572abcbde',
+      info: {
+        'nickname' => 'john_oidc',
+        'first_name' => 'New',
+        'last_name' => 'OIDC',
+        'email' => existing_user.person.email
+      },
+      extra: { raw_info: { 'entitlement' => ['integration-oidc-project'] } }
+    })
+
+    with_config_values(omniauth_enabled: true,
+                       omniauth_oidc_enabled: true,
+                       omniauth_oidc_groups_enabled: true,
+                       omniauth_oidc_groups_claim: 'entitlement',
+                       omniauth_oidc_groups_institution_id: institution.id) do
+      assert_difference('Project.count', 1) do
+        post omniauth_authorize_path(:oidc)
+        follow_redirect!
+        assert_omniauth_bounce_to(root_path)
+      end
+    end
+
+    project = Project.find_by(title: 'integration-oidc-project')
+    assert project
+    person = existing_user.person.reload
+    assert person.member_of?(project)
+    assert person.is_project_administrator?(project)
+  end
+
   test 'should create and activate new GitHub user' do
     OmniAuth.config.mock_auth[:github] = @github_mock_auth
 

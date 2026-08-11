@@ -103,3 +103,6 @@ docker-compose.override.yml
 TODO.md
 config/initializers/oidc_setup.rb
 config/initializers/seek_env_defaults.rb
+config/initializers/custom_sessions.rb
+# Local Docker OIDC helpers (see docker-compose.override.yml.example)
+custom-config/
