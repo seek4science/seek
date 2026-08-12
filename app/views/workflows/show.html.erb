@@ -25,7 +25,8 @@
           <% end %>
         </div>
 
-        <%= render partial: "assets/item_description", locals: { description: @display_workflow.description, relative_root: '/workflows/3/git/1/raw/'}  %>
+        <%= render partial: "assets/item_description", locals: { description: @display_workflow.description, 
+                                                                 relative_root: polymorphic_path([@workflow, :git_raw], version: @display_workflow.version, path: '/')}  %>
 
         <% begin %>
           <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
