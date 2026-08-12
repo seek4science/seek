@@ -211,7 +211,7 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end
 
-  def render_markdown(markdown, relative_root)
+  def render_markdown(markdown, relative_root = '')
     Seek::Markdown.render(markdown, relative_root)
   end
 
