@@ -32,6 +32,8 @@ module Seek
         src = img['src'].strip
         return if src.start_with?('http')
 
+        src = src[1..] if src.start_with?('/')
+
         img['src'] = Addressable::URI.join(context[:relative_root], src).to_s
       end
     end
