@@ -30,7 +30,8 @@ module Seek
         return if img['src'].nil? || context[:relative_root].nil?
 
         src = img['src'].strip
-        return if src.start_with?('http')
+        src_uri = URI(src)
+        return if src_uri.absolute?
 
         src = src[1..] if src.start_with?('/')
 
