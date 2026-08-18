@@ -1,5 +1,5 @@
-# Mission Control - Jobs (experimental, mission-control branch): a web dashboard for inspecting and
-# managing Solid Queue jobs, mounted at /jobs in config/routes.rb.
+# Mission Control - Jobs: a web dashboard for inspecting and managing Solid Queue jobs, mounted at
+# /jobs in config/routes.rb.
 #
 # Gate it behind SEEK's own admin authentication (see MissionControlJobsController) and turn off the
 # gem's default HTTP Basic auth, so access is controlled the same way as the rest of the admin area.
