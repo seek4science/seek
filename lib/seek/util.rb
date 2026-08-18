@@ -151,8 +151,12 @@ module Seek
 
       Process.kill(0, pid)
       pid
-    rescue Errno::ESRCH, Errno::EPERM
+    rescue Errno::ESRCH
+      # No process with this pid - the pidfile is stale.
       nil
+    rescue Errno::EPERM
+      # The process exists but is owned by another user, so we can't signal it. It is still running.
+      pid
     end
 
     # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed

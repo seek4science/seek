@@ -375,9 +375,14 @@ class AdminController < ApplicationController
   end
 
   def restart_job_workers
-    command = "kill -TERM $(cat #{SolidQueue.supervisor_pidfile})"
-    error = execute_command(command)
-    redirect_with_status(error, 'background job workers')
+    pid = Seek::Util.solid_queue_supervisor_pid
+    if pid
+      error = execute_command("kill -TERM #{pid}")
+      redirect_with_status(error, 'background job workers')
+    else
+      flash[:error] = 'There are no background job workers running to restart.'
+      redirect_to action: :show
+    end
   end
 
   def clear_cache

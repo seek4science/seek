@@ -37,8 +37,17 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'admin can restart the job workers' do
-    post :restart_job_workers
+    Seek::Util.stub(:solid_queue_supervisor_pid, 12_345) do
+      post :restart_job_workers
+    end
     assert_nil flash[:error]
+  end
+
+  test 'restarting the job workers reports when none are running' do
+    Seek::Util.stub(:solid_queue_supervisor_pid, nil) do
+      post :restart_job_workers
+    end
+    assert_match(/no background job workers running/, flash[:error])
   end
 
   test 'none admin not get registration form' do

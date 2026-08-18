@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class UtilTest < ActiveSupport::TestCase
 
@@ -216,5 +217,33 @@ Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, 
     assert_equal expected, Seek::Util.schema_org_supported_types.map(&:name)
   end
 
+  test 'solid_queue_supervisor_pid returns nil when the pidfile is missing' do
+    SolidQueue.stub(:supervisor_pidfile, '/no/such/pidfile') do
+      assert_nil Seek::Util.solid_queue_supervisor_pid
+    end
+  end
+
+  test 'solid_queue_supervisor_pid interprets the running process' do
+    Tempfile.create('supervisor.pid') do |file|
+      file.write("12345\n")
+      file.rewind
+      SolidQueue.stub(:supervisor_pidfile, file.path) do
+        # Live process - signal 0 succeeds
+        Process.stub(:kill, 1) do
+          assert_equal 12_345, Seek::Util.solid_queue_supervisor_pid
+        end
+
+        # Stale pidfile - no such process
+        Process.stub(:kill, ->(*) { raise Errno::ESRCH }) do
+          assert_nil Seek::Util.solid_queue_supervisor_pid
+        end
+
+        # Process exists but owned by another user - still running
+        Process.stub(:kill, ->(*) { raise Errno::EPERM }) do
+          assert_equal 12_345, Seek::Util.solid_queue_supervisor_pid
+        end
+      end
+    end
+  end
 
 end
