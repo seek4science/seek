@@ -282,3 +282,5 @@ max_filters:
 reindex_all_batch_size:
   convert: :to_i
 default_citation_style:
+obfuscate_filters:
+  

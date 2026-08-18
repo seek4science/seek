@@ -142,6 +142,9 @@ class FilterTest < ActiveSupport::TestCase
     assert_includes_all year_filter.apply(Publication.all, ['2019', '1970']).to_a, [new_pub, newish_pub, old_pub]
     assert_empty year_filter.apply(Publication.all, ['1996']).to_a
     assert_empty year_filter.apply(Publication.all, ['banana']).to_a
+    assert_empty year_filter.apply(Publication.all, ['999']).to_a
+    assert_empty year_filter.apply(Publication.all, ['50000']).to_a
+    assert_includes_all year_filter.apply(Publication.all, ['2019', '50000']).to_a, [new_pub, newish_pub]
   end
 
   test 'get filter options' do
