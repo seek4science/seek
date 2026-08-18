@@ -30,12 +30,17 @@ module Seek
         return if img['src'].nil? || context[:relative_root].nil?
 
         src = img['src'].strip
-        src_uri = URI(src)
+        src_uri = Addressable::URI.parse(src)
         return if src_uri.absolute?
 
         src = src[1..] if src.start_with?('/')
 
-        img['src'] = Addressable::URI.join(context[:relative_root], src).to_s
+        new_src = Addressable::URI.join(context[:relative_root], src).to_s
+
+        # This stops anyone from attempting to show something from another record
+        return unless new_src.include? context[:relative_root]
+
+        img['src'] = new_src
       end
     end
 

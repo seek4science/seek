@@ -442,6 +442,16 @@ class ApplicationHelperTest < ActionView::TestCase
                  render_markdown('<img src="/test/image.png" />', relative_root: '/root/path/')
   end
 
+  test 'markdown renderer handles path navigation within the workflow' do
+    assert_equal '<img src="/root/path/test/image.png" />',
+                 render_markdown('<img src="test/../test/image.png" />', relative_root: '/root/path/')
+  end
+
+  test 'markdown renderer rejects path that attempts to use a different root' do
+    assert_equal '<img src="/../../another_root/path/test/image.png" />',
+                 render_markdown('<img src="/../../another_root/path/test/image.png" />', relative_root: '/root/path/')
+  end
+
   test 'markdown renderer does not change img tag src when absolute' do
     assert_equal '<img src="http://www.example.com/test/image.png" />',
                  render_markdown('<img src="http://www.example.com/test/image.png" />', relative_root: '/root/path/')
