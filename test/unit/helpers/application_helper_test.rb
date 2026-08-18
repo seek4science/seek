@@ -435,6 +435,25 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "<p>x🍌y</p>", Seek::Markdown.render("x🍌y")
   end
 
+  test 'markdown renderer handles img tag src being relative' do
+    assert_equal '<img src="/root/path/test/image.png" />',
+                 render_markdown('<img src="test/image.png" />', relative_root: '/root/path/')
+    assert_equal '<img src="/root/path/test/image.png" />',
+                 render_markdown('<img src="/test/image.png" />', relative_root: '/root/path/')
+  end
+
+  test 'markdown renderer does not change img tag src when absolute' do
+    assert_equal '<img src="http://www.example.com/test/image.png" />',
+                 render_markdown('<img src="http://www.example.com/test/image.png" />', relative_root: '/root/path/')
+  end
+
+  test 'markdown renderer does not update img tag src when relative root is not provided' do
+    assert_equal '<img src="test/image.png" />',
+                 render_markdown('<img src="test/image.png" />')
+    assert_equal '<img src="/test/image.png" />',
+                 render_markdown('<img src="/test/image.png" />')
+  end
+
   test 'markdown stripper removes markdown tags and HTML' do
    assert_equal "Hello\nThis is some markdown Yep alert('hi');hey http://hello.com a link",
                 Seek::Markdown.strip_markdown("# Hello\n\nThis <span>is</span> some **markdown** <table><tr><td>Yep <script>alert('hi');</script>hey</td></tr></table> http://hello.com [a link](http://link.com)")
