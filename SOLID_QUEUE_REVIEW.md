@@ -72,19 +72,23 @@ ever does need concurrency, the fix is a dedicated queue + worker for the heavy 
 recurring entry's `queue:` option routes it), not a higher thread count and not the default
 queue.
 
-### 3. Minor edge cases (informational)
+### 3. Minor edge cases (informational) — FIXED
 
-- `Seek::Util.solid_queue_supervisor_pid` treats `Process.kill(0, pid)` raising `Errno::EPERM`
-  as "not running" (`lib/seek/util.rb`). If the supervisor is ever owned by a different user
-  the status panel reports it down. Fine for a standard single-user deploy.
-- `restart_job_workers` runs `kill -TERM $(cat #{pidfile})` (`app/controllers/admin_controller.rb`).
-  If the pidfile is absent, `kill` gets no argument and Terrapin surfaces a non-zero exit as a
-  flash error to the admin — acceptable failure mode. Also: the restart only self-heals under
-  `script/run_solid_queue.sh` (docker/prod); in a bare `bin/jobs` dev session the button stops
-  workers without restarting them.
-- `app/views/admin/_restart_buttons.html.erb` renders each worker's `metadata['queues']` (a
-  comma-joined string) as one `<li>`. Correct only because the topology is one queue per worker —
-  if queues are ever consolidated, a list item will read `q1,q2`.
+- `Seek::Util.solid_queue_supervisor_pid` treated `Process.kill(0, pid)` raising `Errno::EPERM`
+  as "not running" (`lib/seek/util.rb`), so a supervisor owned by a different user would be
+  reported down. **Fixed:** `EPERM` (process exists, can't be signalled) now returns the pid;
+  only `ESRCH` (no such process — stale pidfile) reports not-running. Covered by new unit tests.
+- `restart_job_workers` ran `kill -TERM $(cat #{pidfile})` (`app/controllers/admin_controller.rb`);
+  an absent pidfile fed `kill` no argument and surfaced a confusing Terrapin error to the admin.
+  **Fixed:** it now resolves the pid in Ruby and `kill -TERM`s that, reporting cleanly ("no
+  background job workers running to restart") when there is no supervisor. Covered by a new
+  functional test. (Not changed: the restart only self-heals under `script/run_solid_queue.sh`
+  (docker/prod); in a bare `bin/jobs` dev session the button stops workers without restarting
+  them. That's inherent to the TERM-and-supervisor-restarts model, not a code defect.)
+- `app/views/admin/_restart_buttons.html.erb` rendered each worker's `metadata['queues']` (a
+  comma-joined string) as one `<li>`, correct only under the one-queue-per-worker topology.
+  **Fixed:** each worker's string is now split and flattened, so the active-queue list and count
+  are per-queue regardless of how queues map onto workers.
 
 ## Confirmed NOT problems
 
@@ -99,7 +103,8 @@ queue.
 ## Overall
 
 Solid and well-tested. The one substantive suggestion — the weekly-digest schedule (#1) — has
-been fixed; the rest are notes.
+been fixed, as have the minor edge cases (#3). #2 (command tasks serializing on one worker
+thread) is left as documented: not a real problem in practice.
 
 ## Not yet expanded (if a deeper pass is wanted)
 
