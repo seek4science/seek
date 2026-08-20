@@ -20,6 +20,7 @@ gem 'bundler'
 gem 'caxlsx'
 gem 'caxlsx_rails'
 gem 'cff'
+gem 'chronic' # AdminController parses human-readable duration settings (e.g. error grouping timeout) with Chronic
 gem 'citeproc-ruby'
 gem 'commonmarker'
 gem 'country_select'

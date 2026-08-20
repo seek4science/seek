@@ -185,6 +185,7 @@ GEM
     cff (1.3.0)
       json_schema (~> 0.20.4)
       language_list (~> 1.2.1)
+    chronic (0.10.2)
     citeproc (1.1.0)
       date
       forwardable
@@ -1113,6 +1114,7 @@ DEPENDENCIES
   caxlsx
   caxlsx_rails
   cff
+  chronic
   citeproc-ruby
   commonmarker
   country_select
