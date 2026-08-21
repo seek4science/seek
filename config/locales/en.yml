@@ -370,3 +370,6 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
       general: An error occurred whilst fetching the citation
       invalid_style: Invalid citation style
       invalid_cff: "Couldn't extract the citation from the provided CFF file:"
+
+  renderers:
+    truncated_content: "Only the first %{size} of this file is shown, download the file to see the full content."
