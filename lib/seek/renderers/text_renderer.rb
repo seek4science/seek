@@ -41,8 +41,7 @@ module Seek
       end
 
       def truncation_message
-        "Only the first #{number_to_human_size(MAX_RENDERABLE_SIZE)} of this file is shown, " \
-          'download the file to see the full content.'
+        I18n.t('renderers.truncated_content', size: number_to_human_size(MAX_RENDERABLE_SIZE))
       end
     end
   end
