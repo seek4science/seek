@@ -7,7 +7,7 @@ class ApplicationStatus < ApplicationRecord
         alive_since = SolidQueue.process_alive_threshold.ago
         update(
             running_jobs: SolidQueue::Process.where(kind: 'Worker').where('last_heartbeat_at > ?', alive_since).count
-         )
+        )
     end
 
     def search_enabled

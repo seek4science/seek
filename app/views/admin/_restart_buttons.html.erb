@@ -60,7 +60,7 @@
                   <% end %>
                 </ul>
             <% else %>
-                <span class="none_text">No background process running</span>
+                <span class="none_text">No background job workers running</span>
             <% end %>
         <% rescue StandardError => e %>
             <span class="text-danger">Unable to determine current status - <%= e.message %></span>

@@ -3,7 +3,7 @@
 # Adds Solid Queue's tables to the primary database (shared, not a separate queue database).
 # Table definitions mirror solid_queue 1.4.0's bundled db/queue_schema.rb, translated into a
 # regular migration.
-class CreateSolidQueueTables < ActiveRecord::Migration[7.1]
+class CreateSolidQueueTables < ActiveRecord::Migration[7.2]
   def change
     create_table :solid_queue_jobs do |t|
       t.string :queue_name, null: false

@@ -32,7 +32,9 @@ namespace :jobs do
       break if batch.zero?
     end
 
-    waiting = SolidQueue::ReadyExecution.count
+    ready = SolidQueue::ReadyExecution.all
+    ready = ready.where(queue_name: queues.split(',')) unless queues == '*'
+    waiting = ready.count
     puts "Dispatched #{dispatched} due scheduled job(s); #{waiting} job(s) ready to run on queue(s) #{queues}"
 
     # Count what actually runs. Solid Queue doesn't report this itself, and the job rows can't simply be
