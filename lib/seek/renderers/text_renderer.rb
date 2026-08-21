@@ -34,10 +34,16 @@ module Seek
       # Bytes that aren't valid UTF-8 are replaced, since they would otherwise break string handling
       # and the encoding of the response
       def text_content
+        blob.rewind
         content = blob.read(MAX_RENDERABLE_SIZE + 1).to_s.dup.force_encoding(Encoding::UTF_8)
         truncated = content.bytesize > MAX_RENDERABLE_SIZE
-        content = content.byteslice(0, MAX_RENDERABLE_SIZE) if truncated
-        [content.encode('UTF-8', invalid: :replace, undef: :replace), truncated]
+        content = content.encode('UTF-8', invalid: :replace, undef: :replace)
+        if content.bytesize > MAX_RENDERABLE_SIZE
+          # replacing invalid bytes can grow the content, and the limit may fall within a character
+          content = content.byteslice(0, MAX_RENDERABLE_SIZE).scrub('')
+          truncated = true
+        end
+        [content, truncated]
       end
 
       def truncation_message

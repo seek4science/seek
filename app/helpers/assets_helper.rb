@@ -47,7 +47,8 @@ module AssetsHelper
       # The renderer needs the local file content, but it is missing from the filestore
       content = ''
     else
-      content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}", expires_in: 30.days) do
+      cache_key = "#{asset.cache_key}/#{asset.content_blob.cache_key}/v#{Seek::Renderers::BlobRenderer::CACHE_VERSION}"
+      content = Rails.cache.fetch(cache_key, expires_in: 30.days) do
         our_renderer.render
       end
     end
