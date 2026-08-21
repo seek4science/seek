@@ -1,22 +1,27 @@
 module Seek
   module Renderers
     class TextRenderer < BlobRenderer
+      # the maximum amount of content that is rendered, anything beyond this is truncated
+      MAX_RENDERABLE_SIZE = 1.megabyte
+
       def can_render?
         blob.is_text?
       end
 
       def render_content
-        content = text_content
+        content, truncated = text_content
         if content.empty?
           '<span class="subtle">No content to display</span>'
         else
-          "<pre>#{h(content)}</pre>"
+          html = "<pre>#{h(content)}</pre>"
+          html << "<p class=\"subtle\">#{h(truncation_message)}</p>" if truncated
+          html
         end
-
       end
 
       def render_standalone
-        text_content
+        content, truncated = text_content
+        truncated ? "#{content}\n\n#{truncation_message}\n" : content
       end
 
       def format
@@ -25,10 +30,19 @@ module Seek
 
       private
 
-      # the content of the blob, with any bytes that aren't valid UTF-8 replaced, since they would
-      # otherwise break string handling and the encoding of the response
+      # the content of the blob, limited to MAX_RENDERABLE_SIZE, along with whether it was truncated.
+      # Bytes that aren't valid UTF-8 are replaced, since they would otherwise break string handling
+      # and the encoding of the response
       def text_content
-        blob.read.to_s.encode('UTF-8', invalid: :replace, undef: :replace)
+        content = blob.read(MAX_RENDERABLE_SIZE + 1).to_s.dup.force_encoding(Encoding::UTF_8)
+        truncated = content.bytesize > MAX_RENDERABLE_SIZE
+        content = content.byteslice(0, MAX_RENDERABLE_SIZE) if truncated
+        [content.encode('UTF-8', invalid: :replace, undef: :replace), truncated]
+      end
+
+      def truncation_message
+        "Only the first #{number_to_human_size(MAX_RENDERABLE_SIZE)} of this file is shown, " \
+          'download the file to see the full content.'
       end
     end
   end
