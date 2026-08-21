@@ -389,6 +389,9 @@ class PlaceholdersControllerTest < ActionController::TestCase
     assert_equal 8, assigns(:available_filters)[:contributor].length
     assert_equal 2, assigns(:available_filters)[:project].length
 
+    # Filter option links are loaded separately via AJAX - see _resource_filtering.html.erb
+    get :index, xhr: true, params: { filters_only: 1 }
+
     assert_select '.filter-category[data-filter-category="query"]' do
       assert_select '.filter-category-title', text: 'Query'
       assert_select '.filter-option-field-clear', count: 0
@@ -445,17 +448,21 @@ class PlaceholdersControllerTest < ActionController::TestCase
     other_project_doc = FactoryBot.create(:public_placeholder, created_at: 3.days.ago, projects: [other_project])
     FactoryBot.create_list(:public_placeholder, 5, projects: [project])
 
-    get :index, params: { filter: { programme: programme.id, project: other_project.id } }
+    filter_params = { filter: { programme: programme.id, project: other_project.id } }
+    get :index, params: filter_params
 
     assert_equal 1, assigns(:available_filters)[:contributor].length
     assert_equal 2, assigns(:available_filters)[:project].length
 
-    assert_select '.filter-category[data-filter-category="query"]' do
+    main_page = Nokogiri::HTML::Document.parse(@response.body)
+    filters = get_filters_fragment(filter_params)
+
+    assert_select filters, '.filter-category[data-filter-category="query"]' do
       assert_select '.filter-category-title', text: 'Query'
     end
 
     # Should show other project in projects category
-    assert_select '.filter-category[data-filter-category="project"]' do
+    assert_select filters, '.filter-category[data-filter-category="project"]' do
       assert_select '.filter-category-title', text: 'Project'
       assert_select '.filter-option.filter-option-active', count: 1
       assert_select '.filter-option', count: 2
@@ -472,7 +479,7 @@ class PlaceholdersControllerTest < ActionController::TestCase
       assert_select '.expand-filter-category-link', count: 0
     end
 
-    assert_select '.filter-category[data-filter-category="contributor"]' do
+    assert_select filters, '.filter-category[data-filter-category="contributor"]' do
       assert_select '.filter-category-title', text: 'Submitter'
       assert_select '.filter-option', count: 1
       assert_select '.filter-option.filter-option-active', count: 0
@@ -489,9 +496,9 @@ class PlaceholdersControllerTest < ActionController::TestCase
     end
 
     # Nothing in the filtered set has a tag, so the whole category should be hidden
-    assert_select '.filter-category[data-filter-category="tag"]', count: 0
+    assert_select filters, '.filter-category[data-filter-category="tag"]', count: 0
 
-    assert_select '.active-filters' do
+    assert_select main_page, '.active-filters' do
       assert_select '.active-filter-category-title', count: 2
       assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
         assert_select '[href=?]', placeholders_path(filter: { project: other_project.id })
@@ -503,7 +510,7 @@ class PlaceholdersControllerTest < ActionController::TestCase
       end
     end
 
-    assert_select 'a[href=?]', placeholders_path, text: /Clear all filters/
+    assert_select main_page, 'a[href=?]', placeholders_path, text: /Clear all filters/
   end
 
   test 'filtering system obeys authorization and does not leak info on private resources' do
@@ -521,7 +528,8 @@ class PlaceholdersControllerTest < ActionController::TestCase
     assert_equal 3, assigns(:available_filters)[:contributor].length
     assert_equal 1, assigns(:available_filters)[:project].length
     assert_equal 0, assigns(:available_filters)[:tag].length
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    assert_select get_filters_fragment(filter: { programme: programme.id }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-option-dropdown' do
         assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (3)'
         assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
@@ -547,7 +555,8 @@ class PlaceholdersControllerTest < ActionController::TestCase
     assert_equal 4, assigns(:available_filters)[:contributor].length
     assert_equal 1, assigns(:available_filters)[:project].length
     assert_equal 1, assigns(:available_filters)[:tag].length
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    assert_select get_filters_fragment(filter: { programme: programme.id }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-option-dropdown' do
         assert_select 'option[value="PT24H"]', text: 'in the last 24 hours (3)'
         assert_select 'option[value="P1W"]', text: 'in the last 1 week (3)'
@@ -576,15 +585,17 @@ class PlaceholdersControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:available_filters)[:query].count
     assert_equal 1, assigns(:active_filters)[:query].count
 
-    assert_select '.filter-category', count: 2
+    main_page = Nokogiri::HTML::Document.parse(@response.body)
+    filters = get_filters_fragment(filter: { programme: programme.id, query: 'hello' })
+    assert_select filters, '.filter-category', count: 2
 
-    assert_select '.filter-category[data-filter-category="query"]' do
+    assert_select filters, '.filter-category[data-filter-category="query"]' do
       assert_select '.filter-category-title', text: 'Query'
       assert_select '#filter-search-field[value=?]', 'hello'
       assert_select '.filter-option-field-clear', count: 1, href: placeholders_path(filter: { programme: programme.id })
     end
 
-    assert_select '.active-filters' do
+    assert_select main_page, '.active-filters' do
       assert_select ".filter-option[title='hello'].filter-option-active" do
         assert_select '[href=?]', placeholders_path(filter: { programme: programme.id })
         assert_select '.filter-option-label', text: 'hello'
@@ -610,7 +621,8 @@ class PlaceholdersControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id } }
 
     assert_equal 21, assigns(:visible_count)
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    assert_select get_filters_fragment(filter: { programme: programme.id }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other']", text: 'Other', count: 0
@@ -628,7 +640,9 @@ class PlaceholdersControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, created_at: 'P1M' } }
 
     assert_equal 6, assigns(:visible_count)
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    main_page = Nokogiri::HTML::Document.parse(@response.body)
+    assert_select get_filters_fragment(filter: { programme: programme.id, created_at: 'P1M' }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select 'option[value="custom"]', text: 'Custom range'
@@ -640,7 +654,7 @@ class PlaceholdersControllerTest < ActionController::TestCase
         assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
       end
     end
-    assert_select '.active-filters' do
+    assert_select main_page, '.active-filters' do
       assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
         assert_select '[href=?]', placeholders_path(filter: { created_at: 'P1M' })
         assert_select '.filter-option-label', text: programme.title
@@ -656,7 +670,9 @@ class PlaceholdersControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, created_at: date } }
 
     assert_equal 10, assigns(:visible_count)
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    main_page = Nokogiri::HTML::Document.parse(@response.body)
+    assert_select get_filters_fragment(filter: { programme: programme.id, created_at: date }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
@@ -671,7 +687,7 @@ class PlaceholdersControllerTest < ActionController::TestCase
         assert_select '[value=?]', date
       end
     end
-    assert_select '.active-filters' do
+    assert_select main_page, '.active-filters' do
       assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
         assert_select '[href=?]', placeholders_path(filter: { created_at: date })
         assert_select '.filter-option-label', text: programme.title
@@ -689,7 +705,9 @@ class PlaceholdersControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, created_at: range } }
 
     assert_equal 9, assigns(:visible_count)
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    main_page = Nokogiri::HTML::Document.parse(@response.body)
+    assert_select get_filters_fragment(filter: { programme: programme.id, created_at: range }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='custom'][selected='selected']", text: 'Custom range'
@@ -707,7 +725,7 @@ class PlaceholdersControllerTest < ActionController::TestCase
         assert_select '[value=?]', end_date
       end
     end
-    assert_select '.active-filters' do
+    assert_select main_page, '.active-filters' do
       assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
         assert_select '[href=?]', placeholders_path(filter: { created_at: range })
         assert_select '.filter-option-label', text: programme.title
@@ -722,7 +740,9 @@ class PlaceholdersControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, created_at: 'P3D' } }
 
     assert_equal 3, assigns(:visible_count)
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    main_page = Nokogiri::HTML::Document.parse(@response.body)
+    assert_select get_filters_fragment(filter: { programme: programme.id, created_at: 'P3D' }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
@@ -735,7 +755,7 @@ class PlaceholdersControllerTest < ActionController::TestCase
         assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
       end
     end
-    assert_select '.active-filters' do
+    assert_select main_page, '.active-filters' do
       assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
         assert_select '[href=?]', placeholders_path(filter: { created_at: 'P3D' })
         assert_select '.filter-option-label', text: programme.title
@@ -753,7 +773,9 @@ class PlaceholdersControllerTest < ActionController::TestCase
     get :index, params: { filter: { programme: programme.id, created_at: ['PT2H3M', range] } }
 
     assert_equal 7, assigns(:visible_count)
-    assert_select '.filter-category[data-filter-category="created_at"]' do
+    main_page = Nokogiri::HTML::Document.parse(@response.body)
+    assert_select get_filters_fragment(filter: { programme: programme.id, created_at: ['PT2H3M', range] }),
+                  '.filter-category[data-filter-category="created_at"]' do
       assert_select '.filter-category-title', text: 'Created At'
       assert_select '.filter-option-dropdown' do
         assert_select "option[value='other'][selected='selected']", text: 'Other'
@@ -766,7 +788,7 @@ class PlaceholdersControllerTest < ActionController::TestCase
         assert_select 'option[value="P5Y"]', text: 'in the last 5 years (15)'
       end
     end
-    assert_select '.active-filters' do
+    assert_select main_page, '.active-filters' do
       assert_select ".filter-option[title='#{programme.title}'].filter-option-active" do
         assert_select '[href=?]', placeholders_path(filter: { created_at: ['PT2H3M', range] })
         assert_select '.filter-option-label', text: programme.title
