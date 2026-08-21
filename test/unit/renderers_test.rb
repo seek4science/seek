@@ -381,10 +381,22 @@ class RenderersTest < ActiveSupport::TestCase
     @html = Nokogiri::HTML.parse(content)
     assert_select 'pre', text: /invalid .+ bytes/
 
-    blob.rewind
     standalone = renderer.render_standalone
     assert standalone.valid_encoding?
     assert standalone.start_with?('invalid ')
+  end
+
+  test 'text renderer limits the size of content that has been made valid UTF-8' do
+    max = Seek::Renderers::TextRenderer::MAX_RENDERABLE_SIZE
+    # each invalid byte is replaced by a 3 byte character, so the content grows as it is made valid
+    blob = FactoryBot.create(:txt_content_blob, asset: @asset, data: "\xFF" * max)
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+
+    content = renderer.render
+    assert content.valid_encoding?
+    assert content.bytesize <= max + 1000, 'the rendered content should be limited after being made valid UTF-8'
+    @html = Nokogiri::HTML.parse(content)
+    assert_select 'p.subtle', text: /Only the first 1 MB of this file is shown/
   end
 
   test 'text renderer truncates large content' do
@@ -401,9 +413,12 @@ class RenderersTest < ActiveSupport::TestCase
     end
     assert_select 'p.subtle', text: /Only the first 1 MB of this file is shown/
 
-    blob.rewind
+    # rendering again reads the content from the start, rather than continuing where it left off
+    assert_equal content, renderer.render
+
     standalone = renderer.render_standalone
     assert standalone.bytesize < blob.file_size
+    assert standalone.start_with?(File.read(blob.filepath, 100))
     assert standalone.include?('Only the first 1 MB of this file is shown')
   end
 
