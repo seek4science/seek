@@ -371,6 +371,22 @@ class RenderersTest < ActiveSupport::TestCase
     assert_equal '<span class="subtle">No content to display</span>', renderer.render
   end
 
+  test 'text renderer with content that is not valid UTF-8' do
+    blob = FactoryBot.create(:txt_content_blob, asset: @asset, data: "invalid \xFF\xFE bytes\n")
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+    assert renderer.can_render?
+
+    content = renderer.render
+    assert content.valid_encoding?
+    @html = Nokogiri::HTML.parse(content)
+    assert_select 'pre', text: /invalid .+ bytes/
+
+    blob.rewind
+    standalone = renderer.render_standalone
+    assert standalone.valid_encoding?
+    assert standalone.start_with?('invalid ')
+  end
+
   test 'image renderer' do
     blob = FactoryBot.create(:image_content_blob, asset: @asset)
     renderer = Seek::Renderers::ImageRenderer.new(blob)
