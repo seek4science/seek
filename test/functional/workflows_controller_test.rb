@@ -1765,6 +1765,26 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select '#download-group .dropdown-toggle', count: 1
   end
 
+  test 'should have description and update src property of images if they are relative' do
+    workflow = FactoryBot.create :ro_crate_git_workflow, policy: FactoryBot.create(:public_policy)
+
+    workflow.update(description: '<img src="test1/image.png"/><img src="/test2/image.png"/><img src="https://example.com/test3/image.png"/>')
+
+    get :show, params: { id: workflow }
+
+    assert_select '.seek-description', count: 1
+    assert_select '.seek-description img', count: 3
+    assert_select '.seek-description img:nth-of-type(1)' do
+      assert_select ":match('src', ?)", %r{/workflows/\d*/git/1/raw/test1/image.png}
+    end
+    assert_select '.seek-description img:nth-of-type(2)' do
+      assert_select ":match('src', ?)", %r{/workflows/\d*/git/1/raw/test2/image.png}
+    end
+    assert_select '.seek-description img:nth-of-type(3)' do
+      assert_select ":match('src', ?)", 'https://example.com/test3/image.png'
+    end
+  end
+
   test 'lists doi in index in table view' do
     Workflow.delete_all
 
