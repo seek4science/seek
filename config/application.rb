@@ -75,7 +75,7 @@ module SEEK
 
     config.action_mailer.deliver_later_queue_name = 'mailers'
 
-    config.active_job.queue_adapter = :delayed_job
+    config.active_job.queue_adapter = :solid_queue
 
     # Revert Rails 7 change that auto loads nested locale files
     initializer :avoid_nested_locale_directories, before: :add_locales do

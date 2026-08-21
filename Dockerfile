@@ -86,7 +86,7 @@ RUN mkdir -p /var/www
 
 # Fix permissions
 RUN chown -R www-data:www-data /var/www config docker db/schema.rb public solr sqlite3-db
-RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh
+RUN chmod -R 755 docker/upgrade.sh docker/start_workers.sh script/run_solid_queue.sh
 
 # Python dependencies from requirements.txt
 RUN PYTHON_VERSION=$(cat .python-version) && \

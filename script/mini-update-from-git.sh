@@ -22,10 +22,9 @@ echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while
 
 echo "${GREEN} restart workers${NC}"
-bundle exec rake seek:workers:restart
-
-echo "${GREEN} update crontab${NC}"
-bundle exec whenever --update-crontab
+if [ -f tmp/pids/solid_queue_supervisor.pid ]; then
+  kill -TERM $(cat tmp/pids/solid_queue_supervisor.pid) 2>/dev/null || true
+fi
 
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt
