@@ -143,7 +143,19 @@ module Seek
     # The pid of the running Solid Queue supervisor, if its pidfile (config/initializers/solid_queue.rb)
     # exists and the process is still alive, otherwise nil.
     def self.solid_queue_supervisor_pid
-      path = SolidQueue.supervisor_pidfile
+      live_pid_from_pidfile(SolidQueue.supervisor_pidfile)
+    end
+
+    # The pid of the script/run_solid_queue.sh restart loop, if its pidfile exists and the process is
+    # still alive, otherwise nil. Signalling this, rather than the supervisor, stops Solid Queue for
+    # good instead of triggering a restart.
+    def self.solid_queue_runner_pid
+      live_pid_from_pidfile(Rails.root.join('tmp/pids/solid_queue_runner.pid'))
+    end
+
+    # Read a pid from a pidfile, returning it only if the process is still alive (nil for a missing or
+    # stale pidfile). A process owned by another user counts as alive, since it exists.
+    def self.live_pid_from_pidfile(path)
       return nil unless path && File.exist?(path)
 
       pid = File.read(path).strip.to_i
@@ -152,11 +164,9 @@ module Seek
       Process.kill(0, pid)
       pid
     rescue Errno::ESRCH
-      # No process with this pid - the pidfile is stale.
-      nil
+      nil # No process with this pid - the pidfile is stale.
     rescue Errno::EPERM
-      # The process exists but is owned by another user, so we can't signal it. It is still running.
-      pid
+      pid # The process exists but is owned by another user, so we can't signal it. It is still running.
     end
 
     # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed

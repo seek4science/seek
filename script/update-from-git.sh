@@ -19,9 +19,8 @@ bundle install --deployment --without development test
 echo "${GREEN}pip install${NC}"
 python`cat .python-version` -m pip install -r requirements.txt
 
-if [ -f tmp/pids/solid_queue_runner.pid ]; then
-  kill -TERM $(cat tmp/pids/solid_queue_runner.pid) 2>/dev/null || true
-fi
+echo "${GREEN} stop background job workers${NC}"
+bundle exec rake jobs:stop
 
 echo "${GREEN} seek:upgrade${NC}"
 bundle exec rake seek:upgrade
