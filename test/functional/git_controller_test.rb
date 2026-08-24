@@ -230,6 +230,7 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'something')
     assert_select 'a.btn[href=?]', 'https://example.com/something'
     assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'something'), count: 0
+    assert_select 'span', 'This file is held externally'
   end
 
   test 'get raw binary file' do
