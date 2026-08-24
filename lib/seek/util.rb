@@ -150,7 +150,7 @@ module Seek
     # still alive, otherwise nil. Signalling this, rather than the supervisor, stops Solid Queue for
     # good instead of triggering a restart.
     def self.solid_queue_runner_pid
-      live_pid_from_pidfile(Rails.root.join('tmp/pids/solid_queue_runner.pid'))
+      live_pid_from_pidfile(SolidQueue.runner_pidfile)
     end
 
     # Read a pid from a pidfile, returning it only if the process is still alive (nil for a missing or

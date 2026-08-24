@@ -9,6 +9,8 @@
 # good instead of restarting it - used by deployment scripts that need a clean
 # stop before restarting later (see script/update-from-git.sh).
 mkdir -p tmp/pids
+# This path must match SolidQueue.runner_pidfile (config/initializers/solid_queue.rb), which the
+# jobs:stop rake task reads to signal this loop.
 echo $$ > tmp/pids/solid_queue_runner.pid
 
 child_pid=""
