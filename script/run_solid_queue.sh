@@ -16,8 +16,10 @@ stop=0
 trap 'stop=1; [ -n "$child_pid" ] && kill -TERM "$child_pid" 2>/dev/null' TERM INT
 
 while [ "$stop" -eq 0 ]; do
+  echo "Starting Solid Queue supervisor..."
   bundle exec bin/jobs &
   child_pid=$!
+  echo "Solid Queue supervisor started (pid $child_pid)"
   wait "$child_pid"
   child_pid=""
   if [ "$stop" -eq 0 ]; then
