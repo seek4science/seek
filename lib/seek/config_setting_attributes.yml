@@ -225,6 +225,7 @@ placeholders_enabled:
 standard_login_enabled:
 # Omniauth
 omniauth_enabled:
+omniauth_skip_login_page:
 omniauth_user_create:
 omniauth_user_activate:
 omniauth_elixir_aai_enabled:
