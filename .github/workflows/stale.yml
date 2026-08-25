@@ -2,7 +2,7 @@ name: Mark and close stale issues
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # runs every Monday at midnight UTC
+    - cron: '0 0 * * *'  # runs daily at midnight UTC
   workflow_dispatch:
     inputs:
       debug:
@@ -12,6 +12,7 @@ on:
 
 permissions:
   issues: write
+  actions: write               # the resume cache lists and deletes Actions caches
 
 jobs:
   stale:
@@ -32,5 +33,7 @@ jobs:
           exempt-issue-labels: 'pinned'
           days-before-pr-stale: -1     # disable stale marking for PRs
           days-before-pr-close: -1     # disable closing for PRs
+          operations-per-run: 100      # API budget per run; a fresh stale marking costs 3
+          ascending: true              # oldest issues first, so the 4-year backlog is reached first
           enable-statistics: true      # requires ACTIONS_STEP_DEBUG to be visible
           debug-only: true             # dry run — remove this when ready to go live
