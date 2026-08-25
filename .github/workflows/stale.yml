@@ -13,7 +13,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@v11
         with:
           days-before-stale: 1461      # mark as stale after 4 years (365*4+1 leap year)
           days-before-close: 14        # close 14 days after being marked stale
