@@ -49,7 +49,7 @@
 
 <% renderer = Seek::Renderers::RendererFactory.instance.renderer(@blob) %>
 <% if @blob.remote? && !@blob.fetched? && !renderer.external_embed? %>
-  <span class="alert alert-info">This file is held externally</span>
+  <span class="alert alert-info" role="alert">This file is held externally</span>
 <% else %>
   <% if renderer.is_a?(Seek::Renderers::BlankRenderer) %>
     <span class="subtle">Binary content not displayed</span>
