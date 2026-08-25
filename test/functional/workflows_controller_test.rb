@@ -1411,6 +1411,18 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal Seek::BioSchema::Serializer.new(workflow.latest_version).json_representation, json
   end
 
+  test 'json of workflow contains activity data' do
+    workflow = FactoryBot.create(:public_workflow)
+
+    get :show, params: { id: workflow.id, format: :json }
+    json = JSON.parse(response.body)
+    refute_nil json['data']
+    refute_nil json['data']['meta']
+    assert_equal 0, json['data']['meta']['view_count']
+    assert_equal 0, json['data']['meta']['download_count']
+    assert_nil json['data']['meta']['run_count']
+  end
+
   test 'license should be overwritable by project default if not present' do
     post :create_from_ro_crate, params: {
       ro_crate: { data: fixture_file_upload('workflows/1-PreProcessing.crate.zip', 'application/zip') }
