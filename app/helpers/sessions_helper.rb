@@ -1,8 +1,10 @@
 module SessionsHelper
   LOGIN_STRATEGIES = %i[password elixir_aai ldap github oidc].freeze
 
-  # strategies that take the user straight to an external provider, with no form to fill in first
-  REDIRECTING_LOGIN_STRATEGIES = %i[elixir_aai github oidc].freeze
+  # strategies with a form to fill in, rather than sending the user out to the provider
+  FORM_LOGIN_STRATEGIES = %i[password ldap].freeze
+
+  REDIRECTING_LOGIN_STRATEGIES = (LOGIN_STRATEGIES - FORM_LOGIN_STRATEGIES).freeze
 
   # a person can be logged in but not fully registered during
   # the registration process whilst selecting or creating a profile
@@ -21,9 +23,7 @@ module SessionsHelper
 
   # the login strategies currently available, in order of preference
   def available_login_strategies
-    LOGIN_STRATEGIES.select do |strategy|
-      strategy == :password ? show_standard_password_login? : send("show_#{strategy}_login?")
-    end
+    LOGIN_STRATEGIES.select { |strategy| send("show_#{strategy}_login?") }
   end
 
   # the only way to log in, when that is a provider the user can be sent straight to
@@ -63,7 +63,7 @@ module SessionsHelper
     User.logged_in_and_member?
   end
 
-  def show_standard_password_login?
+  def show_password_login?
     # always show if omniauth options aren't available, regardless of standard_login_enabled setting
     params[:show_standard_login].present? || Seek::Config.standard_login_enabled || !show_omniauth_login?
   end
