@@ -104,10 +104,17 @@ class ContributedResourceSerializer < BaseSerializer
                  end
   end
 
+  def _meta
+    meta = super
+    meta[:view_count] = object.view_count
+    meta[:run_count] = object.run_count if object.respond_to?(:can_run?) && object.can_run?
+    meta[:download_count] = object.download_count if object.respond_to?(:contains_downloadable_items?) && object.contains_downloadable_items?
+    meta
+  end
+
   private
 
   def version_number
     (@scope.try(:[], :requested_version) || object)&.version
   end
-
 end
