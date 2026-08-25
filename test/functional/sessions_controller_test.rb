@@ -306,7 +306,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should skip the login page when there is a single omniauth provider' do
-    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
                        omniauth_ldap_enabled: false, omniauth_github_enabled: false,
                        omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
       get :new
@@ -317,8 +317,20 @@ class SessionsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should not skip the login page by default' do
+    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      refute Seek::Config.omniauth_skip_login_page
+      get :new
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#oidc_login a', 1
+    end
+  end
+
   test 'should not skip the login page when there is more than one login option' do
-    with_config_values(standard_login_enabled: true, omniauth_enabled: true,
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: true, omniauth_enabled: true,
                        omniauth_ldap_enabled: false, omniauth_github_enabled: false,
                        omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
       get :new
@@ -330,7 +342,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should not skip the login page for a provider with its own form' do
-    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
                        omniauth_ldap_enabled: true, omniauth_github_enabled: false,
                        omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: false) do
       get :new
@@ -341,7 +353,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should not skip the login page when a strategy is requested' do
-    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
                        omniauth_ldap_enabled: false, omniauth_github_enabled: false,
                        omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
       get :new, params: { strategy: 'oidc' }
@@ -352,7 +364,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should not skip the login page after a failed login' do
-    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
                        omniauth_ldap_enabled: false, omniauth_github_enabled: false,
                        omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
       get :new, flash: { error: 'Something went wrong' }
@@ -363,7 +375,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should still reach the password form when skipping the login page' do
-    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
                        omniauth_ldap_enabled: false, omniauth_github_enabled: false,
                        omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
       get :new, params: { show_standard_login: true }

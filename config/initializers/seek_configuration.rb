@@ -229,6 +229,7 @@ def load_seek_config_defaults!
 
   # omniauth settings and behaviour
   Seek::Config.default :omniauth_enabled, false
+  Seek::Config.default :omniauth_skip_login_page, false
   Seek::Config.default :omniauth_user_create, true
   Seek::Config.default :omniauth_user_activate, true
   Seek::Config.default :omniauth_elixir_aai_enabled, false

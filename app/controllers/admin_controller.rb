@@ -75,6 +75,7 @@ class AdminController < ApplicationController
     end
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
+    Seek::Config.omniauth_skip_login_page = string_to_boolean params[:omniauth_skip_login_page]
     Seek::Config.standard_login_enabled = string_to_boolean params[:standard_login_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]

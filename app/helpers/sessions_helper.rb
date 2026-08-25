@@ -35,6 +35,7 @@ module SessionsHelper
   # the provider to send the user straight to, skipping the login page altogether.
   # the strategy and error checks stop a failed login bouncing straight back to the provider.
   def auto_login_strategy
+    return unless Seek::Config.omniauth_skip_login_page
     return if params[:strategy].present? || flash[:error].present?
 
     sole_redirecting_login_strategy
