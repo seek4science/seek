@@ -574,6 +574,50 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should not register when registration is disabled' do
+    with_config_value(:registration_disabled, true) do
+      assert_no_difference('User.count') do
+        create_user
+      end
+      assert_redirected_to root_path
+      assert_equal Seek::Config.registration_disabled_description, flash[:error]
+    end
+  end
+
+  test 'should hide the register link when registration is disabled' do
+    get :new
+    assert_response :success
+    assert_select 'a[href=?]', signup_path
+
+    with_config_value(:registration_disabled, true) do
+      get :new
+      assert_response :success
+      assert_select 'a[href=?]', signup_path, count: 0
+      assert_select '#home_description', 1
+    end
+  end
+
+  # unlike logging in, registering is never sent straight to the provider - the terms and
+  # conditions have to be accepted first, and they are only presented on this page
+  test 'should not skip the registration page when there is a single omniauth provider' do
+    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#login-panel', 1
+      assert_select '#oidc_registration a[name=?]', 'commit', 1
+
+      with_config_value(:terms_enabled, true) do
+        get :new
+        assert_response :success
+        assert_select 'form#auto-login-form', count: 0
+        assert_select '#oidc_registration input[name=?]', 'tc_agree', 1
+      end
+    end
+  end
+
   protected
 
   def create_user(options = {})

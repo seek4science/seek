@@ -1,4 +1,9 @@
 module SessionsHelper
+  LOGIN_STRATEGIES = %i[password elixir_aai ldap github oidc].freeze
+
+  # strategies that take the user straight to an external provider, with no form to fill in first
+  REDIRECTING_LOGIN_STRATEGIES = %i[elixir_aai github oidc].freeze
+
   # a person can be logged in but not fully registered during
   # the registration process whilst selecting or creating a profile
   def logged_in_and_registered?
@@ -11,13 +16,28 @@ module SessionsHelper
   end
 
   def detect_default_login_strategy
-    return 'password' if show_standard_password_login?
-    return 'elixir_aai' if show_elixir_aai_login?
-    return 'ldap' if show_ldap_login?
-    return 'github' if show_github_login?
-    return 'oidc' if show_oidc_login?
+    available_login_strategies.first&.to_s
+  end
 
-    nil
+  # the login strategies currently available, in order of preference
+  def available_login_strategies
+    LOGIN_STRATEGIES.select do |strategy|
+      strategy == :password ? show_standard_password_login? : send("show_#{strategy}_login?")
+    end
+  end
+
+  # the only way to log in, when that is a provider the user can be sent straight to
+  def sole_redirecting_login_strategy
+    strategies = available_login_strategies
+    strategies.first if strategies.one? && REDIRECTING_LOGIN_STRATEGIES.include?(strategies.first)
+  end
+
+  # the provider to send the user straight to, skipping the login page altogether.
+  # the strategy and error checks stop a failed login bouncing straight back to the provider.
+  def auto_login_strategy
+    return if params[:strategy].present? || flash[:error].present?
+
+    sole_redirecting_login_strategy
   end
 
   # returns true if there is somebody logged in and they are an project manager

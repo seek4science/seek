@@ -103,10 +103,15 @@
         </div>
       </div>
 
-      <div class="panel-footer">
-        <%= link_to "Register an account", signup_path %> or
-        <%= link_to "Forgotten your password?", forgot_password_path %>
-      </div>
+      <% show_registration_link = !Seek::Config.registration_disabled %>
+      <% show_forgotten_password_link = show_standard_password_login? %>
+      <% if show_registration_link || show_forgotten_password_link %>
+        <div class="panel-footer">
+          <%= link_to "Register an account", signup_path if show_registration_link %>
+          <%= "or" if show_registration_link && show_forgotten_password_link %>
+          <%= link_to "Forgotten your password?", forgot_password_path if show_forgotten_password_link %>
+        </div>
+      <% end %>
 
     </div>
 <% end -%>
