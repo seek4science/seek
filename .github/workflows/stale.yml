@@ -20,10 +20,11 @@ jobs:
           stale-issue-message: >
             This issue has been inactive for 4 years and has been marked as stale.
             It will be closed in 14 days unless there is new activity.
+            Apply the `not-stale` label to keep it open.
           close-issue-message: >
             Closing due to 4+ years of inactivity. Feel free to reopen if this is still relevant.
           stale-issue-label: 'stale'
-          exempt-issue-labels: 'pinned'
+          exempt-issue-labels: 'not-stale'
           days-before-pr-stale: -1     # disable stale marking for PRs
           days-before-pr-close: -1     # disable closing for PRs
           operations-per-run: 100      # API budget per run; a fresh stale marking costs 3
