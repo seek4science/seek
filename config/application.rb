@@ -13,16 +13,8 @@ end
 module SEEK
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.2
+    config.load_defaults 8.1
     config.active_record.default_column_serializer = YAML
-
-    # Rails 8.0/8.1 framework defaults that must be set here rather than in
-    # config/initializers/new_framework_defaults_8_1.rb, because the railtie initializers
-    # that read them run before config/initializers is loaded.
-    config.action_dispatch.strict_freshness = true
-    config.active_support.escape_js_separators_in_json = false
-    config.action_controller.action_on_path_relative_redirect = :raise
-    config.action_controller.escape_json_responses = false
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
@@ -69,6 +61,9 @@ module SEEK
 
     config.exceptions_app = self.routes
 
+    # Governs to_json, used by the views that inline JSON into a <script> block.
+    # Responses from `render json:` are separately governed by
+    # action_controller.escape_json_responses, which is false.
     config.active_support.escape_html_entities_in_json = true
 
     #uncomment and set the value if running under a suburi or use RAILS_RELATIVE_URL_ROOT
