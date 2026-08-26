@@ -224,6 +224,8 @@ class ISAStudiesController < ApplicationController
 
     # Check whether base objects exist
     @isa_study.errors.add(:study, "The #{t('isa_study')} was not found.") if @isa_study.study.nil?
+    return respond_with_error(:not_found) if @isa_study.errors.any?
+
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} not found.") if @isa_study.source.nil?
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
     return respond_with_error(:not_found) if @isa_study.errors.any?
@@ -231,11 +233,6 @@ class ISAStudiesController < ApplicationController
     # Check authorizations
     @isa_study.errors.add(:study, "You are not authorized to view this #{t('isa_study')}.") unless @isa_study.study.can_view?
     return respond_with_error(:forbidden) if @isa_study.errors.any?
-
-  rescue ActiveRecord::RecordNotFound
-    render json: { errors: [{ title: 'Not Found', detail: "#{t('isa_study')} with id '#{params[:id]}' was not found." }] },
-           status: :not_found
-    return false
   end
 
   def find_requested_item_for_edit
@@ -244,6 +241,8 @@ class ISAStudiesController < ApplicationController
 
     # Check whether base objects exist
     @isa_study.errors.add(:study, "The #{t('isa_study')} was not found.") if @isa_study.study.nil?
+    return respond_with_error(:not_found) if @isa_study.errors.any?
+
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} source' #{t('sample_type')} not found.") if @isa_study.source.nil?
     @isa_study.errors.add(:sample_type, "'#{t('isa_study')} sample' #{t('sample_type')} not found.") if @isa_study.sample_collection.nil?
     return respond_with_error(:not_found) if @isa_study.errors.any?

@@ -300,9 +300,6 @@ class ISAAssaysController < ApplicationController
       @isa_assay.errors.add(:sample_type, 'Sample type not found.') if @isa_assay.sample_type.nil?
       return respond_with_error(:not_found) if @isa_assay.errors.any?
     end
-  rescue ActiveRecord::RecordNotFound
-    render json: { errors: [{ title: 'Not Found', detail: "#{t('isa_assay')} with id '#{params[:id]}' was not found." }] },
-           status: :not_found
   end
 
   def find_requested_item_for_edit

@@ -45,8 +45,8 @@ class ISAAssay
   end
 
   def populate(id)
-    @assay = Assay.find(id)
-    @sample_type = @assay.sample_type
+    @assay = Assay.find_by(id:)
+    @sample_type = @assay&.sample_type
     if @sample_type
       @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
     end

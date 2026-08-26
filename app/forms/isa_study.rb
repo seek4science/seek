@@ -57,9 +57,9 @@ class ISAStudy
   end
 
   def populate(id)
-    @study = Study.find(id)
-    @source_sample_type = @study.sample_types.first
-    @sample_collection_sample_type = @study.sample_types.second
+    @study = Study.find_by(id:)
+    @source_sample_type = @study&.sample_types&.first
+    @sample_collection_sample_type = @study&.sample_types&.second
   end
 
   private
