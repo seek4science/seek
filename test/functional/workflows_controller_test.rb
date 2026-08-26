@@ -1424,6 +1424,19 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_nil json['data']['meta']['metrics']['run_count']
   end
 
+  test 'json of workflow contains activity data of runnable workflow' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow.id, format: :json }
+    json = JSON.parse(response.body)
+    refute_nil json['data']
+    refute_nil json['data']['meta']
+    refute_nil json['data']['meta']['metrics']
+    assert_equal 0, json['data']['meta']['metrics']['view_count']
+    assert_equal 0, json['data']['meta']['metrics']['download_count']
+    assert_equal 0, json['data']['meta']['metrics']['run_count']
+  end
+
   test 'license should be overwritable by project default if not present' do
     post :create_from_ro_crate, params: {
       ro_crate: { data: fixture_file_upload('workflows/1-PreProcessing.crate.zip', 'application/zip') }
