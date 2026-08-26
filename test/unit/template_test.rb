@@ -8,7 +8,7 @@ class TemplateTest < ActiveSupport::TestCase
     @project_ids = [@project.id]
     @source_characteristic_tag = ISATag.find_by(title: Seek::ISA::TagType::SOURCE_CHARACTERISTIC) || FactoryBot.create(:source_characteristic_isa_tag)
 
-    @string_sample_attribute_type = SampleAttributeType.find_by(title:String) || FactoryBot.create(:string_sample_attribute_type)
+    @string_sample_attribute_type = SampleAttributeType.find_by(title: 'String') || FactoryBot.create(:string_sample_attribute_type)
   end
 
   test 'validation' do

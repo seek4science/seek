@@ -728,13 +728,22 @@ class TemplatesControllerTest < ActionController::TestCase
                                           template_attributes_attributes: {
                                             '0' => {
                                               pos: '1',
+                                              title: 'Source Name',
+                                              required: '1',
+                                              sample_attribute_type_id: @string_type.id,
+                                              is_title: true,
+                                              _destroy: '0',
+                                              isa_tag_id: @source_isa_tag
+                                            },
+                                            '1' => {
+                                              pos: '2',
                                               title: 'Weight',
                                               required: '1',
                                               description: 'weight in grams',
                                               sample_attribute_type_id: @int_type.id,
                                               unit_id: unit.id,
                                               _destroy: '0',
-                                              isa_tag_id: @default_isa_tag
+                                              isa_tag_id: @source_characteristic_isa_tag
                                             }
                                           }
                                         }
@@ -861,6 +870,6 @@ class TemplatesControllerTest < ActionController::TestCase
     child_template_attributes = parent_template.template_attributes.map do |ta|
       FactoryBot.build(:template_attribute, parent_attribute_id: ta.id, title: ta.title, isa_tag_id: ta.isa_tag_id, sample_attribute_type: ta.sample_attribute_type, is_title: ta.is_title, required: ta.required, sample_controlled_vocab: ta.sample_controlled_vocab, pos: ta.pos)
     end
-    FactoryBot.create(:min_template, contributor: person, template_attributes: child_template_attributes, parent_id: parent_template.id)
+    FactoryBot.create(:template, contributor: person, template_attributes: child_template_attributes, parent_id: parent_template.id)
   end
 end
