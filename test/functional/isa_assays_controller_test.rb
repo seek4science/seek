@@ -902,7 +902,9 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_response :not_found
 
     response_body = JSON.parse(response.body)
-    assert_equal 'Not Found', response_body['errors'].first['title']
+    error = response_body['errors'].first
+    assert_equal '/data/attributes/assay', error['source']['pointer']
+    assert_match(/was not found/, error['detail'])
   end
 
   test 'should return forbidden when not authorized to view ISA assay' do
