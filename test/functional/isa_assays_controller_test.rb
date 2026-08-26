@@ -161,7 +161,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     isa_assay = assigns(:isa_assay)
 
     # Errors should be about the missing title
-    assert_equal ["[Assay]: Title can't be blank"], isa_assay.errors.full_messages
+    assert_equal ["Assay Title can't be blank"], isa_assay.errors.full_messages
 
     # A new Sample Type only needs the `isa_template_id`to be ISA-JSON compliant.
     assert isa_assay.sample_type.is_isa_json_compliant?
