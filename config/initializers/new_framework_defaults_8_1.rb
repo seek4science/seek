@@ -25,6 +25,8 @@
 #
 # Applications that want to keep the escaping behavior can set the config to `true`.
 #++
+# Set in config/application.rb: the railtie initializer that reads this runs before
+# config/initializers is loaded, so setting it here would have no effect.
 # Rails.configuration.action_controller.escape_json_responses = false
 
 ###

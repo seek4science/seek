@@ -1735,7 +1735,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'json api escapes html characters in the response body' do
+  test 'json api does not escape html characters in the response body' do
     title = 'Fish <b>&</b> chips'
     doc = FactoryBot.create(:public_document, title: title)
 
@@ -1743,13 +1743,12 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    # Escaping of <, > and & is governed by config.action_controller.escape_json_responses,
-    # which is set to true by config.load_defaults 7.2. The Rails 8.1 default is false, and
-    # adopting it means the raw characters are emitted instead of the \u escapes below.
-    assert_includes response.body, 'Fish \u003cb\u003e\u0026\u003c/b\u003e chips'
-    assert_not_includes response.body, title
+    # config.action_controller.escape_json_responses is false, so <, > and & are emitted
+    # raw. They need no escaping to be valid JSON - only ", \ and control characters do.
+    assert_includes response.body, %("title":"#{title}")
+    assert_not_includes response.body, '\u003cb\u003e'
 
-    # Whichever way escape_json_responses is set, the parsed value must round-trip intact.
+    # The parsed value must round-trip intact.
     assert_equal title, JSON.parse(response.body)['data']['attributes']['title']
   end
 
