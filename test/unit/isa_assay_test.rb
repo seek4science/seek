@@ -28,7 +28,7 @@ class ISAAssayTest < ActiveSupport::TestCase
   test 'populate assigns the assay, its sample type and the input sample type' do
     form = material_isa_assay
 
-    assert_equal @material_assay, form.material_assay
+    assert_equal @material_assay, form.assay
     assert_equal @material_assay.sample_type, form.sample_type
     assert_equal @study.sample_types.last.id, form.input_sample_type_id
   end
@@ -37,7 +37,7 @@ class ISAAssayTest < ActiveSupport::TestCase
     form = ISAAssay.new
     form.populate(0)
 
-    assert_nil form.material_assay
+    assert_nil form.assay
     assert_nil form.sample_type
   end
 
