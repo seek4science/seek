@@ -15,6 +15,11 @@ module SEEK
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
     config.active_record.default_column_serializer = YAML
+
+    # Active Storage is unused, but its variant processor is resolved on boot and
+    # logs a warning unless the image_processing gem is present.
+    config.active_storage.variant_processor = :disabled
+
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
