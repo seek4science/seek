@@ -81,7 +81,7 @@ class ISAAssay
     end
 
     # The Sample type must have exactly one attribute with a 'protocol' ISA tag
-    unless @sample_type.sample_attributes.select { |a| a.isa_tag.isa_protocol? }.one?
+    unless @sample_type.sample_attributes.select { |a| a.isa_tag&.isa_protocol? }.one?
       errors.add(:sample_type, "Should have exactly one attribute with the 'protocol' ISA Tag.")
     end
 
