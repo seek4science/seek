@@ -5638,7 +5638,7 @@ isaStudyResponse:
                 description:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 template_id:
-                  $ref: "#/components/schemas/nonEmptyString"
+                  $ref: "#/components/schemas/nullableNonEmptyString"
                 sample_attributes:
                   type: array
                   items:
@@ -5661,7 +5661,7 @@ isaStudyResponse:
                 description:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 template_id:
-                  $ref: "#/components/schemas/nonEmptyString"
+                  $ref: "#/components/schemas/nullableNonEmptyString"
                 sample_attributes:
                   type: array
                   items:
@@ -5882,7 +5882,7 @@ isaAssayResponse:
                 description:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 template_id:
-                  $ref: "#/components/schemas/nonEmptyString"
+                  $ref: "#/components/schemas/nullableNonEmptyString"
                 sample_attributes:
                   type: array
                   items:
