@@ -223,6 +223,133 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
               headers: { "Authorization": write_access_auth }
       end
     end
+
+    assert_response :ok
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+  end
+
+  test 'show ISA assay - response conforms to the documented schema' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                               linked_sample_type: @study.sample_types.last)
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+  end
+
+  test 'show ISA assay - not found response conforms to the documented schema' do
+    get isa_assay_path(0, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :not_found
+
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
+  end
+
+  # The documented request shape uses a `sample_attributes` array with a nested `sample_attribute_type`
+  # object, rather than the `sample_attributes_attributes` hash the UI form posts.
+  test 'create ISA assay - using the documented request shape' do
+    params = documented_isa_assay_post_params
+
+    assert_nothing_raised { validate_json(params.to_json, '#/components/schemas/isaAssayPost') }
+
+    assert_difference('Assay.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_difference('SampleAttribute.count', 4) do
+          post isa_assays_path(format: :json), params: params, as: :json,
+               headers: { "Authorization": write_access_auth }
+        end
+      end
+    end
+
+    assert_response :created
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+
+    assay = Assay.last
+    assert_equal 'My documented ISA Assay', assay.title
+    assert_equal 'Extract Name', assay.sample_type.sample_attributes.detect(&:is_title).title
+  end
+
+  test 'create ISA assay - top level policy is applied to the assay and its sample type' do
+    params = documented_isa_assay_post_params
+    params[:data][:attributes][:policy] = { access: 'download', permissions: [] }
+
+    post isa_assays_path(format: :json), params: params, as: :json,
+         headers: { "Authorization": write_access_auth }
+    assert_response :created
+
+    assay = Assay.last
+    assert_equal Policy::ACCESSIBLE, assay.policy.access_type
+    assert_equal Policy::ACCESSIBLE, assay.sample_type.policy.access_type
+  end
+
+  test 'create ISA assay - sample type without a protocol tagged attribute is rejected' do
+    params = documented_isa_assay_post_params
+    attributes = params[:data][:attributes][:sample_type][:sample_attributes]
+    protocol_attribute = attributes.detect { |a| a[:isa_tag_id] == @protocol_isa_tag.id.to_s }
+    protocol_attribute[:isa_tag_id] = @parameter_value_isa_tag.id.to_s
+
+    assert_no_difference('Assay.count') do
+      post isa_assays_path(format: :json), params: params, as: :json,
+           headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :unprocessable_entity
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/unprocessableEntityResponse') }
+    assert_includes response.body, "exactly one attribute with the 'protocol' ISA Tag"
+  end
+
+  # Regression test: an attribute with no ISA tag used to raise NoMethodError in the protocol
+  # tag check, returning a 500 instead of a validation error.
+  test 'create ISA assay - sample attribute without an ISA tag is rejected' do
+    params = documented_isa_assay_post_params
+    params[:data][:attributes][:sample_type][:sample_attributes].each { |a| a.delete(:isa_tag_id) }
+
+    assert_no_difference('Assay.count') do
+      post isa_assays_path(format: :json), params: params, as: :json,
+           headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.body, 'All attributes should have an ISA Tag'
+  end
+
+  private
+
+  def documented_isa_assay_post_params
+    {
+      data: {
+        type: 'isa_assays',
+        attributes: {
+          assay: {
+            title: 'My documented ISA Assay',
+            description: 'Created using the shape described in the API documentation',
+            study_id: @study.id.to_s,
+            assay_class_id: @experimental_assay_class.id.to_s,
+            assay_stream_id: @assay_stream.id.to_s
+          },
+          sample_type: {
+            title: 'Documented Assay Sample Type',
+            sample_attributes: [
+              { title: 'Input (collected sample)', pos: 1, required: true, is_title: false,
+                sample_attribute_type: { title: @sample_multi_sample_attribute_type.title },
+                linked_sample_type_id: @study.sample_types.last.id.to_s,
+                isa_tag_id: @input_isa_tag.id.to_s },
+              { title: 'Protocol used', pos: 2, required: true, is_title: false,
+                sample_attribute_type: { title: 'String' }, isa_tag_id: @protocol_isa_tag.id.to_s },
+              { title: 'Extract Name', pos: 3, required: true, is_title: true,
+                sample_attribute_type: { title: 'String' },
+                isa_tag_id: @other_material_isa_tag.id.to_s },
+              { title: 'Parameter Value', pos: 4, required: false, is_title: false,
+                sample_attribute_type: { title: 'String' },
+                isa_tag_id: @parameter_value_isa_tag.id.to_s }
+            ]
+          },
+          input_sample_type_id: @study.sample_types.last.id.to_s
+        }
+      }
+    }
   end
 end
 

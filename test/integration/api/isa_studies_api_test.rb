@@ -202,5 +202,122 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
               headers: { "Authorization": write_access_auth }
       end
     end
+
+    assert_response :ok
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaStudyResponse') }
+  end
+
+  test 'show ISA study - response conforms to the documented schema' do
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: current_person)
+
+    get isa_study_path(study.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaStudyResponse') }
+  end
+
+  test 'show ISA study - not found response conforms to the documented schema' do
+    get isa_study_path(0, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :not_found
+
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
+  end
+
+  # The documented request shape uses a `sample_attributes` array with a nested `sample_attribute_type`
+  # object, rather than the `sample_attributes_attributes` hash the UI form posts.
+  test 'create ISA study - using the documented request shape' do
+    params = documented_isa_study_post_params
+
+    assert_nothing_raised { validate_json(params.to_json, '#/components/schemas/isaStudyPost') }
+
+    assert_difference('Study.count', 1) do
+      assert_difference('SampleType.count', 2) do
+        assert_difference('SampleAttribute.count', 5) do
+          post isa_studies_path(format: :json), params: params, as: :json,
+               headers: { "Authorization": write_access_auth }
+        end
+      end
+    end
+
+    assert_response :created
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaStudyResponse') }
+
+    study = Study.last
+    assert_equal 'My documented ISA Study', study.title
+    source_type = study.sample_types.first
+    assert_equal 'Source Name', source_type.sample_attributes.first.title
+    assert_equal 'String', source_type.sample_attributes.first.sample_attribute_type.title
+  end
+
+  test 'create ISA study - top level policy is applied to the study and its sample types' do
+    params = documented_isa_study_post_params
+    params[:data][:attributes][:policy] = { access: 'download', permissions: [] }
+
+    post isa_studies_path(format: :json), params: params, as: :json,
+         headers: { "Authorization": write_access_auth }
+    assert_response :created
+
+    study = Study.last
+    assert_equal Policy::ACCESSIBLE, study.policy.access_type
+    study.sample_types.each do |sample_type|
+      assert_equal Policy::ACCESSIBLE, sample_type.policy.access_type
+    end
+  end
+
+  test 'create ISA study - sample type without a protocol tagged attribute is rejected' do
+    params = documented_isa_study_post_params
+    collection_attributes = params[:data][:attributes][:sample_collection_sample_type][:sample_attributes]
+    protocol_attribute = collection_attributes.detect { |a| a[:isa_tag_id] == @protocol_isa_tag.id.to_s }
+    protocol_attribute[:isa_tag_id] = @source_characteristic_isa_tag.id.to_s
+
+    assert_no_difference('Study.count') do
+      post isa_studies_path(format: :json), params: params, as: :json,
+           headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :unprocessable_entity
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/unprocessableEntityResponse') }
+    assert_includes response.body, "exactly one attribute with the 'protocol' ISA tag"
+  end
+
+  private
+
+  def documented_isa_study_post_params
+    {
+      data: {
+        type: 'isa_studies',
+        attributes: {
+          study: {
+            title: 'My documented ISA Study',
+            description: 'Created using the shape described in the API documentation',
+            investigation_id: @investigation.id.to_s
+          },
+          source_sample_type: {
+            title: 'Documented Source Sample Type',
+            sample_attributes: [
+              { title: 'Source Name', pos: 1, required: true, is_title: true,
+                sample_attribute_type: { title: 'String' }, isa_tag_id: @source_isa_tag.id.to_s },
+              { title: 'Species', pos: 2, required: false, is_title: false,
+                sample_attribute_type: { title: 'String' },
+                isa_tag_id: @source_characteristic_isa_tag.id.to_s }
+            ]
+          },
+          sample_collection_sample_type: {
+            title: 'Documented Sample Collection Sample Type',
+            sample_attributes: [
+              { title: 'Input', pos: 1, required: true, is_title: false,
+                sample_attribute_type: { title: @sample_multi_sample_attribute_type.title },
+                linked_sample_type_id: 'self', isa_tag_id: @input_isa_tag.id.to_s },
+              { title: 'Sample Name', pos: 2, required: true, is_title: true,
+                sample_attribute_type: { title: 'String' }, isa_tag_id: @sample_isa_tag.id.to_s },
+              { title: 'Collection Protocol', pos: 3, required: true, is_title: false,
+                sample_attribute_type: { title: 'String' }, isa_tag_id: @protocol_isa_tag.id.to_s }
+            ]
+          }
+        }
+      }
+    }
   end
 end
