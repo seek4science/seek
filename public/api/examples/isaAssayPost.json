@@ -9,11 +9,11 @@
         "assay_class_id": "1",
         "assay_stream_id": "150",
         "assay_type_uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type",
-        "technology_type_uri": "http://jermontology.org/ontology/JERMOntology#Technology_type",
-        "policy": {
-          "access": "download",
-          "permissions": []
-        }
+        "technology_type_uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
+      },
+      "policy": {
+        "access": "download",
+        "permissions": []
       },
       "sample_type": {
         "title": "Material Assay Output",

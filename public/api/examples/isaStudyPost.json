@@ -5,11 +5,11 @@
       "study": {
         "title": "An ISA-Compliant Study",
         "description": "A study tracking sources through sample collection",
-        "investigation_id": "1",
-        "policy": {
-          "access": "download",
-          "permissions": []
-        }
+        "investigation_id": "1"
+      },
+      "policy": {
+        "access": "download",
+        "permissions": []
       },
       "source_sample_type": {
         "title": "Study Sources",

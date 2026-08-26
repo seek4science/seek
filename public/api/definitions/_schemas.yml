@@ -5394,7 +5394,7 @@ isaSampleAttributePost:
     is_title:
       type: boolean
     isa_tag_id:
-      $ref: "#/components/schemas/nullableNonEmptyString"
+      $ref: "#/components/schemas/nonEmptyString"
     sample_controlled_vocab_id:
       $ref: "#/components/schemas/nullableNonEmptyString"
     linked_sample_type_id:
@@ -5473,14 +5473,12 @@ isaStudyPost:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 investigation_id:
                   $ref: "#/components/schemas/nonEmptyString"
-                policy:
-                  $ref: "#/components/schemas/policy"
-                discussion_links:
-                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - investigation_id
               additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
             source_sample_type:
               type: object
               properties:
@@ -5557,11 +5555,9 @@ isaStudyPatch:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 other_creators:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
-                policy:
-                  $ref: "#/components/schemas/policy"
-                discussion_links:
-                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
             source_sample_type:
               type: object
               properties:
@@ -5726,15 +5722,13 @@ isaAssayPost:
                   $ref: "#/components/schemas/nullableUriString"
                 technology_type_uri:
                   $ref: "#/components/schemas/nullableUriString"
-                policy:
-                  $ref: "#/components/schemas/policy"
-                discussion_links:
-                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - study_id
                 - assay_class_id
               additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
             sample_type:
               type: object
               properties:
@@ -5794,10 +5788,6 @@ isaAssayPatch:
                   $ref: "#/components/schemas/nullableUriString"
                 technology_type_uri:
                   $ref: "#/components/schemas/nullableUriString"
-                policy:
-                  $ref: "#/components/schemas/policy"
-                discussion_links:
-                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             sample_type:
               type: object
