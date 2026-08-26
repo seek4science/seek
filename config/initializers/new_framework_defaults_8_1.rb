@@ -33,7 +33,9 @@
 # Historically these characters were not valid inside JavaScript literal strings but that changed in ECMAScript 2019.
 # As such it's no longer a concern in modern browsers: https://caniuse.com/mdn-javascript_builtins_json_json_superset.
 #++
-Rails.configuration.active_support.escape_js_separators_in_json = false
+# Set in config/application.rb: the railtie initializer that reads this runs before
+# config/initializers is loaded, so setting it here would have no effect.
+# Rails.configuration.active_support.escape_js_separators_in_json = false
 
 ###
 # Raises an error when order dependent finder methods (e.g. `#first`, `#second`) are called without `order` values
@@ -58,7 +60,9 @@ Rails.configuration.active_record.raise_on_missing_required_finder_order_columns
 # Applications that want to allow these redirects can set the config to `:log` (previous default)
 # to only log warnings, or `:notify` to send ActiveSupport notifications.
 #++
-Rails.configuration.action_controller.action_on_path_relative_redirect = :raise
+# Set in config/application.rb: the railtie initializer that reads this runs before
+# config/initializers is loaded, so setting it here would have no effect.
+# Rails.configuration.action_controller.action_on_path_relative_redirect = :raise
 
 ###
 # Use a Ruby parser to track dependencies between Action View templates
@@ -73,6 +77,10 @@ Rails.configuration.action_view.render_tracker = :ruby
 #++
 Rails.configuration.action_view.remove_hidden_field_autocomplete = true
 
-# Rails 8.0 defaults
-Rails.configuration.action_dispatch.strict_freshness = true
+###
+# Rails 8.0 defaults.
+#
+# strict_freshness is set in config/application.rb: the railtie initializer that reads
+# it runs before config/initializers is loaded.
+#++
 Regexp.timeout ||= 1
