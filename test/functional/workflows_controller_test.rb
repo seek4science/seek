@@ -1418,9 +1418,10 @@ class WorkflowsControllerTest < ActionController::TestCase
     json = JSON.parse(response.body)
     refute_nil json['data']
     refute_nil json['data']['meta']
-    assert_equal 0, json['data']['meta']['view_count']
-    assert_equal 0, json['data']['meta']['download_count']
-    assert_nil json['data']['meta']['run_count']
+    refute_nil json['data']['meta']['metrics']
+    assert_equal 0, json['data']['meta']['metrics']['view_count']
+    assert_equal 0, json['data']['meta']['metrics']['download_count']
+    assert_nil json['data']['meta']['metrics']['run_count']
   end
 
   test 'license should be overwritable by project default if not present' do
