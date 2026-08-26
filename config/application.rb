@@ -22,6 +22,7 @@ module SEEK
     config.action_dispatch.strict_freshness = true
     config.active_support.escape_js_separators_in_json = false
     config.action_controller.action_on_path_relative_redirect = :raise
+    config.action_controller.escape_json_responses = false
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
