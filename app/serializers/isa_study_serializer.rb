@@ -50,7 +50,7 @@ class ISAStudySerializer < SimpleBaseSerializer
       id: sample_type.id.to_s,
       title: sample_type.title,
       description: sample_type.description,
-      template_id: sample_type.template_id,
+      template_id: sample_type.template_id&.to_s,
       sample_attributes: serialize_isa_sample_attributes(sample_type),
       samples: serialize_viewable_samples(sample_type)
     }
@@ -70,7 +70,7 @@ class ISAStudySerializer < SimpleBaseSerializer
         pos: attr.pos,
         required: attr.required,
         is_title: attr.is_title,
-        template_attribute_id: attr.template_attribute_id,
+        template_attribute_id: attr.template_attribute_id&.to_s,
         isa_tag_id: attr.isa_tag_id&.to_s,
         sample_attribute_type: {
           id: attr.sample_attribute_type_id&.to_s,

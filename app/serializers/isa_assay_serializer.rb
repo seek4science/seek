@@ -20,7 +20,7 @@ class ISAAssaySerializer < SimpleBaseSerializer
       description: object.assay.description,
       other_creators: object.assay.other_creators,
       position: object.assay.position,
-      study_id: object.assay.study_id,
+      study_id: object.assay.study_id&.to_s,
       assay_class: {
         title: object.assay.assay_class&.title,
         key: object.assay.assay_class&.key
@@ -62,7 +62,7 @@ class ISAAssaySerializer < SimpleBaseSerializer
       id: sample_type.id.to_s,
       title: sample_type.title,
       description: sample_type.description,
-      template_id: sample_type.template_id,
+      template_id: sample_type.template_id&.to_s,
       sample_attributes: serialize_isa_sample_attributes(sample_type),
       samples: serialize_viewable_samples(sample_type)
     }
@@ -82,7 +82,7 @@ class ISAAssaySerializer < SimpleBaseSerializer
         pos: attr.pos,
         required: attr.required,
         is_title: attr.is_title,
-        template_attribute_id: attr.template_attribute_id,
+        template_attribute_id: attr.template_attribute_id&.to_s,
         isa_tag_id: attr.isa_tag_id&.to_s,
         sample_attribute_type: {
           id: attr.sample_attribute_type_id&.to_s,

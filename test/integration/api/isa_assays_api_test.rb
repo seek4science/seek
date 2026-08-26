@@ -137,7 +137,7 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
           "pos": 1,
           "sample_attribute_type_id": @sample_multi_sample_attribute_type.id,  # Registered sample multi type
           "title": "Input (collected sample)",
-          "isa_tag_id": @input_isa_tag.id,  # Input has no tag
+          "isa_tag_id": @input_isa_tag.id,  # Input
           "required": true,
           "is_title": false,
           "linked_sample_type_id": sample_collection_sample_type_id
