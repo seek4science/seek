@@ -15,6 +15,11 @@ module SEEK
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
     config.active_record.default_column_serializer = YAML
+
+    # 10s rather than the Rails 8.0 default of 1s. Parsing large user-supplied spreadsheets,
+    # ISA templates and workflow files is regexp-heavy, and this limit also applies to gem
+    # code, so the tighter default leaves little headroom.
+    Regexp.timeout = 10
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
