@@ -49,13 +49,6 @@
           </div>
 
           <div class="col-md-6">
-            <% if @project.respond_to?(:project_coordinators) %>
-              <p class="project_coordinators">
-                <strong>Project Coordinators:</strong>
-                <%= project_coordinators_link_list @project %>
-              </p>
-            <% end%>
-
             <% if logged_in_and_registered? %>
               <p class="project_administrators">
                 <strong><%= t('project_administrator').pluralize %>:</strong>
