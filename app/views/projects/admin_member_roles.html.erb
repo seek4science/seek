@@ -16,11 +16,6 @@
         </p>
         <%= form_tag(update_members_project_path(@project)) do %>
             <%= panel('Administrative Roles') do %>
-                <% if admin_logged_in? %>
-                    <label><%= "#{t('pal').pluralize}" %></label>
-                    <%= project_pals_input_box(@project) %>
-                <% end %>
-
                 <%= label_tag("#{t('project_administrator').pluralize}") %>
                 <%= project_administrators_input_box(@project) %>
 
@@ -29,6 +24,11 @@
 
                 <%= label_tag("#{t('asset_gatekeeper').pluralize}") %>
                 <%= project_asset_gatekeepers_input_box(@project) %>
+
+                <% if admin_logged_in? %>
+                    <label><%= "#{t('pal').pluralize}" %></label>
+                    <%= project_pals_input_box(@project) %>
+                <% end %>
             <% end %>
             <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
         <% end %>
