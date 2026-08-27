@@ -1745,8 +1745,9 @@ class DocumentsControllerTest < ActionController::TestCase
 
     # config.action_controller.escape_json_responses is false, so <, > and & are emitted
     # raw. They need no escaping to be valid JSON - only ", \ and control characters do.
-    assert_includes response.body, %("title":"#{title}")
+    assert_includes response.body, title
     assert_not_includes response.body, '\u003cb\u003e'
+    assert_not_includes response.body, '\u0026'
 
     # The parsed value must round-trip intact.
     assert_equal title, JSON.parse(response.body)['data']['attributes']['title']
