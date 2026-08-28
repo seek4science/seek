@@ -1,0 +1,134 @@
+# frozen_string_literal: true
+
+# Defines the `jobs:*` rake tasks against Solid Queue.
+#
+# The delayed_job gem is a dependency and its railtie also contributes `jobs:work`, `jobs:workoff`,
+# `jobs:clear` and `jobs:check`. Gem rake tasks load before the application's own lib/tasks/*.rake,
+# so those definitions already exist by the time this file runs; each is cleared before being
+# redefined below. The guard keeps this working whether or not delayed_job is present.
+%w[work workoff clear check].each do |name|
+  Rake::Task["jobs:#{name}"].clear if Rake::Task.task_defined?("jobs:#{name}")
+end
+
+# Send SIGTERM to a pid, returning whether a running process was signalled. Mirrors the deployment
+# scripts' `kill -TERM ... 2>/dev/null || true` - a stale pidfile or a foreign-owned process is not
+# an error.
+def term_solid_queue(pid)
+  Process.kill('TERM', pid)
+  true
+rescue Errno::ESRCH
+  false # already gone - stale pidfile
+rescue Errno::EPERM
+  warn "Could not signal Solid Queue pid #{pid} (permission denied)"
+  false
+end
+
+namespace :jobs do
+  desc 'Start the Solid Queue supervisor (equivalent to bin/jobs)'
+  task work: :environment do
+    SolidQueue::Supervisor.start
+  end
+
+  desc 'Stop Solid Queue, including the script/run_solid_queue.sh restart loop if it is running'
+  task stop: :environment do
+    # Stop the runner loop rather than the supervisor, so it doesn't immediately respawn one; its own
+    # TERM trap shuts the supervisor down too. Falls back to the bare supervisor when there is no
+    # runner (e.g. a plain `bin/jobs` session).
+    target = Seek::Util.solid_queue_runner_pid || Seek::Util.solid_queue_supervisor_pid
+
+    if target && term_solid_queue(target)
+      puts "Stopped Solid Queue (sent TERM to pid #{target})"
+    else
+      puts 'No Solid Queue processes were running'
+    end
+  end
+
+  desc 'Restart the Solid Queue supervisor (relies on script/run_solid_queue.sh to respawn it)'
+  task restart: :environment do
+    # TERM the supervisor, not the runner: run_solid_queue.sh sees it exit and starts a fresh one, so
+    # the workers pick up new code. Without the runner (a bare `bin/jobs`) this only stops it.
+    pid = Seek::Util.solid_queue_supervisor_pid
+    if pid && term_solid_queue(pid)
+      puts "Restarting Solid Queue (sent TERM to supervisor pid #{pid}); the runner will respawn it"
+    else
+      puts 'No Solid Queue supervisor is running'
+    end
+  end
+
+  desc 'Run all available Solid Queue jobs and exit when the queue is empty. QUEUES=a,b THREADS=n'
+  task workoff: :environment do
+    queues = ENV['QUEUES'].presence || ENV['QUEUE'].presence || '*'
+    threads = (ENV['THREADS'].presence || 3).to_i
+
+    # Move any scheduled jobs that are already due onto the ready queue - normally the dispatcher's
+    # job, but there isn't one running here. Only due jobs are picked up, so anything scheduled for
+    # the future is deliberately left alone. Jobs that were already ready need no dispatching, so this
+    # is routinely zero even when there is plenty of work waiting.
+    dispatched = 0
+    loop do
+      batch = SolidQueue::ScheduledExecution.dispatch_next_batch(500)
+      dispatched += batch
+      break if batch.zero?
+    end
+
+    ready = SolidQueue::ReadyExecution.all
+    ready = ready.where(queue_name: queues.split(',')) unless queues == '*'
+    waiting = ready.count
+    puts "Dispatched #{dispatched} due scheduled job(s); #{waiting} job(s) ready to run on queue(s) #{queues}"
+
+    # Count what actually runs. Solid Queue doesn't report this itself, and the job rows can't simply be
+    # counted afterwards: jobs may enqueue further jobs, and a job that fails is left unfinished. Note
+    # that the exception count stays at zero for SEEK's own jobs however badly they go wrong, because
+    # ApplicationJob's `rescue_from(Exception)` handles the exception inside `perform_now` - it is only
+    # reached by jobs that don't inherit from ApplicationJob, such as SolidQueue::RecurringJob.
+    performed = Concurrent::AtomicFixnum.new
+    failed = Concurrent::AtomicFixnum.new
+    subscriber = ActiveSupport::Notifications.subscribe('perform.active_job') do |*, payload|
+      performed.increment
+      failed.increment if payload[:exception] || payload[:exception_object]
+    end
+
+    started_at = Time.now
+    begin
+      # A worker in `inline` mode runs in the current process and shuts itself down as soon as the ready
+      # queue is empty, waiting for its thread pool to drain first. Jobs enqueued by the jobs being run
+      # are only picked up if they land before the queue empties.
+      worker = SolidQueue::Worker.new(queues: queues, threads: threads, polling_interval: 0.1)
+      worker.mode = :inline
+      worker.start
+    ensure
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
+
+    summary = "Ran #{performed.value} job(s) in #{(Time.now - started_at).round(1)}s"
+    summary += ", #{failed.value} raised an exception" if failed.value.positive?
+    puts summary
+    puts "#{SolidQueue::Job.where(finished_at: nil).count} unfinished job(s) remain (including any scheduled for later)"
+  end
+
+  desc 'Clear the Solid Queue queue by discarding every unfinished job'
+  task clear: :environment do
+    count = 0
+    SolidQueue::Job.where(finished_at: nil).find_each do |job|
+      job.discard
+      count += 1
+    end
+    puts "Discarded #{count} unfinished job(s)"
+  end
+
+  desc "Exit with error status if any jobs older than max_age seconds haven't been run yet"
+  task :check, [:max_age] => :environment do |_task, args|
+    args.with_defaults(max_age: 300)
+
+    # Measured from when the job became due rather than when it was created, so that jobs deliberately
+    # scheduled for later aren't reported as overdue.
+    unfinished = SolidQueue::Job.where(finished_at: nil)
+    due_by = ->(time) { unfinished.where('COALESCE(scheduled_at, created_at) <= ?', time) }
+    stale = due_by.call(Time.now - args[:max_age].to_i).count
+
+    raise "#{stale} jobs older than #{args[:max_age]} seconds have not been processed yet" if stale.positive?
+
+    puts "OK - no job has been waiting longer than #{args[:max_age]} seconds " \
+         "(#{unfinished.count} unfinished job(s), of which #{due_by.call(Time.now).count} due)"
+  end
+end

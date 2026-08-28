@@ -22,10 +22,7 @@ echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while
 
 echo "${GREEN} restart workers${NC}"
-bundle exec rake seek:workers:restart
-
-echo "${GREEN} update crontab${NC}"
-bundle exec whenever --update-crontab
+bundle exec rake jobs:restart
 
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt

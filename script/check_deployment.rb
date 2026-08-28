@@ -1,5 +1,5 @@
 output = `curl --verbose --silent http://localhost:3000/statistics/application_status 2>&1`
-if $?.success? && output.include?('FAIRDOM-SEEK is running | search is enabled | 7 delayed jobs running')
+if $?.success? && output.include?('FAIRDOM-SEEK is running | search is enabled | 8 background job worker processes running')
   exit 0
 else
   puts "::group::Docker logs"

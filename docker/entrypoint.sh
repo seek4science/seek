@@ -42,9 +42,9 @@ bundle exec puma -C docker/puma.rb &
 # Workers and Cron
 if [ -z $NO_ENTRYPOINT_WORKERS ] #Don't start if flag set, for use with docker-compose
 then
-    echo "STARTING WORKERS"
-    bundle exec rake seek:workers:start &
-    
+    echo "STARTING SOLID QUEUE"
+    script/run_solid_queue.sh &
+
     setup_and_start_cron
 fi
 
