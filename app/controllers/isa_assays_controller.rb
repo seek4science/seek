@@ -299,6 +299,9 @@ class ISAAssaysController < ApplicationController
     unless @isa_assay.assay.is_assay_stream?
       @isa_assay.errors.add(:sample_type, 'Sample type not found.') if @isa_assay.sample_type.nil?
       return respond_with_error(:not_found) if @isa_assay.errors.any?
+
+      @isa_assay.errors.add(:sample_type, "You are not authorized to view this #{t('isa_assay')}'s #{t('sample_type')}." ) unless @isa_assay.sample_type.can_view?
+      return respond_with_error(:forbidden) if @isa_assay.errors.any?
     end
   end
 
