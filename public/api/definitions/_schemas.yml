@@ -5872,29 +5872,30 @@ isaAssayResponse:
                 - title
               additionalProperties: false
             sample_type:
-              type: object
-              nullable: true
-              properties:
-                id:
-                  $ref: "#/components/schemas/nonEmptyString"
-                title:
-                  $ref: "#/components/schemas/nonEmptyString"
-                description:
-                  $ref: "#/components/schemas/nullableNonEmptyString"
-                template_id:
-                  $ref: "#/components/schemas/nullableNonEmptyString"
-                sample_attributes:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/isaSampleAttributeResponse"
-                samples:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/isaSampleInResponse"
-              required:
-                - id
-                - title
-              additionalProperties: false
+              anyOf:
+                - type: 'null'
+                - type: object
+                  properties:
+                    id:
+                      $ref: "#/components/schemas/nonEmptyString"
+                    title:
+                      $ref: "#/components/schemas/nonEmptyString"
+                    description:
+                      $ref: "#/components/schemas/nullableNonEmptyString"
+                    template_id:
+                      $ref: "#/components/schemas/nullableNonEmptyString"
+                    sample_attributes:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/isaSampleAttributeResponse"
+                    samples:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/isaSampleInResponse"
+                  required:
+                    - id
+                    - title
+                  additionalProperties: false
             input_sample_type_id:
               $ref: "#/components/schemas/nullableNonEmptyString"
           required:
