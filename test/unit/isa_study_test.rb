@@ -32,6 +32,26 @@ class ISAStudyTest < ActiveSupport::TestCase
     assert_nil form.sample_collection
   end
 
+  test 'validation does not raise when populated with a missing id' do
+    form = ISAStudy.new
+    form.populate(0)
+
+    refute form.valid?
+    assert form.errors[:study].any?
+    assert form.errors[:source_sample_type].any?
+    assert form.errors[:sample_collection_sample_type].any?
+  end
+
+  test 'validation does not raise when the study has no sample types' do
+    plain_study = FactoryBot.create(:study, contributor: @person)
+    form = ISAStudy.new
+    form.populate(plain_study.id)
+
+    refute form.valid?
+    assert form.errors[:source_sample_type].any?
+    assert form.errors[:sample_collection_sample_type].any?
+  end
+
   test 'an ISA JSON compliant study is valid' do
     form = isa_study
 

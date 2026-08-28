@@ -41,6 +41,23 @@ class ISAAssayTest < ActiveSupport::TestCase
     assert_nil form.sample_type
   end
 
+  test 'validation does not raise when populated with a missing id' do
+    form = ISAAssay.new
+    form.populate(0)
+
+    refute form.valid?
+    assert form.errors[:assay].any?
+  end
+
+  test 'validation does not raise when the assay has no sample type' do
+    plain_assay = FactoryBot.create(:assay, contributor: @person)
+    form = ISAAssay.new
+    form.populate(plain_assay.id)
+
+    refute form.valid?
+    assert form.errors[:sample_type].any?
+  end
+
   test 'an ISA JSON compliant assay is valid' do
     form = material_isa_assay
 

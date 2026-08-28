@@ -248,6 +248,44 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
     assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
   end
 
+  test 'update ISA assay - not found' do
+    params = {
+      "data": {
+        "id": "0",
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated description via API" }
+        }
+      }
+    }
+
+    patch isa_assay_path(0, format: :json), params: params, as: :json,
+          headers: { "Authorization": write_access_auth }
+
+    assert_response :not_found
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
+  end
+
+  test 'update ISA assay - not found when the assay has no sample type' do
+    plain_assay = FactoryBot.create(:assay, contributor: current_person)
+
+    params = {
+      "data": {
+        "id": plain_assay.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated description via API" }
+        }
+      }
+    }
+
+    patch isa_assay_path(plain_assay.id, format: :json), params: params, as: :json,
+          headers: { "Authorization": write_access_auth }
+
+    assert_response :not_found
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
+  end
+
   # The documented request shape uses a `sample_attributes` array with a nested `sample_attribute_type`
   # object, rather than the `sample_attributes_attributes` hash the UI form posts.
   test 'create ISA assay - using the documented request shape' do
