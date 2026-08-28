@@ -51,7 +51,7 @@ class ISAAssay
     @assay = Assay.find_by(id:)
     @sample_type = @assay&.sample_type
     if @sample_type
-      @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+      @input_sample_type_id = @sample_type.sample_attributes.detect(&:input_attribute?)&.linked_sample_type_id
     end
   end
 
