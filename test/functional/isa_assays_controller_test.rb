@@ -884,6 +884,7 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: @person,
                                study: study, linked_sample_type: study.sample_types.last)
 
+    login_as(@person)
     get :show, as: :json, params: { id: assay.id }
     assert_response :success
 
