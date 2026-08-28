@@ -16,11 +16,6 @@ module SEEK
     config.load_defaults 8.1
     config.active_record.default_column_serializer = YAML
 
-    # 3s rather than the Rails 8.0 default of 1s. Parsing large user-supplied spreadsheets,
-    # ISA templates and workflow files is regexp-heavy and can legitimately exceed 1s, but
-    # the limit is process-global and is also what caps ReDoS exposure, so the headroom is
-    # kept small.
-    Regexp.timeout = 3
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
