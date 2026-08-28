@@ -173,7 +173,7 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
         end
       end
     end
-    assert_response :success
+    assert_response :created
   end
 
   test 'update ISA study' do

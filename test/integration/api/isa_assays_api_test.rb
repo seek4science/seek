@@ -194,6 +194,7 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
         end
       end
     end
+    assert_response :created
   end
 
   test 'update ISA assay' do
