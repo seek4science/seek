@@ -65,6 +65,9 @@ class ISAStudy
   private
 
   def validate_objects
+    # Missing objects are already reported by the presence validators
+    return if @study.nil? || @source_sample_type.nil? || @sample_collection_sample_type.nil?
+
     @study.errors.each { |e| errors.add(:base, "[Study]: #{e.full_message}") } unless @study.valid?
 
     [@source_sample_type, @sample_collection_sample_type].each do |sample_type|

@@ -4,6 +4,7 @@ class ISAAssay
   attr_accessor :assay, :sample_type, :input_sample_type_id
 
   validates_presence_of :assay
+  validates_presence_of :sample_type, unless: -> { @assay&.is_assay_stream? }
   validate :validate_assay
   validate :validate_sample_type, if: -> { errors.blank? && !@assay.is_assay_stream? }
 
@@ -55,6 +56,9 @@ class ISAAssay
   private
 
   def validate_assay
+    # A missing assay is already reported by the presence validator
+    return if @assay.nil?
+
     @assay.errors.each { |e| errors.add(:assay, "#{e.full_message}") } unless @assay.valid?
 
     if @assay.new_record? && @assay.next_linked_child_assay&.sample_type&.samples&.any?
@@ -66,7 +70,8 @@ class ISAAssay
   end
 
   def validate_sample_type
-    errors.add(:sample_type, 'Sample type is missing!') if @sample_type.nil?
+    # A missing sample type is already reported by the presence validator
+    return if @sample_type.nil?
 
     # In case of an experimental Assay, it must  have an input sample type
     errors.add(:base, '[Input Assay]: Input Assay is not provided') if @input_sample_type_id.blank?
