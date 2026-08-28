@@ -6,7 +6,7 @@ class ISAAssay
   validates_presence_of :assay
   validates_presence_of :sample_type, unless: -> { assay_stream? }
   validate :validate_assay, if: -> { @assay.present? }
-  validate :validate_sample_type, if: -> { errors.blank? && !@assay.is_assay_stream? }
+  validate :validate_sample_type, if: -> { errors.blank? && !assay_stream? }
 
   private def assay_stream? = @assay&.is_assay_stream?
 
