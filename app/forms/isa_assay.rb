@@ -4,9 +4,11 @@ class ISAAssay
   attr_accessor :assay, :sample_type, :input_sample_type_id
 
   validates_presence_of :assay
-  validates_presence_of :sample_type, unless: -> { @assay&.is_assay_stream? }
-  validate :validate_assay
+  validates_presence_of :sample_type, unless: -> { assay_stream? }
+  validate :validate_assay, if: -> { @assay.present? }
   validate :validate_sample_type, if: -> { errors.blank? && !@assay.is_assay_stream? }
+
+  private def assay_stream? = @assay&.is_assay_stream?
 
   def initialize(params = {})
     @assay = Assay.new(params[:assay] || {})
@@ -56,9 +58,6 @@ class ISAAssay
   private
 
   def validate_assay
-    # A missing assay is already reported by the presence validator
-    return if @assay.nil?
-
     @assay.errors.each { |e| errors.add(:assay, "#{e.full_message}") } unless @assay.valid?
 
     if @assay.new_record? && @assay.next_linked_child_assay&.sample_type&.samples&.any?
