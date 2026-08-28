@@ -248,6 +248,54 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
     assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
   end
 
+  test 'update ISA assay - forbidden when not authorized to edit' do
+    other_person = FactoryBot.create(:person)
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: other_person,
+                               linked_sample_type: @study.sample_types.last,
+                               policy: FactoryBot.create(:publicly_viewable_policy))
+
+    params = {
+      "data": {
+        "id": assay.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated description via API" }
+        }
+      }
+    }
+
+    assert_no_changes -> { assay.reload.description } do
+      patch isa_assay_path(assay.id, format: :json), params: params, as: :json,
+            headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :forbidden
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
+  end
+
+  test 'update ISA assay - assay stream has no sample type' do
+    assay_stream = FactoryBot.create(:assay_stream, contributor: current_person, study: @study)
+
+    params = {
+      "data": {
+        "id": assay_stream.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated stream description via API" }
+        }
+      }
+    }
+
+    assert_changes -> { assay_stream.reload.description }, to: 'Updated stream description via API' do
+      patch isa_assay_path(assay_stream.id, format: :json), params: params, as: :json,
+            headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :ok
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+    assert_nil JSON.parse(response.body)['data']['attributes']['sample_type']
+  end
+
   test 'update ISA assay - not found' do
     params = {
       "data": {

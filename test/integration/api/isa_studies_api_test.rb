@@ -225,6 +225,30 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
     assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
   end
 
+  test 'update ISA study - forbidden when not authorized to edit' do
+    other_person = FactoryBot.create(:person)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: other_person,
+                               policy: FactoryBot.create(:publicly_viewable_policy))
+
+    params = {
+      "data": {
+        "id": study.id.to_s,
+        "type": "isa_studies",
+        "attributes": {
+          "study": { "description": "Updated description via API" }
+        }
+      }
+    }
+
+    assert_no_changes -> { study.reload.description } do
+      patch isa_study_path(study.id, format: :json), params: params, as: :json,
+            headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :forbidden
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
+  end
+
   test 'update ISA study - not found' do
     params = {
       "data": {
