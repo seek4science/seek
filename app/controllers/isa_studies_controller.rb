@@ -231,7 +231,9 @@ class ISAStudiesController < ApplicationController
     return respond_with_error(:not_found) if @isa_study.errors.any?
 
     # Check authorizations
-    @isa_study.errors.add(:study, "You are not authorized to view this #{t('isa_study')}.") unless @isa_study.study.can_view?
+    @isa_study.errors.add(:study, "You are not authorized to view this #{t('isa_study')}." ) unless @isa_study.study.can_view?
+    @isa_study.errors.add(:sample_type, "You are not authorized to view the '#{t('isa_study')} source' #{t('sample_type')}." ) unless @isa_study.source.can_view?
+    @isa_study.errors.add(:sample_type, "You are not authorized to view the '#{t('isa_study')} sample collection' #{t('sample_type')}." ) unless @isa_study.sample_collection.can_view?
     return respond_with_error(:forbidden) if @isa_study.errors.any?
   end
 
