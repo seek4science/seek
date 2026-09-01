@@ -353,6 +353,7 @@ metrics:
       $ref: "#/components/schemas/nullableInteger"
     run_count:
       $ref: "#/components/schemas/nullableInteger"
+  additionalProperties: false
 collectionItemMeta:
   type: object
   properties:
