@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1039989171",
+    "id": "1040000133",
     "type": "people",
     "attributes": {
       "avatar": null,
@@ -19,13 +19,13 @@
         "Gromacs",
         "Python"
       ],
-      "login": "user2693"
+      "login": "user934"
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "1022253164",
+            "id": "1022264179",
             "type": "projects"
           }
         ]
@@ -33,81 +33,57 @@
       "institutions": {
         "data": [
           {
-            "id": "980193662",
+            "id": "980204705",
             "type": "institutions"
           }
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       },
       "collections": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/people/1039989171"
+      "self": "/people/1040000133"
     },
     "meta": {
-      "created": "2026-06-16T14:30:45.309Z",
-      "modified": "2026-06-16T14:30:45.385Z",
+      "created": "2026-08-27T08:38:12.003Z",
+      "modified": "2026-08-27T08:38:12.079Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "0ef5257f-1a8e-4456-9571-bbaf356730ef"
+      "uuid": "a7509272-cd00-47a5-9007-d6bf8c3ec536"
     }
   },
   "jsonapi": {

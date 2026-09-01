@@ -1,30 +1,26 @@
 {
   "data": {
-    "id": "140",
+    "id": "10311",
     "type": "samples",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "Fred Bloggs",
       "tags": [
         "tag1",
         "tag2"
       ],
-      "created_at": "2026-06-16T14:26:41.607Z",
-      "updated_at": "2026-06-16T14:26:41.580Z",
+      "created_at": "2026-08-27T08:37:42.570Z",
+      "updated_at": "2026-08-27T08:37:42.536Z",
       "creators": [
         {
-          "profile": "/people/1039988187",
+          "profile": "/people/1039999951",
           "family_name": "Last",
-          "given_name": "Person1486",
-          "affiliation": "An Institution: 1722",
+          "given_name": "Person670",
+          "affiliation": "An Institution: 763",
           "orcid": null
         }
       ],
@@ -51,7 +47,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039988187",
+            "id": "1039999951",
             "type": "people"
           }
         ]
@@ -59,34 +55,32 @@
       "submitter": {
         "data": [
           {
-            "id": "1039988187",
+            "id": "1039999951",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "162",
+          "id": "10357",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "1022252239",
+            "id": "1022264003",
             "type": "projects"
           }
         ]
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "investigations": {
         "data": [
           {
-            "id": "973655160",
+            "id": "973655518",
             "type": "investigations"
           }
         ]
@@ -94,7 +88,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385191",
+            "id": "1060385435",
             "type": "studies"
           }
         ]
@@ -102,7 +96,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386914",
+            "id": "1035387170",
             "type": "assays"
           }
         ]
@@ -110,21 +104,24 @@
       "people": {
         "data": [
           {
-            "id": "1039988187",
+            "id": "1039999951",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/140"
+      "self": "/samples/10311"
     },
     "meta": {
-      "created": "2026-06-16T14:26:41.607Z",
-      "modified": "2026-06-16T14:26:41.580Z",
+      "created": "2026-08-27T08:37:42.570Z",
+      "modified": "2026-08-27T08:37:42.536Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "9a08f14a-ca8b-4d7d-ba68-b3f190add469"
+      "uuid": "8d2e12c0-6ea6-4d89-914f-fb5d2fac2af1",
+      "metrics": {
+        "view_count": 0
+      }
     }
   },
   "jsonapi": {
