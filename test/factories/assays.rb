@@ -142,9 +142,9 @@ FactoryBot.define do
     description { 'An assay stream populated with assays' }
     association :assay_class, factory: :assay_stream_class
     after(:build) do |assay_stream, eval|
-      first_material_assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: assay_stream.contributor, title: 'Pre-treatment', linked_sample_type: eval.sample_collection_sample_type, study: assay_stream.study, contributor: assay_stream.contributor)
-      second_material_assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: assay_stream.contributor, title: 'Extraction', linked_sample_type: first_material_assay.sample_type, study: assay_stream.study, contributor: assay_stream.contributor)
-      data_file_assay = FactoryBot.create(:isa_json_compliant_data_file_assay, contributor: assay_stream.contributor, title: 'Measurement', linked_sample_type: second_material_assay.sample_type, study: assay_stream.study, contributor: assay_stream.contributor)
+      first_material_assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: assay_stream.contributor, title: 'Pre-treatment', linked_sample_type: eval.sample_collection_sample_type, study: assay_stream.study)
+      second_material_assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: assay_stream.contributor, title: 'Extraction', linked_sample_type: first_material_assay.sample_type, study: assay_stream.study)
+      data_file_assay = FactoryBot.create(:isa_json_compliant_data_file_assay, contributor: assay_stream.contributor, title: 'Measurement', linked_sample_type: second_material_assay.sample_type, study: assay_stream.study)
       assay_stream.child_assays = [first_material_assay, second_material_assay, data_file_assay]
     end
   end
