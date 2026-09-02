@@ -121,6 +121,27 @@
                                "#{t('login.oidc')} Client ID", "The client ID to use to authenticate with the #{t('login.oidc')} provider.") %>
         <%= admin_password_setting(:omniauth_oidc_secret, Seek::Config.omniauth_oidc_secret,
                                    "#{t('login.oidc')} Secret", "The secret to use to authenticate with the #{t('login.oidc')} provider.") %>
+        <%= admin_text_setting(:omniauth_oidc_scope, Seek::Config.omniauth_oidc_scope,
+                               "#{t('login.oidc')} Scopes", "Space-separated OIDC scopes to request. Include any custom scope needed for group claims (e.g. <code>entitlement</code>). Default: <code>openid email profile</code>.") %>
+        <%= admin_checkbox_setting(:omniauth_oidc_groups_enabled, 1, Seek::Config.omniauth_oidc_groups_enabled,
+                                   "Map OIDC groups to #{t('project').pluralize}",
+                                   "When enabled, values from the configured groups claim are used to find or create #{t('project').pluralize} and add the user as a member.
+                                   New #{t('project').pluralize}, or existing ones with no administrator, make the user a #{t('project')} administrator; otherwise they become a normal member.
+                                   Membership is additive: leaving a group at the identity provider does not remove SEEK membership.",
+                                   onchange: toggle_appear_javascript('omniauth_oidc_groups_settings')) %>
+        <div id="omniauth_oidc_groups_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_oidc_groups_enabled) -%>;">
+          <%= admin_text_setting(:omniauth_oidc_groups_claim, Seek::Config.omniauth_oidc_groups_claim,
+                                 'Groups claim path',
+                                 'Dot-notation path into the OIDC userinfo/ID token claims, e.g. <code>entitlement</code>, <code>groups</code>, or <code>realm_access.roles</code>.') %>
+          <%= admin_dropdown_setting(:omniauth_oidc_groups_institution_id,
+                                     options_for_select(
+                                       [['(use person\'s first institution / first available)', '']] +
+                                         Institution.order(:title).map { |i| [i.title, i.id] },
+                                       Seek::Config.omniauth_oidc_groups_institution_id
+                                     ),
+                                     "Default #{t('institution')} for new memberships",
+                                     "Used when adding the user to a #{t('project')}. If blank, the person's existing institution is preferred.") %>
+        </div>
       </div>
       <div class="col-sm-5">
         <%= panel('Client Info') do %>

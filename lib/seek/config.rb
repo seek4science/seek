@@ -417,7 +417,7 @@ module Seek
     end
 
     def omniauth_oidc_config
-      {
+      config = {
         callback_path: omniauth_callback_path('oidc'),
         issuer: omniauth_oidc_issuer,
         name: :oidc,
@@ -429,6 +429,11 @@ module Seek
           redirect_uri: omniauth_redirect_uri('oidc')
         }
       }
+
+      scope = omniauth_oidc_scope.to_s.strip
+      config[:scope] = scope.split unless scope.blank?
+
+      config
     end
 
     def omniauth_oidc_image

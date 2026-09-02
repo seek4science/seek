@@ -105,6 +105,10 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_issuer = params[:omniauth_oidc_issuer]
     Seek::Config.omniauth_oidc_client_id = params[:omniauth_oidc_client_id]
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
+    Seek::Config.omniauth_oidc_scope = params[:omniauth_oidc_scope]
+    Seek::Config.omniauth_oidc_groups_enabled = string_to_boolean params[:omniauth_oidc_groups_enabled]
+    Seek::Config.omniauth_oidc_groups_claim = params[:omniauth_oidc_groups_claim]
+    Seek::Config.omniauth_oidc_groups_institution_id = params[:omniauth_oidc_groups_institution_id].presence
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     # Per-adaptor external search toggles (map: key => {'enabled' =>boolean})
