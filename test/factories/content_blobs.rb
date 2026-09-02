@@ -186,6 +186,12 @@ FactoryBot.define do
     original_filename { 'csv_test.csv' }
     data { File.new("#{Rails.root}/test/fixtures/files/csv_test.csv", 'rb').read }
   end
+
+  factory(:iso_8859_1_csv_content_blob, parent: :content_blob) do
+    content_type { 'text/csv' }
+    original_filename { 'iso-8859-1.csv' }
+    data { File.new("#{Rails.root}/test/fixtures/files/iso-8859-1.csv", 'rb').read }
+  end
   
   factory(:tsv_content_blob, parent: :content_blob) do
     content_type { 'text/tab-separated-values' }
@@ -209,6 +215,18 @@ FactoryBot.define do
     content_type { 'application/octet-stream' }
     original_filename { 'binary.bin' }
     data { File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read }
+  end
+
+  factory(:little_file_content_blob, parent: :content_blob) do
+    content_type { 'text/plain' }
+    original_filename { 'little_file.txt' }
+    data { File.open("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb') { |f| f.read } }
+  end
+
+  factory(:little_file_v2_content_blob, parent: :content_blob) do
+    content_type { 'text/plain' }
+    original_filename { 'little_file_v2.txt' }
+    data { File.open("#{Rails.root}/test/fixtures/files/little_file_v2.txt", 'rb') { |f| f.read } }
   end
   
   factory(:study_template_content_blob, parent: :content_blob) do

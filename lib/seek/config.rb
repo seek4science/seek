@@ -495,41 +495,46 @@ module Seek
       val
     end
 
-    use_db = begin
-      Settings.table_exists?
-    rescue StandardError
+    # Whether the settings database table exists and should be read from.
+    #
+    # Defaults are used only when there are provably no stored settings to lose: either the database is
+    # reachable but the table has not been created yet (table_exists? returns false, as during db:setup before
+    # the schema is loaded), or the database itself does not exist yet (NoDatabaseError, e.g. a fresh checkout
+    # before db:create). Any other failure means the database exists but is unreachable, and is allowed to
+    # propagate, so a process never silently serves default configuration values in place of the real stored
+    # settings (which could, for example, expose disabled features or apply the wrong policy). A boot that hits
+    # this simply fails and is retried, rather than being poisoned for its whole lifetime; and because a false
+    # result never sticks (only true is memoized), reads recover on their own once the database is reachable again.
+    def settings_table_available?
+      @settings_table_available ||= Settings.table_exists?
+    rescue ActiveRecord::NoDatabaseError
       false
     end
 
-    if use_db
-      def get_value(setting, conversion = nil)
-        val = Settings.defaults[setting.to_s]
-        if Thread.current[:use_settings_cache]
-          begin
-            result = settings_cache[setting]
-          rescue Errno::ENOENT => e
-            Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
-            result = Settings.global.fetch(setting)
-          end
-        else
+    def get_value(setting, conversion = nil)
+      return get_default_value(setting, conversion) unless settings_table_available?
+
+      val = Settings.defaults[setting.to_s]
+      if Thread.current[:use_settings_cache]
+        begin
+          result = settings_cache[setting]
+        rescue Errno::ENOENT => e
+          Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
           result = Settings.global.fetch(setting)
         end
-        val = result.value if result
-        val = val.send(conversion) if conversion && val
-        val
+      else
+        result = Settings.global.fetch(setting)
       end
+      val = result.value if result
+      val = val.send(conversion) if conversion && val
+      val
+    end
 
-      def set_value(setting, val, conversion = nil)
-        val = val.send(conversion) if conversion && val
+    def set_value(setting, val, conversion = nil)
+      val = val.send(conversion) if conversion && val
+      if settings_table_available?
         Settings.global[setting] = val
-      end
-    else
-      def get_value(setting, conversion = nil)
-        get_default_value(setting, conversion)
-      end
-
-      def set_value(setting, val, conversion = nil)
-        val = val.send(conversion) if conversion && val
+      else
         Settings.defaults[setting.to_sym] = val
       end
     end

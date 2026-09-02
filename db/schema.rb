@@ -1910,15 +1910,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.boolean "include_external_search", default: false
   end
 
-  create_table "sessions", id: :integer, force: :cascade do |t|
-    t.string "session_id", null: false
-    t.text "data", limit: 16777215
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["session_id"], name: "index_sessions_on_session_id"
-    t.index ["updated_at"], name: "index_sessions_on_updated_at"
-  end
-
   create_table "settings", id: :integer, force: :cascade do |t|
     t.string "var", null: false
     t.text "value"

@@ -93,6 +93,7 @@ module TemplatesHelper
       unit_id: attribute.unit_id,
       pos: attribute.pos,
       isa_tag_id: attribute.isa_tag_id,
+      isa_tag_title: attribute.isa_tag&.title,
       linked_sample_type_id: attribute.linked_sample_type_id,
       template_attribute_id: attribute.id
     }

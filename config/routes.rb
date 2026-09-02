@@ -45,7 +45,7 @@ SEEK::Application.routes.draw do
   end
 
   concern :has_dashboard do |stats_options|
-    resources :stats, stats_options.reverse_merge(only: []) do
+    resources :stats, **stats_options.reverse_merge(only: []) do
       collection do
         get :dashboard
         get :contributions
@@ -130,7 +130,7 @@ SEEK::Application.routes.draw do
       scope controller: :git, path: '/git(/*version)', constraints: { path: /[^\0]+/ }, format: false do
         get 'tree(/*path)' => 'git#tree', as: :git_tree
         get 'blob/*path' => 'git#blob', as: :git_blob
-        get 'raw/*path' => 'git#raw', as: :git_raw
+        get 'raw(/*path)' => 'git#raw', as: :git_raw
         get 'download/*path' => 'git#download', as: :git_download
         get 'browse' => 'git#browse', as: :git_browse
         post 'blob(/*path)' =>'git#add_file', as: :git_add_file

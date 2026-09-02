@@ -47,6 +47,14 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should show inline content preview for pdf document' do
+    pdf_doc = FactoryBot.create(:document, content_blob: FactoryBot.create(:pdf_content_blob),
+                                 policy: FactoryBot.create(:downloadable_public_policy))
+    get :show, params: { id: pdf_doc.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
+  end
+
   test 'should not show hidden document' do
     hidden_doc = FactoryBot.create(:private_document)
 
@@ -258,7 +266,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'create, update and show a document with extended metadata' do
+  test 'create a document with extended metadata' do
     cmt = FactoryBot.create(:simple_document_extended_metadata_type)
 
     person = FactoryBot.create(:person)
@@ -288,7 +296,19 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a document with extended metadata' do
+    cmt = FactoryBot.create(:simple_document_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    document = FactoryBot.create(:document, contributor: person, policy: FactoryBot.create(:public_policy),
+                                 extended_metadata: cm)
 
     get :show, params: { id: document }
     assert_response :success
@@ -1679,6 +1699,58 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     assert_equal first_doc, assigns(:documents).first
+  end
+
+  test 'filters can be obfuscated' do
+    project = FactoryBot.create(:project)
+    project_doc = FactoryBot.create(:public_document, created_at: 3.days.ago, projects: [project])
+    project_doc.annotate_with('awkward&id=1unsafe[]tag !', 'tag', project_doc.contributor)
+    disable_authorization_checks { project_doc.save! }
+    FactoryBot.create_list(:public_document, 5, projects: [project])
+
+    with_config_value(:obfuscate_filters, false) do
+      get :index
+
+      assert_select '.filter-category[data-filter-category="project"]' do
+        assert_select '.filter-category-title', text: 'Project'
+        assert_select "a.filter-option[title='#{project.title}']" do
+          assert_select '[href=?]', documents_path(filter: { project: project.id })
+          assert_select '.filter-option-label', text: project.title
+          assert_select '.filter-option-count', text: '6'
+        end
+      end
+    end
+
+    with_config_value(:obfuscate_filters, true) do
+      get :index
+
+      assert_select '.filter-category[data-filter-category="project"]' do
+        assert_select '.filter-category-title', text: 'Project'
+        assert_select "span.filter-option[title='#{project.title}']" do
+          assert_select '[data-filter-link=?]', Base64.urlsafe_encode64(documents_path(filter: { project: project.id }))
+          assert_select '.filter-option-label', text: project.title
+          assert_select '.filter-option-count', text: '6'
+        end
+      end
+    end
+  end
+
+  test 'json api does not escape html characters in the response body' do
+    title = 'Fish <b>&</b> chips'
+    doc = FactoryBot.create(:public_document, title: title)
+
+    get :show, params: { id: doc.id }, format: :json
+
+    assert_response :success
+
+    # config.action_controller.escape_json_responses is false, so <, > and & are emitted
+    # raw. They need no escaping to be valid JSON - only ", \ and control characters do.
+    assert_includes response.body, title
+    assert_not_includes response.body, '\u003cb\u003e'
+    assert_not_includes response.body, '\u0026'
+
+    # The parsed value must round-trip intact.
+    assert_equal title, JSON.parse(response.body)['data']['attributes']['title']
   end
 
   private

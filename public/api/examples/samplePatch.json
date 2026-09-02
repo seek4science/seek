@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "samples",
-    "id": "156",
+    "id": "10327",
     "attributes": {
       "attribute_map": {
         "full_name": "Fred Bloggs",
@@ -17,15 +17,13 @@
         "age": 42,
         "bool": true
       },
-      "tags": [
-
-      ]
+      "tags": []
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "1022252297",
+            "id": "1022264061",
             "type": "projects"
           }
         ]

@@ -990,6 +990,7 @@ class SampleTypesControllerTest < ActionController::TestCase
       assert source_sample_type.is_isa_json_compliant?
       get :manage, params: { id: source_sample_type }
       assert_redirected_to sample_types_path
+      assert_equal 'This sample type is ISA JSON compliant and cannot be managed.', flash[:error]
 
       refute project_sample_type.is_isa_json_compliant?
       get :manage, params: { id: project_sample_type }

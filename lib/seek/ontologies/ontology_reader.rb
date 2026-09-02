@@ -72,7 +72,7 @@ module Seek
       def process_ontology_hierarchy
         parent_uri = default_parent_class_uri
         OntologyClass # so that the class is loaded before it is needed from the cache
-        Rails.cache.fetch(cache_key) do
+        Rails.cache.fetch(cache_key, expires_in: 7.days) do
           subclasses = subclasses_for(parent_uri)
           o = build_ontology_class parent_uri, nil, nil, subclasses
           subclasses.each { |s| s.parents << o }

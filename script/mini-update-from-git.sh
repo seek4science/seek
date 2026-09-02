@@ -30,3 +30,4 @@ bundle exec whenever --update-crontab
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt
 bundle exec rake tmp:clear
+bundle exec rake seek:clear_cache

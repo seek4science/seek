@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "105",
+    "id": "1516",
     "type": "workflows",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022251883",
+              "id": "1022267454",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximally Patched Workflow",
       "license": "CC-BY-4.0",
       "description": "A workflow to do important stuff",
@@ -31,14 +29,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/workflows/105?version=1",
+          "url": "http://localhost:3000/workflows/1516?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:25:23.664Z",
-      "updated_at": "2026-06-16T14:25:24.065Z",
+      "created_at": "2026-08-27T08:51:35.585Z",
+      "updated_at": "2026-08-27T08:51:35.885Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,16 +45,16 @@
           "md5sum": "ef2ea32522098acc937199f6c2b64f41",
           "sha1sum": "a5133ccdb0376324d039431e4eff4f7d21a751cd",
           "content_type": "application/x-yaml",
-          "link": "http://localhost:3000/workflows/105/content_blobs/1050453041",
+          "link": "http://localhost:3000/workflows/1516/content_blobs/1050456815",
           "size": 732
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039987833",
+          "profile": "/people/1040003489",
           "family_name": "Last",
-          "given_name": "Person1157",
-          "affiliation": "An Institution: 1367",
+          "given_name": "Person3667",
+          "affiliation": "An Institution: 4345",
           "orcid": null
         }
       ],
@@ -86,8 +84,7 @@
           "identifier": "http://edamontology.org/topic_3277"
         }
       ],
-      "internals": {
-      },
+      "internals": {},
       "tools": [
         {
           "name": "BioPython",
@@ -99,7 +96,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039987833",
+            "id": "1040003489",
             "type": "people"
           }
         ]
@@ -107,7 +104,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039987831",
+            "id": "1040003487",
             "type": "people"
           }
         ]
@@ -115,11 +112,11 @@
       "people": {
         "data": [
           {
-            "id": "1039987831",
+            "id": "1040003487",
             "type": "people"
           },
           {
-            "id": "1039987833",
+            "id": "1040003489",
             "type": "people"
           }
         ]
@@ -127,7 +124,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022251883",
+            "id": "1022267454",
             "type": "projects"
           }
         ]
@@ -135,7 +132,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655102",
+            "id": "973656226",
             "type": "investigations"
           }
         ]
@@ -143,7 +140,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385134",
+            "id": "1060386050",
             "type": "studies"
           }
         ]
@@ -151,7 +148,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386858",
+            "id": "1035387636",
             "type": "assays"
           }
         ]
@@ -159,7 +156,7 @@
       "publications": {
         "data": [
           {
-            "id": "161",
+            "id": "448",
             "type": "publications"
           }
         ]
@@ -167,7 +164,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250543",
+            "id": "1055250985",
             "type": "sops"
           }
         ]
@@ -175,7 +172,7 @@
       "presentations": {
         "data": [
           {
-            "id": "56",
+            "id": "210",
             "type": "presentations"
           }
         ]
@@ -183,7 +180,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883654405",
+            "id": "1055250987",
             "type": "data_files"
           }
         ]
@@ -191,21 +188,25 @@
       "documents": {
         "data": [
           {
-            "id": "68",
+            "id": "567",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/workflows/105?version=1"
+      "self": "/workflows/1516?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:25:23.618Z",
-      "modified": "2026-06-16T14:25:24.000Z",
+      "created": "2026-08-27T08:51:35.561Z",
+      "modified": "2026-08-27T08:51:35.786Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "de973945-b268-4781-aeec-87b1789e01a1"
+      "uuid": "957cbac2-00b4-483f-ae4c-59fb252f57f3",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

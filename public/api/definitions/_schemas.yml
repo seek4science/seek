@@ -335,12 +335,26 @@ meta:
       $ref: "#/components/schemas/dateTimeString"
     uuid:
       $ref: "#/components/schemas/nonEmptyString"
+    metrics:
+      $ref: '#/components/schemas/metrics'
   required:
     - created
     - modified
     - uuid
     - base_url
     - api_version
+  additionalProperties: false
+metrics:
+  type: object
+  properties:
+    view_count:
+      $ref: "#/components/schemas/nullableInteger"
+    download_count:
+      $ref: "#/components/schemas/nullableInteger"
+    run_count:
+      $ref: "#/components/schemas/nullableInteger"
+  required:
+    - view_count
   additionalProperties: false
 collectionItemMeta:
   type: object

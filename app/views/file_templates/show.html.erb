@@ -30,6 +30,9 @@
             <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_file_template} %>
 	  </div>
 	</div>
+
+	<%= rendered_asset_view(@display_file_template) %>
+
 	<%= render :partial=>"general/isa_graph", :locals => {:root_item => @file_template, :deep => true, :include_parents => true} %>
       </div>
 

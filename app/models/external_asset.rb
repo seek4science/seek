@@ -20,7 +20,7 @@ class ExternalAsset < ApplicationRecord
 
   after_initialize :options_from_json
 
-  after_save(:trigger_reindexing) if Seek::Config.solr_enabled
+  after_save(:trigger_reindexing)
 
   # as there is no callback for reload
   def reload

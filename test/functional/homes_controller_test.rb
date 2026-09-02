@@ -813,4 +813,19 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+
+  test 'should hide the register button when registration is disabled' do
+    with_config_value(:home_show_features, true) do
+      get :index
+      assert_response :success
+      assert_select '#home-features a[href=?]', signup_path, 1
+
+      with_config_value(:registration_disabled, true) do
+        get :index
+        assert_response :success
+        assert_select '#home-features a[href=?]', signup_path, count: 0
+      end
+    end
+  end
+
 end

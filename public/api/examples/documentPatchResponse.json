@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "234",
+    "id": "499",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -8,18 +8,16 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022254270",
+              "id": "1022265664",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "extended_attributes": {
-        "extended_metadata_type_id": "316",
+        "extended_metadata_type_id": "366",
         "attribute_map": {
           "role_email": "alice@email.com",
           "role_phone": "0012345",
@@ -46,32 +44,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/234?version=1",
+          "url": "http://localhost:3000/documents/499?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:34:24.473Z",
-      "updated_at": "2026-06-16T14:34:24.853Z",
+      "created_at": "2026-08-27T08:42:27.618Z",
+      "updated_at": "2026-08-27T08:42:27.799Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-252",
+          "original_filename": "file-152",
           "url": null,
-          "md5sum": "457e8837e0f338a8a141fd9c49990211",
-          "sha1sum": "eada2427078a5260229e102d8fa6afd1daccbde2",
+          "md5sum": "1496e715180222798caf17e003b6b901",
+          "sha1sum": "ddffd6951c92049a85cf5cc0303b88d2ac7cbeed",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/234/content_blobs/1050453615",
+          "link": "http://localhost:3000/documents/499/content_blobs/1050456288",
           "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039990161",
+          "profile": "/people/1040001567",
           "family_name": "Last",
-          "given_name": "Person3091",
-          "affiliation": "An Institution: 3740",
+          "given_name": "Person2061",
+          "affiliation": "An Institution: 2400",
           "orcid": null
         }
       ],
@@ -81,7 +79,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039990161",
+            "id": "1040001567",
             "type": "people"
           }
         ]
@@ -89,7 +87,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039990159",
+            "id": "1040001565",
             "type": "people"
           }
         ]
@@ -97,11 +95,11 @@
       "people": {
         "data": [
           {
-            "id": "1039990159",
+            "id": "1040001565",
             "type": "people"
           },
           {
-            "id": "1039990161",
+            "id": "1040001567",
             "type": "people"
           }
         ]
@@ -109,7 +107,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022254270",
+            "id": "1022265664",
             "type": "projects"
           }
         ]
@@ -117,7 +115,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655396",
+            "id": "973655894",
             "type": "investigations"
           }
         ]
@@ -125,7 +123,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385415",
+            "id": "1060385744",
             "type": "studies"
           }
         ]
@@ -133,34 +131,36 @@
       "assays": {
         "data": [
           {
-            "id": "1035387075",
+            "id": "1035387445",
             "type": "assays"
           }
         ]
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
         "data": [
           {
-            "id": "165",
+            "id": "1407",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/234?version=1"
+      "self": "/documents/499?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:34:24.453Z",
-      "modified": "2026-06-16T14:34:24.781Z",
+      "created": "2026-08-27T08:42:27.603Z",
+      "modified": "2026-08-27T08:42:27.768Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "53ff03ec-5815-4e38-aa67-6089d7554ae5"
+      "uuid": "dd18b0a5-a443-49ce-b839-80e80e180ab6",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

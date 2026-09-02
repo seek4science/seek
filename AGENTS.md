@@ -52,6 +52,21 @@ script/stop-docker-solr.sh            # Stop Solr via Docker
 bundle exec rake seek:reindex_all     # Rebuild Solr index
 ```
 
+### Redis (cache + sessions)
+
+```bash
+script/start-docker-redis.sh          # Start Redis via Docker (seek-redis on :6379)
+script/stop-docker-redis.sh           # Stop Redis (keeps the seek-redis-data-volume)
+script/reset-docker-redis.sh          # Wipe and restart Redis (clears cache AND sessions)
+script/delete-docker-redis.sh         # Remove the stopped container and its data volume
+```
+
+`REDIS_MAXMEMORY` (default `256mb`) sets the `maxmemory` limit. For `docker-compose.yml` it is read
+from `docker/redis.env`; for the scripts and the other compose variants it is a host env var. Redis
+backs `Rails.cache`, sessions and the `Rack::Attack` throttle counters on one instance
+(`allkeys-lru`). `Seek::RedisConfig.url` (`lib/seek/redis_config.rb`) is the single source of truth
+for the connection URL.
+
 ### Linting
 
 ```bash

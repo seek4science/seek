@@ -49,18 +49,6 @@
           </div>
 
           <div class="col-md-6">
-            <p class="pals">
-              <strong><%= Seek::Config.instance_admins_name %> <%= t('pal').pluralize %>:</strong>
-              <%= pals_link_list @project -%>
-            </p>
-
-            <% if @project.respond_to?(:project_coordinators) %>
-              <p class="project_coordinators">
-                <strong>Project Coordinators:</strong>
-                <%= project_coordinators_link_list @project %>
-              </p>
-            <% end%>
-
             <% if logged_in_and_registered? %>
               <p class="project_administrators">
                 <strong><%= t('project_administrator').pluralize %>:</strong>
@@ -80,6 +68,11 @@
                 <%= gatekeepers_link_list @project %>
               </p>
             <% end %>
+
+            <p class="pals">
+              <strong><%= Seek::Config.instance_admins_name %> <%= t('pal').pluralize %>:</strong>
+              <%= pals_link_list @project -%>
+            </p>
             <p>
               <% if @project.start_date %>
                 <strong><%= t('project') -%> start date:</strong>

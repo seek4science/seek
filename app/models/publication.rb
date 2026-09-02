@@ -12,15 +12,13 @@ class Publication < ApplicationRecord
   alias_attribute :description, :abstract
 
   # searchable must come before acts_as_asset is called
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :journal, :pubmed_id, :doi, :published_date, :human_disease_terms
-      text :publication_authors do
-        seek_authors.map(&:person).collect(&:name)
-      end
-      text :non_seek_authors do
-        non_seek_authors.compact.map(&:first_name) | non_seek_authors.compact.map(&:last_name)
-      end
+  searchable(auto_index: false) do
+    text :journal, :pubmed_id, :doi, :published_date, :human_disease_terms
+    text :publication_authors do
+      seek_authors.map(&:person).collect(&:name)
+    end
+    text :non_seek_authors do
+      non_seek_authors.compact.map(&:first_name) | non_seek_authors.compact.map(&:last_name)
     end
   end
 

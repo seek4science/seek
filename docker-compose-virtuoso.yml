@@ -1,6 +1,7 @@
 x-shared:
-  seek_base: &seek_base # build: .
-    image: fairdom/seek:1.18
+  seek_base: &seek_base
+    # build: .
+    image: fairdom/seek:main
 
     restart: always
     environment: &seek_base_env
@@ -10,6 +11,7 @@ x-shared:
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
     env_file:
       - docker/db.env
+      - docker/redis.env
       - docker/virtuoso.env
     volumes:
       - seek-filestore:/seek/filestore
@@ -52,6 +54,29 @@ services:
       retries: 5
       start_period: 20s
 
+  redis_store:
+    image: redis:8.6-alpine
+    container_name: seek-redis
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$$REDIS_MAXMEMORY" --maxmemory-policy allkeys-lru
+    env_file:
+      - docker/redis.env
+    volumes:
+      - seek-redis-data:/data
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
   seek:
     # The SEEK application
     <<: *seek_base
@@ -79,7 +104,7 @@ services:
     command: docker/start_workers.sh
 
   solr:
-    image: solr:8.11.4
+    image: solr:9.10.1
     container_name: seek-solr
     restart: always
     environment:
@@ -117,3 +142,4 @@ volumes:
   seek-solr-data:
   seek-cache:
   seek-virtuoso-data:
+  seek-redis-data:

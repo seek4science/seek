@@ -1,13 +1,11 @@
 {
   "data": {
-    "id": "1022253708",
+    "id": "1022267972",
     "type": "projects",
     "attributes": {
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "extended_attributes": {
-        "extended_metadata_type_id": "203",
+        "extended_metadata_type_id": "569",
         "attribute_map": {
           "dad": {
             "first_name": "john",
@@ -42,30 +40,28 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039989654",
+              "id": "1040003945",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022253708",
+              "id": "1022267972",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980194172",
+              "id": "980208604",
               "type": "institutions"
             },
             "access": "view"
           }
         ]
       },
-      "members": [
-
-      ],
+      "members": [],
       "use_default_policy": false,
       "topic_annotations": [
         {
@@ -80,136 +76,94 @@
     },
     "relationships": {
       "project_administrators": {
-        "data": [
-
-        ]
+        "data": []
       },
       "pals": {
-        "data": [
-
-        ]
+        "data": []
       },
       "asset_housekeepers": {
-        "data": [
-
-        ]
+        "data": []
       },
       "asset_gatekeepers": {
-        "data": [
-
-        ]
+        "data": []
       },
       "organisms": {
         "data": [
           {
-            "id": "627234394",
+            "id": "627234525",
             "type": "organisms"
           }
         ]
       },
       "human_diseases": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
-        "data": [
-
-        ]
+        "data": []
       },
       "institutions": {
-        "data": [
-
-        ]
+        "data": []
       },
       "programmes": {
         "data": [
           {
-            "id": "34",
+            "id": "306",
             "type": "programmes"
           }
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "file_templates": {
-        "data": [
-
-        ]
+        "data": []
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       },
       "collections": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/projects/1022253708"
+      "self": "/projects/1022267972"
     },
     "meta": {
-      "created": "2026-06-16T14:32:32.424Z",
-      "modified": "2026-06-16T14:32:32.687Z",
+      "created": "2026-08-27T08:53:39.444Z",
+      "modified": "2026-08-27T08:53:39.802Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "6a6b9755-cd7d-48e2-b224-db936589c774"
+      "uuid": "b3003f2b-87a9-484f-970e-a5e5c82d3153"
     }
   },
   "jsonapi": {

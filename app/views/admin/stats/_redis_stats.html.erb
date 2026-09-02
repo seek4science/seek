@@ -1,0 +1,57 @@
+<h4>Redis cache</h4>
+
+<% if stats.nil? %>
+  <p class="none_text">The configured cache store does not use Redis, so there are no Redis statistics to show.</p>
+<% elsif stats['error'] %>
+  <div class="alert alert-danger">Could not fetch Redis statistics: <%= stats['error'] %></div>
+<% else %>
+  <p>
+    Redis backs both the cache and user sessions on a single instance. Under memory pressure the
+    <code>maxmemory-policy</code> evicts keys instance-wide, so a rising <strong>evicted keys</strong>
+    count is the signal that Redis is full and may be discarding session keys early (silent logouts),
+    not just cache entries. Contrast it with <strong>expired keys</strong>, which is the healthy,
+    expected removal of keys whose TTL has passed.
+  </p>
+
+  <table class="table table-hover" id="redis-stats">
+    <tbody>
+      <tr>
+        <th>Used memory</th>
+        <td><%= stats['used_memory_human'] %></td>
+      </tr>
+      <tr>
+        <th>Max memory</th>
+        <td><%= stats['maxmemory_human'].to_s == '0B' ? 'unlimited' : stats['maxmemory_human'] %></td>
+      </tr>
+      <tr>
+        <th>Eviction policy</th>
+        <td><%= stats['maxmemory_policy'] %></td>
+      </tr>
+      <tr class="<%= stats['evicted_keys'].to_i.positive? ? 'warning' : '' %>">
+        <th>Evicted keys</th>
+        <td>
+          <%= number_with_delimiter(stats['evicted_keys']) %>
+          <% if stats['evicted_keys'].to_i.positive? %>
+            <span class="label label-warning">memory pressure</span>
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <th>Expired keys</th>
+        <td><%= number_with_delimiter(stats['expired_keys']) %></td>
+      </tr>
+      <tr>
+        <th>Keyspace hits</th>
+        <td><%= number_with_delimiter(stats['keyspace_hits']) %></td>
+      </tr>
+      <tr>
+        <th>Keyspace misses</th>
+        <td><%= number_with_delimiter(stats['keyspace_misses']) %></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="none_text">
+    Counts are cumulative since Redis last started, so watch the trend rather than the absolute value.
+  </p>
+<% end %>
