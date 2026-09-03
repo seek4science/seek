@@ -378,7 +378,14 @@ class AdminController < ApplicationController
     # Stops the Solid Queue supervisor and starts a fresh one in the background (seek:workers:start
     # daemonises), so the workers pick up any code/config changes.
     error = execute_command('bundle exec rake seek:workers:restart')
-    redirect_with_status(error, 'background job workers')
+    if error.blank?
+      # The supervisor is spawned in the background and takes a moment to register, so the status
+      # panel won't show it immediately - flag that so the panel can invite a refresh.
+      flash[:job_workers_restarting] = true
+    else
+      flash[:error] = "There was a problem with restarting the background job workers. #{error.gsub('Terrapin::', '')}"
+    end
+    redirect_to action: :show
   end
 
   def clear_cache

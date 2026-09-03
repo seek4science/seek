@@ -41,6 +41,13 @@
           Background job workers
         </h4>
 
+        <% if flash[:job_workers_restarting] %>
+            <div class="alert alert-info" style="margin-bottom: 10px;">
+              The background job workers are restarting - this can take a few moments.
+              <%= link_to 'Refresh', admin_path %> to check their status.
+            </div>
+        <% end %>
+
         <% begin %>
             <% pid = Seek::Util.solid_queue_supervisor_pid %>
             <% if pid %>
