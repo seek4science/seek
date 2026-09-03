@@ -20,13 +20,13 @@ echo "${GREEN}pip install${NC}"
 python`cat .python-version` -m pip install -r requirements.txt
 
 echo "${GREEN} stop background job workers${NC}"
-bundle exec rake jobs:stop
+bundle exec rake seek:workers:stop
 
 echo "${GREEN} seek:upgrade${NC}"
 bundle exec rake seek:upgrade
 
 sleep 5 # small delay to make sure SOLR has started up and ready
-script/run_solid_queue.sh &
+bundle exec rake seek:workers:start
 
 echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while

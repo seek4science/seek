@@ -375,14 +375,10 @@ class AdminController < ApplicationController
   end
 
   def restart_job_workers
-    pid = Seek::Util.solid_queue_supervisor_pid
-    if pid
-      error = execute_command("kill -TERM #{pid}")
-      redirect_with_status(error, 'background job workers')
-    else
-      flash[:error] = 'There are no background job workers running to restart.'
-      redirect_to action: :show
-    end
+    # Stops the Solid Queue supervisor and starts a fresh one in the background (seek:workers:start
+    # daemonises), so the workers pick up any code/config changes.
+    error = execute_command('bundle exec rake seek:workers:restart')
+    redirect_with_status(error, 'background job workers')
   end
 
   def clear_cache

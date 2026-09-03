@@ -43,7 +43,7 @@ bundle exec puma -C docker/puma.rb &
 if [ -z $NO_ENTRYPOINT_WORKERS ] #Don't start if flag set, for use with docker-compose
 then
     echo "STARTING SOLID QUEUE"
-    script/run_solid_queue.sh &
+    bundle exec rake seek:workers:start
 
     setup_and_start_cron
 fi

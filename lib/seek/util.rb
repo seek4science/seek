@@ -146,13 +146,6 @@ module Seek
       live_pid_from_pidfile(SolidQueue.supervisor_pidfile)
     end
 
-    # The pid of the script/run_solid_queue.sh restart loop, if its pidfile exists and the process is
-    # still alive, otherwise nil. Signalling this, rather than the supervisor, stops Solid Queue for
-    # good instead of triggering a restart.
-    def self.solid_queue_runner_pid
-      live_pid_from_pidfile(SolidQueue.runner_pidfile)
-    end
-
     # Read a pid from a pidfile, returning it only if the process is still alive (nil for a missing or
     # stale pidfile). A process owned by another user counts as alive, since it exists.
     def self.live_pid_from_pidfile(path)

@@ -10,49 +10,10 @@
   Rake::Task["jobs:#{name}"].clear if Rake::Task.task_defined?("jobs:#{name}")
 end
 
-# Send SIGTERM to a pid, returning whether a running process was signalled. Mirrors the deployment
-# scripts' `kill -TERM ... 2>/dev/null || true` - a stale pidfile or a foreign-owned process is not
-# an error.
-def term_solid_queue(pid)
-  Process.kill('TERM', pid)
-  true
-rescue Errno::ESRCH
-  false # already gone - stale pidfile
-rescue Errno::EPERM
-  warn "Could not signal Solid Queue pid #{pid} (permission denied)"
-  false
-end
-
 namespace :jobs do
   desc 'Start the Solid Queue supervisor (equivalent to bin/jobs)'
   task work: :environment do
     SolidQueue::Supervisor.start
-  end
-
-  desc 'Stop Solid Queue, including the script/run_solid_queue.sh restart loop if it is running'
-  task stop: :environment do
-    # Stop the runner loop rather than the supervisor, so it doesn't immediately respawn one; its own
-    # TERM trap shuts the supervisor down too. Falls back to the bare supervisor when there is no
-    # runner (e.g. a plain `bin/jobs` session).
-    target = Seek::Util.solid_queue_runner_pid || Seek::Util.solid_queue_supervisor_pid
-
-    if target && term_solid_queue(target)
-      puts "Stopped Solid Queue (sent TERM to pid #{target})"
-    else
-      puts 'No Solid Queue processes were running'
-    end
-  end
-
-  desc 'Restart the Solid Queue supervisor (relies on script/run_solid_queue.sh to respawn it)'
-  task restart: :environment do
-    # TERM the supervisor, not the runner: run_solid_queue.sh sees it exit and starts a fresh one, so
-    # the workers pick up new code. Without the runner (a bare `bin/jobs`) this only stops it.
-    pid = Seek::Util.solid_queue_supervisor_pid
-    if pid && term_solid_queue(pid)
-      puts "Restarting Solid Queue (sent TERM to supervisor pid #{pid}); the runner will respawn it"
-    else
-      puts 'No Solid Queue supervisor is running'
-    end
   end
 
   desc 'Run all available Solid Queue jobs and exit when the queue is empty. QUEUES=a,b THREADS=n'
