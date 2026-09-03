@@ -14,7 +14,7 @@ namespace :seek do
         # Daemonise: a new process group detached from this task, writing to the Rails log, so bin/jobs
         # keeps running after the task returns. The supervisor records its own pid in
         # SolidQueue.supervisor_pidfile (config/initializers/solid_queue.rb), which stop/status read.
-        log = Rails.root.join('log', "#{Rails.env}.log").to_s
+        log = Rails.application.config.paths['log'].first
         pid = Process.spawn('bundle', 'exec', 'bin/jobs',
                             chdir: Rails.root.to_s, pgroup: true,
                             in: File::NULL, out: [log, 'a'], err: [log, 'a'])
