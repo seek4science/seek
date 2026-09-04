@@ -1,5 +1,3 @@
-require 'delayed/command'
-
 class AdminController < ApplicationController
   include CommonSweepers
 
@@ -377,10 +375,18 @@ class AdminController < ApplicationController
     redirect_with_status(error, 'server')
   end
 
-  def restart_delayed_job
-    command = "bundle exec rake seek:workers:restart"
-    error = execute_command(command)
-    redirect_with_status(error, 'background job workers')
+  def restart_job_workers
+    # Stops the Solid Queue supervisor and starts a fresh one in the background (seek:workers:start
+    # daemonises), so the workers pick up any code/config changes.
+    error = execute_command('bundle exec rake seek:workers:restart')
+    if error.blank?
+      # The supervisor is spawned in the background and takes a moment to register, so the status
+      # panel won't show it immediately - flag that so the panel can invite a refresh.
+      flash[:job_workers_restarting] = true
+    else
+      flash[:error] = "There was a problem with restarting the background job workers. #{error.gsub('Terrapin::', '')}"
+    end
+    redirect_to action: :show
   end
 
   def clear_cache
@@ -388,17 +394,6 @@ class AdminController < ApplicationController
     flash[:notice] = "Cache cleared"
     respond_to do |format|
       format.html { render :index}
-    end
-  end
-
-  # give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
-  def wait_for_delayed_job_to_start
-    sleep(0.5)
-    pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids", 'delayed_job.0')
-    count = 0
-    while !pid.running? && (count < 10)
-      sleep(0.5)
-      count += 1
     end
   end
 
@@ -628,9 +623,9 @@ class AdminController < ApplicationController
     return array.slice(0,index) + array.slice(index+1,array.length)
   end
 
-  # this destroys any failed Delayed::Jobs
+  # this destroys any failed SolidQueue::Jobs
   def clear_failed_jobs
-    Delayed::Job.where('failed_at IS NOT NULL').destroy_all
+    SolidQueue::Job.failed.destroy_all
     respond_to do |format|
       format.json { head :ok }
     end

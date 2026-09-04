@@ -1,0 +1,77 @@
+# Schedules use standard 5-field cron syntax, in UTC:
+#
+#   ┌───────────── minute        (0-59)
+#   │ ┌───────────── hour        (0-23)
+#   │ │ ┌───────────── day of month (1-31)
+#   │ │ │ ┌───────────── month     (1-12)
+#   │ │ │ │ ┌───────────── day of week (0-6, Sunday = 0)
+#   │ │ │ │ │
+#   * * * * *
+#
+# `*` means every value, `*/n` every nth value, and `a,b,c` a specific list. So "0 0 * * 0" is
+# midnight every Sunday, and "0 */4 * * *" is on the hour every 4 hours. (Fugit parses these, so a
+# few natural-language forms like "every hour at minute 12" also work.)
+#
+# Recurring entries for scheduled jobs and tasks that map onto Solid Queue, via either a
+# `class:` entry (an ActiveJob class, enqueued with `perform_later`) or a `command:` entry
+# (arbitrary Ruby, run via SolidQueue::RecurringJob#perform's `eval` - not limited to ActiveJob
+# calls, e.g. clear_finished_jobs/application_status_refresh below are plain class method
+# calls). `command:`-only entries (no `class:`) enqueue onto the `solid_queue_recurring` queue
+# (SolidQueue::RecurringJob's own queue_as), which is why config/queue.yml has a dedicated
+# worker for it. All periodic application jobs live here; the only periodic work handled by cron
+# (docker/seek.crontab) is OS-level process reaping (kill-long-running-soffice.sh) that isn't an
+# ActiveJob or Ruby call.
+#
+# The heavier daily jobs are staggered across the early-morning hours (00:00-04:00) so they don't
+# all run at once.
+production:
+  periodic_subscription_email_daily:
+    class: PeriodicSubscriptionEmailJob
+    args: [ daily ]
+    schedule: "0 0 * * *"
+  periodic_subscription_email_weekly:
+    class: PeriodicSubscriptionEmailJob
+    args: [ weekly ]
+    schedule: "0 0 * * 0"
+  periodic_subscription_email_monthly:
+    class: PeriodicSubscriptionEmailJob
+    args: [ monthly ]
+    schedule: "0 0 1 * *"
+  regular_maintenance:
+    class: RegularMaintenanceJob
+    schedule: "0 */4 * * *"
+  auth_lookup_maintenance:
+    class: AuthLookupMaintenanceJob
+    schedule: "0 */8 * * *"
+  cache_overflow_cleanup:
+    class: CacheOverflowCleanupJob
+    schedule: "0 4 * * *"
+  life_monitor_status:
+    class: LifeMonitorStatusJob
+    schedule: "0 2 * * *"
+  news_feed_refresh:
+    class: NewsFeedRefreshJob
+    priority: 3
+    schedule: "<%= NewsFeedRefreshJob.cron_schedule %>"
+  queue_timed_jobs:
+    command: "ApplicationJob.queue_timed_jobs"
+    schedule: "*/10 * * * *"
+  clear_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+  application_status_refresh:
+    command: "ApplicationStatus.instance.refresh"
+    schedule: "* * * * *"
+  galaxy_tool_map_refresh:
+    command: "Galaxy::ToolMap.instance.refresh"
+    schedule: "0 3 * * *"
+  bioschema_data_dump_generate:
+    command: "Seek::BioSchema::DataDump.generate_dumps"
+    schedule: "10 0 * * *"
+  sitemap_refresh:
+    class: SitemapRefreshJob
+    schedule: "45 0 * * *"
+
+# No recurring entries for development/test - matches solid_queue's own default
+# template convention and avoids periodic jobs (subscription emails, etc.) firing
+# unexpectedly on a local machine when `bin/jobs` is run for testing.

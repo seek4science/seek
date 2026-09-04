@@ -8,6 +8,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     db:seed:019_sop_type_controlled_vocab
+    migrate_delayed_jobs_to_solid_queue
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -55,6 +56,15 @@ namespace :seek do
           FileUtils.rm_rf(path, secure: true)
         end
       end
+    end
+  end
+
+  desc('migrates any jobs left in the delayed_jobs table into Solid Queue (one-off, post-cutover)')
+  task(migrate_delayed_jobs_to_solid_queue: [:environment]) do
+    only_once('seek:migrate_delayed_jobs_to_solid_queue 1.19.0') do
+      puts '... migrating any remaining delayed_jobs into Solid Queue'
+      result = Seek::DelayedJobMigrator.run(logger: ->(message) { puts "    #{message}" })
+      puts "... #{result.summary}"
     end
   end
 
