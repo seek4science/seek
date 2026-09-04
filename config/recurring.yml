@@ -52,7 +52,7 @@ production:
   news_feed_refresh:
     class: NewsFeedRefreshJob
     priority: 3
-    schedule: "*/<%= Seek::Config.home_feeds_cache_timeout %> * * * *"
+    schedule: "<%= NewsFeedRefreshJob.cron_schedule %>"
   queue_timed_jobs:
     command: "ApplicationJob.queue_timed_jobs"
     schedule: "*/10 * * * *"

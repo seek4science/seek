@@ -42,7 +42,7 @@ class RecurringTest < ActiveSupport::TestCase
     news_refresh = pop_task(:news_feed_refresh)
     assert_equal 'NewsFeedRefreshJob', news_refresh[:class]
     assert_equal 3, news_refresh[:priority]
-    assert_equal "*/#{Seek::Config.home_feeds_cache_timeout} * * * *", news_refresh[:schedule]
+    assert_equal NewsFeedRefreshJob.cron_schedule, news_refresh[:schedule]
 
     queue_timed = pop_task(:queue_timed_jobs)
     assert_equal 'ApplicationJob.queue_timed_jobs', queue_timed[:command]
@@ -71,9 +71,19 @@ class RecurringTest < ActiveSupport::TestCase
     assert_empty @tasks, "Found untested recurring task(s): #{@tasks.keys.join(', ')}"
   end
 
-  test 'news feed refresh schedule changes with config' do
-    with_config_value(:home_feeds_cache_timeout, 731) do
-      assert_equal '*/731 * * * *', production_tasks[:news_feed_refresh][:schedule]
+  test 'news feed refresh schedule stays a valid cron as the cache timeout changes' do
+    # A bare "*/n" cron is only valid for n in 1..59; larger intervals must become an hour/day step,
+    # or Solid Queue's Fugit-based validation rejects the schedule and stops the scheduler.
+    {
+      30 => '*/30 * * * *', # minute interval
+      90 => '0 */2 * * *',  # rounded up to a two-hour step
+      731 => '0 */12 * * *' # large interval a bare */n cron could not express
+    }.each do |timeout, expected|
+      with_config_value(:home_feeds_cache_timeout, timeout) do
+        schedule = production_tasks[:news_feed_refresh][:schedule]
+        assert_equal expected, schedule
+        assert Fugit.parse_cron(schedule), "#{schedule.inspect} is not a valid cron"
+      end
     end
   end
 
