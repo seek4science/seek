@@ -3,7 +3,8 @@ require 'minitest/mock'
 
 class ExceptionNotificationTest < ActionDispatch::IntegrationTest
   test 'filters sensitive parameters out of exception notifications' do
-    assert_equal 0, ActionMailer::Base.deliveries.length
+    ActionMailer::Base.deliveries.clear
+    assert_empty ActionMailer::Base.deliveries
 
     User.stub(:admin_logged_in?, true) do
       with_config_value(:email_enabled, true) do
