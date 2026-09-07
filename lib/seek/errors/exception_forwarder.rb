@@ -7,13 +7,13 @@ module Seek
       # the option :data will get merged with some default info that reports the configured site host, and current user
       # information
       def self.send_notification(exception, options = {}, user = User.current_user)
-        Rails.logger.error "Sending execption ERROR - #{exception.class.name} (#{exception.message})"
+        Rails.logger.error "Sending exception ERROR - #{exception.class.name} (#{exception.message})"
         return unless Seek::Config.exception_notification_enabled
         env = options[:env]
         data = default_data(user).merge(options[:data] || {})
         begin
           ExceptionNotifier.notify_exception(exception, env: env, data: data)
-         rescue StandardError => deliver_exception
+        rescue StandardError => deliver_exception
            Rails.logger.error 'Error delivering exception email - ' \
                         "#{deliver_exception.class.name} (#{deliver_exception.message})"
         end
