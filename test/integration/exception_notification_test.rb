@@ -19,7 +19,9 @@ class ExceptionNotificationTest < ActionDispatch::IntegrationTest
                 get fail_path, params: { http_code: '500',
                                          password: 'unique_string_2',
                                          email: 'unique_string_3',
-                                         unfiltered_param: 'unique_string_4' }, as: :json, headers: headers
+                                         unfiltered_param: 'unique_string_4',
+                                         author: 'unique_string_5'
+                }, as: :json, headers: headers
               end
 
               assert_equal 1, ActionMailer::Base.deliveries.length # Exception notification
@@ -32,6 +34,7 @@ class ExceptionNotificationTest < ActionDispatch::IntegrationTest
               assert_not_includes body, 'unique_string_2'
               assert_not_includes body, 'unique_string_3'
               assert_includes body, 'unique_string_4'
+              assert_includes body, 'unique_string_5'
               assert_match /HTTP_AUTHORIZATION\s+: \[FILTERED\]/, body
             end
           end

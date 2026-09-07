@@ -14,8 +14,8 @@ module Seek
         begin
           ExceptionNotifier.notify_exception(exception, env: env, data: data)
         rescue StandardError => deliver_exception
-           Rails.logger.error 'Error delivering exception email - ' \
-                        "#{deliver_exception.class.name} (#{deliver_exception.message})"
+          Rails.logger.error 'Error delivering exception email - ' \
+                               "#{deliver_exception.class.name} (#{deliver_exception.message})"
         end
       end
 
