@@ -875,7 +875,7 @@ GEM
     ruby-xz (1.0.3)
     rubyntlm (0.6.5)
       base64
-    rubyzip (3.3.0)
+    rubyzip (3.6.0)
     rugged (1.9.0)
     sample-template-generator (0.7.1)
       rdoc (~> 6.0)
