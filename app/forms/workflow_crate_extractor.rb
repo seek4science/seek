@@ -1,5 +1,6 @@
 require 'ro_crate'
 require 'seek/download_handling/http_streamer'
+require 'open4'
 
 # A kind of "form object" to create a Git repository + version + annotations from a Workflow RO-Crate.
 class WorkflowCrateExtractor
@@ -86,6 +87,30 @@ class WorkflowCrateExtractor
   end
 
   def extract_crate
+    do_validation = false
+    begin
+      Zip::File.open(ro_crate[:data].path) do |zip_file|
+        do_validation = zip_file.find_entry('ro-crate-metadata.json').present?
+      end
+    rescue Zip::Error
+      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+      return
+    end
+
+    # The validation library does not support version 1.0 crates
+    # They use ro-crate-metadata.jsonld rather than ro-crate-metadata.json
+    # So we only use this library if it contains a ro-crate-metadata.json file
+    if do_validation
+      Open4.open4(Seek::Util.python_exec("script/validate-ro-crate.py #{ro_crate[:data].path}")) do |_pid, _stdin, stdout, _stderr|
+        until (line = stdout.gets).nil?
+          errors.add(:base, line.strip)
+        end
+        stdout.close
+      end
+
+      return if errors.any?
+    end
+
     begin
       @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
     rescue Zip::Error
