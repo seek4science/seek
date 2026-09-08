@@ -35,7 +35,7 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
     assert_not_nil verify(signed_oidc_token({}, key: private_jwk, alg: :ES256))
   end
 
-  test 'accepts a token with no key id when the provider offers a single key' do
+  test 'accepts a token with no key id while the provider offers a single key' do
     token = JSON::JWT.new(default_oidc_claims).sign(oidc_rsa_key, :RS256).to_s
 
     assert_nil JSON::JWT.decode(token, :skip_verification).header[:kid]
@@ -63,10 +63,6 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
 
   test 'rejects a token that is not yet valid' do
     assert_nil verify(signed_oidc_token({ nbf: 10.minutes.from_now.to_i }))
-  end
-
-  test 'rejects a token issued in the future' do
-    assert_nil verify(signed_oidc_token({ iat: 10.minutes.from_now.to_i }))
   end
 
   test 'rejects a token from another issuer' do
@@ -108,6 +104,8 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
     assert_nil verify(forged.sign(oidc_rsa_key.public_key.to_pem, :HS256).to_s)
   end
 
+  # ruby-jwt compares the algorithm before resolving a key, which is what keeps a caller from
+  # reaching the rotation refetch with tokens naming a junk algorithm and an invented key id.
   test 'looks up no key at all for a token naming an algorithm it will not accept' do
     forged = JSON::JWT.new(default_oidc_claims)
     forged.header[:kid] = 'no-such-key'

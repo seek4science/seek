@@ -8,10 +8,11 @@ module Seek
       # Seek::Config.omniauth_oidc_config, and so the value held in identities.provider.
       PROVIDER = 'oidc'.freeze
 
-      # Asymmetric algorithms only. Handing this list to JSON::JWT.decode is what rejects an
-      # unsigned token, and a token signed HS256 using the provider's public key as the shared
-      # secret. JSON::JWS#verify! compares against alg.to_sym, so these have to be symbols.
-      SIGNING_ALGORITHMS = %i[RS256 RS384 RS512 PS256 PS384 PS512 ES256 ES384 ES512].freeze
+      # Asymmetric algorithms only, and ruby-jwt insists on being handed the list. It compares the
+      # token's algorithm against this before it looks up any key, which is what rejects an
+      # unsigned token, and one signed HS256 using the provider's published public key as the
+      # shared secret. Strings here, unlike json-jwt, which wants symbols.
+      SIGNING_ALGORITHMS = %w[RS256 RS384 RS512 PS256 PS384 PS512 ES256 ES384 ES512].freeze
 
       # Leeway for the claims that place a token in the future, so that a token minted moments ago
       # is not refused merely because this clock lags the provider's. Deliberately not allowed
@@ -48,9 +49,9 @@ module Seek
         return nil unless self.class.enabled?
         return nil unless plausible_jwt?
 
-        claims = verified_claims
-        return nil if claims.nil?
-        return nil unless claims_acceptable?(claims)
+        claims, = ::JWT.decode(@token, nil, true, decode_options)
+        return nil if claims['sub'].blank?
+        return nil unless audience_accepted?(claims)
 
         claims
       rescue StandardError => e
@@ -67,68 +68,39 @@ module Seek
         @token.bytesize.between?(2, MAX_TOKEN_BYTES) && @token.count('.') == 2
       end
 
-      def verified_claims
-        # decode below enforces the allowlist too, so checking the header first looks redundant.
-        # It is not: this returns before any key is looked up, and so is what keeps a caller from
-        # reaching the key rotation refetch in Discovery with tokens that name a junk algorithm
-        # and an invented key id.
-        header = ::JSON::JWT.decode(@token, :skip_verification).header
-        return nil unless SIGNING_ALGORITHMS.include?(header[:alg]&.to_sym)
-
-        candidate_keys(header[:kid]).each do |jwk|
-          claims = decode(jwk)
-          return claims if claims
-        end
-
-        nil
-      end
-
-      # One key at a time, never the whole set: handed a set, json-jwt chooses the key itself from
-      # the key id the token asks for, which takes that choice out of our hands.
-      def decode(jwk)
-        ::JSON::JWT.decode(@token, jwk, SIGNING_ALGORITHMS)
-      rescue ::JSON::JWT::Exception, ::OpenSSL::OpenSSLError
-        nil
-      end
-
-      # Providers that name the key they signed with are the common case; trying each key in turn
-      # covers the rest, bounded by the size of the provider's key set.
-      def candidate_keys(kid)
-        return [discovery.signing_key(kid)].compact if kid.present?
-
-        discovery.signing_keys
-      end
-
-      def claims_acceptable?(claims)
-        claims[:iss] == Seek::Config.omniauth_oidc_issuer &&
-          claims[:sub].present? &&
-          current?(claims) &&
-          audience_accepted?(claims)
-      end
-
-      # A token has to say when it expires, and must not be dated for use later on.
-      def current?(claims)
-        now = Time.now.to_i
-        expiry = time_claim(claims, :exp)
-        return false if expiry.nil? || expiry <= now
-
-        starts = [time_claim(claims, :nbf), time_claim(claims, :iat)].compact
-        starts.none? { |from| from > (now + FUTURE_CLAIM_LEEWAY) }
-      end
-
-      def time_claim(claims, name)
-        claims[name].presence&.to_i
+      # Expiry and not-before are verified by default. exp_leeway is stated even though nought is
+      # the default, because what matters here is that it differs from nbf_leeway. iat is left
+      # unverified: it describes a token rather than bounding its validity, and ruby-jwt allows it
+      # no leeway at all, so checking it would refuse a token minted a moment ago by a clock
+      # slightly ahead of this one. required_claims asserts only that a claim is present, hence
+      # the separate check for a blank subject.
+      #
+      # allow_nil_kid lets a provider that does not name the key it signed with still work, though
+      # only where it publishes a single key: ruby-jwt takes the first in the set rather than
+      # trying each.
+      def decode_options
+        {
+          algorithms: SIGNING_ALGORITHMS,
+          jwks: ->(options) { discovery.key_set(invalidate: options[:invalidate]) },
+          allow_nil_kid: true,
+          required_claims: %w[exp sub iss],
+          iss: Seek::Config.omniauth_oidc_issuer,
+          verify_iss: true,
+          exp_leeway: 0,
+          nbf_leeway: FUTURE_CLAIM_LEEWAY
+        }
       end
 
       # An empty list means the instance has chosen not to check the audience at all, in which case
       # any token the provider signed for anybody is accepted. azp is considered alongside aud
       # because a provider commonly names the resource in aud and the calling application in azp,
-      # and it is the calling application an administrator wants to name here.
+      # and it is the calling application an administrator wants to name here. ruby-jwt's own aud
+      # verification knows nothing of azp, so this stays by hand.
       def audience_accepted?(claims)
         accepted = Seek::Config.omniauth_oidc_api_audience_list
         return true if accepted.empty?
 
-        presented = (Array(claims[:aud]) + [claims[:azp]]).compact.map(&:to_s)
+        presented = ([*claims['aud']] + [claims['azp']]).compact.map(&:to_s)
         presented.intersect?(accepted)
       end
 

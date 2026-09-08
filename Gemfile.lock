@@ -1143,6 +1143,7 @@ DEPENDENCIES
   jquery-rails
   jquery-ui-rails
   json-schema
+  jwt
   libreconv
   libxml-ruby
   licensee

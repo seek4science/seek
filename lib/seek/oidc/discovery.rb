@@ -22,24 +22,20 @@ module Seek
         @issuer = issuer.to_s
       end
 
-      # The signing key with the given id, or nil if the provider offers no such key.
+      # The provider's key set, in the form ruby-jwt's key finder asks for it.
       #
-      # An unrecognised id is taken to mean the provider has rotated its keys, so the key set is
-      # fetched again - but at most once per REFRESH_COOLDOWN across the whole deployment, so that
-      # a caller presenting tokens bearing invented key ids cannot turn each of its requests into
-      # a request to the provider.
-      def signing_key(kid)
-        return nil if provider_unavailable?
+      # That finder asks again with invalidate: true when a token names a key the set does not
+      # hold, which is how a rotated key gets picked up. The refetch is allowed at most once every
+      # REFRESH_COOLDOWN across the whole deployment, so that tokens naming invented key ids
+      # cannot turn each request into a request to the provider. When it is refused the set comes
+      # back unchanged and the key is simply not found.
+      def key_set(invalidate: false)
+        raise Error, "the signing keys of '#{@issuer}' could not be fetched recently" if provider_unavailable?
 
-        reaching_provider { key_set[kid] || rotated_key(kid) }
-      end
-
-      # Every key the provider offers for signing, for a token that arrives without a key id.
-      # Deliberately a plain Array: JSON::JWK::Set#[] looks a key up by its id, not by position.
-      def signing_keys
-        return [] if provider_unavailable?
-
-        reaching_provider { key_set.to_a.reject { |jwk| jwk[:use] == 'enc' } }
+        reaching_provider do
+          refresh! if invalidate && refresh_allowed?
+          @key_set ||= parse(jwks_json)
+        end
       end
 
       private
@@ -62,15 +58,10 @@ module Seek
         Rails.cache.read(cache_key('unavailable')).present?
       end
 
-      def key_set
-        @key_set ||= parse(jwks_json)
-      end
-
-      def rotated_key(kid)
-        return nil unless refresh_allowed?
-
-        @key_set = parse(refreshed_jwks_json)
-        @key_set[kid]
+      def refresh!
+        json = fetch_jwks_json
+        Rails.cache.write(cache_key('jwks'), json, expires_in: JWKS_CACHE_TTL)
+        @key_set = parse(json)
       end
 
       # Writing with unless_exist is a single atomic operation - Redis SET NX - so this bounds
@@ -82,10 +73,6 @@ module Seek
 
       def jwks_json
         Rails.cache.fetch(cache_key('jwks'), expires_in: JWKS_CACHE_TTL) { fetch_jwks_json }
-      end
-
-      def refreshed_jwks_json
-        fetch_jwks_json.tap { |json| Rails.cache.write(cache_key('jwks'), json, expires_in: JWKS_CACHE_TTL) }
       end
 
       def fetch_jwks_json
@@ -106,7 +93,7 @@ module Seek
       end
 
       def parse(json)
-        ::JSON::JWK::Set.new(::JSON.parse(json))
+        ::JWT::JWK::Set.new(::JSON.parse(json))
       end
 
       # A connection of our own rather than OpenIDConnect.http_client, which imposes no timeouts.
