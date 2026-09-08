@@ -3,7 +3,7 @@ require 'json/jwt'
 # Builds access tokens, and stubs the provider that verifies them, for tests of OpenID Connect
 # authentication. The issuer matches the one set for the test environment in
 # config/initializers/seek_testing.rb.
-module OidcTestHelper
+module OIDCTestHelper
   OIDC_ISSUER = 'https://example.com/oidc'.freeze
   OIDC_KID = 'seek-test-key'.freeze
 

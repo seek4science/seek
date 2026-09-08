@@ -1,6 +1,6 @@
 module Seek
-  # See Seek::Oidc::Discovery for why this namespace is spelled Oidc.
-  module Oidc
+  # See Seek::OIDC::Discovery for what this namespace's spelling depends on.
+  module OIDC
     # Checks whether a bearer token is a currently valid access token issued by the OpenID Connect
     # provider configured for this instance, verifying its signature against the provider's keys.
     class AccessTokenVerifier

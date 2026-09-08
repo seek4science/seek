@@ -6,7 +6,7 @@ class UserTest < ActiveSupport::TestCase
   # Then, you can remove it from this and the functional test.
 
   include AuthenticatedTestHelper
-  include OidcTestHelper
+  include OIDCTestHelper
 
   test 'validates email if set' do
     u = FactoryBot.create :user

@@ -2,7 +2,7 @@ require 'test_helper'
 require 'oidc_test_helper'
 
 class AuthenticationTest < ActionDispatch::IntegrationTest
-  include OidcTestHelper
+  include OIDCTestHelper
 
   def setup
     @user = FactoryBot.create(:user,

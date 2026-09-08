@@ -2,7 +2,7 @@ require 'test_helper'
 require 'oidc_test_helper'
 
 class AccessTokenVerifierTest < ActiveSupport::TestCase
-  include OidcTestHelper
+  include OIDCTestHelper
 
   def setup
     # Both the cached key set and the recorded requests would otherwise carry over between tests.
@@ -213,6 +213,6 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
   end
 
   def described_verify(token)
-    Seek::Oidc::AccessTokenVerifier.verify(token)
+    Seek::OIDC::AccessTokenVerifier.verify(token)
   end
 end

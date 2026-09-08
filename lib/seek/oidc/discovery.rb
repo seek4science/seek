@@ -1,10 +1,9 @@
 module Seek
-  # The namespace is Seek::Oidc rather than Seek::OIDC because Zeitwerk derives the constant from
-  # the directory name with String#camelize, and no "OIDC" acronym is registered in
-  # config/initializers/inflections.rb. Adding one there breaks boot until this directory is
-  # renamed to match. It must also never be called Seek::OpenIDConnect, or unqualified references
-  # to the gem of that name would resolve to this namespace instead.
-  module Oidc
+  # Zeitwerk derives this constant from the directory name with String#camelize, so the spelling
+  # OIDC depends on the acronym registered in config/initializers/inflections.rb; removing it
+  # there breaks boot. The namespace must never be called Seek::OpenIDConnect, or unqualified
+  # references to the gem of that name would resolve to this namespace instead.
+  module OIDC
     # The signing keys of the OpenID Connect provider configured for this instance, found through
     # its discovery document and cached, so that verifying an access token needs no request to the
     # provider.

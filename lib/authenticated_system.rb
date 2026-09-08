@@ -149,7 +149,7 @@ module AuthenticatedSystem
   # OpenID Connect provider, resolved to a user through a linked identity. Tried before
   # #user_from_api_token, so that a genuine token does not pay that method's throttling delay.
   def user_from_oidc_token
-    return unless Seek::Oidc::AccessTokenVerifier.enabled?
+    return unless Seek::OIDC::AccessTokenVerifier.enabled?
 
     authenticate_with_http_token do |token, _options|
       next if token.blank?
