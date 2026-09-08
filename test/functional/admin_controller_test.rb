@@ -565,6 +565,19 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 123, Seek::Config.related_items_limit
   end
 
+  test 'update OIDC API settings' do
+    with_config_values(omniauth_oidc_api_enabled: false, omniauth_oidc_api_audiences: '') do
+      post :update_features_enabled, params: {
+        omniauth_oidc_api_enabled: '1',
+        omniauth_oidc_api_audiences: 'seek-client, cli-client'
+      }
+
+      assert Seek::Config.omniauth_oidc_api_enabled
+      assert_equal 'seek-client, cli-client', Seek::Config.omniauth_oidc_api_audiences
+      assert_equal %w[seek-client cli-client], Seek::Config.omniauth_oidc_api_audience_list
+    end
+  end
+
   test 'update LDAP settings' do
     with_config_value(:omniauth_ldap_enabled, false) do
       with_config_value(:omniauth_ldap_config, { }) do

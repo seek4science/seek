@@ -431,6 +431,13 @@ module Seek
       }
     end
 
+    # The audience values an OpenID Connect access token may carry to be accepted as a credential
+    # for the API. Empty means the audience is not checked, so any token the provider signed is
+    # accepted.
+    def omniauth_oidc_api_audience_list
+      omniauth_oidc_api_audiences.to_s.split(/[,\s]+/).reject(&:blank?)
+    end
+
     def omniauth_oidc_image
       Avatar.find_by_id(omniauth_oidc_image_id) if omniauth_oidc_image_id
     end

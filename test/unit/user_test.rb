@@ -1,10 +1,12 @@
 require 'test_helper'
+require 'oidc_test_helper'
 
 class UserTest < ActiveSupport::TestCase
   # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead.
   # Then, you can remove it from this and the functional test.
 
   include AuthenticatedTestHelper
+  include OidcTestHelper
 
   test 'validates email if set' do
     u = FactoryBot.create :user
@@ -350,5 +352,40 @@ class UserTest < ActiveSupport::TestCase
     record = User.new({ login: 'quire', password: test_password, password_confirmation: test_password }.merge(options))
     record.save
     record
+  end
+
+  test 'from_oidc_token finds the user whose identity holds the token subject' do
+    identity = FactoryBot.create(:oidc_identity, uid: 'oidc-subject-1')
+
+    assert_equal identity.user, from_oidc_token(signed_oidc_token)
+  end
+
+  test 'from_oidc_token does not create a user for an unknown subject' do
+    log = capture_log { assert_nil from_oidc_token(signed_oidc_token) }
+
+    assert_match(/not linked/, log)
+  end
+
+  test 'from_oidc_token ignores an identity from another provider' do
+    FactoryBot.create(:identity, provider: 'elixir_aai', uid: 'oidc-subject-1')
+
+    assert_nil from_oidc_token(signed_oidc_token)
+  end
+
+  test 'from_oidc_token ignores an unacceptable token' do
+    FactoryBot.create(:oidc_identity, uid: 'oidc-subject-1')
+
+    assert_nil from_oidc_token(signed_oidc_token({ exp: 10.minutes.ago.to_i }))
+  end
+
+  private
+
+  def from_oidc_token(token)
+    WebMock.reset!
+    clear_rails_cache
+    stub_oidc_provider
+    with_oidc_api_enabled { User.from_oidc_token(token) }
+  ensure
+    clear_rails_cache
   end
 end

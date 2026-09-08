@@ -1,6 +1,9 @@
 require 'test_helper'
+require 'oidc_test_helper'
 
 class AuthenticationTest < ActionDispatch::IntegrationTest
+  include OidcTestHelper
+
   def setup
     @user = FactoryBot.create(:user,
                     login: 'my-user',
@@ -11,6 +14,14 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     @user.person.update_column(:email, 'my-user@example.com')
 
     @document = FactoryBot.create(:private_document, contributor: @user.person)
+
+    WebMock.reset!
+    clear_rails_cache
+    stub_oidc_provider
+  end
+
+  def teardown
+    clear_rails_cache
   end
 
   test 'authenticate using HTTP basic' do
@@ -81,6 +92,62 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_nil session[:user_id]
   end
 
+
+  test 'authenticate using OIDC access token' do
+    @user.identities.create!(provider: 'oidc', uid: 'oidc-subject-1')
+
+    with_oidc_api_enabled do
+      get document_path(@document), headers: { 'Authorization' => bearer_auth(signed_oidc_token) }
+    end
+
+    assert_response :success
+    assert_equal @user.id, session[:user_id]
+  end
+
+  test 'do not authenticate using OIDC access token when it is not enabled for the API' do
+    @user.identities.create!(provider: 'oidc', uid: 'oidc-subject-1')
+
+    with_oidc_api_enabled do
+      with_config_value(:omniauth_oidc_api_enabled, false) do
+        get document_path(@document), headers: { 'Authorization' => bearer_auth(signed_oidc_token) }
+      end
+    end
+
+    assert_response :forbidden
+    assert_nil session[:user_id]
+    assert_not_requested :get, "#{OIDC_ISSUER}/.well-known/openid-configuration"
+  end
+
+  test 'do not authenticate using OIDC access token for a subject with no identity' do
+    with_oidc_api_enabled do
+      get document_path(@document), headers: { 'Authorization' => bearer_auth(signed_oidc_token) }
+    end
+
+    assert_response :forbidden
+    assert_nil session[:user_id]
+  end
+
+  test 'do not authenticate using an expired OIDC access token' do
+    @user.identities.create!(provider: 'oidc', uid: 'oidc-subject-1')
+
+    with_oidc_api_enabled do
+      token = signed_oidc_token({ exp: 10.minutes.ago.to_i })
+      get document_path(@document), headers: { 'Authorization' => bearer_auth(token) }
+    end
+
+    assert_response :forbidden
+    assert_nil session[:user_id]
+  end
+
+  test 'authenticate using API token while OIDC access tokens are accepted' do
+    with_oidc_api_enabled do
+      get document_path(@document), headers: { 'Authorization' => token_auth(@token) }
+    end
+
+    assert_response :success
+    assert_equal @user.id, session[:user_id]
+    assert_not_requested :get, "#{OIDC_ISSUER}/.well-known/openid-configuration"
+  end
 
   private
 

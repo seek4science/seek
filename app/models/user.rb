@@ -314,6 +314,22 @@ class User < ApplicationRecord
     joins(:api_tokens).where(api_tokens: { encrypted_token: ApiToken.encrypt_token(token) }).first
   end
 
+  # The user whose OpenID Connect identity the given access token belongs to, or nil if the token
+  # is not acceptable or belongs to nobody here. A token for somebody with no identity is left
+  # alone rather than being made into an account: users are only created when logging in.
+  def self.from_oidc_token(token)
+    claims = Seek::Oidc::AccessTokenVerifier.verify(token)
+    return nil if claims.nil?
+
+    subject = claims['sub'].to_s
+    user = Identity.find_by(provider: Seek::Oidc::AccessTokenVerifier::PROVIDER, uid: subject)&.user
+    if user.nil?
+      Rails.logger.info("OpenID Connect access token accepted for subject '#{subject}', " \
+                        "which is not linked to a #{Seek::Config.instance_name} user")
+    end
+    user
+  end
+
   def uses_omniauth?
     identities.any?
   end

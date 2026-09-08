@@ -121,6 +121,27 @@
                                "#{t('login.oidc')} Client ID", "The client ID to use to authenticate with the #{t('login.oidc')} provider.") %>
         <%= admin_password_setting(:omniauth_oidc_secret, Seek::Config.omniauth_oidc_secret,
                                    "#{t('login.oidc')} Secret", "The secret to use to authenticate with the #{t('login.oidc')} provider.") %>
+        <%= admin_checkbox_setting(:omniauth_oidc_api_enabled, 1, Seek::Config.omniauth_oidc_api_enabled,
+                                   "Accept #{t('login.oidc')} access tokens for the API",
+                                   "Allows an access token issued by the #{t('login.oidc')} provider to be used as a credential for the
+                                   #{Seek::Config.instance_name} API, in place of an API Token, by sending it as
+                                   <code>Authorization: Bearer &lt;token&gt;</code>. The token is checked against the provider's signing keys,
+                                   and must belong to a #{t('login.oidc')} identity that is already linked to a #{Seek::Config.instance_name}
+                                   user; no account is ever created this way. The caller then has exactly that user's own permissions.
+                                   Leave this unchecked to allow #{t('login.oidc')} for logging in but not for the API.",
+                                   onchange: toggle_appear_javascript('omniauth_oidc_api_settings')) %>
+        <div id="omniauth_oidc_api_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_oidc_api_enabled) -%>;">
+          <%= admin_text_setting(:omniauth_oidc_api_audiences, Seek::Config.omniauth_oidc_api_audiences,
+                                 'Accepted token audiences',
+                                 "A comma separated list of values that a token's <code>aud</code> or <code>azp</code> claim must include for
+                                 it to be accepted. Usually the client ID of each application you want to allow to call the
+                                 #{Seek::Config.instance_name} API on a user's behalf.<br/><br/>
+                                 <strong>If you leave this blank the audience is not checked, and any correctly signed, unexpired token from
+                                 this provider is accepted</strong> &mdash; including a token issued to an application that has nothing to do
+                                 with #{Seek::Config.instance_name}. Anyone who can persuade one of your users to authorise an unrelated
+                                 application against your provider could then present that token here and act as that user. Only leave it
+                                 blank if you control every application registered with the provider.") %>
+        </div>
       </div>
       <div class="col-sm-5">
         <%= panel('Client Info') do %>
