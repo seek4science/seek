@@ -46,7 +46,7 @@ gem 'jbuilder-json_api'
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
 gem 'json-schema'
-gem 'jwt' # verifies OpenID Connect access tokens presented as API credentials
+gem 'jwt', '~> 3.2' # verifies OpenID Connect access tokens presented as API credentials
 gem 'libreconv'
 gem 'libxml-ruby', require: 'libxml'
 gem 'licensee'
