@@ -108,6 +108,15 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
     assert_nil verify(forged.sign(oidc_rsa_key.public_key.to_pem, :HS256).to_s)
   end
 
+  test 'looks up no key at all for a token naming an algorithm it will not accept' do
+    forged = JSON::JWT.new(default_oidc_claims)
+    forged.header[:kid] = 'no-such-key'
+
+    assert_nil verify(forged.sign(oidc_rsa_key.public_key.to_pem, :HS256).to_s)
+
+    assert_not_requested :get, "#{OIDC_ISSUER}/jwks"
+  end
+
   test 'rejects a token naming a key the provider does not offer' do
     assert_nil verify(signed_oidc_token({}, key: JSON::JWK.new(oidc_rsa_key, kid: 'no-such-key')))
   end

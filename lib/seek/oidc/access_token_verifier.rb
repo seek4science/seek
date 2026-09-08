@@ -68,6 +68,10 @@ module Seek
       end
 
       def verified_claims
+        # decode below enforces the allowlist too, so checking the header first looks redundant.
+        # It is not: this returns before any key is looked up, and so is what keeps a caller from
+        # reaching the key rotation refetch in Discovery with tokens that name a junk algorithm
+        # and an invented key id.
         header = ::JSON::JWT.decode(@token, :skip_verification).header
         return nil unless SIGNING_ALGORITHMS.include?(header[:alg]&.to_sym)
 

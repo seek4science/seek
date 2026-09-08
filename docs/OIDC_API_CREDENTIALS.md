@@ -285,6 +285,12 @@ provider's *public* key as the shared secret. Both are covered by tests.
 The list holds symbols, not strings: `JSON::JWS#verify!` compares against `alg&.to_sym`, so a
 list of strings silently matches nothing and would reject every token.
 
+The algorithm is also checked against the token header before any key is looked up. That is
+easy to mistake for dead weight, since `decode` enforces the same list, but it is what stops an
+unauthenticated caller reaching the key rotation refetch by sending tokens that name a junk
+algorithm and an invented key id. It is a bound on what a caller can cost the provider, not a
+duplicate of the signature check.
+
 ### `Seek::OIDC`, and the inflection
 
 Zeitwerk derives the constant from the directory name, which initially gave the awkward
@@ -347,12 +353,12 @@ curl -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json' \
 
 ## Testing
 
-43 new tests, all passing, and no regressions across the authentication, admin, omniauth, OAuth
+44 new tests, all passing, and no regressions across the authentication, admin, omniauth, OAuth
 and API suites.
 
 | Where | Tests |
 | --- | --- |
-| `test/unit/oidc/access_token_verifier_test.rb` | 31 |
+| `test/unit/oidc/access_token_verifier_test.rb` | 32 |
 | `test/integration/authentication_test.rb` | 5 |
 | `test/unit/user_test.rb` | 4 |
 | `test/unit/config_test.rb` | 2 |
