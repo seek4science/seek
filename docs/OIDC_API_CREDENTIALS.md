@@ -1,7 +1,6 @@
 # Accepting an OpenID Connect access token as an API credential
 
-Implements [#2733](https://github.com/seek4science/seek/issues/2733). Commits `e7af7db6e4`
-and `423cea0013` on `openid-api-2733`.
+Implements [#2733](https://github.com/seek4science/seek/issues/2733), on `openid-api-2733`.
 
 ## The problem
 
@@ -44,8 +43,10 @@ So the question "which SEEK user is this subject?" was already answerable, and k
 by ordinary logins. The only missing piece was a way to establish that a bearer token really
 came from the provider and really concerned that subject.
 
-Nothing new was needed in the Gemfile either: `openid_connect` (2.3.1) can fetch a discovery
-document, and `json-jwt` (1.16.7) can verify a signature against a key set.
+Two of the three gems needed were already there. `openid_connect` (2.3.1) fetches a discovery
+document, and `jwt` (3.2.0) verifies a token and its claims — the latter was in the lockfile as
+a dependency of `oauth2`, and is now declared directly. `json-jwt` remains only as
+`openid_connect`'s own dependency; no SEEK code calls it.
 
 ## What was added
 
@@ -55,9 +56,13 @@ Finds the provider's signing keys through its discovery document and caches them
 verifying a token normally needs no request to the provider at all.
 
 ```ruby
-Seek::OIDC::Discovery.new(issuer).signing_key(kid)  # => JSON::JWK or nil
-Seek::OIDC::Discovery.new(issuer).signing_keys      # => Array
+Seek::OIDC::Discovery.new(issuer).key_set(invalidate: false)  # => JWT::JWK::Set
 ```
+
+That signature is the one ruby-jwt's key finder asks for. It calls the loader again with
+`invalidate: true` when a token names a key the set does not hold, which is how a rotated key
+gets picked up — so the library decides *when* to retry, and this class decides only how often
+it is willing to be asked.
 
 Everything is cached in `Rails.cache`, under keys hashed on the issuer rather than its host so
 that adding a second provider later needs no change here:
@@ -79,8 +84,10 @@ Seek::OIDC::AccessTokenVerifier.enabled?      # => is this configured and switch
 Seek::OIDC::AccessTokenVerifier.verify(token) # => claims Hash, or nil. Never raises.
 ```
 
-In order: a cheap shape test, then the algorithm allowlist, then the signature, then the
-claims — `iss`, `sub`, `exp`, `nbf`, `iat`, and the audience.
+A cheap shape test, then a single `JWT.decode` carrying the algorithm allowlist, the key set
+loader, the required claims, the issuer and the leeways. Two checks remain by hand afterwards:
+a blank subject, because `required_claims` asserts only that a claim is present, and the
+audience, because ruby-jwt knows nothing of `azp`.
 
 ### `User.from_oidc_token` — `app/models/user.rb:320`
 
@@ -220,14 +227,18 @@ no restart, unlike the provider itself, which is wired into the middleware at bo
 
 ### Clock leeway on one side only
 
-`exp` is honoured exactly as issued. Leeway of 60 seconds applies only to the claims that place
-a token in the *future* — `nbf` and `iat`.
+`exp` is honoured exactly as issued: `exp_leeway: 0`. Leeway of 60 seconds applies only to
+`nbf`, via `nbf_leeway`.
 
 The asymmetry is deliberate, because the two directions have opposite risk profiles. If SEEK's
-clock lags the provider's, a token minted moments ago has an `iat` in SEEK's future and would be
+clock lags the provider's, a token minted moments ago is dated in SEEK's future and would be
 refused; that failure is intermittent, invisible to the caller, and unfixable by them —
 retrying makes it worse, as the new token is dated later still. Being strict there protects
 against nothing, since forging claims requires the signing key.
+
+`iat` is not verified at all. It describes when a token was made rather than bounding when it
+may be used, and ruby-jwt allows it no leeway whatsoever (`claims/issued_at.rb`), so enabling
+it would refuse exactly the freshly minted token described above.
 
 Leeway against `exp` is the reverse. The failure it would avoid is benign and self-correcting —
 the caller fetches a fresh token, which a device-flow client does anyway — while the cost is
@@ -247,8 +258,9 @@ rotated key would never be picked up.
 `SWD.cache = Rails.cache` was rejected too: its cache key is the host alone, so two issuers
 sharing a host would collide, and it is shared with the browser login path.
 
-Caching explicitly instead stores only strings, under SEEK's own namespaced keys, with chosen
-expiries, and changes nothing about web login.
+ruby-jwt offers no caching of its own — its key set loader is the hook, and what it caches is
+our business. So caching explicitly is the only option in any case: it stores only strings,
+under SEEK's own namespaced keys, with chosen expiries, and changes nothing about web login.
 
 ### Bounding what an attacker can cost the provider
 
@@ -277,19 +289,21 @@ is logged so that a genuine bug stays visible.
 
 ### The algorithm allowlist
 
-`SIGNING_ALGORITHMS` holds asymmetric algorithms only, and is passed to `JSON::JWT.decode`
-rather than merely checked against the header. This is what rejects an unsigned token
-(`alg: none`) and the classic key-confusion attack, where a token is signed `HS256` using the
-provider's *public* key as the shared secret. Both are covered by tests.
+`SIGNING_ALGORITHMS` holds asymmetric algorithms only, and ruby-jwt insists on being given the
+list — its default is `HS256`, so omitting it would be far worse than forgetting it elsewhere.
+Restricting it is what rejects an unsigned token (`alg: none`) and the classic key-confusion
+attack, where a token is signed `HS256` using the provider's *published public key* as the
+shared secret. Both are covered by tests.
 
-The list holds symbols, not strings: `JSON::JWS#verify!` compares against `alg&.to_sym`, so a
-list of strings silently matches nothing and would reject every token.
+The list holds **strings**, which is the opposite of what `json-jwt` wants: that library
+compares against `alg&.to_sym`, so a list of strings there silently matches nothing and rejects
+every token. Anything moving between the two libraries has to change the type.
 
-The algorithm is also checked against the token header before any key is looked up. That is
-easy to mistake for dead weight, since `decode` enforces the same list, but it is what stops an
-unauthenticated caller reaching the key rotation refetch by sending tokens that name a junk
-algorithm and an invented key id. It is a bound on what a caller can cost the provider, not a
-duplicate of the signature check.
+`JWT::Decode#decode_segments` compares the algorithm *before* it resolves a key
+(`verify_algo` then `set_key`). That ordering is relied upon, not merely convenient: it is what
+stops an unauthenticated caller reaching the key rotation refetch with tokens naming a junk
+algorithm and an invented key id. A test asserts that such a token causes no key lookup, so the
+library is held to it.
 
 ### `Seek::OIDC`, and the inflection
 
@@ -333,6 +347,66 @@ These are properties of the design, documented rather than fixed:
 - **Each token-authenticated request creates a session**, because `current_user=` writes
   `session[:user_id]`. Pre-existing for API tokens and basic auth, but worth knowing for a tool
   making many stateless calls.
+- **Clearing the cache costs the outage buffer, not any login.** Nothing cached here is
+  authentication state — it is the provider's *public* keys — so clearing it logs nobody out and
+  invalidates no token; the next request refetches and succeeds. But until it is warm again SEEK
+  cannot ride out a provider outage the way a twelve-hour key set otherwise lets it, and several
+  concurrent requests will each fetch, since `Rails.cache.fetch` takes no lock. Redis is
+  `allkeys-lru`, so eviction has the same effect without anyone acting. Note that
+  `Rails.cache.clear` does not disturb sessions: the store is namespaced `cache` while sessions
+  live under `session:`, so it deletes `cache:*` rather than flushing the database.
+- **A provider that omits the key id is only supported where it publishes one key.**
+  `allow_nil_kid` makes ruby-jwt take the first key in the set rather than trying each, so a
+  provider that both omits `kid` and publishes several keys would fail. Keycloak always sets it.
+
+## Alternatives considered
+
+### Reusing the omniauth strategy
+
+The first question a reviewer asks: SEEK already depends on `omniauth_openid_connect`, which
+discovers the provider and verifies tokens — why not call it?
+
+Because there is nothing to call. The strategy defines no class methods at all; every method is
+an instance method on `OmniAuth::Strategy`, request-scoped Rack middleware needing an `env`,
+its options and the session. Reaching it from the API path would mean building a strategy
+outside the middleware stack and feeding it a synthetic env.
+
+Two further reasons it would be wrong even if it were reachable. It verifies **ID** tokens —
+`decode_id_token` ends at `OpenIDConnect::ResponseObject::IdToken`, whose `verify!` requires
+`aud` to equal the client id and a `nonce` matching the session. A third-party access token has
+neither, by design. And it caches nothing across requests: `config` and `public_key` are
+memoised per instance, and `config.jwks` issues a fresh HTTP GET, which is one discovery and
+one key set fetch *per login* — fine for a browser redirect, ruinous per API request.
+
+### Verifying the claims by hand
+
+The first implementation did the claim checking itself over `json-jwt`, which offers none: it
+verifies a signature and leaves expiry, issuer, audience and required claims to the caller. It
+worked and was fully tested, but it was around forty lines of security-relevant code
+reimplementing a solved problem. `jwt` does all of it — including the asymmetric leeway, the
+required-claims assertion and the retry on an unrecognised key id — so the checks were handed
+over. What could not be handed over is in *Reasoning* above: `azp`, the optional audience, and
+everything in `Discovery`.
+
+### Introspection and userinfo
+
+Covered under *Verifying locally rather than asking the provider*. Both add a round trip to
+every authenticated request and make the API depend on the provider being up; userinfo also
+returns no `aud` or `azp`, which would make the audience check impossible.
+
+`rack-oauth2` (already present, via `openid_connect`) has an introspection client, and would be
+the tool to reach for had that route been taken.
+
+### Other gems
+
+- **`faraday-http-cache`** could cache the key set from the provider's HTTP cache headers, but
+  that depends on the provider sending sensible ones and provides none of the refresh cooldown
+  or negative caching that bound what a caller can cost the provider.
+- **`omniauth-keycloak`, `keycloak`** are provider-specific. The provider here is an
+  administrator's setting, so tying the implementation to one product would be wrong even
+  though Keycloak is the case that prompted the issue.
+- **`devise-jwt`, `doorkeeper-jwt`** issue tokens. Consuming somebody else's is the opposite
+  problem.
 
 ## Enabling it
 
@@ -353,12 +427,12 @@ curl -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json' \
 
 ## Testing
 
-44 new tests, all passing, and no regressions across the authentication, admin, omniauth, OAuth
+43 new tests, all passing, and no regressions across the authentication, admin, omniauth, OAuth
 and API suites.
 
 | Where | Tests |
 | --- | --- |
-| `test/unit/oidc/access_token_verifier_test.rb` | 32 |
+| `test/unit/oidc/access_token_verifier_test.rb` | 31 |
 | `test/integration/authentication_test.rb` | 5 |
 | `test/unit/user_test.rb` | 4 |
 | `test/unit/config_test.rb` | 2 |
@@ -368,9 +442,13 @@ and API suites.
 builder, and WebMock stubs for the discovery and key set endpoints. Signing with the private JWK
 rather than the bare OpenSSL key is what puts the key id into the token header.
 
+Those fixtures sign with `json-jwt` while the code verifies with `jwt`, so a token built by one
+implementation is checked by the other. That is worth keeping: a suite where the same library
+signs and verifies only proves it agrees with itself.
+
 The negative cases carry most of the value: `alg: none`; `HS256` signed with the provider's
-public key; a different key claiming the provider's key id; an altered payload; expired, not yet
-valid, and future-dated tokens; a wrong issuer; a missing subject; an unknown key id; and
+public key; a different key claiming the provider's key id; an altered payload; expired and
+not-yet-valid tokens; a wrong issuer; a missing or blank subject; an unknown key id; and
 credentials that are not tokens at all, asserting that no request to the provider is made.
 
 Three tests pin behaviour that would otherwise be easy to regress, by counting requests:
@@ -394,7 +472,8 @@ test/oidc_test_helper.rb
 test/unit/oidc/access_token_verifier_test.rb
 ```
 
-Changed: `lib/authenticated_system.rb`, `app/models/user.rb`, `lib/seek/config.rb`,
+Changed: `Gemfile` and `Gemfile.lock` (declaring `jwt`),
+`lib/authenticated_system.rb`, `app/models/user.rb`, `lib/seek/config.rb`,
 `lib/seek/config_setting_attributes.yml`, `config/initializers/seek_configuration.rb`,
 `config/initializers/inflections.rb`, `app/controllers/admin_controller.rb`,
 `app/views/admin/_omniauth.html.erb`, `public/api/definitions/openapi-v3.yml`, and the test
