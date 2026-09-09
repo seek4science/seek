@@ -28,6 +28,64 @@ is a SEEK API token, which:
 An OAuth access token from SEEK's own provider was no better: it expires after two hours, so
 holding one on somebody's behalf means also storing and renewing a long-lived refresh token.
 
+## The flow
+
+Three exchanges, only the third of which is new. The link between a provider subject and a SEEK
+user is established once, in a browser; the token the tool then presents is the provider's own,
+and SEEK verifies it against the provider's published keys rather than asking the provider about
+it.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor R as Researcher
+    participant CLI as CLI tool, or their forwarding service
+    participant KC as Keycloak
+    participant SEEK as SEEK
+    participant C as Rails.cache
+
+    Note over R,SEEK: Once, in a browser, so that identities holds the link
+    R->>SEEK: OIDC web login
+    SEEK->>KC: Authorization code flow
+    KC-->>SEEK: ID token, carrying sub
+    SEEK->>SEEK: identities row, provider oidc, uid = sub, user_id
+
+    Note over R,KC: Per session, on a compute node with no browser
+    CLI->>KC: Device authorization request, client_id
+    KC-->>CLI: device_code, user_code, verification_uri
+    R->>KC: Approves the user_code in a browser elsewhere
+    loop Until approved
+        CLI->>KC: Poll the token endpoint with device_code
+    end
+    KC-->>CLI: Access token, a JWT signed RS256, and a refresh token
+
+    Note over CLI,SEEK: Per API call
+    CLI->>SEEK: GET /data_files, Authorization Bearer access token
+    SEEK->>SEEK: plausible_jwt?, two dots and under 8 KB
+    SEEK->>C: Key set for this issuer
+    alt Warm, the ordinary case
+        C-->>SEEK: JWKS, held 12 hours
+    else Cold, or an unnamed kid, at most once every 5 minutes
+        SEEK->>KC: GET /.well-known/openid-configuration
+        KC-->>SEEK: jwks_uri, held 1 hour
+        SEEK->>KC: GET jwks_uri
+        KC-->>SEEK: JWKS
+        SEEK->>C: Store
+    end
+    SEEK->>SEEK: Verify signature, iss, exp, nbf, then sub and aud or azp
+    SEEK->>SEEK: identities.uid = sub, so User.from_oidc_token
+    SEEK-->>CLI: 200, with SEEK's ordinary authorization applied as that user
+
+    Note over CLI,KC: After the token's two hours
+    CLI->>SEEK: Request carrying an expired token
+    SEEK-->>CLI: 401
+    CLI->>KC: refresh_token grant
+    KC-->>CLI: A fresh access token
+```
+
+A token that fails any of those checks yields no user, and the request falls through to the rest
+of the chain — in practice to `user_from_api_token`, which misses too and answers 401.
+
 ## What already existed
 
 Most of the mechanism was in place. `SessionsController#omniauth_authentication`
