@@ -110,7 +110,7 @@ module Seek
     end
 
     def configure_exception_notification
-      if exception_notification_enabled && Rails.env.production?
+      if exception_notification_enabled
         ExceptionNotification.configure do |config|
           config.ignored_exceptions = ['ActionDispatch::Http::Parameters::ParseError',
                                       'ActionController::InvalidAuthenticityToken',
