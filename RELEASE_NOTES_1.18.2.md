@@ -11,16 +11,20 @@
 - **Sharing links are no longer indexable by search engines** — Pages opened via a sharing link (`?code=`) could be crawled and indexed, exposing links to non-public items in public search results and generating heavy crawler traffic. Responses to requests carrying a `code` parameter now send an `X-Robots-Tag` header, a `noindex, nofollow` robots meta tag, and a canonical link pointing at the URL without the code (#2717)
 - **Consistent ordering of project roles** — The *Administering the project roles* page listed roles as Project administrators, Asset gatekeepers, Asset housekeepers, PALs, while the project overview page listed them in a different order with gatekeepers and housekeepers swapped — making it easy to assign someone to the wrong role. Both views now use the same order (Project administrators, Asset housekeepers, Asset gatekeepers, PALs), with role visibility unchanged (#2727, #2731)
 - **Removed unused project coordinators code** — Project coordinators were provided by the `ProjectPosition` model removed in #880; the remaining view block and helper could never render and have been deleted
+- **Authorization codes redacted from logs and exception reports** — `authoriz` has been added to the list of filtered parameters, so authorization codes carried in URLs (such as those in sharing links) are no longer written out in full in the Rails log or in exception notification emails (#2735)
 
 ## Bug Fixes
 
 - **Search returning all viewable items instead of query matches** — On Docker and Docker Compose deployments, full-text search could return every item the current user can view rather than only the matches, because `solr_enabled` was set from an `after_initialize` block that ran after the models had been eager-loaded, so the `searchable` blocks were never registered — particularly affecting the worker daemons. The searchable blocks are now always registered, with the query path gated on the setting instead (#2682)
 - **Error in the experiment view when not logged in** — The DataHub/single page experiment view raised an error for anonymous visitors (for example in a private browsing window). The `dynamic_table_data` endpoint now handles public access correctly, filters out items the user is not authorised to see, and restricts sample types, studies and assays to the current project (#2674, #2677)
+- **Error deleting a resource when search is disabled** — Deleting a resource always ran the callback that removes it from the Solr index, even on instances with search turned off, which raised an error. The callback now checks `solr_enabled` first (#2736)
+- **Invalid years causing a database error in the year filter** — Out-of-range years reaching the year filter could trigger `Mysql2::Error: Incorrect DATE value` on some MySQL versions. Years are now restricted to the 1000–9999 range before the query is built, and a query mixing valid and invalid years now ignores just the invalid ones rather than returning an empty set (#2715)
 
 ## Infrastructure & Dependencies
 
 - **Rails updated to 7.2.3.2** — Includes the latest upstream security and bug fixes
-- Added functional test coverage for the noindex headers, robots meta tag and canonical link on code-shared URLs, for the page-scoped COPASI bundle, for filter obfuscation, and for the `dynamic_table_data` endpoint
+- **rubyzip updated** from 3.3.0 to 3.6.0
+- Added functional test coverage for the noindex headers, robots meta tag and canonical link on code-shared URLs, for the page-scoped COPASI bundle, for filter obfuscation, for the `dynamic_table_data` endpoint, and for exception notification parameter filtering
 
 ---
 Full list of changes: https://github.com/seek4science/seek/milestone/36?closed=1
