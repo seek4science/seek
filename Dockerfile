@@ -37,9 +37,11 @@ RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
 FROM base AS builder
 
 # Install build dependencies
+# clang/libclang-dev required to compile selma (rb-sys/bindgen) on aarch64-linux
+# where no prebuilt native gem is published in Gemfile.lock.
 RUN PYTHON_VERSION=$(cat .python-version) && \
     apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential cmake \
+    apt-get install -y --no-install-recommends build-essential cmake clang libclang-dev \
     libcurl4-gnutls-dev libmagick++-dev libmariadb-dev libpq-dev libreadline-dev \
     libsqlite3-dev libssl-dev libxml++2.6-dev libxslt1-dev libyaml-dev \
     python${PYTHON_VERSION}-dev python3-pip python${PYTHON_VERSION}-venv && \
@@ -78,7 +80,7 @@ COPY docker/virtuoso_settings.docker.yml config/virtuoso_settings.yml
 RUN touch config/using-docker
 
 # SQLite Database (for asset compilation)
-RUN mkdir sqlite3-db
+RUN mkdir -p sqlite3-db
 COPY --chown=www-data:www-data docker/database.docker.sqlite3.yml config/database.yml
 
 # Create /var/www folder for bundler to compile dependencies into
