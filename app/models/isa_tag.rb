@@ -67,6 +67,6 @@ class ISATag < ApplicationRecord
       Seek::ISA::TagType::ALL_TYPES
     end
 
-    tags.map { |tag| ISATag.find_by(title: tag) }
+    tags.map { |tag| ISATag.find_by(title: tag) }.compact
   end
 end

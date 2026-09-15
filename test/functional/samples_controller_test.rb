@@ -588,8 +588,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'filter by template' do
-    template1 = FactoryBot.create(:template, policy: FactoryBot.create(:public_policy ))
-    template2 = FactoryBot.create(:template, policy: FactoryBot.create(:public_policy ))
+    template1 = FactoryBot.create(:min_template, policy: FactoryBot.create(:public_policy ))
+    template2 = FactoryBot.create(:min_template, policy: FactoryBot.create(:public_policy ))
     sample_type1 = FactoryBot.create(:simple_sample_type, template_id: template1.id)
     sample_type2 = FactoryBot.create(:simple_sample_type, template_id: template2.id)
     sample1 = FactoryBot.create(:sample, sample_type: sample_type1, policy: FactoryBot.create(:public_policy), 
@@ -626,7 +626,7 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'should get table view for template' do
     person = FactoryBot.create(:person)
-    template =  FactoryBot.create(:template, policy: FactoryBot.create(:public_policy ))
+    template =  FactoryBot.create(:min_template, policy: FactoryBot.create(:public_policy ))
     sample_type = FactoryBot.create(:simple_sample_type, template_id: template.id)
     2.times do # public
       FactoryBot.create(:sample, sample_type: sample_type, contributor: person, 
@@ -1308,7 +1308,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'should not return private samples with basic query' do
     with_config_value(:isa_json_compliance_enabled, true) do
       person = FactoryBot.create(:person)
-      template = FactoryBot.create(:template)
+      template = FactoryBot.create(:min_template)
       sample_type = FactoryBot.create(:simple_sample_type, template_id: template.id)
       sample1 = FactoryBot.create(:sample, sample_type: sample_type, contributor: person)
       sample2 = FactoryBot.create(:sample, sample_type: sample_type, contributor: person)
@@ -1421,12 +1421,12 @@ class SamplesControllerTest < ActionController::TestCase
 									else
 										FactoryBot.build(:data_file_comment_isa_tag)
 									end
-				boolean_attribute = FactoryBot.create(:boolean_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
-				sop_attribute = FactoryBot.create(:sop_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
-				strain_attribute = FactoryBot.create(:strain_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - strain")
-				datafile_attribute = FactoryBot.create(:data_file_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - data file")
-				float_attribute = FactoryBot.create(:float_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - float")
-				datetime_attribute = FactoryBot.create(:datetime_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - datetime")
+				boolean_attribute = FactoryBot.build(:boolean_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - boolean")
+				sop_attribute = FactoryBot.build(:sop_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - sop")
+				strain_attribute = FactoryBot.build(:strain_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - strain")
+				datafile_attribute = FactoryBot.build(:data_file_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - data file")
+				float_attribute = FactoryBot.build(:float_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - float")
+				datetime_attribute = FactoryBot.build(:datetime_template_attribute, isa_tag: isa_tag, title: "#{isa_tag.title} - datetime")
 				template.template_attributes << [boolean_attribute, sop_attribute, strain_attribute, datafile_attribute,
 																				 float_attribute, datetime_attribute]
 				template.save

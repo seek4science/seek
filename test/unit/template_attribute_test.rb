@@ -6,6 +6,7 @@ class TemplateAttributeTest < ActiveSupport::TestCase
     @string_type = FactoryBot.create(:string_sample_attribute_type)
     @registered_sample_multi_attribute_type = FactoryBot.create(:sample_multi_sample_attribute_type)
     @registered_sample_attribute_type = FactoryBot.create(:sample_sample_attribute_type)
+    @template = FactoryBot.create(:min_template)
   end
 
   test 'allow isa tag change' do
@@ -13,17 +14,20 @@ class TemplateAttributeTest < ActiveSupport::TestCase
     # When template has child templates => disabled
 
     parent_attribute = FactoryBot.create(:template_attribute,
-                                         sample_attribute_type: @string_type)
+                                         sample_attribute_type: @string_type,
+                                         template: @template)
     child_attribute = FactoryBot.create(:template_attribute,
                                         parent_attribute: parent_attribute,
-                                        sample_attribute_type: @string_type)
-    parentless_attribute = FactoryBot.create(:template_attribute, sample_attribute_type: @string_type)
+                                        sample_attribute_type: @string_type,
+                                        template: @template)
+    parentless_attribute = FactoryBot.create(:template_attribute, template: @template, sample_attribute_type: @string_type)
     assert parentless_attribute.allow_isa_tag_change?
     refute child_attribute.allow_isa_tag_change?
   end
 
   test 'is input attribute?' do
     attribute = FactoryBot.create(:template_attribute,
+                                  template: @template,
                                   sample_attribute_type: @registered_sample_multi_attribute_type,
                                   title: 'Input attribute',
                                   isa_tag: FactoryBot.create(:input_isa_tag)
