@@ -146,6 +146,20 @@ module Seek
       live_pid_from_pidfile(SolidQueue.supervisor_pidfile)
     end
 
+    # The Solid Queue worker processes with a recent heartbeat. solid_queue_processes is in the
+    # application database, so this is readable from the web front end even when the workers run in
+    # a different container.
+    def self.live_job_workers
+      SolidQueue::Process.where(kind: 'Worker')
+                         .where('last_heartbeat_at > ?', SolidQueue.process_alive_threshold.ago)
+    end
+
+    # The names of the queues those workers are currently serving.
+    def self.active_queue_names
+      live_job_workers.flat_map { |process| process.metadata['queues'].to_s.split(',') }
+                      .map(&:strip).reject(&:blank?).uniq.sort
+    end
+
     # Read a pid from a pidfile, returning it only if the process is still alive (nil for a missing or
     # stale pidfile). A process owned by another user counts as alive, since it exists.
     def self.live_pid_from_pidfile(path)
