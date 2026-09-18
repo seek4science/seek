@@ -2,7 +2,7 @@ name: Mark and close stale issues
 
 on:
   schedule:
-    - cron: '0 1 * * 1-4'  # runs Monday to Thursday at 01:00 UTC
+    - cron: '0 1 * * 1-5'  # runs Monday to Friday at 01:00 UTC
   workflow_dispatch:
 
 permissions:
