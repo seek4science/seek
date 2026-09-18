@@ -13,6 +13,37 @@ class JobsDashboardTest < ActionDispatch::IntegrationTest
     teardown_jobs_dashboard
   end
 
+  # The url helpers pick up the engine's script_name once a /jobs page has been visited, so the
+  # paths being asserted are worked out before the first request.
+  test 'back link returns to the SEEK page the dashboard was entered from' do
+    entered_from = person_path(FactoryBot.create(:person))
+
+    get '/jobs/queues', headers: { 'HTTP_REFERER' => entered_from }
+
+    assert_response :success
+    assert_select 'nav.navbar a[href=?]', entered_from, text: /Back to/
+
+    # Moving around inside the dashboard leaves the entry point in place.
+    get '/jobs/finished/jobs', headers: { 'HTTP_REFERER' => '/jobs/queues' }
+
+    assert_response :success
+    assert_select 'nav.navbar a[href=?]', entered_from
+  end
+
+  test 'back link falls back to the home page, and ignores referers from elsewhere' do
+    home = root_path
+
+    get '/jobs/queues'
+
+    assert_response :success
+    assert_select 'nav.navbar a[href=?]', home
+
+    get '/jobs/queues', headers: { 'HTTP_REFERER' => 'http://elsewhere.example.com/people/1' }
+
+    assert_response :success
+    assert_select 'nav.navbar a[href=?]', home
+  end
+
   test 'queues list includes configured queues that have never had a job' do
     create_finished_job(ReindexingJob.new, scheduled_at: 1.minute.ago, finished_at: 30.seconds.ago)
     never_used = Seek::Util.configured_queue_names - SolidQueue::Job.distinct.pluck(:queue_name)
