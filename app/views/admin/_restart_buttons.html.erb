@@ -54,10 +54,7 @@
                 <span class="text-success">Running</span>
                 <span class="text-muted">(Process ID: <%= pid -%>)</span>
 
-                <% alive_since = SolidQueue.process_alive_threshold.ago %>
-                <% active_queues = SolidQueue::Process.where(kind: 'Worker').where('last_heartbeat_at > ?', alive_since)
-                                                      .flat_map { |p| p.metadata['queues'].to_s.split(',') }
-                                                      .map(&:strip).reject(&:blank?).sort %>
+                <% active_queues = Seek::Util.active_queue_names %>
                 <p class="text-muted" style="margin-top: 10px; margin-bottom: 0;">
                   Active queues (<%= active_queues.count -%>):
                 </p>

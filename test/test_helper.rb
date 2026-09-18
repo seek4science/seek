@@ -25,6 +25,7 @@ require 'integration/api/write_api_test_suite'
 require 'rdf_test_cases'
 require 'rack_test_cookie_jar_extensions'
 require 'single_page_test_utils'
+require 'jobs_dashboard_test_helper'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,

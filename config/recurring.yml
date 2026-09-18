@@ -15,8 +15,8 @@
 # Recurring entries for scheduled jobs and tasks that map onto Solid Queue, via either a
 # `class:` entry (an ActiveJob class, enqueued with `perform_later`) or a `command:` entry
 # (arbitrary Ruby, run via SolidQueue::RecurringJob#perform's `eval` - not limited to ActiveJob
-# calls, e.g. clear_finished_jobs/application_status_refresh below are plain class method
-# calls). `command:`-only entries (no `class:`) enqueue onto the `solid_queue_recurring` queue
+# calls, e.g. clear_finished_jobs below is a plain class method call). `command:`-only entries
+# (no `class:`) enqueue onto the `solid_queue_recurring` queue
 # (SolidQueue::RecurringJob's own queue_as), which is why config/queue.yml has a dedicated
 # worker for it. All periodic application jobs live here; the only periodic work handled by cron
 # (docker/seek.crontab) is OS-level process reaping (kill-long-running-soffice.sh) that isn't an
@@ -59,9 +59,6 @@ production:
   clear_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
-  application_status_refresh:
-    command: "ApplicationStatus.instance.refresh"
-    schedule: "* * * * *"
   galaxy_tool_map_refresh:
     command: "Galaxy::ToolMap.instance.refresh"
     schedule: "0 3 * * *"
