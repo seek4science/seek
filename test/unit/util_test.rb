@@ -225,6 +225,15 @@ Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, 
     assert_equal ['worker-1'], Seek::Util.live_job_workers.pluck(:name)
   end
 
+  test 'configured_queue_names reads the queues from the worker configuration' do
+    names = Seek::Util.configured_queue_names
+
+    assert_equal names.uniq.sort, names
+    assert_includes names, QueueNames::DEFAULT
+    assert_includes names, 'solid_queue_recurring'
+    assert_not_includes names, '*'
+  end
+
   test 'active_queue_names lists the queues live workers are serving' do
     create_solid_queue_process('worker-1', queues: 'indexing')
     create_solid_queue_process('worker-2', queues: 'authlookup, indexing')

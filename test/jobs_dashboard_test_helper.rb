@@ -5,6 +5,7 @@
 module JobsDashboardTestHelper
   def setup_jobs_dashboard
     ActiveJob::QueueAdapters::SolidQueueAdapter.prepend(ActiveJob::QueueAdapters::SolidQueueExt)
+    ActiveJob::QueueAdapters::SolidQueueAdapter.prepend(Seek::JobDashboard::AllConfiguredQueues)
     @original_dashboard_applications = MissionControl::Jobs.applications
     MissionControl::Jobs.applications = MissionControl::Jobs::Applications.new
     MissionControl::Jobs.applications.add('SEEK', solid_queue: ActiveJob::QueueAdapters::SolidQueueAdapter.new)
