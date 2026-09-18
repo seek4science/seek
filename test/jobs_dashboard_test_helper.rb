@@ -15,6 +15,12 @@ module JobsDashboardTestHelper
     MissionControl::Jobs.applications = @original_dashboard_applications
   end
 
+  # The page a dashboard pagination link points at. The engine's default_url_options puts a
+  # server_id on every generated path, so the query is parsed rather than matched whole.
+  def linked_page(link)
+    Rack::Utils.parse_query(URI.parse(link['href']).query)['page']
+  end
+
   # A finished job, as Solid Queue would leave it behind once preserve_finished_jobs has kept it.
   def create_finished_job(job, scheduled_at:, finished_at:)
     SolidQueue::Job.create!(queue_name: job.queue_name, class_name: job.class.name,

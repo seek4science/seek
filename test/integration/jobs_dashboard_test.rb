@@ -15,6 +15,32 @@ class JobsDashboardTest < ActionDispatch::IntegrationTest
 
   # The url helpers pick up the engine's script_name once a /jobs page has been visited, so the
   # paths being asserted are worked out before the first request.
+  test 'pagination offers first and last page links either side of previous and next' do
+    25.times { |n| create_finished_job(ReindexingJob.new, scheduled_at: n.minutes.ago, finished_at: n.minutes.ago) }
+
+    get '/jobs/finished/jobs', params: { page: 2 }
+
+    assert_response :success
+    assert_select 'nav[aria-label=pagination]' do
+      assert_select 'span', text: '2 / 3'
+      assert_select 'a', text: 'First page' do |links|
+        assert_equal '1', linked_page(links.first)
+        assert_nil links.first['disabled']
+      end
+      assert_select 'a', text: 'Last page' do |links|
+        assert_equal '3', linked_page(links.first)
+        assert_nil links.first['disabled']
+      end
+    end
+
+    # On the first page there is nowhere before it to go.
+    get '/jobs/finished/jobs', params: { page: 1 }
+
+    assert_response :success
+    assert_select 'nav[aria-label=pagination] a[disabled]', text: 'First page'
+    assert_select 'nav[aria-label=pagination] a[disabled]', text: 'Previous page'
+  end
+
   test 'back link returns to the SEEK page the dashboard was entered from' do
     entered_from = person_path(FactoryBot.create(:person))
 
