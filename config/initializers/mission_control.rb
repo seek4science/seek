@@ -11,3 +11,9 @@
 # unambiguous.
 MissionControl::Jobs.base_controller_class = 'MissionControlJobsController'
 MissionControl::Jobs.http_basic_auth_enabled = false
+
+# SEEK's own customisations to the dashboard (lib/seek/job_dashboard). Applied in to_prepare so
+# they survive code reloading in development, where the gem's helper is unloaded and redefined.
+Rails.application.config.to_prepare do
+  MissionControl::Jobs::JobsHelper.prepend(Seek::JobDashboard::FinishedJobDuration)
+end
