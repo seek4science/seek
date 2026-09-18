@@ -154,6 +154,16 @@ module Seek
                          .where('last_heartbeat_at > ?', SolidQueue.process_alive_threshold.ago)
     end
 
+    # The queues this instance is configured to serve, read from config/queue.yml through Solid
+    # Queue's own loader so that the feature flag conditions in that file are applied. Unlike
+    # active_queue_names this doesn't depend on any workers currently running.
+    def self.configured_queue_names
+      SolidQueue::Configuration.new.configured_processes
+                               .select { |process| process.kind == :worker }
+                               .flat_map { |process| process.attributes[:queues].to_s.split(',') }
+                               .map(&:strip).reject { |name| name.blank? || name == '*' }.uniq.sort
+    end
+
     # The names of the queues those workers are currently serving.
     def self.active_queue_names
       live_job_workers.flat_map { |process| process.metadata['queues'].to_s.split(',') }
