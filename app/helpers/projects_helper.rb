@@ -32,10 +32,6 @@ module ProjectsHelper
     link_list_for_role(t('asset_gatekeeper'), project.asset_gatekeepers)
   end
 
-  def project_coordinators_link_list(project)
-    link_list_for_role('Project coordinator', project.project_coordinators)
-  end
-
   def programme_link(project)
     html = if project.try(:programme).nil?
              "<span class='none_text'>This #{t('project')} is not associated with a #{t('programme')}</span>"

@@ -685,11 +685,11 @@ function registeredSamplesObjectsInput(column, data, options, url, multiInput) {
     if (isHiddenInput) {
       return `<option selected="selected" title="ID: hidden" value="hidden">#HIDDEN</option>`
     } else {
-      return `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`
+      return `<option selected="selected" title="ID: ${sanitizeData(e.id)}" value="${sanitizeData(e.id)}">${sanitizeData(e.title)}</option>`
     }
   }).join("");
   if (options.readonly) {
-    return data.map((e) => `<span title="ID: ${e.id}" class="badge">${sanitizeData(e.title)}</span>`).join(" ");
+    return data.map((e) => `<span title="ID: ${sanitizeData(e.id)}" class="badge">${sanitizeData(e.title)}</span>`).join(" ");
   } else {
     const typeaheadTemplate = 'typeahead/single_pages_samples'
     const objectInputName = data.map((e) => e.id).join('-') + '-' + crypto.randomUUID();
@@ -745,9 +745,9 @@ function cvListObjectsInput(column, data, options, url, multiInput) {
 }
 
 function simpleObjectsInput(column, data, options, url, multiInput) {
-  const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${e.id}" value="${e.id}">${sanitizeData(e.title)}</option>`);
+  const existingOptions = data.map((e) => `<option selected="selected" title="ID: ${sanitizeData(e.id)}" value="${sanitizeData(e.id)}">${sanitizeData(e.title)}</option>`);
   if (options.readonly) {
-    return data.map((e) => `<span title="ID: ${sanitizeData(e)}" class="badge">${sanitizeData(e)}</span>`).join(" ");
+    return data.map((e) => `<span title="ID: ${sanitizeData(e.id)}" class="badge">${sanitizeData(e.title)}</span>`).join(" ");
   } else {
     const typeaheadTemplate = 'typeahead/single_pages_samples';
     const objectInputName = data.map((e) => sanitizeData(e)).join('-') + '-' + crypto.randomUUID();

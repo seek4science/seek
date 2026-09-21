@@ -3,14 +3,12 @@ class Sample < ApplicationRecord
   include Seek::BioSchema::Support
   include Seek::JSONMetadata::Serialization
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :attribute_values do
-        attribute_values_for_search
-      end
-      text :sample_type do
-        sample_type.title
-      end
+  searchable(auto_index: false) do
+    text :attribute_values do
+      attribute_values_for_search
+    end
+    text :sample_type do
+      sample_type.title
     end
   end
 
@@ -153,7 +151,7 @@ class Sample < ApplicationRecord
       _linking_samples.each do |linking_sample|
         changed = false
         potential_linking_attributes.each do |attr|
-          Array(linking_sample.get_attribute_value(attr)).each do |linked_sample_data|
+          Array.wrap(linking_sample.get_attribute_value(attr)).each do |linked_sample_data|
             next unless linked_sample_data['id'] == id
             next if linked_sample_data['title'] == title
             linked_sample_data['title'] = title

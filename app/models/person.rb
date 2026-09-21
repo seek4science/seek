@@ -103,13 +103,11 @@ class Person < ApplicationRecord
 
   has_many :sent_message_logs, class_name: 'MessageLog', foreign_key: :sender_id, dependent: :destroy
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :expertise
-      text :tools
-      text :disciplines do
-        disciplines.map(&:title)
-      end
+  searchable(auto_index: false) do
+    text :expertise
+    text :tools
+    text :disciplines do
+      disciplines.map(&:title)
     end
   end
 

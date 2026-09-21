@@ -297,8 +297,7 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_response :success
 
     inherited_template.template_attributes.each_with_index do |_ta, i|
-      id = "select#template_template_attributes_attributes_#{i}_isa_tag_title[disabled='disabled']"
-      assert_select id
+      assert_select "select#template_template_attributes_attributes_#{i}_isa_tag_id.disabled"
     end
 
     inherited_template.template_attributes << FactoryBot.create(:template_attribute, title: 'Extra attribute', isa_tag: FactoryBot.create(:source_characteristic_isa_tag), sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), pos: 4)
@@ -314,10 +313,10 @@ class TemplatesControllerTest < ActionController::TestCase
     get :edit, params: { id: inherited_template.id }
     assert_response :success
 
-    assert_select "select#template_template_attributes_attributes_0_isa_tag_title[disabled='disabled']"
+    assert_select "select#template_template_attributes_attributes_0_isa_tag_id.disabled"
     cnt_last_attribute = inherited_template.template_attributes.count - 1
 
-    assert_select "select#template_template_attributes_attributes_#{cnt_last_attribute}_isa_tag_title[disabled='disabled']", text: 'source_characteristic', count: 0
+    assert_select "select#template_template_attributes_attributes_#{cnt_last_attribute}_isa_tag_id.disabled", text: 'source_characteristic', count: 0
 
   end
 
@@ -650,6 +649,81 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_select 'script#project-selector-possibilities-json', count: 1
     options = "[{\"id\":#{project.id},\"text\":\"#{project.title}\"}]"
     assert_select 'script#project-selector-possibilities-json', text: /#{options}/, count: 1
+  end
+
+  test 'should create template attribute with unit' do
+    unit = Unit.find_or_create_by(symbol: 'g')
+
+    assert_difference('Template.count') do
+      post :create, params: { template: { title: 'Template with unit',
+                                          project_ids: @project_ids,
+                                          level: 'study source',
+                                          organism: 'any',
+                                          version: '1.0.0',
+                                          template_attributes_attributes: {
+                                            '0' => {
+                                              pos: '1',
+                                              title: 'Weight',
+                                              required: '1',
+                                              description: 'weight in grams',
+                                              sample_attribute_type_id: @int_type.id,
+                                              unit_id: unit.id,
+                                              _destroy: '0',
+                                              isa_tag_id: @default_isa_tag
+                                            }
+                                          }
+                                        }
+                            }
+    end
+
+    template = assigns(:template)
+    assert_redirected_to template_path(template)
+    weight = template.template_attributes.find_by(title: 'Weight')
+    assert_not_nil weight
+    assert_equal unit, weight.unit
+  end
+
+  test 'should update template attribute to set unit' do
+    unit = Unit.find_or_create_by(symbol: 'g')
+    template = FactoryBot.create(:min_template, project_ids: @project_ids, contributor: @person, title: 'unit_update_template')
+    attribute = template.template_attributes.first
+
+    fields = {
+      '0' => {
+        id: attribute.id,
+        pos: attribute.pos,
+        title: attribute.title,
+        required: (attribute.required ? '1' : '0'),
+        sample_attribute_type_id: attribute.sample_attribute_type_id,
+        unit_id: unit.id,
+        _destroy: '0',
+        isa_tag_id: attribute.isa_tag_id
+      }
+    }
+
+    put :update, params: { id: template, template: { title: template.title, template_attributes_attributes: fields } }
+
+    assert_redirected_to template_path(assigns(:template))
+    assert_equal unit, assigns(:template).template_attributes.first.unit
+  end
+
+  test 'should populate template with unit from json upload' do
+    login_as(@admin)
+    unit = Unit.find_or_create_by(symbol: 'g')
+
+    template_json = fixture_file_upload('upload_json_sample_type_template/test_unit_template.json', 'application/json')
+
+    assert_enqueued_jobs 1, only: PopulateTemplatesJob do
+      post :populate_template, params: { template_json_file: template_json }
+    end
+
+    assert_difference('Template.count', 1) do
+      perform_enqueued_jobs(only: PopulateTemplatesJob)
+    end
+
+    weight_attribute = Template.last.template_attributes.find_by(title: 'Weight')
+    assert_not_nil weight_attribute
+    assert_equal unit, weight_attribute.unit
   end
 
   test 'should reuse existing controlled vocabularies' do

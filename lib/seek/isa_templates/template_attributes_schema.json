@@ -138,6 +138,16 @@
           "type": "null"
         }
       ]
+    },
+    "unit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "additionalProperties": false

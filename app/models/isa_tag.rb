@@ -1,9 +1,7 @@
 class ISATag < ApplicationRecord
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :title
-    end
+  searchable(auto_index: false) do
+    text :title
   end
 
   validates :title, presence: true

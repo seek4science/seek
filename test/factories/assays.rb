@@ -117,8 +117,8 @@ FactoryBot.define do
     sequence(:title) { |n| "ISA JSON compliant material assay #{n}" }
     description { 'An assay linked to an ISA JSON compliant study and a sample type' }
     after(:build) do |assay, eval|
-      assay.study ||= FactoryBot.create(:isa_json_compliant_study)
-      assay.sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: eval.linked_sample_type)
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study, contributor: assay.contributor)
+      assay.sample_type = FactoryBot.create(:isa_assay_material_sample_type, policy: assay.policy, contributor: assay.contributor, projects: assay.study.projects, linked_sample_type: eval.linked_sample_type)
     end
   end
 
@@ -129,8 +129,8 @@ FactoryBot.define do
     sequence(:title) { |n| "ISA JSON compliant data file assay #{n}" }
     description { 'An assay linked to an ISA JSON compliant study and a sample type' }
     after(:build) do |assay, eval|
-      assay.study ||= FactoryBot.create(:isa_json_compliant_study)
-      assay.sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, linked_sample_type: eval.linked_sample_type)
+      assay.study ||= FactoryBot.create(:isa_json_compliant_study, contributor: assay.contributor)
+      assay.sample_type = FactoryBot.create(:isa_assay_data_file_sample_type, policy: assay.policy, projects: assay.study.projects, linked_sample_type: eval.linked_sample_type, contributor: assay.contributor)
     end
   end
 

@@ -1,7 +1,7 @@
 x-shared:
   seek_base: &seek_base
     # build: .
-    image: fairdom/seek:1.18-dev
+    image: fairdom/seek:1.18
 
     restart: always
     environment: &seek_base_env

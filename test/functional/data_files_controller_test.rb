@@ -385,6 +385,14 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should show inline content preview for pdf data file' do
+    pdf_data_file = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:pdf_content_blob),
+                                       policy: FactoryBot.create(:downloadable_public_policy))
+    get :show, params: { id: pdf_data_file.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
+  end
+
   test 'should show data file' do
     d = FactoryBot.create :rightfield_datafile, policy: FactoryBot.create(:public_policy)
     assert_difference('ActivityLog.count') do
@@ -1275,6 +1283,14 @@ class DataFilesControllerTest < ActionController::TestCase
     data = FactoryBot.create :small_test_spreadsheet_datafile, policy: FactoryBot.create(:public_policy)
     get :explore, params: { id: data }
     assert_response :success
+  end
+
+  test 'explore csv with non utf-8 encoding' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy),
+                                       content_blob: FactoryBot.create(:iso_8859_1_csv_content_blob))
+    get :explore, params: { id: df }
+    assert_response :success
+    assert_select 'div#spreadsheet_1 table.sheet td', text: /Temp/
   end
 
   test 'explore spreadsheet with error logs' do

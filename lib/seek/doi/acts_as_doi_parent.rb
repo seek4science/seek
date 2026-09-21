@@ -21,7 +21,7 @@ module Seek
             text :doi do
               dois
             end
-          end if Seek::Config.solr_enabled
+          end
 
           include Seek::Doi::ActsAsDoiParent::InstanceMethods
         end

@@ -229,6 +229,34 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'unit select is enabled when sample type has no samples with values for that sample attribute' do
+    sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person)
+    assert_empty sample_type.samples
+
+    get :edit, params: { id: sample_type }
+    assert_response :success
+
+    sample_type.sample_attributes.each do |attr|
+      assert_select "select[name*='unit_id']:not([disabled])", minimum: 1
+    end
+  end
+
+  test 'unit select is disabled when sample type has samples with values for that sample attribute' do
+    sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person)
+    User.with_current_user(@person.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: @project_ids)
+      sample.set_attribute_value('full name', 'Test Person')
+      sample.set_attribute_value(:age, 30)
+      sample.save!
+    end
+    assert sample_type.samples.any?
+
+    get :edit, params: { id: sample_type }
+    assert_response :success
+
+    assert_select "select[name*='unit_id'].disabled", minimum: 1
+  end
+
   test 'should update sample_type' do
     sample_type = nil
     perform_enqueued_jobs(only: [SampleTemplateGeneratorJob, SampleTypeUpdateJob]) do
@@ -961,7 +989,8 @@ class SampleTypesControllerTest < ActionController::TestCase
       login_as(person)
       assert source_sample_type.is_isa_json_compliant?
       get :manage, params: { id: source_sample_type }
-      assert_redirected_to sample_type_path
+      assert_redirected_to sample_types_path
+      assert_equal 'This sample type is ISA JSON compliant and cannot be managed.', flash[:error]
 
       refute project_sample_type.is_isa_json_compliant?
       get :manage, params: { id: project_sample_type }

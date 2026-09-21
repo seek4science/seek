@@ -73,6 +73,9 @@ class CopasiTest < ActionController::TestCase
       assert_select 'h1', text: /#{model.title} - Copasi Model Simulation/
       assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
 
+      # the copasi/plotly bundle is loaded here, and only here - see copasi/index.js
+      assert_select 'script[src*=?]', 'copasi/index', count: 1
+
       expected_href = "copasi://process?downloadUrl=http://#{request.host_with_port}/models/#{model.id}/content_blobs/#{model.content_blobs.first.id}/download&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
       assert_select 'a[href=?]', expected_href, text: 'Simulate in CopasiUI'
     end
@@ -208,6 +211,22 @@ class CopasiTest < ActionController::TestCase
       assert_select 'strong', text: /Downloads/, count: 1
       assert_select 'strong', text: /Runs:/, count: 0
     end
+  end
+
+  test 'copasi bundle is not loaded outside the simulation page' do
+    with_config_value(:copasi_enabled, true) do
+      model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
+      get :show, params: { id: model }
+      assert_response :success
+      assert_select 'script[src*=?]', 'copasi/index', count: 0
+    end
+  end
+
+  # copasijs.js is ~9.4MB, so it must never go back into the global bundle
+  test 'copasi and plotly are not required by application.js' do
+    source = File.read(Rails.root.join('app', 'assets', 'javascripts', 'application.js'))
+    refute_match(%r{^\s*//=\s*require\s+copasi/}, source)
+    refute_match(/^\s*\/\/=\s*require\s+plotly/, source)
   end
 
 end

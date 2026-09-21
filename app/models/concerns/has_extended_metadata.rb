@@ -14,14 +14,12 @@ module HasExtendedMetadata
       has_one :extended_metadata, as: :item, dependent: :destroy, autosave: true
       accepts_nested_attributes_for :extended_metadata
 
-      if Seek::Config.solr_enabled
-        searchable(auto_index: false) do
-          text :extended_metadata_attribute_values do
-            extended_metadata_attribute_values_for_search
-          end
-          text :extended_metadata_type do
-            extended_metadata.extended_metadata_type.title if extended_metadata.present?
-          end
+      searchable(auto_index: false) do
+        text :extended_metadata_attribute_values do
+          extended_metadata_attribute_values_for_search
+        end
+        text :extended_metadata_type do
+          extended_metadata.extended_metadata_type.title if extended_metadata.present?
         end
       end
     end
