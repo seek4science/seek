@@ -133,7 +133,7 @@ class AssetTest < ActiveSupport::TestCase
     refute FactoryBot.create(:publication).supports_spreadsheet_explore?
     refute FactoryBot.create(:collection).supports_spreadsheet_explore?
     refute FactoryBot.create(:sample).supports_spreadsheet_explore?
-    refute FactoryBot.create(:template).supports_spreadsheet_explore?
+    refute FactoryBot.create(:min_template).supports_spreadsheet_explore?
   end
 
   test 'tech type titles' do
@@ -345,7 +345,7 @@ class AssetTest < ActiveSupport::TestCase
   end
 
   test 'has deleted contributor?' do
-    assets = [:data_file,:sop, :model, :presentation,:document, :event, :workflow, :publication, :collection, :placeholder, :file_template, :template, :sample,
+    assets = [:data_file,:sop, :model, :presentation,:document, :event, :workflow, :publication, :collection, :placeholder, :file_template, :min_template, :sample,
               :data_file_version,:sop_version, :model_version, :presentation_version, :document_version, :workflow_version, :publication_version]
     assets.each do |asset_type|
       item = FactoryBot.create(asset_type,deleted_contributor:'Person:99')
