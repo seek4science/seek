@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'oidc_test_helper'
+require 'minitest/mock'
 
 class AuthenticationTest < ActionDispatch::IntegrationTest
   include OIDCTestHelper
@@ -137,6 +138,21 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_response :forbidden
     assert_nil session[:user_id]
+  end
+
+  test 'does not look an OIDC access token up as an API token once it has been refused' do
+    looked_up = false
+
+    with_oidc_api_enabled do
+      token = signed_oidc_token({ exp: 10.minutes.ago.to_i })
+      User.stub(:from_api_token, ->(_) { looked_up = true; nil }) do
+        get document_path(@document), headers: { 'Authorization' => bearer_auth(token) }
+      end
+    end
+
+    assert_response :forbidden
+    assert_nil session[:user_id]
+    assert_not looked_up, 'a JWT cannot be an API token, so it should not be looked up as one'
   end
 
   test 'authenticate using API token while OIDC access tokens are accepted' do

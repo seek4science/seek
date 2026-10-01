@@ -133,10 +133,16 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
   end
 
   test 'picks up a rotated provider key' do
+    # The original set has to be in hand first, or the rotated key would be there from the start
+    # and the refetch an unknown key id triggers would never be exercised.
+    assert_not_nil verify(signed_oidc_token)
+    assert_requested :get, "#{OIDC_ISSUER}/jwks", times: 1
+
     rotated = OpenSSL::PKey::RSA.generate(2048)
     stub_oidc_key_set(keys: [oidc_public_key(kid: 'rotated-key', key: rotated)])
 
     assert_not_nil verify(signed_oidc_token({}, key: JSON::JWK.new(rotated, kid: 'rotated-key')))
+    assert_requested :get, "#{OIDC_ISSUER}/jwks", times: 2
   end
 
   test 'rejects a token when discovery fails, and stops asking for a while' do

@@ -268,9 +268,13 @@ record for a foreign token and returns nil. `check_doorkeeper_scopes`
 OIDC token never trips the OAuth scope checks, and existing precedence for real OAuth tokens is
 untouched.
 
-That ordering also means failed OIDC authentication needs no new throttling: a rejected token
-falls through to `user_from_api_token`, whose block still runs — Rails' `TOKEN_REGEX` matches
-`Bearer` as well as `Token` — misses, and applies that same two-second penalty in production.
+A rejected token falls through to `user_from_api_token`, whose block still runs: Rails'
+`TOKEN_REGEX` matches `Bearer` as well as `Token`. It declines the credential before the lookup,
+through `ApiToken.plausible_token?`, because an API token is urlsafe base64 and so holds no dots.
+Without that, the two-second penalty would fall on the ordinary case of somebody who has not
+linked their account yet, and an unauthenticated caller could hold a request thread for two
+seconds at a time with JWT-shaped nonsense. Guessing an API token is throttled exactly as before:
+a credential shaped like one still pays on a miss.
 
 ### No extra privilege gate
 
