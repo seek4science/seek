@@ -315,7 +315,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'can submit new version of RO-Crate with orcID clash' do
-    p1 = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1825-0097') # in the uploaded crate
+    p1 = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1825-0097') # also in the uploaded crate
     p2 = FactoryBot.create(:person, first_name: 'Sam', last_name: 'Williams') # not in the uploaded crate
     workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow', creators: [p1, p2], contributor: current_person)
     assert_no_difference('Workflow.count') do
@@ -336,6 +336,8 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
         new_version = workflow.git_version
         assert_equal 2, old_version.assets_creators.size
         assert_equal 2, new_version.assets_creators.size
+        assert_equal 'Joe Bloggs', new_version.assets_creators[0].name # from the crate
+        assert_equal 'Jane Smith', new_version.assets_creators[1].name # in both the original version and the crate
       end
     end
   end
