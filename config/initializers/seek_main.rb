@@ -22,7 +22,7 @@ Rails.configuration.after_initialize do
     ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'ObservationUnit', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']
 
     begin
-      Seek::Config.load_cache
+      Seek::Config.propagate_all
     rescue Settings::DecryptionError
       puts "\n" * 3
       puts "#" * 40
