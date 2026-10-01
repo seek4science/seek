@@ -54,7 +54,7 @@ module OIDCTestHelper
                  headers: { 'Content-Type' => 'application/json' })
   end
 
-  def with_oidc_api_enabled(audiences: '', &block)
+  def with_oidc_api_enabled(audiences: 'seek-client', &block)
     with_config_values({ omniauth_enabled: true, omniauth_oidc_enabled: true,
                          omniauth_oidc_api_enabled: true, omniauth_oidc_issuer: OIDC_ISSUER,
                          omniauth_oidc_api_audiences: audiences }, &block)

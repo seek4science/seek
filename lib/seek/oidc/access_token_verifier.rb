@@ -26,11 +26,17 @@ module Seek
         # Is an access token from the provider accepted as a credential for the API? Reading the
         # settings per request means an administrator turning this on needs no restart, unlike the
         # provider itself, which is wired into the middleware at boot.
+        #
+        # An empty audience list leaves the feature off. Accepting whatever the provider signed,
+        # for any application, is not something an instance should arrive at by leaving a field
+        # blank, so the omission costs a feature that does not work rather than an API anybody
+        # holding an unrelated token can call.
         def enabled?
           Seek::Config.omniauth_enabled &&
             Seek::Config.omniauth_oidc_enabled &&
             Seek::Config.omniauth_oidc_api_enabled &&
-            Seek::Config.omniauth_oidc_issuer.present?
+            Seek::Config.omniauth_oidc_issuer.present? &&
+            Seek::Config.omniauth_oidc_api_audience_list.any?
         end
 
         def verify(token)
@@ -91,15 +97,16 @@ module Seek
         }
       end
 
-      # An empty list means the instance has chosen not to check the audience at all, in which case
-      # any token the provider signed for anybody is accepted. azp is considered alongside aud
-      # because a provider commonly names the resource in aud and the calling application in azp,
-      # and it is the calling application an administrator wants to name here. ruby-jwt's own aud
-      # verification knows nothing of azp, so this stays by hand.
+      # azp is considered alongside aud because a provider commonly names the resource in aud and
+      # the calling application in azp, and it is the calling application an administrator wants to
+      # name here. Some providers mint access tokens carrying no aud at all, leaving azp as the
+      # only thing to match on. ruby-jwt's own aud verification knows nothing of azp, so this stays
+      # by hand.
+      #
+      # An empty accepted list matches nothing, though enabled? has already refused the request by
+      # then.
       def audience_accepted?(claims)
         accepted = Seek::Config.omniauth_oidc_api_audience_list
-        return true if accepted.empty?
-
         presented = ([*claims['aud']] + [claims['azp']]).compact.map(&:to_s)
         presented.intersect?(accepted)
       end

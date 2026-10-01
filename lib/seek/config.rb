@@ -432,8 +432,7 @@ module Seek
     end
 
     # The audience values an OpenID Connect access token may carry to be accepted as a credential
-    # for the API. Empty means the audience is not checked, so any token the provider signed is
-    # accepted.
+    # for the API. Empty leaves the feature off: see Seek::OIDC::AccessTokenVerifier.enabled?.
     def omniauth_oidc_api_audience_list
       omniauth_oidc_api_audiences.to_s.split(/[,\s]+/).reject(&:blank?)
     end

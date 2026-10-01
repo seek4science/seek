@@ -168,7 +168,7 @@ next to the provider's existing settings:
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | `omniauth_oidc_api_enabled` | `false` | Accept the provider's access tokens for the API |
-| `omniauth_oidc_api_audiences` | `''` | Accepted `aud`/`azp` values, comma separated |
+| `omniauth_oidc_api_audiences` | `''` | Accepted `aud`/`azp` values, comma separated. Required: blank leaves the feature off |
 
 `Seek::Config.omniauth_oidc_api_audience_list` parses the second into an array, following the
 existing `exception_notification_recipients` precedent.
@@ -230,20 +230,23 @@ token and often leaves `aud` as `["account"]` unless an audience mapper is confi
 the topology above the administrator lists the command line tool's client id, and what they are
 really saying is *these applications may act as my users in SEEK*.
 
-The check is **optional**, and empty means no check at all. That is a deliberate decision: it
-is reasonable for an institution that controls every client registered with its provider, and
-unreasonable for a large federated provider where third parties can register clients. Two
-things carry the risk instead:
+The check is therefore **not optional**. An empty list leaves the feature off: `enabled?`
+requires one, and the admin page refuses to tick the box without one, leaving the setting off
+and saying why. There is no value meaning "accept anything", because the only states worth
+having are a named set of applications and the feature switched off — "any token this provider
+ever signed, for anybody" is not a configuration an instance should be able to reach by leaving
+a field blank.
 
-- the feature is **off unless enabled**, so an instance that has not considered the question is
-  not exposed;
-- the admin help text states the consequence of leaving it blank in full. That copy is
-  load-bearing, not decoration.
+The alternative was to accept blank and lean on the admin help text to explain the risk. That
+makes the dangerous state the one reached by doing nothing, and leaves it indistinguishable
+from a half-finished configuration. Failing closed costs an administrator one error message;
+failing open costs every linked user's data.
 
-The default is blank rather than SEEK's own client id, which might look like the safer choice.
-It is not: that value is an *ID token's* audience, and Keycloak access tokens do not carry it.
-Defaulting to it would reject every legitimate token out of the box, and administrators would
-"fix" it by clearing the field — arriving at blank anyway, but without having read the warning.
+The default is blank rather than SEEK's own client id, which might look like the more helpful
+choice. It is not: that value is an *ID token's* audience, and access tokens do not carry it —
+a local Keycloak mints tokens with no `aud` at all and `azp` set to the *calling* client.
+Defaulting to SEEK's client id would reject every legitimate token out of the box, and
+administrators would "fix" it by clearing the field.
 
 ### Where it sits in the authentication chain
 
@@ -386,12 +389,13 @@ These are properties of the design, documented rather than fixed:
   provider's access token lifetime. Deprovisioning is still immediate in the way that matters:
   the identity lookup runs on every request, so removing the identity or the user cuts access at
   once.
-- **ID tokens.** With no audience configured, an *ID* token from the same issuer satisfies every
-  check and would authenticate. It is still a token the user legitimately holds and is bound to
-  SEEK, so this is not a soundness break, but it is not the intended credential. The remedy is
-  the audience setting, pointed at an audience only access tokens carry. Two code-level
-  heuristics were considered and rejected: requiring `typ: at+jwt` per RFC 9068 breaks Keycloak,
-  the target provider, and rejecting tokens bearing a `nonce` is provider-specific.
+- **ID tokens.** An *ID* token from the same issuer, carrying an accepted audience, satisfies
+  every check and would authenticate. It is still a token the user legitimately holds and is
+  bound to SEEK, so this is not a soundness break, but it is not the intended credential. An
+  audience naming only the applications that call the API narrows this, since an ID token's `aud`
+  is SEEK's own client id. Two code-level heuristics were considered and rejected: requiring
+  `typ: at+jwt` per RFC 9068 breaks Keycloak, the target provider, and rejecting tokens bearing a
+  `nonce` is provider-specific.
 - **Discovery is always attempted over HTTPS**, whatever scheme the issuer is configured with,
   because the library rebuilds the URL from host, port and path. An `http://localhost` provider
   will not work. This affects web login identically today.
@@ -443,8 +447,8 @@ verifies a signature and leaves expiry, issuer, audience and required claims to 
 worked and was fully tested, but it was around forty lines of security-relevant code
 reimplementing a solved problem. `jwt` does all of it — including the asymmetric leeway, the
 required-claims assertion and the retry on an unrecognised key id — so the checks were handed
-over. What could not be handed over is in *Reasoning* above: `azp`, the optional audience, and
-everything in `Discovery`.
+over. What could not be handed over is in *Reasoning* above: `azp`, the audience, and everything
+in `Discovery`.
 
 ### Introspection and userinfo
 
@@ -472,7 +476,7 @@ the tool to reach for had that route been taken.
    restart, since providers are wired into the middleware at boot.
 2. Tick **Accept … access tokens for the API**.
 3. Set **Accepted token audiences** to the client id of each application that may call SEEK on a
-   user's behalf. Read the warning before leaving it blank.
+   user's behalf. This is required; the setting above will not stay on without it.
 4. Each researcher signs into SEEK through the provider once, in a browser, and completes their
    profile. Their identity is then linked, and can be confirmed at `/users/:id/identities`.
 

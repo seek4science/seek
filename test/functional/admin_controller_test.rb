@@ -578,6 +578,30 @@ class AdminControllerTest < ActionController::TestCase
     end
   end
 
+  test 'will not accept OIDC tokens for the API without an audience' do
+    with_config_values(omniauth_oidc_api_enabled: false, omniauth_oidc_api_audiences: '') do
+      post :update_features_enabled, params: {
+        omniauth_oidc_api_enabled: '1',
+        omniauth_oidc_api_audiences: ' , '
+      }
+
+      assert_not Seek::Config.omniauth_oidc_api_enabled
+      assert_match(/audiences must be given/, flash[:error])
+    end
+  end
+
+  test 'turns OIDC API tokens off when the audience is cleared' do
+    with_config_values(omniauth_oidc_api_enabled: true, omniauth_oidc_api_audiences: 'seek-client') do
+      post :update_features_enabled, params: {
+        omniauth_oidc_api_enabled: '1',
+        omniauth_oidc_api_audiences: ''
+      }
+
+      assert_not Seek::Config.omniauth_oidc_api_enabled
+      assert_equal '', Seek::Config.omniauth_oidc_api_audiences
+    end
+  end
+
   test 'update LDAP settings' do
     with_config_value(:omniauth_ldap_enabled, false) do
       with_config_value(:omniauth_ldap_config, { }) do

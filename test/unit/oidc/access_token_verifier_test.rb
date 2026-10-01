@@ -187,13 +187,25 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
     assert_not_requested :get, "#{OIDC_ISSUER}/.well-known/openid-configuration"
   end
 
-  test 'accepts any audience when none is configured' do
-    assert_not_nil verify(signed_oidc_token({ aud: 'somebody-else', azp: 'somebody-else' }))
+  test 'accepts no token at all while no audience is configured' do
+    assert_nil verify(signed_oidc_token, audiences: '')
   end
 
   test 'treats a list of only separators as no audience at all' do
-    assert_not_nil verify(signed_oidc_token({ aud: 'somebody-else', azp: 'somebody-else' }),
-                          audiences: ' , ')
+    assert_nil verify(signed_oidc_token, audiences: ' , ')
+  end
+
+  test 'is not enabled while no audience is configured' do
+    with_oidc_api_enabled(audiences: '') do
+      assert_not Seek::OIDC::AccessTokenVerifier.enabled?
+    end
+  end
+
+  test 'reaches the provider for no token at all while no audience is configured' do
+    verify(signed_oidc_token, audiences: '')
+
+    assert_not_requested :get, "#{OIDC_ISSUER}/.well-known/openid-configuration"
+    assert_not_requested :get, "#{OIDC_ISSUER}/jwks"
   end
 
   test 'accepts a configured audience given as a string' do
@@ -215,7 +227,7 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
 
   private
 
-  def verify(token, audiences: '')
+  def verify(token, audiences: 'seek-client')
     with_oidc_api_enabled(audiences: audiences) { described_verify(token) }
   end
 
