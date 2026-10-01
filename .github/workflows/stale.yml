@@ -2,7 +2,7 @@ name: Mark and close stale issues
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # runs daily at midnight UTC
+    - cron: '0 1 * * 1-5'  # runs Monday to Friday at 01:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -30,4 +30,3 @@ jobs:
           operations-per-run: 100      # API budget per run; a fresh stale marking costs 3
           ascending: true              # oldest issues first, so the 4-year backlog is reached first
           enable-statistics: true      # logs a summary of what was processed
-          debug-only: true             # dry run — remove this when ready to go live

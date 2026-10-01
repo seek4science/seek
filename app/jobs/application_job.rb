@@ -43,13 +43,20 @@ class ApplicationJob < ActiveJob::Base
   end
 
   after_perform do |job|
-    if job.follow_on_job?
-      job.queue_job(default_priority, follow_on_delay)
-    end
+    job.queue_follow_on_job if job.follow_on_job?
   end
 
-  # adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
-  # or by default allow_duplicate_jobs? returns false.
+  # Enqueues the next job in a follow-on chain, as a new job rather than a re-enqueue of this one.
+  # ActiveJob#enqueue keeps the existing job_id, and the jobs dashboard looks jobs up by ActiveJob
+  # id, so sharing an id across a chain makes every job in it resolve to the last one.
+  def queue_follow_on_job
+    options = {}
+    options[:wait] = follow_on_delay if follow_on_delay
+
+    self.class.set(**options).perform_later(*arguments)
+  end
+
+  # adds the job to the queue.
   def queue_job(priority = nil, delay = default_delay)
     args = { }
     args[:wait] = delay if delay

@@ -52,10 +52,6 @@ class RecurringTest < ActiveSupport::TestCase
     assert_equal 'SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)', clear_finished[:command]
     assert_equal '12 * * * *', Fugit.parse(clear_finished[:schedule].to_s).to_cron_s
 
-    app_status = pop_task(:application_status_refresh)
-    assert_equal 'ApplicationStatus.instance.refresh', app_status[:command]
-    assert_equal '* * * * *', app_status[:schedule]
-
     tool_map_refresh = pop_task(:galaxy_tool_map_refresh)
     assert_equal 'Galaxy::ToolMap.instance.refresh', tool_map_refresh[:command]
     assert_equal '0 3 * * *', tool_map_refresh[:schedule]

@@ -26,15 +26,14 @@ class StatisticsControllerTest < ActionController::TestCase
   end
 
   test 'application status' do
-    ApplicationStatus.delete_all
+    SolidQueue::Process.create!(kind: 'Worker', name: 'worker-1', pid: 1, hostname: 'test',
+                                supervisor_id: nil, metadata: {}, last_heartbeat_at: Time.current)
     with_config_value :instance_name, 'Euro SEEK' do
       with_config_value :solr_enabled, true do
         logout
-        assert_difference('ApplicationStatus.count') do
-          get :application_status
-        end
+        get :application_status
         assert_response :success
-        assert_match(/Euro SEEK is running \| search is enabled \| [0-9]+ background job worker processes running/, @response.body)
+        assert_match(/Euro SEEK is running \| search is enabled \| 1 background job worker processes running/, @response.body)
       end
     end
   end

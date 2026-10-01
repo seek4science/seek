@@ -217,6 +217,31 @@ Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, 
     assert_equal expected, Seek::Util.schema_org_supported_types.map(&:name)
   end
 
+  test 'live_job_workers only counts workers with a recent heartbeat' do
+    create_solid_queue_process('worker-1', kind: 'Worker')
+    create_solid_queue_process('worker-stale', kind: 'Worker', alive: false)
+    create_solid_queue_process('dispatcher-1', kind: 'Dispatcher')
+
+    assert_equal ['worker-1'], Seek::Util.live_job_workers.pluck(:name)
+  end
+
+  test 'configured_queue_names reads the queues from the worker configuration' do
+    names = Seek::Util.configured_queue_names
+
+    assert_equal names.uniq.sort, names
+    assert_includes names, QueueNames::DEFAULT
+    assert_includes names, 'solid_queue_recurring'
+    assert_not_includes names, '*'
+  end
+
+  test 'active_queue_names lists the queues live workers are serving' do
+    create_solid_queue_process('worker-1', queues: 'indexing')
+    create_solid_queue_process('worker-2', queues: 'authlookup, indexing')
+    create_solid_queue_process('worker-stale', queues: 'samples', alive: false)
+
+    assert_equal %w[authlookup indexing], Seek::Util.active_queue_names
+  end
+
   test 'solid_queue_supervisor_pid returns nil when the pidfile is missing' do
     SolidQueue.stub(:supervisor_pidfile, '/no/such/pidfile') do
       assert_nil Seek::Util.solid_queue_supervisor_pid
@@ -244,6 +269,16 @@ Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, 
         end
       end
     end
+  end
+
+  private
+
+  def create_solid_queue_process(name, kind: 'Worker', queues: nil, alive: true)
+    heartbeat = alive ? Time.current : (SolidQueue.process_alive_threshold * 2).ago
+    attributes = { name: name, kind: kind, pid: SolidQueue::Process.count + 1, hostname: 'test',
+                   supervisor_id: nil, metadata: queues ? { 'queues' => queues } : {},
+                   last_heartbeat_at: heartbeat }
+    SolidQueue::Process.create!(attributes)
   end
 
 end
