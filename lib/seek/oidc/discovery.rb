@@ -14,9 +14,7 @@ module Seek
       DISCOVERY_CACHE_TTL = 1.hour
       REFRESH_COOLDOWN = 5.minutes
       PROVIDER_UNAVAILABLE_TTL = 1.minute
-      MAX_JWKS_BYTES = 128.kilobytes
-      OPEN_TIMEOUT = 2
-      READ_TIMEOUT = 5
+      DISCOVERY_PATH = '.well-known/openid-configuration'.freeze
 
       def initialize(issuer)
         @issuer = issuer.to_s
@@ -25,20 +23,40 @@ module Seek
       # The provider's key set, in the form ruby-jwt's key finder asks for it.
       #
       # That finder asks again with invalidate: true when a token names a key the set does not
-      # hold, which is how a rotated key gets picked up. The refetch is allowed at most once every
-      # REFRESH_COOLDOWN across the whole deployment, so that tokens naming invented key ids
-      # cannot turn each request into a request to the provider. When it is refused the set comes
-      # back unchanged and the key is simply not found.
+      # hold, which is how a rotated key gets picked up.
       def key_set(invalidate: false)
-        raise Error, "the signing keys of '#{@issuer}' could not be fetched recently" if provider_unavailable?
-
-        reaching_provider do
-          refresh! if invalidate && refresh_allowed?
-          @key_set ||= parse(jwks_json)
-        end
+        refresh! if invalidate
+        @key_set ||= parse(jwks_json)
       end
 
       private
+
+      # A refetch for a key the set does not hold. Allowed at most once every REFRESH_COOLDOWN
+      # across the whole deployment, so that tokens naming invented key ids cannot turn each
+      # request into a request to the provider, and not attempted at all while the provider is
+      # known to be down. Never fatal: when it does not happen the set stands as it is and the key
+      # is simply not found, which is already how an unknown key id ends.
+      def refresh!
+        return if provider_unavailable? || !refresh_allowed?
+
+        json = reaching_provider { fetch_jwks_json }
+        Rails.cache.write(cache_key('jwks'), json, expires_in: JWKS_CACHE_TTL)
+        @key_set = parse(json)
+      rescue Error => e
+        Rails.logger.info("Keeping the OpenID Connect key set already held: #{e.message}")
+      end
+
+      # A key set already in hand is used even while the provider is known to be down. It was
+      # fetched while the provider was up and an outage does not make it wrong, so only fetching
+      # is refused; refusing to use it as well would turn a moment's outage into a minute in which
+      # every token is rejected.
+      def jwks_json
+        Rails.cache.fetch(cache_key('jwks'), expires_in: JWKS_CACHE_TTL) do
+          raise Error, "the signing keys of '#{@issuer}' could not be fetched recently" if provider_unavailable?
+
+          reaching_provider { fetch_jwks_json }
+        end
+      end
 
       # Any failure to reach the provider is noted for PROVIDER_UNAVAILABLE_TTL before being
       # raised. Rails.cache.fetch does not cache exceptions, so without this an outage would cost
@@ -58,12 +76,6 @@ module Seek
         Rails.cache.read(cache_key('unavailable')).present?
       end
 
-      def refresh!
-        json = fetch_jwks_json
-        Rails.cache.write(cache_key('jwks'), json, expires_in: JWKS_CACHE_TTL)
-        @key_set = parse(json)
-      end
-
       # Writing with unless_exist is a single atomic operation - Redis SET NX - so this bounds
       # refreshes across every process, not merely within one.
       def refresh_allowed?
@@ -71,40 +83,66 @@ module Seek
                           expires_in: REFRESH_COOLDOWN, unless_exist: true)
       end
 
-      def jwks_json
-        Rails.cache.fetch(cache_key('jwks'), expires_in: JWKS_CACHE_TTL) { fetch_jwks_json }
-      end
-
+      # Read before being handed back to be cached for JWKS_CACHE_TTL, so that a response which is
+      # not a key set is never stored, failing identically for half a day.
       def fetch_jwks_json
-        uri = jwks_uri
-        body = http_client.get(uri).body.to_s
-        raise Error, "the key set at #{uri} is larger than #{MAX_JWKS_BYTES} bytes" if body.bytesize > MAX_JWKS_BYTES
-
+        body = BoundedFetch.get(jwks_uri)
+        parse(body)
         body
       end
 
-      # Only jwks_uri is taken from the discovery document. The response object's #jwks and
-      # #jwk(kid) share one instance variable but store different things in it, so calling either
-      # of them spoils the result of the other.
+      # Only jwks_uri is taken from the discovery document, which is fetched over the same bounded
+      # connection as everything else here. The library's own discovery goes through swd, whose
+      # Faraday connection sets no timeouts at all: a provider that accepts a connection and then
+      # never answers would hold the request thread for as long as it cared to, and since nothing
+      # is raised the provider would never be marked unavailable either, so every later request
+      # carrying a token would do the same until no thread was left.
       def jwks_uri
         Rails.cache.fetch(cache_key('jwks-uri'), expires_in: DISCOVERY_CACHE_TTL) do
-          ::OpenIDConnect::Discovery::Provider::Config.discover!(@issuer).jwks_uri
+          jwks_uri_from(BoundedFetch.get(discovery_uri))
         end
       end
 
+      # The issuer is checked because the document says which provider it describes, and a key set
+      # is only the right one to trust if it belongs to the issuer the tokens will name.
+      def jwks_uri_from(body)
+        document = ::JSON.parse(body)
+        issued_by = document['issuer']
+        raise Error, "#{discovery_uri} describes the issuer '#{issued_by}'" unless issued_by == @issuer
+
+        document['jwks_uri'].presence || raise(Error, "#{discovery_uri} names no jwks_uri")
+      rescue ::JSON::ParserError => e
+        raise Error, "#{discovery_uri} is not JSON: #{e.message}"
+      end
+
+      # Built from the issuer as configured, scheme included, which is what the provider itself
+      # publishes the document under.
+      def discovery_uri
+        "#{@issuer.chomp('/')}/#{DISCOVERY_PATH}"
+      end
+
+      # Built key by key. JWT::JWK.create_from raises for a key type ruby-jwt cannot represent -
+      # anything but RSA, EC and oct - and building the set in one go would discard every usable
+      # key alongside it. A provider publishing an EdDSA key next to its RSA ones is reason enough,
+      # and the ones it cannot use would otherwise be fatal for as long as the set stayed cached.
       def parse(json)
-        ::JWT::JWK::Set.new(::JSON.parse(json))
+        keys = published_keys(json).filter_map do |key|
+          ::JWT::JWK.create_from(key)
+        rescue ::JWT::JWKError => e
+          Rails.logger.info("Ignoring a key published by '#{@issuer}': #{e.message}")
+          nil
+        end
+        Rails.logger.warn("No usable signing key published by '#{@issuer}'") if keys.empty?
+
+        ::JWT::JWK::Set.new(keys)
       end
 
-      # A connection of our own rather than OpenIDConnect.http_client, which imposes no timeouts.
-      # Its configuration block is held in a class variable shared with the browser login flow, so
-      # setting them there would change that too.
-      def http_client
-        ::Faraday.new do |faraday|
-          faraday.options.open_timeout = OPEN_TIMEOUT
-          faraday.options.timeout = READ_TIMEOUT
-          faraday.response :raise_error
-        end
+      def published_keys(json)
+        published = ::JSON.parse(json)
+        keys = published['keys'] if published.is_a?(::Hash)
+        raise Error, "the key set of '#{@issuer}' lists no keys" unless keys.is_a?(::Array)
+
+        keys
       end
 
       # Keyed on the issuer rather than its host, so that a second provider added later needs no

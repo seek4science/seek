@@ -135,6 +135,13 @@ that adding a second provider later needs no change here:
 `jwks_uri` is resolved lazily *inside* the key-set fetch, so a warm cache costs one read and no
 HTTP.
 
+### `Seek::OIDC::BoundedFetch` — `lib/seek/oidc/bounded_fetch.rb`
+
+The single way this code talks to the provider: a GET with a 2s connect timeout, a 5s read
+timeout, and a 128KB ceiling applied to the response as it arrives. It exists because a provider
+is a third party that cannot be relied on to answer quickly or briefly, and because neither
+library in play imposes either bound. See *Bounding what an attacker can cost the provider*.
+
 ### `Seek::OIDC::AccessTokenVerifier` — `lib/seek/oidc/access_token_verifier.rb`
 
 ```ruby
@@ -333,12 +340,35 @@ within five minutes instead of twelve hours; a million invented key ids cost one
 
 Separately, a provider that cannot be reached is remembered for a minute. `Rails.cache.fetch`
 does not cache exceptions, so without this an outage would cost a fresh connection attempt, and
-a full timeout, on every API request.
+a full timeout, on every API request. The marker stops SEEK *fetching*, not verifying: a key set
+already held is still used while it stands, since that set was fetched while the provider was up
+and an outage does not make it wrong. Refusing to use it as well would let one 502, which an
+unauthenticated caller can provoke by naming a key id that does not exist, reject every
+legitimate token for the following minute.
 
-Requests to the provider use a connection with explicit 2s connect and 5s read timeouts rather
-than `OpenIDConnect.http_client`, which imposes none. A hung provider would otherwise tie up
-Puma threads. It is a separate connection because that gem holds its configuration in a class
-variable shared with the browser login flow.
+Every request to the provider goes through `Seek::OIDC::BoundedFetch`, which sets a 2s connect
+and 5s read timeout and abandons a response once it passes 128KB. Neither bound can be left to
+the libraries: `OpenIDConnect.http_client` sets no timeout, and discovery goes through `swd`,
+whose connection sets none either. A provider that accepts a connection and then never answers
+would hold a request thread for as long as it liked — and because nothing is raised it would
+never be marked unavailable, so every later request carrying a bearer token would do the same
+until the Puma pool was gone. The size bound is applied to the chunks as they arrive rather than
+to the finished body, so an endpoint that streams without stopping is cut off rather than
+buffered first.
+
+That is also why only `jwks_uri` is taken from the discovery document and the document is
+fetched directly, rather than through `OpenIDConnect::Discovery::Provider::Config.discover!`.
+The URL is built from the issuer as configured, scheme included, and the document's own `issuer`
+is checked against it, which is what the library did.
+
+The key set is built one key at a time. `JWT::JWK.create_from` raises for a key type ruby-jwt
+cannot represent — anything but RSA, EC and `oct` — and building the set in one call would
+discard every usable key alongside it. Providers do publish mixed sets, an EdDSA key next to RSA
+ones being the common case, and the failure would be both sticky and misleading: the valid JSON
+stays cached for twelve hours while the error reads as the provider being unavailable. A key
+that cannot be built is logged and skipped. For the same reason the body is read as a key set
+before it is cached at all, so a response that is not one is never stored to fail identically
+for half a day.
 
 ### Never raising
 
@@ -396,9 +426,10 @@ These are properties of the design, documented rather than fixed:
   is SEEK's own client id. Two code-level heuristics were considered and rejected: requiring
   `typ: at+jwt` per RFC 9068 breaks Keycloak, the target provider, and rejecting tokens bearing a
   `nonce` is provider-specific.
-- **Discovery is always attempted over HTTPS**, whatever scheme the issuer is configured with,
-  because the library rebuilds the URL from host, port and path. An `http://localhost` provider
-  will not work. This affects web login identically today.
+- **Web login discovery is always attempted over HTTPS**, whatever scheme the issuer is
+  configured with, because `swd` rebuilds the URL from host, port and path. The API path no
+  longer goes through it and so follows the issuer's own scheme, but an `http://` provider still
+  cannot be logged into through a browser.
 - **A cache outage widens the request bound.** If `Rails.cache` is unreachable, keys are fetched
   afresh per request and neither the cooldown nor the unavailability marker can be written. The
   application is already in trouble at that point, since the cache also backs sessions.
@@ -528,6 +559,7 @@ New:
 
 ```
 lib/seek/oidc/discovery.rb
+lib/seek/oidc/bounded_fetch.rb
 lib/seek/oidc/access_token_verifier.rb
 public/api/descriptions/authOidcToken.md
 test/oidc_test_helper.rb

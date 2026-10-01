@@ -150,6 +150,53 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
     assert_requested :get, "#{OIDC_ISSUER}/.well-known/openid-configuration", times: 1
   end
 
+  test 'ignores a key of a type it cannot use alongside one it can' do
+    WebMock.reset!
+    clear_rails_cache
+    stub_oidc_discovery
+    stub_request(:get, "#{OIDC_ISSUER}/jwks")
+      .to_return(status: 200, headers: { 'Content-Type' => 'application/json' },
+                 body: { keys: [{ kty: 'OKP', crv: 'Ed25519', kid: 'edwards-key', x: 'not-a-key' },
+                                oidc_public_key.as_json] }.to_json)
+
+    assert_not_nil verify(signed_oidc_token)
+  end
+
+  test 'keeps verifying from a key set already held while the provider is down' do
+    assert_not_nil verify(signed_oidc_token)
+
+    stub_request(:get, "#{OIDC_ISSUER}/.well-known/openid-configuration").to_timeout
+    stub_request(:get, "#{OIDC_ISSUER}/jwks").to_timeout
+    Rails.cache.write("seek:oidc:#{Digest::SHA256.hexdigest(OIDC_ISSUER)}:unavailable", true)
+
+    assert_not_nil verify(signed_oidc_token)
+  end
+
+  test 'refuses a key set larger than it is willing to read' do
+    WebMock.reset!
+    clear_rails_cache
+    stub_oidc_discovery
+    stub_request(:get, "#{OIDC_ISSUER}/jwks")
+      .to_return(status: 200, headers: { 'Content-Type' => 'application/json' },
+                 body: { keys: [oidc_public_key.as_json],
+                         padding: 'x' * Seek::OIDC::BoundedFetch::MAX_RESPONSE_BYTES }.to_json)
+
+    assert_nil verify(signed_oidc_token)
+  end
+
+  test 'finds the discovery document under the scheme the issuer is configured with' do
+    insecure = 'http://example.com/oidc'.freeze
+    WebMock.reset!
+    clear_rails_cache
+    stub_oidc_provider(issuer: insecure)
+
+    with_oidc_api_enabled(issuer: insecure) do
+      assert_not_nil described_verify(signed_oidc_token({ iss: insecure }))
+    end
+
+    assert_requested :get, "#{insecure}/.well-known/openid-configuration"
+  end
+
   test 'rejects a token when the key set cannot be fetched' do
     WebMock.reset!
     clear_rails_cache
