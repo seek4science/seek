@@ -4,10 +4,11 @@ require 'minitest/mock'
 class SettingsPropagationTest < ActionDispatch::IntegrationTest
 
   setup do
+    Seek::Config.settings_cache
     Seek::Config.site_base_host = 'http://website.golf' # Make sure at least 1 Setting exists
     # Modify settings table without triggering cache clearance
     Settings.last.update_column(:updated_at, 5.minutes.from_now)
-    Seek::Config.clear_cache
+    RequestStore.delete(:config_cache)
   end
 
   test 'propagation triggered on request if settings were changed' do
