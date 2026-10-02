@@ -606,6 +606,22 @@ class ConfigTest < ActiveSupport::TestCase
     assert_nil Settings.fetch(:new_name_2)
   end
 
+  test 'omniauth oidc api defaults to off with no audience restriction' do
+    refute Seek::Config.omniauth_oidc_api_enabled
+    assert_equal '', Seek::Config.omniauth_oidc_api_audiences.to_s
+    assert_empty Seek::Config.omniauth_oidc_api_audience_list
+  end
+
+  test 'omniauth oidc api audience list' do
+    with_config_value(:omniauth_oidc_api_audiences, 'a, b c,,  d ') do
+      assert_equal %w[a b c d], Seek::Config.omniauth_oidc_api_audience_list
+    end
+
+    with_config_value(:omniauth_oidc_api_audiences, ' , ') do
+      assert_empty Seek::Config.omniauth_oidc_api_audience_list
+    end
+  end
+
   test 'elixir AAI config' do
     with_config_value(:site_base_host, 'https://secure.website:3001') do
       with_config_value(:omniauth_elixir_aai_client_id, 'abc') do
