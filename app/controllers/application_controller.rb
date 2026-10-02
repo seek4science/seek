@@ -15,6 +15,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery unless: -> { request.format.json? }
 
+  before_action :config_propagation
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
 
@@ -712,5 +713,9 @@ class ApplicationController < ActionController::Base
 
   def safe_class_lookup(class_name, raise: true)
     Seek::Util.lookup_class(class_name, raise: raise)
+  end
+
+  def config_propagation
+    Seek::Config.settings_cache # Perform config propagation if needed
   end
 end
