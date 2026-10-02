@@ -151,7 +151,7 @@ module Seek
     def propagate_all
       prop_methods = methods.select { |m| m.to_s.end_with?('_propagate') }
       prop_methods.each do |m|
-        eval m.to_s
+        send m
       end
     end
   end
@@ -514,16 +514,14 @@ module Seek
     def get_value(setting, conversion = nil)
       return get_default_value(setting, conversion) unless settings_table_available?
 
-      val = Settings.defaults[setting.to_s]
-      if Thread.current[:use_settings_cache]
-        begin
-          result = settings_cache[setting]
-        rescue Errno::ENOENT => e
-          Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
-          result = Settings.global.fetch(setting)
-        end
-      else
-        result = Settings.global.fetch(setting)
+
+      str_setting = setting.to_s
+      val = Settings.defaults[str_setting]
+      begin
+        result = settings_cache[str_setting]
+      rescue Errno::ENOENT => e
+        Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
+        result = Settings.global.fetch(str_setting)
       end
       val = result.value if result
       val = val.send(conversion) if conversion && val
@@ -637,41 +635,33 @@ module Seek
       true
     end
 
-    def self.enable_cache!
-      Thread.current[:use_settings_cache] = true
-    end
-
-    def self.disable_cache!
-      Thread.current[:use_settings_cache] = nil
-    end
+    @cache_mutex = Mutex.new
 
     def self.settings_cache
-      RequestStore.fetch(:config_cache) do
-        cache_store.fetch(cache_key, expires_in: 1.week) do
-          cache_setting = Thread.current[:use_settings_cache]
-          begin
-            hash = {}
-            disable_cache! # Disable cache whilst loading settings to prevent infinite loop via `attr_encrypted_key_path`
-            Settings.global.to_a.each { |s| hash[s.var] = s }
-            hash
-          ensure
-            Thread.current[:use_settings_cache] = cache_setting
-          end
-        end
+      RequestStore.fetch(:config_cache) do # In cache block so it only checks once per request
+        load_cache if settings_changed?
+        @_cache
       end
+    end
+
+    def self.load_cache
+      @cache_mutex.synchronize do
+        version = Settings.all.cache_version
+        new_cache = {}
+        Settings.global.to_a.each { |s| new_cache[s.var] = s }
+        @_cache = new_cache
+        @_version = version
+      end
+      propagate_all
     end
 
     def self.clear_cache
       RequestStore.delete(:config_cache)
-      cache_store.delete(cache_key)
+      @_version = nil
     end
 
-    def self.cache_key
-      'seek_config'
-    end
-
-    def self.cache_store
-      Rails.application.config.settings_cache_store
+    def self.settings_changed?
+      @_version != Settings.all.cache_version
     end
   end
 end
