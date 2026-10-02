@@ -149,14 +149,6 @@ class Settings < ActiveRecord::Base
     end
   end
 
-  def self.changed?
-    @_version != Settings.all.cache_version
-  end
-
-  def self.reset_version
-    @_version = Settings.all.cache_version
-  end
-
   private
 
   def ensure_no_plaintext

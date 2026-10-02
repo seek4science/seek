@@ -514,12 +514,14 @@ module Seek
     def get_value(setting, conversion = nil)
       return get_default_value(setting, conversion) unless settings_table_available?
 
-      val = Settings.defaults[setting.to_s]
+
+      str_setting = setting.to_s
+      val = Settings.defaults[str_setting]
       begin
-        result = settings_cache[setting]
+        result = settings_cache[str_setting]
       rescue Errno::ENOENT => e
         Rails.logger.warn("Errno::ENOENT error reading the settings cache - #{e.message}")
-        result = Settings.global.fetch(setting)
+        result = Settings.global.fetch(str_setting)
       end
       val = result.value if result
       val = val.send(conversion) if conversion && val
@@ -539,6 +541,7 @@ module Seek
       # Initialize the hash from defaults if it does not exist yet in settings
       Settings.global[var] = Settings.defaults[var.to_s] unless Settings.global.fetch(var)
       result = Settings.merge!(var, value)
+      send "#{var}_propagate" if respond_to? "#{var}_propagate"
       result
     end
 
@@ -556,6 +559,7 @@ module Seek
       options ||= {}
       setter = "#{setting}="
       getter = setting.to_s
+      propagate = "#{getter}_propagate"
       fallback = "#{getter}_fallback"
       default = "default_#{setting}"
       if respond_to?(fallback)
@@ -574,6 +578,7 @@ module Seek
 
       define_class_method setter do |val|
         set_value(setting, val, options[:convert])
+        send propagate if respond_to?(propagate)
       end
     end
 
@@ -632,7 +637,7 @@ module Seek
 
     def self.settings_cache
       RequestStore.fetch(:config_cache) do # In cache block so it only checks once per request
-        load_cache if Settings.changed?
+        load_cache if settings_changed?
         @_cache
       end
     end
@@ -640,12 +645,17 @@ module Seek
     def self.load_cache
       @_cache = {}
       Settings.global.to_a.each { |s| @_cache[s.var] = s }
-      Settings.reset_version
+      @_version = Settings.all.cache_version
       propagate_all
     end
 
     def self.clear_cache
       RequestStore.delete(:config_cache)
+      @_version = nil
+    end
+
+    def self.settings_changed?
+      @_version != Settings.all.cache_version
     end
   end
 end
