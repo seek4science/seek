@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_18_140000) do
+ActiveRecord::Schema[7.2].define(version: 2026_10_02_100000) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -1550,11 +1550,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_18_140000) do
   create_table "projects_observed_variable_sets", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "observed_variable_set_id"
+    t.index ["observed_variable_set_id", "project_id"], name: "index_projects_ovs_on_ovs_id_and_project_id"
+    t.index ["project_id"], name: "index_projects_observed_variable_sets_on_project_id"
   end
 
   create_table "projects_publication_versions", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
+    t.index ["project_id"], name: "index_projects_publication_versions_on_project_id"
+    t.index ["version_id", "project_id"], name: "index_projects_pub_versions_on_version_id_and_project_id"
   end
 
   create_table "projects_publications", id: false, force: :cascade do |t|
@@ -1574,21 +1578,29 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_18_140000) do
   create_table "projects_samples", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "sample_id"
+    t.index ["project_id"], name: "index_projects_samples_on_project_id"
+    t.index ["sample_id", "project_id"], name: "index_projects_samples_on_sample_id_and_project_id"
   end
 
   create_table "projects_sop_versions", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
+    t.index ["project_id"], name: "index_projects_sop_versions_on_project_id"
+    t.index ["version_id", "project_id"], name: "index_projects_sop_versions_on_version_id_and_project_id"
   end
 
   create_table "projects_sops", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "sop_id"
+    t.index ["project_id"], name: "index_projects_sops_on_project_id"
+    t.index ["sop_id", "project_id"], name: "index_projects_sops_on_sop_id_and_project_id"
   end
 
   create_table "projects_strains", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "strain_id"
+    t.index ["project_id"], name: "index_projects_strains_on_project_id"
+    t.index ["strain_id", "project_id"], name: "index_projects_strains_on_strain_id_and_project_id"
   end
 
   create_table "projects_templates", force: :cascade do |t|
@@ -1601,11 +1613,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_18_140000) do
   create_table "projects_workflow_versions", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
+    t.index ["project_id"], name: "index_projects_workflow_versions_on_project_id"
+    t.index ["version_id", "project_id"], name: "index_projects_workflow_versions_on_version_id_and_project_id"
   end
 
   create_table "projects_workflows", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "workflow_id"
+    t.index ["project_id"], name: "index_projects_workflows_on_project_id"
+    t.index ["workflow_id", "project_id"], name: "index_projects_workflows_on_workflow_id_and_project_id"
   end
 
   create_table "publication_auth_lookup", force: :cascade do |t|
