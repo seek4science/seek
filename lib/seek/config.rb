@@ -635,6 +635,8 @@ module Seek
       true
     end
 
+    @cache_mutex = Mutex.new
+
     def self.settings_cache
       RequestStore.fetch(:config_cache) do # In cache block so it only checks once per request
         load_cache if settings_changed?
@@ -643,9 +645,12 @@ module Seek
     end
 
     def self.load_cache
-      @_cache = {}
-      Settings.global.to_a.each { |s| @_cache[s.var] = s }
-      @_version = Settings.all.cache_version
+      @cache_mutex.synchronize do
+        new_cache = {}
+        Settings.global.to_a.each { |s| new_cache[s.var] = s }
+        @_cache = new_cache
+        @_version = Settings.all.cache_version
+      end
       propagate_all
     end
 
