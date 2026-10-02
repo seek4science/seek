@@ -23,11 +23,17 @@ class SettingsPropagationTest < ActionDispatch::IntegrationTest
   end
 
   test 'propagation triggered before performing job if settings were changed' do
+    do_nothing_job = Class.new(ApplicationJob) do
+      def perform
+        # no op
+      end
+    end
+
     assert Seek::Config.settings_changed?
     propagation_happened = false
     Seek::Config.stub(:propagate_all, -> () { propagation_happened = true }) do
       refute propagation_happened
-      AuthLookupUpdateJob.new.perform
+      do_nothing_job.new.perform_now
       assert propagation_happened
       refute Seek::Config.settings_changed?
     end
