@@ -646,10 +646,11 @@ module Seek
 
     def self.load_cache
       @cache_mutex.synchronize do
+        version = Settings.all.cache_version
         new_cache = {}
         Settings.global.to_a.each { |s| new_cache[s.var] = s }
         @_cache = new_cache
-        @_version = Settings.all.cache_version
+        @_version = version
       end
       propagate_all
     end
