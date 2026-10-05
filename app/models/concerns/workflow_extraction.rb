@@ -161,6 +161,7 @@ module WorkflowExtraction
     crate['datePublished'] = Time.now unless crate['datePublished']
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
+    crate['contentUrl'] = polymorphic_url([parent, :git_download], version: version, path: main_workflow_path)
 
     crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
 
