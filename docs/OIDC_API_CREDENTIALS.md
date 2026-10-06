@@ -101,10 +101,12 @@ So the question "which SEEK user is this subject?" was already answerable, and k
 by ordinary logins. The only missing piece was a way to establish that a bearer token really
 came from the provider and really concerned that subject.
 
-Two of the three gems needed were already there. `openid_connect` (2.3.1) fetches a discovery
-document, and `jwt` (3.2.0) verifies a token and its claims — the latter was in the lockfile as
-a dependency of `oauth2`, and is now declared directly. `json-jwt` remains only as
-`openid_connect`'s own dependency; no SEEK code calls it.
+Only one gem was needed, and it was already in the lockfile. `jwt` (3.2.0) verifies a token and
+its claims; it was there as a dependency of `oauth2` and is now declared directly. `openid_connect`
+(2.3.1) and `json-jwt` (1.16.7) stay for the browser login flow and for `omniauth_openid_connect`.
+No code added here calls either, the discovery document being fetched directly for the reasons
+under *Bounding what an attacker can cost the provider*; the test fixtures do call `json-jwt`, and
+deliberately, so that the library which signs is not the one that verifies.
 
 ## What was added
 
@@ -523,7 +525,9 @@ the tool to reach for had that route been taken.
 ## Enabling it
 
 1. Configure the OpenID Connect provider under *Admin* → *Enable/disable features* and
-   restart, since providers are wired into the middleware at boot.
+   restart, since providers are wired into the middleware at boot. The issuer must be `https`:
+   keys fetched in the clear could be substituted, so an `http` one is refused and reported as
+   the provider being unavailable.
 2. Tick **Accept … access tokens for the API**.
 3. Set **Accepted token audiences** to the client id of each application that may call SEEK on a
    user's behalf. This is required; the setting above will not stay on without it.
@@ -539,16 +543,17 @@ curl -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json' \
 
 ## Testing
 
-43 new tests, all passing, and no regressions across the authentication, admin, omniauth, OAuth
+55 new tests, all passing, and no regressions across the authentication, admin, omniauth, OAuth
 and API suites.
 
 | Where | Tests |
 | --- | --- |
-| `test/unit/oidc/access_token_verifier_test.rb` | 31 |
-| `test/integration/authentication_test.rb` | 5 |
+| `test/unit/oidc/access_token_verifier_test.rb` | 39 |
+| `test/integration/authentication_test.rb` | 6 |
 | `test/unit/user_test.rb` | 4 |
+| `test/functional/admin_controller_test.rb` | 3 |
 | `test/unit/config_test.rb` | 2 |
-| `test/functional/admin_controller_test.rb` | 1 |
+| `test/unit/api_token_test.rb` | 1 |
 
 `test/oidc_test_helper.rb` holds the shared fixtures: a generated RSA key pair, a signed token
 builder, and WebMock stubs for the discovery and key set endpoints. Signing with the private JWK
@@ -560,13 +565,22 @@ signs and verifies only proves it agrees with itself.
 
 The negative cases carry most of the value: `alg: none`; `HS256` signed with the provider's
 public key; a different key claiming the provider's key id; an altered payload; expired and
-not-yet-valid tokens; a wrong issuer; a missing or blank subject; an unknown key id; and
-credentials that are not tokens at all, asserting that no request to the provider is made.
+not-yet-valid tokens; a wrong issuer; a missing or blank subject; an unknown key id; a token
+presented while no audience is configured; and credentials that are not tokens at all, asserting
+that no request to the provider is made.
 
-Three tests pin behaviour that would otherwise be easy to regress, by counting requests:
-one refetch for an unknown key id, *still* only one for a second unknown key id — the bound on
-what an attacker can cost the provider — and no repeat discovery request while the provider is
-marked unreachable.
+Another group covers what a provider can do to this instance rather than what a caller can: a key
+type ruby-jwt cannot build, published alongside one it can; a key set larger than the limit; a
+provider that is down while a key set is already held, which must keep verifying; and an issuer
+named over cleartext, refused by default, allowed only when asked for outside production, and
+refused *in* production however it is asked.
+
+Thirteen tests pin behaviour that would otherwise be easy to regress, by counting requests to the
+provider. The ones worth knowing are there: one refetch for an unknown key id and *still* only one
+for a second — the bound on what an attacker can cost the provider; two fetches for a rotated key,
+which is the only thing distinguishing a working rotation from a key set that was never reloaded;
+no repeat discovery request while the provider is marked unreachable; and no request at all for a
+credential that was never a token for this provider.
 
 Note that this suite resets WebMock explicitly. The automatic per-test reset from
 `webmock/minitest` is not in effect here, because VCR hooks into WebMock, so request counts
@@ -589,9 +603,9 @@ Changed: `Gemfile` and `Gemfile.lock` (declaring `jwt`),
 `lib/authenticated_system.rb`, `app/models/user.rb`, `lib/seek/config.rb`,
 `lib/seek/config_setting_attributes.yml`, `config/initializers/seek_configuration.rb`,
 `config/initializers/inflections.rb`, `app/controllers/admin_controller.rb`,
-`app/views/admin/_omniauth.html.erb`, `public/api/definitions/openapi-v3.yml`,
-`public/api/definitions/_paths.yml`, and the test
-files above plus `test/factories/users.rb`.
+`app/views/admin/_omniauth.html.erb`, `app/models/api_token.rb`,
+`public/api/definitions/openapi-v3.yml`, `public/api/definitions/_paths.yml`, and the test files
+named above plus `test/factories/users.rb`.
 
 No migration, and so no `seek:upgrade` task: `identities` already has the columns and the
 `[provider, uid]` index the lookup uses, and new settings take their value from
