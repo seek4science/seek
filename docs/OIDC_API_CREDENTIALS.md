@@ -185,8 +185,12 @@ existing `exception_notification_recipients` precedent.
 
 `public/api/definitions/openapi-v3.yml` gains an `oidcBearerToken` security scheme and a new
 `public/api/descriptions/authOidcToken.md`, in the style of the existing `authToken.md`. The
-resolved spec files beside it are gitignored and regenerated at boot by
-`config/initializers/resolve_api.rb`, so only the source is edited.
+scheme is added to the root `security` array *and* to each of the 59 operations in `_paths.yml`
+that declare one of their own, because an operation's array replaces the root's rather than
+adding to it: without that it would be offered on the 53 read operations and on none of the
+writes, which is where the question of which credential to use actually arises. The resolved spec
+files beside them are gitignored and regenerated at boot by `config/initializers/resolve_api.rb`,
+so only the sources are edited.
 
 ## How this solves the issue
 
@@ -585,7 +589,8 @@ Changed: `Gemfile` and `Gemfile.lock` (declaring `jwt`),
 `lib/authenticated_system.rb`, `app/models/user.rb`, `lib/seek/config.rb`,
 `lib/seek/config_setting_attributes.yml`, `config/initializers/seek_configuration.rb`,
 `config/initializers/inflections.rb`, `app/controllers/admin_controller.rb`,
-`app/views/admin/_omniauth.html.erb`, `public/api/definitions/openapi-v3.yml`, and the test
+`app/views/admin/_omniauth.html.erb`, `public/api/definitions/openapi-v3.yml`,
+`public/api/definitions/_paths.yml`, and the test
 files above plus `test/factories/users.rb`.
 
 No migration, and so no `seek:upgrade` task: `identities` already has the columns and the
