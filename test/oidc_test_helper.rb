@@ -54,6 +54,14 @@ module OIDCTestHelper
                  headers: { 'Content-Type' => 'application/json' })
   end
 
+  def with_env(vars)
+    original = vars.each_key.to_h { |k| [k, ENV.key?(k) ? ENV[k] : :__unset__] }
+    vars.each { |k, v| v.nil? ? ENV.delete(k) : ENV[k] = v }
+    yield
+  ensure
+    original.each { |k, v| v == :__unset__ ? ENV.delete(k) : ENV[k] = v }
+  end
+
   def with_oidc_api_enabled(audiences: 'seek-client', issuer: OIDC_ISSUER, &block)
     with_config_values({ omniauth_enabled: true, omniauth_oidc_enabled: true,
                          omniauth_oidc_api_enabled: true, omniauth_oidc_issuer: issuer,

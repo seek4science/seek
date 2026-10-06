@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'oidc_test_helper'
+require 'minitest/mock'
 
 class AccessTokenVerifierTest < ActiveSupport::TestCase
   include OIDCTestHelper
@@ -190,14 +191,48 @@ class AccessTokenVerifierTest < ActiveSupport::TestCase
     assert_nil verify(signed_oidc_token)
   end
 
-  test 'finds the discovery document under the scheme the issuer is configured with' do
+  test 'will not fetch the keys of a provider named over cleartext' do
     insecure = 'http://example.com/oidc'.freeze
     WebMock.reset!
     clear_rails_cache
     stub_oidc_provider(issuer: insecure)
 
-    with_oidc_api_enabled(issuer: insecure) do
-      assert_not_nil described_verify(signed_oidc_token({ iss: insecure }))
+    with_env(Seek::OIDC::BoundedFetch::INSECURE_ENV_VAR => nil) do
+      with_oidc_api_enabled(issuer: insecure) do
+        assert_nil described_verify(signed_oidc_token({ iss: insecure }))
+      end
+    end
+
+    assert_not_requested :get, "#{insecure}/.well-known/openid-configuration"
+  end
+
+  test 'never fetches over cleartext in production, however it is asked' do
+    insecure = 'http://example.com/oidc'.freeze
+    WebMock.reset!
+    clear_rails_cache
+    stub_oidc_provider(issuer: insecure)
+
+    with_env(Seek::OIDC::BoundedFetch::INSECURE_ENV_VAR => '1') do
+      Rails.stub(:env, ActiveSupport::StringInquirer.new('production')) do
+        with_oidc_api_enabled(issuer: insecure) do
+          assert_nil described_verify(signed_oidc_token({ iss: insecure }))
+        end
+      end
+    end
+
+    assert_not_requested :get, "#{insecure}/.well-known/openid-configuration"
+  end
+
+  test 'fetches over cleartext only when asked to, and then under the configured scheme' do
+    insecure = 'http://example.com/oidc'.freeze
+    WebMock.reset!
+    clear_rails_cache
+    stub_oidc_provider(issuer: insecure)
+
+    with_env(Seek::OIDC::BoundedFetch::INSECURE_ENV_VAR => '1') do
+      with_oidc_api_enabled(issuer: insecure) do
+        assert_not_nil described_verify(signed_oidc_token({ iss: insecure }))
+      end
     end
 
     assert_requested :get, "#{insecure}/.well-known/openid-configuration"

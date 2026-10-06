@@ -138,9 +138,10 @@ HTTP.
 ### `Seek::OIDC::BoundedFetch` — `lib/seek/oidc/bounded_fetch.rb`
 
 The single way this code talks to the provider: a GET with a 2s connect timeout, a 5s read
-timeout, and a 128KB ceiling applied to the response as it arrives. It exists because a provider
-is a third party that cannot be relied on to answer quickly or briefly, and because neither
-library in play imposes either bound. See *Bounding what an attacker can cost the provider*.
+timeout, a 128KB ceiling applied to the response as it arrives, and a refusal to fetch over
+anything but `https`. It exists because a provider is a third party that cannot be relied on to
+answer quickly or briefly, and because neither library in play imposes any of those bounds. See
+*Bounding what an attacker can cost the provider*.
 
 ### `Seek::OIDC::AccessTokenVerifier` — `lib/seek/oidc/access_token_verifier.rb`
 
@@ -365,6 +366,16 @@ fetched directly, rather than through `OpenIDConnect::Discovery::Provider::Confi
 The URL is built from the issuer as configured, scheme included, and the document's own `issuer`
 is checked against it, which is what the library did.
 
+Building the URL from the configured scheme is only safe because cleartext is then refused
+outright. A provider is no more trustworthy than the connection its keys arrive over: anyone able
+to answer in its place can publish a key set of their own, and every linked user's account
+follows. `swd` happened to prevent this by rebuilding every URL as `https` and discarding the
+configured scheme, which also made an `http://` provider simply not work; replacing it meant
+making the rule explicit rather than incidental. The exception, for a provider on a developer's
+own machine, is `OIDC_INSECURE_DISCOVERY=1` in the environment, and it is ignored in production.
+It is an environment variable rather than a setting because an administrator should not find
+"stop checking the transport" in the admin UI beside the thing it protects.
+
 The key set is built one key at a time. `JWT::JWK.create_from` raises for a key type ruby-jwt
 cannot represent — anything but RSA, EC and `oct` — and building the set in one call would
 discard every usable key alongside it. Providers do publish mixed sets, an EdDSA key next to RSA
@@ -430,10 +441,10 @@ These are properties of the design, documented rather than fixed:
   is SEEK's own client id. Two code-level heuristics were considered and rejected: requiring
   `typ: at+jwt` per RFC 9068 breaks Keycloak, the target provider, and rejecting tokens bearing a
   `nonce` is provider-specific.
-- **Web login discovery is always attempted over HTTPS**, whatever scheme the issuer is
-  configured with, because `swd` rebuilds the URL from host, port and path. The API path no
-  longer goes through it and so follows the issuer's own scheme, but an `http://` provider still
-  cannot be logged into through a browser.
+- **An `http://` provider is refused**, on both paths and for different reasons: the API path
+  declines to fetch keys over cleartext unless `OIDC_INSECURE_DISCOVERY=1` is set outside
+  production, and web login goes through `swd`, which rebuilds every URL as `https` whatever the
+  issuer says and so cannot reach one at all.
 - **A cache outage widens the request bound.** If `Rails.cache` is unreachable, keys are fetched
   afresh per request and neither the cooldown nor the unavailability marker can be written. The
   application is already in trouble at that point, since the cache also backs sessions.
