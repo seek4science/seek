@@ -5,7 +5,7 @@ the work is in this file, including the full program source.
 
 **Status:** sketch, not deployed. Nothing here has been run against AWS. Open
 questions 4.1–4.4 have been answered from the SEEK codebase (section 4) and the
-program updated to match; 4.5–4.7 remain. The one SEEK code change required
+program updated to match; 4.5 is resolved by SEEK change 5.4; 4.6–4.7 remain. The one SEEK code change required
 before `pulumi up` (Redis TLS, section 5.1) has been made.
 
 **Source of truth for the app:** [`seek4science/seek`](https://github.com/seek4science/seek),
@@ -193,7 +193,7 @@ rewrite — task definitions, load balancer, EFS mounts and databases are unaffe
 ## 4. Open questions
 
 4.1–4.4 were answered by reading the SEEK repo; the program in section 8
-reflects the answers. 4.5–4.7 remain open.
+reflects the answers. 4.5 is resolved by SEEK change 5.4. 4.6–4.7 remain open.
 
 **4.1 Database and Redis hostnames — RESOLVED; Redis needs a SEEK change.**
 
@@ -262,8 +262,9 @@ crontab (`docker/seek.crontab`) contains only the LibreOffice (`soffice.bin`)
 reaper; all periodic application work is in `config/recurring.yml` under Solid
 Queue. This reverses decision 3.5 — see there.
 
-**4.5 Solr configset.** Compose bind-mounts `./solr/seek/conf`. Needs baking into
-a derived image pushed to ECR; `solrImage` in stack config points at it.
+**4.5 Solr configset — RESOLVED by 5.4.** Compose bind-mounts
+`./solr/seek/conf`. `solr/Dockerfile` now bakes it into a derived image
+(`fairdom/seek-solr`), which `solrImage` in stack config points at.
 
 **4.6 EBS device naming.** The Solr user data assumes the volume appears at
 `/dev/nvme1n1`; Nitro renames attached devices, so `/dev/sdf` in the attachment is
@@ -287,7 +288,7 @@ the SEEK repository itself. Only 5.1 blocks deployment.
 | 5.1 | Redis TLS support in `Seek::RedisConfig` — **DONE** | **Yes**, as the program stands | Disable `transitEncryptionEnabled` and drop `authToken` on ElastiCache |
 | 5.2 | Allow TLS for the entrypoint's MySQL client checks | No | `require_secure_transport = 0` in `dbParams` (done) |
 | 5.3 | `check_mysql` distinguishes "cannot connect" from "empty database" | No, hardening | Run first-run setup as a one-off task; watch boot logs |
-| 5.4 | Build and publish a derived Solr image from `solr/seek/conf` | No, convenience | Build it outside the repo and push to ECR by hand |
+| 5.4 | Derived Solr image from `solr/seek/conf` — **DONE** | No, convenience | Build it outside the repo |
 
 **5.1 Redis TLS (required) — DONE.** `Seek::RedisConfig.url`
 (`lib/seek/redis_config.rb`) now uses the `rediss://` scheme when `REDIS_TLS`
@@ -315,11 +316,32 @@ Checking connectivity first (a plain authenticated `SELECT 1`) and only then
 the table would turn misconfiguration into a clear error rather than an
 attempted schema load. Benefits compose deployments too.
 
-**5.4 Derived Solr image (optional).** Open question 4.5: the configset lives
-in `solr/seek/conf` and compose bind-mounts it. A small `solr/Dockerfile`
-(`FROM solr:9.10.1`, `COPY` the configset) built alongside the SEEK image in
-`.github/workflows/docker-image.yml` would version the configset with the code
-that depends on it, and give other cloud deployments the same image.
+**5.4 Derived Solr image — DONE.** Open question 4.5: the configset lives in
+`solr/seek/conf` and compose bind-mounts it. `solr/Dockerfile` (`FROM
+solr:9.10.1`) bakes it in as `seek_config`, so the configset is versioned with
+the code that depends on it. Build from the `solr` directory and push by hand
+alongside `fairdom/seek`, with the same tag:
+
+```bash
+docker build -t fairdom/seek-solr:<seek-version> solr
+```
+
+The image also fixes a problem compose has today. `solr-precreate` copies the
+configset only when the core does not yet exist, so on a persistent volume an
+existing core keeps the configuration it was created with, and a release that
+changes `solr/seek/conf` (e.g. #2690) needs a manual copy. The image's
+`start-seek-solr.sh` replaces an existing core's `conf/` with the baked-in
+configset on every start, then hands over to `solr-precreate`; the index data
+is untouched, and the reindex in `seek:upgrade` covers changes that affect
+indexing. Tested locally: a restart with a changed configset refreshed the
+core's conf and kept the indexed documents. The image carries a `HEALTHCHECK`
+on `/solr/seek/admin/ping`, matching compose.
+
+`solr:9.10.1` is multi-arch, so `docker buildx build --platform
+linux/amd64,linux/arm64 --push` would allow a Graviton `solrInstanceType`.
+
+Compose and `script/start-docker-solr.sh` still bind-mount the configset and so
+do not get the refresh; switching them to the image is a possible follow-up.
 
 ---
 
@@ -360,8 +382,8 @@ elsewhere.
 2. ~~Make SEEK change 5.1 (Redis TLS).~~ Done; needs a SEEK image built from
    a commit that includes it.
 3. `pulumi preview` against a throwaway stack and fix provider-schema drift.
-4. Build the derived Solr image with the configset baked in; push to ECR
-   (SEEK change 5.4 if done in-repo).
+4. Build and push `fairdom/seek-solr` (SEEK change 5.4, done) at the same tag
+   as the SEEK image.
 5. Add the one-off task definitions for first-run setup and `docker/upgrade.sh`.
    First-run setup must complete before the web service scales past one task
    (4.4).
@@ -405,7 +427,10 @@ config:
     default: fairdom/seek:main
   solrImage:
     type: string
-    default: solr:9.10.1
+    default: fairdom/seek-solr:main
+    description: >
+      Built from solr/Dockerfile in the SEEK repo (handover 5.4). Use the
+      same tag as seekImage so the Solr configset matches the code.
   webCount:
     type: integer
     default: 2
@@ -445,7 +470,7 @@ config:
     default: t3.medium
     description: >
       amd64 by default, since the derived Solr image may not have an arm64
-      build. Switch to t4g.medium for ~20% off if it does.
+      build. Switch to t4g.medium for ~20% off if it is pushed multi-arch.
   solrDataSizeGb:
     type: integer
     default: 100
@@ -968,7 +993,10 @@ resources:
   # DLM below give a restore path if the volume itself is lost.
   #
   # The compose file bind-mounts ./solr/seek/conf from the repo; off a single
-  # host that has to be baked into a derived image. solrImage points at it.
+  # host it is baked into a derived image (solr/Dockerfile) that solrImage
+  # points at. The image creates the core on first start and refreshes its
+  # conf from the configset on every later start, so a new image tag carries
+  # configuration changes onto the existing volume.
   # -------------------------------------------------------------------------
   solrData:
     type: aws:ebs:Volume
@@ -1032,8 +1060,7 @@ resources:
           -p 8983:8983 \
           -v /var/solr:/var/solr \
           -e SOLR_JAVA_MEM="-Xms512m -Xmx1024m" \
-          ${solrImage} \
-          solr-precreate seek /opt/solr/server/solr/configsets/seek_config
+          ${solrImage}
 
   solrAttach:
     type: aws:ec2:VolumeAttachment
@@ -1209,8 +1236,8 @@ config:
   seek:certificateArn: arn:aws:acm:eu-west-2:111122223333:certificate/REPLACE-ME
   seek:hostedZoneId: REPLACEME
 
-  seek:seekImage: fairdom/seek:1.16.0 # pin a release rather than :main
-  seek:solrImage: 111122223333.dkr.ecr.eu-west-2.amazonaws.com/seek-solr:9.10.1
+  seek:seekImage: fairdom/seek:pulumi # built from the pulumi branch and pushed when ready to deploy
+  seek:solrImage: fairdom/seek-solr:pulumi # same tag as seekImage
 
   seek:webCount: "2"
   seek:webCountMax: "8"
