@@ -5,8 +5,8 @@ the work is in this file, including the full program source.
 
 **Status:** sketch, not deployed. Nothing here has been run against AWS. Open
 questions 4.1–4.4 have been answered from the SEEK codebase (section 4) and the
-program updated to match; 4.5–4.7 remain. One SEEK code change (Redis TLS,
-section 5) is required before `pulumi up`.
+program updated to match; 4.5–4.7 remain. The one SEEK code change required
+before `pulumi up` (Redis TLS, section 5.1) has been made.
 
 **Source of truth for the app:** [`seek4science/seek`](https://github.com/seek4science/seek),
 specifically `docker-compose.yml` on `main`.
@@ -284,21 +284,21 @@ the SEEK repository itself. Only 5.1 blocks deployment.
 
 | # | Change | Required? | Alternative without a SEEK change |
 |---|---|---|---|
-| 5.1 | Redis TLS support in `Seek::RedisConfig` | **Yes**, as the program stands | Disable `transitEncryptionEnabled` and drop `authToken` on ElastiCache |
+| 5.1 | Redis TLS support in `Seek::RedisConfig` — **DONE** | **Yes**, as the program stands | Disable `transitEncryptionEnabled` and drop `authToken` on ElastiCache |
 | 5.2 | Allow TLS for the entrypoint's MySQL client checks | No | `require_secure_transport = 0` in `dbParams` (done) |
 | 5.3 | `check_mysql` distinguishes "cannot connect" from "empty database" | No, hardening | Run first-run setup as a one-off task; watch boot logs |
 | 5.4 | Build and publish a derived Solr image from `solr/seek/conf` | No, convenience | Build it outside the repo and push to ECR by hand |
 
-**5.1 Redis TLS (required).** `lib/seek/redis_config.rb` hardcodes the
-`redis://` scheme. Add an opt-in, e.g. `REDIS_TLS=1` → `rediss://`, keeping the
-default unchanged so compose deployments are unaffected. Every Redis consumer
-(cache store, settings cache, session store, Rack::Attack) already goes through
-`Seek::RedisConfig.url`, so this one method is the whole change, plus cases in
-`test/unit/redis_config_test.rb`. Check that the `redis-store` gem behind
-`:redis_store` sessions honours `rediss://` as well as `RedisCacheStore` does.
-ElastiCache's certificate is publicly trusted, so no CA bundle should be
-needed. The program already sets `REDIS_TLS`; it is inert until this lands. The
-variable name is a proposal; keep the two in step.
+**5.1 Redis TLS (required) — DONE.** `Seek::RedisConfig.url`
+(`lib/seek/redis_config.rb`) now uses the `rediss://` scheme when `REDIS_TLS`
+is `1`, `true` or `yes` (case-insensitive), and `redis://` otherwise, so
+compose deployments are unaffected. Every Redis consumer (cache store,
+settings cache, session store, Rack::Attack) goes through this method, so it is
+the whole change; cases added to `test/unit/redis_config_test.rb`. Verified
+that both client libraries treat `rediss://` as TLS: `redis-client` (behind
+`RedisCacheStore`) and `redis-store` 1.11 (behind the `:redis_store` session
+store, including its `/0/session` path form). ElastiCache's certificate is
+publicly trusted, so no CA bundle is needed. The program sets `REDIS_TLS=1`.
 
 **5.2 MySQL client TLS (optional).** The Dockerfile writes `[client] skip-ssl`
 to `/etc/mysql/conf.d/disable-ssl.cnf`, so `mysqladmin`/`mysql` in
@@ -357,8 +357,8 @@ elsewhere.
 1. ~~Answer open questions 4.1–4.4 by reading the SEEK repo.~~ Done; see
    section 4. Confirm the www-data uid (4.2) and the RDS 8.4
    `require_secure_transport` default (4.1) when convenient.
-2. Make SEEK change 5.1 (Redis TLS), or decide to drop ElastiCache transit
-   encryption instead.
+2. ~~Make SEEK change 5.1 (Redis TLS).~~ Done; needs a SEEK image built from
+   a commit that includes it.
 3. `pulumi preview` against a throwaway stack and fix provider-schema drift.
 4. Build the derived Solr image with the configset baked in; push to ECR
    (SEEK change 5.4 if done in-repo).
@@ -497,8 +497,9 @@ variables:
   # Connection settings: MYSQL_* are read by docker/database.docker.mysql.yml
   # and docker/shared_functions.sh; REDIS_HOST and REDIS_PASSWORD by
   # Seek::RedisConfig (lib/seek/redis_config.rb), which fixes the port at
-  # 6379, so there is no REDIS_PORT. REDIS_TLS has no effect until SEEK
-  # supports it (handover section 5.1); ElastiCache below requires TLS.
+  # 6379, so there is no REDIS_PORT. REDIS_TLS selects rediss://, which
+  # ElastiCache below requires; it needs a SEEK image that includes handover
+  # change 5.1.
   webEnv:
     - name: RAILS_ENV
       value: production
@@ -767,9 +768,8 @@ resources:
   # and ElastiCache's snapshot-based durability is sufficient. allkeys-lru is
   # carried over from compose; size the node so it does not evict sessions.
   #
-  # transitEncryptionEnabled means TLS-only connections, which needs SEEK
-  # change 5.1 (REDIS_TLS). Without it, disable transit encryption and drop
-  # authToken instead.
+  # transitEncryptionEnabled means TLS-only connections; SEEK connects over
+  # TLS when REDIS_TLS is set (handover change 5.1).
   # -------------------------------------------------------------------------
   redisSubnets:
     type: aws:elasticache:SubnetGroup
