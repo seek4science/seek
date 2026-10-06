@@ -8,6 +8,45 @@ project's [README](../infra/biofair-mc-workflow-hub/README.md).
 
 Not yet deployed or previewed against AWS.
 
+## Services overview
+
+The services and how they connect. Services with a thick border run as
+multiple containers.
+
+```mermaid
+flowchart LR
+    users(["Users"])
+    alb["Load balancer"]
+    web["Front-end<br/>2-8 containers, autoscaled"]
+    workers["Workers<br/>1 container, can be raised"]
+    solr["Solr<br/>1 container"]
+    db[("MySQL<br/>app data + job queue")]
+    redis[("Redis<br/>cache + sessions")]
+    files[("Shared filestore<br/>uploads + file cache")]
+
+    users --> alb --> web
+    web --> db
+    web --> redis
+    web --> solr
+    web --> files
+    workers --> db
+    workers --> redis
+    workers --> solr
+    workers --> files
+
+    classDef multi stroke-width:4px
+    class web multi
+```
+
+| Service | Runs as | Containers |
+|---|---|---|
+| Front-end | ECS Fargate service | 2-8, scaled on CPU |
+| Workers | ECS Fargate service | 1, can be raised (`workerCount`) |
+| Solr | Docker on a dedicated EC2 instance | 1 |
+| MySQL | RDS, managed | n/a, single instance |
+| Redis | ElastiCache, managed | n/a, single node |
+| Shared filestore | EFS, managed | n/a, mounted by every front-end and worker container |
+
 ## Runtime architecture
 
 How a request reaches SEEK, and which services each part of SEEK depends on.
