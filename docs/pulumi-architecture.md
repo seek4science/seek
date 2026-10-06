@@ -8,6 +8,45 @@ project's [README](../infra/biofair-mc-workflow-hub/README.md).
 
 Not yet deployed or previewed against AWS.
 
+## Phase 1 on this branch: one EC2 instance
+
+The program currently deploys a single instance running SEEK's
+`docker-compose.yml`, not the managed-services design the rest of this
+document shows. See the project
+[README](../infra/biofair-mc-workflow-hub/README.md).
+
+```mermaid
+flowchart LR
+    you(["Developer"])
+    gh[("GitHub<br/>seek4science/seek")]
+    hub[("Docker Hub")]
+
+    subgraph vpc["VPC"]
+        subgraph ec2["EC2 instance in a private subnet<br/>Ubuntu 24.04, no inbound"]
+            seek["SEEK<br/>:3000"]
+            workers["Workers"]
+            db[("MySQL")]
+            redis[("Redis")]
+            solr["Solr"]
+        end
+        nat["NAT Gateway<br/>public subnet"]
+    end
+
+    you -- "SSM port forward to 3000" --> seek
+    seek --> db
+    seek --> redis
+    seek --> solr
+    workers --> db
+    workers --> redis
+    workers --> solr
+    ec2 -. "first boot: clone, image pulls" .-> nat
+    nat -.-> gh
+    nat -.-> hub
+```
+
+The sections below describe the managed-services design, a candidate for
+phase 2.
+
 ## Services overview
 
 The services and how they connect. Services with a thick border run as

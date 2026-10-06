@@ -408,6 +408,12 @@ the AWS account it targets:
   added with `pulumi config set --secret` and stored there encrypted.
 - `README.md`: scope, open questions, and deploy steps.
 
+**Phase 1 on this branch.** The program does not currently deploy this design.
+It deploys level 1 from section 1 instead: one EC2 instance running SEEK's
+`docker-compose.yml` unchanged, reached through SSM, with no load balancer and
+no new IAM resources. The managed-services design here remains the candidate
+for phase 2; see the README.
+
 Following biofair-mc-infra's conventions, it differs from the sketch that was
 originally embedded here in these ways:
 
