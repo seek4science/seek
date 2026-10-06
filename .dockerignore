@@ -45,3 +45,6 @@ coverage/
 .claude
 AGENTS.md
 CLAUDE.md
+
+# Infrastructure as code
+infra/

@@ -1,0 +1,27 @@
+config:
+  aws:region: eu-west-2
+  aws:defaultTags:
+    tags:
+      Environment: staging
+      ManagedBy: pulumi
+  biofair-mc-workflow-hub:environment: staging
+  biofair-mc-workflow-hub:vpcCidr: 10.30.0.0/16
+
+  # DNS and certificate issuance are still an open question with the BioFAIR
+  # Hub; see README.md.
+  biofair-mc-workflow-hub:domainName: REPLACE-ME
+  biofair-mc-workflow-hub:certificateArn: REPLACE-ME
+  biofair-mc-workflow-hub:hostedZoneId: REPLACE-ME
+
+  # Built from the pulumi branch of the SEEK repo and pushed when ready to deploy.
+  biofair-mc-workflow-hub:seekImage: fairdom/seek:pulumi
+  biofair-mc-workflow-hub:solrImage: fairdom/seek-solr:pulumi # same tag as seekImage
+
+  biofair-mc-workflow-hub:webCount: "1" # raise once the schema exists; see README.md
+  biofair-mc-workflow-hub:webCountMax: "8"
+  biofair-mc-workflow-hub:workerCount: "1"
+  biofair-mc-workflow-hub:pumaWorkers: "2"
+
+  biofair-mc-workflow-hub:dbInstanceClass: db.t4g.medium
+  biofair-mc-workflow-hub:dbAllocatedStorage: "100"
+  biofair-mc-workflow-hub:redisNodeType: cache.t4g.small
