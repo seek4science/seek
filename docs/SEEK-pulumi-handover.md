@@ -408,6 +408,12 @@ the AWS account it targets:
   added with `pulumi config set --secret` and stored there encrypted.
 - `README.md`: scope, open questions, and deploy steps.
 
+**Phase 1.** The program currently deploys a cut-down phase 1 of this design:
+HTTP only at the load balancer's hostname, fixed task counts, the Solr index on
+the instance's root volume, Solr reached by IP, no shared file cache, no Redis
+auth token, and no EFS backups. Everything it does deploy carries forward
+unchanged; the README lists what phase 2 adds back.
+
 Following biofair-mc-infra's conventions, it differs from the sketch that was
 originally embedded here in these ways:
 

@@ -8,6 +8,12 @@ project's [README](../infra/biofair-mc-workflow-hub/README.md).
 
 Not yet deployed or previewed against AWS.
 
+These diagrams show the full design. The program currently deploys phase 1,
+which leaves out HTTPS and the public DNS record, front-end autoscaling (it
+runs a fixed number of containers), the Solr data volume and its snapshots,
+the private DNS zone, the shared file cache and the Redis auth token. See the
+project [README](../infra/biofair-mc-workflow-hub/README.md#phase-2).
+
 ## Services overview
 
 The services and how they connect. Services with a thick border run as

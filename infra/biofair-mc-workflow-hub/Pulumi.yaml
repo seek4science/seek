@@ -2,75 +2,38 @@ name: biofair-mc-workflow-hub
 runtime: yaml
 description: >-
   AWS infrastructure for the WorkflowHub (SEEK) component of the BioFAIR
-  Methods Commons Spoke, in the biofair-mc-workflow-hub account. Frontend and
-  workers run as ECS Fargate services, MySQL on RDS, Redis on ElastiCache,
-  filestore on EFS, Solr on its own EC2 instance with a persistent EBS volume.
-  Mirrors the service topology of seek4science/seek docker-compose.yml.
+  Methods Commons Spoke, in the biofair-mc-workflow-hub account. Phase 1:
+  front-end and workers on ECS Fargate, MySQL on RDS, Redis on ElastiCache,
+  filestore on EFS, and Solr on its own EC2 instance, served over HTTP at the
+  load balancer's own hostname.
 
-# Design decisions and open questions behind this program, referred to below
-# by section number ("handover 4.4"), are in docs/SEEK-pulumi-handover.md.
+# Design decisions, referred to below by section number ("handover 4.4"), are
+# in docs/SEEK-pulumi-handover.md. What phase 2 adds is listed in README.md.
 
-# ---------------------------------------------------------------------------
-# Configuration. Set per-stack in Pulumi.<stack>.yaml.
-# ---------------------------------------------------------------------------
 config:
   environment:
     type: string
-    description: >
-      Environment name (staging, production), used in resource names. One
-      stack per environment, as in biofair-mc-infra.
+    description: Environment name (staging, production), used in resource names.
   vpcCidr:
     type: string
-    description: CIDR block for the VPC, e.g. 10.30.0.0/16
   ssmInstanceProfileName:
     type: string
     default: ssm-instance-profile
-    description: >
-      Existing SSM-only instance profile for the Solr instance, looked up
-      rather than created, as in biofair-mc-infra's common package.
-  domainName:
-    type: string
-    description: Public hostname, e.g. workflowhub.example.ac.uk
-  certificateArn:
-    type: string
-    description: ACM certificate ARN in this region covering domainName
-  hostedZoneId:
-    type: string
-    description: Route 53 zone to create the A record in
+    description: Existing SSM-only instance profile, looked up rather than created.
   seekImage:
     type: string
     default: fairdom/seek:main
   solrImage:
     type: string
     default: fairdom/seek-solr:main
-    description: >
-      Built from solr/Dockerfile in the SEEK repo (handover 5.4). Use the
-      same tag as seekImage so the Solr configset matches the code.
+    description: Built from solr/Dockerfile; use the same tag as seekImage.
   webCount:
     type: integer
-    default: 2
-    description: >
-      Baseline number of frontend tasks. Use 1 for the very first deploy
-      against an empty database: each web task runs `rake db:setup` at boot
-      if the schema is missing, and several doing so at once race.
-  webCountMax:
-    type: integer
-    default: 8
+    default: 1
+    description: Keep at 1 until the schema exists (handover 4.4).
   workerCount:
     type: integer
     default: 1
-    description: >
-      Safe to raise if job throughput demands it. Solid Queue is safe across
-      several supervisors, and supercronic only reaps LibreOffice processes
-      inside its own container, so each task should run its own copy.
-  pumaWorkers:
-    type: string
-    default: "2"
-    description: >
-      Puma worker processes per web task (1 thread each, so this is the
-      task's request concurrency). Set explicitly because docker/puma.rb
-      otherwise uses the processor count, which on Fargate may reflect the
-      host rather than the task. Size against task memory on measurement.
   dbInstanceClass:
     type: string
     default: db.t4g.medium
@@ -83,48 +46,19 @@ config:
   solrInstanceType:
     type: string
     default: t3.medium
-    description: >
-      amd64 by default, since the derived Solr image may not have an arm64
-      build. Switch to t4g.medium for ~20% off if it is pushed multi-arch.
-  solrDataSizeGb:
-    type: integer
-    default: 100
-  dbName:
-    type: string
-    default: seek_production
-  dbUser:
-    type: string
-    default: seek
   dbPassword:
     type: string
     secret: true
-  redisAuthToken:
-    type: string
-    secret: true
 
-# ---------------------------------------------------------------------------
-# Shared values. This is the YAML equivalent of the `x-shared: seek_base_env`
-# anchor block in docker-compose.yml.
-# ---------------------------------------------------------------------------
 variables:
-  # Prefix for named resources, e.g. biofair-mc-workflow-hub-staging.
+  # e.g. biofair-mc-workflow-hub-staging
   namePrefix: ${pulumi.project}-${environment}
-
-  solrHost: solr.seek.internal
 
   ssmProfile:
     fn::invoke:
       function: aws:iam:getInstanceProfile
       arguments:
         name: ${ssmInstanceProfileName}
-
-  # The EBS volume and the instance must sit in the same AZ, so look up the AZ
-  # of the subnet the instance goes into rather than hardcoding one.
-  solrSubnet:
-    fn::invoke:
-      function: aws:ec2:getSubnet
-      arguments:
-        id: ${vpc.privateSubnetIds[0]}
 
   al2023:
     fn::invoke:
@@ -136,62 +70,31 @@ variables:
           - name: name
             values: ["al2023-ami-2023.*-x86_64"]
 
-  # The two services need almost the same environment but differ in a couple
-  # of variables, and Pulumi YAML cannot concatenate lists -- there is no
-  # equivalent of compose's `<<: *seek_base_env` plus additions for a
-  # sequence. So both lists are written out. This is the only real friction
-  # from staying in YAML, and is the first thing that would improve if this
-  # were ever converted to Python.
-  #
-  # Connection settings: MYSQL_* are read by docker/database.docker.mysql.yml
-  # and docker/shared_functions.sh; REDIS_HOST and REDIS_PASSWORD by
-  # Seek::RedisConfig (lib/seek/redis_config.rb), which fixes the port at
-  # 6379, so there is no REDIS_PORT. REDIS_TLS selects rediss://, which
-  # ElastiCache below requires; it needs a SEEK image that includes handover
-  # change 5.1.
-  webEnv:
+  # Shared by the web and worker containers. NO_ENTRYPOINT_WORKERS is only read
+  # by the web entrypoint and QUIET_SUPERCRONIC only by the workers, so one list
+  # serves both. REDIS_TLS needs a SEEK image with handover change 5.1.
+  seekEnv:
     - name: RAILS_ENV
       value: production
     - name: RAILS_LOG_LEVEL
       value: info
     - name: SOLR_HOST
-      value: ${solrHost}
+      value: ${solrInstance.privateIp}
     - name: SOLR_PORT
       value: "8983"
     - name: MYSQL_HOST
       value: ${db.address}
     - name: MYSQL_DATABASE
-      value: ${dbName}
+      value: seek_production
     - name: MYSQL_USER
-      value: ${dbUser}
+      value: seek
     - name: REDIS_HOST
       value: ${redis.primaryEndpointAddress}
     - name: REDIS_TLS
       value: "1"
     - name: PUMA_WORKERS_NUM
-      value: ${pumaWorkers}
-    # As in compose: the web tasks must not also spawn queue workers.
+      value: "2"
     - name: NO_ENTRYPOINT_WORKERS
-      value: "1"
-
-  workerEnv:
-    - name: RAILS_ENV
-      value: production
-    - name: RAILS_LOG_LEVEL
-      value: info
-    - name: SOLR_HOST
-      value: ${solrHost}
-    - name: SOLR_PORT
-      value: "8983"
-    - name: MYSQL_HOST
-      value: ${db.address}
-    - name: MYSQL_DATABASE
-      value: ${dbName}
-    - name: MYSQL_USER
-      value: ${dbUser}
-    - name: REDIS_HOST
-      value: ${redis.primaryEndpointAddress}
-    - name: REDIS_TLS
       value: "1"
     - name: QUIET_SUPERCRONIC
       value: "1"
@@ -199,20 +102,7 @@ variables:
   seekSecrets:
     - name: MYSQL_PASSWORD
       valueFrom: ${dbSecret.arn}
-    - name: REDIS_PASSWORD
-      valueFrom: ${redisSecret.arn}
 
-  # Two shared volumes, one EFS filesystem, an access point each.
-  #
-  # filestore is the obvious one: every web and worker task must see the same
-  # uploaded files.
-  #
-  # tmp/cache is shared too. It holds a small number of largish generated files
-  # (the size threshold is configurable) rather than the many-small-objects
-  # traffic that makes NFS painful, and most SEEK caching goes to Redis anyway.
-  # So the access pattern suits EFS elastic throughput well, and sharing it
-  # means an expensive generated file produced by one task can be served by
-  # any other rather than regenerated per task.
   appVolumes:
     - name: filestore
       efsVolumeConfiguration:
@@ -221,29 +111,15 @@ variables:
         authorizationConfig:
           accessPointId: ${filestoreAccessPoint.id}
           iam: ENABLED
-    - name: cache
-      efsVolumeConfiguration:
-        fileSystemId: ${sharedFs.id}
-        transitEncryption: ENABLED
-        authorizationConfig:
-          accessPointId: ${cacheAccessPoint.id}
-          iam: ENABLED
 
   appMounts:
     - sourceVolume: filestore
       containerPath: /seek/filestore
       readOnly: false
-    - sourceVolume: cache
-      containerPath: /seek/tmp/cache
-      readOnly: false
 
 resources:
   # -------------------------------------------------------------------------
-  # Networking
-  #
-  # awsx:ec2:Vpc is used deliberately. Pulumi YAML has no loops, so writing
-  # subnets, route tables and NAT gateways per AZ by hand would be ~20 near
-  # identical blocks. The component does the iteration internally.
+  # Networking: two AZs, public and private subnets, a single NAT gateway.
   # -------------------------------------------------------------------------
   vpc:
     type: awsx:ec2:Vpc
@@ -251,7 +127,7 @@ resources:
       cidrBlock: ${vpcCidr}
       numberOfAvailabilityZones: 2
       natGateways:
-        strategy: Single # Use OnePerAz for production HA; costs roughly 2x.
+        strategy: Single
       tags:
         Name: ${namePrefix}
 
@@ -262,10 +138,6 @@ resources:
       description: Public ingress to the load balancer
       ingress:
         - protocol: tcp
-          fromPort: 443
-          toPort: 443
-          cidrBlocks: ["0.0.0.0/0"]
-        - protocol: tcp
           fromPort: 80
           toPort: 80
           cidrBlocks: ["0.0.0.0/0"]
@@ -275,13 +147,12 @@ resources:
           toPort: 0
           cidrBlocks: ["0.0.0.0/0"]
 
-  # One SG for all application tasks (web, workers, solr). They need to reach
-  # each other, and the data stores admit this SG specifically.
+  # Web, workers and Solr. The data stores admit this group.
   appSg:
     type: aws:ec2:SecurityGroup
     properties:
       vpcId: ${vpc.vpcId}
-      description: SEEK application tasks
+      description: SEEK application tasks and Solr
       egress:
         - protocol: "-1"
           fromPort: 0
@@ -298,7 +169,6 @@ resources:
       fromPort: 3000
       toPort: 3000
 
-  # Solr is reached by web and workers on 8983, from within the same SG.
   appToSolr:
     type: aws:ec2:SecurityGroupRule
     properties:
@@ -313,7 +183,7 @@ resources:
     type: aws:ec2:SecurityGroup
     properties:
       vpcId: ${vpc.vpcId}
-      description: RDS, ElastiCache and EFS -- reachable only from app tasks
+      description: RDS, ElastiCache and EFS, reachable only from appSg
       ingress:
         - protocol: tcp
           fromPort: 3306
@@ -324,7 +194,7 @@ resources:
           toPort: 6379
           securityGroups: ["${appSg.id}"]
         - protocol: tcp
-          fromPort: 2049 # NFS for EFS
+          fromPort: 2049
           toPort: 2049
           securityGroups: ["${appSg.id}"]
       egress:
@@ -334,7 +204,7 @@ resources:
           cidrBlocks: ["0.0.0.0/0"]
 
   # -------------------------------------------------------------------------
-  # Secrets
+  # MySQL
   # -------------------------------------------------------------------------
   dbSecret:
     type: aws:secretsmanager:Secret
@@ -348,21 +218,6 @@ resources:
       secretId: ${dbSecret.id}
       secretString: ${dbPassword}
 
-  redisSecret:
-    type: aws:secretsmanager:Secret
-    properties:
-      name: ${namePrefix}/redis-auth-token
-      recoveryWindowInDays: 7
-
-  redisSecretValue:
-    type: aws:secretsmanager:SecretVersion
-    properties:
-      secretId: ${redisSecret.id}
-      secretString: ${redisAuthToken}
-
-  # -------------------------------------------------------------------------
-  # MySQL -- replaces the `db` service
-  # -------------------------------------------------------------------------
   dbSubnets:
     type: aws:rds:SubnetGroup
     properties:
@@ -372,16 +227,12 @@ resources:
     type: aws:rds:ParameterGroup
     properties:
       family: mysql8.4
-      # Matches the compose command flags on the mysql service.
       parameters:
         - name: character_set_server
           value: utf8mb4
         - name: collation_server
           value: utf8mb4_unicode_ci
-        # The SEEK image configures its mysql client with `skip-ssl`, so the
-        # entrypoint's readiness checks cannot connect if TLS is required
-        # (handover 4.1). RDS is reachable only from appSg in private subnets.
-        # Drop this if SEEK change 5.2 lands.
+        # The image's mysql client uses skip-ssl (handover 4.1).
         - name: require_secure_transport
           value: "0"
 
@@ -392,39 +243,30 @@ resources:
       engineVersion: "8.4"
       instanceClass: ${dbInstanceClass}
       allocatedStorage: ${dbAllocatedStorage}
-      maxAllocatedStorage: 500 # storage autoscaling
-      dbName: ${dbName}
-      username: ${dbUser}
+      maxAllocatedStorage: 500
+      dbName: seek_production
+      username: seek
       password: ${dbPassword}
       dbSubnetGroupName: ${dbSubnets.name}
       vpcSecurityGroupIds: ["${dataSg.id}"]
       parameterGroupName: ${dbParams.name}
       storageEncrypted: true
-      multiAz: false # true for production HA
       backupRetentionPeriod: 14
       deletionProtection: true
       skipFinalSnapshot: false
       finalSnapshotIdentifier: ${namePrefix}-final
-      applyImmediately: false
 
   # -------------------------------------------------------------------------
-  # Redis -- replaces the `redis_store` service
-  #
-  # Cache, sessions and Rack::Attack throttle counters. SEEK uses Solid
-  # Queue, so the job queue lives in MySQL and nothing here is durable
-  # application data; losing it logs users out but loses nothing. The
-  # `appendonly yes` in the compose file is therefore not worth reproducing,
-  # and ElastiCache's snapshot-based durability is sufficient. allkeys-lru is
-  # carried over from compose; size the node so it does not evict sessions.
-  #
-  # transitEncryptionEnabled means TLS-only connections; SEEK connects over
-  # TLS when REDIS_TLS is set (handover change 5.1).
+  # Redis: cache, sessions and throttle counters; no durable data (handover
+  # 3.4). TLS-only, without an auth token.
   # -------------------------------------------------------------------------
   redisSubnets:
     type: aws:elasticache:SubnetGroup
     properties:
       subnetIds: ${vpc.privateSubnetIds}
 
+  # As in compose. The default policy only evicts keys with an expiry, and
+  # SEEK's cache entries mostly have none.
   redisParams:
     type: aws:elasticache:ParameterGroup
     properties:
@@ -436,39 +278,26 @@ resources:
   redis:
     type: aws:elasticache:ReplicationGroup
     properties:
-      description: SEEK Rails cache
+      description: SEEK cache and sessions
       engine: redis
       engineVersion: "7.1"
       nodeType: ${redisNodeType}
-      numCacheClusters: 1 # 2 with automaticFailoverEnabled for HA
+      numCacheClusters: 1
       port: 6379
       parameterGroupName: ${redisParams.name}
       subnetGroupName: ${redisSubnets.name}
       securityGroupIds: ["${dataSg.id}"]
       atRestEncryptionEnabled: true
       transitEncryptionEnabled: true
-      authToken: ${redisAuthToken}
-      snapshotRetentionLimit: 7
 
   # -------------------------------------------------------------------------
-  # EFS -- replaces the `seek-filestore` and `seek-cache` external volumes
-  #
-  # One filesystem, two access points. Sharing a filesystem means a single
-  # throughput pool and a single backup policy; the access points keep the two
-  # trees separate and independently owned.
-  #
-  # This is the only place the lack of loops in Pulumi YAML actually shows:
-  # one mount target per AZ, written out longhand. With two AZs that is two
-  # blocks. Add a third if you raise numberOfAvailabilityZones above.
+  # EFS: the shared filestore. One mount target per AZ.
   # -------------------------------------------------------------------------
   sharedFs:
     type: aws:efs:FileSystem
     properties:
       encrypted: true
-      throughputMode: elastic # avoids the burst-credit cliff
-      lifecyclePolicies:
-        - transitionToIa: AFTER_60_DAYS
-        - transitionToPrimaryStorageClass: AFTER_1_ACCESS
+      throughputMode: elastic
       tags:
         Name: ${namePrefix}-shared
 
@@ -486,10 +315,7 @@ resources:
       subnetId: ${vpc.privateSubnetIds[1]}
       securityGroups: ["${dataSg.id}"]
 
-  # The access point pins ownership. Get the uid/gid wrong and SEEK starts
-  # cleanly then silently fails to write uploads, which is the single most
-  # common way this setup breaks. The fairdom/seek image runs as www-data,
-  # uid/gid 33 in its Debian base image (handover 4.2).
+  # The image runs as www-data, uid/gid 33 (handover 4.2).
   filestoreAccessPoint:
     type: aws:efs:AccessPoint
     properties:
@@ -504,31 +330,46 @@ resources:
           ownerGid: 33
           permissions: "0755"
 
-  # Cache files are regenerable, so no lifecycle transition to IA here -- an
-  # IA read incurs a retrieval charge, and these get re-read while warm.
-  cacheAccessPoint:
-    type: aws:efs:AccessPoint
+  # -------------------------------------------------------------------------
+  # Solr: the derived image on an EC2 instance, index on the root volume. A
+  # replaced instance means a reindex (handover 3.6).
+  # -------------------------------------------------------------------------
+  solrInstance:
+    type: aws:ec2:Instance
     properties:
-      fileSystemId: ${sharedFs.id}
-      posixUser:
-        uid: 33
-        gid: 33
-      rootDirectory:
-        path: /cache
-        creationInfo:
-          ownerUid: 33
-          ownerGid: 33
-          permissions: "0755"
-
-  efsBackup:
-    type: aws:efs:BackupPolicy
-    properties:
-      fileSystemId: ${sharedFs.id}
-      backupPolicy:
-        status: ENABLED
+      ami: ${al2023.id}
+      instanceType: ${solrInstanceType}
+      subnetId: ${vpc.privateSubnetIds[0]}
+      vpcSecurityGroupIds: ["${appSg.id}"]
+      iamInstanceProfile: ${ssmProfile.name}
+      rootBlockDevice:
+        volumeSize: 50
+        volumeType: gp3
+        encrypted: true
+      tags:
+        Name: ${namePrefix}-solr
+      userData: |
+        #!/bin/bash
+        set -euo pipefail
+        dnf install -y docker
+        systemctl enable --now docker
+        mkdir -p /var/solr
+        chown 8983:8983 /var/solr
+        docker run -d --restart always --name solr \
+          -p 8983:8983 \
+          -v /var/solr:/var/solr \
+          -e SOLR_JAVA_MEM="-Xms512m -Xmx1024m" \
+          ${solrImage}
+    options:
+      # The AMI lookup returns the newest image, which would otherwise replace
+      # the instance, and with it the index, whenever Amazon publishes one.
+      ignoreChanges: ["ami"]
 
   # -------------------------------------------------------------------------
-  # Cluster, service discovery, load balancer
+  # ECS: cluster, load balancer, web and worker services.
+  #
+  # awsx:ecs:FargateService creates a task execution role and a task role per
+  # service, which the Developer permission set may not allow; see README.md.
   # -------------------------------------------------------------------------
   cluster:
     type: aws:ecs:Cluster
@@ -538,43 +379,14 @@ resources:
         - name: containerInsights
           value: enabled
 
-  # Solr now runs on a fixed instance rather than a task, so a plain private
-  # hosted zone replaces Cloud Map -- there is nothing dynamic left to register.
-  internalZone:
-    type: aws:route53:Zone
-    properties:
-      name: seek.internal
-      comment: Internal name resolution for the SEEK stack
-      vpcs:
-        - vpcId: ${vpc.vpcId}
-
-  solrRecord:
-    type: aws:route53:Record
-    properties:
-      zoneId: ${internalZone.zoneId}
-      name: ${solrHost}
-      type: A
-      ttl: 60
-      records:
-        - ${solrInstance.privateIp}
-
   alb:
     type: awsx:lb:ApplicationLoadBalancer
     properties:
       subnetIds: ${vpc.publicSubnetIds}
       securityGroups: ["${albSg.id}"]
-      listeners:
-        - port: 80
-          protocol: HTTP
-          defaultActions:
-            - type: redirect
-              redirect:
-                port: "443"
-                protocol: HTTPS
-                statusCode: HTTP_301
-        - port: 443
-          protocol: HTTPS
-          certificateArn: ${certificateArn}
+      listener:
+        port: 80
+        protocol: HTTP
       defaultTargetGroup:
         port: 3000
         protocol: HTTP
@@ -582,154 +394,13 @@ resources:
         vpcId: ${vpc.vpcId}
         deregistrationDelay: 30
         healthCheck:
-          path: /up # the healthcheck endpoint used in docker-compose.yml
+          path: /up
           interval: 30
           timeout: 5
           healthyThreshold: 2
           unhealthyThreshold: 5
           matcher: "200"
-      # Sticky sessions are usually unnecessary for Rails with a shared session
-      # store, but enable here if SEEK turns out to keep per-instance state.
-      # defaultTargetGroup.stickiness: { type: lb_cookie, enabled: true }
 
-  dnsRecord:
-    type: aws:route53:Record
-    properties:
-      zoneId: ${hostedZoneId}
-      name: ${domainName}
-      type: A
-      aliases:
-        - name: ${alb.loadBalancer.dnsName}
-          zoneId: ${alb.loadBalancer.zoneId}
-          evaluateTargetHealth: true
-
-  # -------------------------------------------------------------------------
-  # Solr -- replaces the `solr` service
-  #
-  # NOT a Fargate task. An ECS-managed EBS volume is created and destroyed with
-  # the task, so every deploy would hand Solr an empty disk and trigger a full
-  # reindex. That reindex grows with the corpus, so the index has to outlive
-  # both the container and the instance.
-  #
-  # Hence: a standalone EBS volume, attached to a dedicated instance. The volume
-  # is a separate resource from the instance, so replacing the instance
-  # reattaches the same disk rather than starting from nothing. Snapshots via
-  # DLM below give a restore path if the volume itself is lost.
-  #
-  # The compose file bind-mounts ./solr/seek/conf from the repo; off a single
-  # host it is baked into a derived image (solr/Dockerfile) that solrImage
-  # points at. The image creates the core on first start and refreshes its
-  # conf from the configset on every later start, so a new image tag carries
-  # configuration changes onto the existing volume.
-  # -------------------------------------------------------------------------
-  solrData:
-    type: aws:ebs:Volume
-    properties:
-      availabilityZone: ${solrSubnet.availabilityZone}
-      size: ${solrDataSizeGb}
-      type: gp3
-      encrypted: true
-      tags:
-        Name: ${namePrefix}-solr-data
-        Snapshot: ${namePrefix}-solr
-    options:
-      protect: true
-
-  solrInstance:
-    type: aws:ec2:Instance
-    properties:
-      ami: ${al2023.id}
-      instanceType: ${solrInstanceType}
-      subnetId: ${vpc.privateSubnetIds[0]}
-      vpcSecurityGroupIds: ["${appSg.id}"]
-      # SSM access only; the instance needs no other AWS API access. Pulling
-      # the Solr image from Docker Hub goes via the NAT gateway.
-      iamInstanceProfile: ${ssmProfile.name}
-      tags:
-        Name: ${namePrefix}-solr
-      userData: |
-        #!/bin/bash
-        set -euo pipefail
-        dnf install -y docker
-        systemctl enable --now docker
-
-        DEV=/dev/nvme1n1
-        for i in $(seq 1 60); do [ -b "$DEV" ] && break; sleep 2; done
-
-        if ! blkid "$DEV"; then mkfs.ext4 -m0 "$DEV"; fi
-        mkdir -p /var/solr
-        grep -q "$DEV" /etc/fstab || echo "$DEV /var/solr ext4 defaults,nofail 0 2" >> /etc/fstab
-        mount -a
-        chown -R 8983:8983 /var/solr
-
-        docker run -d --restart always --name solr \
-          -p 8983:8983 \
-          -v /var/solr:/var/solr \
-          -e SOLR_JAVA_MEM="-Xms512m -Xmx1024m" \
-          ${solrImage}
-
-  solrAttach:
-    type: aws:ec2:VolumeAttachment
-    properties:
-      deviceName: /dev/sdf
-      volumeId: ${solrData.id}
-      instanceId: ${solrInstance.id}
-      # Do not let Pulumi yank the disk out from under a running Solr.
-      stopInstanceBeforeDetaching: true
-
-  # Nightly snapshots of the index volume. The index is technically derivable
-  # from MySQL, but a reindex is slow enough that restoring a snapshot is the
-  # faster recovery path.
-  #
-  # Creates an IAM role, which the Developer permission set may not allow;
-  # see README.md, "Open questions".
-  dlmRole:
-    type: aws:iam:Role
-    properties:
-      assumeRolePolicy: |
-        {
-          "Version": "2012-10-17",
-          "Statement": [{
-            "Effect": "Allow",
-            "Principal": { "Service": "dlm.amazonaws.com" },
-            "Action": "sts:AssumeRole"
-          }]
-        }
-      managedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSDataLifecycleManagerServiceRole
-
-  solrSnapshots:
-    type: aws:dlm:LifecyclePolicy
-    properties:
-      description: Nightly snapshots of the SEEK Solr index
-      executionRoleArn: ${dlmRole.arn}
-      state: ENABLED
-      policyDetails:
-        resourceTypes: ["VOLUME"]
-        targetTags:
-          Snapshot: ${namePrefix}-solr
-        schedules:
-          - name: nightly
-            createRule:
-              interval: 24
-              intervalUnit: HOURS
-              times: ["03:00"]
-            retainRule:
-              count: 7
-            copyTags: true
-
-  # -------------------------------------------------------------------------
-  # SEEK frontend -- replaces the `seek` service
-  #
-  # This is where horizontal scaling lives. desiredCount is just a number;
-  # going from 2 tasks to 8 is a config change, not more infrastructure.
-  # NO_ENTRYPOINT_WORKERS mirrors the compose setting so the web tasks do not
-  # also spawn job workers.
-  #
-  # awsx:ecs:FargateService creates a task execution role and a task role for
-  # each service when none are passed in, which the Developer permission set
-  # may not allow; see README.md, "Open questions".
-  # -------------------------------------------------------------------------
   web:
     type: awsx:ecs:FargateService
     properties:
@@ -751,24 +422,16 @@ resources:
             portMappings:
               - containerPort: 3000
                 targetGroup: ${alb.defaultTargetGroup}
-            environment: ${webEnv}
+            environment: ${seekEnv}
             secrets: ${seekSecrets}
             mountPoints: ${appMounts}
             healthCheck:
-              command:
-                ["CMD-SHELL", "curl -f http://localhost:3000/up || exit 1"]
+              command: ["CMD-SHELL", "curl -f http://localhost:3000/up || exit 1"]
               interval: 30
               timeout: 5
               retries: 5
               startPeriod: 60
 
-  # -------------------------------------------------------------------------
-  # Solid Queue workers -- replaces the `seek_workers` service
-  #
-  # No target group, no ingress. Jobs live in the same database as the rest of
-  # the application, so queue state is covered by RDS backups and PITR along
-  # with everything else. Can be scaled via workerCount (handover 3.5).
-  # -------------------------------------------------------------------------
   workers:
     type: awsx:ecs:FargateService
     properties:
@@ -787,7 +450,7 @@ resources:
             image: ${seekImage}
             essential: true
             command: ["docker/start_workers.sh"]
-            environment: ${workerEnv}
+            environment: ${seekEnv}
             secrets: ${seekSecrets}
             mountPoints: ${appMounts}
             healthCheck:
@@ -797,34 +460,8 @@ resources:
               retries: 5
               startPeriod: 60
 
-  # -------------------------------------------------------------------------
-  # Autoscaling for the frontend
-  # -------------------------------------------------------------------------
-  webScaleTarget:
-    type: aws:appautoscaling:Target
-    properties:
-      serviceNamespace: ecs
-      scalableDimension: ecs:service:DesiredCount
-      resourceId: service/${cluster.name}/${web.service.name}
-      minCapacity: ${webCount}
-      maxCapacity: ${webCountMax}
-
-  webScalePolicy:
-    type: aws:appautoscaling:Policy
-    properties:
-      policyType: TargetTrackingScaling
-      serviceNamespace: ${webScaleTarget.serviceNamespace}
-      scalableDimension: ${webScaleTarget.scalableDimension}
-      resourceId: ${webScaleTarget.resourceId}
-      targetTrackingScalingPolicyConfiguration:
-        targetValue: 65
-        predefinedMetricSpecification:
-          predefinedMetricType: ECSServiceAverageCPUUtilization
-        scaleInCooldown: 300
-        scaleOutCooldown: 60
-
 outputs:
-  url: https://${domainName}
+  url: http://${alb.loadBalancer.dnsName}
   databaseEndpoint: ${db.address}
   redisEndpoint: ${redis.primaryEndpointAddress}
   sharedFsId: ${sharedFs.id}
