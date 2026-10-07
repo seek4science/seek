@@ -11,26 +11,26 @@ description: >-
 # in docs/SEEK-pulumi-handover.md. What phase 2 adds is listed in README.md.
 
 config:
+  # Environment name (staging, production), used in resource names.
   environment:
     type: string
-    description: Environment name (staging, production), used in resource names.
   vpcCidr:
     type: string
+  # Existing SSM-only instance profile, looked up rather than created.
   ssmInstanceProfileName:
     type: string
     default: ssm-instance-profile
-    description: Existing SSM-only instance profile, looked up rather than created.
   seekImage:
     type: string
     default: fairdom/seek:main
+  # Built from solr/Dockerfile; use the same tag as seekImage.
   solrImage:
     type: string
     default: fairdom/seek-solr:main
-    description: Built from solr/Dockerfile; use the same tag as seekImage.
+  # Keep at 1 until the schema exists (handover 4.4).
   webCount:
     type: integer
     default: 1
-    description: Keep at 1 until the schema exists (handover 4.4).
   workerCount:
     type: integer
     default: 1
@@ -134,6 +134,7 @@ resources:
   albSg:
     type: aws:ec2:SecurityGroup
     properties:
+      name: ${namePrefix}-alb-sg
       vpcId: ${vpc.vpcId}
       description: Public ingress to the load balancer
       ingress:
@@ -151,6 +152,7 @@ resources:
   appSg:
     type: aws:ec2:SecurityGroup
     properties:
+      name: ${namePrefix}-app-sg
       vpcId: ${vpc.vpcId}
       description: SEEK application tasks and Solr
       egress:
@@ -182,6 +184,7 @@ resources:
   dataSg:
     type: aws:ec2:SecurityGroup
     properties:
+      name: ${namePrefix}-data-sg
       vpcId: ${vpc.vpcId}
       description: RDS, ElastiCache and EFS, reachable only from appSg
       ingress:
@@ -221,11 +224,13 @@ resources:
   dbSubnets:
     type: aws:rds:SubnetGroup
     properties:
+      name: ${namePrefix}-db-subnets
       subnetIds: ${vpc.privateSubnetIds}
 
   dbParams:
     type: aws:rds:ParameterGroup
     properties:
+      name: ${namePrefix}-db-params
       family: mysql8.4
       parameters:
         - name: character_set_server
@@ -263,6 +268,7 @@ resources:
   redisSubnets:
     type: aws:elasticache:SubnetGroup
     properties:
+      name: ${namePrefix}-redis-subnets
       subnetIds: ${vpc.privateSubnetIds}
 
   # As in compose. The default policy only evicts keys with an expiry, and
@@ -270,6 +276,7 @@ resources:
   redisParams:
     type: aws:elasticache:ParameterGroup
     properties:
+      name: ${namePrefix}-redis-params
       family: redis7
       parameters:
         - name: maxmemory-policy
@@ -371,6 +378,40 @@ resources:
   # awsx:ecs:FargateService creates a task execution role and a task role per
   # service, which the Developer permission set may not allow; see README.md.
   # -------------------------------------------------------------------------
+  # Execution role shared by both services: the standard ECS policy (image
+  # pulls, logs) plus reading the database password from Secrets Manager,
+  # which the standard policy does not cover.
+  executionRole:
+    type: aws:iam:Role
+    properties:
+      name: ${namePrefix}-ecs-execution
+      assumeRolePolicy:
+        fn::toJSON:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: ecs-tasks.amazonaws.com
+              Action: sts:AssumeRole
+
+  executionRolePolicy:
+    type: aws:iam:RolePolicyAttachment
+    properties:
+      role: ${executionRole.name}
+      policyArn: arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  executionRoleSecrets:
+    type: aws:iam:RolePolicy
+    properties:
+      role: ${executionRole.name}
+      policy:
+        fn::toJSON:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: secretsmanager:GetSecretValue
+              Resource: ${dbSecret.arn}
+
   cluster:
     type: aws:ecs:Cluster
     properties:
@@ -412,6 +453,8 @@ resources:
       taskDefinitionArgs:
         cpu: "1024"
         memory: "2048"
+        executionRole:
+          roleArn: ${executionRole.arn}
         volumes: ${appVolumes}
         containers:
           seek:
@@ -443,6 +486,8 @@ resources:
       taskDefinitionArgs:
         cpu: "1024"
         memory: "2048"
+        executionRole:
+          roleArn: ${executionRole.arn}
         volumes: ${appVolumes}
         containers:
           seek-workers:
