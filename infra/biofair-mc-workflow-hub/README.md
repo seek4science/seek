@@ -267,7 +267,10 @@ aws rds stop-db-instance --db-instance-identifier "$DB"
 ```
 
 ```console
-# Resume: start the database and Solr, wait, then restore the groups
+# Resume: start the database and Solr, wait, then restore the groups.
+# A database still stopping after a pause cannot be started yet.
+until [ "$(aws rds describe-db-instances --db-instance-identifier "$DB" \
+  --query 'DBInstances[0].DBInstanceStatus' --output text)" = stopped ]; do sleep 15; done
 aws rds start-db-instance --db-instance-identifier "$DB"
 aws ec2 start-instances --instance-ids "$SOLR"
 aws rds wait db-instance-available --db-instance-identifier "$DB"
