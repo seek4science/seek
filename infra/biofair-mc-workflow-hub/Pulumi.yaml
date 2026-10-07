@@ -3,9 +3,10 @@ runtime: yaml
 description: >-
   AWS infrastructure for the WorkflowHub (SEEK) component of the BioFAIR
   Methods Commons Spoke, in the biofair-mc-workflow-hub account. Phase 1:
-  front-end and workers on ECS Fargate, MySQL on RDS, Redis on ElastiCache,
-  filestore on EFS, and Solr on its own EC2 instance, served over HTTP at the
-  load balancer's own hostname.
+  front-end and workers as Docker containers on EC2 Auto Scaling groups,
+  MySQL on RDS, Redis on ElastiCache, filestore on EFS, and Solr on its own
+  EC2 instance, served over HTTP at the load balancer's own hostname. Creates
+  no IAM resources.
 
 # Design decisions, referred to below by section number ("handover 4.4"), are
 # in docs/SEEK-pulumi-handover.md. What phase 2 adds is listed in README.md.
@@ -34,6 +35,12 @@ config:
   workerCount:
     type: integer
     default: 1
+  webInstanceType:
+    type: string
+    default: t3.large
+  workerInstanceType:
+    type: string
+    default: t3.large
   dbInstanceClass:
     type: string
     default: db.t4g.medium
@@ -70,52 +77,45 @@ variables:
           - name: name
             values: ["al2023-ami-2023.*-x86_64"]
 
-  # Shared by the web and worker containers. NO_ENTRYPOINT_WORKERS is only read
-  # by the web entrypoint and QUIET_SUPERCRONIC only by the workers, so one list
-  # serves both. REDIS_TLS needs a SEEK image with handover change 5.1.
-  seekEnv:
-    - name: RAILS_ENV
-      value: production
-    - name: RAILS_LOG_LEVEL
-      value: info
-    - name: SOLR_HOST
-      value: ${solrInstance.privateIp}
-    - name: SOLR_PORT
-      value: "8983"
-    - name: MYSQL_HOST
-      value: ${db.address}
-    - name: MYSQL_DATABASE
-      value: seek_production
-    - name: MYSQL_USER
-      value: seek
-    - name: REDIS_HOST
-      value: ${redis.primaryEndpointAddress}
-    - name: REDIS_TLS
-      value: "1"
-    - name: PUMA_WORKERS_NUM
-      value: "2"
-    - name: NO_ENTRYPOINT_WORKERS
-      value: "1"
-    - name: QUIET_SUPERCRONIC
-      value: "1"
+  # First half of the web and worker instances' user data: install Docker,
+  # mount the filestore, and write the container environment. Each launch
+  # template appends its own `docker run`. NO_ENTRYPOINT_WORKERS is only read
+  # by the web entrypoint and QUIET_SUPERCRONIC only by the workers, so one
+  # environment serves both. REDIS_TLS needs a SEEK image with handover
+  # change 5.1.
+  hostSetup: |
+    #!/bin/bash
+    set -euo pipefail
+    dnf install -y docker amazon-efs-utils
+    systemctl enable --now docker
 
-  seekSecrets:
-    - name: MYSQL_PASSWORD
-      valueFrom: ${dbSecret.arn}
+    # Through the access point, so files are owned by www-data (uid 33), as
+    # the container expects (handover 4.2).
+    mkdir -p /mnt/filestore
+    echo "${sharedFs.id}:/ /mnt/filestore efs _netdev,tls,accesspoint=${filestoreAccessPoint.id} 0 0" >> /etc/fstab
+    mount /mnt/filestore
 
-  appVolumes:
-    - name: filestore
-      efsVolumeConfiguration:
-        fileSystemId: ${sharedFs.id}
-        transitEncryption: ENABLED
-        authorizationConfig:
-          accessPointId: ${filestoreAccessPoint.id}
-          iam: ENABLED
+    # The SSM instance role can read Parameter Store.
+    TOKEN=$(curl -sX PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+    REGION=$(curl -sH "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
+    DB_PASSWORD=$(aws ssm get-parameter --region "$REGION" --name ${dbPasswordParam.name} --with-decryption --query Parameter.Value --output text)
 
-  appMounts:
-    - sourceVolume: filestore
-      containerPath: /seek/filestore
-      readOnly: false
+    install -m 600 /dev/null /etc/seek.env
+    cat > /etc/seek.env <<EOF
+    RAILS_ENV=production
+    RAILS_LOG_LEVEL=info
+    SOLR_HOST=${solrInstance.privateIp}
+    SOLR_PORT=8983
+    MYSQL_HOST=${db.address}
+    MYSQL_DATABASE=seek_production
+    MYSQL_USER=seek
+    MYSQL_PASSWORD=$DB_PASSWORD
+    REDIS_HOST=${redis.primaryEndpointAddress}
+    REDIS_TLS=1
+    PUMA_WORKERS_NUM=2
+    NO_ENTRYPOINT_WORKERS=1
+    QUIET_SUPERCRONIC=1
+    EOF
 
 resources:
   # -------------------------------------------------------------------------
@@ -209,17 +209,13 @@ resources:
   # -------------------------------------------------------------------------
   # MySQL
   # -------------------------------------------------------------------------
-  dbSecret:
-    type: aws:secretsmanager:Secret
+  # Read at boot by the web and worker instances.
+  dbPasswordParam:
+    type: aws:ssm:Parameter
     properties:
-      name: ${namePrefix}/db-password
-      recoveryWindowInDays: 7
-
-  dbSecretValue:
-    type: aws:secretsmanager:SecretVersion
-    properties:
-      secretId: ${dbSecret.id}
-      secretString: ${dbPassword}
+      name: /${namePrefix}/db-password
+      type: SecureString
+      value: ${dbPassword}
 
   dbSubnets:
     type: aws:rds:SubnetGroup
@@ -373,53 +369,13 @@ resources:
       ignoreChanges: ["ami"]
 
   # -------------------------------------------------------------------------
-  # ECS: cluster, load balancer, web and worker services.
+  # Load balancer, and the web and worker Auto Scaling groups. The instances
+  # use the existing SSM instance profile.
   #
-  # awsx:ecs:FargateService creates a task execution role and a task role per
-  # service, which the Developer permission set may not allow; see README.md.
+  # A change to a launch template, including a new AMI from the lookup above,
+  # rolls the group's instances: each new one boots and pulls the image
+  # before the old one is terminated.
   # -------------------------------------------------------------------------
-  # Execution role shared by both services: the standard ECS policy (image
-  # pulls, logs) plus reading the database password from Secrets Manager,
-  # which the standard policy does not cover.
-  executionRole:
-    type: aws:iam:Role
-    properties:
-      name: ${namePrefix}-ecs-execution
-      assumeRolePolicy:
-        fn::toJSON:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service: ecs-tasks.amazonaws.com
-              Action: sts:AssumeRole
-
-  executionRolePolicy:
-    type: aws:iam:RolePolicyAttachment
-    properties:
-      role: ${executionRole.name}
-      policyArn: arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-
-  executionRoleSecrets:
-    type: aws:iam:RolePolicy
-    properties:
-      role: ${executionRole.name}
-      policy:
-        fn::toJSON:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action: secretsmanager:GetSecretValue
-              Resource: ${dbSecret.arn}
-
-  cluster:
-    type: aws:ecs:Cluster
-    properties:
-      name: ${namePrefix}
-      settings:
-        - name: containerInsights
-          value: enabled
-
   alb:
     type: awsx:lb:ApplicationLoadBalancer
     properties:
@@ -431,7 +387,7 @@ resources:
       defaultTargetGroup:
         port: 3000
         protocol: HTTP
-        targetType: ip
+        targetType: instance
         vpcId: ${vpc.vpcId}
         deregistrationDelay: 30
         healthCheck:
@@ -442,73 +398,118 @@ resources:
           unhealthyThreshold: 5
           matcher: "200"
 
-  web:
-    type: awsx:ecs:FargateService
+  webLaunchTemplate:
+    type: aws:ec2:LaunchTemplate
     properties:
-      cluster: ${cluster.arn}
-      desiredCount: ${webCount}
-      networkConfiguration:
-        subnets: ${vpc.privateSubnetIds}
-        securityGroups: ["${appSg.id}"]
-      taskDefinitionArgs:
-        cpu: "1024"
-        memory: "2048"
-        executionRole:
-          roleArn: ${executionRole.arn}
-        volumes: ${appVolumes}
-        containers:
-          seek:
-            name: seek
-            image: ${seekImage}
-            essential: true
-            command: ["docker/entrypoint.sh"]
-            portMappings:
-              - containerPort: 3000
-                targetGroup: ${alb.defaultTargetGroup}
-            environment: ${seekEnv}
-            secrets: ${seekSecrets}
-            mountPoints: ${appMounts}
-            healthCheck:
-              command: ["CMD-SHELL", "curl -f http://localhost:3000/up || exit 1"]
-              interval: 30
-              timeout: 5
-              retries: 5
-              startPeriod: 60
+      namePrefix: ${namePrefix}-web-
+      imageId: ${al2023.id}
+      instanceType: ${webInstanceType}
+      iamInstanceProfile:
+        arn: ${ssmProfile.arn}
+      vpcSecurityGroupIds: ["${appSg.id}"]
+      blockDeviceMappings:
+        - deviceName: /dev/xvda
+          ebs:
+            volumeSize: 30
+            volumeType: gp3
+            encrypted: "true"
+            deleteOnTermination: "true"
+      metadataOptions:
+        httpTokens: required
+      tagSpecifications:
+        - resourceType: instance
+          tags:
+            Name: ${namePrefix}-web
+            Environment: ${environment}
+            ManagedBy: pulumi
+      userData:
+        fn::toBase64:
+          fn::join:
+            - ""
+            - - ${hostSetup}
+              - |
+                docker run -d --restart always --name seek --env-file /etc/seek.env \
+                  -p 3000:3000 -v /mnt/filestore:/seek/filestore \
+                  ${seekImage} docker/entrypoint.sh
 
-  workers:
-    type: awsx:ecs:FargateService
+  webGroup:
+    type: aws:autoscaling:Group
     properties:
-      cluster: ${cluster.arn}
-      desiredCount: ${workerCount}
-      networkConfiguration:
-        subnets: ${vpc.privateSubnetIds}
-        securityGroups: ["${appSg.id}"]
-      taskDefinitionArgs:
-        cpu: "1024"
-        memory: "2048"
-        executionRole:
-          roleArn: ${executionRole.arn}
-        volumes: ${appVolumes}
-        containers:
-          seek-workers:
-            name: seek-workers
-            image: ${seekImage}
-            essential: true
-            command: ["docker/start_workers.sh"]
-            environment: ${seekEnv}
-            secrets: ${seekSecrets}
-            mountPoints: ${appMounts}
-            healthCheck:
-              command: ["CMD", "bash", "script/check_worker_pids.sh"]
-              interval: 30
-              timeout: 10
-              retries: 5
-              startPeriod: 60
+      name: ${namePrefix}-web
+      minSize: ${webCount}
+      maxSize: ${webCount}
+      desiredCapacity: ${webCount}
+      vpcZoneIdentifiers: ${vpc.privateSubnetIds}
+      targetGroupArns: ["${alb.defaultTargetGroup.arn}"]
+      # SEEK's first boot creates the database, which takes a while.
+      healthCheckType: ELB
+      healthCheckGracePeriod: 900
+      launchTemplate:
+        id: ${webLaunchTemplate.id}
+        version: ${webLaunchTemplate.latestVersion}
+      instanceRefresh:
+        strategy: Rolling
+        preferences:
+          minHealthyPercentage: 100
+          maxHealthyPercentage: 200
+
+  workerLaunchTemplate:
+    type: aws:ec2:LaunchTemplate
+    properties:
+      namePrefix: ${namePrefix}-worker-
+      imageId: ${al2023.id}
+      instanceType: ${workerInstanceType}
+      iamInstanceProfile:
+        arn: ${ssmProfile.arn}
+      vpcSecurityGroupIds: ["${appSg.id}"]
+      blockDeviceMappings:
+        - deviceName: /dev/xvda
+          ebs:
+            volumeSize: 30
+            volumeType: gp3
+            encrypted: "true"
+            deleteOnTermination: "true"
+      metadataOptions:
+        httpTokens: required
+      tagSpecifications:
+        - resourceType: instance
+          tags:
+            Name: ${namePrefix}-worker
+            Environment: ${environment}
+            ManagedBy: pulumi
+      userData:
+        fn::toBase64:
+          fn::join:
+            - ""
+            - - ${hostSetup}
+              - |
+                docker run -d --restart always --name seek-workers --env-file /etc/seek.env \
+                  -v /mnt/filestore:/seek/filestore \
+                  ${seekImage} docker/start_workers.sh
+
+  workerGroup:
+    type: aws:autoscaling:Group
+    properties:
+      name: ${namePrefix}-worker
+      minSize: ${workerCount}
+      maxSize: ${workerCount}
+      desiredCapacity: ${workerCount}
+      vpcZoneIdentifiers: ${vpc.privateSubnetIds}
+      healthCheckType: EC2
+      launchTemplate:
+        id: ${workerLaunchTemplate.id}
+        version: ${workerLaunchTemplate.latestVersion}
+      instanceRefresh:
+        strategy: Rolling
+        preferences:
+          minHealthyPercentage: 100
+          maxHealthyPercentage: 200
 
 outputs:
   url: http://${alb.loadBalancer.dnsName}
   databaseEndpoint: ${db.address}
   redisEndpoint: ${redis.primaryEndpointAddress}
   sharedFsId: ${sharedFs.id}
-  clusterName: ${cluster.name}
+  webGroupName: ${webGroup.name}
+  workerGroupName: ${workerGroup.name}
   solrPrivateIp: ${solrInstance.privateIp}
