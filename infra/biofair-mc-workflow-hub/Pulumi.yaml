@@ -47,6 +47,14 @@ config:
   dbAllocatedStorage:
     type: integer
     default: 100
+  # Protect the database from deletion, and snapshot it when it is deleted.
+  # Turn both off for throwaway trials so `pulumi destroy` completes.
+  dbDeletionProtection:
+    type: boolean
+    default: true
+  dbSkipFinalSnapshot:
+    type: boolean
+    default: false
   redisNodeType:
     type: string
     default: cache.t4g.small
@@ -125,6 +133,8 @@ resources:
     type: awsx:ec2:Vpc
     properties:
       cidrBlock: ${vpcCidr}
+      # EFS mount names only resolve with DNS hostnames enabled.
+      enableDnsHostnames: true
       numberOfAvailabilityZones: 2
       natGateways:
         strategy: Single
@@ -245,6 +255,8 @@ resources:
       instanceClass: ${dbInstanceClass}
       allocatedStorage: ${dbAllocatedStorage}
       maxAllocatedStorage: 500
+      # Fixed 3,000 IOPS baseline, rather than gp2's 3 per GB, at the same price.
+      storageType: gp3
       dbName: seek_production
       username: seek
       password: ${dbPassword}
@@ -253,8 +265,8 @@ resources:
       parameterGroupName: ${dbParams.name}
       storageEncrypted: true
       backupRetentionPeriod: 14
-      deletionProtection: true
-      skipFinalSnapshot: false
+      deletionProtection: ${dbDeletionProtection}
+      skipFinalSnapshot: ${dbSkipFinalSnapshot}
       finalSnapshotIdentifier: ${namePrefix}-final
 
   # -------------------------------------------------------------------------

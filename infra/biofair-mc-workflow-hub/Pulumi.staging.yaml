@@ -19,4 +19,7 @@ config:
 
   biofair-mc-workflow-hub:dbInstanceClass: db.t4g.medium
   biofair-mc-workflow-hub:dbAllocatedStorage: "100"
+  # Staging is for trials: let `pulumi destroy` delete the database outright.
+  biofair-mc-workflow-hub:dbDeletionProtection: "false"
+  biofair-mc-workflow-hub:dbSkipFinalSnapshot: "true"
   biofair-mc-workflow-hub:redisNodeType: cache.t4g.small

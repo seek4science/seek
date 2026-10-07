@@ -204,12 +204,32 @@ then open a shell with `aws ssm start-session --target <instance-id>` and
 `sudo -i`. The container is `seek` on web instances and `seek-workers` on
 worker instances; boot progress is in `/var/log/cloud-init-output.log`.
 
+If an instance's user data failed, fix the cause and replace the instance:
+its user data only runs on first boot. `aws autoscaling
+start-instance-refresh` does this for a group, but stalls when the group's
+only instance is unhealthy, since it waits for that instance first. In that
+case cancel the refresh and terminate the instance; the group launches a
+replacement:
+
+```console
+aws autoscaling terminate-instance-in-auto-scaling-group \
+  --instance-id <instance-id> --no-should-decrement-desired-capacity
+```
+
 ### First deploy
 
 The stack config starts with `webCount: 1`. On an empty database the SEEK web
 container runs `rake db:setup` at boot, and several instances doing so at once
 would race (handover 4.4). Once the first instance is healthy and the schema
 exists, `webCount` can be raised. Then run the initial Solr index.
+
+The first Auto Scaling group created in an account makes AWS create the
+`AWSServiceRoleForAutoScaling` service-linked role. The groups' first launch
+can come before the new role has propagated, failing with "Access denied when
+attempting to assume role" or "Authentication Failure". Auto Scaling retries
+by itself and the instances launch a minute later, but `pulumi up` has
+already reported both groups as failed. Run `pulumi up --refresh` to record
+the groups as they are; this only happens once per account.
 
 ### Upgrading SEEK
 
@@ -224,15 +244,68 @@ docker run --rm --env-file /etc/seek.env -v /mnt/filestore:/seek/filestore \
 then set `seekImage` to the new tag in the stack config and `pulumi up`, which
 rolls both groups onto it.
 
+### Pausing and resuming
+
+`pulumi destroy` deletes the data too. To stop paying for compute but keep the
+database, filestore and Solr index, stop or empty the parts that compute and
+leave the storage. Run these from this directory, with `AWS_PROFILE` set:
+
+```console
+# Pause: empty both groups, then stop Solr and the database
+for g in "$(pulumi stack output webGroupName)" "$(pulumi stack output workerGroupName)"; do
+  aws autoscaling update-auto-scaling-group --auto-scaling-group-name "$g" \
+    --min-size 0 --max-size 0 --desired-capacity 0
+done
+SOLR=$(aws ec2 describe-instances \
+  --filters Name=private-ip-address,Values="$(pulumi stack output solrPrivateIp)" \
+  --query 'Reservations[].Instances[].InstanceId' --output text)
+DB=$(aws rds describe-db-instances \
+  --query "DBInstances[?Endpoint.Address=='$(pulumi stack output databaseEndpoint)'].DBInstanceIdentifier" \
+  --output text)
+aws ec2 stop-instances --instance-ids "$SOLR"
+aws rds stop-db-instance --db-instance-identifier "$DB"
+```
+
+```console
+# Resume: start the database and Solr, wait, then restore the groups
+aws rds start-db-instance --db-instance-identifier "$DB"
+aws ec2 start-instances --instance-ids "$SOLR"
+aws rds wait db-instance-available --db-instance-identifier "$DB"
+pulumi up --refresh
+```
+
+`pulumi up --refresh` notices the emptied groups and sets them back to
+`webCount` and `workerCount`. The new instances find the existing database
+and carry on, without setting it up again. Set `SOLR` and `DB` again as above
+if resuming from a new shell.
+
+While paused, the stack still costs roughly a third of its running cost: the
+NAT gateway, load balancer and ElastiCache cannot be stopped, and the database
+and filestore are billed for storage. AWS restarts a stopped database
+automatically after seven days, so for a longer pause, stop it again when it
+restarts. Paying nothing while keeping the data needs a snapshot to restore
+from, or the data stores in a stack of their own; neither is set up yet.
+
 ### Tearing down
 
 ```console
 pulumi destroy
-pulumi stack rm staging
+pulumi stack rm --preserve-config staging
 ```
+
+`--preserve-config` keeps `Pulumi.staging.yaml`, which `stack rm` otherwise
+deletes along with the stack. It still holds the old stack's `encryptionsalt`
+and encrypted `dbPassword`; remove those lines before creating the stack again
+with `pulumi stack init`.
 
 `destroy` needs the same machine, local backend and passphrase as `up`, and a
 current AWS sign-in. Every resource is tagged `ManagedBy: pulumi` and
 `Environment: staging`, so anything left behind can be found in the console's
-Tag Editor. RDS is created with deletion protection and takes a final
-snapshot, so `destroy` stops at the database until protection is turned off.
+Tag Editor.
+
+The staging stack config turns off the database's deletion protection and
+final snapshot (`dbDeletionProtection`, `dbSkipFinalSnapshot`), so `destroy`
+deletes it outright. Both default to on, for stacks holding real data; there,
+`destroy` stops at the database until protection is turned off, and leaves a
+`<prefix>-final` snapshot. Changing these settings only takes effect through
+`pulumi up`, not during a `destroy`.
