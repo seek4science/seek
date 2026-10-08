@@ -70,6 +70,11 @@ variables:
   # e.g. biofair-mc-workflow-hub-staging
   namePrefix: ${pulumi.project}-${environment}
 
+  # Solr's name in the VPC's private DNS zone. The web and worker instances
+  # use it rather than Solr's IP, so replacing Solr does not change their
+  # launch templates and roll them.
+  solrHost: solr.seek.internal
+
   ssmProfile:
     fn::invoke:
       function: aws:iam:getInstanceProfile
@@ -113,7 +118,7 @@ variables:
     cat > /etc/seek.env <<EOF
     RAILS_ENV=production
     RAILS_LOG_LEVEL=info
-    SOLR_HOST=${solrInstance.privateIp}
+    SOLR_HOST=${solrHost}
     SOLR_PORT=8983
     MYSQL_HOST=${db.address}
     MYSQL_DATABASE=seek_production
@@ -380,6 +385,25 @@ resources:
       # The AMI lookup returns the newest image, which would otherwise replace
       # the instance, and with it the index, whenever Amazon publishes one.
       ignoreChanges: ["ami"]
+
+  # Private DNS for the VPC, so Solr is reachable by name.
+  internalZone:
+    type: aws:route53:Zone
+    properties:
+      name: seek.internal
+      comment: Internal names for ${namePrefix}
+      vpcs:
+        - vpcId: ${vpc.vpcId}
+
+  solrRecord:
+    type: aws:route53:Record
+    properties:
+      zoneId: ${internalZone.zoneId}
+      name: ${solrHost}
+      type: A
+      ttl: 60
+      records:
+        - ${solrInstance.privateIp}
 
   # -------------------------------------------------------------------------
   # Load balancer, and the web and worker Auto Scaling groups. The instances

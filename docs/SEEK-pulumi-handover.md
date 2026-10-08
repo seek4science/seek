@@ -415,7 +415,7 @@ the AWS account it targets:
 
 **Phase 1.** The program currently deploys a cut-down phase 1 of this design:
 HTTP only at the load balancer's hostname, fixed instance counts, the Solr
-index on the instance's root volume, Solr reached by IP, no shared file cache,
+index on the instance's root volume, no shared file cache,
 no Redis auth token, and no EFS backups. [`pulumi-next-phase.md`](pulumi-next-phase.md)
 lists what phase 2 adds back.
 

@@ -16,7 +16,7 @@ on EC2 instances in Auto Scaling groups, not on ECS Fargate, because the
 the database password comes from SSM Parameter Store rather than Secrets
 Manager, and there is no ECS cluster. And it leaves out HTTPS and the public
 DNS record, front-end autoscaling (a fixed number of instances), the Solr data
-volume and its snapshots, the private DNS zone, the shared file cache and the
+volume and its snapshots, the shared file cache and the
 Redis auth token. See the project
 [README](../infra/biofair-mc-workflow-hub/README.md).
 

@@ -18,7 +18,8 @@ to what is needed to prove SEEK runs on it:
 - MySQL on RDS, Redis on ElastiCache (TLS, no auth token), and the filestore
   on EFS
 - Solr on its own EC2 instance running the `fairdom/seek-solr` image, with the
-  index on the instance's root volume
+  index on the instance's root volume, reachable as `solr.seek.internal`
+  through a Route 53 private zone attached to the VPC
 
 It creates no IAM resources: every instance uses the account's existing
 `ssm-instance-profile`, and is reached through SSM. Comments in `Pulumi.yaml`
@@ -38,6 +39,10 @@ Each group launches from a launch template whose user data:
    `docker/start_workers.sh` on worker instances.
 
 Container logs stay on each instance (`docker logs seek`).
+
+The instances reach Solr as `solr.seek.internal` rather than by its IP. If the
+Solr instance is replaced, `pulumi up` updates that record (60-second TTL),
+and the web and worker instances are left alone.
 
 A change to a launch template (a new image tag, a changed setting, or a new
 Amazon Linux AMI from the lookup) makes `pulumi up` roll that group: each new

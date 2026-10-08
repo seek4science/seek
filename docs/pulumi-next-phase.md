@@ -11,7 +11,8 @@ Phase 1 is the managed-services design with the extras left out, and with the
 front-end and workers as Docker containers on EC2 Auto Scaling groups rather
 than ECS Fargate. It has been deployed in the `biofair-mc-workflow-hub`
 account, paused and resumed with its data intact, and destroyed cleanly. It
-needs no IAM permissions beyond the `Developer` permission set.
+needs no IAM permissions beyond the `Developer` permission set. It also has
+one piece of the full design: Solr's private DNS name, `solr.seek.internal`.
 
 The full design, before phase 1 cut it down, is in the history at commit
 `6550a42c0b`. Most items below were already written there and can be adapted
@@ -54,7 +55,7 @@ that blocks it.
   `ASGAverageCPUUtilization`. The full design's `webScaleTarget` and
   `webScalePolicy` were written for ECS and do not carry over directly.
 - **Consider:** new instances take several minutes to boot and pull the SEEK
-  image, so scale out early (a lower CPU target) rather than late. Item 5
+  image, so scale out early (a lower CPU target) rather than late. Item 4
   becomes worthwhile once there is more than one web instance.
 
 ### 3. Durable Solr index
@@ -65,21 +66,15 @@ that blocks it.
   volume in the instance's AZ), `solrAttach`, and the Solr user data that
   waits for the device, formats it only if empty, and mounts it at
   `/var/solr`. The `ignoreChanges: ["ami"]` on the instance can then go.
+  Solr's private DNS name means a replacement does not disturb the web and
+  worker instances.
 - **Snapshots:** the full design's nightly DLM snapshots (`dlmRole`,
   `solrSnapshots`) need an IAM role, which `Developer` cannot create. Either
   ask the Hub for the role, or rely on a reindex as the recovery path.
 - **Check:** the device name on the current instance types and AMI (handover
   4.6).
 
-### 4. Private DNS name for Solr
-
-- **Adds:** `solr.seek.internal` instead of the instance's IP in the SEEK
-  environment, so replacing Solr does not need the web and worker instances
-  rolled.
-- **Needs:** the full design's `internalZone` and `solrRecord`, and
-  `SOLR_HOST=solr.seek.internal` in `hostSetup`.
-
-### 5. Shared file cache
+### 4. Shared file cache
 
 - **Adds:** a `tmp/cache` shared between web instances, so a large generated
   file is not regenerated per instance (handover 3.3).
@@ -87,7 +82,7 @@ that blocks it.
   `hostSetup` (e.g. `/mnt/cache`); and `-v /mnt/cache:/seek/tmp/cache` on the
   web and worker `docker run`.
 
-### 6. Redis auth token
+### 5. Redis auth token
 
 - **Adds:** a password on Redis, on top of TLS and the security group.
 - **Needs:** an `authToken` on the replication group, the token in Parameter
