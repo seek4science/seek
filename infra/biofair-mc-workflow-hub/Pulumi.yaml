@@ -28,10 +28,19 @@ config:
   solrImage:
     type: string
     default: fairdom/seek-solr:main
-  # Keep at 1 until the schema exists (handover 4.4).
+  # The fewest web instances; autoscaling adds more, up to webCountMax. Keep
+  # at 1 until the schema exists (handover 4.4).
   webCount:
     type: integer
     default: 1
+  webCountMax:
+    type: integer
+    default: 8
+  # Average CPU across the web instances that autoscaling aims for. Low,
+  # because a new instance takes several minutes to boot and pull the image.
+  webCpuTarget:
+    type: integer
+    default: 50
   workerCount:
     type: integer
     default: 1
@@ -518,14 +527,18 @@ resources:
     type: aws:autoscaling:Group
     properties:
       name: ${namePrefix}-web
+      # No desiredCapacity: autoscaling owns it, starting at minSize.
       minSize: ${webCount}
-      maxSize: ${webCount}
-      desiredCapacity: ${webCount}
+      maxSize: ${webCountMax}
       vpcZoneIdentifiers: ${vpc.privateSubnetIds}
       targetGroupArns: ["${alb.defaultTargetGroup.arn}"]
       # SEEK's first boot creates the database, which takes a while.
       healthCheckType: ELB
       healthCheckGracePeriod: 900
+      # Leave a new instance out of the CPU average while it boots, so its
+      # start-up does not trigger further scaling. A new web instance is
+      # healthy within about five minutes.
+      defaultInstanceWarmup: 300
       launchTemplate:
         id: ${webLaunchTemplate.id}
         version: ${webLaunchTemplate.latestVersion}
@@ -534,6 +547,19 @@ resources:
         preferences:
           minHealthyPercentage: 100
           maxHealthyPercentage: 200
+
+  # Adds web instances when average CPU is above webCpuTarget, and removes
+  # them when it is well below.
+  webScalePolicy:
+    type: aws:autoscaling:Policy
+    properties:
+      name: ${namePrefix}-web-cpu
+      autoscalingGroupName: ${webGroup.name}
+      policyType: TargetTrackingScaling
+      targetTrackingConfiguration:
+        predefinedMetricSpecification:
+          predefinedMetricType: ASGAverageCPUUtilization
+        targetValue: ${webCpuTarget}
 
   workerLaunchTemplate:
     type: aws:ec2:LaunchTemplate

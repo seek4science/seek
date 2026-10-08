@@ -19,7 +19,6 @@ deployed and torn down successfully.
 - Front-end autoscaling
 - A durable Solr index that survives instance replacement, with snapshots
 - A shared file cache across web instances
-- A Redis auth token
 
 ## Phase 3
 
@@ -27,6 +26,8 @@ deployed and torn down successfully.
   without touching the database, filestore or Solr index
 - Pulumi `protect: true` on the database and EFS, so a `destroy` fails rather
   than deleting them
+- A Redis auth token
+- Review the instance types and sizes against measured use
 
 ## Phase 4 (post-staging)
 

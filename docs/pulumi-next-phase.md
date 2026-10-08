@@ -2,9 +2,9 @@
 
 What is needed to take the Pulumi program in
 [`infra/biofair-mc-workflow-hub/`](../infra/biofair-mc-workflow-hub/) from
-phase 1, through phase 2 (staging), phase 3 (protecting the data) and
-phase 4 (post-staging), to the full
-design in [`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md).
+phase 1, through phase 2 (staging), phase 3 (protecting the data, and sizing)
+and phase 4 (post-staging), to the full design in
+[`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md).
 
 ## Where phase 1 stands
 
@@ -88,15 +88,7 @@ that blocks it.
   `hostSetup` (e.g. `/mnt/cache`); and `-v /mnt/cache:/seek/tmp/cache` on the
   web and worker `docker run`.
 
-### 6. Redis auth token
-
-- **Adds:** a password on Redis, on top of TLS and the security group.
-- **Needs:** an `authToken` on the replication group, the token in Parameter
-  Store as a SecureString (as the database password is), read in `hostSetup`
-  and written as `REDIS_PASSWORD` to `/etc/seek.env`. Generate it in the
-  program rather than as stack config (see below).
-
-## Phase 3: protecting the data
+## Phase 3: protecting the data, and sizing
 
 ### 1. Data and compute stacks
 
@@ -140,6 +132,43 @@ that blocks it.
   `pulumi state unprotect` first. Staging trials that are torn down
   completely, as now, would want it off, so tie it to config in the same way
   as `dbDeletionProtection`.
+
+### 3. Redis auth token
+
+- **Adds:** a password on Redis, on top of TLS and the security group. Redis
+  holds SEEK's sessions, so anything that could reach it could take over or
+  alter a logged-in user's session. Today only the web, worker and Solr
+  instances can reach it, and they already hold the database password, so
+  this guards against a later loosening of the security groups more than
+  against anything possible now. It also matches docker-compose, which sets a
+  Redis password.
+- **Needs:** an `authToken` on the replication group, the token in Parameter
+  Store as a SecureString (as the database password is), read in `hostSetup`
+  and written as `REDIS_PASSWORD` to `/etc/seek.env`. Generate it in the
+  program rather than as stack config (see cross-cutting work).
+
+### 4. Review instance types and sizes
+
+- **Adds:** sizes based on measured use rather than estimates, before the
+  deployment holds real data and costs start to matter.
+- **Current:** web and worker `t3.large` (2 vCPU, 8 GiB), Solr `t3.medium`,
+  RDS `db.t3.medium`, ElastiCache `cache.t4g.small`, with `PUMA_WORKERS_NUM`
+  fixed at 2 in `hostSetup`.
+- **Measure:** memory and CPU of each container (`docker stats` on the
+  instances, CloudWatch CPU for each group and the database) under realistic
+  use and under `scripts/load-test.sh`.
+- **Consider:**
+  - Smaller web instances, more of them, now that the web tier autoscales;
+    and Puma workers sized to each instance's memory.
+  - A smaller worker instance if job load stays light.
+  - Burstable (`t3`) instances under sustained load run in unlimited mode
+    and are charged for CPU above their baseline; a steadily busy tier may be
+    cheaper as `m`-class.
+  - Graviton (`t4g`, `m7g`) is cheaper, but needs arm64 builds of the SEEK
+    and Solr images (the SEEK Dockerfile fetches an amd64 supercronic), and
+    `db.t4g` classes are not offered in the VPC's zones (eu-west-2a/2b).
+  - Reserved instances or a savings plan once sizes settle, for a
+    long-running deployment.
 
 ## Phase 4 (post-staging)
 

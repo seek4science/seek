@@ -417,7 +417,7 @@ the AWS account it targets:
 HTTPS with a self-signed certificate at the load balancer's hostname, fixed
 instance counts, the Solr index on the instance's root volume, no shared file
 cache, no Redis auth token, and no EFS backups.
-[`pulumi-next-phase.md`](pulumi-next-phase.md) lists what phase 2 adds back.
+[`pulumi-next-phase.md`](pulumi-next-phase.md) lists what later phases add back.
 
 **Not Fargate.** On this branch the front-end and workers run as Docker
 containers on EC2 instances in Auto Scaling groups, rather than as ECS Fargate
