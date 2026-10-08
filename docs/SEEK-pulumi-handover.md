@@ -377,6 +377,9 @@ elsewhere.
 
 ## 7. Suggested next steps for Claude Code
 
+Phase 1 has been deployed; see [`pulumi-next-phase.md`](pulumi-next-phase.md)
+for what the next phase needs. The list below is the original plan.
+
 1. ~~Answer open questions 4.1–4.4 by reading the SEEK repo.~~ Done; see
    section 4. Confirm the www-data uid (4.2) and the RDS 8.4
    `require_secure_transport` default (4.1) when convenient.
@@ -404,15 +407,17 @@ like `biofair-mc-galaxy/` in
 the AWS account it targets:
 
 - `Pulumi.yaml`: the program.
-- `Pulumi.staging.yaml`: the `staging` stack's config, committed. Secrets are
-  added with `pulumi config set --secret` and stored there encrypted.
-- `README.md`: scope, open questions, and deploy steps.
+- `Pulumi.staging.yaml`: the `staging` stack's config, committed. Each
+  deployer's local stack adds its salt and encrypted secrets to it, which are
+  not committed.
+- `README.md`: scope and getting started.
+- `tech-notes.md`: how it works, setting up access, and operating the stack.
 
 **Phase 1.** The program currently deploys a cut-down phase 1 of this design:
 HTTP only at the load balancer's hostname, fixed instance counts, the Solr
 index on the instance's root volume, Solr reached by IP, no shared file cache,
-no Redis auth token, and no EFS backups. The README lists what phase 2 adds
-back.
+no Redis auth token, and no EFS backups. [`pulumi-next-phase.md`](pulumi-next-phase.md)
+lists what phase 2 adds back.
 
 **Not Fargate.** On this branch the front-end and workers run as Docker
 containers on EC2 instances in Auto Scaling groups, rather than as ECS Fargate
@@ -432,7 +437,5 @@ originally embedded here in these ways:
   every resource is tagged `Environment` and `ManagedBy: pulumi` through the
   AWS provider's `defaultTags` in the stack config.
 - The VPC CIDR is stack config (`10.30.0.0/16` for staging).
-- The Solr instance uses the account's existing `ssm-instance-profile`
-  rather than creating its own IAM role. The ECS and DLM roles are still
-  created by the program; whether that is permitted is an open question,
-  listed in the README.
+- Every instance uses the account's existing `ssm-instance-profile`, and the
+  program creates no IAM roles (see "Not Fargate" above).

@@ -9,7 +9,7 @@ description: >-
   no IAM resources.
 
 # Design decisions, referred to below by section number ("handover 4.4"), are
-# in docs/SEEK-pulumi-handover.md. What phase 2 adds is listed in README.md.
+# in docs/SEEK-pulumi-handover.md. What phase 2 adds is in docs/pulumi-next-phase.md.
 
 config:
   # Environment name (staging, production), used in resource names.

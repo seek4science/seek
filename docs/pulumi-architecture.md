@@ -4,7 +4,8 @@ Diagrams of what the Pulumi project in
 [`infra/biofair-mc-workflow-hub/`](../infra/biofair-mc-workflow-hub/) deploys,
 and how the project is put together. For the reasoning behind the design, see
 [`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md); for deploy steps, see the
-project's [README](../infra/biofair-mc-workflow-hub/README.md).
+project's [README](../infra/biofair-mc-workflow-hub/README.md) and
+[`tech-notes.md`](../infra/biofair-mc-workflow-hub/tech-notes.md).
 
 Not yet deployed or previewed against AWS.
 
@@ -176,7 +177,7 @@ flowchart LR
         subgraph proj["infra/biofair-mc-workflow-hub/"]
             program["Pulumi.yaml<br/>config schema, variables,<br/>resources, outputs"]
             stack["Pulumi.staging.yaml<br/>stack config, committed,<br/>secrets encrypted"]
-            readme["README.md"]
+            readme["README.md<br/>tech-notes.md"]
         end
         handover["docs/SEEK-pulumi-handover.md<br/>design decisions"]
     end

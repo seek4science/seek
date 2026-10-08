@@ -12,7 +12,7 @@ config:
   biofair-mc-workflow-hub:seekImage: fairdom/seek:pulumi
   biofair-mc-workflow-hub:solrImage: fairdom/seek-solr:pulumi # same tag as seekImage
 
-  biofair-mc-workflow-hub:webCount: "1" # raise once the schema exists; see README.md
+  biofair-mc-workflow-hub:webCount: "1" # raise once the schema exists; see tech-notes.md
   biofair-mc-workflow-hub:workerCount: "1"
   biofair-mc-workflow-hub:webInstanceType: t3.large
   biofair-mc-workflow-hub:workerInstanceType: t3.large
