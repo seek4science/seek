@@ -13,12 +13,16 @@ successfully.
 
 ## Phase 2
 
-- HTTPS and a real domain
+- HTTPS, with a self-signed certificate for testing
 - Front-end autoscaling
 - A durable Solr index that survives instance replacement, with snapshots
 - A private DNS name for Solr
 - A shared file cache across web instances
 - A Redis auth token
+
+## Phase 3 (post-staging)
+
+- A real domain, with a trusted certificate
 - EFS backups
 - Container logs in CloudWatch
 - Higher availability for production: a NAT gateway per AZ, Multi-AZ RDS, a

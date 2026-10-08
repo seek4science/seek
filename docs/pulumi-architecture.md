@@ -66,7 +66,7 @@ How a request reaches SEEK, and which services each part of SEEK depends on.
 ```mermaid
 flowchart TB
     users(["Users"])
-    hub[("Docker Hub<br/>fairdom/seek:pulumi<br/>fairdom/seek-solr:pulumi")]
+    hub[("Docker Hub<br/>fairdom/seek:workflowhub-pulumi<br/>fairdom/seek-solr:pulumi")]
 
     subgraph aws["AWS account: biofair-mc-workflow-hub (eu-west-2)"]
         dns["Route 53 public record<br/>domainName"]

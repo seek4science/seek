@@ -24,7 +24,7 @@ config:
   seekImage:
     type: string
     default: fairdom/seek:main
-  # Built from solr/Dockerfile; use the same tag as seekImage.
+  # Built from solr/Dockerfile, from the same commit as seekImage.
   solrImage:
     type: string
     default: fairdom/seek-solr:main
@@ -41,9 +41,10 @@ config:
   workerInstanceType:
     type: string
     default: t3.large
+  # db.t4g classes are not offered in eu-west-2a/2b, the VPC's zones.
   dbInstanceClass:
     type: string
-    default: db.t4g.medium
+    default: db.t3.medium
   dbAllocatedStorage:
     type: integer
     default: 100

@@ -66,7 +66,7 @@ Shared with biofair-mc-infra's `docs/aws-context.md`, "Still needs a decision":
   answer.
 - **Pulumi state backend.** Not set up yet; must be the same for everyone
   working on this stack.
-- **DNS and ACM certificate issuance.** Not needed until phase 2.
+- **DNS and ACM certificate issuance.** Not needed until phase 3.
 
 ## Setting up
 
@@ -119,14 +119,15 @@ typically a working day. When it expires, sign in again with
 
 ### Images
 
-The SEEK and Solr images named in the stack config (`fairdom/seek:pulumi` and
-`fairdom/seek-solr:pulumi`) are built from this branch of the SEEK repository
-and pushed by hand, from the repository root:
+The SEEK and Solr images named in the stack config
+(`fairdom/seek:workflowhub-pulumi` and `fairdom/seek-solr:pulumi`) are built
+from the same commit of this branch of the SEEK repository, so the Solr
+configset matches the code, and pushed by hand from the repository root:
 
 ```console
-docker build -t fairdom/seek:pulumi .
+docker build -t fairdom/seek:workflowhub-pulumi .
 docker build -t fairdom/seek-solr:pulumi solr
-docker push fairdom/seek:pulumi
+docker push fairdom/seek:workflowhub-pulumi
 docker push fairdom/seek-solr:pulumi
 ```
 
