@@ -11,6 +11,19 @@ filestore on EFS, and Solr on its own instance. It needs no IAM permissions
 beyond the `Developer` permission set, and has been deployed and torn down
 successfully.
 
+## Phase 2
+
+- HTTPS and a real domain
+- Front-end autoscaling
+- A durable Solr index that survives instance replacement, with snapshots
+- A private DNS name for Solr
+- A shared file cache across web instances
+- A Redis auth token
+- EFS backups
+- Container logs in CloudWatch
+- Higher availability for production: a NAT gateway per AZ, Multi-AZ RDS, a
+  Redis replica
+
 ## Getting started
 
 Prerequisites: the [Pulumi CLI](https://www.pulumi.com/docs/iac/download-install/),
