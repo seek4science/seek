@@ -12,7 +12,7 @@ class CacheOverflowCallSitesTest < ActiveSupport::TestCase
     'lib/seek/assets_standard_controller_actions.rb' =>
       /Rails\.cache\.fetch\("spreadsheet-workbook-.*expires_in:/,
     'lib/rightfield/rightfield.rb' =>
-      [/Rails\.cache\.fetch\(".*_rf_csv", expires_in:/, /Rails\.cache\.fetch\(".*_rf_rdf", expires_in:/],
+      [/Rails\.cache\.fetch\("rf_csv-.*expires_in:/, /Rails\.cache\.fetch\("rf_rdf-.*expires_in:/],
     'app/helpers/assets_helper.rb' =>
       [/cache_key = ".*content_blob\.cache_key.*"/, /Rails\.cache\.fetch\(cache_key, expires_in:/],
     'lib/seek/renderers/notebook_renderer.rb' => /Rails\.cache\.fetch\("notebook-.*expires_in:/,
