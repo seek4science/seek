@@ -12,7 +12,8 @@ to what is needed to prove SEEK runs on it:
 
 - a VPC with public and private subnets across two Availability Zones and a
   single NAT Gateway
-- an Application Load Balancer, HTTP only, at its own AWS hostname
+- an Application Load Balancer at its own AWS hostname, serving HTTPS with a
+  self-signed certificate, and redirecting HTTP to HTTPS
 - SEEK web and Solid Queue worker instances, each in an Auto Scaling group of
   fixed size, running the SEEK image with Docker on Amazon Linux 2023
 - MySQL on RDS, Redis on ElastiCache (TLS, no auth token), and the filestore
@@ -39,6 +40,20 @@ Each group launches from a launch template whose user data:
    `docker/start_workers.sh` on worker instances.
 
 Container logs stay on each instance (`docker logs seek`).
+
+### HTTPS
+
+Pulumi's `tls` provider generates a private key and a self-signed certificate
+(valid for a year, named `<prefix>.seek.internal`), which the program imports
+into ACM for the load balancer's 443 listener. Port 80 redirects to 443.
+Browsers warn about the certificate; accept the warning to continue. The
+private key is held encrypted in the Pulumi state. The load balancer only
+accepts certificates for a fully qualified domain name, hence the
+`.seek.internal` name, though nothing resolves it.
+
+The load balancer terminates TLS and passes `X-Forwarded-Proto: https`
+through nginx to Rails, so SEEK generates `https://` links. A real domain
+replaces only the certificate (`docs/pulumi-next-phase.md`, phase 4).
 
 The instances reach Solr as `solr.seek.internal` rather than by its IP. If the
 Solr instance is replaced, `pulumi up` updates that record (60-second TTL),
@@ -71,7 +86,7 @@ Shared with biofair-mc-infra's `docs/aws-context.md`, "Still needs a decision":
   answer.
 - **Pulumi state backend.** Not set up yet; must be the same for everyone
   working on this stack.
-- **DNS and ACM certificate issuance.** Not needed until phase 3.
+- **DNS and ACM certificate issuance.** Not needed until phase 4.
 
 ## Setting up
 
@@ -174,7 +189,8 @@ exists, `webCount` can be raised. Then run the initial Solr index.
 
 After `pulumi up`, SEEK is at the `url` stack output once the web instance has
 booted and passed its health check, which takes several minutes on first
-boot. Until then the load balancer returns 502.
+boot. Until then the load balancer returns 502. The address is HTTPS with a
+self-signed certificate, so the browser warns first.
 
 The first Auto Scaling group created in an account makes AWS create the
 `AWSServiceRoleForAutoScaling` service-linked role. The groups' first launch
@@ -275,7 +291,8 @@ NAT gateway, load balancer and ElastiCache cannot be stopped, and the database
 and filestore are billed for storage. AWS restarts a stopped database
 automatically after seven days, so for a longer pause, stop it again when it
 restarts. Paying nothing while keeping the data needs a snapshot to restore
-from, or the data stores in a stack of their own; neither is set up yet.
+from, or the data stores in a stack of their own (phase 3); neither is set up
+yet.
 
 ### Tearing down
 

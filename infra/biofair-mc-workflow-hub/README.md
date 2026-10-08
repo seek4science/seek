@@ -5,23 +5,32 @@ infrastructure for WorkflowHub, which runs SEEK. It is written in Pulumi YAML.
 
 ## Current scope
 
-Phase 1: a VPC, an HTTP load balancer in front of SEEK web and worker
-instances in EC2 Auto Scaling groups, MySQL on RDS, Redis on ElastiCache, the
-filestore on EFS, and Solr on its own instance, reached by a private DNS name.
-It needs no IAM permissions beyond the `Developer` permission set, and has
-been deployed and torn down successfully.
+Phase 1 and the completed parts of phase 2: a VPC, a load balancer serving
+HTTPS with a self-signed certificate in front of SEEK web and worker instances
+in EC2 Auto Scaling groups, MySQL on RDS, Redis on ElastiCache, the filestore
+on EFS, and Solr on its own instance, reached by a private DNS name. It needs
+no IAM permissions beyond the `Developer` permission set, and has been
+deployed and torn down successfully.
 
 ## Phase 2
 
-- HTTPS, with a self-signed certificate for testing
+- **Completed:** HTTPS, with a self-signed certificate for testing
+- **Completed:** A private DNS name for Solr
 - Front-end autoscaling
 - A durable Solr index that survives instance replacement, with snapshots
 - A shared file cache across web instances
 - A Redis auth token
 
-## Phase 3 (post-staging)
+## Phase 3
 
-- A real domain, with a trusted certificate
+- Separate stacks for data and compute, so the compute can be taken down
+  without touching the database, filestore or Solr index
+- Pulumi `protect: true` on the database and EFS, so a `destroy` fails rather
+  than deleting them
+
+## Phase 4 (post-staging)
+
+- A real domain, with a trusted certificate in place of the self-signed one
 - EFS backups
 - Container logs in CloudWatch
 - Higher availability for production: a NAT gateway per AZ, Multi-AZ RDS, a
@@ -46,7 +55,8 @@ pulumi preview
 pulumi up
 ```
 
-SEEK is then at `pulumi stack output url`, a few minutes after `up` finishes.
+SEEK is then at `pulumi stack output url`, a few minutes after `up` finishes;
+the browser warns about the self-signed certificate.
 `stack init` and `config set --secret` add your stack's salt and encrypted
 password to `Pulumi.staging.yaml`; don't commit them.
 

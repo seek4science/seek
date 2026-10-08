@@ -5,8 +5,8 @@ description: >-
   Methods Commons Spoke, in the biofair-mc-workflow-hub account. Phase 1:
   front-end and workers as Docker containers on EC2 Auto Scaling groups,
   MySQL on RDS, Redis on ElastiCache, filestore on EFS, and Solr on its own
-  EC2 instance, served over HTTP at the load balancer's own hostname. Creates
-  no IAM resources.
+  EC2 instance, served over HTTPS with a self-signed certificate at the load
+  balancer's own hostname. Creates no IAM resources.
 
 # Design decisions, referred to below by section number ("handover 4.4"), are
 # in docs/SEEK-pulumi-handover.md. What phase 2 adds is in docs/pulumi-next-phase.md.
@@ -154,6 +154,10 @@ resources:
       vpcId: ${vpc.vpcId}
       description: Public ingress to the load balancer
       ingress:
+        - protocol: tcp
+          fromPort: 443
+          toPort: 443
+          cidrBlocks: ["0.0.0.0/0"]
         - protocol: tcp
           fromPort: 80
           toPort: 80
@@ -413,14 +417,55 @@ resources:
   # rolls the group's instances: each new one boots and pulls the image
   # before the old one is terminated.
   # -------------------------------------------------------------------------
+  # A self-signed certificate for HTTPS until there is a real domain, so
+  # browsers warn. Generated here and imported into ACM; the private key is
+  # held encrypted in the Pulumi state.
+  tlsKey:
+    type: tls:PrivateKey
+    properties:
+      algorithm: RSA
+      rsaBits: 2048
+
+  tlsCert:
+    type: tls:SelfSignedCert
+    properties:
+      privateKeyPem: ${tlsKey.privateKeyPem}
+      # The load balancer only accepts certificates for a fully qualified
+      # domain name; any will do for a self-signed one.
+      subject:
+        commonName: ${namePrefix}.seek.internal
+      dnsNames:
+        - ${namePrefix}.seek.internal
+      validityPeriodHours: 8760
+      allowedUses:
+        - key_encipherment
+        - digital_signature
+        - server_auth
+
+  certificate:
+    type: aws:acm:Certificate
+    properties:
+      privateKey: ${tlsKey.privateKeyPem}
+      certificateBody: ${tlsCert.certPem}
+
+  # HTTPS on 443; plain HTTP on 80 redirects to it.
   alb:
     type: awsx:lb:ApplicationLoadBalancer
     properties:
       subnetIds: ${vpc.publicSubnetIds}
       securityGroups: ["${albSg.id}"]
-      listener:
-        port: 80
-        protocol: HTTP
+      listeners:
+        - port: 80
+          protocol: HTTP
+          defaultActions:
+            - type: redirect
+              redirect:
+                port: "443"
+                protocol: HTTPS
+                statusCode: HTTP_301
+        - port: 443
+          protocol: HTTPS
+          certificateArn: ${certificate.arn}
       defaultTargetGroup:
         port: 3000
         protocol: HTTP
@@ -543,7 +588,7 @@ resources:
           maxHealthyPercentage: 200
 
 outputs:
-  url: http://${alb.loadBalancer.dnsName}
+  url: https://${alb.loadBalancer.dnsName}
   databaseEndpoint: ${db.address}
   redisEndpoint: ${redis.primaryEndpointAddress}
   sharedFsId: ${sharedFs.id}

@@ -7,17 +7,17 @@ and how the project is put together. For the reasoning behind the design, see
 project's [README](../infra/biofair-mc-workflow-hub/README.md) and
 [`tech-notes.md`](../infra/biofair-mc-workflow-hub/tech-notes.md).
 
-Not yet deployed or previewed against AWS.
+Phase 1 has been deployed to staging.
 
 These diagrams show the full design. The program currently deploys phase 1,
 which differs in two ways. The front-end and workers run as Docker containers
 on EC2 instances in Auto Scaling groups, not on ECS Fargate, because the
 `Developer` permission set cannot create or pass the IAM roles Fargate needs;
 the database password comes from SSM Parameter Store rather than Secrets
-Manager, and there is no ECS cluster. And it leaves out HTTPS and the public
-DNS record, front-end autoscaling (a fixed number of instances), the Solr data
-volume and its snapshots, the shared file cache and the
-Redis auth token. See the project
+Manager, and there is no ECS cluster. HTTPS uses a self-signed certificate.
+And it leaves out the real domain and its public DNS record, front-end
+autoscaling (a fixed number of instances), the Solr data volume and its
+snapshots, the shared file cache and the Redis auth token. See the project
 [README](../infra/biofair-mc-workflow-hub/README.md).
 
 ## Services overview
