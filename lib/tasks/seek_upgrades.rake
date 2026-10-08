@@ -7,17 +7,8 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:004_model_types
-    db:seed:005_publication_types
-    update_rdf
-    db:seed:018_discipline_vocab
-    strip_publication_abstracts
-    db:seed:015_isa_tags
-    assign_isa_tag_id_to_sample_attributes
-    assign_isa_tag_id_to_template_attributes
-    db:seed:017_minimal_starter_isa_templates
     db:seed:019_sop_type_controlled_vocab
-    db:seed:020_event_types
+    migrate_delayed_jobs_to_solid_queue
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -32,7 +23,7 @@ namespace :seek do
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
-    Rails.cache.clear
+    Rake::Task['seek:clear_cache'].invoke
 
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
@@ -68,50 +59,13 @@ namespace :seek do
     end
   end
 
-  task(strip_publication_abstracts: [:environment]) do
-    puts 'Stripping publication abstracts...'
-    updated_count = 0
-    Publication.select(:id, :abstract).find_each do |publication|
-      if publication.abstract.present?
-        stripped = publication.abstract.strip
-        if stripped.length != publication.abstract.length
-          publication.update_column(:abstract, stripped)
-          updated_count += 1
-        end
-      end
+  desc('migrates any jobs left in the delayed_jobs table into Solid Queue (one-off, post-cutover)')
+  task(migrate_delayed_jobs_to_solid_queue: [:environment]) do
+    only_once('seek:migrate_delayed_jobs_to_solid_queue 1.19.0') do
+      puts '... migrating any remaining delayed_jobs into Solid Queue'
+      result = Seek::DelayedJobMigrator.run(logger: ->(message) { puts "    #{message}" })
+      puts "... #{result.summary}"
     end
-    puts "... updated #{updated_count} publications"
-  end
-
-  task(assign_isa_tag_id_to_sample_attributes: [:environment]) do
-    puts 'Assigning isa tags to input sample attributes...'
-    updated_count = 0
-    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
-    SampleAttribute.joins(:sample_type)
-                   .where(isa_tag_id: nil)
-                   .where.not(linked_sample_type_id: nil)
-                   .find_each(batch_size: 1000) do |sa|
-      next unless sa.sample_type.is_isa_json_compliant? && sa.seek_sample_multi?
-
-      sa.update_column(:isa_tag_id, input_isa_tag_id)
-      updated_count += 1
-      puts '.'
-    end
-    puts "... #{updated_count} input sample attributes were updated."
-  end
-
-  task(assign_isa_tag_id_to_template_attributes: [:environment]) do
-    puts 'Assigning isa tags to input template attributes...'
-    input_isa_tag_id = ISATag.all.detect { |tag| tag.isa_input? }.id
-    updated_count = 0
-    TemplateAttribute.where(isa_tag_id: nil).find_each(batch_size: 1000) do |ta|
-      next unless ta.seek_sample_multi?
-
-      ta.update_column(:isa_tag_id, input_isa_tag_id)
-      updated_count += 1
-      puts '.'
-    end
-    puts "... #{updated_count} input template attributes were updated."
   end
 
   private

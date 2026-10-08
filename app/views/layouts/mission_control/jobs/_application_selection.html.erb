@@ -1,0 +1,14 @@
+<%# Overrides the Mission Control partial of the same name, so that the back link returns to the
+    SEEK page the dashboard was entered from (MissionControlJobsController#seek_return_path). %>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-menu is-active mb-4">
+    <div class="navbar-start">
+      <%= link_to "Back to #{Seek::Config.instance_name}", seek_return_path %>
+    </div>
+
+    <div class="navbar-end">
+      <%= render "layouts/mission_control/jobs/application_selection/servers", application: @application %>
+      <%= render "layouts/mission_control/jobs/application_selection/applications" if selectable_applications.any? %>
+    </div>
+  </div>
+</nav>

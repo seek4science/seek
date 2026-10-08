@@ -126,6 +126,8 @@ max_cachable_size:
   convert: :to_i
 hard_max_cachable_size:
   convert: :to_i
+cache_max_redis_item_size:
+  convert: :to_i
 tag_threshold:
   convert: :to_i
 max_visible_tags:
@@ -223,6 +225,7 @@ placeholders_enabled:
 standard_login_enabled:
 # Omniauth
 omniauth_enabled:
+omniauth_skip_login_page:
 omniauth_user_create:
 omniauth_user_activate:
 omniauth_elixir_aai_enabled:
@@ -269,8 +272,6 @@ bio_tools_enabled:
 require_cookie_consent:
 galaxy_tool_sources:
 metadata_license:
-regular_job_offset:
-  convert: :to_i
 auto_activate_programmes:
 auto_activate_site_managed_projects:
 fair_data_station_enabled:
@@ -282,3 +283,5 @@ max_filters:
 reindex_all_batch_size:
   convert: :to_i
 default_citation_style:
+obfuscate_filters:
+  

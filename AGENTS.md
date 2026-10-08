@@ -12,8 +12,7 @@ FAIRDOM-SEEK (v1.18) is a Rails 7.2 / Ruby 3.3 web platform for sharing scientif
 
 ```bash
 bundle exec rails server          # Start the app (default: port 3000)
-bundle exec rake seek:workers:start  # Start delayed_job background workers
-bundle exec rake seek:workers:stop
+bundle exec bin/jobs               # Start Solid Queue background workers
 ```
 
 ### Testing
@@ -51,6 +50,21 @@ script/start-docker-solr.sh           # Start Solr via Docker
 script/stop-docker-solr.sh            # Stop Solr via Docker
 bundle exec rake seek:reindex_all     # Rebuild Solr index
 ```
+
+### Redis (cache + sessions)
+
+```bash
+script/start-docker-redis.sh          # Start Redis via Docker (seek-redis on :6379)
+script/stop-docker-redis.sh           # Stop Redis (keeps the seek-redis-data-volume)
+script/reset-docker-redis.sh          # Wipe and restart Redis (clears cache AND sessions)
+script/delete-docker-redis.sh         # Remove the stopped container and its data volume
+```
+
+`REDIS_MAXMEMORY` (default `256mb`) sets the `maxmemory` limit. For `docker-compose.yml` it is read
+from `docker/redis.env`; for the scripts and the other compose variants it is a host env var. Redis
+backs `Rails.cache`, sessions and the `Rack::Attack` throttle counters on one instance
+(`allkeys-lru`). `Seek::RedisConfig.url` (`lib/seek/redis_config.rb`) is the single source of truth
+for the connection URL.
 
 ### Linting
 
@@ -101,7 +115,7 @@ The REST API uses `active_model_serializers` with `BaseSerializer` (`app/seriali
 
 ### Background Jobs
 
-All async work uses `delayed_job` (ActiveRecord backend). Jobs are in `app/jobs/`. Start/stop workers via `rake seek:workers:start/stop`. Key jobs: `AuthLookupUpdateJob`, `ReindexingJob`, subscription email jobs, RDF generation.
+All async work uses `Solid Queue` (`solid_queue` gem, tables in the primary database). Jobs are in `app/jobs/`. Worker/dispatcher/scheduler processes are started via `bin/jobs` (see `config/queue.yml` for topology, `config/recurring.yml` for scheduled jobs); `rake seek:workers:start` daemonises `bin/jobs` in the background for deployment (`seek:workers:stop`/`restart`/`status` manage it). Key jobs: `AuthLookupUpdateJob`, `ReindexingJob`, subscription email jobs, RDF generation. (Migrated from `delayed_job` - the `delayed_job_active_record` gem and its tables remain installed as a rollback safety net for now.)
 
 ### Semantic / RDF
 

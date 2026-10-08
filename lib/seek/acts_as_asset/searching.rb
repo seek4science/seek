@@ -33,7 +33,7 @@ module Seek
           text :git_content do
             git_search_terms if is_git_versioned?
           end
-        end if Seek::Config.solr_enabled
+        end
       end
     end
   end

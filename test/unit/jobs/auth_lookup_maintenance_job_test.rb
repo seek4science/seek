@@ -13,10 +13,6 @@ class AuthLookupMaintenaceJobTest < ActiveSupport::TestCase
     AuthLookupUpdateQueue.destroy_all
   end
 
-  test 'run period' do
-    assert_equal 8.hours, AuthLookupMaintenanceJob::RUN_PERIOD
-  end
-
   test 'priority' do
     assert_equal 3, AuthLookupMaintenanceJob.priority
   end

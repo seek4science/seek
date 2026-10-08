@@ -1,5 +1,3 @@
-require 'delayed/command'
-
 class AdminController < ApplicationController
   include CommonSweepers
 
@@ -75,6 +73,7 @@ class AdminController < ApplicationController
     end
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
+    Seek::Config.omniauth_skip_login_page = string_to_boolean params[:omniauth_skip_login_page]
     Seek::Config.standard_login_enabled = string_to_boolean params[:standard_login_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
@@ -349,8 +348,10 @@ class AdminController < ApplicationController
     Seek::Config.show_as_external_link_enabled = string_to_boolean params[:show_as_external_link_enabled]
     Seek::Config.block_file_uploads = string_to_boolean params[:block_file_uploads]
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
-    Seek::Config.max_cachable_size = params[:max_cachable_size]
-    Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
+    # These fields are entered in whole KB on the settings form but stored in bytes.
+    Seek::Config.max_cachable_size = helpers.kb_to_bytes(params[:max_cachable_size])
+    Seek::Config.hard_max_cachable_size = helpers.kb_to_bytes(params[:hard_max_cachable_size])
+    Seek::Config.cache_max_redis_item_size = helpers.kb_to_bytes(params[:cache_max_redis_item_size])
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
     Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
@@ -374,10 +375,18 @@ class AdminController < ApplicationController
     redirect_with_status(error, 'server')
   end
 
-  def restart_delayed_job
-    command = "bundle exec rake seek:workers:restart"
-    error = execute_command(command)
-    redirect_with_status(error, 'background job workers')
+  def restart_job_workers
+    # Stops the Solid Queue supervisor and starts a fresh one in the background (seek:workers:start
+    # daemonises), so the workers pick up any code/config changes.
+    error = execute_command('bundle exec rake seek:workers:restart')
+    if error.blank?
+      # The supervisor is spawned in the background and takes a moment to register, so the status
+      # panel won't show it immediately - flag that so the panel can invite a refresh.
+      flash[:job_workers_restarting] = true
+    else
+      flash[:error] = "There was a problem with restarting the background job workers. #{error.gsub('Terrapin::', '')}"
+    end
+    redirect_to action: :show
   end
 
   def clear_cache
@@ -385,17 +394,6 @@ class AdminController < ApplicationController
     flash[:notice] = "Cache cleared"
     respond_to do |format|
       format.html { render :index}
-    end
-  end
-
-  # give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
-  def wait_for_delayed_job_to_start
-    sleep(0.5)
-    pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids", 'delayed_job.0')
-    count = 0
-    while !pid.running? && (count < 10)
-      sleep(0.5)
-      count += 1
     end
   end
 
@@ -483,6 +481,8 @@ class AdminController < ApplicationController
         render partial: 'admin/stats/storage_usage_stats'
       when 'snapshot_and_doi_stats'
         render partial: 'admin/stats/snapshot_and_doi_stats'
+      when 'redis_stats'
+        render partial: 'admin/stats/redis_stats', locals: { stats: redis_cache_stats }
       when 'none'
         render html: ''
       else
@@ -623,15 +623,26 @@ class AdminController < ApplicationController
     return array.slice(0,index) + array.slice(index+1,array.length)
   end
 
-  # this destroys any failed Delayed::Jobs
+  # this destroys any failed SolidQueue::Jobs
   def clear_failed_jobs
-    Delayed::Job.where('failed_at IS NOT NULL').destroy_all
+    SolidQueue::Job.failed.destroy_all
     respond_to do |format|
       format.json { head :ok }
     end
   end
 
   private
+
+  # Redis INFO stats for the admin dashboard, or nil if the configured cache store isn't Redis-backed
+  # (e.g. the test environment's :memory_store). A hash with an 'error' key is returned if the stats
+  # can't be fetched (Redis unreachable) so the panel can report it rather than 500.
+  def redis_cache_stats
+    return nil unless Rails.cache.respond_to?(:redis_memory_stats)
+
+    Rails.cache.redis_memory_stats
+  rescue StandardError => e
+    { 'error' => e.message }
+  end
 
   def check_valid_email(email_address, field)
     if email_address.blank? || email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/

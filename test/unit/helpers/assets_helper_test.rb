@@ -70,6 +70,22 @@ class AssetsHelperTest < ActionView::TestCase
     assert rendered_asset_view(pres).blank?
   end
 
+  test 'rendered_asset_view when the content blob file is missing on disk' do
+    person = FactoryBot.create(:admin)
+    User.current_user = person.user
+
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:txt_content_blob),
+                            policy: FactoryBot.create(:public_policy))
+    assert df.content_blob.file_exists?
+    refute rendered_asset_view(df).blank?
+
+    File.delete(df.content_blob.filepath)
+    refute df.content_blob.file_exists?
+    assert_nothing_raised do
+      assert rendered_asset_view(df).blank?
+    end
+  end
+
   test 'authorised assets with lookup' do
     @assets = create_a_bunch_of_assets
     with_auth_lookup_enabled do

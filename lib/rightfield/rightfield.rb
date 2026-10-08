@@ -20,7 +20,7 @@ module Rightfield
 
     def generate_rightfield_csv(datafile)
       # Cache key is path-independent (cache_key), so it is stable across backends.
-      Rails.cache.fetch("rf_csv-#{datafile.content_blob.cache_key}") do
+      Rails.cache.fetch("rf_csv-#{datafile.content_blob.cache_key}", expires_in: 30.days) do
         # The RightField JAR needs a real local file; stream a temp copy so this works on S3 too.
         datafile.content_blob.with_temporary_copy do |path|
           run_rightfield_command(invoke_csv_command(datafile, path))
@@ -29,7 +29,7 @@ module Rightfield
     end
 
     def generate_rightfield_rdf(datafile)
-      Rails.cache.fetch("rf_rdf-#{datafile.content_blob.cache_key}") do
+      Rails.cache.fetch("rf_rdf-#{datafile.content_blob.cache_key}", expires_in: 30.days) do
         datafile.content_blob.with_temporary_copy do |path|
           run_rightfield_command(invoke_rdf_command(datafile, path))
         end

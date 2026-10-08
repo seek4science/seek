@@ -1,17 +1,15 @@
 {
   "data": {
-    "id": "1004285605",
+    "id": "1004285778",
     "type": "models",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
-          "id": "103",
+          "id": "165",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +29,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/models/1004285605?version=1",
+          "url": "http://localhost:3000/models/1004285778?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:30:19.524Z",
-      "updated_at": "2026-06-16T14:30:19.629Z",
+      "created_at": "2026-08-27T08:35:55.162Z",
+      "updated_at": "2026-08-27T08:35:55.371Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,7 +45,7 @@
           "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
           "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
           "content_type": "application/xml",
-          "link": "http://localhost:3000/models/1004285605/content_blobs/1050453360",
+          "link": "http://localhost:3000/models/1004285778/content_blobs/1050455641",
           "size": 5933
         },
         {
@@ -56,13 +54,13 @@
           "md5sum": "01788bca93265d80e8127ca0039bb69b",
           "sha1sum": "ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",
           "content_type": "application/vnd.ms-excel",
-          "link": "http://localhost:3000/models/1004285605/content_blobs/1050453361",
+          "link": "http://localhost:3000/models/1004285778/content_blobs/1050455642",
           "size": 9216
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039989049",
+          "profile": "/people/1039999448",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -79,7 +77,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039989049",
+            "id": "1039999448",
             "type": "people"
           }
         ]
@@ -87,7 +85,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039989050",
+            "id": "1039999449",
             "type": "people"
           }
         ]
@@ -95,7 +93,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234364",
+            "id": "627234408",
             "type": "organisms"
           }
         ]
@@ -103,11 +101,11 @@
       "people": {
         "data": [
           {
-            "id": "1039989049",
+            "id": "1039999448",
             "type": "people"
           },
           {
-            "id": "1039989050",
+            "id": "1039999449",
             "type": "people"
           }
         ]
@@ -115,7 +113,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022253051",
+            "id": "1022263502",
             "type": "projects"
           }
         ]
@@ -123,7 +121,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655261",
+            "id": "973655459",
             "type": "investigations"
           }
         ]
@@ -131,7 +129,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385288",
+            "id": "1060385377",
             "type": "studies"
           }
         ]
@@ -139,7 +137,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386956",
+            "id": "1035387113",
             "type": "assays"
           }
         ]
@@ -147,21 +145,26 @@
       "publications": {
         "data": [
           {
-            "id": "209",
+            "id": "182",
             "type": "publications"
           }
         ]
       }
     },
     "links": {
-      "self": "/models/1004285605?version=1"
+      "self": "/models/1004285778?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:30:19.492Z",
-      "modified": "2026-06-16T14:30:19.524Z",
+      "created": "2026-08-27T08:35:55.117Z",
+      "modified": "2026-08-27T08:35:55.162Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c6f4391a-b3f2-47a8-abe5-9505349c8633"
+      "uuid": "3bc6185f-9e7f-4a1c-b933-564aef42d974",
+      "metrics": {
+        "view_count": 0,
+        "run_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

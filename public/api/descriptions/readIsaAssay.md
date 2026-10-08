@@ -1,0 +1,1 @@
+<a name="readIsaAssay"></a>The **readIsaAssay** operation returns an ISA Assay — its assay metadata, output sample type, and the ID of the input sample type — including the samples (visible to the authenticated user) within the output sample type.

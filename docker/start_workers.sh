@@ -13,7 +13,7 @@ start_search
 # Cron
 setup_and_start_cron
 
-echo "STARTING WORKERS"
+echo "STARTING SOLID QUEUE"
 bundle exec rake seek:workers:start
 
 # Ensure the workers have started up and the logs are available before tailing

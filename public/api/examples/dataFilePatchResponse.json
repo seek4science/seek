@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "883654314",
+    "id": "1055250928",
     "type": "data_files",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022251010",
+              "id": "1022266814",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximally Patched Data File",
       "license": "CC-BY-4.0",
       "description": "Study of the Human Genome",
@@ -31,14 +29,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/883654314?version=1",
+          "url": "http://localhost:3000/data_files/1055250928?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:21:59.964Z",
-      "updated_at": "2026-06-16T14:22:00.512Z",
+      "created_at": "2026-08-27T08:45:54.746Z",
+      "updated_at": "2026-08-27T08:45:55.052Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,16 +45,16 @@
           "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
           "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/883654314/content_blobs/1050452633",
+          "link": "http://localhost:3000/data_files/1055250928/content_blobs/1050456605",
           "size": 8827
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039986938",
+          "profile": "/people/1040002826",
           "family_name": "Last",
-          "given_name": "Person394",
-          "affiliation": "An Institution: 470",
+          "given_name": "Person3147",
+          "affiliation": "An Institution: 3659",
           "orcid": null
         }
       ],
@@ -78,7 +76,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039986938",
+            "id": "1040002826",
             "type": "people"
           }
         ]
@@ -86,7 +84,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039986936",
+            "id": "1040002824",
             "type": "people"
           }
         ]
@@ -94,11 +92,11 @@
       "people": {
         "data": [
           {
-            "id": "1039986936",
+            "id": "1040002824",
             "type": "people"
           },
           {
-            "id": "1039986938",
+            "id": "1040002826",
             "type": "people"
           }
         ]
@@ -106,7 +104,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022251010",
+            "id": "1022266814",
             "type": "projects"
           }
         ]
@@ -114,7 +112,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973654926",
+            "id": "973656138",
             "type": "investigations"
           }
         ]
@@ -122,7 +120,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060384962",
+            "id": "1060385962",
             "type": "studies"
           }
         ]
@@ -130,7 +128,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386712",
+            "id": "1035387599",
             "type": "assays"
           }
         ]
@@ -138,7 +136,7 @@
       "publications": {
         "data": [
           {
-            "id": "63",
+            "id": "419",
             "type": "publications"
           }
         ]
@@ -146,7 +144,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618686",
+            "id": "1025618835",
             "type": "events"
           }
         ]
@@ -154,7 +152,7 @@
       "workflows": {
         "data": [
           {
-            "id": "33",
+            "id": "1475",
             "type": "workflows"
           }
         ]
@@ -167,14 +165,18 @@
       }
     },
     "links": {
-      "self": "/data_files/883654314?version=1"
+      "self": "/data_files/1055250928?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:21:59.951Z",
-      "modified": "2026-06-16T14:22:00.472Z",
+      "created": "2026-08-27T08:45:54.729Z",
+      "modified": "2026-08-27T08:45:55.011Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "b2f3a39b-5fae-4d5d-8ad3-3450fd014f73"
+      "uuid": "3837ac1f-c265-4a24-996e-7e0c729c5ff6",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

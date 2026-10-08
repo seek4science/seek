@@ -1,12 +1,10 @@
 {
-  "data": [
-
-  ],
+  "data": [],
   "jsonapi": {
     "version": "1.0"
   },
   "links": {
-    "self": "/collections/61/items"
+    "self": "/collections/180/items"
   },
   "meta": {
     "base_url": "http://localhost:3000",

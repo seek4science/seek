@@ -1,24 +1,20 @@
 {
   "data": {
-    "id": "1035386774",
+    "id": "1035387535",
     "type": "assays",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
-          "id": "19",
+          "id": "339",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
-      "snapshots": [
-
-      ],
+      "snapshots": [],
       "title": "A Maximal Modelling Assay",
       "description": "A Western Blot Assay",
       "other_creators": "Anonymous creator",
@@ -36,12 +32,10 @@
         "label": null,
         "uri": null
       },
-      "tags": [
-
-      ],
+      "tags": [],
       "creators": [
         {
-          "profile": "/people/1039987253",
+          "profile": "/people/1040002371",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -53,7 +47,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039987253",
+            "id": "1040002371",
             "type": "people"
           }
         ]
@@ -61,7 +55,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039987239",
+            "id": "1040002357",
             "type": "people"
           }
         ]
@@ -69,24 +63,22 @@
       "organisms": {
         "data": [
           {
-            "id": "627234329",
+            "id": "627234476",
             "type": "organisms"
           }
         ]
       },
       "human_diseases": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [
           {
-            "id": "1039987239",
+            "id": "1040002357",
             "type": "people"
           },
           {
-            "id": "1039987253",
+            "id": "1040002371",
             "type": "people"
           }
         ]
@@ -94,27 +86,27 @@
       "projects": {
         "data": [
           {
-            "id": "1022251310",
+            "id": "1022266431",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "973655009",
+          "id": "973656013",
           "type": "investigations"
         }
       },
       "study": {
         "data": {
-          "id": "1060385045",
+          "id": "1060385859",
           "type": "studies"
         }
       },
       "data_files": {
         "data": [
           {
-            "id": "883654343",
+            "id": "1055250878",
             "type": "data_files"
           }
         ]
@@ -122,7 +114,7 @@
       "samples": {
         "data": [
           {
-            "id": "34",
+            "id": "10394",
             "type": "samples"
           }
         ]
@@ -130,7 +122,7 @@
       "models": {
         "data": [
           {
-            "id": "1004285504",
+            "id": "1004285918",
             "type": "models"
           }
         ]
@@ -138,7 +130,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250473",
+            "id": "1055250954",
             "type": "sops"
           }
         ]
@@ -146,34 +138,32 @@
       "publications": {
         "data": [
           {
-            "id": "92",
+            "id": "355",
             "type": "publications"
           }
         ]
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
         "data": [
           {
-            "id": "34",
+            "id": "536",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/assays/1035386774"
+      "self": "/assays/1035387535"
     },
     "meta": {
-      "created": "2026-06-16T14:23:09.482Z",
-      "modified": "2026-06-16T14:23:09.530Z",
+      "created": "2026-08-27T08:44:34.149Z",
+      "modified": "2026-08-27T08:44:34.205Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "eb6a9b15-8831-4319-a859-375bec1ce718"
+      "uuid": "67185357-de0b-4f9e-b060-05a0d966373f"
     }
   },
   "jsonapi": {

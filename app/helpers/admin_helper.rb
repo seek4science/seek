@@ -47,6 +47,17 @@ module AdminHelper
     end
   end
 
+  # These size settings are stored in bytes but presented to the admin in KB (1 KB = 1024 bytes),
+  # rounded to at most 1 decimal place. A whole number is shown without a fractional part.
+  def bytes_to_kb(bytes)
+    kb = (bytes.to_i / 1024.0).round(1)
+    kb == kb.to_i ? kb.to_i : kb
+  end
+
+  def kb_to_bytes(kb)
+    (kb.to_f * 1024).round
+  end
+
   def admin_text_setting(name, value, title, description = nil, options = {})
     admin_setting_block(title, description) do
       text_field_tag(name, value, options.merge!(class: 'form-control'))

@@ -1,27 +1,25 @@
 {
   "data": {
     "type": "sample_types",
-    "id": "265",
+    "id": "10537",
     "attributes": {
       "title": "This is a new title.",
       "sample_attributes": [
         {
-          "id": "1155",
+          "id": "3273",
           "title": "This is a new attribute title",
           "sample_attribute_type": {
-            "title": "String attribute type 220"
+            "title": "String attribute type 831"
           }
         }
       ],
-      "tags": [
-
-      ]
+      "tags": []
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "1022253409",
+            "id": "1022268256",
             "type": "projects"
           }
         ]
@@ -29,7 +27,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386996",
+            "id": "1035387697",
             "type": "assays"
           }
         ]

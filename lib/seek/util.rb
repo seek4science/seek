@@ -140,12 +140,50 @@ module Seek
       ActiveRecord::Base.connection.instance_values['config'][:adapter]
     end
 
-    def self.delayed_job_pids
-      directory = "#{Rails.root}/tmp/pids"
-      Daemons::PidFile.find_files(directory, 'delayed_job', false, '').collect do |path|
-        file = path.sub("#{directory}/", '').sub('.pid', '')
-        Daemons::PidFile.new(directory, file)
-      end
+    # The pid of the running Solid Queue supervisor, if its pidfile (config/initializers/solid_queue.rb)
+    # exists and the process is still alive, otherwise nil.
+    def self.solid_queue_supervisor_pid
+      live_pid_from_pidfile(SolidQueue.supervisor_pidfile)
+    end
+
+    # The Solid Queue worker processes with a recent heartbeat. solid_queue_processes is in the
+    # application database, so this is readable from the web front end even when the workers run in
+    # a different container.
+    def self.live_job_workers
+      SolidQueue::Process.where(kind: 'Worker')
+                         .where('last_heartbeat_at > ?', SolidQueue.process_alive_threshold.ago)
+    end
+
+    # The queues this instance is configured to serve, read from config/queue.yml through Solid
+    # Queue's own loader so that the feature flag conditions in that file are applied. Unlike
+    # active_queue_names this doesn't depend on any workers currently running.
+    def self.configured_queue_names
+      SolidQueue::Configuration.new.configured_processes
+                               .select { |process| process.kind == :worker }
+                               .flat_map { |process| process.attributes[:queues].to_s.split(',') }
+                               .map(&:strip).reject { |name| name.blank? || name == '*' }.uniq.sort
+    end
+
+    # The names of the queues those workers are currently serving.
+    def self.active_queue_names
+      live_job_workers.flat_map { |process| process.metadata['queues'].to_s.split(',') }
+                      .map(&:strip).reject(&:blank?).uniq.sort
+    end
+
+    # Read a pid from a pidfile, returning it only if the process is still alive (nil for a missing or
+    # stale pidfile). A process owned by another user counts as alive, since it exists.
+    def self.live_pid_from_pidfile(path)
+      return nil unless path && File.exist?(path)
+
+      pid = File.read(path).strip.to_i
+      return nil unless pid.positive?
+
+      Process.kill(0, pid)
+      pid
+    rescue Errno::ESRCH
+      nil # No process with this pid - the pidfile is stale.
+    rescue Errno::EPERM
+      pid # The process exists but is owned by another user, so we can't signal it. It is still running.
     end
 
     # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed

@@ -14,7 +14,7 @@ module Seek #:nodoc:
             text :doi do
               snapshots.map(&:doi).compact
             end
-          end if Seek::Config.solr_enabled
+          end
 
           include Seek::ResearchObjects::ActsAsSnapshottable::InstanceMethods
 

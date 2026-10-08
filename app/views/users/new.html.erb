@@ -29,7 +29,7 @@
     <div class="panel-body">
       <% if show_omniauth_login? %>
         <ul class="nav nav-tabs" role="tablist">
-          <% if show_standard_password_login? %>
+          <% if show_password_login? %>
             <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
               <a href="#password_registration" aria-controls="password_registration" role="tab" data-toggle="tab">SEEK login</a>
             <% end %>
@@ -58,7 +58,7 @@
       <% end #omniauth enabled and providers available %>
 
       <div class="tab-content">
-        <% if show_standard_password_login? %>
+        <% if show_password_login? %>
           <%= content_tag(:div, id: 'password_registration', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
             <%= form_for @user do |f| -%>
 

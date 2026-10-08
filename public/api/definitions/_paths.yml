@@ -2572,6 +2572,224 @@
         $ref: "#/components/responses/notFound"
       "406":
         $ref: "#/components/responses/notAcceptable"
+/isa_studies:
+  post:
+    operationId: createIsaStudy
+    summary: Create a new ISA study
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createIsaStudy.md
+    tags:
+      - create
+      - isaStudies
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/isaStudyPost"
+      description: The ISA study to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaStudyResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaStudyPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/isa_studies/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The ID of the ISA study (Study ID) to fetch or update
+      schema:
+        type: integer
+      example: 67
+  get:
+    operationId: readIsaStudy
+    summary: Fetch an ISA study
+    description:
+      $ref: ../descriptions/readIsaStudy.md
+    tags:
+      - read
+      - isaStudies
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaStudyResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaStudyResponse.json
+      "401":
+        $ref: "#/components/responses/unauthorized"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "406":
+        $ref: "#/components/responses/notAcceptable"
+  patch:
+    operationId: updateIsaStudy
+    summary: Update an ISA study
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateIsaStudy.md
+    tags:
+      - update
+      - isaStudies
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/isaStudyPatch"
+      description: The ISA study fields to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaStudyResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaStudyPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+/isa_assays:
+  post:
+    operationId: createIsaAssay
+    summary: Create a new ISA assay
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createIsaAssay.md
+    tags:
+      - create
+      - isaAssays
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/isaAssayPost"
+      description: The ISA assay to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaAssayResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaAssayPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/isa_assays/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The ID of the ISA assay (Assay ID) to fetch or update
+      schema:
+        type: integer
+      example: 120
+  get:
+    operationId: readIsaAssay
+    summary: Fetch an ISA assay
+    description:
+      $ref: ../descriptions/readIsaAssay.md
+    tags:
+      - read
+      - isaAssays
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaAssayResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaAssayResponse.json
+      "401":
+        $ref: "#/components/responses/unauthorized"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "406":
+        $ref: "#/components/responses/notAcceptable"
+  patch:
+    operationId: updateIsaAssay
+    summary: Update an ISA assay
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateIsaAssay.md
+    tags:
+      - update
+      - isaAssays
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/isaAssayPatch"
+      description: The ISA assay fields to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/isaAssayResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/isaAssayPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
 /sample_types:
   get:
     operationId: listSampleTypes

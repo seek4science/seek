@@ -305,6 +305,114 @@ class SessionsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should skip the login page when there is a single omniauth provider' do
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new
+      assert_response :success
+      assert_select '#login-panel', count: 0
+      assert_select 'form#auto-login-form[action^=?]', '/auth/oidc'
+      assert_select 'form#auto-login-form input#auto_login_button[value=?]', 'Sign in with SEEK Testing OIDC'
+    end
+  end
+
+  test 'should not skip the login page by default' do
+    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      refute Seek::Config.omniauth_skip_login_page
+      get :new
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#oidc_login a', 1
+    end
+  end
+
+  test 'should not skip the login page when there is more than one login option' do
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: true, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#login-panel', 1
+      assert_select '#oidc_login a', 1
+    end
+  end
+
+  test 'should not skip the login page for a provider with its own form' do
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: true, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: false) do
+      get :new
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#ldap_login input[name="username"]', 1
+    end
+  end
+
+  test 'should not skip the login page when a strategy is requested' do
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new, params: { strategy: 'oidc' }
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#oidc_login a', 1
+    end
+  end
+
+  test 'should not skip the login page after a failed login' do
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new, flash: { error: 'Something went wrong' }
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#oidc_login a', 1
+    end
+  end
+
+  test 'should still reach the password form when skipping the login page' do
+    with_config_values(omniauth_skip_login_page: true, standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new, params: { show_standard_login: true }
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select 'div.tab-content div#password_login', 1
+    end
+  end
+
+  test 'should hide registration and password reset links when unavailable' do
+    FactoryBot.create(:user)
+
+    get :new
+    assert_select '.panel-footer a[href=?]', signup_path, 1
+    assert_select '.panel-footer a[href=?]', forgot_password_path, 1
+
+    with_config_value(:registration_disabled, true) do
+      get :new
+      assert_select '.panel-footer a[href=?]', signup_path, count: 0
+      assert_select '.panel-footer a[href=?]', forgot_password_path, 1
+    end
+
+    # no SEEK password to reset when standard login is unavailable
+    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: true, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new
+      assert_select '.panel-footer a[href=?]', signup_path, 1
+      assert_select '.panel-footer a[href=?]', forgot_password_path, count: 0
+
+      with_config_value(:registration_disabled, true) do
+        get :new
+        assert_select '.panel-footer', count: 0
+      end
+    end
+  end
+
   protected
 
   def cookie_for(user)

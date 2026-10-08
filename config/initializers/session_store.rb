@@ -1,13 +1,10 @@
 # Be sure to restart your server when you modify this file.
 
-redis_host = ENV.fetch('REDIS_HOST', 'localhost')
-redis_password = ENV.fetch('REDIS_PASSWORD', nil)
-session_url =
-  if redis_password.present?
-    "redis://:#{CGI::escape(redis_password)}@#{redis_host}:6379/0/session"
-  else
-    "redis://#{redis_host}:6379/0/session"
-  end
+require_relative '../../lib/seek/redis_config'
+
+# The session namespace lives on the same DB as the cache (Seek::RedisConfig.url), under the
+# /session path, so cache and sessions share one authenticated connection URL.
+session_url = "#{Seek::RedisConfig.url}/session"
 
 session_options = {
   servers: [session_url],

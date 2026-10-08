@@ -25,6 +25,7 @@ require 'integration/api/write_api_test_suite'
 require 'rdf_test_cases'
 require 'rack_test_cookie_jar_extensions'
 require 'single_page_test_utils'
+require 'jobs_dashboard_test_helper'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,
@@ -145,6 +146,18 @@ class ActiveSupport::TestCase
   def clear_rails_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
+  end
+
+  # Swaps Rails.logger for a Logger writing to a StringIO for the duration of the block, returning
+  # everything logged as a String.
+  def capture_log
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = original_logger
   end
 
   def clear_current_user
@@ -278,7 +291,7 @@ VCR.configure do |config|
   # ignore sparql requests, for some of the RDF integration tests
   # fixme: in the future it would be good to make the sparql data consistent enough to work with VCR
   config.ignore_request do |request|
-    request.uri =~ /sparql-auth/
+    request.uri =~ /sparql-auth/ || request.uri =~ /localhost:8890/
   end
 
   # Disable VCR recording when running in CI to detect missing cassettes and avoid making live requests.
@@ -290,6 +303,20 @@ WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line 
 # Clear testing filestore before test run (but check its under tmp for safety)
 if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
   FileUtils.rm_r(Seek::Config.filestore_path)
+end
+
+# Integration tests exercise the full stack, so they use the Redis-backed throttle store the app
+# actually runs with (the CI workflow provides a Redis server, which the session store needs
+# regardless). Unit and functional tests keep the in-memory store set up by the initializer.
+class ActionDispatch::IntegrationTest
+  setup do
+    @rack_attack_memory_store = Rack::Attack.cache.store
+    Rack::Attack.cache.store = Seek::RackAttackStore.build
+  end
+
+  teardown do
+    Rack::Attack.cache.store = @rack_attack_memory_store
+  end
 end
 
 class ActionController::TestCase

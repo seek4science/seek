@@ -207,6 +207,7 @@ def load_seek_config_defaults!
   Seek::Config.default :cache_remote_files, true
   Seek::Config.default :max_cachable_size, 20 * 1024 * 1024
   Seek::Config.default :hard_max_cachable_size, 100 * 1024 * 1024
+  Seek::Config.default :cache_max_redis_item_size, 1 * 1024 * 1024
 
   Seek::Config.default :orcid_required, false
 
@@ -228,6 +229,7 @@ def load_seek_config_defaults!
 
   # omniauth settings and behaviour
   Seek::Config.default :omniauth_enabled, false
+  Seek::Config.default :omniauth_skip_login_page, false
   Seek::Config.default :omniauth_user_create, true
   Seek::Config.default :omniauth_user_activate, true
   Seek::Config.default :omniauth_elixir_aai_enabled, false

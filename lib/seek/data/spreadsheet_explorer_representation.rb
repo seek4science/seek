@@ -39,13 +39,13 @@ module Seek
       # Return the data file's spreadsheet XML
       # If it doesn't exist yet, it gets created
       def spreadsheet_xml
-        Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
+        Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}", expires_in: 30.days) do
           content_blob.to_spreadsheet_xml
         end
       end
 
       def spreadsheet_csv
-        Rails.cache.fetch("blob_ss_csv-#{content_blob.cache_key}") do
+        Rails.cache.fetch("blob_ss_csv-#{content_blob.cache_key}", expires_in: 30.days) do
           content_blob.extract_csv
         end
       end

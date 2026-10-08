@@ -19,11 +19,11 @@
                 <%= label_tag("#{t('project_administrator').pluralize}") %>
                 <%= project_administrators_input_box(@project) %>
 
-                <%= label_tag("#{t('asset_gatekeeper').pluralize}") %>
-                <%= project_asset_gatekeepers_input_box(@project) %>
-
                 <%= label_tag("#{t('asset_housekeeper').pluralize}") %>
                 <%= project_asset_housekeepers_input_box(@project) %>
+
+                <%= label_tag("#{t('asset_gatekeeper').pluralize}") %>
+                <%= project_asset_gatekeepers_input_box(@project) %>
 
                 <% if admin_logged_in? %>
                     <label><%= "#{t('pal').pluralize}" %></label>
