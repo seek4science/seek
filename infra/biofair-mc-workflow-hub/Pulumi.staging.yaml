@@ -13,7 +13,7 @@ config:
   biofair-mc-workflow-hub:seekImage: fairdom/seek:workflowhub-pulumi
   biofair-mc-workflow-hub:solrImage: fairdom/seek-solr:pulumi
 
-  biofair-mc-workflow-hub:webCount: "1" # the minimum; raise once the schema exists, see tech-notes.md
+  biofair-mc-workflow-hub:webCount: "1" # the minimum; keep at 1 until the schema exists
   biofair-mc-workflow-hub:webCountMax: "8"
   biofair-mc-workflow-hub:workerCount: "1"
   biofair-mc-workflow-hub:webInstanceType: t3.large

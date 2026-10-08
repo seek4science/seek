@@ -8,8 +8,7 @@ description: >-
   EC2 instance, served over HTTPS with a self-signed certificate at the load
   balancer's own hostname. Creates no IAM resources.
 
-# Design decisions, referred to below by section number ("handover 4.4"), are
-# in docs/SEEK-pulumi-handover.md. What phase 2 adds is in docs/pulumi-next-phase.md.
+# See README.md for deploying it.
 
 config:
   # Environment name (staging, production), used in resource names.
@@ -29,7 +28,8 @@ config:
     type: string
     default: fairdom/seek-solr:main
   # The fewest web instances; autoscaling adds more, up to webCountMax. Keep
-  # at 1 until the schema exists (handover 4.4).
+  # at 1 until the schema exists: on an empty database each web container
+  # creates it at boot, and several doing so at once would race.
   webCount:
     type: integer
     default: 1
@@ -104,16 +104,16 @@ variables:
   # mount the filestore, and write the container environment. Each launch
   # template appends its own `docker run`. NO_ENTRYPOINT_WORKERS is only read
   # by the web entrypoint and QUIET_SUPERCRONIC only by the workers, so one
-  # environment serves both. REDIS_TLS needs a SEEK image with handover
-  # change 5.1.
+  # environment serves both. REDIS_TLS needs a SEEK image recent enough to
+  # support it.
   hostSetup: |
     #!/bin/bash
     set -euo pipefail
     dnf install -y docker amazon-efs-utils
     systemctl enable --now docker
 
-    # Through the access point, so files are owned by www-data (uid 33), as
-    # the container expects (handover 4.2).
+    # Through the access point, so files are owned by www-data (uid 33), the
+    # user the SEEK container runs as.
     mkdir -p /mnt/filestore
     echo "${sharedFs.id}:/ /mnt/filestore efs _netdev,tls,accesspoint=${filestoreAccessPoint.id} 0 0" >> /etc/fstab
     mount /mnt/filestore
@@ -262,7 +262,8 @@ resources:
           value: utf8mb4
         - name: collation_server
           value: utf8mb4_unicode_ci
-        # The image's mysql client uses skip-ssl (handover 4.1).
+        # The SEEK image's mysql client connects without TLS (skip-ssl), so its
+        # start-up checks fail if the server requires it.
         - name: require_secure_transport
           value: "0"
 
@@ -289,8 +290,8 @@ resources:
       finalSnapshotIdentifier: ${namePrefix}-final
 
   # -------------------------------------------------------------------------
-  # Redis: cache, sessions and throttle counters; no durable data (handover
-  # 3.4). TLS-only, without an auth token.
+  # Redis: cache, sessions and throttle counters; no durable data, since
+  # SEEK's job queue is in MySQL. TLS-only, without an auth token.
   # -------------------------------------------------------------------------
   redisSubnets:
     type: aws:elasticache:SubnetGroup
@@ -349,7 +350,8 @@ resources:
       subnetId: ${vpc.privateSubnetIds[1]}
       securityGroups: ["${dataSg.id}"]
 
-  # The image runs as www-data, uid/gid 33 (handover 4.2).
+  # The SEEK image runs as www-data, uid/gid 33 in its Debian base. A wrong
+  # owner here lets SEEK start but fail to write uploads.
   filestoreAccessPoint:
     type: aws:efs:AccessPoint
     properties:
@@ -366,7 +368,7 @@ resources:
 
   # -------------------------------------------------------------------------
   # Solr: the derived image on an EC2 instance, index on the root volume. A
-  # replaced instance means a reindex (handover 3.6).
+  # replaced instance means a full reindex, which is slow.
   # -------------------------------------------------------------------------
   solrInstance:
     type: aws:ec2:Instance
