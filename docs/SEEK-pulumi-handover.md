@@ -408,6 +408,21 @@ the AWS account it targets:
   added with `pulumi config set --secret` and stored there encrypted.
 - `README.md`: scope, open questions, and deploy steps.
 
+**Phase 1.** The program currently deploys a cut-down phase 1 of this design:
+HTTP only at the load balancer's hostname, fixed instance counts, the Solr
+index on the instance's root volume, Solr reached by IP, no shared file cache,
+no Redis auth token, and no EFS backups. The README lists what phase 2 adds
+back.
+
+**Not Fargate.** On this branch the front-end and workers run as Docker
+containers on EC2 instances in Auto Scaling groups, rather than as ECS Fargate
+services (decision 3.9). Fargate needs IAM roles for ECS and permission to
+pass them, which the `Developer` permission set does not have. The
+instances use the account's existing SSM instance profile instead, and the
+database password moves from Secrets Manager to SSM Parameter Store, which
+that profile can read. RDS,
+ElastiCache, EFS, the load balancer and Solr are unchanged.
+
 Following biofair-mc-infra's conventions, it differs from the sketch that was
 originally embedded here in these ways:
 
