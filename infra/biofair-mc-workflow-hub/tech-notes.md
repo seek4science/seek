@@ -14,8 +14,9 @@ to what is needed to prove SEEK runs on it:
   single NAT Gateway
 - an Application Load Balancer at its own AWS hostname, serving HTTPS with a
   self-signed certificate, and redirecting HTTP to HTTPS
-- SEEK web and Solid Queue worker instances, each in an Auto Scaling group of
-  fixed size, running the SEEK image with Docker on Amazon Linux 2023
+- SEEK web and Solid Queue worker instances in Auto Scaling groups, running
+  the SEEK image with Docker on Amazon Linux 2023: 1-8 web instances,
+  autoscaled on CPU, and one worker
 - MySQL on RDS, Redis on ElastiCache (TLS, no auth token), and the filestore
   on EFS
 - Solr on its own EC2 instance running the `fairdom/seek-solr` image, with the
@@ -62,6 +63,21 @@ and the web and worker instances are left alone.
 A change to a launch template (a new image tag, a changed setting, or a new
 Amazon Linux AMI from the lookup) makes `pulumi up` roll that group: each new
 instance boots and passes its health check before an old one is terminated.
+
+### Autoscaling
+
+The web group runs between `webCount` (1) and `webCountMax` (8) instances. A
+target tracking policy adds instances while average CPU across the group is
+above `webCpuTarget` (50%), and removes them once it has been well below
+(under 35%) for 15 minutes. A new instance is left out of the average for
+its first five minutes, while it boots and pulls the image. Pulumi does not
+set the group's desired capacity, so a `pulumi up` leaves the current number
+of instances alone.
+
+EC2's basic monitoring reports CPU every five minutes, so scaling reacts a
+few minutes late in both directions. Watch it in the console under the
+group's **Activity** tab, or the CloudWatch alarms named
+`TargetTracking-<group>-AlarmHigh` and `-AlarmLow`.
 
 ### Why not Fargate
 
@@ -279,8 +295,8 @@ aws rds wait db-instance-available --db-instance-identifier "$DB"
 pulumi up --refresh
 ```
 
-`pulumi up --refresh` notices the emptied groups and sets them back to
-`webCount` and `workerCount`. The new instances find the existing database
+`pulumi up --refresh` notices the emptied groups and sets their sizes back
+from the stack config, starting the web group at `webCount`. The new instances find the existing database
 and carry on, without setting it up again. Set `SOLR` and `DB` again as above
 if resuming from a new shell. Starting a stopped database takes 5-10 minutes,
 including a recovery step; its progress is on the database's **Logs &
@@ -320,7 +336,9 @@ deletes it outright. Both default to on, for stacks holding real data; there,
 
 ### Costs
 
-Running, the staging stack costs roughly $0.48 an hour at London on-demand
-prices, about half of it the three EC2 instances and the rest RDS,
-ElastiCache, the load balancer and the NAT gateway. Paused, roughly $0.15 an
-hour.
+At London on-demand prices, the staging stack costs roughly $0.38 an hour
+for everything except the web instances (the worker and Solr instances, RDS,
+ElastiCache, the load balancer and the NAT gateway), plus about $0.10 an hour
+for each web instance: about $0.48 an hour at the minimum of one, $0.68 at
+three and $1.17 at the maximum of eight. A busy `t3` instance adds about
+$0.03 an hour in CPU credits. Paused, roughly $0.15 an hour.

@@ -15,9 +15,9 @@ on EC2 instances in Auto Scaling groups, not on ECS Fargate, because the
 `Developer` permission set cannot create or pass the IAM roles Fargate needs;
 the database password comes from SSM Parameter Store rather than Secrets
 Manager, and there is no ECS cluster. HTTPS uses a self-signed certificate.
-And it leaves out the real domain and its public DNS record, front-end
-autoscaling (a fixed number of instances), the Solr data volume and its
-snapshots, the shared file cache and the Redis auth token. See the project
+The web tier autoscales from 1 rather than 2 instances. And it leaves out the
+real domain and its public DNS record, the Solr data volume and its snapshots,
+the shared file cache and the Redis auth token. See the project
 [README](../infra/biofair-mc-workflow-hub/README.md).
 
 ## Services overview

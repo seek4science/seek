@@ -6,17 +6,17 @@ infrastructure for WorkflowHub, which runs SEEK. It is written in Pulumi YAML.
 ## Current scope
 
 Phase 1 and the completed parts of phase 2: a VPC, a load balancer serving
-HTTPS with a self-signed certificate in front of SEEK web and worker instances
-in EC2 Auto Scaling groups, MySQL on RDS, Redis on ElastiCache, the filestore
-on EFS, and Solr on its own instance, reached by a private DNS name. It needs
-no IAM permissions beyond the `Developer` permission set, and has been
-deployed and torn down successfully.
+HTTPS with a self-signed certificate in front of SEEK web instances,
+autoscaled on CPU, and a worker instance, in EC2 Auto Scaling groups, MySQL on
+RDS, Redis on ElastiCache, the filestore on EFS, and Solr on its own instance,
+reached by a private DNS name. It needs no IAM permissions beyond the
+`Developer` permission set, and has been deployed and torn down successfully.
 
 ## Phase 2
 
 - **Completed:** HTTPS, with a self-signed certificate for testing
 - **Completed:** A private DNS name for Solr
-- Front-end autoscaling
+- **Completed:** Front-end autoscaling
 - A durable Solr index that survives instance replacement, with snapshots
 - A shared file cache across web instances
 

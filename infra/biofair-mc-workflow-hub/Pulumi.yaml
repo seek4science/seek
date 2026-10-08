@@ -380,6 +380,8 @@ resources:
         volumeSize: 50
         volumeType: gp3
         encrypted: true
+        tags:
+          Name: ${namePrefix}-solr
       tags:
         Name: ${namePrefix}-solr
       userData: |
@@ -513,6 +515,11 @@ resources:
             Name: ${namePrefix}-web
             Environment: ${environment}
             ManagedBy: pulumi
+        - resourceType: volume
+          tags:
+            Name: ${namePrefix}-web
+            Environment: ${environment}
+            ManagedBy: pulumi
       userData:
         fn::toBase64:
           fn::join:
@@ -581,6 +588,11 @@ resources:
         httpTokens: required
       tagSpecifications:
         - resourceType: instance
+          tags:
+            Name: ${namePrefix}-worker
+            Environment: ${environment}
+            ManagedBy: pulumi
+        - resourceType: volume
           tags:
             Name: ${namePrefix}-worker
             Environment: ${environment}

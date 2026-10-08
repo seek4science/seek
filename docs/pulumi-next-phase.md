@@ -53,16 +53,20 @@ that blocks it.
   an A record for the Solr instance (`solrRecord`), and
   `SOLR_HOST=solr.seek.internal` in `hostSetup`.
 
-### 3. Front-end autoscaling
+### 3. **Completed:** Front-end autoscaling
 
-- **Adds:** 2-8 web instances, scaled on CPU.
-- **Needs:** a `webCountMax` setting, `maxSize: ${webCountMax}` on `webGroup`,
-  and an `aws:autoscaling:Policy` with target tracking on
-  `ASGAverageCPUUtilization`. The full design's `webScaleTarget` and
-  `webScalePolicy` were written for ECS and do not carry over directly.
-- **Consider:** new instances take several minutes to boot and pull the SEEK
-  image, so scale out early (a lower CPU target) rather than late. Item 5
-  becomes worthwhile once there is more than one web instance.
+- **Adds:** 1-8 web instances, scaled on CPU.
+- **Done as:** `webGroup` runs between `webCount` and `webCountMax`, with no
+  desired capacity set, so autoscaling owns it; `webScalePolicy`, a target
+  tracking policy on `ASGAverageCPUUtilization` at `webCpuTarget` (50%, low
+  because a new instance takes about five minutes to boot and pull the
+  image); and a 300-second instance warm-up. Tested under load: the group
+  scaled out to three instances, and scaled back in once the load stopped.
+- **Consider:** detailed monitoring on the web launch template
+  (`monitoring: enabled: true`, about $2 a month per instance). With basic
+  monitoring CPU is reported every five minutes, so scaling reacts late in
+  both directions, and can add an instance as load ends. Item 5 becomes
+  worthwhile now there can be more than one web instance.
 
 ### 4. Durable Solr index
 
