@@ -112,11 +112,15 @@ variables:
     dnf install -y docker amazon-efs-utils
     systemctl enable --now docker
 
-    # Through the access point, so files are owned by www-data (uid 33), the
-    # user the SEEK container runs as.
-    mkdir -p /mnt/filestore
+    # The filestore and the file cache, each through its access point, so
+    # files are owned by www-data (uid 33), the user the SEEK container runs
+    # as. Sharing the cache lets any instance serve a large generated file
+    # that another has already produced.
+    mkdir -p /mnt/filestore /mnt/cache
     echo "${sharedFs.id}:/ /mnt/filestore efs _netdev,tls,accesspoint=${filestoreAccessPoint.id} 0 0" >> /etc/fstab
+    echo "${sharedFs.id}:/ /mnt/cache efs _netdev,tls,accesspoint=${cacheAccessPoint.id} 0 0" >> /etc/fstab
     mount /mnt/filestore
+    mount /mnt/cache
 
     # The SSM instance role can read Parameter Store.
     TOKEN=$(curl -sX PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
@@ -366,6 +370,22 @@ resources:
           ownerGid: 33
           permissions: "0755"
 
+  # SEEK's file cache (tmp/cache): the few generated files too large for
+  # Redis. Shared by every web and worker instance.
+  cacheAccessPoint:
+    type: aws:efs:AccessPoint
+    properties:
+      fileSystemId: ${sharedFs.id}
+      posixUser:
+        uid: 33
+        gid: 33
+      rootDirectory:
+        path: /cache
+        creationInfo:
+          ownerUid: 33
+          ownerGid: 33
+          permissions: "0755"
+
   # -------------------------------------------------------------------------
   # Solr: the derived image on an EC2 instance, index on the root volume. A
   # replaced instance means a full reindex, which is slow.
@@ -529,7 +549,7 @@ resources:
             - - ${hostSetup}
               - |
                 docker run -d --restart always --name seek --env-file /etc/seek.env \
-                  -p 3000:3000 -v /mnt/filestore:/seek/filestore \
+                  -p 3000:3000 -v /mnt/filestore:/seek/filestore -v /mnt/cache:/seek/tmp/cache \
                   ${seekImage} docker/entrypoint.sh
 
   webGroup:
@@ -606,7 +626,7 @@ resources:
             - - ${hostSetup}
               - |
                 docker run -d --restart always --name seek-workers --env-file /etc/seek.env \
-                  -v /mnt/filestore:/seek/filestore \
+                  -v /mnt/filestore:/seek/filestore -v /mnt/cache:/seek/tmp/cache \
                   ${seekImage} docker/start_workers.sh
 
   workerGroup:

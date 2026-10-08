@@ -65,8 +65,7 @@ that blocks it.
 - **Consider:** detailed monitoring on the web launch template
   (`monitoring: enabled: true`, about $2 a month per instance). With basic
   monitoring CPU is reported every five minutes, so scaling reacts late in
-  both directions, and can add an instance as load ends. Item 5 becomes
-  worthwhile now there can be more than one web instance.
+  both directions, and can add an instance as load ends.
 
 ### 4. Durable Solr index
 
@@ -84,13 +83,15 @@ that blocks it.
 - **Check:** the device name on the current instance types and AMI (handover
   4.6).
 
-### 5. Shared file cache
+### 5. **Completed:** Shared file cache
 
 - **Adds:** a `tmp/cache` shared between web instances, so a large generated
   file is not regenerated per instance (handover 3.3).
-- **Needs:** the full design's `cacheAccessPoint`; a second mount in
-  `hostSetup` (e.g. `/mnt/cache`); and `-v /mnt/cache:/seek/tmp/cache` on the
-  web and worker `docker run`.
+- **Done as:** `cacheAccessPoint`, a second access point on the EFS
+  filesystem at `/cache`, owned by uid 33; `hostSetup` mounts it at
+  `/mnt/cache` alongside the filestore; and both the web and worker
+  `docker run` mount it as `/seek/tmp/cache`, as docker-compose does, so the
+  workers' cleanup job prunes the shared cache.
 
 ## Phase 3: protecting the data, and sizing
 
@@ -109,7 +110,7 @@ that blocks it.
   | VPC and subnets | NAT gateway, and the private subnets' default route through it |
   | Security groups (`appSg`, `dataSg`, `albSg`), which reference each other | Load balancer, certificate and listeners |
   | RDS, its subnet and parameter groups, the password parameter | Web and worker launch templates and Auto Scaling groups |
-  | EFS, mount targets and access point | Solr instance and its DNS record |
+  | EFS, mount targets and access points | Solr instance and its DNS record |
   | The private DNS zone | ElastiCache, which holds only cache and sessions |
   | The Solr data volume, once phase 2 adds it | |
 

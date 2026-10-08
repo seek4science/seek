@@ -416,7 +416,7 @@ the AWS account it targets:
 **Phase 1.** The program currently deploys a cut-down phase 1 of this design:
 HTTPS with a self-signed certificate at the load balancer's hostname, 1-8
 autoscaled web instances, the Solr index on the instance's root volume, no
-shared file cache, no Redis auth token, and no EFS backups.
+Redis auth token, and no EFS backups.
 [`pulumi-next-phase.md`](pulumi-next-phase.md) lists what later phases add
 back.
 

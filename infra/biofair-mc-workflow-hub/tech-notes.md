@@ -18,7 +18,7 @@ to what is needed to prove SEEK runs on it:
   the SEEK image with Docker on Amazon Linux 2023: 1-8 web instances,
   autoscaled on CPU, and one worker
 - MySQL on RDS, Redis on ElastiCache (TLS, no auth token), and the filestore
-  on EFS
+  and a shared file cache on EFS, each through its own access point
 - Solr on its own EC2 instance running the `fairdom/seek-solr` image, with the
   index on the instance's root volume, reachable as `solr.seek.internal`
   through a Route 53 private zone attached to the VPC
@@ -32,13 +32,19 @@ refer to sections of the handover as "handover 4.4" and so on.
 Each group launches from a launch template whose user data:
 
 1. installs Docker and the EFS mount helper, and mounts the filestore at
-   `/mnt/filestore` through its access point, so files are owned by
-   `www-data` (uid 33) as the container expects;
+   `/mnt/filestore` and the file cache at `/mnt/cache`, each through its
+   access point, so files are owned by `www-data` (uid 33) as the container
+   expects;
 2. reads the database password from SSM Parameter Store
    (`/<prefix>/db-password`);
 3. writes the container environment to `/etc/seek.env` (mode 600);
-4. runs the SEEK container: `docker/entrypoint.sh` on web instances,
+4. runs the SEEK container, with the two mounts as `/seek/filestore` and
+   `/seek/tmp/cache`: `docker/entrypoint.sh` on web instances,
    `docker/start_workers.sh` on worker instances.
+
+The file cache holds the few generated files too large for Redis. Sharing it
+means any web instance can serve a file another has already generated, and
+the workers' scheduled cleanup job prunes it for all of them.
 
 Container logs stay on each instance (`docker logs seek`).
 
@@ -255,7 +261,8 @@ One SEEK version at a time (handover 3.8): from a shell on a web instance, run
 the upgrade with the new image,
 
 ```console
-docker run --rm --env-file /etc/seek.env -v /mnt/filestore:/seek/filestore \
+docker run --rm --env-file /etc/seek.env \
+  -v /mnt/filestore:/seek/filestore -v /mnt/cache:/seek/tmp/cache \
   fairdom/seek:<new-tag> docker/upgrade.sh
 ```
 

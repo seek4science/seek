@@ -33,18 +33,16 @@ flowchart LR
         db[("MySQL<br/>app data + job queue")]
         redis[("Redis<br/>cache + sessions")]
         files[("Shared filestore<br/>uploads")]
-        cache[("Shared file cache<br/>phase 2")]
+        cache[("Shared file cache<br/>large generated files")]
     end
 
     users --> alb --> web
-    web & workers --> solr & db & redis & files
-    web -.-> cache
+    web & workers --> solr & db & redis & files & cache
 
     classDef multi stroke-width:4px
     classDef planned stroke-dasharray:5 5,color:#777
     classDef bare fill:none,stroke:none
     class web multi
-    class cache planned
     class app,backing bare
 ```
 
@@ -55,7 +53,7 @@ flowchart LR
 | Solr | `fairdom/seek-solr` container on a dedicated EC2 instance | 1 |
 | MySQL | RDS, managed | single instance |
 | Redis | ElastiCache, managed | single node |
-| Shared filestore | EFS, managed | mounted by every front-end and worker instance |
+| Shared filestore and file cache | EFS, managed, an access point each | mounted by every front-end and worker instance |
 
 ## Runtime architecture
 
@@ -82,10 +80,9 @@ flowchart TB
         privdns["Route 53 private zone<br/>solr.seek.internal"]
         rds[("RDS MySQL 8.4<br/>db.t3.medium, gp3<br/>app data + job queue")]
         redis[("ElastiCache Redis 7.1, TLS<br/>cache, sessions, throttling")]
-        efs[("EFS<br/>/filestore access point")]
+        efs[("EFS<br/>/filestore and /cache access points")]
         params["SSM Parameter Store<br/>DB password"]
 
-        cacheap[("EFS /cache access point<br/>phase 2")]
         ebs[("Standalone EBS volume for the Solr index<br/>nightly snapshots<br/>phase 2")]
         token["Redis auth token in Parameter Store<br/>phase 3"]
     end
@@ -105,12 +102,11 @@ flowchart TB
     hub -. "pulled via NAT" .-> web
     hub -. "pulled via NAT" .-> workers
     hub -. "pulled via NAT" .-> solr
-    web -.-> cacheap
     solr -.-> ebs
     token -.-> redis
 
     classDef planned stroke-dasharray:5 5,color:#777
-    class cacheap,ebs,token planned
+    class ebs,token planned
 ```
 
 | docker-compose service | AWS resource |
@@ -120,8 +116,8 @@ flowchart TB
 | `db` | RDS MySQL 8.4 (`db`) |
 | `redis_store` | ElastiCache Redis replication group (`redis`) |
 | `solr` | EC2 instance running `fairdom/seek-solr` (`solrInstance`); index on its root volume until phase 2 |
-| `seek-filestore` volume | EFS filesystem with a `/filestore` access point |
-| `seek-cache` volume | Each instance's own disk until phase 2 adds a shared `/cache` access point |
+| `seek-filestore` volume | An EFS filesystem, through a `/filestore` access point |
+| `seek-cache` volume | The same EFS filesystem, through a `/cache` access point |
 
 Each web and worker instance's user data mounts the filestore, reads the
 database password from Parameter Store, writes the container environment,
