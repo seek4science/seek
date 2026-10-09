@@ -161,6 +161,7 @@ module WorkflowExtraction
     crate['datePublished'] = Time.now unless crate['datePublished']
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
+    crate['contentUrl'] = main_workflow_url
 
     crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
 
@@ -252,6 +253,13 @@ module WorkflowExtraction
     resource = is_a_version? ? parent : self
     resource = [action.to_sym, resource] if action
     Seek::Util.routes.polymorphic_url(resource, version: version)
+  end
+
+  def main_workflow_url
+    resource = is_a_version? ? parent : self
+    return unless is_git_versioned? && !resource.main_workflow_path.nil?
+
+    Seek::Util.routes.polymorphic_url([resource, :git_download], version: version, path: resource.main_workflow_path)
   end
 
   [:main_workflow, :diagram, :abstract_cwl].each do |type|
