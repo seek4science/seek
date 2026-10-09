@@ -178,6 +178,11 @@ class Workflow < ApplicationRecord
     @extraction_errors = metadata.delete(:errors) || []
     @extracted_metadata = metadata
     assign_attributes(@extracted_metadata)
+
+    updated_assets_creators_attrs = @extracted_metadata[:assets_creators_attributes]&.values || []
+    return if updated_assets_creators_attrs.empty?
+
+    self.assets_creators = retained_and_new_creators(updated_assets_creators_attrs)
   end
 
   def workflow_data_files_attributes=(attributes)

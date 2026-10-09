@@ -314,6 +314,34 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'can submit new version of RO-Crate with orcID clash' do
+    p1 = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1825-0097') # also in the uploaded crate
+    p2 = FactoryBot.create(:person, first_name: 'Sam', last_name: 'Williams') # not in the uploaded crate
+    workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow', creators: [p1, p2], contributor: current_person)
+    assert_no_difference('Workflow.count') do
+      assert_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/creator_with_orcid.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }, headers: { 'Authorization' => write_access_auth }
+
+        assert_response :success
+
+        workflow.reload
+        assert_equal 2, workflow.version
+
+        old_version = workflow.find_version(1)
+        new_version = workflow.git_version
+        assert_equal 2, old_version.assets_creators.size
+        assert_equal 2, new_version.assets_creators.size
+        assert_equal 'Joe Bloggs', new_version.assets_creators[0].name # from the crate
+        assert_equal 'Jane Smith', new_version.assets_creators[1].name # in both the original version and the crate
+      end
+    end
+  end
+
   test 'cannot submit RO-Crate with ambiguous matching ID' do
     workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
     workflow2 = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
