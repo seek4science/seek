@@ -65,10 +65,6 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   config.cache_store = Seek::Caching::RedisWithFileOverflowStore.build("#{Rails.root}/tmp/cache")
-  config.settings_cache_store = ActiveSupport::Cache::RedisCacheStore.new(
-    url: Seek::RedisConfig.url,
-    namespace: 'settings-cache'
-  )
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
