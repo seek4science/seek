@@ -150,9 +150,16 @@ module Seek
 
     def propagate_all
       prop_methods = methods.select { |m| m.to_s.end_with?('_propagate') }
+      exception = nil
       prop_methods.each do |m|
-        send m
+        begin
+          send m
+        rescue StandardError => e
+          exception ||= e
+        end
       end
+      raise exception if exception
+      true
     end
   end
 
