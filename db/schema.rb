@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_18_140000) do
+ActiveRecord::Schema[7.2].define(version: 2026_10_12_113000) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -931,7 +931,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_18_140000) do
     t.string "provider"
     t.string "uid"
     t.integer "user_id"
-    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid"
+    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
