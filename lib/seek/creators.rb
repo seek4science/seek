@@ -46,7 +46,7 @@ module Seek
         end
       end.compact
 
-      (existing - retained_and_new).each(&:destroy)
+      (existing - retained_and_new).each(&:mark_for_destruction)
 
       retained_and_new
     end
