@@ -80,6 +80,6 @@ class HasExternalIdentifierTest < ActiveSupport::TestCase
 
   private
   def factory_names
-    [:investigation, :study, :assay, :observation_unit, :data_file, :model, :sop, :presentation, :workflow, :document, :sample, :strain, :collection, :publication, :placeholder, :file_template, :template, :simple_sample_type]
+    [:investigation, :study, :assay, :observation_unit, :data_file, :model, :sop, :presentation, :workflow, :document, :sample, :strain, :collection, :publication, :placeholder, :file_template, :min_template, :simple_sample_type]
   end
 end
