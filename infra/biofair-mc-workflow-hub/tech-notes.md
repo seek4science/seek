@@ -1,7 +1,9 @@
 # WorkflowHub: technical notes
 
 Details behind the [README](README.md): how the deployment works, setting up
-access, and operating the stack. Run commands from this directory with
+access, and operating the stack. This project, on the SEEK repository's
+`pulumi` branch, is the authoritative copy; biofair-mc-infra's
+`biofair-mc-workflow-hub/` holds a copy of it, updated from here. Run commands from this directory with
 `AWS_PROFILE` set (see [AWS credentials](#aws-credentials)).
 
 ## How it works

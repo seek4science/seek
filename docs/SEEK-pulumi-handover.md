@@ -4,10 +4,12 @@ Output of a design conversation: the reasoning behind the Pulumi program in
 [`infra/biofair-mc-workflow-hub/`](../infra/biofair-mc-workflow-hub/), whose
 README covers how to deploy it.
 
-**Status:** sketch, not deployed. Nothing here has been run against AWS. Open
-questions 4.1–4.4 have been answered from the SEEK codebase (section 4) and the
-program updated to match; 4.5 is resolved by SEEK change 5.4; 4.6–4.7 remain. The one SEEK code change required
-before `pulumi up` (Redis TLS, section 5.1) has been made.
+**Status:** a cut-down phase 1 of this design, adapted to run without ECS
+Fargate (section 8), has been deployed to staging and torn down again; see
+[`pulumi-next-phase.md`](pulumi-next-phase.md) for what comes next. The rest of
+this document is the original design and its reasoning. The SEEK code changes
+it needs (section 5) are in pull request
+[#2756](https://github.com/seek4science/seek/pull/2756), not yet merged.
 
 **Source of truth for the app:** [`seek4science/seek`](https://github.com/seek4science/seek),
 specifically `docker-compose.yml` on `main`.
@@ -286,12 +288,12 @@ the SEEK repository itself. Only 5.1 blocks deployment.
 
 | # | Change | Required? | Alternative without a SEEK change |
 |---|---|---|---|
-| 5.1 | Redis TLS support in `Seek::RedisConfig` — **DONE** | **Yes**, as the program stands | Disable `transitEncryptionEnabled` and drop `authToken` on ElastiCache |
+| 5.1 | Redis TLS support in `Seek::RedisConfig` — **in #2756** | **Yes**, as the program stands | Disable `transitEncryptionEnabled` and drop `authToken` on ElastiCache |
 | 5.2 | Allow TLS for the entrypoint's MySQL client checks | No | `require_secure_transport = 0` in `dbParams` (done) |
 | 5.3 | `check_mysql` distinguishes "cannot connect" from "empty database" | No, hardening | Run first-run setup as a one-off task; watch boot logs |
-| 5.4 | Derived Solr image from `solr/seek/conf` — **DONE** | No, convenience | Build it outside the repo |
+| 5.4 | Derived Solr image from `solr/seek/conf` — **in #2756** | No, convenience | Build it outside the repo |
 
-**5.1 Redis TLS (required) — DONE.** `Seek::RedisConfig.url`
+**5.1 Redis TLS (required) — in pull request #2756.** `Seek::RedisConfig.url`
 (`lib/seek/redis_config.rb`) now uses the `rediss://` scheme when `REDIS_TLS`
 is `1`, `true` or `yes` (case-insensitive), and `redis://` otherwise, so
 compose deployments are unaffected. Every Redis consumer (cache store,
@@ -301,6 +303,9 @@ that both client libraries treat `rediss://` as TLS: `redis-client` (behind
 `RedisCacheStore`) and `redis-store` 1.11 (behind the `:redis_store` session
 store, including its `/0/session` path form). ElastiCache's certificate is
 publicly trusted, so no CA bundle is needed. The program sets `REDIS_TLS=1`.
+The pull request also points production Action Cable's `config/cable.yml` at
+`Seek::RedisConfig.url` (unless `REDIS_URL` is set), so it would use the same
+Redis, authentication and TLS; SEEK does not use Action Cable yet.
 
 **5.2 MySQL client TLS (optional).** The Dockerfile writes `[client] skip-ssl`
 to `/etc/mysql/conf.d/disable-ssl.cnf`, so `mysqladmin`/`mysql` in
@@ -317,7 +322,7 @@ Checking connectivity first (a plain authenticated `SELECT 1`) and only then
 the table would turn misconfiguration into a clear error rather than an
 attempted schema load. Benefits compose deployments too.
 
-**5.4 Derived Solr image — DONE.** Open question 4.5: the configset lives in
+**5.4 Derived Solr image — in pull request #2756.** Open question 4.5: the configset lives in
 `solr/seek/conf` and compose bind-mounts it. `solr/Dockerfile` (`FROM
 solr:9.10.1`) bakes it in as `seek_config`, so the configset is versioned with
 the code that depends on it. Build from the `solr` directory and push by hand

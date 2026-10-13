@@ -6,11 +6,16 @@ phase 1, through phase 2 (staging), phase 3 (protecting the data, and sizing)
 and phase 4 (post-staging), to the full design in
 [`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md).
 
+The Pulumi project in `infra/biofair-mc-workflow-hub/`, on the SEEK
+repository's `pulumi` branch, is the authoritative copy; biofair-mc-infra's
+`biofair-mc-workflow-hub/` holds a copy of it. Make changes here and copy them
+across.
+
 ## Where phase 1 stands
 
 Phase 1 is the managed-services design with the extras left out, and with the
 front-end and workers as Docker containers on EC2 Auto Scaling groups rather
-than ECS Fargate. It has been deployed in the `biofair-mc-workflow-hub`
+than ECS Fargate. It was deployed in the `biofair-mc-workflow-hub`
 account, paused and resumed with its data intact, and destroyed cleanly. It
 needs no IAM permissions beyond the `Developer` permission set. Two phase 2
 items have since been completed, and are marked below.
@@ -161,7 +166,8 @@ that blocks it.
   fixed at 2 in `hostSetup`.
 - **Measure:** memory and CPU of each container (`docker stats` on the
   instances, CloudWatch CPU for each group and the database) under realistic
-  use and under `scripts/load-test.sh`.
+  use and under a load test (many parallel requests through the load
+  balancer for 15-20 minutes, enough to make the web group scale).
 - **Consider:**
   - Smaller web instances, more of them, now that the web tier autoscales;
     and Puma workers sized to each instance's memory.
@@ -174,6 +180,22 @@ that blocks it.
     `db.t4g` classes are not offered in the VPC's zones (eu-west-2a/2b).
   - Reserved instances or a savings plan once sizes settle, for a
     long-running deployment.
+- **Then:** set the number of Puma workers and the Solr JVM memory to match
+  the chosen sizes. Both are fixed today (`PUMA_WORKERS_NUM=2` in
+  `hostSetup`; `SOLR_JAVA_MEM="-Xms512m -Xmx1024m"` in the Solr user data),
+  so they would become stack config alongside the instance types.
+
+### 5. Scaling on more than CPU (to investigate)
+
+- **Question:** whether the web group should also scale on memory, or on
+  something closer to load than CPU.
+- **Notes:** Auto Scaling's built-in target tracking metrics are CPU,
+  network traffic, and the load balancer's requests per target; memory is
+  not one of them. Scaling on memory needs the CloudWatch agent on the
+  instances publishing it, which needs CloudWatch permissions on the
+  instance role (the same Hub request as container logs, phase 4). Requests
+  per target needs no extra permissions, and may track Puma's capacity (a
+  fixed number of single-threaded workers per instance) better than CPU.
 
 ## Phase 4 (post-staging)
 

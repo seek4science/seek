@@ -8,7 +8,7 @@ and how the project is put together. For deploy steps, see the project's
 each later phase needs, [`pulumi-next-phase.md`](pulumi-next-phase.md); for the
 original design, [`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md).
 
-The diagrams show what is deployed to staging now: phase 1 and the completed
+The diagrams show what the program deploys: phase 1 and the completed
 parts of phase 2. Parts still to come in phases 2 and 3 are drawn with dashed
 outlines and labelled with their phase. Phase 4 (a real domain, backups,
 CloudWatch logs, higher availability) is not shown.
