@@ -54,6 +54,15 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     })
   end
 
+  # OmniAuth successful_login renders a same-origin bounce page instead of a 302,
+  # so cookies stick after the IdP cross-site return.
+  def assert_omniauth_bounce_to(expected_path)
+    assert_response :success
+    assert_select 'meta[http-equiv=refresh]'
+    assert_match(/window\.location\.replace/, response.body)
+    assert_includes response.body, expected_path
+  end
+
   # This test is to support the legacy LDAP integration that matched users having the same SEEK and LDAP usernames
   test 'should authenticate existing LDAP user without identity' do
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
@@ -62,7 +71,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_difference('User.count', 0) do
       assert_difference('Identity.count', 1) do
         post omniauth_callback_path(:ldap)
-        assert_redirected_to root_path
+        assert_omniauth_bounce_to(root_path)
       end
     end
 
@@ -77,7 +86,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_difference('User.count', 0) do
       assert_difference('Identity.count', 0) do
         post omniauth_callback_path(:ldap)
-        assert_redirected_to root_path
+        assert_omniauth_bounce_to(root_path)
       end
     end
 
@@ -138,7 +147,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
           # AAI
           post omniauth_authorize_path(:elixir_aai, state: 'return_to:/')
           follow_redirect!
-          assert_redirected_to root_path
+          assert_omniauth_bounce_to(root_path)
           assert_equal existing_user.id, session[:user_id]
         end
       end
@@ -306,10 +315,65 @@ class OmniauthTest < ActionDispatch::IntegrationTest
       with_config_value(:omniauth_elixir_aai_enabled, true) do
         post omniauth_authorize_path(:elixir_aai, state: 'return_to:/sops')
         follow_redirect!
-        assert_redirected_to sops_path
+        assert_omniauth_bounce_to(sops_path)
         assert_equal existing_user.id, session[:user_id]
       end
     end
+  end
+
+  test 'should authenticate existing OIDC user' do
+    OmniAuth.config.mock_auth[:oidc] = @oidc_mock_auth
+    existing_user = FactoryBot.create(:user, login: 'oidc_bob')
+    existing_user.identities.create!(uid: 'google-auth2|357823572abcbde', provider: 'oidc')
+
+    with_config_value(:omniauth_enabled, true) do
+      with_config_value(:omniauth_oidc_enabled, true) do
+        assert_difference('User.count', 0) do
+          assert_difference('Identity.count', 0) do
+            post omniauth_authorize_path(:oidc)
+            follow_redirect!
+            assert_omniauth_bounce_to(root_path)
+            assert_equal existing_user.id, session[:user_id]
+          end
+        end
+      end
+    end
+  end
+
+  test 'OIDC login syncs groups claim to projects when enabled' do
+    institution = FactoryBot.create(:institution)
+    existing_user = FactoryBot.create(:person, institution: institution).user
+    existing_user.identities.create!(uid: 'google-auth2|357823572abcbde', provider: 'oidc')
+
+    OmniAuth.config.mock_auth[:oidc] = OmniAuth::AuthHash.new({
+      provider: 'oidc',
+      uid: 'google-auth2|357823572abcbde',
+      info: {
+        'nickname' => 'john_oidc',
+        'first_name' => 'New',
+        'last_name' => 'OIDC',
+        'email' => existing_user.person.email
+      },
+      extra: { raw_info: { 'entitlement' => ['integration-oidc-project'] } }
+    })
+
+    with_config_values(omniauth_enabled: true,
+                       omniauth_oidc_enabled: true,
+                       omniauth_oidc_groups_enabled: true,
+                       omniauth_oidc_groups_claim: 'entitlement',
+                       omniauth_oidc_groups_institution_id: institution.id) do
+      assert_difference('Project.count', 1) do
+        post omniauth_authorize_path(:oidc)
+        follow_redirect!
+        assert_omniauth_bounce_to(root_path)
+      end
+    end
+
+    project = Project.find_by(title: 'integration-oidc-project')
+    assert project
+    person = existing_user.person.reload
+    assert person.member_of?(project)
+    assert person.is_project_administrator?(project)
   end
 
   test 'should create and activate new GitHub user' do
