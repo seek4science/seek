@@ -19,6 +19,7 @@ security:
       - read
       - write
   - apiToken: []
+  - oidcBearerToken: []
   - basicAuth: []
 servers:
   - url: https://fairdomhub.org
@@ -195,6 +196,12 @@ components:
       name: Authorization
       description:
         $ref: ../descriptions/authToken.md
+    oidcBearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description:
+        $ref: ../descriptions/authOidcToken.md
     basicAuth:
       type: http
       description:
