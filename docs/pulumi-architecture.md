@@ -133,7 +133,8 @@ the key in Parameter Store, and runs Solr; see
 ## Network and security groups
 
 Two Availability Zones, each with a public and a private subnet. Only the load
-balancer and the NAT Gateway sit in public subnets.
+balancer and the NAT Gateway sit in public subnets. Arrows point from the side
+that opens the connection; responses come back on the same connection.
 
 ```mermaid
 flowchart TB
@@ -166,8 +167,8 @@ flowchart TB
     instances -- "3306 TLS" --> rds
     instances -- "6379 TLS" --> redis
     instances -- "2049 NFS over TLS" --> efs
-    instances & solr -. "outbound" .-> nat
-    nat -. "image pulls etc." .-> internet
+    instances & solr -. "own internet access" .-> nat
+    nat -. "image pulls, packages,<br/>SSM, RDS CA bundle" .-> internet
 ```
 
 | Security group | Inbound |
