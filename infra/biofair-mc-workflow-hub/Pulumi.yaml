@@ -194,13 +194,13 @@ resources:
           toPort: 0
           cidrBlocks: ["0.0.0.0/0"]
 
-  # Web, workers and Solr. The data stores admit this group.
+  # The web and worker instances. The data stores and Solr admit this group.
   appSg:
     type: aws:ec2:SecurityGroup
     properties:
       name: ${namePrefix}-app-sg
       vpcId: ${vpc.vpcId}
-      description: SEEK application tasks and Solr
+      description: SEEK web and worker instances
       egress:
         - protocol: "-1"
           fromPort: 0
@@ -217,15 +217,24 @@ resources:
       fromPort: 3000
       toPort: 3000
 
-  appToSolr:
-    type: aws:ec2:SecurityGroupRule
+  # Solr, in a group of its own: reachable on 8983 from the web and worker
+  # instances only, and not admitted by the data stores, which it never uses.
+  solrSg:
+    type: aws:ec2:SecurityGroup
     properties:
-      type: ingress
-      securityGroupId: ${appSg.id}
-      sourceSecurityGroupId: ${appSg.id}
-      protocol: tcp
-      fromPort: 8983
-      toPort: 8983
+      name: ${namePrefix}-solr-sg
+      vpcId: ${vpc.vpcId}
+      description: Solr, reachable only from the web and worker instances
+      ingress:
+        - protocol: tcp
+          fromPort: 8983
+          toPort: 8983
+          securityGroups: ["${appSg.id}"]
+      egress:
+        - protocol: "-1"
+          fromPort: 0
+          toPort: 0
+          cidrBlocks: ["0.0.0.0/0"]
 
   dataSg:
     type: aws:ec2:SecurityGroup
@@ -421,7 +430,7 @@ resources:
       ami: ${al2023.id}
       instanceType: ${solrInstanceType}
       subnetId: ${vpc.privateSubnetIds[0]}
-      vpcSecurityGroupIds: ["${appSg.id}"]
+      vpcSecurityGroupIds: ["${solrSg.id}"]
       iamInstanceProfile: ${ssmProfile.name}
       rootBlockDevice:
         volumeSize: 20
@@ -438,11 +447,11 @@ resources:
         systemctl enable --now docker
 
         # The data volume, found by its ID: on Nitro instances the attachment's
-        # device name is only a hint. Wait for it to attach, format it only if
-        # it is blank, and mount it at /var/solr by UUID.
+        # device name is only a hint. Wait up to ten minutes for it to attach,
+        # format it only if it is blank, and mount it at /var/solr by UUID.
         VOL=${solrData.id}
         DEV=/dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_$(echo "$VOL" | tr -d -)
-        for i in $(seq 1 90); do [ -e "$DEV" ] && break; sleep 2; done
+        for i in $(seq 1 300); do [ -e "$DEV" ] && break; sleep 2; done
         [ -e "$DEV" ]
         blkid "$DEV" || mkfs.ext4 -L solr-data "$DEV"
         UUID=$(blkid -s UUID -o value "$DEV")
@@ -462,6 +471,9 @@ resources:
       # but means a search outage while the new instance boots, so it is left
       # to a deliberate `pulumi up --replace`.
       ignoreChanges: ["ami"]
+      # The data volume can only be attached to one instance, so a replacement
+      # must detach it and delete the old instance before creating the new.
+      deleteBeforeReplace: true
 
   solrAttach:
     type: aws:ec2:VolumeAttachment
@@ -471,6 +483,8 @@ resources:
       instanceId: ${solrInstance.id}
       # Stop Solr cleanly rather than pull the disk from under it.
       stopInstanceBeforeDetaching: true
+    options:
+      deleteBeforeReplace: true
 
   # Private DNS for the VPC, so Solr is reachable by name.
   internalZone:
