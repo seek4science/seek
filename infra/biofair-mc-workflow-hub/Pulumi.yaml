@@ -156,12 +156,23 @@ variables:
     mkdir -p /etc/seek
     curl -fsS -o /etc/seek/rds-ca.pem https://truststore.pki.rds.amazonaws.com/${region}/${region}-bundle.pem
 
+    # Solr's self-signed certificate, in a directory of trusted certificates
+    # mounted into the container as SSL_CERT_DIR. OpenSSL still reads the
+    # image's public CAs from its default file, so other HTTPS is unaffected.
+    mkdir -p /etc/seek/ca.d
+    cat > /etc/seek/ca.d/solr.pem <<'PEM'
+    ${solrTlsCert.certPem}
+    PEM
+    openssl rehash /etc/seek/ca.d
+
     install -m 600 /dev/null /etc/seek.env
     cat > /etc/seek.env <<EOF
     RAILS_ENV=production
     RAILS_LOG_LEVEL=info
     SOLR_HOST=${solrHost}
     SOLR_PORT=8983
+    SOLR_URL=https://${solrHost}:8983/solr/seek
+    SSL_CERT_DIR=/etc/seek/ca.d
     MYSQL_HOST=${db.address}
     MYSQL_DATABASE=seek_production
     MYSQL_USER=seek
@@ -468,6 +479,41 @@ resources:
       tags:
         Name: ${namePrefix}-solr-data
 
+  # Solr's TLS certificate: self-signed, for the name SEEK uses and for
+  # localhost, which Solr's health check uses and Jetty requires the
+  # certificate to cover. The web and worker instances trust this certificate
+  # itself. A `pulumi up` in its last year replaces it, and the instances pick
+  # up the new one when they are next replaced or restarted.
+  solrTlsKey:
+    type: tls:PrivateKey
+    properties:
+      algorithm: ECDSA
+      ecdsaCurve: P256
+
+  solrTlsCert:
+    type: tls:SelfSignedCert
+    properties:
+      privateKeyPem: ${solrTlsKey.privateKeyPem}
+      subject:
+        commonName: ${solrHost}
+      dnsNames:
+        - ${solrHost}
+        - localhost
+      validityPeriodHours: 87600
+      earlyRenewalHours: 8760
+      allowedUses:
+        - key_encipherment
+        - digital_signature
+        - server_auth
+
+  # Read by the Solr instance at boot.
+  solrTlsKeyParam:
+    type: aws:ssm:Parameter
+    properties:
+      name: /${namePrefix}/solr-tls-key
+      type: SecureString
+      value: ${solrTlsKey.privateKeyPem}
+
   solrInstance:
     type: aws:ec2:Instance
     properties:
@@ -484,6 +530,9 @@ resources:
           Name: ${namePrefix}-solr
       tags:
         Name: ${namePrefix}-solr
+      # User data only runs on an instance's first boot, so a change to it
+      # replaces the instance rather than restarting it to no effect.
+      userDataReplaceOnChange: true
       userData: |
         #!/bin/bash
         set -euo pipefail
@@ -504,10 +553,37 @@ resources:
         mount /var/solr
         chown 8983:8983 /var/solr
 
+        # TLS: the key from Parameter Store and the certificate, in a PKCS12
+        # keystore readable by the container's solr user (gid 8983), under a
+        # password made for this boot. The key is not kept outside the
+        # keystore.
+        mkdir -p /etc/solr-tls
+        cat > /etc/solr-tls/cert.pem <<'PEM'
+        ${solrTlsCert.certPem}
+        PEM
+        KEY=$(mktemp)
+        aws ssm get-parameter --region ${region} --name ${solrTlsKeyParam.name} --with-decryption --query Parameter.Value --output text > "$KEY"
+        KEYSTORE_PASSWORD=$(openssl rand -hex 16)
+        openssl pkcs12 -export -in /etc/solr-tls/cert.pem -inkey "$KEY" -name solr \
+          -out /etc/solr-tls/keystore.p12 -passout "pass:$KEYSTORE_PASSWORD"
+        rm -f "$KEY"
+        chown root:8983 /etc/solr-tls/keystore.p12
+        chmod 640 /etc/solr-tls/keystore.p12
+
         docker run -d --restart always --name solr \
           -p 8983:8983 \
           -v /var/solr:/var/solr \
+          -v /etc/solr-tls/keystore.p12:/etc/solr-tls/keystore.p12:ro \
           -e SOLR_JAVA_MEM="-Xms512m -Xmx1024m" \
+          -e SOLR_SSL_ENABLED=true \
+          -e SOLR_SSL_KEY_STORE=/etc/solr-tls/keystore.p12 \
+          -e SOLR_SSL_KEY_STORE_TYPE=PKCS12 \
+          -e SOLR_SSL_KEY_STORE_PASSWORD="$KEYSTORE_PASSWORD" \
+          -e SOLR_SSL_TRUST_STORE=/etc/solr-tls/keystore.p12 \
+          -e SOLR_SSL_TRUST_STORE_TYPE=PKCS12 \
+          -e SOLR_SSL_TRUST_STORE_PASSWORD="$KEYSTORE_PASSWORD" \
+          -e SOLR_SSL_NEED_CLIENT_AUTH=false \
+          -e SOLR_SSL_WANT_CLIENT_AUTH=false \
           ${solrImage}
     options:
       # The AMI lookup returns the newest image, which would otherwise replace
@@ -662,6 +738,7 @@ resources:
                 docker run -d --restart always --name seek --env-file /etc/seek.env \
                   -p 3000:3000 -v /mnt/filestore:/seek/filestore -v /mnt/cache:/seek/tmp/cache \
                   -v /etc/seek/rds-ca.pem:/etc/seek/rds-ca.pem:ro \
+                  -v /etc/seek/ca.d:/etc/seek/ca.d:ro \
                   ${seekImage} docker/entrypoint.sh
 
   webGroup:
@@ -740,6 +817,7 @@ resources:
                 docker run -d --restart always --name seek-workers --env-file /etc/seek.env \
                   -v /mnt/filestore:/seek/filestore -v /mnt/cache:/seek/tmp/cache \
                   -v /etc/seek/rds-ca.pem:/etc/seek/rds-ca.pem:ro \
+                  -v /etc/seek/ca.d:/etc/seek/ca.d:ro \
                   ${seekImage} docker/start_workers.sh
 
   workerGroup:
