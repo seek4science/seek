@@ -1,14 +1,23 @@
 #!/bin/sh
 
+# With MYSQL_SSL_CA set, connect over TLS and verify the server's certificate
+# against that CA bundle, overriding the image's skip-ssl client default.
+function mysql_tls_args {
+    if [ ! -z $MYSQL_SSL_CA ]
+    then
+        echo "--ssl --ssl-ca=$MYSQL_SSL_CA --ssl-verify-server-cert"
+    fi
+}
+
 function wait_for_mysql {
-    while ! mysqladmin ping -h $MYSQL_HOST --silent; do
+    while ! mysqladmin $(mysql_tls_args) ping -h $MYSQL_HOST --silent; do
             echo "WAITING FOR MYSQL"
             sleep 2
     done
 }
 
 function wait_for_database {
-    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
+    while ! mysql $(mysql_tls_args) -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
     do
             echo "WAITING FOR DATABASE"
             sleep 2
@@ -36,7 +45,7 @@ function check_mysql {
 
         wait_for_mysql
 
-        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
+        if ! mysql $(mysql_tls_args) -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
         then
             echo "SETTING UP MYSQL DB"
             bundle exec rake db:setup
