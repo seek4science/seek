@@ -113,12 +113,20 @@ variables:
           - name: name
             values: ["al2023-ami-2023.*-x86_64"]
 
+  # The provider's region, for the instances' Parameter Store and CA bundle
+  # lookups.
+  region:
+    fn::invoke:
+      function: aws:getRegion
+      return: name
+
   # First half of the web and worker instances' user data: install Docker,
   # mount the filestore, and write the container environment. Each launch
   # template appends its own `docker run`. NO_ENTRYPOINT_WORKERS is only read
   # by the web entrypoint and QUIET_SUPERCRONIC only by the workers, so one
-  # environment serves both. REDIS_TLS needs a SEEK image recent enough to
-  # support it.
+  # environment serves both. REDIS_TLS and MYSQL_SSL_CA need a SEEK image
+  # recent enough to support them; without MYSQL_SSL_CA support, SEEK cannot
+  # connect, since the database requires TLS.
   hostSetup: |
     #!/bin/bash
     set -euo pipefail
@@ -136,9 +144,12 @@ variables:
     mount /mnt/cache
 
     # The SSM instance role can read Parameter Store.
-    TOKEN=$(curl -sX PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
-    REGION=$(curl -sH "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
-    DB_PASSWORD=$(aws ssm get-parameter --region "$REGION" --name ${dbPasswordParam.name} --with-decryption --query Parameter.Value --output text)
+    DB_PASSWORD=$(aws ssm get-parameter --region ${region} --name ${dbPasswordParam.name} --with-decryption --query Parameter.Value --output text)
+
+    # The CA bundle for RDS's certificates, mounted into the container so
+    # SEEK connects to MySQL over TLS and verifies the server.
+    mkdir -p /etc/seek
+    curl -fsS -o /etc/seek/rds-ca.pem https://truststore.pki.rds.amazonaws.com/${region}/${region}-bundle.pem
 
     install -m 600 /dev/null /etc/seek.env
     cat > /etc/seek.env <<EOF
@@ -150,6 +161,7 @@ variables:
     MYSQL_DATABASE=seek_production
     MYSQL_USER=seek
     MYSQL_PASSWORD=$DB_PASSWORD
+    MYSQL_SSL_CA=/etc/seek/rds-ca.pem
     REDIS_HOST=${redis.primaryEndpointAddress}
     REDIS_TLS=1
     PUMA_WORKERS_NUM=2
@@ -288,10 +300,9 @@ resources:
           value: utf8mb4
         - name: collation_server
           value: utf8mb4_unicode_ci
-        # The SEEK image's mysql client connects without TLS (skip-ssl), so its
-        # start-up checks fail if the server requires it.
+        # SEEK connects over TLS (MYSQL_SSL_CA), so refuse plain connections.
         - name: require_secure_transport
-          value: "0"
+          value: "1"
 
   db:
     type: aws:rds:Instance
@@ -613,6 +624,7 @@ resources:
               - |
                 docker run -d --restart always --name seek --env-file /etc/seek.env \
                   -p 3000:3000 -v /mnt/filestore:/seek/filestore -v /mnt/cache:/seek/tmp/cache \
+                  -v /etc/seek/rds-ca.pem:/etc/seek/rds-ca.pem:ro \
                   ${seekImage} docker/entrypoint.sh
 
   webGroup:
@@ -690,6 +702,7 @@ resources:
               - |
                 docker run -d --restart always --name seek-workers --env-file /etc/seek.env \
                   -v /mnt/filestore:/seek/filestore -v /mnt/cache:/seek/tmp/cache \
+                  -v /etc/seek/rds-ca.pem:/etc/seek/rds-ca.pem:ro \
                   ${seekImage} docker/start_workers.sh
 
   workerGroup:
