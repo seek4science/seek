@@ -126,7 +126,10 @@ variables:
   # by the web entrypoint and QUIET_SUPERCRONIC only by the workers, so one
   # environment serves both. REDIS_TLS and MYSQL_SSL_CA need a SEEK image
   # recent enough to support them; without MYSQL_SSL_CA support, SEEK cannot
-  # connect, since the database requires TLS.
+  # connect, since the database requires TLS. BOOTSNAP_CACHE_DIR keeps
+  # bootsnap's cache in the container, out of the shared file cache on EFS,
+  # where instances booting at once (or on different images) leave each other
+  # stale NFS handles and Puma fails to start.
   hostSetup: |
     #!/bin/bash
     set -euo pipefail
@@ -164,6 +167,7 @@ variables:
     MYSQL_SSL_CA=/etc/seek/rds-ca.pem
     REDIS_HOST=${redis.primaryEndpointAddress}
     REDIS_TLS=1
+    BOOTSNAP_CACHE_DIR=/seek/tmp/bootsnap
     PUMA_WORKERS_NUM=2
     NO_ENTRYPOINT_WORKERS=1
     QUIET_SUPERCRONIC=1
