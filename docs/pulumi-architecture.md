@@ -74,7 +74,7 @@ flowchart TB
             workers["SEEK container<br/>Solid Queue + supercronic"]
         end
         subgraph solrbox["Solr EC2 instance"]
-            solr["seek-solr container<br/>:8983, index on root volume"]
+            solr["seek-solr container<br/>:8983, SG: solrSg"]
         end
 
         privdns["Route 53 private zone<br/>solr.seek.internal"]
@@ -83,7 +83,8 @@ flowchart TB
         efs[("EFS<br/>/filestore and /cache access points")]
         params["SSM Parameter Store<br/>DB password"]
 
-        ebs[("Standalone EBS volume for the Solr index<br/>nightly snapshots<br/>phase 2")]
+        ebs[("EBS volume for the Solr index<br/>survives instance replacement")]
+        snaps["Nightly snapshots of the index volume<br/>needs an IAM role from the Hub"]
         token["Redis auth token in Parameter Store<br/>phase 2"]
     end
 
@@ -102,11 +103,12 @@ flowchart TB
     hub -. "pulled via NAT" .-> web
     hub -. "pulled via NAT" .-> workers
     hub -. "pulled via NAT" .-> solr
-    solr -.-> ebs
+    solr --- ebs
+    snaps -.-> ebs
     token -.-> redis
 
     classDef planned stroke-dasharray:5 5,color:#777
-    class ebs,token planned
+    class snaps,token planned
 ```
 
 | docker-compose service | AWS resource |
@@ -115,7 +117,7 @@ flowchart TB
 | `seek_workers` | Worker Auto Scaling group (`workerGroup`), no ingress |
 | `db` | RDS MySQL 8.4 (`db`) |
 | `redis_store` | ElastiCache Redis replication group (`redis`) |
-| `solr` | EC2 instance running `fairdom/seek-solr` (`solrInstance`); index on its root volume until phase 2 |
+| `solr` | EC2 instance running `fairdom/seek-solr` (`solrInstance`), index on its own EBS volume (`solrData`) |
 | `seek-filestore` volume | An EFS filesystem, through a `/filestore` access point |
 | `seek-cache` volume | The same EFS filesystem, through a `/cache` access point |
 
@@ -141,7 +143,10 @@ flowchart TB
 
         subgraph appsg["Private subnets, SG: appSg"]
             instances["web and worker instances<br/>ALB reaches web instances only"]
-            solr["Solr instance<br/>AZ a"]
+        end
+
+        subgraph solrsg["Private subnet, SG: solrSg"]
+            solr["Solr instance<br/>AZ a, with its data volume"]
         end
 
         subgraph datasg["Private subnets, SG: dataSg"]
@@ -164,8 +169,13 @@ flowchart TB
 | Security group | Inbound |
 |---|---|
 | `albSg` | 443 and 80 from anywhere |
-| `appSg` | 3000 from `albSg`; 8983 from `appSg` itself |
+| `appSg` | 3000 from `albSg` |
+| `solrSg` | 8983 from `appSg` only |
 | `dataSg` | 3306, 6379 and 2049 from `appSg` only |
+
+Solr has a security group of its own, so it is reachable only from the web and
+worker instances, and cannot reach the database, Redis or EFS, which it never
+uses.
 
 No security group opens port 22. Every instance uses the account's existing
 `ssm-instance-profile`, and administrative access is through SSM Session
@@ -186,7 +196,7 @@ flowchart LR
         efs[("EFS<br/>protect: true")]
         param["DB password parameter"]
         zone["Private DNS zone"]
-        solrvol[("Solr data volume<br/>phase 2")]
+        solrvol[("Solr data volume")]
     end
 
     subgraph compute["Compute stack: disposable"]
@@ -242,7 +252,7 @@ The program is a single Pulumi YAML file in four sections:
 |---|---|
 | `config` | Per-stack settings: `environment`, `vpcCidr`, image tags, web and worker counts and the CPU target, instance sizes, database size and deletion settings, and the `dbPassword` secret |
 | `variables` | The `namePrefix` (`biofair-mc-workflow-hub-<environment>`), Solr's DNS name, lookups of the SSM instance profile and the Amazon Linux AMI, and `hostSetup`, the web and worker instances' shared user data |
-| `resources` | VPC and security groups; the password parameter, RDS, ElastiCache and EFS; the Solr instance and its private DNS name; the self-signed certificate and the load balancer; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
+| `resources` | VPC and security groups; the password parameter, RDS, ElastiCache and EFS; the Solr instance, its data volume and private DNS name; the self-signed certificate and the load balancer; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
 | `outputs` | Site URL, database and Redis endpoints, EFS ID, web and worker group names, Solr's private IP |
 
 Every resource is tagged `Environment` and `ManagedBy: pulumi` through the AWS

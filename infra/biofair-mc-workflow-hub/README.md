@@ -9,9 +9,9 @@ Phase 1 and the completed parts of phase 2: a VPC, a load balancer serving
 HTTPS with a self-signed certificate in front of SEEK web instances,
 autoscaled on CPU, and a worker instance, in EC2 Auto Scaling groups, MySQL on
 RDS, Redis on ElastiCache, the filestore and a shared file cache on EFS, and
-Solr on its own instance, reached by a private DNS name. It needs no IAM
-permissions beyond the `Developer` permission set, and has been deployed and
-torn down successfully.
+Solr on its own instance, with its index on a separate volume, reached by a
+private DNS name. It needs no IAM permissions beyond the `Developer`
+permission set, and has been deployed and torn down successfully.
 
 ## Phase 2
 
@@ -20,8 +20,10 @@ torn down successfully.
 - **Completed:** Front-end autoscaling
 - **Completed:** A shared file cache across web instances
 - A Redis auth token
-- Check security groups (esp. solr) and secure connections between components
-- A durable Solr index that survives instance replacement, with snapshots
+- **Completed:** Solr isolated in its own security group
+- Decide which connections between components to encrypt
+- **Completed:** A durable Solr index that survives instance replacement;
+  snapshots still need an IAM role from the Hub
 
 ## Phase 3
 
@@ -36,10 +38,11 @@ torn down successfully.
 ## Phase 4 (post-staging)
 
 - A real domain, with a trusted certificate in place of the self-signed one
-- EFS backups
+- Database and EFS backups
 - Container logs in CloudWatch
 - Higher availability for production: a NAT gateway per AZ, Multi-AZ RDS, a
   Redis replica
+- Email delivery, so SEEK can send account, notification and error emails
 
 ## Getting started
 

@@ -21,9 +21,9 @@ to what is needed to prove SEEK runs on it:
   autoscaled on CPU, and one worker
 - MySQL on RDS, Redis on ElastiCache (TLS, no auth token), and the filestore
   and a shared file cache on EFS, each through its own access point
-- Solr on its own EC2 instance running the `fairdom/seek-solr` image, with the
-  index on the instance's root volume, reachable as `solr.seek.internal`
-  through a Route 53 private zone attached to the VPC
+- Solr on its own EC2 instance running the `fairdom/seek-solr` image, in its
+  own security group, with the index on a separate EBS volume, reachable as
+  `solr.seek.internal` through a Route 53 private zone attached to the VPC
 
 It creates no IAM resources: every instance uses the account's existing
 `ssm-instance-profile`, and is reached through SSM. Comments in `Pulumi.yaml`
@@ -67,6 +67,32 @@ replaces only the certificate (`docs/pulumi-next-phase.md`, phase 4).
 The instances reach Solr as `solr.seek.internal` rather than by its IP. If the
 Solr instance is replaced, `pulumi up` updates that record (60-second TTL),
 and the web and worker instances are left alone.
+
+### Solr
+
+Solr's security group, `solrSg`, admits only port 8983 from the web and
+worker instances. Solr cannot reach the database, Redis or EFS.
+
+The index is on its own 20 GB EBS volume (`solrDataSizeGb`), mounted at
+`/var/solr`. Solr's user data finds the volume by its ID, formats it only if
+it is blank, and mounts it by UUID, so a new Solr instance picks up the
+existing index. Pulumi does not replace the Solr instance for a new Amazon
+Linux AMI; to replace it deliberately:
+
+```console
+pulumi up --replace 'urn:pulumi:staging::biofair-mc-workflow-hub::aws:ec2/instance:Instance::solrInstance'
+```
+
+Pulumi detaches the volume and deletes the old instance before creating the
+new one, since the volume can only be attached to one instance at a time, so
+search is unavailable for a few minutes. There are no scheduled snapshots of
+the volume yet (they need an IAM role from the Hub); take one by hand before
+anything risky with `aws ec2 create-snapshot --volume-id <volume id>`.
+
+To grow the volume, raise `solrDataSizeGb` and `pulumi up`; EBS resizes it in
+place, at most once every six hours. Then, on the Solr instance, grow the
+file system with `sudo resize2fs /dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_<volume id without the dash>`.
+A volume cannot be shrunk.
 
 A change to a launch template (a new image tag, a changed setting, or a new
 Amazon Linux AMI from the lookup) makes `pulumi up` roll that group: each new

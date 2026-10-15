@@ -17,7 +17,7 @@ Phase 1 is the managed-services design with the extras left out, and with the
 front-end and workers as Docker containers on EC2 Auto Scaling groups rather
 than ECS Fargate. It was deployed in the `biofair-mc-workflow-hub`
 account, paused and resumed with its data intact, and destroyed cleanly. It
-needs no IAM permissions beyond the `Developer` permission set. Four phase 2
+needs no IAM permissions beyond the `Developer` permission set. Five phase 2
 items have since been completed, and are marked below.
 
 The full design, before phase 1 cut it down, is in the history at commit
@@ -100,13 +100,11 @@ that blocks it.
 
 - **Adds:** a review of what can reach what inside the VPC, and of which
   connections between components are encrypted.
-- **Security groups now:** the web, worker and Solr instances all share
-  `appSg`, which admits Solr's port 8983 from `appSg` itself, and `dataSg`
-  admits MySQL, Redis and NFS from `appSg`. So the Solr instance can reach
-  the database, Redis and EFS, which it never needs, and anything in `appSg`
-  can reach Solr. Giving Solr its own security group, admitting 8983 only
-  from the web and worker instances and admitted by nothing in `dataSg`,
-  narrows both.
+- **Done: Solr isolated.** Solr has its own security group, `solrSg`,
+  admitting only 8983 from the web and worker instances (`appSg`); it no
+  longer shares `appSg`, so `dataSg` no longer admits it, and Solr cannot
+  reach the database, Redis or EFS. Tested: search works, and a connection
+  from the Solr instance to MySQL is refused.
 - **Connections now:** encrypted are browser to load balancer (HTTPS),
   instances to Redis (TLS) and instances to EFS (the mount helper's `tls`
   option). Unencrypted, though only inside private subnets, are:
@@ -118,24 +116,33 @@ that blocks it.
     an `ssl_mode`);
   - instances to Solr (HTTP on 8983; TLS would need Solr's own certificate
     configuration).
-- **Decide:** which of these to encrypt, and which to accept as private
-  network traffic, before the deployment holds real data.
+- **Still to decide:** which of these to encrypt, and which to accept as
+  private network traffic, before the deployment holds real data.
 
-### 7. Durable Solr index
+### 7. **Completed:** Durable Solr index
 
 - **Adds:** an index that survives the Solr instance being replaced, so a
   replacement does not mean a full reindex (handover 3.6).
-- **Needs:** the full design's `solrData` (a standalone, protected gp3
-  volume in the instance's AZ), `solrAttach`, and the Solr user data that
-  waits for the device, formats it only if empty, and mounts it at
-  `/var/solr`. The `ignoreChanges: ["ami"]` on the instance can then go.
-  Solr's private DNS name means a replacement does not disturb the web and
-  worker instances.
-- **Snapshots:** the full design's nightly DLM snapshots (`dlmRole`,
-  `solrSnapshots`) need an IAM role, which `Developer` cannot create. Either
-  ask the Hub for the role, or rely on a reindex as the recovery path.
-- **Check:** the device name on the current instance types and AMI (handover
-  4.6).
+- **Done as:** `solrData`, a gp3 volume of `solrDataSizeGb` (20 GB; a
+  production index measured 7.4 GB, and Solr needs about twice the index
+  size while merging or reindexing), placed in the Solr subnet's AZ by the
+  `solrSubnet` lookup; `solrAttach`, which stops the instance before any
+  detach; and Solr user data that finds the volume by its ID, waits for it to
+  attach, formats it only if it is blank, and mounts it at `/var/solr` by
+  UUID. The Solr instance and the attachment use `deleteBeforeReplace`: the
+  volume can only be attached to one instance, so a replacement must detach
+  it and delete the old instance before creating the new one. Tested by
+  replacing the Solr instance: the same volume was reattached unformatted,
+  and the index and search were intact.
+- **Still open: snapshots.** Nightly snapshots (the full design's `dlmRole`
+  and `solrSnapshots`) need `AWSDataLifecycleManagerDefaultRole`, which does
+  not exist in the account, and permission for `Developer` to pass it to
+  `dlm.amazonaws.com`, which it lacks. Both need the Hub. Until then, take a
+  one-off snapshot before risky changes (`aws ec2 create-snapshot`), and
+  rely on a reindex from MySQL if the volume is lost.
+- **Resizing:** the volume can grow in place with `pulumi up` after raising
+  `solrDataSizeGb` (at most once every six hours), followed by `resize2fs`
+  on the Solr instance; it cannot shrink.
 
 ## Phase 3: protecting the data, and sizing
 
@@ -241,12 +248,33 @@ For once the deployment moves beyond staging.
 - **Blocked on:** the DNS and ACM question with the Hub: who owns the hosted
   zone, and how a certificate is issued.
 
-### 2. Backups
+### 2. Database and EFS backups
 
-- **Adds:** EFS backups (the full design's `efsBackup`) to go with RDS's
-  automated backups, which phase 1 already has (14 days).
-- **Check:** EFS automatic backups use AWS Backup and its service role; test
-  whether `Developer` can enable them before relying on it.
+- **Database now:** RDS automated backups are on (`backupRetentionPeriod:
+  14`): a daily snapshot plus point-in-time recovery to any second in the
+  last 14 days. But they belong to the database instance: deleting it
+  deletes them, and the staging config also skips the final snapshot
+  (`dbSkipFinalSnapshot`), so a staging `destroy` leaves nothing. They are
+  also in the same account and region as the database.
+- **Database for production:**
+  - keep the defaults, deletion protection on and a final snapshot taken on
+    deletion;
+  - decide the retention (up to 35 days for automated backups; longer needs
+    manual or AWS Backup snapshots);
+  - consider copies outside the account or region (AWS Backup cross-region
+    or cross-account copy), which need an AWS Backup service role from the
+    Hub;
+  - consider regular logical dumps (`mysqldump`) to S3, which restore into
+    any MySQL, not only RDS, and make moving the data elsewhere simple.
+- **EFS:** the filestore holds the uploaded files, so needs backing up as
+  much as the database. The full design's `efsBackup` turns on EFS automatic
+  backups, which use AWS Backup and its service role.
+- **Check:** whether `Developer` can enable EFS automatic backups and AWS
+  Backup plans. AWS Backup's default service role does not exist in the
+  account, and passing roles is likely denied, as it is for snapshots
+  (phase 2 item 7), so this may need the Hub too.
+- **Test:** restore both, the database to a point in time and a file from
+  EFS, before relying on them.
 
 ### 3. Container logs in CloudWatch
 
@@ -262,6 +290,24 @@ For once the deployment moves beyond staging.
 A NAT gateway per AZ (`strategy: OnePerAz`), Multi-AZ RDS, an ElastiCache
 replica with automatic failover, and Solr in an Auto Scaling group of one.
 Each roughly doubles the cost of that part.
+
+### 5. Email delivery
+
+- **Adds:** working email from SEEK: account activation and password
+  resets, subscription and other notifications, and error reports.
+- **Needs:** an SMTP server for SEEK's settings (`email_enabled`, the `smtp`
+  settings and `noreply_sender`, set in SEEK's admin pages, not in the
+  program). Either:
+  - **Amazon SES** in `eu-west-2`: verify the sending domain with DNS
+    records (DKIM), so it follows the real domain (item 1); request
+    production access to leave the SES sandbox, which only delivers to
+    verified addresses; and create SMTP credentials, which are an IAM user's
+    keys, so need the Hub. Held in Parameter Store, read at boot as the
+    database password is.
+  - **An existing institutional relay**, if one will accept mail from AWS.
+- **Notes:** EC2 blocks outbound port 25 by default; use the submission
+  port (587) with STARTTLS, which the instances can already reach through
+  the NAT gateway.
 
 ## Cross-cutting work
 
