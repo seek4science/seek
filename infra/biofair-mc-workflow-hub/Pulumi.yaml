@@ -71,6 +71,10 @@ config:
   solrInstanceType:
     type: string
     default: t3.medium
+  # Size of the volume holding the Solr index.
+  solrDataSizeGb:
+    type: integer
+    default: 20
   dbPassword:
     type: string
     secret: true
@@ -89,6 +93,15 @@ variables:
       function: aws:iam:getInstanceProfile
       arguments:
         name: ${ssmInstanceProfileName}
+
+  # The Solr instance's subnet. Its data volume must be in the same AZ, and is
+  # placed by this lookup rather than by the instance, so it does not depend
+  # on the instance it outlives.
+  solrSubnet:
+    fn::invoke:
+      function: aws:ec2:getSubnet
+      arguments:
+        id: ${vpc.privateSubnetIds[0]}
 
   al2023:
     fn::invoke:
@@ -387,9 +400,21 @@ resources:
           permissions: "0755"
 
   # -------------------------------------------------------------------------
-  # Solr: the derived image on an EC2 instance, index on the root volume. A
-  # replaced instance means a full reindex, which is slow.
+  # Solr: the derived image on an EC2 instance, with the index on its own EBS
+  # volume. The volume is a separate resource, so replacing the instance
+  # reattaches the same index rather than starting empty and needing a full,
+  # slow reindex.
   # -------------------------------------------------------------------------
+  solrData:
+    type: aws:ebs:Volume
+    properties:
+      availabilityZone: ${solrSubnet.availabilityZone}
+      size: ${solrDataSizeGb}
+      type: gp3
+      encrypted: true
+      tags:
+        Name: ${namePrefix}-solr-data
+
   solrInstance:
     type: aws:ec2:Instance
     properties:
@@ -399,7 +424,7 @@ resources:
       vpcSecurityGroupIds: ["${appSg.id}"]
       iamInstanceProfile: ${ssmProfile.name}
       rootBlockDevice:
-        volumeSize: 50
+        volumeSize: 20
         volumeType: gp3
         encrypted: true
         tags:
@@ -411,8 +436,21 @@ resources:
         set -euo pipefail
         dnf install -y docker
         systemctl enable --now docker
+
+        # The data volume, found by its ID: on Nitro instances the attachment's
+        # device name is only a hint. Wait for it to attach, format it only if
+        # it is blank, and mount it at /var/solr by UUID.
+        VOL=${solrData.id}
+        DEV=/dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_$(echo "$VOL" | tr -d -)
+        for i in $(seq 1 90); do [ -e "$DEV" ] && break; sleep 2; done
+        [ -e "$DEV" ]
+        blkid "$DEV" || mkfs.ext4 -L solr-data "$DEV"
+        UUID=$(blkid -s UUID -o value "$DEV")
         mkdir -p /var/solr
+        grep -q "$UUID" /etc/fstab || echo "UUID=$UUID /var/solr ext4 defaults,nofail 0 2" >> /etc/fstab
+        mount /var/solr
         chown 8983:8983 /var/solr
+
         docker run -d --restart always --name solr \
           -p 8983:8983 \
           -v /var/solr:/var/solr \
@@ -420,8 +458,19 @@ resources:
           ${solrImage}
     options:
       # The AMI lookup returns the newest image, which would otherwise replace
-      # the instance, and with it the index, whenever Amazon publishes one.
+      # the instance whenever Amazon publishes one. Replacing it is now safe,
+      # but means a search outage while the new instance boots, so it is left
+      # to a deliberate `pulumi up --replace`.
       ignoreChanges: ["ami"]
+
+  solrAttach:
+    type: aws:ec2:VolumeAttachment
+    properties:
+      deviceName: /dev/sdf
+      volumeId: ${solrData.id}
+      instanceId: ${solrInstance.id}
+      # Stop Solr cleanly rather than pull the disk from under it.
+      stopInstanceBeforeDetaching: true
 
   # Private DNS for the VPC, so Solr is reachable by name.
   internalZone:
