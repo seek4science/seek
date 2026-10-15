@@ -3,11 +3,6 @@
 Pulumi component provisioning the `biofair-mc-workflow-hub` account's AWS
 infrastructure for WorkflowHub, which runs SEEK. It is written in Pulumi YAML.
 
-It is maintained in the SEEK repository
-([seek4science/seek](https://github.com/seek4science/seek), `pulumi` branch,
-under `infra/biofair-mc-workflow-hub/`); copies elsewhere are kept in step from
-there.
-
 ## Current scope
 
 Phase 1 and the completed parts of phase 2: a VPC, a load balancer serving
@@ -23,8 +18,10 @@ torn down successfully.
 - **Completed:** HTTPS, with a self-signed certificate for testing
 - **Completed:** A private DNS name for Solr
 - **Completed:** Front-end autoscaling
-- A durable Solr index that survives instance replacement, with snapshots
 - **Completed:** A shared file cache across web instances
+- A Redis auth token
+- Check security groups (esp. solr) and secure connections between components
+- A durable Solr index that survives instance replacement, with snapshots
 
 ## Phase 3
 
@@ -32,11 +29,9 @@ torn down successfully.
   without touching the database, filestore or Solr index
 - Pulumi `protect: true` on the database and EFS, so a `destroy` fails rather
   than deleting them
-- A Redis auth token
-- Review the instance types and sizes against measured use, then set the
-  number of Puma workers and the Solr JVM memory to match
-- Investigate autoscaling on more than CPU, such as memory or requests per
-  instance
+- Review the instance types and sizes against measured use
+  - followed up by setting the number of Puma workers, and the Solr JVM memory
+- Autoscaling for memory also ?
 
 ## Phase 4 (post-staging)
 

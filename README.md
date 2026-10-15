@@ -1,73 +1,68 @@
-# WorkflowHub
+[![Build Status](https://github.com/seek4science/seek/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/seek4science/seek/actions/workflows/tests.yml)
+[![DOI](https://zenodo.org/badge/20803285.svg)](https://zenodo.org/badge/latestdoi/20803285)
 
-Pulumi component provisioning the `biofair-mc-workflow-hub` account's AWS
-infrastructure for WorkflowHub, which runs SEEK. It is written in Pulumi YAML.
+# FAIRDOM-SEEK
 
-## Current scope
+## License
 
-Phase 1 and the completed parts of phase 2: a VPC, a load balancer serving
-HTTPS with a self-signed certificate in front of SEEK web instances,
-autoscaled on CPU, and a worker instance, in EC2 Auto Scaling groups, MySQL on
-RDS, Redis on ElastiCache, the filestore and a shared file cache on EFS, and
-Solr on its own instance, reached by a private DNS name. It needs no IAM
-permissions beyond the `Developer` permission set, and has been deployed and
-torn down successfully.
+Copyright © 2009-2026, University of Manchester and HITS gGmbH
 
-## Phase 2
+[BSD 3-clause](BSD-LICENSE)
 
-- **Completed:** HTTPS, with a self-signed certificate for testing
-- **Completed:** A private DNS name for Solr
-- **Completed:** Front-end autoscaling
-- **Completed:** A shared file cache across web instances
-- A Redis auth token
-- Check security groups (esp. solr) and secure connections between components
-- A durable Solr index that survives instance replacement, with snapshots
+## About FAIRDOM-SEEK
 
-## Phase 3
+The FAIRDOM-SEEK platform is a web-based resource for sharing heterogeneous scientific research datasets,models or simulations, processes and research outcomes. It preserves associations between them, along with information about the people and organisations involved.
+Underpinning SEEK is the ISA infrastructure, a standard format for describing how individual experiments are aggregated into wider studies and investigations. Within SEEK, ISA has been extended and is configurable to allow the structure to be used outside of Biology.
 
-- Separate stacks for data and compute, so the compute can be taken down
-  without touching the database, filestore or Solr index
-- Pulumi `protect: true` on the database and EFS, so a `destroy` fails rather
-  than deleting them
-- Review the instance types and sizes against measured use
-  - followed up by setting the number of Puma workers, and the Solr JVM memory
-- Autoscaling for memory also ?
+FAIRDOM-SEEK is incorporating semantic technology allowing sophisticated queries over the data, yet without getting in the way of your users.
 
-## Phase 4 (post-staging)
+For an example of FAIRDOM-SEEK please visit our [Demo](http://demo.seek4science.org/).
 
-- A real domain, with a trusted certificate in place of the self-signed one
-- EFS backups
-- Container logs in CloudWatch
-- Higher availability for production: a NAT gateway per AZ, Multi-AZ RDS, a
-  Redis replica
+To see FAIRDOM-SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOMHub](http://fairdomhub.org). Examples include: 
 
-## Getting started
+- [FAIRDOMHub](https://fairdomhub.org/)
+- [WorkflowHub](https://workflowhub.eu/)
+- [DataHub](https://datahub.elixir-belgium.org/)
+- [IBISBAKHub](https://hub.ibisba.eu/)
+- [NextSEEK](https://fair-dom.org/fairdom-in-use/nextseek)
 
-Prerequisites: the [Pulumi CLI](https://www.pulumi.com/docs/iac/download-install/),
-the AWS CLI v2 with its `session-manager-plugin`, and AWS credentials for the
-`biofair-mc-workflow-hub` account from `aws configure sso` (SSO region
-`eu-north-1`, default region `eu-west-2`). The SEEK and Solr images named in
-`Pulumi.staging.yaml` must already be pushed to Docker Hub.
+For more information please visit: [SEEK for Science](http://www.seek4science.org/)
 
-```console
-export AWS_PROFILE=workflowhub   # the profile name you chose in aws configure sso
+## FAIRDOM
 
-pulumi login --local
-pulumi stack init staging
-pulumi config set --secret dbPassword "$(openssl rand -hex 16)"
+FAIRDOM-SEEK is being developed and funded as part of the FAIRDOM initiative.
+For more information please visit: [FAIRDOM](http://fair-dom.org).
 
-pulumi preview
-pulumi up
-```
 
-SEEK is then at `pulumi stack output url`, a few minutes after `up` finishes;
-the browser warns about the self-signed certificate.
-`stack init` and `config set --secret` add your stack's salt and encrypted
-password to `Pulumi.staging.yaml`; don't commit them.
+## Installation
 
-To remove everything, including the data:
+We recommend installing FAIRDOM-SEEK on Debian or Ubuntu.
 
-```console
-pulumi destroy
-pulumi stack rm --preserve-config staging
-```
+To install the latest release please visit:
+[SEEK install guide](http://docs.seek4science.org/tech/install)
+
+For details about other distributions and installing on macOS please visit:
+[Other distributions guide](http://docs.seek4science.org/tech/other-distributions)
+
+The documentation is available in its own repository: [seek-documentation](https://github.com/seek4science/seek-documentation).
+
+## Contacting Us
+
+For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://docs.seek4science.org/contacting_us)
+
+## Contributing to FAIRDOM-SEEK
+
+In general :
+
+1. Fork it ( https://github.com/seek4science/seek/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
+
+For more details on how and what you can contribute to SEEK please visit [Contributing](http://docs.seek4science.org/contributing)
+
+
+
+
+

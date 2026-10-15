@@ -17,7 +17,7 @@ Phase 1 is the managed-services design with the extras left out, and with the
 front-end and workers as Docker containers on EC2 Auto Scaling groups rather
 than ECS Fargate. It was deployed in the `biofair-mc-workflow-hub`
 account, paused and resumed with its data intact, and destroyed cleanly. It
-needs no IAM permissions beyond the `Developer` permission set. Two phase 2
+needs no IAM permissions beyond the `Developer` permission set. Four phase 2
 items have since been completed, and are marked below.
 
 The full design, before phase 1 cut it down, is in the history at commit
@@ -72,7 +72,56 @@ that blocks it.
   monitoring CPU is reported every five minutes, so scaling reacts late in
   both directions, and can add an instance as load ends.
 
-### 4. Durable Solr index
+### 4. **Completed:** Shared file cache
+
+- **Adds:** a `tmp/cache` shared between web instances, so a large generated
+  file is not regenerated per instance (handover 3.3).
+- **Done as:** `cacheAccessPoint`, a second access point on the EFS
+  filesystem at `/cache`, owned by uid 33; `hostSetup` mounts it at
+  `/mnt/cache` alongside the filestore; and both the web and worker
+  `docker run` mount it as `/seek/tmp/cache`, as docker-compose does, so the
+  workers' cleanup job prunes the shared cache.
+
+### 5. Redis auth token
+
+- **Adds:** a password on Redis, on top of TLS and the security group. Redis
+  holds SEEK's sessions, so anything that could reach it could take over or
+  alter a logged-in user's session. Today only the web, worker and Solr
+  instances can reach it, and they already hold the database password, so
+  this guards against a later loosening of the security groups more than
+  against anything possible now. It also matches docker-compose, which sets a
+  Redis password.
+- **Needs:** an `authToken` on the replication group, the token in Parameter
+  Store as a SecureString (as the database password is), read in `hostSetup`
+  and written as `REDIS_PASSWORD` to `/etc/seek.env`. Generate it in the
+  program rather than as stack config (see cross-cutting work).
+
+### 6. Security groups and secure connections
+
+- **Adds:** a review of what can reach what inside the VPC, and of which
+  connections between components are encrypted.
+- **Security groups now:** the web, worker and Solr instances all share
+  `appSg`, which admits Solr's port 8983 from `appSg` itself, and `dataSg`
+  admits MySQL, Redis and NFS from `appSg`. So the Solr instance can reach
+  the database, Redis and EFS, which it never needs, and anything in `appSg`
+  can reach Solr. Giving Solr its own security group, admitting 8983 only
+  from the web and worker instances and admitted by nothing in `dataSg`,
+  narrows both.
+- **Connections now:** encrypted are browser to load balancer (HTTPS),
+  instances to Redis (TLS) and instances to EFS (the mount helper's `tls`
+  option). Unencrypted, though only inside private subnets, are:
+  - load balancer to the web instances (HTTP on 3000, after TLS ends at the
+    load balancer);
+  - instances to MySQL, with `require_secure_transport=0`, because the SEEK
+    image's mysql client connects without TLS (handover change 5.2, a SEEK
+    change, would allow it; Rails' own `mysql2` connection would also need
+    an `ssl_mode`);
+  - instances to Solr (HTTP on 8983; TLS would need Solr's own certificate
+    configuration).
+- **Decide:** which of these to encrypt, and which to accept as private
+  network traffic, before the deployment holds real data.
+
+### 7. Durable Solr index
 
 - **Adds:** an index that survives the Solr instance being replaced, so a
   replacement does not mean a full reindex (handover 3.6).
@@ -87,16 +136,6 @@ that blocks it.
   ask the Hub for the role, or rely on a reindex as the recovery path.
 - **Check:** the device name on the current instance types and AMI (handover
   4.6).
-
-### 5. **Completed:** Shared file cache
-
-- **Adds:** a `tmp/cache` shared between web instances, so a large generated
-  file is not regenerated per instance (handover 3.3).
-- **Done as:** `cacheAccessPoint`, a second access point on the EFS
-  filesystem at `/cache`, owned by uid 33; `hostSetup` mounts it at
-  `/mnt/cache` alongside the filestore; and both the web and worker
-  `docker run` mount it as `/seek/tmp/cache`, as docker-compose does, so the
-  workers' cleanup job prunes the shared cache.
 
 ## Phase 3: protecting the data, and sizing
 
@@ -143,21 +182,7 @@ that blocks it.
   completely, as now, would want it off, so tie it to config in the same way
   as `dbDeletionProtection`.
 
-### 3. Redis auth token
-
-- **Adds:** a password on Redis, on top of TLS and the security group. Redis
-  holds SEEK's sessions, so anything that could reach it could take over or
-  alter a logged-in user's session. Today only the web, worker and Solr
-  instances can reach it, and they already hold the database password, so
-  this guards against a later loosening of the security groups more than
-  against anything possible now. It also matches docker-compose, which sets a
-  Redis password.
-- **Needs:** an `authToken` on the replication group, the token in Parameter
-  Store as a SecureString (as the database password is), read in `hostSetup`
-  and written as `REDIS_PASSWORD` to `/etc/seek.env`. Generate it in the
-  program rather than as stack config (see cross-cutting work).
-
-### 4. Review instance types and sizes
+### 3. Review instance types and sizes
 
 - **Adds:** sizes based on measured use rather than estimates, before the
   deployment holds real data and costs start to matter.
@@ -185,7 +210,7 @@ that blocks it.
   `hostSetup`; `SOLR_JAVA_MEM="-Xms512m -Xmx1024m"` in the Solr user data),
   so they would become stack config alongside the instance types.
 
-### 5. Scaling on more than CPU (to investigate)
+### 4. Scaling on more than CPU (to investigate)
 
 - **Question:** whether the web group should also scale on memory, or on
   something closer to load than CPU.

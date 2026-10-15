@@ -84,7 +84,7 @@ flowchart TB
         params["SSM Parameter Store<br/>DB password"]
 
         ebs[("Standalone EBS volume for the Solr index<br/>nightly snapshots<br/>phase 2")]
-        token["Redis auth token in Parameter Store<br/>phase 3"]
+        token["Redis auth token in Parameter Store<br/>phase 2"]
     end
 
     users --> alb --> web
