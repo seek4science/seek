@@ -122,14 +122,15 @@ variables:
 
   # First half of the web and worker instances' user data: install Docker,
   # mount the filestore, and write the container environment. Each launch
-  # template appends its own `docker run`. NO_ENTRYPOINT_WORKERS is only read
-  # by the web entrypoint and QUIET_SUPERCRONIC only by the workers, so one
-  # environment serves both. REDIS_TLS and MYSQL_SSL_CA need a SEEK image
-  # recent enough to support them; without MYSQL_SSL_CA support, SEEK cannot
-  # connect, since the database requires TLS. BOOTSNAP_CACHE_DIR keeps
-  # bootsnap's cache in the container, out of the shared file cache on EFS,
-  # where instances booting at once (or on different images) leave each other
-  # stale NFS handles and Puma fails to start.
+  # template appends its own `docker run`. NO_ENTRYPOINT_WORKERS and NGINX_TLS
+  # are only read by the web entrypoint and QUIET_SUPERCRONIC only by the
+  # workers, so one environment serves both. REDIS_TLS, MYSQL_SSL_CA and
+  # NGINX_TLS need a SEEK image recent enough to support them; without
+  # MYSQL_SSL_CA support, SEEK cannot connect, since the database requires
+  # TLS. BOOTSNAP_CACHE_DIR keeps bootsnap's cache in the container, out of
+  # the shared file cache on EFS, where instances booting at once (or on
+  # different images) leave each other stale NFS handles and Puma fails to
+  # start.
   hostSetup: |
     #!/bin/bash
     set -euo pipefail
@@ -172,6 +173,7 @@ variables:
     BOOTSNAP_CACHE_DIR=/seek/tmp/bootsnap
     PUMA_WORKERS_NUM=2
     NO_ENTRYPOINT_WORKERS=1
+    NGINX_TLS=1
     QUIET_SUPERCRONIC=1
     EOF
 
@@ -586,7 +588,10 @@ resources:
       privateKey: ${tlsKey.privateKeyPem}
       certificateBody: ${tlsCert.certPem}
 
-  # HTTPS on 443; plain HTTP on 80 redirects to it.
+  # HTTPS on 443; plain HTTP on 80 redirects to it. The connection on to the
+  # web instances is HTTPS too (NGINX_TLS): the container's certificate is
+  # self-signed, which the load balancer accepts, as it does not verify
+  # target certificates.
   alb:
     type: awsx:lb:ApplicationLoadBalancer
     properties:
@@ -606,11 +611,12 @@ resources:
           certificateArn: ${certificate.arn}
       defaultTargetGroup:
         port: 3000
-        protocol: HTTP
+        protocol: HTTPS
         targetType: instance
         vpcId: ${vpc.vpcId}
         deregistrationDelay: 30
         healthCheck:
+          protocol: HTTPS
           path: /up
           interval: 30
           timeout: 5
