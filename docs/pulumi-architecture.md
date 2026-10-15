@@ -8,15 +8,17 @@ and how the project is put together. For deploy steps, see the project's
 each later phase needs, [`pulumi-next-phase.md`](pulumi-next-phase.md); for the
 original design, [`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md).
 
-The diagrams show what the program deploys: phase 1 and the completed
-parts of phase 2. Parts still to come in phases 2 and 3 are drawn with dashed
-outlines and labelled with their phase. Phase 4 (a real domain, backups,
-CloudWatch logs, higher availability) is not shown.
+The diagrams show what the program deploys: phase 1 and phase 2. Parts still
+to come are drawn with dashed outlines: the Solr volume's scheduled snapshots,
+which wait on an IAM role from the Hub, and phase 3's data and compute stacks.
+Phase 4 (a real domain, backups, CloudWatch logs, higher availability, email
+delivery) is not shown.
 
 ## Services overview
 
 The services and how they connect. Services with a thick border run as
-multiple instances.
+multiple instances. Every connection is encrypted: HTTPS to and from the load
+balancer and to Solr, TLS to MySQL and Redis, and NFS over TLS to EFS.
 
 ```mermaid
 flowchart LR
@@ -81,7 +83,7 @@ flowchart TB
         rds[("RDS MySQL 8.4, TLS<br/>db.t3.medium, gp3<br/>app data + job queue")]
         redis[("ElastiCache Redis 7.1, TLS, auth token<br/>cache, sessions, throttling")]
         efs[("EFS<br/>/filestore and /cache access points")]
-        params["SSM Parameter Store<br/>DB password, Redis auth token"]
+        params["SSM Parameter Store<br/>DB password, Redis auth token,<br/>Solr TLS key"]
 
         ebs[("EBS volume for the Solr index<br/>survives instance replacement")]
         snaps["Nightly snapshots of the index volume<br/>needs an IAM role from the Hub"]
@@ -95,10 +97,11 @@ flowchart TB
     workers --> rds
     workers --> redis
     workers --> efs
-    workers --> solr
+    workers -- "https://solr.seek.internal" --> solr
     privdns -.- solr
     params -. "read at boot" .-> web
     params -. "read at boot" .-> workers
+    params -. "read at boot" .-> solr
     hub -. "pulled via NAT" .-> web
     hub -. "pulled via NAT" .-> workers
     hub -. "pulled via NAT" .-> solr
@@ -119,9 +122,12 @@ flowchart TB
 | `seek-filestore` volume | An EFS filesystem, through a `/filestore` access point |
 | `seek-cache` volume | The same EFS filesystem, through a `/cache` access point |
 
-Each web and worker instance's user data mounts the filestore, reads the
-database password from Parameter Store, writes the container environment,
-and runs the SEEK container; see
+Each web and worker instance's user data mounts the filestore and file cache
+over TLS, reads the database password and Redis auth token from Parameter
+Store, fetches the RDS CA bundle, trusts Solr's self-signed certificate,
+writes the container environment, and runs the SEEK container. The Solr
+instance's user data mounts the index volume, builds Solr's TLS keystore from
+the key in Parameter Store, and runs Solr; see
 [`tech-notes.md`](../infra/biofair-mc-workflow-hub/tech-notes.md).
 
 ## Network and security groups
@@ -157,9 +163,9 @@ flowchart TB
     internet -- "443, 80" --> alb
     alb -- "HTTPS 3000" --> instances
     instances -- "HTTPS 8983" --> solr
-    instances -- "3306" --> rds
-    instances -- "6379" --> redis
-    instances -- "2049 NFS" --> efs
+    instances -- "3306 TLS" --> rds
+    instances -- "6379 TLS" --> redis
+    instances -- "2049 NFS over TLS" --> efs
     instances & solr -. "outbound" .-> nat
     nat -. "image pulls etc." .-> internet
 ```
@@ -201,8 +207,8 @@ flowchart LR
         nat["NAT gateway<br/>and default route"]
         alb["Load balancer<br/>certificate, listeners"]
         groups["Web and worker<br/>Auto Scaling groups"]
-        solr["Solr instance<br/>and DNS record"]
-        redis[("ElastiCache")]
+        solr["Solr instance, DNS record<br/>and TLS certificate"]
+        redis[("ElastiCache<br/>and its auth token")]
     end
 
     data -- "stack reference:<br/>subnet and security group IDs,<br/>DB address, EFS IDs" --> compute
@@ -249,8 +255,8 @@ The program is a single Pulumi YAML file in four sections:
 | Section | Contents |
 |---|---|
 | `config` | Per-stack settings: `environment`, `vpcCidr`, image tags, web and worker counts and the CPU target, instance sizes, database size and deletion settings, and the `dbPassword` secret |
-| `variables` | The `namePrefix` (`biofair-mc-workflow-hub-<environment>`), Solr's DNS name, lookups of the SSM instance profile and the Amazon Linux AMI, and `hostSetup`, the web and worker instances' shared user data |
-| `resources` | VPC and security groups; the password parameter, RDS, ElastiCache and EFS; the Solr instance, its data volume and private DNS name; the self-signed certificate and the load balancer; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
+| `variables` | The `namePrefix` (`biofair-mc-workflow-hub-<environment>`), Solr's DNS name, lookups of the SSM instance profile, the Amazon Linux AMI and the region, and `hostSetup`, the web and worker instances' shared user data |
+| `resources` | VPC and security groups; the password parameter, RDS and its parameter group; the generated Redis auth token, its parameter and ElastiCache; EFS; the Solr instance, its data volume, private DNS name, and TLS key, certificate and key parameter; the load balancer's self-signed certificate and the load balancer; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
 | `outputs` | Site URL, database and Redis endpoints, EFS ID, web and worker group names, Solr's private IP |
 
 Every resource is tagged `Environment` and `ManagedBy: pulumi` through the AWS
