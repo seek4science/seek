@@ -218,38 +218,7 @@ flowchart LR
     class data,compute planned
 ```
 
-## Project structure and deployment flow
-
-What lives where in the SEEK repository, and how it becomes a running stack.
-
-```mermaid
-flowchart LR
-    subgraph repo["SEEK repository, pulumi branch"]
-        dockerfile["Dockerfile"]
-        solrdf["solr/Dockerfile<br/>+ solr/seek/conf"]
-        subgraph proj["infra/biofair-mc-workflow-hub/"]
-            program["Pulumi.yaml<br/>config schema, variables,<br/>resources, outputs"]
-            stack["Pulumi.staging.yaml<br/>stack config, committed;<br/>local salt and secrets not"]
-            readme["README.md<br/>tech-notes.md"]
-        end
-        docs["docs/<br/>pulumi-next-phase.md,<br/>SEEK-pulumi-handover.md"]
-    end
-
-    dockerhub[("Docker Hub")]
-    state[("Pulumi state<br/>local backend for now")]
-    awsacct["AWS account<br/>biofair-mc-workflow-hub"]
-
-    dockerfile -- "docker build + push, by hand" --> dockerhub
-    solrdf -- "docker build + push, by hand" --> dockerhub
-    program --> up{{"pulumi up<br/>stack: staging"}}
-    stack --> up
-    up <--> state
-    up -- "creates and updates resources" --> awsacct
-    dockerhub -- "images pulled at boot" --> awsacct
-    docs -. "plans and design" .-> program
-```
-
-### Inside `Pulumi.yaml`
+## Inside `Pulumi.yaml`
 
 The program is a single Pulumi YAML file in four sections:
 
