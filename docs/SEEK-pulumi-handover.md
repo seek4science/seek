@@ -198,7 +198,7 @@ rewrite — task definitions, load balancer, EFS mounts and databases are unaffe
 4.1–4.4 were answered by reading the SEEK repo; the program reflects the
 answers. 4.5 is resolved by SEEK change 5.4. 4.6–4.7 remain open.
 
-**4.1 Database and Redis hostnames — RESOLVED; Redis needs a SEEK change.**
+**4.1 Database and Redis hostnames — RESOLVED; Redis and MySQL TLS need SEEK changes.**
 
 - *MySQL:* fully overridable. `docker/database.docker.mysql.yml` (copied to
   `config/database.yml` at boot) reads `MYSQL_HOST`, `MYSQL_DATABASE`,
@@ -214,12 +214,10 @@ answers. 4.5 is resolved by SEEK change 5.4. 4.6–4.7 remain open.
   transit encryption, so SEEK cannot connect as sketched. See SEEK change 5.1.
 - *MySQL TLS:* the image writes `[client] skip-ssl` into
   `/etc/mysql/conf.d/disable-ssl.cnf`, so the entrypoint's `mysqladmin` and
-  `mysql` readiness checks never use TLS. RDS for MySQL 8.4 is believed to
-  default `require_secure_transport` to ON (verify against the 8.4 parameter
-  group defaults); if so those checks fail, with the consequences in 4.4. The
-  program now sets `require_secure_transport = 0` in `dbParams`, acceptable
-  since RDS is reachable only from `appSg` inside private subnets. SEEK change
-  5.2 is the alternative.
+  `mysql` readiness checks never use TLS, and Rails' own `mysql2` connection
+  turned out not to use it either. **Resolved by SEEK change 5.2:** with
+  `MYSQL_SSL_CA` set, both use TLS, and the program sets
+  `require_secure_transport` on in `dbParams`.
 
 **4.2 EFS access point uid/gid — RESOLVED: 33:33, not 1000:1000.** The runtime
 image ends with `USER www-data`, and in the Debian base image
@@ -284,12 +282,12 @@ version rather than trusted from this sketch.
 
 Everything else in this document is infrastructure: Pulumi program, stack
 config, or one-off operational steps. These are the items that need changes to
-the SEEK repository itself. Only 5.1 blocks deployment.
+the SEEK repository itself. 5.1 and 5.2 are needed by the program as it stands.
 
 | # | Change | Required? | Alternative without a SEEK change |
 |---|---|---|---|
 | 5.1 | Redis TLS support in `Seek::RedisConfig` — **in #2756** | **Yes**, as the program stands | Disable `transitEncryptionEnabled` and drop `authToken` on ElastiCache |
-| 5.2 | Allow TLS for the entrypoint's MySQL client checks | No | `require_secure_transport = 0` in `dbParams` (done) |
+| 5.2 | MySQL TLS through `MYSQL_SSL_CA` — **done** | **Yes**, as the program stands | `require_secure_transport = 0` in `dbParams` |
 | 5.3 | `check_mysql` distinguishes "cannot connect" from "empty database" | No, hardening | Run first-run setup as a one-off task; watch boot logs |
 | 5.4 | Derived Solr image from `solr/seek/conf` — **in #2756** | No, convenience | Build it outside the repo |
 
@@ -307,14 +305,17 @@ The pull request also points production Action Cable's `config/cable.yml` at
 `Seek::RedisConfig.url` (unless `REDIS_URL` is set), so it would use the same
 Redis, authentication and TLS; SEEK does not use Action Cable yet.
 
-**5.2 MySQL client TLS (optional).** The Dockerfile writes `[client] skip-ssl`
-to `/etc/mysql/conf.d/disable-ssl.cnf`, so `mysqladmin`/`mysql` in
-`docker/shared_functions.sh` cannot talk to a server that requires TLS.
-Making this conditional (e.g. on an env var at boot) would let RDS keep
-`require_secure_transport` on. Also worth checking whether the `mysql2`
-connection Rails itself makes negotiates TLS by default with the bundled
-client library; if not, `database.docker.mysql.yml` would need an `ssl_mode`
-setting too.
+**5.2 MySQL TLS — done.** The Dockerfile writes `[client] skip-ssl` to
+`/etc/mysql/conf.d/disable-ssl.cnf`, and Rails' `mysql2` connection did not
+negotiate TLS either (checked on staging: an empty `Ssl_cipher`). Setting
+`MYSQL_SSL_CA` to a CA bundle's path inside the container now turns TLS on
+for both: `docker/database.docker.mysql.yml` adds `ssl_mode: verify_identity`
+and `sslca`, and `docker/shared_functions.sh` adds `--ssl --ssl-ca
+--ssl-verify-server-cert` to the `mysql` and `mysqladmin` checks, overriding
+the option file. Unset, nothing changes. Tested against RDS with the image's
+MariaDB 11.8 client library: TLSv1.3, and a certificate from the wrong CA is
+refused. The program mounts the RDS CA bundle and sets
+`require_secure_transport` on.
 
 **5.3 Safer first-run detection (optional).** `check_mysql` treats any failure
 of `desc $MYSQL_DATABASE.users` as "database is empty" and runs `rake db:setup`.
@@ -386,8 +387,7 @@ Phase 1 has been deployed; see [`pulumi-next-phase.md`](pulumi-next-phase.md)
 for what the next phase needs. The list below is the original plan.
 
 1. ~~Answer open questions 4.1–4.4 by reading the SEEK repo.~~ Done; see
-   section 4. Confirm the www-data uid (4.2) and the RDS 8.4
-   `require_secure_transport` default (4.1) when convenient.
+   section 4. Confirm the www-data uid (4.2) when convenient.
 2. ~~Make SEEK change 5.1 (Redis TLS).~~ Done; needs a SEEK image built from
    a commit that includes it.
 3. `pulumi preview` against a throwaway stack and fix provider-schema drift.
@@ -420,8 +420,7 @@ the AWS account it targets:
 
 **Phase 1.** The program currently deploys a cut-down phase 1 of this design:
 HTTPS with a self-signed certificate at the load balancer's hostname, 1-8
-autoscaled web instances, the Solr index on the instance's root volume, no
-Redis auth token, and no EFS backups.
+autoscaled web instances, and no EFS backups.
 [`pulumi-next-phase.md`](pulumi-next-phase.md) lists what later phases add
 back.
 

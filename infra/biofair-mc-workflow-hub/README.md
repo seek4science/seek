@@ -19,9 +19,10 @@ permission set, and has been deployed and torn down successfully.
 - **Completed:** A private DNS name for Solr
 - **Completed:** Front-end autoscaling
 - **Completed:** A shared file cache across web instances
-- A Redis auth token
+- **Completed:** A Redis auth token
 - **Completed:** Solr isolated in its own security group
 - Decide which connections between components to encrypt
+  - **Completed:** MySQL over TLS
 - **Completed:** A durable Solr index that survives instance replacement;
   snapshots still need an IAM role from the Hub
 

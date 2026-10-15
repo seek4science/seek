@@ -78,14 +78,13 @@ flowchart TB
         end
 
         privdns["Route 53 private zone<br/>solr.seek.internal"]
-        rds[("RDS MySQL 8.4<br/>db.t3.medium, gp3<br/>app data + job queue")]
-        redis[("ElastiCache Redis 7.1, TLS<br/>cache, sessions, throttling")]
+        rds[("RDS MySQL 8.4, TLS<br/>db.t3.medium, gp3<br/>app data + job queue")]
+        redis[("ElastiCache Redis 7.1, TLS, auth token<br/>cache, sessions, throttling")]
         efs[("EFS<br/>/filestore and /cache access points")]
-        params["SSM Parameter Store<br/>DB password"]
+        params["SSM Parameter Store<br/>DB password, Redis auth token"]
 
         ebs[("EBS volume for the Solr index<br/>survives instance replacement")]
         snaps["Nightly snapshots of the index volume<br/>needs an IAM role from the Hub"]
-        token["Redis auth token in Parameter Store<br/>phase 2"]
     end
 
     users --> alb --> web
@@ -105,10 +104,9 @@ flowchart TB
     hub -. "pulled via NAT" .-> solr
     solr --- ebs
     snaps -.-> ebs
-    token -.-> redis
 
     classDef planned stroke-dasharray:5 5,color:#777
-    class snaps,token planned
+    class snaps planned
 ```
 
 | docker-compose service | AWS resource |
