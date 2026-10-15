@@ -148,6 +148,7 @@ variables:
 
     # The SSM instance role can read Parameter Store.
     DB_PASSWORD=$(aws ssm get-parameter --region ${region} --name ${dbPasswordParam.name} --with-decryption --query Parameter.Value --output text)
+    REDIS_PASSWORD=$(aws ssm get-parameter --region ${region} --name ${redisAuthTokenParam.name} --with-decryption --query Parameter.Value --output text)
 
     # The CA bundle for RDS's certificates, mounted into the container so
     # SEEK connects to MySQL over TLS and verifies the server.
@@ -166,6 +167,7 @@ variables:
     MYSQL_PASSWORD=$DB_PASSWORD
     MYSQL_SSL_CA=/etc/seek/rds-ca.pem
     REDIS_HOST=${redis.primaryEndpointAddress}
+    REDIS_PASSWORD=$REDIS_PASSWORD
     REDIS_TLS=1
     BOOTSNAP_CACHE_DIR=/seek/tmp/bootsnap
     PUMA_WORKERS_NUM=2
@@ -332,7 +334,7 @@ resources:
 
   # -------------------------------------------------------------------------
   # Redis: cache, sessions and throttle counters; no durable data, since
-  # SEEK's job queue is in MySQL. TLS-only, without an auth token.
+  # SEEK's job queue is in MySQL. TLS-only, with an auth token.
   # -------------------------------------------------------------------------
   redisSubnets:
     type: aws:elasticache:SubnetGroup
@@ -351,6 +353,23 @@ resources:
         - name: maxmemory-policy
           value: allkeys-lru
 
+  # Generated here, so no one chooses it and the stack config holds no copy;
+  # it is kept as a secret in the Pulumi state. Letters and digits only, which
+  # ElastiCache accepts and SEEK's Redis URL needs no escaping for.
+  redisAuthToken:
+    type: random:RandomPassword
+    properties:
+      length: 32
+      special: false
+
+  # Read by the web and worker instances at boot.
+  redisAuthTokenParam:
+    type: aws:ssm:Parameter
+    properties:
+      name: /${namePrefix}/redis-auth-token
+      type: SecureString
+      value: ${redisAuthToken.result}
+
   redis:
     type: aws:elasticache:ReplicationGroup
     properties:
@@ -365,6 +384,14 @@ resources:
       securityGroupIds: ["${dataSg.id}"]
       atRestEncryptionEnabled: true
       transitEncryptionEnabled: true
+      authToken: ${redisAuthToken.result}
+    options:
+      # A token set when the group is created is required from the start.
+      # Changing it in place uses ROTATE, which leaves the new token optional
+      # (and adding one to a group that had none still admits clients without
+      # it) until a separate SET, so a change replaces the group instead. Redis
+      # holds only the cache and sessions, so a replacement logs users out.
+      replaceOnChanges: ["authToken"]
 
   # -------------------------------------------------------------------------
   # EFS: the shared filestore. One mount target per AZ.
