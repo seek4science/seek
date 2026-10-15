@@ -21,8 +21,10 @@ permission set, and has been deployed and torn down successfully.
 - **Completed:** A shared file cache across web instances
 - **Completed:** A Redis auth token
 - **Completed:** Solr isolated in its own security group
-- Decide which connections between components to encrypt
+- Encrypt the connections between components
   - **Completed:** MySQL over TLS
+  - **Completed:** Load balancer to web instances over HTTPS
+  - Solr over TLS
 - **Completed:** A durable Solr index that survives instance replacement;
   snapshots still need an IAM role from the Hub
 

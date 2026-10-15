@@ -72,8 +72,13 @@ private key is held encrypted in the Pulumi state. The load balancer only
 accepts certificates for a fully qualified domain name, hence the
 `.seek.internal` name, though nothing resolves it.
 
-The load balancer terminates TLS and passes `X-Forwarded-Proto: https`
-through nginx to Rails, so SEEK generates `https://` links. A real domain
+The connection on from the load balancer to the web instances is HTTPS too.
+The web containers run with `NGINX_TLS`, so nginx generates a self-signed
+certificate at each start and serves HTTPS on port 3000, and the target group
+and its health check use HTTPS. The load balancer does not verify target
+certificates, so nothing needs distributing or renewing. It passes
+`X-Forwarded-Proto: https` through nginx to Rails, so SEEK generates
+`https://` links. A real domain
 replaces only the certificate (`docs/pulumi-next-phase.md`, phase 4).
 
 The instances reach Solr as `solr.seek.internal` rather than by its IP. If the

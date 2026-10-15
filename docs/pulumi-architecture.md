@@ -68,7 +68,7 @@ flowchart TB
         alb["Application Load Balancer<br/>HTTPS 443, self-signed certificate in ACM<br/>HTTP 80 redirects"]
 
         subgraph webasg["Web Auto Scaling group, 1-8"]
-            web["SEEK container<br/>nginx :3000 to Puma"]
+            web["SEEK container<br/>nginx HTTPS :3000 to Puma"]
         end
         subgraph workerasg["Worker Auto Scaling group, 1"]
             workers["SEEK container<br/>Solid Queue + supercronic"]
@@ -155,7 +155,7 @@ flowchart TB
     end
 
     internet -- "443, 80" --> alb
-    alb -- "3000" --> instances
+    alb -- "HTTPS 3000" --> instances
     instances -- "8983" --> solr
     instances -- "3306" --> rds
     instances -- "6379" --> redis

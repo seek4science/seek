@@ -119,17 +119,25 @@ that blocks it.
   and `dbParams` sets `require_secure_transport`, so RDS refuses plain
   connections. Tested: a plain connection is refused, and SEEK and the
   workers run.
-- **Connections now:** encrypted are browser to load balancer (HTTPS),
-  instances to MySQL, Redis (TLS) and EFS (the mount helper's `tls`
-  option). Unencrypted, though only inside private subnets, are:
-  - load balancer to the web instances (HTTP on 3000, after TLS ends at the
-    load balancer);
-  - instances to Solr (HTTP on 8983; TLS would need Solr's own certificate
-    configuration).
-- **Still to decide:** whether to encrypt these two, or accept them as
-  private network traffic, before the deployment holds real data. Ending
-  TLS at the load balancer is the usual AWS pattern, and Solr is reachable
-  only from the web and worker instances.
+- **Done: load balancer to web instances over HTTPS.** The web containers
+  run with `NGINX_TLS` (handover change 5.5), so nginx serves HTTPS on 3000
+  with a self-signed certificate generated at each start; the target group
+  and its health check use HTTPS. The load balancer does not verify target
+  certificates, so nothing needs distributing or renewing. Tested: the
+  target is healthy over HTTPS, the site works, and nginx answers TLSv1.3
+  on 3000 and refuses plain HTTP there.
+- **Connections now:** encrypted are browser to load balancer and load
+  balancer to web instances (HTTPS), instances to MySQL, Redis (TLS) and EFS
+  (the mount helper's `tls` option). Unencrypted, though only inside private
+  subnets, is instances to Solr (HTTP on 8983).
+- **Next: Solr over TLS.** Unlike the load balancer, SEEK should verify
+  Solr's certificate, so this needs a small private CA and a certificate for
+  `solr.seek.internal` from Pulumi's `tls` provider; the Solr private key in
+  Parameter Store, read at boot into a keystore for Solr's `SOLR_SSL_*`
+  settings; the CA added to a bundle the web and worker instances point
+  `SSL_CERT_FILE` at; `SOLR_URL` with `https` for Sunspot; and the Solr
+  image's health check following the TLS setting (a SEEK change). The
+  certificate needs a long validity and a note on renewing it.
 
 ### 7. **Completed:** Durable Solr index
 

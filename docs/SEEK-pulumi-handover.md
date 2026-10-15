@@ -248,7 +248,8 @@ the domain root) and `webCount > 1` is fine.
    the container; concurrency-safe.
 3. Renders `docker/nginx.conf.template` and later runs **nginx on :3000, proxying
    to Puma on :2000** inside the container. ALB target port 3000 is correct;
-   nginx serves `public/` and `/assets` directly.
+   nginx serves `public/` and `/assets` directly, over HTTPS with
+   `NGINX_TLS` (change 5.5).
 4. `rake sitemap:create &`: each task regenerates the sitemap into its own
    container filesystem. Redundant across tasks but harmless.
 5. Puma (`docker/puma.rb`): `workers` defaults to `Concurrent.processor_count`,
@@ -282,7 +283,7 @@ version rather than trusted from this sketch.
 
 Everything else in this document is infrastructure: Pulumi program, stack
 config, or one-off operational steps. These are the items that need changes to
-the SEEK repository itself. 5.1 and 5.2 are needed by the program as it stands.
+the SEEK repository itself. 5.1, 5.2 and 5.5 are needed by the program as it stands.
 
 | # | Change | Required? | Alternative without a SEEK change |
 |---|---|---|---|
@@ -290,6 +291,7 @@ the SEEK repository itself. 5.1 and 5.2 are needed by the program as it stands.
 | 5.2 | MySQL TLS through `MYSQL_SSL_CA` — **done** | **Yes**, as the program stands | `require_secure_transport = 0` in `dbParams` |
 | 5.3 | `check_mysql` distinguishes "cannot connect" from "empty database" | No, hardening | Run first-run setup as a one-off task; watch boot logs |
 | 5.4 | Derived Solr image from `solr/seek/conf` — **in #2756** | No, convenience | Build it outside the repo |
+| 5.5 | nginx HTTPS on :3000 through `NGINX_TLS` — **done** | **Yes**, as the program stands | Target group back to HTTP |
 
 **5.1 Redis TLS (required) — in pull request #2756.** `Seek::RedisConfig.url`
 (`lib/seek/redis_config.rb`) now uses the `rediss://` scheme when `REDIS_TLS`
@@ -349,6 +351,16 @@ linux/amd64,linux/arm64 --push` would allow a Graviton `solrInstanceType`.
 
 Compose and `script/start-docker-solr.sh` still bind-mount the configset and so
 do not get the refresh; switching them to the image is a possible follow-up.
+
+**5.5 nginx HTTPS — done.** With `NGINX_TLS` set (`1`, `true` or `yes`),
+`configure_nginx_listen` in `docker/shared_functions.sh` generates a
+self-signed ECDSA certificate in `/tmp/nginx-tls` at each start, and the
+entrypoint substitutes `listen 3000 ssl` and the certificate into
+`docker/nginx.conf.template` (`SEEK_LISTEN`); unset, nginx serves plain HTTP
+on 3000 as before. For a proxy that encrypts its connection to the container
+without verifying the certificate, such as the load balancer. The template's
+`ssl_protocols` is now TLSv1.2 and TLSv1.3. Tested in the image and on
+staging: TLSv1.3 on 3000, plain HTTP there answered with 400.
 
 ---
 
