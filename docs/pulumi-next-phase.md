@@ -17,8 +17,9 @@ Phase 1 is the managed-services design with the extras left out, and with the
 front-end and workers as Docker containers on EC2 Auto Scaling groups rather
 than ECS Fargate. It was deployed in the `biofair-mc-workflow-hub`
 account, paused and resumed with its data intact, and destroyed cleanly. It
-needs no IAM permissions beyond the `Developer` permission set. Five phase 2
-items have since been completed, and are marked below.
+needs no IAM permissions beyond the `Developer` permission set. All seven
+phase 2 items have since been completed, and are marked below; only the Solr
+volume's scheduled snapshots wait, on an IAM role from the Hub.
 
 The full design, before phase 1 cut it down, is in the history at commit
 `6550a42c0b`. Most items below were already written there and can be adapted
@@ -104,7 +105,7 @@ that blocks it.
   without the token or with a wrong one are refused, and SEEK's cache and
   sessions work.
 
-### 6. Security groups and secure connections
+### 6. **Completed:** Security groups and secure connections
 
 - **Adds:** a review of what can reach what inside the VPC, and of which
   connections between components are encrypted.
@@ -126,18 +127,23 @@ that blocks it.
   certificates, so nothing needs distributing or renewing. Tested: the
   target is healthy over HTTPS, the site works, and nginx answers TLSv1.3
   on 3000 and refuses plain HTTP there.
-- **Connections now:** encrypted are browser to load balancer and load
-  balancer to web instances (HTTPS), instances to MySQL, Redis (TLS) and EFS
-  (the mount helper's `tls` option). Unencrypted, though only inside private
-  subnets, is instances to Solr (HTTP on 8983).
-- **Next: Solr over TLS.** Unlike the load balancer, SEEK should verify
-  Solr's certificate, so this needs a small private CA and a certificate for
-  `solr.seek.internal` from Pulumi's `tls` provider; the Solr private key in
-  Parameter Store, read at boot into a keystore for Solr's `SOLR_SSL_*`
-  settings; the CA added to a bundle the web and worker instances point
-  `SSL_CERT_FILE` at; `SOLR_URL` with `https` for Sunspot; and the Solr
-  image's health check following the TLS setting (a SEEK change). The
-  certificate needs a long validity and a note on renewing it.
+- **Connections now:** all encrypted: browser to load balancer and load
+  balancer to web instances (HTTPS), and instances to MySQL, Redis, Solr
+  (TLS) and EFS (the mount helper's `tls` option).
+- **Done: Solr over TLS.** Unlike the load balancer, SEEK verifies Solr's
+  certificate. The program generates a key and a self-signed certificate
+  for `solr.seek.internal` and `localhost` (`solrTlsKey`, `solrTlsCert`),
+  valid ten years and renewed by a `pulumi up` in the last; the key is in
+  Parameter Store, read at boot into a PKCS12 keystore for Solr's
+  `SOLR_SSL_*` settings. The web and worker instances trust the certificate
+  itself through `SSL_CERT_DIR`, which leaves the image's public CAs in
+  place, and Sunspot uses an `https` `SOLR_URL`. The Solr image's health
+  check follows the TLS setting (handover change 5.6). A change to the Solr
+  user data now replaces the instance (`userDataReplaceOnChange`), since
+  user data only runs on first boot. Tested: HTTPS verified, plain HTTP and
+  other certificates refused, search works, and a full reindex indexed every
+  searchable item; indexing during the rollout was lost, as expected, and
+  the reindex restored it.
 
 ### 7. **Completed:** Durable Solr index
 

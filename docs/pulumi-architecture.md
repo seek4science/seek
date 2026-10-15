@@ -74,7 +74,7 @@ flowchart TB
             workers["SEEK container<br/>Solid Queue + supercronic"]
         end
         subgraph solrbox["Solr EC2 instance"]
-            solr["seek-solr container<br/>:8983, SG: solrSg"]
+            solr["seek-solr container<br/>HTTPS :8983, SG: solrSg"]
         end
 
         privdns["Route 53 private zone<br/>solr.seek.internal"]
@@ -91,7 +91,7 @@ flowchart TB
     web --> rds
     web --> redis
     web --> efs
-    web -- "solr.seek.internal" --> solr
+    web -- "https://solr.seek.internal" --> solr
     workers --> rds
     workers --> redis
     workers --> efs
@@ -156,7 +156,7 @@ flowchart TB
 
     internet -- "443, 80" --> alb
     alb -- "HTTPS 3000" --> instances
-    instances -- "8983" --> solr
+    instances -- "HTTPS 8983" --> solr
     instances -- "3306" --> rds
     instances -- "6379" --> redis
     instances -- "2049 NFS" --> efs

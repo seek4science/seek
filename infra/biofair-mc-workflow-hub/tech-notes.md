@@ -22,8 +22,9 @@ to what is needed to prove SEEK runs on it:
 - MySQL on RDS (TLS required), Redis on ElastiCache (TLS and an auth token), and the filestore
   and a shared file cache on EFS, each through its own access point
 - Solr on its own EC2 instance running the `fairdom/seek-solr` image, in its
-  own security group, with the index on a separate EBS volume, reachable as
-  `solr.seek.internal` through a Route 53 private zone attached to the VPC
+  own security group, serving HTTPS only, with the index on a separate EBS
+  volume, reachable as `solr.seek.internal` through a Route 53 private zone
+  attached to the VPC
 
 It creates no IAM resources: every instance uses the account's existing
 `ssm-instance-profile`, and is reached through SSM. Comments in `Pulumi.yaml`
@@ -89,6 +90,28 @@ and the web and worker instances are left alone.
 
 Solr's security group, `solrSg`, admits only port 8983 from the web and
 worker instances. Solr cannot reach the database, Redis or EFS.
+
+Solr serves HTTPS only. The program generates a key and a self-signed
+certificate (`solrTlsKey`, `solrTlsCert`) for `solr.seek.internal` and for
+`localhost`, which the image's health check uses and Jetty requires the
+certificate to cover. The key is in Parameter Store
+(`/<prefix>/solr-tls-key`); at boot the Solr instance builds a PKCS12
+keystore from it, under a password made for that boot, for Solr's
+`SOLR_SSL_*` settings. The web and worker instances trust the certificate
+itself: it is in `/etc/seek/ca.d`, mounted into the container as
+`SSL_CERT_DIR`, while OpenSSL still reads the image's public CAs from its
+default file. `SOLR_URL` points Sunspot at `https://solr.seek.internal:8983`,
+and SEEK verifies the certificate and the host name.
+
+The certificate is valid for ten years. A `pulumi up` in its last year
+replaces it, which replaces the Solr instance and rolls both groups.
+
+User data only runs on an instance's first boot, so any change to Solr's
+replaces the instance (`userDataReplaceOnChange`) rather than restarting it.
+While a change to how SEEK reaches Solr rolls out, instances still on the old
+settings cannot index, and SEEK rescues the errors, so those updates are
+lost: run `bundle exec rake seek:reindex_all` in the worker container once
+the groups have rolled.
 
 The index is on its own 20 GB EBS volume (`solrDataSizeGb`), mounted at
 `/var/solr`. Solr's user data finds the volume by its ID, formats it only if

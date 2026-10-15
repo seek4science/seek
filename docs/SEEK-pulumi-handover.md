@@ -283,7 +283,7 @@ version rather than trusted from this sketch.
 
 Everything else in this document is infrastructure: Pulumi program, stack
 config, or one-off operational steps. These are the items that need changes to
-the SEEK repository itself. 5.1, 5.2 and 5.5 are needed by the program as it stands.
+the SEEK repository itself. 5.1, 5.2, 5.5 and 5.6 are needed by the program as it stands.
 
 | # | Change | Required? | Alternative without a SEEK change |
 |---|---|---|---|
@@ -292,6 +292,7 @@ the SEEK repository itself. 5.1, 5.2 and 5.5 are needed by the program as it sta
 | 5.3 | `check_mysql` distinguishes "cannot connect" from "empty database" | No, hardening | Run first-run setup as a one-off task; watch boot logs |
 | 5.4 | Derived Solr image from `solr/seek/conf` — **in #2756** | No, convenience | Build it outside the repo |
 | 5.5 | nginx HTTPS on :3000 through `NGINX_TLS` — **done** | **Yes**, as the program stands | Target group back to HTTP |
+| 5.6 | Solr image health check over HTTPS with `SOLR_SSL_ENABLED` — **done** | For a healthy status only; Solr runs either way | Ignore the unhealthy status |
 
 **5.1 Redis TLS (required) — in pull request #2756.** `Seek::RedisConfig.url`
 (`lib/seek/redis_config.rb`) now uses the `rediss://` scheme when `REDIS_TLS`
@@ -361,6 +362,15 @@ on 3000 as before. For a proxy that encrypts its connection to the container
 without verifying the certificate, such as the load balancer. The template's
 `ssl_protocols` is now TLSv1.2 and TLSv1.3. Tested in the image and on
 staging: TLSv1.3 on 3000, plain HTTP there answered with 400.
+
+**5.6 Solr health check over HTTPS — done.** With `SOLR_SSL_ENABLED=true`,
+the `HEALTHCHECK` in `solr/Dockerfile` pings `https://localhost:8983` without
+verifying the certificate; otherwise plain HTTP as before. Jetty rejects a
+request for a host name the certificate does not cover (`400 Invalid SNI`),
+so a certificate used with the image must also name `localhost`. Sunspot
+needs no change for TLS: it honours `SOLR_URL`, and Ruby's OpenSSL honours
+`SSL_CERT_DIR`. Tested with `solr:9.10.1` and a PKCS12 keystore: healthy
+with and without TLS.
 
 ---
 

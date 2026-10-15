@@ -10,8 +10,9 @@ HTTPS with a self-signed certificate in front of SEEK web instances,
 autoscaled on CPU, and a worker instance, in EC2 Auto Scaling groups, MySQL on
 RDS, Redis on ElastiCache, the filestore and a shared file cache on EFS, and
 Solr on its own instance, with its index on a separate volume, reached by a
-private DNS name. It needs no IAM permissions beyond the `Developer`
-permission set, and has been deployed and torn down successfully.
+private DNS name. Every connection between them is encrypted. It needs no IAM
+permissions beyond the `Developer` permission set, and has been deployed and
+torn down successfully.
 
 ## Phase 2
 
@@ -21,10 +22,8 @@ permission set, and has been deployed and torn down successfully.
 - **Completed:** A shared file cache across web instances
 - **Completed:** A Redis auth token
 - **Completed:** Solr isolated in its own security group
-- Encrypt the connections between components
-  - **Completed:** MySQL over TLS
-  - **Completed:** Load balancer to web instances over HTTPS
-  - Solr over TLS
+- **Completed:** Every connection between components encrypted: MySQL and
+  Solr over TLS, and the load balancer to the web instances over HTTPS
 - **Completed:** A durable Solr index that survives instance replacement;
   snapshots still need an IAM role from the Hub
 
