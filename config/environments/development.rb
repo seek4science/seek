@@ -35,10 +35,6 @@ Rails.application.configure do
   #   config.cache_store = :null_store
   # end
   config.cache_store = Seek::Caching::RedisWithFileOverflowStore.build("#{Rails.root}/tmp/cache/dev-cache")
-  config.settings_cache_store = ActiveSupport::Cache::RedisCacheStore.new(
-    url: Seek::RedisConfig.url,
-    namespace: 'settings-cache'
-  )
 
   config.public_file_server.enabled = true
 
