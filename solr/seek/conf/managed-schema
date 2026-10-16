@@ -63,7 +63,7 @@
   <!-- DatePointField replaces TrieDateField (removed in Solr 9) -->
   <fieldType name="tdate" class="solr.DatePointField" omitNorms="true" docValues="true"/>
 
-  <fieldType name="daterange" class="solr.DateRangeField" omitNorms="true"/>
+  <fieldType name="daterange" class="solr.DateRangeField"/>
 
   <!-- Dictionary source for the spellcheck component. Deliberately plainer than
        the "text" type - no n-gramming or word splitting, so that the terms
