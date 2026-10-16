@@ -330,7 +330,7 @@ class WorkflowsController < ApplicationController
       @workflow = @crate_extractor.build
       new_version = !@workflow.id.nil?
 
-      if (!new_version || @workflow.git_version.save) && @workflow.save
+      if @workflow.save && (!new_version || @workflow.git_version.save)
         render json: @workflow, include: json_api_include_param
       else
         render json: json_api_errors(@workflow), status: :unprocessable_entity
