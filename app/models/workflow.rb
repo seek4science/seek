@@ -173,11 +173,22 @@ class Workflow < ApplicationRecord
   attr_reader :extraction_warnings
   attr_reader :extraction_errors
 
-  def provide_metadata(metadata)
+  def provide_metadata(metadata, update_creators: false)
     @extraction_warnings = metadata.delete(:warnings) || []
     @extraction_errors = metadata.delete(:errors) || []
     @extracted_metadata = metadata
     assign_attributes(@extracted_metadata)
+
+    return unless update_creators
+
+    update_creators(@extracted_metadata)
+  end
+
+  def update_creators(metadata)
+    updated_assets_creators_attrs = metadata[:assets_creators_attributes]&.values || []
+    return if updated_assets_creators_attrs.empty?
+
+    self.assets_creators = retained_and_new_creators(updated_assets_creators_attrs)
   end
 
   def workflow_data_files_attributes=(attributes)
