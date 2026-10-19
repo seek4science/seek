@@ -1,23 +1,21 @@
 {
   "data": {
-    "id": "177",
+    "id": "498",
     "type": "documents",
     "attributes": {
       "policy": {
         "access": "download",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
-          "id": "142",
+          "id": "310",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "276",
+        "extended_metadata_type_id": "363",
         "attribute_map": {
           "role_email": "alice@email.com",
           "role_phone": "0012345",
@@ -46,14 +44,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/177?version=1",
+          "url": "http://localhost:3000/documents/498?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-11-20T10:19:04.000Z",
-      "updated_at": "2024-11-20T10:19:04.000Z",
+      "created_at": "2026-08-27T08:42:26.800Z",
+      "updated_at": "2026-08-27T08:42:26.800Z",
       "doi": null,
       "content_blobs": [
         {
@@ -62,13 +60,13 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/177/content_blobs/1046",
+          "link": "http://localhost:3000/documents/498/content_blobs/1050456286",
           "size": 8
         }
       ],
       "creators": [
         {
-          "profile": "/people/3541",
+          "profile": "/people/1040001562",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -81,7 +79,7 @@
       "creators": {
         "data": [
           {
-            "id": "3541",
+            "id": "1040001562",
             "type": "people"
           }
         ]
@@ -89,7 +87,7 @@
       "submitter": {
         "data": [
           {
-            "id": "3542",
+            "id": "1040001563",
             "type": "people"
           }
         ]
@@ -97,11 +95,11 @@
       "people": {
         "data": [
           {
-            "id": "3541",
+            "id": "1040001562",
             "type": "people"
           },
           {
-            "id": "3542",
+            "id": "1040001563",
             "type": "people"
           }
         ]
@@ -109,7 +107,7 @@
       "projects": {
         "data": [
           {
-            "id": "3416",
+            "id": "1022265662",
             "type": "projects"
           }
         ]
@@ -117,7 +115,7 @@
       "investigations": {
         "data": [
           {
-            "id": "496",
+            "id": "973655893",
             "type": "investigations"
           }
         ]
@@ -125,7 +123,7 @@
       "studies": {
         "data": [
           {
-            "id": "483",
+            "id": "1060385743",
             "type": "studies"
           }
         ]
@@ -133,7 +131,7 @@
       "assays": {
         "data": [
           {
-            "id": "397",
+            "id": "1035387444",
             "type": "assays"
           }
         ]
@@ -141,7 +139,7 @@
       "publications": {
         "data": [
           {
-            "id": "221",
+            "id": "287",
             "type": "publications"
           }
         ]
@@ -149,21 +147,25 @@
       "workflows": {
         "data": [
           {
-            "id": "192",
+            "id": "1406",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/177?version=1"
+      "self": "/documents/498?version=1"
     },
     "meta": {
-      "created": "2024-11-20T10:19:04.000Z",
-      "modified": "2024-11-20T10:19:04.000Z",
+      "created": "2026-08-27T08:42:26.743Z",
+      "modified": "2026-08-27T08:42:26.800Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "cb1a6250-8956-013d-24a2-0a81884ed284"
+      "uuid": "f38a247b-1811-400c-89fe-5ad7c3be81a8",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

@@ -40,7 +40,7 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'create, update and show a presentation with extended metadata' do
+  test 'create a presentation with extended metadata' do
 
     cmt = FactoryBot.create(:simple_presentation_extended_metadata_type)
 
@@ -67,8 +67,21 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a presentation with extended metadata' do
+
+    cmt = FactoryBot.create(:simple_presentation_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    presentation = FactoryBot.create(:presentation, contributor: person, policy: FactoryBot.create(:public_policy),
+                                     extended_metadata: cm)
 
     get :show, params: { id: presentation }
     assert_response :success

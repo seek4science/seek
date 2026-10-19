@@ -1,7 +1,7 @@
 module Seek
   module BioSchema
     module ResourceDecorators
-      # Decorator that provides extensions for a Organism
+      # Decorator that provides extensions for an Organism
       class Organism < Thing
         schema_mappings synonyms: :alternateName,
                         ncbi_uri: :sameAs

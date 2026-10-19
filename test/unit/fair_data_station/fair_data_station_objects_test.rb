@@ -195,6 +195,83 @@ class FairDataStationObjectsTest < ActiveSupport::TestCase
     assert_equal partial_sample_type, sample.find_closest_matching_sample_type(nil)
   end
 
+  test 'find closest matching sample type excludes types with missing required attributes' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+
+    # create a type that matches all FDS properties but has an extra required attribute not in FDS data
+    type_with_missing_required = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    type_with_missing_required.sample_attributes << FactoryBot.build(
+      :sample_attribute,
+      sample_attribute_type: FactoryBot.create(:string_sample_attribute_type),
+      title: 'Required missing field',
+      pid: 'http://example.com/not_in_fds_data',
+      required: true,
+      sample_type: type_with_missing_required
+    )
+    type_with_missing_required.reload
+
+    # only the type with missing required exists — should return nil
+    assert_nil sample.find_closest_matching_sample_type(nil)
+
+    # add a valid type with no missing required attributes — should be preferred
+    valid_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    assert_equal valid_type, sample.find_closest_matching_sample_type(nil)
+  end
+
+  test 'find closest matching sample type does not exclude types where only missing required attributes are core annotations' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+
+    # Title has pid=schema:name (required) — a core annotation stripped from property_ids but always populated via populate_seek_sample
+    type = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    assert type.sample_attributes.find { |a| a.title == 'Title' }.required?
+
+    assert_equal type, sample.find_closest_matching_sample_type(nil)
+  end
+
+  test 'find closest matching extended metadata type excludes types with missing required attributes' do
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    assay = inv.studies.first.assays.first
+
+    # create a type that matches all FDS properties but has an extra required attribute not in FDS data
+    type_with_missing_required = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    type_with_missing_required.extended_metadata_attributes << FactoryBot.create(
+      :study_title_extended_metadata_attribute,
+      title: 'Required missing field',
+      pid: 'http://example.com/not_in_fds_data',
+      required: true
+    )
+    type_with_missing_required.reload
+
+    # only the type with missing required exists — should return nil
+    assert_nil assay.find_closest_matching_extended_metadata_type
+
+    # add a valid type with no missing required attributes — should be preferred
+    valid_type = FactoryBot.create(:fairdata_test_case_assay_extended_metadata)
+    assert_equal valid_type, assay.find_closest_matching_extended_metadata_type
+  end
+
+  test 'find_exact_matching_sample_type does not falsely match when attribute count matches but pids differ' do
+    # A sample type from a different FDS source with the same attribute count but different non-core PIDs
+    # was incorrectly detected as an exact match.
+    path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
+    inv = Seek::FairDataStation::Reader.new.parse_graph(path).first
+    sample = inv.studies.first.observation_units.first.samples.first
+    person = FactoryBot.create(:person)
+
+    # Same attribute count as the exact match, but one non-core PID replaced with an unrelated one.
+    wrong_sample_type = FactoryBot.create(:fairdatastation_test_case_sample_type)
+    attr = wrong_sample_type.sample_attributes.find { |a| a.pid == 'https://w3id.org/mixs/0000011' }
+    attr.update_column(:pid, 'http://example.com/different_prop')
+
+    assert_equal 6, wrong_sample_type.sample_attributes.count
+    assert_nil sample.find_exact_matching_sample_type(person)
+  end
+
   test 'find_exact_matching_sample_type dont pick if private' do
     path = "#{Rails.root}/test/fixtures/files/fair_data_station/seek-fair-data-station-test-case-irregular.ttl"
     inv = Seek::FairDataStation::Reader.new.parse_graph(path).first

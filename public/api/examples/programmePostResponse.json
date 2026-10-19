@@ -1,11 +1,9 @@
 {
   "data": {
-    "id": "34",
+    "id": "269",
     "type": "programmes",
     "attributes": {
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "avatar": null,
       "title": "Post Programme Max",
       "description": "A very exciting programme",
@@ -20,11 +18,11 @@
       "administrators": {
         "data": [
           {
-            "id": "1950",
+            "id": "1040001726",
             "type": "people"
           },
           {
-            "id": "1952",
+            "id": "1040001728",
             "type": "people"
           }
         ]
@@ -32,11 +30,11 @@
       "people": {
         "data": [
           {
-            "id": "1950",
+            "id": "1040001726",
             "type": "people"
           },
           {
-            "id": "1952",
+            "id": "1040001728",
             "type": "people"
           }
         ]
@@ -44,86 +42,60 @@
       "projects": {
         "data": [
           {
-            "id": "1829",
+            "id": "1022265874",
             "type": "projects"
           }
         ]
       },
       "institutions": {
-        "data": [
-
-        ]
+        "data": []
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       },
       "collections": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/programmes/34"
+      "self": "/programmes/269"
     },
     "meta": {
-      "created": "2024-11-20T10:15:18.000Z",
-      "modified": "2024-11-20T10:15:18.000Z",
+      "created": "2026-08-27T08:42:54.391Z",
+      "modified": "2026-08-27T08:42:54.391Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "443bd8d0-8956-013d-24a2-0a81884ed284"
+      "uuid": "5f00e64c-ee32-4944-a209-f91e6750c137"
     }
   },
   "jsonapi": {

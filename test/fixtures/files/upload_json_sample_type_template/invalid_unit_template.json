@@ -1,0 +1,42 @@
+{
+  "data": [
+    {
+      "metadata": {
+        "name": "Invalid Unit Test Template",
+        "group": "ISA Test",
+        "group_order": 1,
+        "temporary_name": "1_invalid_unit_test_template",
+        "version": "1.0.0",
+        "isa_config": null,
+        "isa_measurement_type": null,
+        "isa_technology_type": null,
+        "isa_protocol_type": null,
+        "repo_schema_id": null,
+        "organism": "any",
+        "level": "study source"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Source Name",
+          "description": "Sources are considered as the starting biological material used in a study.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "source"
+        },
+        {
+          "iri": null,
+          "name": "Weight",
+          "description": "Weight with an unrecognised unit symbol.",
+          "dataType": "Integer",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "source_characteristic",
+          "unit": "INVALID_UNIT_XYZ"
+        }
+      ]
+    }
+  ]
+}

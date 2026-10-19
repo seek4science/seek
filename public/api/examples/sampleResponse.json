@@ -1,27 +1,21 @@
 {
   "data": {
-    "id": "148",
+    "id": "10324",
     "type": "samples",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "Fred Bloggs",
       "tags": [
         "tag1",
         "tag2"
       ],
-      "created_at": "2024-11-20T10:14:06.000Z",
-      "updated_at": "2024-11-20T10:14:06.000Z",
-      "creators": [
-
-      ],
+      "created_at": "2026-08-27T08:37:51.751Z",
+      "updated_at": "2026-08-27T08:37:51.751Z",
+      "creators": [],
       "other_creators": null,
       "attribute_map": {
         "full_name": "Fred Bloggs",
@@ -35,12 +29,12 @@
         ],
         "patients": [
           {
-            "id": 146,
+            "id": 10322,
             "type": "Sample",
             "title": "Fred Bloggs"
           },
           {
-            "id": 147,
+            "id": 10323,
             "type": "Sample",
             "title": "Fred Bloggs"
           }
@@ -49,12 +43,12 @@
         "age": 42,
         "bool": true,
         "data file": {
-          "id": 135,
+          "id": 1055250773,
           "type": "DataFile",
           "title": "This Data file"
         },
         "sop": {
-          "id": 67,
+          "id": 1055250813,
           "type": "Sop",
           "title": "This Sop"
         }
@@ -62,28 +56,26 @@
     },
     "relationships": {
       "creators": {
-        "data": [
-
-        ]
+        "data": []
       },
       "submitter": {
         "data": [
           {
-            "id": "1334",
+            "id": "1039999998",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "174",
+          "id": "10374",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "1170",
+            "id": "1022264050",
             "type": "projects"
           }
         ]
@@ -91,44 +83,41 @@
       "data_files": {
         "data": [
           {
-            "id": "135",
+            "id": "1055250773",
             "type": "data_files"
           }
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [
           {
-            "id": "1334",
+            "id": "1039999998",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/148"
+      "self": "/samples/10324"
     },
     "meta": {
-      "created": "2024-11-20T10:14:06.000Z",
-      "modified": "2024-11-20T10:14:06.000Z",
+      "created": "2026-08-27T08:37:51.751Z",
+      "modified": "2026-08-27T08:37:51.751Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "19197440-8956-013d-24a2-0a81884ed284"
+      "uuid": "353e46bc-3b8e-4beb-8e73-ccb60f485bee",
+      "metrics": {
+        "view_count": 0
+      }
     }
   },
   "jsonapi": {

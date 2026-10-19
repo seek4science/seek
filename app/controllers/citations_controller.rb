@@ -11,6 +11,6 @@ class CitationsController < ApplicationController
   private
 
   def set_citation_style
-    session[:citation_style] = params[:style] if params[:style].present?
+    session[:citation_style] = params[:style] if params[:style].present? && Seek::Citations.valid_style?(params[:style])
   end
 end

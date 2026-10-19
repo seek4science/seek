@@ -15,7 +15,7 @@ module Seek
 
     module InstanceMethods
       def regenerate_uuid
-        self.uuid = UUID.generate
+        self.uuid = SecureRandom.uuid
       end
 
       def uuid

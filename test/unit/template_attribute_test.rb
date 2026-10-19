@@ -23,12 +23,11 @@ class TemplateAttributeTest < ActiveSupport::TestCase
   end
 
   test 'is input attribute?' do
-    # When isa tag is nil, title includes 'input' and sample attribute type is seek sample multi => true
-    # Otherwise => false
-
     attribute = FactoryBot.create(:template_attribute,
                                   sample_attribute_type: @registered_sample_multi_attribute_type,
-                                  title: 'Input attribute')
+                                  title: 'Input attribute',
+                                  isa_tag: FactoryBot.create(:input_isa_tag)
+    )
     assert attribute.input_attribute?
     attribute.isa_tag = FactoryBot.create(:source_characteristic_isa_tag)
     refute attribute.input_attribute?

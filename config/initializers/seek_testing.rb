@@ -79,6 +79,13 @@ def load_seek_testing_defaults!
       Settings.defaults[:solr_enabled] = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
 
+      # the spy has no Solr response behind it, so stub out the spellcheck block alongside the ones it already stubs
+      SunspotMatchers::SunspotSearchSpy.class_eval do
+        def solr_spellcheck
+          {}
+        end
+      end
+
       Settings.defaults[:filtering_enabled] = true
 
       Settings.defaults[:imprint_enabled]= false
@@ -88,6 +95,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:zenodo_api_url] = "https://sandbox.zenodo.org/api"
       Settings.defaults[:zenodo_oauth_url] = "https://sandbox.zenodo.org/oauth"
 
+      Settings.defaults[:block_file_uploads] = false
       Settings.defaults[:cache_remote_files] = true
       Settings.defaults[:max_cachable_size] = 2000
       Settings.defaults[:hard_max_cachable_size] = 50000

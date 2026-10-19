@@ -1,0 +1,35 @@
+conference:
+  title: 'Conference'
+  description: 'Large formal meeting or series of meetings'
+workshop:
+  title: 'Workshop'
+  description: 'Hands-on session or training'
+seminar:
+  title: 'Seminar'
+  description: 'Educational presentation or lecture'
+webinar:
+  title: 'Webinar'
+  description: 'Online seminar'
+meetup:
+  title: 'Meetup'
+  description: 'Informal gathering'
+hackathon:
+  title: 'Hackathon'
+  description: 'Collaborative programming event'
+meeting:
+  title: 'Meeting'
+  description: 'A general project meeting'
+deliverable:
+  title: 'Deliverable'
+  description: 'A project deliverable submission'
+milestone:
+  title: 'Milestone'
+  description: 'A project milestone'
+experiment:
+  title: 'Experiment'
+  description: 'A scientific experiment'
+experiment_phase:
+  title: 'Experiment Phase'
+  description: 'A phase within a scientific experiment'
+
+

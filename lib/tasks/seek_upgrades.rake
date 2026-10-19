@@ -3,23 +3,12 @@
 require 'rubygems'
 require 'rake'
 
-
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:011_topics_controlled_vocab
-    db:seed:012_operations_controlled_vocab
-    db:seed:013_data_formats_controlled_vocab
-    db:seed:014_data_types_controlled_vocab
-    db:seed:003_model_formats
-    db:seed:004_model_recommended_environments
-    db:seed:004_model_types
-    db:seed:005_publication_types
-    update_rdf
-    update_morpheus_model
-    db:seed:018_discipline_vocab
-    strip_publication_abstracts
+    db:seed:019_sop_type_controlled_vocab
+    migrate_delayed_jobs_to_solid_queue
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -34,7 +23,7 @@ namespace :seek do
     puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
-    Rails.cache.clear
+    Rake::Task['seek:clear_cache'].invoke
 
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
@@ -56,7 +45,7 @@ namespace :seek do
 
   # if rdf repository enabled then generate jobs, otherwise just clear the cache. Only runs once
   task(update_rdf: [:environment]) do
-    only_once('seek:update_rdf 1.17.0') do
+    only_once('seek:update_rdf 1.18.0') do
       if Seek::Rdf::RdfRepository.instance&.configured?
         puts '... triggering rdf generation jobs'
         Rake::Task['seek_rdf:generate'].invoke
@@ -70,49 +59,13 @@ namespace :seek do
     end
   end
 
-  task(update_morpheus_model: [:environment]) do
-    puts "... updating morpheus model"
-    affected_models = []
-    errors = []
-    Model.find_each do |model|
-      next unless model.is_morpheus_supported?
-      begin
-        unless model.model_format
-          model.model_format = ModelFormat.find_by!(title: 'Morpheus')
-        end
-        unless model.recommended_environment
-          model.recommended_environment = RecommendedModelEnvironment.find_by!(title: 'Morpheus')
-        end
-      rescue ActiveRecord::RecordNotFound => e
-        error_message = "Error: #{e.message}. Ensure that the required 'Morpheus' records exist in the database."
-        puts error_message
-        errors << error_message
-        next
-      end
-      model.update_columns(model_format_id: model.model_format_id, recommended_environment_id: model.recommended_environment_id)
-      affected_models << model
+  desc('migrates any jobs left in the delayed_jobs table into Solid Queue (one-off, post-cutover)')
+  task(migrate_delayed_jobs_to_solid_queue: [:environment]) do
+    only_once('seek:migrate_delayed_jobs_to_solid_queue 1.19.0') do
+      puts '... migrating any remaining delayed_jobs into Solid Queue'
+      result = Seek::DelayedJobMigrator.run(logger: ->(message) { puts "    #{message}" })
+      puts "... #{result.summary}"
     end
-    ReindexingQueue.enqueue(affected_models)
-    puts "... reindexing job triggered for #{affected_models.count} models"
-    unless errors.empty?
-      puts "The following errors were encountered during the update:"
-      errors.each { |error| puts error }
-    end
-  end
-
-  task(strip_publication_abstracts: [:environment]) do
-    puts 'Stripping publication abstracts...'
-    updated_count = 0
-    Publication.select(:id, :abstract).find_each do |publication|
-      if publication.abstract.present?
-        stripped = publication.abstract.strip
-        if stripped.length != publication.abstract.length
-          publication.update_column(:abstract, stripped)
-          updated_count += 1
-        end
-      end
-    end
-    puts "... updated #{updated_count} publications"
   end
 
   private

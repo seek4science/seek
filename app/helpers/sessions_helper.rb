@@ -1,4 +1,11 @@
 module SessionsHelper
+  LOGIN_STRATEGIES = %i[password elixir_aai ldap github oidc].freeze
+
+  # strategies with a form to fill in, rather than sending the user out to the provider
+  FORM_LOGIN_STRATEGIES = %i[password ldap].freeze
+
+  REDIRECTING_LOGIN_STRATEGIES = (LOGIN_STRATEGIES - FORM_LOGIN_STRATEGIES).freeze
+
   # a person can be logged in but not fully registered during
   # the registration process whilst selecting or creating a profile
   def logged_in_and_registered?
@@ -8,6 +15,30 @@ module SessionsHelper
   # returns true if there is somebody logged in and they are an admin
   def admin_logged_in?
     User.admin_logged_in?
+  end
+
+  def detect_default_login_strategy
+    available_login_strategies.first&.to_s
+  end
+
+  # the login strategies currently available, in order of preference
+  def available_login_strategies
+    LOGIN_STRATEGIES.select { |strategy| send("show_#{strategy}_login?") }
+  end
+
+  # the only way to log in, when that is a provider the user can be sent straight to
+  def sole_redirecting_login_strategy
+    strategies = available_login_strategies
+    strategies.first if strategies.one? && REDIRECTING_LOGIN_STRATEGIES.include?(strategies.first)
+  end
+
+  # the provider to send the user straight to, skipping the login page altogether.
+  # the strategy and error checks stop a failed login bouncing straight back to the provider.
+  def auto_login_strategy
+    return unless Seek::Config.omniauth_skip_login_page
+    return if params[:strategy].present? || flash[:error].present?
+
+    sole_redirecting_login_strategy
   end
 
   # returns true if there is somebody logged in and they are an project manager
@@ -30,6 +61,11 @@ module SessionsHelper
   # returns true if there is somebody logged in and they are member of a project
   def logged_in_and_member?
     User.logged_in_and_member?
+  end
+
+  def show_password_login?
+    # always show if omniauth options aren't available, regardless of standard_login_enabled setting
+    params[:show_standard_login].present? || Seek::Config.standard_login_enabled || !show_omniauth_login?
   end
 
   def show_omniauth_login?

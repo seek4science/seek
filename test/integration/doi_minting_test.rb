@@ -4,7 +4,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   include MockHelper
 
   # Only test the versioned types. Types with snapshots are tested separately.
-  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.select { |type| type.method_defined?(:versions) }.collect { |type| type.name.underscore }
+  DOIABLE_VERSIONED_ASSETS = Seek::Util.doiable_asset_types.select { |type| type.method_defined?(:versions) }.collect { |type| type.name.underscore }
 
   setup do
     @user = FactoryBot.create(:user, login: 'test')
@@ -12,12 +12,12 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     doi_citation_mock
   end
 
-  test 'doiable assets' do
-    assert_equal %w(data_file document file_template model sop workflow), DOIABLE_ASSETS
+  test 'doiable versioned assets' do
+    assert_equal %w(data_file document file_template model presentation sop workflow), DOIABLE_VERSIONED_ASSETS
   end
 
   test 'mint a DOI button' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       assert asset.find_version(1).can_mint_doi?
 
@@ -31,7 +31,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'hidden version can not mint a DOI' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       assert asset.find_version(1).can_mint_doi?
       login_as(asset.contributor.user)
@@ -48,7 +48,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'get mint_doi_confirm' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       assert asset.is_published?
       assert asset.can_manage?
@@ -67,7 +67,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'authorization for mint_doi_confirm' do
     a_user = User.current_user = FactoryBot.create(:user, login: 'a_user')
 
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       login_as(@user)
       asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       refute asset.is_published?
@@ -93,7 +93,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'mint_doi' do
     mock_datacite_request
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       post "/#{type.pluralize}/#{asset.id}/mint_doi"
@@ -141,7 +141,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'handle error when mint_doi' do
     mock_datacite_request
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       with_config_value :datacite_username, 'invalid' do
@@ -154,7 +154,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show doi attribute for asset which doi is minted' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       doi = '10.5072/my_test'
       version = asset.latest_version
@@ -169,7 +169,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show doi attribute on minted version' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       asset.save_as_new_version
@@ -197,7 +197,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'should log doi after doi is minted' do
     mock_datacite_request
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
 
       post "/#{type.pluralize}/#{asset.id}/mint_doi"
@@ -215,7 +215,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'after DOI is minted, the -Upload new version- button is not disabled' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -230,7 +230,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'after DOI is minted, the -Delete- button is disabled' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -244,7 +244,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'can not delete asset after DOI is minted' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -261,7 +261,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'after DOI is minted, disable the sharing_form options to unpublish the asset' do
     skip 'This test no longer works with the dynamic permissions form'
 
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -275,7 +275,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'can not unpublish asset after DOI is minted' do
-    DOIABLE_ASSETS.each do |type|
+    DOIABLE_VERSIONED_ASSETS.each do |type|
       asset = doiable_asset(type)
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
@@ -356,12 +356,227 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     assert_nil workflow.latest_git_version.doi
   end
 
+  test 'retract DOI button' do
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      latest_version = asset.latest_version
+      latest_version.doi = '10.5072/my_test'
+      assert latest_version.save
+      assert latest_version.has_doi?
+
+      get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
+      assert_response :success
+      assert_select '#buttons' do
+        assert_select 'a[href=?]', polymorphic_path(asset, action: 'retract_doi_confirm'), text: /Retract DOI/
+      end
+    end
+  end
+
+  test 'get retract_doi_confirm shows all DOIs to retract' do
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      assert asset.is_published?
+      assert asset.can_manage?
+      versioned_asset = asset.latest_version
+      versioned_asset.doi = '10.5072/my_test'
+      assert versioned_asset.save
+      assert versioned_asset.has_doi?
+
+      asset.creators = [FactoryBot.create(:person)]
+      asset.save
+
+      asset.save_as_new_version
+      versioned_asset_2 = asset.latest_version
+      versioned_asset_2.doi = '10.5072/my_test_2'
+      assert versioned_asset_2.save
+      assert versioned_asset_2.has_doi?
+
+      get "/#{type.pluralize}/#{asset.id}/retract_doi_confirm"
+      assert_response :success
+
+      assert_select 'pre', text: versioned_asset.doi_identifier
+      assert_select 'pre', text: versioned_asset_2.doi_identifier
+    end
+  end
+
+  test 'can not retract DOI if can not manage asset' do
+    a_user = User.current_user = FactoryBot.create(:user, login: 'a_user')
+
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      login_as(@user)
+      asset = doiable_asset(type, policy: FactoryBot.create(:private_policy))
+      asset.publish!
+
+      login_as(a_user)
+      assert_equal a_user, User.current_user
+      refute asset.can_manage?
+
+      get "/#{type.pluralize}/#{asset.id}/retract_doi_confirm"
+      assert_response :redirect
+      assert_not_nil flash[:error]
+
+      post "/#{type.pluralize}/#{asset.id}/retract_doi", params: { retraction_reason: 'test reason' }
+      assert_response :redirect
+      assert_not_nil flash[:error]
+    end
+  end
+
+  test 'can not retract DOI if no DOI exists' do
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      assert asset.is_published?
+      assert asset.can_manage?
+
+      get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
+      assert_response :success
+      assert_select '#buttons' do
+        assert_select 'a[href=?]', polymorphic_path(asset, action: 'retract_doi_confirm'), text: /Retract DOI/, count: 0
+      end
+
+      get "/#{type.pluralize}/#{asset.id}/retract_doi_confirm"
+      assert_response :redirect
+      assert_not_nil flash[:error]
+
+      post "/#{type.pluralize}/#{asset.id}/retract_doi", params: { retraction_reason: 'test retraction reason' }
+      assert_response :redirect
+      assert_not_nil flash[:error]
+    end
+  end
+
+  test 'retract_doi' do
+    mock_datacite_request
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      latest_version = asset.latest_version
+      latest_version.doi = '10.5072/my_test'
+      assert latest_version.save
+      assert latest_version.has_doi?
+
+      post "/#{type.pluralize}/#{asset.id}/retract_doi", params: { retraction_reason: 'test reason' }
+      assert_redirected_to root_path
+      assert_not_nil flash[:notice]
+
+      delete_doi_log = AssetDoiLog.where(asset_type: asset.class.name, asset_id: asset.id, asset_version: asset.version, action: AssetDoiLog::DELETE).last
+      assert_not_nil delete_doi_log
+      assert_equal 'test reason', delete_doi_log.comment
+
+      # Should store metadata in the log to display on the retracted page after the asset is deleted
+      assert_not_nil delete_doi_log.datacite_metadata
+      parsed_metadata = JSON.parse(delete_doi_log.datacite_metadata)
+      assert_equal 'test title', parsed_metadata['title']
+      assert_equal 'Fairdom', parsed_metadata['publisher']
+      assert_equal 'Dataset', parsed_metadata['resource_type'][0]
+      assert_equal 'Last1', parsed_metadata['creators'][0]['last_name']
+      assert_equal 'First1', parsed_metadata['creators'][0]['first_name']
+      assert_equal 'Last2', parsed_metadata['creators'][1]['last_name']
+      assert_equal 'First2', parsed_metadata['creators'][1]['first_name']
+      assert_equal 2014, parsed_metadata['year']
+
+      assert_not asset.class.exists?(asset.id)
+      assert_raises(ActiveRecord::RecordNotFound) { asset.reload }
+    end
+  end
+
+  test 'reason is required when retracting DOI' do
+    mock_datacite_request
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      latest_version = asset.latest_version
+      latest_version.doi = '10.5072/my_test'
+      assert latest_version.save
+      assert latest_version.has_doi?
+
+      post "/#{type.pluralize}/#{asset.id}/retract_doi"
+      assert_redirected_to polymorphic_path(asset, action: :retract_doi_confirm)
+      assert_not_nil flash[:error]
+
+      delete_doi_log = AssetDoiLog.where(asset_type: asset.class.name, asset_id: asset.id, asset_version: asset.version, action: AssetDoiLog::DELETE).last
+      assert_nil delete_doi_log
+    end
+  end
+
+  test 'retracts all DOIs for all versions of the asset' do
+    mock_datacite_request
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      versioned_asset = asset.latest_version
+      versioned_asset.doi = '10.5072/my_test'
+      assert versioned_asset.save
+      assert versioned_asset.has_doi?
+
+      asset.creators = [FactoryBot.create(:person)]
+      asset.save
+
+      asset.save_as_new_version
+      versioned_asset_2 = asset.latest_version
+      versioned_asset_2.doi = '10.5072/my_test_2'
+      assert versioned_asset_2.save
+      assert versioned_asset_2.has_doi?
+
+      post "/#{type.pluralize}/#{asset.id}/retract_doi", params: { retraction_reason: 'test retraction reason' }
+      assert_redirected_to root_path
+      assert_not_nil flash[:notice]
+
+      delete_doi_log = AssetDoiLog.where(asset_type: asset.class.name, asset_id: asset.id, asset_version: versioned_asset.version, action: AssetDoiLog::DELETE).last
+      assert_not_nil delete_doi_log
+      delete_doi_log_2 = AssetDoiLog.where(asset_type: asset.class.name, asset_id: asset.id, asset_version: versioned_asset_2.version, action: AssetDoiLog::DELETE).last
+      assert_not_nil delete_doi_log_2
+    end
+  end
+
+  test 'can delete asset if DOI is retracted' do
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      versioned_asset = asset.latest_version
+      versioned_asset.doi = '10.5072/my_test'
+      assert versioned_asset.save
+      assert versioned_asset.has_doi?
+
+      asset.creators = [FactoryBot.create(:person)]
+      asset.save
+
+      AssetDoiLog.create(asset_type: asset.class.name, asset_id: asset.id, asset_version: versioned_asset.version, doi: versioned_asset.doi, action: AssetDoiLog::DELETE, user_id: User.current_user.id)
+
+      assert asset.can_delete?
+    end
+  end
+  test 'shows retracted page if doi has been retracted' do
+    mock_datacite_request
+    DOIABLE_VERSIONED_ASSETS.each do |type|
+      asset = doiable_asset(type)
+      latest_version = asset.latest_version
+      latest_version.doi = '10.5072/my_test'
+      assert latest_version.save
+      assert latest_version.has_doi?
+
+      post "/#{type.pluralize}/#{asset.id}/retract_doi", params: { retraction_reason: 'test retraction reason' }
+      assert_redirected_to root_path
+      assert_not_nil flash[:notice]
+
+      get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
+      assert_response :gone
+      assert_includes response.body, 'test retraction reason'
+
+      get "/#{type.pluralize}/#{asset.id}/"
+      assert_response :gone
+      assert_includes response.body, 'test retraction reason'
+
+      # The retracted page should show metadata
+      assert_includes response.body, 'test title'
+      assert_includes response.body, 'Fairdom'
+    end
+  end
+
   private
 
   def mock_datacite_request
     stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
     stub_request(:post, 'https://mds.test.datacite.org/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
     stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['invalid', 'test']).to_return(body: '401 Bad credentials', status: 401)
+    stub_request(:get, 'https://mds.test.datacite.org/metadata/10.5072/my_test').with(basic_auth: ['test', 'test']).to_return(body: File.new("#{Rails.root}/test/fixtures/files/doi_metadata.xml"), status: 200)
+    stub_request(:get, 'https://mds.test.datacite.org/metadata/10.5072/my_test_2').with(basic_auth: ['test', 'test']).to_return(body: File.new("#{Rails.root}/test/fixtures/files/doi_metadata.xml"), status: 200)
+    stub_request(:delete, 'https://mds.test.datacite.org/metadata/10.5072/my_test').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 200)
+    stub_request(:delete, 'https://mds.test.datacite.org/metadata/10.5072/my_test_2').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 200)
   end
 
   def asset_url(asset)

@@ -1,0 +1,29 @@
+########################################################################################################################
+# Adding the Sample Type metadata sheet
+########################################################################################################################
+
+workbook.add_worksheet(name: 'Sample Type Metadata') do |sheet|
+  sheet.add_row ['Sample Type:'], style: [styles[:header_one_style]]
+  sheet.add_row ['Fairdom ID:', @sample_type.id], style: [styles[:header_two_style], nil]
+  sheet.add_row ['Title:', @sample_type.title], style: [styles[:header_two_style], nil]
+  sheet.add_row ['UUID:', @sample_type.uuid], style: [styles[:header_two_style], nil]
+
+  sheet.add_row ['Template:'], style: styles[:header_one_style]
+  sheet.add_row ['Fairdom ID:', @template.id], style: [styles[:header_two_style], nil]
+  sheet.add_row ['Title:', @template.title], style: [styles[:header_two_style], nil]
+  sheet.add_row ['UUID:', @template.uuid], style: [styles[:header_two_style], nil]
+
+  sheet.add_row ['Study:'], style: styles[:header_one_style]
+  sheet.add_row ['Fairdom ID:', @study.id], style: [styles[:header_two_style], nil]
+  sheet.add_row ['Title:', @study.title], style: [styles[:header_two_style], nil]
+  sheet.add_row ['UUID:', @study.uuid], style: [styles[:header_two_style], nil]
+
+  if @assay
+    sheet.add_row ['Assay:'], style: styles[:header_one_style]
+    sheet.add_row ['Fairdom ID:', @assay&.id], style: [styles[:header_two_style], nil]
+    sheet.add_row ['Title:', @assay&.title], style: [styles[:header_two_style], nil]
+    sheet.add_row ['UUID:', @assay&.uuid], style: [styles[:header_two_style], nil]
+  end
+
+  sheet.sheet_protection.password = secret_pwd
+end

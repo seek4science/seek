@@ -1,0 +1,11 @@
+<% original_path ||= request.original_fullpath %>
+<div class="text-center" id="auto-login">
+  <p>Redirecting to <%= omniauth_method_name(strategy) %>&hellip;</p>
+  <%= form_tag omniauth_authorize_path(strategy, state: "return_to:#{original_path}"), id: 'auto-login-form' do %>
+    <%= submit_tag "Sign in with #{omniauth_method_name(strategy)}", class: 'btn btn-primary', id: 'auto_login_button' %>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+    document.getElementById('auto-login-form').submit();
+</script>

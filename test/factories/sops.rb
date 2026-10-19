@@ -39,8 +39,17 @@ FactoryBot.define do
     workflows {[FactoryBot.build(:workflow, policy: FactoryBot.create(:public_policy))]}
     relationships {[FactoryBot.create(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: FactoryBot.create(:publication))]}
     after(:create) do |sop|
+      FactoryBot.create(:sop_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.sop_types_controlled_vocab
+
       sop.content_blob = FactoryBot.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
       sop.annotate_with(['Sop-tag1', 'Sop-tag2', 'Sop-tag3', 'Sop-tag4', 'Sop-tag5'], 'tag', sop.contributor)
+      sop_type_cv = SampleControlledVocab::SystemVocabs.vocab_for_property(:sop_types) || FactoryBot.create(:sop_types_controlled_vocab)
+      User.with_current_user sop.contributor do
+        sop.sop_type_annotations = sop_type_cv
+                                     .sample_controlled_vocab_terms
+                                     .detect { |term| term.label == 'enrichment protocol' }
+                                     .iri
+      end
       sop.save!
     end
     other_creators { 'Blogs, Joe' }

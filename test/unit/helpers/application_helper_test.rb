@@ -434,4 +434,47 @@ class ApplicationHelperTest < ActionView::TestCase
   test 'markdown renderer allows non-ASCII characters' do
     assert_equal "<p>x🍌y</p>", Seek::Markdown.render("x🍌y")
   end
+
+  test 'markdown renderer handles img tag src being relative' do
+    assert_equal '<img src="/root/path/test/image.png" />',
+                 render_markdown('<img src="test/image.png" />', relative_root: '/root/path/')
+    assert_equal '<img src="/root/path/test/image.png" />',
+                 render_markdown('<img src="/test/image.png" />', relative_root: '/root/path/')
+  end
+
+  test 'markdown renderer handles path navigation within the workflow' do
+    assert_equal '<img src="/root/path/test/image.png" />',
+                 render_markdown('<img src="test/../test/image.png" />', relative_root: '/root/path/')
+  end
+
+  test 'markdown renderer rejects path that attempts to use a different root' do
+    assert_equal '<img src="/../../another_root/path/test/image.png" />',
+                 render_markdown('<img src="/../../another_root/path/test/image.png" />', relative_root: '/root/path/')
+  end
+
+  test 'markdown renderer does not change img tag src when absolute' do
+    assert_equal '<img src="http://www.example.com/test/image.png" />',
+                 render_markdown('<img src="http://www.example.com/test/image.png" />', relative_root: '/root/path/')
+  end
+
+  test 'markdown renderer does not update img tag src when relative root is not provided' do
+    assert_equal '<img src="test/image.png" />',
+                 render_markdown('<img src="test/image.png" />')
+    assert_equal '<img src="/test/image.png" />',
+                 render_markdown('<img src="/test/image.png" />')
+  end
+
+  test 'markdown stripper removes markdown tags and HTML' do
+   assert_equal "Hello\nThis is some markdown Yep alert('hi');hey http://hello.com a link",
+                Seek::Markdown.strip_markdown("# Hello\n\nThis <span>is</span> some **markdown** <table><tr><td>Yep <script>alert('hi');</script>hey</td></tr></table> http://hello.com [a link](http://link.com)")
+  end
+
+  test 'markdown stripper handles blank input' do
+    assert_equal '', Seek::Markdown.strip_markdown('')
+  end
+
+  test 'markdown stripper handles non-UTF-8 and special characters' do
+    assert_equal "x � y", Seek::Markdown.strip_markdown("x \xD7 y")
+    assert_equal "x🍌y", Seek::Markdown.strip_markdown("x🍌y")
+  end
 end

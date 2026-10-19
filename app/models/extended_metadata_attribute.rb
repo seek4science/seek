@@ -15,6 +15,7 @@ class ExtendedMetadataAttribute < ApplicationRecord
   end
 
   def label
-    super || title&.humanize
+    label_value = read_attribute(:label)
+    label_value.nil? ? title&.humanize : label_value
   end
 end

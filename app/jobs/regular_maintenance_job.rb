@@ -1,12 +1,11 @@
 # A job that runs regularly and performs certain general maintenance tasks
-# the jobs is run periodically according to RUN_PERIOD
+# the job is run periodically, according to the schedule set in config/recurring.yml
 # short running, simple, maintenance operations can be added here, complex, or longer running operations should spawn a
 # new job specific to the operation
 
 require 'rake'
 
 class RegularMaintenanceJob < ApplicationJob
-  RUN_PERIOD = 4.hours.freeze
   REMOVE_DANGLING_BLOB_GRACE_PERIOD = 8.hours.freeze
   REMOVE_DELETED_BLOB_GRACE_PERIOD = 24.hours.freeze
   REPO_GRACE_PERIOD = 8.hours.freeze

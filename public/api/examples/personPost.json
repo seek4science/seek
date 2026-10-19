@@ -3,13 +3,12 @@
     "type": "people",
     "attributes": {
       "first_name": "Post",
-      "last_name": "Person1635",
-      "email": "maxtest1635@test.com",
+      "last_name": "Person1040000116",
+      "email": "maxtest1040000116@test.com",
       "description": "A person with all possible details",
       "web_page": "http://www.website.com",
       "orcid": "https://orcid.org/0000-0001-9842-9718",
       "phone": "34-167-552266",
-      "skype_name": "postedSkype",
       "expertise": [
         "modeling",
         "programming"

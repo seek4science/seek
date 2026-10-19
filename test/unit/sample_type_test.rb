@@ -102,16 +102,31 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'can download?' do
-    # essentially the same as can_view?
-
-    # can't download if not a project member
-    st = FactoryBot.create(:simple_sample_type)
-    assert_empty st.projects & @person.projects
-
-    refute st.can_download?(@person.user)
-    User.with_current_user(@person.user) do
+    with_auth_lookup_enabled do
+      person = FactoryBot.create(:person)
+      another_person = FactoryBot.create(:person)
+      # essentially the same as can_view?
+      st = FactoryBot.create(:simple_sample_type, policy:FactoryBot.create(:private_policy), contributor: person)
+      assert_equal Policy::NO_ACCESS, st.policy.access_type
+      st.update_lookup_table_for_all_users
+      assert st.can_download?(person.user)
+      refute st.can_download?(another_person.user)
       refute st.can_download?
+      assert st.authorized_for_download?(person.user)
+      refute st.authorized_for_download?(another_person.user)
+      refute st.authorized_for_download?
+
+      st = FactoryBot.create(:simple_sample_type, policy:FactoryBot.create(:publicly_viewable_policy), contributor: person)
+      assert_equal Policy::VISIBLE, st.policy.access_type
+      st.update_lookup_table_for_all_users
+      assert st.can_download?(person.user)
+      assert st.can_download?(another_person.user)
+      refute st.can_download?
+      assert st.authorized_for_download?(person.user)
+      assert st.authorized_for_download?(another_person.user)
+      refute st.authorized_for_download?
     end
+
   end
 
   test 'not an asset or downloadable' do
@@ -986,34 +1001,45 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert sample_type.errors.added?(:'sample_attributes.unit', 'cannot be changed (weight)')
   end
 
-  test 'determin whether sample types are considered ISA-JSON compliant' do
-
+  test 'is_isa_json_compliant? on a existing (saved) sample type' do
     source_sample_type = FactoryBot.create(:isa_source_sample_type)
-    sample_collection_sample_type= FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type)
+    sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type, linked_sample_type: source_sample_type)
     assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type, linked_sample_type: sample_collection_sample_type)
+
+    # No assay/study yet
+    refute assay_sample_type.is_isa_json_compliant?
+    [source_sample_type, sample_collection_sample_type].each { |st| refute st.is_isa_json_compliant? }
+
+    # Assay added, but investigation is NOT ISA-JSON compliant
+    # (the old code had a vacuous-truth bug that made this pass; the new code correctly returns false)
+    assay = FactoryBot.create(:assay, sample_type: assay_sample_type)
+    assay_sample_type.reload
+    refute assay.study.investigation.is_isa_json_compliant
     refute assay_sample_type.is_isa_json_compliant?
 
-    FactoryBot.create(:assay, sample_type: assay_sample_type)
+    # Make the investigation ISA-JSON compliant → assay sample type becomes compliant
+    assay.study.investigation.update_column(:is_isa_json_compliant, true)
+    assay_sample_type.reload
     assert assay_sample_type.is_isa_json_compliant?
 
-    [source_sample_type, sample_collection_sample_type].each do |st|
-      refute st.is_isa_json_compliant?
-    end
-
+    # ISA Study sample types: study exists but investigation is not yet ISA-JSON compliant
     study = FactoryBot.create(:study, sample_types: [source_sample_type, sample_collection_sample_type])
+    [source_sample_type, sample_collection_sample_type].each { |st| st.reload; refute st.is_isa_json_compliant? }
 
-    [source_sample_type, sample_collection_sample_type].each do |st|
-      refute st.is_isa_json_compliant?
-    end
-
+    # Once the investigation is flagged as ISA-JSON compliant, the study sample types comply too
     FactoryBot.create(:investigation, is_isa_json_compliant: true, studies: [study])
+    [source_sample_type, sample_collection_sample_type].each { |st| st.reload; assert st.is_isa_json_compliant? }
+  end
 
-    [source_sample_type, sample_collection_sample_type].each do |st|
-      st.reload
-      assert st.is_isa_json_compliant?
-    end
+  test 'is_isa_json_compliant? on a new (unsaved) sample type' do
+    # New record without a template is not ISA-JSON compliant
+    refute SampleType.new.is_isa_json_compliant?
 
-
+    # New record with a template is considered ISA-JSON compliant at creation time,
+    # because the assay/study links don't exist yet
+    template = FactoryBot.create(:isa_source_template)
+    new_type = SampleType.new(template_id: template.id)
+    assert new_type.is_isa_json_compliant?
   end
 
   test 'previous linked sample type' do

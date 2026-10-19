@@ -4,14 +4,21 @@ require 'csl/styles'
 module CitationsHelper
   def render_doi_citation(doi, style)
     Seek::Citations.from_doi(doi, style)
+  rescue Seek::Citations::InvalidStyleException
+    t('citations.errors.invalid_style')
   rescue JSON::ParserError, RestClient::Exception
-    'An error occurred whilst fetching the citation'
+    t('citations.errors.general')
   end
 
   def render_cff_citation(blob, style)
     Seek::Citations.from_cff(blob, style)
-  rescue StandardError
-    'An error occurred whilst fetching the citation'
+  rescue ::CFF::ValidationError => exception
+    safe_join [t('citations.errors.invalid_cff'),
+               content_tag(:ul, safe_join(exception.errors.map { |e| content_tag(:li, e.message) }))]
+  rescue Seek::Citations::InvalidStyleException
+    t('citations.errors.invalid_style')
+  rescue JSON::ParserError, RestClient::Exception
+    t('citations.errors.general')
   end
 
   def citation_style_options(selected = nil)
@@ -20,6 +27,6 @@ module CitationsHelper
   end
 
   def selected_citation_style
-    session[:citation_style] || Seek::Citations::DEFAULT
+    session[:citation_style] || Seek::Config.default_citation_style
   end
 end

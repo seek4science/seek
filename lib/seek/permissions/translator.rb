@@ -13,13 +13,14 @@ module Seek
                             download named_download launch submit_job data execute plot explore
                             download_log download_results input output download_output download_input
                             view_result compare_versions simulate copasi_simulate diagram ro_crate ro_crate_metadata run
+                            export_isa export_isatab_json
                           ]).freeze,
 
         edit: Set.new(%i[
                         edit new create update new_version create_version destroy_version edit_version
                         update_version new_item create_item edit_item update_item quick_add resolve_link
                         describe_ports retrieve_nels_sample_metadata new_git_version edit_paths update_paths
-                        create_version_from_git
+                        create_version_from_git create_version_from_ro_crate
                       ]).freeze,
 
         delete: Set.new(%i[

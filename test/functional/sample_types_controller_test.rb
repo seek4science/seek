@@ -229,6 +229,34 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'unit select is enabled when sample type has no samples with values for that sample attribute' do
+    sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person)
+    assert_empty sample_type.samples
+
+    get :edit, params: { id: sample_type }
+    assert_response :success
+
+    sample_type.sample_attributes.each do |attr|
+      assert_select "select[name*='unit_id']:not([disabled])", minimum: 1
+    end
+  end
+
+  test 'unit select is disabled when sample type has samples with values for that sample attribute' do
+    sample_type = FactoryBot.create(:patient_sample_type, project_ids: @project_ids, contributor: @person)
+    User.with_current_user(@person.user) do
+      sample = Sample.new(sample_type: sample_type, project_ids: @project_ids)
+      sample.set_attribute_value('full name', 'Test Person')
+      sample.set_attribute_value(:age, 30)
+      sample.save!
+    end
+    assert sample_type.samples.any?
+
+    get :edit, params: { id: sample_type }
+    assert_response :success
+
+    assert_select "select[name*='unit_id'].disabled", minimum: 1
+  end
+
   test 'should update sample_type' do
     sample_type = nil
     perform_enqueued_jobs(only: [SampleTemplateGeneratorJob, SampleTypeUpdateJob]) do
@@ -297,17 +325,17 @@ class SampleTypesControllerTest < ActionController::TestCase
                                  project_ids: person.projects.collect(&:id),
                                  contributor: person,
                                  content_blob: FactoryBot.create(:sample_type_template_content_blob),
-                                 policy: FactoryBot.create(:downloadable_public_policy)
+                                 policy: FactoryBot.create(:publicly_viewable_policy)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
     assert sample_type.can_view?
     assert sample_type.can_download?
     get :show, params: { id: sample_type }
     assert_response :success
-    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text:'Download'
+    assert_select 'a[href=?]',download_sample_type_content_blob_path(sample_type,sample_type.template), text: 'Download'
 
-    sample_type.policy = FactoryBot.create(:publicly_viewable_policy)
-    disable_authorization_checks { sample_type.save! }
+    logout
+
     assert sample_type.can_view?
     refute sample_type.can_download?
     get :show, params: { id: sample_type }
@@ -440,7 +468,46 @@ class SampleTypesControllerTest < ActionController::TestCase
                params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
                          content_blobs: [blob],
                          policy_attributes: policy_attributes }
+          assert_redirected_to edit_sample_type_path(assigns(:sample_type))
+        end
+      end
+    end
 
+    sample_type = assigns(:sample_type)
+    assert_redirected_to edit_sample_type_path(sample_type)
+    assert_empty sample_type.errors
+    assert sample_type.uploaded_template?
+
+    policy = sample_type.policy
+    assert_equal Policy::VISIBLE, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal Policy::MANAGING, policy.permissions.first.access_type
+    assert_equal @project, policy.permissions.first.contributor
+
+    assert_equal %w[fish golf], sample_type.tags.sort
+
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'create', ActivityLog.last.action
+  end
+
+  test 'create from template even with file uploads blocked' do
+    blob = { data: template_for_upload }
+
+    policy_attributes = projects_policy(Policy::VISIBLE, [@project], Policy::MANAGING)
+
+    with_config_value(:block_file_uploads, true) do
+      assert_difference('ActivityLog.count', 1) do
+        assert_difference('SampleType.count', 1) do
+          assert_difference('ContentBlob.count', 1) do
+            assert_nothing_raised do
+              post :create_from_template,
+                   params: { sample_type: { title: 'Hello!', project_ids: @project_ids, tags: ['fish','golf'] },
+                             content_blobs: [blob],
+                             policy_attributes: policy_attributes }
+              refute_nil assigns(:sample_type)
+              assert_redirected_to edit_sample_type_path(assigns(:sample_type))
+            end
+          end
         end
       end
     end
@@ -922,7 +989,8 @@ class SampleTypesControllerTest < ActionController::TestCase
       login_as(person)
       assert source_sample_type.is_isa_json_compliant?
       get :manage, params: { id: source_sample_type }
-      assert_redirected_to sample_type_path
+      assert_redirected_to sample_types_path
+      assert_equal 'This sample type is ISA JSON compliant and cannot be managed.', flash[:error]
 
       refute project_sample_type.is_isa_json_compliant?
       get :manage, params: { id: project_sample_type }

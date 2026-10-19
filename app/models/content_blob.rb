@@ -44,7 +44,7 @@ class ContentBlob < ApplicationRecord
 
   include Seek::Data::Checksums
 
-  CHUNK_SIZE = 2 ** 12
+  CHUNK_SIZE = 10 ** 6 # 1 MB
 
   acts_as_fleximage do
     image_directory Seek::Config.temporary_filestore_path + '/image_assets'
@@ -55,6 +55,8 @@ class ContentBlob < ApplicationRecord
   end
 
   acts_as_fleximage_extension
+
+  has_task :remote_content_fetch
 
   # This overrides the method from acts_as_fleximage so that the original image is read from the default SEEK filestore
   #  rather than the special `image_directory` specified above. Resized images will still go in there, though.
@@ -177,10 +179,10 @@ class ContentBlob < ApplicationRecord
   end
 
   def cachable?
-    Seek::Config.cache_remote_files &&
-      !is_webpage? &&
-      file_size &&
-      file_size < Seek::Config.max_cachable_size
+    return false if Seek::Config.block_file_uploads
+    return false unless Seek::Config.cache_remote_files
+
+    !is_webpage? && file_size && file_size < Seek::Config.max_cachable_size
   end
 
   def search_terms
@@ -247,8 +249,6 @@ class ContentBlob < ApplicationRecord
     self.class.valid_url?(url)
   end
 
-  has_task :remote_content_fetch
-
   def content_path(opts = {})
     opts.reverse_merge!(action: 'download')
     Seek::Util.routes.polymorphic_path([asset, self], opts)
@@ -278,7 +278,7 @@ class ContentBlob < ApplicationRecord
     raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     return unless @tmp_io_object
 
-    if @tmp_io_object.respond_to?(:path)
+    if @tmp_io_object.respond_to?(:path) && File.exist?(@tmp_io_object.path)
       @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
       if @tmp_io_object.path
         FileUtils.cp @tmp_io_object.path, filepath
@@ -287,9 +287,7 @@ class ContentBlob < ApplicationRecord
         if @tmp_io_object.path.start_with?("#{Dir.tmpdir}#{File::SEPARATOR}")
           File.delete(@tmp_io_object.path)
         end
-
       end
-
     else
       @tmp_io_object.rewind
       File.open(filepath, 'wb+') do |f|
@@ -298,6 +296,7 @@ class ContentBlob < ApplicationRecord
         end
       end
     end
+
     @tmp_io_object = nil
   end
 
@@ -310,13 +309,24 @@ class ContentBlob < ApplicationRecord
   end
 
   def create_retrieval_job
-    if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
+    return if Seek::Config.block_file_uploads
+    return unless Seek::Config.cache_remote_files
+
+    if  !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
       RemoteContentFetchingJob.perform_later(self)
     end
   end
 
   def clear_sample_type_matches
-    Rails.cache.delete_matched("st-match-#{id}*") if changed?
+    return unless changed? && id
+
+    # SampleType#matches_content_blob? caches results under the array key
+    # ['st-match', blob, content_blob, ...], which normalizes to
+    # "st-match/content_blobs/<blob.id>-.../content_blobs/<content_blob.id>-.../...". This blob can
+    # appear in either the matched-blob or the sample-type-template position, so match its own
+    # "content_blobs/<id>-" segment anywhere within an st-match key. The trailing "-" bounds the id
+    # (cache_key is "content_blobs/<id>-<sha1sum>") so blob 12 doesn't also clear blob 120.
+    Rails.cache.delete_matched(%r{st-match/.*content_blobs/#{id}-})
   end
 
   # cleans up any files converted to txt or pdf, if they exist

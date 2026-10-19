@@ -1,33 +1,33 @@
 {
   "data": [
     {
-      "id": "980192423",
+      "id": "980207525",
       "type": "institutions",
       "attributes": {
         "title": "A Minimal Institution"
       },
       "links": {
-        "self": "/institutions/980192423"
+        "self": "/institutions/980207525"
       }
     },
     {
-      "id": "980192424",
+      "id": "980207526",
       "type": "institutions",
       "attributes": {
-        "title": "An Institution: 90"
+        "title": "An Institution: 3752"
       },
       "links": {
-        "self": "/institutions/980192424"
+        "self": "/institutions/980207526"
       }
     },
     {
-      "id": "980192425",
+      "id": "980207527",
       "type": "institutions",
       "attributes": {
-        "title": "University of Manchester"
+        "title": "Manchester Institute of Biotechnology, University of Manchester"
       },
       "links": {
-        "self": "/institutions/980192425"
+        "self": "/institutions/980207527"
       }
     }
   ],

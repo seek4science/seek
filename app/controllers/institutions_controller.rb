@@ -86,11 +86,13 @@ class InstitutionsController < ApplicationController
     query = (params[:q] || '').downcase
     results = Institution.where("LOWER(title) LIKE :query
                                   OR LOWER(city) LIKE :query
+                                  OR LOWER(department) LIKE :query
                                   OR LOWER(address) LIKE :query",
                            query: "%#{query}%").limit(params[:limit] || 10)
     items = results.map do |institution|
       { id: institution.id,
-        text: institution.base_title,
+        text: institution.title,
+        base_title: institution.base_title,
         department: institution.department,
         ror_id: institution.ror_id,
         web_page: institution.web_page,

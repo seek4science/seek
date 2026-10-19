@@ -12,25 +12,35 @@ module Seek
       end
 
       def find_closest_matching_sample_type(person, property_ids = additional_metadata_annotations.collect { |annotation| annotation[0] })
-        candidates = SampleType.includes(:sample_attributes).authorized_for(:view, person).collect do |sample_type|
+        # name/title/description are always populated via core annotation handling even though they're stripped from property_ids
+        always_present_pids = [@schema.name.to_s, @schema.title.to_s, @schema.description.to_s]
+        candidates = SampleType.includes(:sample_attributes).authorized_for(:view, person).filter_map do |sample_type|
           sample_type_property_ids = sample_type.sample_attributes.collect(&:pid).compact_blank
           intersection = (property_ids & sample_type_property_ids)
+          # skip types with no matching properties
+          next if intersection.empty?
+          # skip types where any required attribute is absent from the FDS data — they would fail validation
+          required_pids = sample_type.sample_attributes.select(&:required?).collect(&:pid).compact_blank
+          next if (required_pids - property_ids - always_present_pids).any?
           difference = (property_ids | sample_type_property_ids) - intersection
-          emt = nil if intersection.empty?
           [intersection.length, difference.length, sample_type]
-        end.sort_by do |x|
-          # order by the number of properties matched coming top, but downgraded by the number of differences
-          [-x[0], x[1]]
-        end
+        end.sort_by { |x| [-x[0], x[1]] }
 
         candidates.first&.last
       end
 
       def find_exact_matching_sample_type(person)
-        property_ids = all_additional_potential_annotation_predicates
-        property_ids |= [@schema.title.to_s, @schema.description.to_s]
+        additional_ids = all_additional_potential_annotation_predicates
+        property_ids = additional_ids | [@schema.title.to_s, @schema.description.to_s]
         sample_type = find_closest_matching_sample_type(person, property_ids)
+        # count check catches attributes without PIDs, which are invisible to the PID comparison below
         return unless sample_type && sample_type.sample_attributes.count == property_ids.count
+
+        core_pid_strings = core_annotations.map(&:to_s)
+        sample_type_additional_pids = sample_type.sample_attributes.collect(&:pid).compact_blank.reject do |pid|
+          core_pid_strings.include?(pid)
+        end
+        return unless additional_ids.sort == sample_type_additional_pids.sort
 
         sample_type
       end

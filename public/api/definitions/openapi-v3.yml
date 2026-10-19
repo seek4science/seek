@@ -117,6 +117,15 @@ tags:
   - name: workflows
     description:
       $ref: ../descriptions/workflows.md
+  - name: ISA tags
+    description:
+      $ref: ../descriptions/isaTags.md
+  - name: isaStudies
+    description:
+      $ref: ../descriptions/isaStudies.md
+  - name: isaAssays
+    description:
+      $ref: ../descriptions/isaAssays.md
 x-tagGroups:
   - name: operation types
     tags:
@@ -141,6 +150,8 @@ x-tagGroups:
       - investigations
       - studies
       - assays
+      - isaStudies
+      - isaAssays
   - name: Assets
     tags:
       - collections
@@ -161,6 +172,7 @@ x-tagGroups:
       - sampleTypes
       - samples
       - sampleAttributeTypes
+      - isaTags
   - name: Extended Metadata Types
     tags:
       - extendedMetadataTypes
@@ -221,5 +233,17 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/notImplementedResponse"
+    notAcceptable:
+      description: Not acceptable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/notAcceptableResponse"
+    unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/unauthorizedResponse"
 paths:
   $ref: _paths.yml

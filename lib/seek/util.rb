@@ -59,7 +59,7 @@ module Seek
       # FIXME: hard-coded extra types - are are these items now user_creatable?
       # FIXME: remove the reliance on user-creatable, partly by respond_to?(:reindex) but also take into account if it has been enabled or not
       #- could add a searchable? method
-      extras = [Person, Programme, Project, Institution, Organism, HumanDisease, ObservationUnit]
+      extras = [Person, Programme, Project, Institution, ISATag, Organism, HumanDisease, ObservationUnit]
       cache('searchable_types') { filter_disabled(user_creatable_types | extras).sort_by(&:name) }
     end
 
@@ -140,12 +140,50 @@ module Seek
       ActiveRecord::Base.connection.instance_values['config'][:adapter]
     end
 
-    def self.delayed_job_pids
-      directory = "#{Rails.root}/tmp/pids"
-      Daemons::PidFile.find_files(directory, 'delayed_job', false, '').collect do |path|
-        file = path.sub("#{directory}/", '').sub('.pid', '')
-        Daemons::PidFile.new(directory, file)
-      end
+    # The pid of the running Solid Queue supervisor, if its pidfile (config/initializers/solid_queue.rb)
+    # exists and the process is still alive, otherwise nil.
+    def self.solid_queue_supervisor_pid
+      live_pid_from_pidfile(SolidQueue.supervisor_pidfile)
+    end
+
+    # The Solid Queue worker processes with a recent heartbeat. solid_queue_processes is in the
+    # application database, so this is readable from the web front end even when the workers run in
+    # a different container.
+    def self.live_job_workers
+      SolidQueue::Process.where(kind: 'Worker')
+                         .where('last_heartbeat_at > ?', SolidQueue.process_alive_threshold.ago)
+    end
+
+    # The queues this instance is configured to serve, read from config/queue.yml through Solid
+    # Queue's own loader so that the feature flag conditions in that file are applied. Unlike
+    # active_queue_names this doesn't depend on any workers currently running.
+    def self.configured_queue_names
+      SolidQueue::Configuration.new.configured_processes
+                               .select { |process| process.kind == :worker }
+                               .flat_map { |process| process.attributes[:queues].to_s.split(',') }
+                               .map(&:strip).reject { |name| name.blank? || name == '*' }.uniq.sort
+    end
+
+    # The names of the queues those workers are currently serving.
+    def self.active_queue_names
+      live_job_workers.flat_map { |process| process.metadata['queues'].to_s.split(',') }
+                      .map(&:strip).reject(&:blank?).uniq.sort
+    end
+
+    # Read a pid from a pidfile, returning it only if the process is still alive (nil for a missing or
+    # stale pidfile). A process owned by another user counts as alive, since it exists.
+    def self.live_pid_from_pidfile(path)
+      return nil unless path && File.exist?(path)
+
+      pid = File.read(path).strip.to_i
+      return nil unless pid.positive?
+
+      Process.kill(0, pid)
+      pid
+    rescue Errno::ESRCH
+      nil # No process with this pid - the pidfile is stale.
+    rescue Errno::EPERM
+      pid # The process exists but is owned by another user, so we can't signal it. It is still running.
     end
 
     # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed
@@ -154,13 +192,43 @@ module Seek
     end
 
     def self.python_exec(cmd)
-      "python3.9 #{cmd}"
+      "python#{python_version} #{cmd}"
+    end
+
+    def self.python_version
+      @python_version ||= Rails.root.join('.python-version').read.chomp
     end
 
     def self.lookup_class(class_name, raise: true)
       c = persistent_class_lookup[class_name]
       raise NameError, "#{class_name} not an appropriate class" if c.nil? && raise
       c
+    end
+
+    # Safely unzips a given file to the given destination directory.
+    # Optionally yields each entry in the zip file to the given block.
+    def self.unzip(file, destination, &block)
+      directory = Pathname(destination)
+      Zip::File.open(file) do |zipfile|
+        zipfile.each do |entry|
+          next if entry.name_is_directory?
+          dest = directory.join(entry.name)
+          # Guard against zip-slip attacks.
+          begin
+            unsafe = dest.expand_path.relative_path_from(directory.expand_path).each_filename.first == '..'
+          rescue ArgumentError # Handle unjoinable paths, e.g. on different drives.
+            unsafe = true
+          end
+          raise "Unsafe path in zip entry: #{entry.name}" if unsafe
+
+          unless ::File.exist?(dest)
+            FileUtils::mkdir_p(::File.dirname(dest))
+            entry.extract(entry.name, destination_directory: directory)
+          end
+
+          yield entry if block_given?
+        end
+      end
     end
 
     private

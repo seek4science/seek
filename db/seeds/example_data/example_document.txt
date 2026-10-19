@@ -1,0 +1,1 @@
+This is an example document for the SEEK sandbox. It describes the experimental setup for the reconstituted gluconeogenic enzyme system from Sulfolobus solfataricus.

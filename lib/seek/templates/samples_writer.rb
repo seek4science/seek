@@ -9,7 +9,7 @@ module Seek
 
       def initialize(sample_type)
         @sample_type = sample_type
-        @tmp_file = "/tmp/#{UUID.generate}.xlxs"
+        @tmp_file = "/tmp/#{SecureRandom.uuid}.xlxs"
       end
 
       def generate

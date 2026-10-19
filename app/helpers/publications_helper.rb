@@ -22,7 +22,7 @@ module PublicationsHelper
     when Publication::REGISTRATION_FROM_BIBTEX
       'imported from a bibtex file'
     else
-      `unknown`
+      'Not specified'
     end
   end
 

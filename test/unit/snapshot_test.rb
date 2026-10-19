@@ -4,7 +4,6 @@ require 'minitest/mock'
 class SnapshotTest < ActiveSupport::TestCase
   include MockHelper
 
-  fixtures :investigations
 
   setup do
     contributor = FactoryBot.create(:person)

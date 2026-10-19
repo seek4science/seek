@@ -1,11 +1,9 @@
 {
   "data": {
-    "id": "42",
+    "id": "277",
     "type": "programmes",
     "attributes": {
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "avatar": null,
       "title": "Changed title",
       "description": "A very exciting programme patched!",
@@ -19,7 +17,7 @@
       "administrators": {
         "data": [
           {
-            "id": "2032",
+            "id": "1040001808",
             "type": "people"
           }
         ]
@@ -27,7 +25,7 @@
       "people": {
         "data": [
           {
-            "id": "2032",
+            "id": "1040001808",
             "type": "people"
           }
         ]
@@ -35,86 +33,60 @@
       "projects": {
         "data": [
           {
-            "id": "1917",
+            "id": "1022265962",
             "type": "projects"
           }
         ]
       },
       "institutions": {
-        "data": [
-
-        ]
+        "data": []
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       },
       "collections": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/programmes/42"
+      "self": "/programmes/277"
     },
     "meta": {
-      "created": "2024-11-20T10:15:28.000Z",
-      "modified": "2024-11-20T10:15:28.000Z",
+      "created": "2026-08-27T08:43:07.148Z",
+      "modified": "2026-08-27T08:43:07.221Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "4a510000-8956-013d-24a2-0a81884ed284"
+      "uuid": "c962b11f-b654-4bc6-ab3b-6638fd4a74b1"
     }
   },
   "jsonapi": {

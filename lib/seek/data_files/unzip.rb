@@ -22,17 +22,13 @@ module Seek
           end
           find_unzipped_datafiles(tmp_dir)
         end
-  
+
         def unzip_zip(tmp_dir)
-          Zip::File.open(content_blob.filepath).entries.each do |file|
-            path = File.join(tmp_dir, file.name)
-            FileUtils.mkdir_p(File.dirname(path))
-            file.extract(path) unless File.exist?(path)
-          end
+          Seek::Util.unzip(content_blob.filepath, tmp_dir)
         end
 
         def unzip_tar(tmp_dir, input = content_blob.filepath)
-            Minitar.unpack(input, tmp_dir)
+          Minitar.unpack(input, tmp_dir)
         end
 
         def unzip_tbz2(tmp_dir)

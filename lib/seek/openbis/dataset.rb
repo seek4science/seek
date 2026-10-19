@@ -84,7 +84,7 @@ module Seek
         end
 
         Rails.logger.info("Creating zip file #{zip_path}")
-        Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
+        Zip::File.open(zip_path, create: true) do |zipfile|
           Dir.glob("#{dest_folder}/**/*").reject { |f| File.directory?(f) }.each do |path|
             file_path_in_zip = File.join(root_folder, Pathname(path).relative_path_from(Pathname(dest_folder)).to_s)
             Rails.logger.info("Adding #{path} as #{file_path_in_zip} to zip file #{zip_path}")

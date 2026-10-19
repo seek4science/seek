@@ -4,7 +4,6 @@ class AttributionsTest < ActionController::TestCase
   # use SopsController, because attributions don't have their own controller
   tests SopsController
 
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -45,7 +44,7 @@ class AttributionsTest < ActionController::TestCase
     # update the SOP, but supply no data about attributions - these should be removed
     assert_no_difference('Sop.count') do
       assert_difference('Relationship.count', -1) do
-        put :update, params: { id: assigns(:sop).id, sop: { title: 'edited_title', project_ids: [projects(:myexperiment_project).id] }, sharing: valid_sharing, attributions: [] } # NB! no attributions supplied - should remove if any existed for the sop
+        put :update, params: { id: assigns(:sop).id, sop: { title: 'edited_title', project_ids: [projects(:myexperiment_project).id] }, sharing: valid_sharing, attributions: ActiveSupport::JSON.encode([]) } # NB! no attributions supplied - should remove if any existed for the sop
 
         assert_redirected_to sop_path(assigns(:sop))
       end
@@ -147,7 +146,7 @@ class AttributionsTest < ActionController::TestCase
     assert_response :success
     assert_select 'div.panel' do
       assert_select 'div.panel-heading', text: /Attributions/
-      assert_select 'ul.list' do
+      assert_select 'ul.attributions_list' do
         assert_select 'li' do
           assert_select 'a[href=?]', sop_path(sop2), text: /#{sop2.title}/
         end

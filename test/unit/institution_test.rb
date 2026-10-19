@@ -4,8 +4,6 @@ class InstitutionTest < ActiveSupport::TestCase
 
   include MockHelper
 
-  fixtures :institutions, :projects, :work_groups, :users, :group_memberships, :people
-
   def setup
     ror_mock
   end

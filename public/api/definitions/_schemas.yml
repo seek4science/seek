@@ -249,6 +249,15 @@ versionNumber:
   minLength: 1
   enum:
     - "1.0"
+eventLocationTypeString:
+  anyOf:
+    - type: 'null'
+    - type: string
+      minlength: 1
+      enum:
+        - in_person
+        - hybrid
+        - online
 JsonApiVersion:
   type: object
   properties:
@@ -326,12 +335,26 @@ meta:
       $ref: "#/components/schemas/dateTimeString"
     uuid:
       $ref: "#/components/schemas/nonEmptyString"
+    metrics:
+      $ref: '#/components/schemas/metrics'
   required:
     - created
     - modified
     - uuid
     - base_url
     - api_version
+  additionalProperties: false
+metrics:
+  type: object
+  properties:
+    view_count:
+      $ref: "#/components/schemas/nullableInteger"
+    download_count:
+      $ref: "#/components/schemas/nullableInteger"
+    run_count:
+      $ref: "#/components/schemas/nullableInteger"
+  required:
+    - view_count
   additionalProperties: false
 collectionItemMeta:
   type: object
@@ -850,6 +873,7 @@ anyType:
     - human_diseases
     - institutions
     - investigations
+    - isa_tags
     - models
     - observation_units
     - organisms
@@ -931,6 +955,21 @@ institutionType:
   minLength: 1
   enum:
     - institutions
+isaTagType:
+  type: string
+  minLength: 1
+  enum:
+    - isa_tags
+isaStudiesType:
+  type: string
+  minLength: 1
+  enum:
+    - isa_studies
+isaAssaysType:
+  type: string
+  minLength: 1
+  enum:
+    - isa_assays
 modelType:
   type: string
   minLength: 1
@@ -1679,6 +1718,10 @@ eventPost:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -1740,6 +1783,10 @@ eventPatch:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -2110,8 +2157,6 @@ personPost:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
               $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
-              $ref: "#/components/schemas/nullableNonEmptyString"
           required:
             - first_name
             - last_name
@@ -2156,8 +2201,6 @@ personPatch:
             tools:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
-              $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
               $ref: "#/components/schemas/nullableNonEmptyString"
           additionalProperties: false
       required:
@@ -3144,6 +3187,24 @@ unprocessableEntityResponse:
     errors:
       - detail: id specified by the PUT request does not match object-id in the
           JSON input
+unauthorizedResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: Unauthorized
+        detail: You are not authorized to perform this action.
+notAcceptableResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: Not Acceptable
+        detail: Only Application/json is supported.
 badRequestResponse:
   type: object
   properties:
@@ -3682,6 +3743,10 @@ eventResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             url:
               $ref: "#/components/schemas/nullableUriString"
+            event_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            location_type:
+              $ref: "#/components/schemas/eventLocationTypeString"
             address:
               $ref: "#/components/schemas/nullableNonEmptyString"
             city:
@@ -3899,6 +3964,31 @@ investigationResponse:
     - data
     - jsonapi
   additionalProperties: false
+isaTagResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/isaTagType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+          required:
+            - title
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/indexLinks"
+      required:
+        - id
+        - type
+        - attributes
+        - links
 modelResponse:
   type: object
   properties:
@@ -4051,8 +4141,6 @@ personResponse:
             tools:
               $ref: "#/components/schemas/nonEmptyStringList"
             phone:
-              $ref: "#/components/schemas/nullableNonEmptyString"
-            skype_name:
               $ref: "#/components/schemas/nullableNonEmptyString"
             login:
               $ref: "#/components/schemas/nullableNonEmptyString"
@@ -4457,6 +4545,8 @@ publicationResponse:
               $ref: "#/components/schemas/nullableNonEmptyString"
             publication_type:
               $ref: "#/components/schemas/nonEmptyString"
+            registered_mode:
+              $ref: "#/components/schemas/nonEmptyString"
             authors:
               $ref: "#/components/schemas/nonEmptyStringList"
             content_blobs:
@@ -4496,6 +4586,7 @@ publicationResponse:
             - pubmed_id
             - citation
             - publication_type
+            - registered_mode
             - link_to_pub
           additionalProperties: false
         relationships:
@@ -4840,6 +4931,8 @@ extendedMetadataTypeExtendedMetadataAttributeResponse:
       type: boolean
     pos:
       $ref: "#/components/schemas/nullableInteger"
+    allow_cv_free_text:
+      type: boolean
     sample_controlled_vocab_id:
       $ref: "#/components/schemas/nullableNonEmptyString"
     linked_extended_metadata_type_id:
@@ -5278,3 +5371,614 @@ gitErrorResponse:
   properties:
     error:
       type: string
+#
+#
+# --- ISA STUDY & ISA ASSAY ---
+#
+#
+isaSampleAttributePost:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    pid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      oneOf:
+        - required:
+            - id
+        - required:
+            - title
+    required:
+      type: boolean
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    unit:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    is_title:
+      type: boolean
+    isa_tag_id:
+      $ref: "#/components/schemas/nonEmptyString"
+    sample_controlled_vocab_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    linked_sample_type_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    template_attribute_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - title
+    - sample_attribute_type
+    - isa_tag_id
+  additionalProperties: false
+isaSampleAttributePatch:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    pid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      oneOf:
+        - required:
+            - id
+        - required:
+            - title
+    required:
+      type: boolean
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    unit:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    is_title:
+      type: boolean
+    isa_tag_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_controlled_vocab_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    linked_sample_type_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    template_attribute_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    _destroy:
+      type: boolean
+  required: []
+  additionalProperties: false
+isaStudyPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/isaStudiesType"
+        attributes:
+          type: object
+          properties:
+            study:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                experimentalists:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                other_creators:
+                  $ref: "#/components/schemas/nullableOtherCreatorsString"
+                investigation_id:
+                  $ref: "#/components/schemas/nonEmptyString"
+              required:
+                - title
+                - investigation_id
+              additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
+            source_sample_type:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                template_id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                sample_attributes:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributePost"
+              required:
+                - title
+                - sample_attributes
+              additionalProperties: false
+            sample_collection_sample_type:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                template_id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                sample_attributes:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributePost"
+              required:
+                - title
+                - sample_attributes
+              additionalProperties: false
+          required:
+            - study
+            - source_sample_type
+            - sample_collection_sample_type
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/isaStudyPost.json
+isaStudyPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/isaStudiesType"
+        attributes:
+          type: object
+          properties:
+            study:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                experimentalists:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                other_creators:
+                  $ref: "#/components/schemas/nullableOtherCreatorsString"
+              additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
+            source_sample_type:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                sample_attributes:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributePatch"
+              additionalProperties: false
+            sample_collection_sample_type:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                sample_attributes:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributePatch"
+              additionalProperties: false
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/isaStudyPatch.json
+isaStudyResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/isaStudiesType"
+        attributes:
+          type: object
+          properties:
+            study:
+              type: object
+              properties:
+                id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                experimentalists:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                other_creators:
+                  $ref: "#/components/schemas/nullableOtherCreatorsString"
+                position:
+                  $ref: "#/components/schemas/nullableInteger"
+              required:
+                - id
+                - title
+              additionalProperties: false
+            source_sample_type:
+              type: object
+              properties:
+                id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                template_id:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                sample_attributes:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributeResponse"
+                samples:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/isaSampleInResponse"
+              required:
+                - id
+                - title
+              additionalProperties: false
+            sample_collection_sample_type:
+              type: object
+              properties:
+                id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                template_id:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                sample_attributes:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributeResponse"
+                samples:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/isaSampleInResponse"
+              required:
+                - id
+                - title
+              additionalProperties: false
+          required:
+            - study
+            - source_sample_type
+            - sample_collection_sample_type
+          additionalProperties: false
+        meta:
+          $ref: "#/components/schemas/meta"
+      required:
+        - id
+        - type
+        - attributes
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+isaAssayPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/isaAssaysType"
+        attributes:
+          type: object
+          properties:
+            assay:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                other_creators:
+                  $ref: "#/components/schemas/nullableOtherCreatorsString"
+                study_id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                assay_class_id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                assay_stream_id:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                assay_type_uri:
+                  $ref: "#/components/schemas/nullableUriString"
+                technology_type_uri:
+                  $ref: "#/components/schemas/nullableUriString"
+              required:
+                - title
+                - study_id
+                - assay_class_id
+              additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
+            sample_type:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                template_id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                sample_attributes:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributePost"
+              required:
+                - title
+                - sample_attributes
+              additionalProperties: false
+            input_sample_type_id:
+              $ref: "#/components/schemas/nonEmptyString"
+          required:
+            - assay
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/isaAssayPost.json
+isaAssayPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/isaAssaysType"
+        attributes:
+          type: object
+          properties:
+            assay:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                other_creators:
+                  $ref: "#/components/schemas/nullableOtherCreatorsString"
+                assay_type_uri:
+                  $ref: "#/components/schemas/nullableUriString"
+                technology_type_uri:
+                  $ref: "#/components/schemas/nullableUriString"
+              additionalProperties: false
+            sample_type:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                sample_attributes:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: "#/components/schemas/isaSampleAttributePatch"
+              additionalProperties: false
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/isaAssayPatch.json
+isaAssayResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/isaAssaysType"
+        attributes:
+          type: object
+          properties:
+            assay:
+              type: object
+              properties:
+                id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                study_id:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                other_creators:
+                  $ref: "#/components/schemas/nullableOtherCreatorsString"
+                position:
+                  $ref: "#/components/schemas/nullableInteger"
+                assay_class:
+                  type: object
+                  properties:
+                    title:
+                      $ref: "#/components/schemas/nullableNonEmptyString"
+                    key:
+                      $ref: "#/components/schemas/nonEmptyString"
+                  required:
+                    - key
+                  additionalProperties: false
+                assay_type:
+                  type: object
+                  properties:
+                    label:
+                      $ref: "#/components/schemas/nullableNonEmptyString"
+                    uri:
+                      $ref: "#/components/schemas/nullableUriString"
+                  additionalProperties: false
+                technology_type:
+                  type: object
+                  properties:
+                    label:
+                      $ref: "#/components/schemas/nullableNonEmptyString"
+                    uri:
+                      $ref: "#/components/schemas/nullableUriString"
+                  additionalProperties: false
+              required:
+                - id
+                - title
+              additionalProperties: false
+            sample_type:
+              anyOf:
+                - type: 'null'
+                - type: object
+                  properties:
+                    id:
+                      $ref: "#/components/schemas/nonEmptyString"
+                    title:
+                      $ref: "#/components/schemas/nonEmptyString"
+                    description:
+                      $ref: "#/components/schemas/nullableNonEmptyString"
+                    template_id:
+                      $ref: "#/components/schemas/nullableNonEmptyString"
+                    sample_attributes:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/isaSampleAttributeResponse"
+                    samples:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/isaSampleInResponse"
+                  required:
+                    - id
+                    - title
+                  additionalProperties: false
+            input_sample_type_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+          required:
+            - assay
+          additionalProperties: false
+        meta:
+          $ref: "#/components/schemas/meta"
+      required:
+        - id
+        - type
+        - attributes
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+isaSampleAttributeResponse:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    required:
+      type: boolean
+    is_title:
+      type: boolean
+    isa_tag_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    template_attribute_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+        title:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+      additionalProperties: false
+    linked_sample_type_id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    unit:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    pid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - id
+    - title
+  additionalProperties: false
+isaSampleInResponse:
+  type: object
+  description: A sample visible to the authenticated user, as embedded in an ISA study or assay response.
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    data:
+      type: object
+      description: The attribute values for this sample. Keys are attribute titles; values vary by attribute type.
+      additionalProperties: true
+  required:
+    - id
+    - title
+    - data
+  additionalProperties: false

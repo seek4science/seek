@@ -64,22 +64,28 @@ module Scrapers
 
     def create_resources(repositories)
       repositories.map do |repo|
-        output.puts "  Considering #{repo.remote.chomp('.git')}..."
-        if @only_latest
-          tag = latest_tag(repo)
-          if tag.nil?
-            output.puts "    Error while getting latest tag - wrong branch name?"
-            next
+        begin
+          output.puts "  Considering #{repo.remote.chomp('.git')}..."
+          if @only_latest
+            tag = latest_tag(repo)
+            if tag.nil?
+              output.puts "    Error while getting latest tag - wrong branch name?"
+              next
+            end
+            tags = [tag]
+          else
+            tags = all_tags(repo)
+            if tags.empty?
+              output.puts "    No tags found to register"
+              next
+            end
           end
-          tags = [tag]
-        else
-          tags = all_tags(repo)
-          if tags.empty?
-            output.puts "    No tags found to register"
-            next
-          end
+          resources = tags.map { |tag| create_resource(repo, tag) }
+
+          resources
+        ensure
+          repo.close
         end
-        tags.map { |tag| create_resource(repo, tag) }
       end.flatten.compact
     end
 
@@ -117,6 +123,9 @@ module Scrapers
       end
 
       workflow
+    rescue ROCrate::ReadException => e
+      output.puts "    RO-Crate read error: #{e.message}"
+      nil
     end
 
     def main_branch(repo)
@@ -143,7 +152,13 @@ module Scrapers
     def clone_repositories(repo_list)
       repos = repo_list.map { |repo| Git::Repository.find_or_create_by(remote: repo['clone_url']) }
 
-      repos.each(&:fetch)
+      repos.each do |r|
+        begin
+          r.fetch
+        ensure
+          r.close # Close open files
+        end
+      end
 
       repos
     end

@@ -57,13 +57,13 @@ module WorkflowExtraction
 
   delegate :inputs, :outputs, :steps, to: :structure
 
-  def can_run?
-    can_download?(nil) && workflow_class&.executable? && run_url.present?
+  def can_run?(execution_base_url = nil)
+    can_download?(nil) && workflow_class&.executable? && run_url(execution_base_url).present?
   end
 
-  def run_url
+  def run_url(execution_base_url = nil)
     if workflow_class&.key == 'galaxy'
-      base = execution_instance_url || Seek::Config.galaxy_instance_default
+      base = execution_base_url || execution_instance_url || Seek::Config.galaxy_instance_default
       return if base.nil?
 
       parent_id = is_a_version? ? parent.id : id
@@ -131,7 +131,7 @@ module WorkflowExtraction
       end
 
       remotes.each do |path, url|
-        crate.add_external_file(url)
+        crate.add_external_file(url, localPath: path)
       end
 
       crate['datePublished'] = git_version.commit_object&.time
@@ -151,7 +151,7 @@ module WorkflowExtraction
     others = other_creators&.split(',')&.collect(&:strip)&.compact || []
     authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
     crate.author = authors
-    crate.license = license
+    crate.license = Seek::License.find(license)&.url
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
 
@@ -210,6 +210,12 @@ module WorkflowExtraction
         # TODO: Find a way to do this in populate_ro_crate (Without tmpdir disappearing when it comes to writing)
         if should_generate_crate? && is_git_versioned?
           git_version.in_temp_dir do |tmpdir|
+            crate.entities.each do |entity|
+              next unless !entity.nil? && entity.type == 'File' && entity.external? && !entity['localPath'].nil?
+
+              full_path = File.join(tmpdir, entity['localPath'])
+              File.delete(full_path) if File.zero?(full_path)
+            end
             crate.add_all(tmpdir, false, include_hidden: true)
             yield crate
           end

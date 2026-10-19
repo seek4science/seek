@@ -8,7 +8,7 @@ function wait_for_mysql {
 }
 
 function wait_for_database {
-    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null
+    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
     do
             echo "WAITING FOR DATABASE"
             sleep 2
@@ -36,7 +36,7 @@ function check_mysql {
 
         wait_for_mysql
 
-        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null
+        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
         then
             echo "SETTING UP MYSQL DB"
             bundle exec rake db:setup
@@ -62,15 +62,12 @@ function start_search {
 }
 
 function setup_and_start_cron {
-    echo "GENERATING CRONTAB"
-    bundle exec whenever > /seek/seek.crontab
-
     if [ -z $QUIET_SUPERCRONIC ]
     then
       echo "STARTING SUPERCRONIC"
-      supercronic /seek/seek.crontab &
+      supercronic /seek/docker/seek.crontab &
     else
       echo "STARTING SUPERCRONIC (QUIET)"
-      supercronic -quiet /seek/seek.crontab &
+      supercronic -quiet /seek/docker/seek.crontab &
     fi
 }

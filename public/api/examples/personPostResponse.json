@@ -1,15 +1,15 @@
 {
   "data": {
-    "id": "1635",
+    "id": "1040000116",
     "type": "people",
     "attributes": {
       "avatar": null,
-      "title": "Post Person1635",
+      "title": "Post Person1040000116",
       "description": "A person with all possible details",
       "first_name": "Post",
-      "last_name": "Person1635",
+      "last_name": "Person1040000116",
       "orcid": "https://orcid.org/0000-0001-9842-9718",
-      "mbox_sha1sum": "94a75dba0ac6d2149ec73b6e172890fba41f6a2b",
+      "mbox_sha1sum": "e273b7a598ea25781ebe52c89ea18c64652838dd",
       "expertise": [
         "modeling",
         "programming"
@@ -23,85 +23,57 @@
     },
     "relationships": {
       "projects": {
-        "data": [
-
-        ]
+        "data": []
       },
       "institutions": {
-        "data": [
-
-        ]
+        "data": []
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       },
       "collections": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/people/1635"
+      "self": "/people/1040000116"
     },
     "meta": {
-      "created": "2024-11-20T10:14:42.000Z",
-      "modified": "2024-11-20T10:14:42.000Z",
+      "created": "2026-08-27T08:38:07.907Z",
+      "modified": "2026-08-27T08:38:07.907Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "2eb5a010-8956-013d-24a2-0a81884ed284"
+      "uuid": "9923d74f-8c5f-4d31-bf01-fe67f66dff65"
     }
   },
   "jsonapi": {

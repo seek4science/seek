@@ -14,10 +14,8 @@ Rails.application.config.assets.compile = true
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
 Rails.application.config.assets.precompile += [
     'spreadsheet_explorer',
-    'pdfjs/compatibility',
-    'pdfjs/debugger',
-    'pdfjs/l10n',
     'pdfjs/pdf',
+    'pdfjs/pdf.worker',
     'pdfjs/viewer.js',
     "pdfjs/viewer.css",
     "cytoscape_web/index",
@@ -29,6 +27,7 @@ Rails.application.config.assets.precompile += [
     'select2.bootstrap.min.css',
     'single_page/index.js',
     'single_page/dynamic_table.js',
+    'copasi/index.js',
     'tablesorter/jquery-latest.js',
     'tablesorter/jquery.tablesorter.js',
     'multi_step_wizard.js',

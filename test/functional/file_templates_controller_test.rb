@@ -2,7 +2,6 @@ require 'test_helper'
 require 'minitest/mock'
 
 class FileTemplatesControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -46,6 +45,14 @@ class FileTemplatesControllerTest < ActionController::TestCase
     get :show, params: { id: visible_ft }
 
     assert_response :success
+  end
+
+  test 'should show inline content preview for pdf file template' do
+    pdf_ft = FactoryBot.create(:file_template, content_blob: FactoryBot.create(:pdf_content_blob),
+                                policy: FactoryBot.create(:downloadable_public_policy))
+    get :show, params: { id: pdf_ft.id }
+    assert_response :success
+    assert_select 'div.renderer iframe', count: 1
   end
 
   test 'should not show hidden file template' do

@@ -36,6 +36,9 @@
             <%= render :partial => 'nels/data_sheet', locals: { displayed_resource: @display_data_file } if @data_file.nels? %>
           </div>
         </div>
+
+        <%= rendered_asset_view(@display_data_file) %>
+
         <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :deep => true, :include_parents => true} %>
       </div>
 

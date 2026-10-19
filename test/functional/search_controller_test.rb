@@ -64,10 +64,8 @@ class SearchControllerTest < ActionController::TestCase
     FactoryBot.create_list(:model, 3, policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
-      with_config_value(:external_search_enabled, true) do
-        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(3) }) do
-          get :index, params: { q: 'yeast', include_external_search: '1' }
-        end
+      Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(3) }) do
+        get :index, params: { q: 'yeast', include_external_search: '1' }
       end
     end
 
@@ -81,9 +79,7 @@ class SearchControllerTest < ActionController::TestCase
 
   test 'biomodels search can handle unreleased models' do
     VCR.use_cassette('biomodels/search-unreleased') do
-      with_config_value(:external_search_enabled, true) do
-        get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
-      end
+      get :index, params: { q: '2024', include_external_search: '1', search_type:'models' }
     end
 
     assert_select '.related-items li a', text: 'BioModels Database (6)'
@@ -232,14 +228,45 @@ class SearchControllerTest < ActionController::TestCase
   end
 
 
+  test 'ISATag is excluded from HTML search results' do
+    isa_tag = FactoryBot.create(:min_isa_tag)
+
+    ISATag.stub(:solr_cache, -> (q) { [isa_tag.id] }) do
+      get :index, params: { q: 'isa' }
+    end
+
+    assert_response :success
+    assert_nil assigns(:results)['ISATag']
+  end
+
+  test 'ISATag is included in JSON API search results' do
+    isa_tag = FactoryBot.create(:min_isa_tag)
+
+    ISATag.stub(:solr_cache, -> (q) { [isa_tag.id] }) do
+      get :index, params: { q: 'isa' }, format: :json
+    end
+
+    assert_response :success
+    assert_equal 1, assigns(:results)['ISATag'].count
+  end
+
+  test 'Sample is included in JSON API search results' do
+    sample = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
+
+    Sample.stub(:solr_cache, -> (q) { [sample.id] }) do
+      get :index, params: { q: 'sample' }, format: :json
+    end
+
+    assert_response :success
+    assert_equal 1, assigns(:results)['Sample'].count
+  end
+
   test 'remember external search' do
     FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
 
     VCR.use_cassette('biomodels/search') do
-      with_config_value(:external_search_enabled, true) do
-        Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
-          get :index, params: { q: 'yeast', include_external_search: '1' }
-        end
+      Model.stub(:solr_cache, -> (q) { Model.pluck(:id).last(1) }) do
+        get :index, params: { q: 'yeast', include_external_search: '1' }
       end
     end
 
@@ -248,5 +275,78 @@ class SearchControllerTest < ActionController::TestCase
 
     assert assigns(:include_external_search)
     assert_select 'div#advanced-search input#include_external_search[type=checkbox][checked=checked]'
+  end
+
+  test 'search query is passed to Solr with its original case' do
+    # Solr's analysers lowercase for matching; the query must keep its case so uppercase
+    # boolean operators (AND/OR/NOT) are recognised by edismax rather than downcased away.
+    FactoryBot.create(:public_document)
+
+    received = []
+    Document.stub(:solr_cache, -> (q) { received << q; Document.pluck(:id) }) do
+      get :index, params: { q: 'cosmo OR headings' }
+    end
+
+    assert_includes received, 'cosmo OR headings'
+    refute_includes received, 'cosmo or headings'
+  end
+
+  test 'shows spelling suggestion when it differs from the query' do
+    FactoryBot.create(:public_document)
+
+    with_spellcheck_collations(['collation', 'metabolomics']) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
+        get :index, params: { q: 'metabolomcs' }
+      end
+    end
+
+    assert_equal 'metabolomics', assigns(:spelling_suggestion)
+    assert_select 'p.spelling-suggestion' do
+      assert_select 'a[href=?]', search_path(search_query: 'metabolomics'), text: /metabolomics/
+    end
+  end
+
+  test 'no spelling suggestion when the collation matches the query' do
+    FactoryBot.create(:public_document)
+
+    with_spellcheck_collations(['collation', 'Metabolomics']) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
+        get :index, params: { q: 'Metabolomics' }
+      end
+    end
+
+    assert_nil assigns(:spelling_suggestion)
+    assert_select 'p.spelling-suggestion', count: 0
+  end
+
+  test 'no spelling suggestion when solr offers no collation' do
+    FactoryBot.create(:public_document)
+
+    with_spellcheck_collations([]) do
+      Document.stub(:solr_cache, -> (q) { Document.pluck(:id) }) do
+        get :index, params: { q: 'metabolomics' }
+      end
+    end
+
+    assert_nil assigns(:spelling_suggestion)
+    assert_select 'p.spelling-suggestion', count: 0
+  end
+
+  private
+
+  # Stands in for the search Solr is asked to run purely for its spellcheck response
+  def with_spellcheck_collations(collations, &block)
+    search = Struct.new(:solr_spellcheck) do
+      def execute
+        self
+      end
+
+      # every other searchable type also runs through this stub, and finds nothing
+      def hits
+        []
+      end
+    end.new({ 'collations' => collations })
+
+    Sunspot.stub(:new_search, ->(*_args, &_blk) { search }, &block)
   end
 end

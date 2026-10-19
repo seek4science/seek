@@ -161,7 +161,7 @@ class SamplesController < ApplicationController
         if sample.save
           results.push({ ex_id: par[:ex_id], id: sample.id })
         else
-          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages, level: 'SampleAttribute' })
         end
       end
       raise ActiveRecord::Rollback if errors.any?
@@ -181,9 +181,9 @@ class SamplesController < ApplicationController
           raise 'You are not allowed to edit this sample.' unless sample.can_edit?
           sample = update_sample_with_params(converted_params, sample)
           saved = sample.save
-          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages, level: 'SampleAttribute' }) unless saved
         rescue StandardError => e
-          errors.push({ ex_id: par[:ex_id], error: e.message })
+          errors.push({ ex_id: par[:ex_id], error: e.message, level: 'Sample' })
         end
       end
       raise ActiveRecord::Rollback if errors.any?
@@ -198,9 +198,26 @@ class SamplesController < ApplicationController
       params[:data].each do |par|
         begin
           sample = Sample.find(par[:id])
-          errors.push({ ex_id: par[:ex_id], error: "Can not be deleted." }) if !(sample.can_delete? && sample.destroy)
-        rescue 
-          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+
+          if sample.can_delete?
+            sample.destroy
+          else
+            errors.push({ ex_id: par[:ex_id], error: "Unauthorized to delete Sample with id '#{par[:id]}'.", level: 'Sample' })
+          end
+        rescue ActiveRecord::RecordNotFound
+          if par[:id] == "#HIDDEN"
+            errors.push({ ex_id: par[:ex_id], error: "You cannot delete a hidden sample!", level: 'Sample' })
+          else
+            errors.push({ ex_id: par[:ex_id], error: "Sample with id '#{par[:id]}' not found.", level: 'Sample' })
+          end
+        rescue StandardError => e
+          message =
+            if sample && sample.errors.present?
+              sample.errors.full_messages.join(', ')
+            else
+              e.message
+            end
+          errors.push({ ex_id: par[:ex_id], error: message, level: 'Sample' })
         end
       end
       raise ActiveRecord::Rollback if errors.any?

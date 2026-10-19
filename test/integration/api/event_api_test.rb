@@ -21,6 +21,7 @@ class EventApiTest < ActionDispatch::IntegrationTest
     @data_file = FactoryBot.create(:data_file, contributor: current_person)
     @creator = FactoryBot.create(:person)
     @event = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy), contributor: current_person)
+    FactoryBot.create(:event_type, title: 'Workshop') unless EventType.find_by(title: 'Workshop')
   end
 
   test 'returns sensible error objects' do

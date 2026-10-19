@@ -4,7 +4,7 @@ class Study < ApplicationRecord
 
   searchable(:auto_index => false) do
     text :experimentalists
-  end if Seek::Config.solr_enabled
+  end
 
   belongs_to :investigation
   has_many :projects, through: :investigation

@@ -229,6 +229,7 @@ class AssaysController < ApplicationController
                                   { data_files_attributes: %i[asset_id direction relationship_type_id] },
                                   { placeholders_attributes: %i[asset_id direction relationship_type_id] },
                                   { publication_ids: [] },
+                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { extended_metadata_attributes: determine_extended_metadata_keys },
                                   { discussion_links_attributes: %i[id url label _destroy] }).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)

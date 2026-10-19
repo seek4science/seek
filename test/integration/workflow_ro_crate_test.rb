@@ -7,7 +7,8 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
   test 'parse generated Workflow RO-Crate' do
     project = FactoryBot.create(:project, title: 'Cool Project')
     person = FactoryBot.create(:person, first_name: 'Xavier', last_name: 'Xavierson')
-    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person], other_creators: 'Jane Bloggs')
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, projects: [project], creators: [person],
+                                 other_creators: 'Jane Bloggs', license: 'CC-BY-4.0')
     zip = workflow.ro_crate_zip
 
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
@@ -26,6 +27,24 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     cwl = crate.get('Genomics-1-PreProcessing_without_downloading_from_SRA.cwl')
     assert cwl
     assert_equal cwl, crate.main_workflow_cwl
+
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', crate.license, 'Should convert license to full SPDX URI'
+  end
+
+  test 'Workflow RO-Crate includes publications' do
+    publication = FactoryBot.create(:publication, title: 'A Book About Stuff')
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, publications: [publication], license: 'CC-BY-4.0')
+    zip = workflow.ro_crate_zip
+
+    crate = ROCrate::WorkflowCrateReader.read_zip(zip)
+
+    refute_nil crate.main_workflow.properties['citation']
+    refute_nil crate.main_workflow.properties['citation']['@id']
+
+    included_publication = crate.get(crate.main_workflow.properties['citation']['@id'])
+    refute_nil included_publication
+    assert_equal 'ScholarlyArticle', included_publication['@type']
+    assert_equal 'A Book About Stuff', included_publication['name']
   end
 
   test 'include remotes in generated Workflow RO-Crate' do
@@ -57,9 +76,17 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
     remote1 = crate.get('http://internet.internet/file')
     assert remote1.is_a?(::ROCrate::File)
+    assert_equal remote1.properties['localPath'], 'blah.txt'
 
-    remote1 = crate.get('http://internet.internet/another_file')
-    assert remote1.is_a?(::ROCrate::File)
+    remote2 = crate.get('http://internet.internet/another_file')
+    assert remote2.is_a?(::ROCrate::File)
+    assert_equal remote2.properties['localPath'], 'blah2.txt'
+
+    Zip::File.open(zip) do |zipfile|
+      assert zipfile.find_entry('ro-crate-metadata.json')
+      assert zipfile.find_entry('blah.txt')
+      refute zipfile.find_entry('blah2.txt')
+    end
   end
 
   test 'generate Workflow RO-Crate for repository containing symlink' do

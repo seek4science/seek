@@ -1,0 +1,159 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://mds.test.datacite.org/metadata
+    body:
+      encoding: UTF-8
+      string: |
+        <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+        <identifier identifierType="DOI">10.5072/my_test</identifier>
+        <creators>
+        <creator>
+        <creatorName>First, Last</creatorName>
+        </creator>
+        </creators>
+        <titles>
+        <title>For testing</title>
+        </titles>
+        <publisher>ABC</publisher>
+        <publicationYear>2013</publicationYear>
+        <subjects>
+        <subject>Assessment</subject>
+        <subject>Information Literacy</subject>
+        <subject>Engineering</subject>
+        </subjects>
+        <language>eng</language>
+        <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+        <version>1</version>
+        <descriptions>
+        <description descriptionType="Abstract">
+        A test
+        </description>
+        </descriptions>
+        </resource>
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.3.10p183
+      Content-Type:
+      - application/xml;charset=UTF-8
+      Content-Length:
+      - '822'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - mds.test.datacite.org
+      Authorization:
+      - Basic dGVzdDp0ZXN0
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Date:
+      - Wed, 11 Mar 2026 10:50:08 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Status:
+      - 201 Created
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Vary:
+      - Accept-Encoding, Origin
+    body:
+      encoding: ASCII-8BIT
+      string: OK (10.5072/MY_TEST)
+  recorded_at: Wed, 11 Mar 2026 10:50:09 GMT
+- request:
+    method: post
+    uri: https://mds.test.datacite.org/doi
+    body:
+      encoding: UTF-8
+      string: |-
+        doi=10.5072/MY_TEST
+        url=https://seek.sysmo-db.org
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.3.10p183
+      Content-Type:
+      - text/plain;charset=UTF-8
+      Content-Length:
+      - '52'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - mds.test.datacite.org
+      Authorization:
+      - Basic dGVzdDp0ZXN0
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Date:
+      - Wed, 11 Mar 2026 13:00:52 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Status:
+      - 201 Created
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Vary:
+      - Accept-Encoding, Origin
+    body:
+      encoding: ASCII-8BIT
+      string: OK
+  recorded_at: Wed, 11 Mar 2026 13:00:53 GMT
+- request:
+    method: delete
+    uri: https://mds.test.datacite.org/metadata/10.5072/MY_TEST
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/3.3.10p183
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - mds.test.datacite.org
+      Authorization:
+      - Basic dGVzdDp0ZXN0
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 11 Mar 2026 13:00:53 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Status:
+      - 200 OK
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Vary:
+      - Accept-Encoding, Origin
+    body:
+      encoding: ASCII-8BIT
+      string: OK
+  recorded_at: Wed, 11 Mar 2026 13:00:53 GMT
+recorded_with: VCR 6.3.1

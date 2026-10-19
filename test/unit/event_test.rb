@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class EventTest < ActiveSupport::TestCase
-  fixtures :all
 
   def setup
     @event = events(:event_with_no_files)

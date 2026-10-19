@@ -45,10 +45,10 @@
             <%= f.text_area :description, required: false, name: "studies[description][]", :class => "form-control", value: study.description %>
           </td>
           <td>
-            <%= f.date_field :startDate, required: true, name: "studies[startDate][]", :class => "form-control", value: study.extended_metadata.data[:study_start_date] %>
+            <%= date_field_tag "studies[startDate][]", study.extended_metadata.data[:study_start_date], required: true, class: "form-control" %>
           </td>
           <td>
-            <%= f.date_field :endDate, required: false, name: "studies[endDate][]", :class => "form-control", value: study.extended_metadata.data[:study_end_date] %>
+            <%= date_field_tag "studies[endDate][]", study.extended_metadata.data[:study_end_date], required: false, class: "form-control" %>
           </td>
           <td>
             <%= f.text_area :contactInstitution, required: true, name: "studies[contactInstitution][]", :class => "form-control", value: study.extended_metadata.data[:contact_institution] %>
@@ -90,14 +90,14 @@
             <%= f.text_area :culturalPractices, required: false, name: "studies[culturalPractices][]", :class => "form-control", value: study.extended_metadata.data[:cultural_practices] %>
           </td>
           <td>
-            <%= f.text_area :culturalPractices, required: false, name: "studies[data_files][]", :class => "form-control", value: @studies_datafiles[study.extended_metadata.data[:id]][:data_file].join(", ") %>
+            <%= f.text_area :data_files, required: false, name: "studies[data_files][]", :class => "form-control", value: @studies_datafiles[study.extended_metadata.data[:id]][:data_file].join(", ") %>
           </td>
         </tr>
         <%= hidden_field_tag "studies[data_file_description][]", @studies_datafiles[study.extended_metadata.data[:id]][:data_file_description].join(", ") %>
         <%= hidden_field_tag "studies[license]", @license %>
       <% end %>
       <% @existing_studies.each do |existing_study| %>
-        <%= hidden_field_tag "existing_studies[]", existing_study %>
+        <%= hidden_field_tag "existing_studies[]", existing_study.to_json %>
       <% end %>
       </tbody>
     </table>

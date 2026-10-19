@@ -14,10 +14,6 @@ class TemplateAttribute < ApplicationRecord
 
   before_save :default_pos
 
-  def controlled_vocab?
-    sample_attribute_type&.base_type == Seek::Samples::BaseType::CV
-  end
-
   def allow_isa_tag_change?
     !inherited?
   end
@@ -27,7 +23,7 @@ class TemplateAttribute < ApplicationRecord
   end
 
   def input_attribute?
-    isa_tag.nil? && title&.downcase&.include?('input') && sample_attribute_type.seek_sample_multi?
+    isa_tag&.isa_input? && title&.downcase&.include?('input') && seek_sample_multi?
   end
 
   private

@@ -5,10 +5,24 @@ class SinglePagesControllerTest < ActionController::TestCase
 
   def setup
     @instance_name = Seek::Config.instance_name
-    @member = FactoryBot.create :user
+    @member = FactoryBot.create :person
+    @project = @member.projects.first
     login_as @member
     @initial_isa_json_compliance_enabled = Seek::Config.isa_json_compliance_enabled
     Seek::Config.isa_json_compliance_enabled = true
+    @investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, policy: FactoryBot.create(:public_policy),
+                                      projects: [@project], contributor: @member)
+    @study = FactoryBot.create(:isa_json_compliant_study, investigation: @investigation,
+                              policy: FactoryBot.create(:public_policy), contributor: @member)
+    @source_sample_type = @study.sample_types.first
+    @sample_collection_sample_type = @study.sample_types.second
+
+    @assay_stream = FactoryBot.create(:assay_stream, study: @study, policy: FactoryBot.create(:public_policy), contributor: @member)
+    @assay = FactoryBot.create(:isa_json_compliant_material_assay, assay_stream: @assay_stream, study: @study,
+                              linked_sample_type: @sample_collection_sample_type, contributor: @member,
+                              policy: FactoryBot.create(:public_policy), position: 0)
+    @material_assay_sample_type = @assay.sample_type
+
   end
 
   def teardown
@@ -17,533 +31,257 @@ class SinglePagesControllerTest < ActionController::TestCase
 
   test 'should show' do
     with_config_value(:project_single_page_enabled, true) do
-      project = FactoryBot.create(:project)
-      get :show, params: { id: project.id }
+      get :show, params: { id: @project.id }
       assert_response :success
     end
   end
 
   test 'should hide inaccessible items in treeview' do
-    project = FactoryBot.create(:project)
-    FactoryBot.create(:investigation, contributor: @member.person, policy: FactoryBot.create(:private_policy),
-                                      projects: [project])
+    # Another user creates an investigation under the same project
+    other_user = FactoryBot.create(:user)
+    FactoryBot.create(:investigation, contributor: other_user.person, policy: FactoryBot.create(:private_policy),
+                                projects: [@project])
 
-    login_as(FactoryBot.create(:user))
-    inv_two = FactoryBot.create(:investigation, contributor: User.current_user.person, policy: FactoryBot.create(:private_policy),
-                                                projects: [project])
-
-    controller = TreeviewBuilder.new project, nil
+    # @member visualises the treeview of the project
+    controller = TreeviewBuilder.new @project, nil
     result = controller.send(:build_tree_data)
 
     json = JSON.parse(result)[0]
 
-    assert_equal 'hidden item', json['children'][0]['text']
-    assert_equal inv_two.title, json['children'][1]['text']
+    # @member sees his / her investigation but not the one made by other_user
+    assert_equal @investigation.title, json['children'][0]['text']
+    assert_equal 'hidden item', json['children'][1]['text']
   end
 
-  test 'Should not generate export if not authorized' do
-    id_label, _person, project, study, source_sample_type, sources = setup_file_upload.values_at(
-      :id_label, :person, :project, :study, :source_sample_type, :sources
-    )
+  test 'should return dynamic table data to an unauthenticated user when ISA-study is public' do
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, contributor: @member, policy: FactoryBot.create(:public_policy))
+
+    logout
+
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 1, json['data'].length
+    refute json['data'].flatten.include?('#HIDDEN')
+  end
+
+  test 'should return dynamic table data when ISA-assay is public' do
+    source = FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
+    sample = FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, linked_samples: [source],
+                               policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:isa_material_assay_sample, sample_type: @material_assay_sample_type, linked_samples: [sample],
+                      policy: FactoryBot.create(:public_policy))
+
+    logout
+
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: @assay.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 1, json['data'].length
+    refute json['data'].flatten.include?('#HIDDEN')
+  end
+
+  test 'dynamic table data should not have unauthorized items' do
+    first_source = FactoryBot.create(:isa_source, contributor: @member, sample_type: @source_sample_type, policy: FactoryBot.create(:private_policy))
+    _second_source = FactoryBot.create(:isa_source, contributor: @member, sample_type: @source_sample_type, policy: FactoryBot.create(:private_policy))
+    sample = FactoryBot.create(:isa_sample, contributor: @member, sample_type: @sample_collection_sample_type, linked_samples: [first_source],
+                               policy: FactoryBot.create(:private_policy))
+    FactoryBot.create(:isa_material_assay_sample, contributor: @member, sample_type: @material_assay_sample_type, linked_samples: [sample],
+                      policy: FactoryBot.create(:private_policy))
+
+    logout
+
+    # Since Study and Assay samples are private, nothing should be returned
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: @assay.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 1, json['data'].length
+    assert json['data'].flatten.all? { |value| value == '#HIDDEN' }
+
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 2, json['data'].length
+    assert json['data'].flatten.all? { |value| value == '#HIDDEN' || value.blank? }
+  end
+
+  test 'dynamic table data should not contain unauthorized samples' do
+    other_person = FactoryBot.create(:person)
+
+    visible_source = FactoryBot.create(:isa_source, title: 'visible source', sample_type: @source_sample_type,
+                                       contributor: @member, policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:isa_source, title: 'hidden source', sample_type: @source_sample_type,
+                      contributor: other_person, policy: FactoryBot.create(:private_policy))
+
+    logout
+
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 2, json['data'].length
+
+    visible_row = json['data'].detect { |row| row.include?(visible_source.id) }
+    hidden_row = json['data'].detect { |row| row != visible_row }
+
+    refute_nil visible_row
+    assert visible_row.none? { |value| value == '#HIDDEN' }
+    assert hidden_row.all? { |value| value == '#HIDDEN' || value.blank? }
+  end
+
+  test 'dynamic table data should return an empty array when the requested assay is unauthorized' do
+    source = FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
+    sample = FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, linked_samples: [source],
+                      policy: FactoryBot.create(:public_policy))
+    private_assay = FactoryBot.create(:isa_json_compliant_material_assay, study: @study, assay_stream: @assay.assay_stream, linked_sample_type: @sample_collection_sample_type, contributor: @member, policy: FactoryBot.create(:private_policy))
+    private_assay_sample_type = private_assay.sample_type
+    FactoryBot.create(:isa_material_assay_sample, sample_type: private_assay_sample_type, linked_samples: [sample],
+                      policy: FactoryBot.create(:public_policy))
+
+    logout
+
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: private_assay.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    # The assay itself is unauthorized, so no data should be returned, even though the parent study is public.
+    assert_equal [], json['data']
+  end
+
+  test 'dynamic table data for a public assay is unaffected by an unauthorized parent study' do
+    source = FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
+    sample = FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, linked_samples: [source],
+                               policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:isa_material_assay_sample, sample_type: @material_assay_sample_type, linked_samples: [sample],
+                      policy: FactoryBot.create(:public_policy))
+
+    @study.update!(policy: FactoryBot.create(:private_policy))
+    logout
+
+    get :dynamic_table_data, params: { id: @project.id, study_id: @study.id, assay_id: @assay.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    # The assay's own policy is public and assay-level aggregation doesn't depend on the parent study,
+    # so its data is still returned even though the study itself is private.
+    assert_equal 1, json['data'].length
+    refute json['data'].flatten.include?('#HIDDEN')
+  end
+
+  test 'should return dynamic table data for a public sample type' do
+    FactoryBot.create(:isa_source, contributor: @member, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
+
+    logout
+
+    get :dynamic_table_data, params: { id: @project.id, sample_type_id: @source_sample_type.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 1, json['data'].length
+  end
+
+  test 'dynamic table data should not error out for an unauthorized sample type' do
+    private_study = FactoryBot.create(:isa_json_compliant_study, contributor: @member, investigation: @investigation, policy: FactoryBot.create(:private_policy))
+    private_source_sample_type = private_study.sample_types.first
+    FactoryBot.create(:isa_source, sample_type: private_source_sample_type, projects: [@project], policy: FactoryBot.create(:private_policy), contributor: @member)
+
+    # Authorized person sees the source with its metadata
+    get :dynamic_table_data, params: { id: @project.id, sample_type_id: private_source_sample_type.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal 1, json['data'].size
+    refute json['data'].flatten.include?('#HIDDEN')
+
+    # Unauthenticated user does not get to see any sources
+    logout
+
+    get :dynamic_table_data, params: { id: @project.id, sample_type_id: private_source_sample_type.id }
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal [], json['data']
+
+    # Unauthorized user does not get to see any sources
     unauthorized_person = FactoryBot.create(:person)
-    source_ids = sources.map { |s| { id_label => s.id } }
-    sample_type_id = source_sample_type.id
-    study_id = study.id
-    assay_id = nil
 
     login_as(unauthorized_person)
-
-    post_params = { sample_ids: source_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
-
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
-    assert_redirected_to single_page_path(id: project.id, item_type: 'study', item_id: study_id)
-    assert_equal flash[:error], 'Could not retrieve Study Sample Type! Do you have at least viewing permissions?'
-  end
-
-  test 'generates a valid export of study sources in single page' do
-    # Generate the excel data
-    id_label, person, _project, study, source_sample_type, sources = setup_file_upload.values_at(
-      :id_label, :person, :project, :study, :source_sample_type, :sources
-    )
-
-    source_ids = sources.map { |s| { id_label => s.id } }
-    sample_type_id = source_sample_type.id
-    study_id = study.id
-    assay_id = nil
-
-    login_as(person)
-
-    post_params = { sample_ids: source_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
-
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
-    response_cd = response.headers["Content-Disposition"]
-    assert_response :ok
-    assert response_cd.include?("filename=\"#{source_sample_type.title}.xlsx\"")
-  end
-
-  test 'generates a valid export of study samples in single page' do
-    id_label, person, study, sample_collection_sample_type, study_samples = setup_file_upload.values_at(
-      :id_label, :person, :study, :sample_collection_sample_type, :study_samples
-    )
-
-    source_sample_ids = study_samples.map { |ss| { id_label => ss.id } }
-    sample_type_id = sample_collection_sample_type.id
-    study_id = study.id
-    assay_id = nil
-
-    login_as(person)
-
-    post_params = { sample_ids: source_sample_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
-
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
-    response_cd = response.headers["Content-Disposition"]
-    assert_response :ok
-    assert response_cd.include?("filename=\"#{sample_collection_sample_type.title}.xlsx\"")
-  end
-
-  test 'generates a valid export of assay samples in single page' do
-    id_label, person, study, assay, assay_sample_type, assay_samples = setup_file_upload.values_at(
-      :id_label, :person, :study, :assay, :assay_sample_type, :assay_samples
-    )
-
-    assay_sample_ids = assay_samples.map { |ss| { id_label => ss.id } }
-    sample_type_id = assay_sample_type.id
-    study_id = study.id
-    assay_id = assay.id
-
-    login_as(person)
-
-    post_params = { sample_ids: assay_sample_ids.to_json,
-                    sample_type_id: sample_type_id.to_json,
-                    study_id: study_id.to_json,
-                    assay_id: assay_id.to_json }
-
-    post :export_to_excel, params: post_params, xhr: true
-
-    assert_response :ok, msg = "Couldn't reach the server"
-
-    response_body = JSON.parse(response.body)
-    assert response_body.key?('uuid'), msg = "Response body is expected to have a 'uuid' key"
-    cache_uuid = response_body['uuid']
-
-    get :download_samples_excel, params: { uuid: cache_uuid }
-    response_cd = response.headers["Content-Disposition"]
-    assert_response :ok
-    assert response_cd.include?("filename=\"#{assay_sample_type.title}.xlsx\"")
-  end
-
-  test 'invalid file extension should raise exception' do
-    file_path = 'upload_single_page/00_wrong_format_spreadsheet.ods'
-    file = fixture_file_upload(file_path, 'application/vnd.oasis.opendocument.spreadsheet')
-
-    project, source_sample_type = setup_file_upload.values_at(
-      :project, :source_sample_type
-    )
-
-    post :upload_samples, params: { file:, project_id: project.id,
-                                    sample_type_id: source_sample_type.id }
-
-    assert_response :bad_request
-    assert_equal flash[:error], "Please upload a valid spreadsheet file with extension '.xlsx'"
-  end
-
-  test 'Should prevent to upload to the wrong Sample Type' do
-    project, sample_collection_sample_type = setup_file_upload.values_at(
-      :project, :sample_collection_sample_type
-    )
-
-    file_path = 'upload_single_page/01_combo_update_sources_spreadsheet.xlsx'
-    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-    post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                               sample_type_id: sample_collection_sample_type.id }
-
-    assert_response :bad_request
-  end
-
-  test 'Should not process invalid workbooks' do
-    project, source_sample_type = setup_file_upload.values_at(
-      :project, :source_sample_type
-    )
-
-    file_path = 'upload_single_page/02_invalid_workbook.xlsx'
-    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-    post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                               sample_type_id: source_sample_type.id }
-
-    assert_response :bad_request
-  end
-
-  test 'Should update, create and detect duplicate sources when uploading to a source Sample Type' do
-    project, source_sample_type = setup_file_upload.values_at(
-      :project, :source_sample_type
-    )
-
-    file_path = 'upload_single_page/01_combo_update_sources_spreadsheet.xlsx'
-    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-    post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                               sample_type_id: source_sample_type.id }
-
-    response_data = JSON.parse(response.body)['uploadData']
-    db_samples = response_data['dbSamples']
-    updated_samples = response_data['updateSamples']
-    new_samples = response_data['newSamples']
-    possible_duplicates = response_data['possibleDuplicates']
+    get :dynamic_table_data, params: { id: @project.id, sample_type_id: private_source_sample_type.id }
 
     assert_response :success
-    assert_equal db_samples.size, 5
-    assert_equal updated_samples.size, 2
-    assert_equal new_samples.size, 2
-    assert_equal possible_duplicates.size, 1
-
-    post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                               sample_type_id: source_sample_type.id }
-
-    assert_response :success
-
-    assert_select 'table#create-samples-table', count: 1 do
-      assert_select "tbody tr", count: new_samples.size
-    end
-
-    assert_select 'table#update-samples-table', count: 1 do
-      update_sample_ids = updated_samples.map { |s| s['id'] }
-      update_sample_ids.map do |sample_id|
-        row_id_updated = "update-sample-#{sample_id}-updated"
-        assert_select "tr##{row_id_updated}", count: 1
-
-        row_id_original = "update-sample-#{sample_id}-original"
-        assert_select "tr##{row_id_original}", count: 1
-      end
-    end
-
-    assert_select 'table#duplicate-samples-table', count: 1 do
-      dup_sample_ids = possible_duplicates.map { |s| s['duplicate']['id'] }
-      dup_sample_ids.map do |sample_id|
-        row_id = "duplicate-sample-#{sample_id}"
-        assert_select "tr##{row_id}-1", count: 1
-        assert_select "tr##{row_id}-2", count: 1
-      end
-    end
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal [], json['data']
   end
 
-  test 'Should update, create and detect duplicate samples when uploading to a source sample Sample Type' do
-    project, sample_collection_sample_type = setup_file_upload.values_at(
-      :project, :sample_collection_sample_type
-    )
+  test 'dynamic table data should not return a sample type belonging to a different project' do
+    other_project = FactoryBot.create(:project)
+    FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
 
-    file_path = 'upload_single_page/03_combo_update_samples_spreadsheet.xlsx'
-    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-    post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                               sample_type_id: sample_collection_sample_type.id }
-
-    response_data = JSON.parse(response.body)['uploadData']
-    updated_samples = response_data['updateSamples']
-    new_samples = response_data['newSamples']
-    possible_duplicates = response_data['possibleDuplicates']
+    get :dynamic_table_data, params: { id: other_project.id, sample_type_id: @source_sample_type.id }
 
     assert_response :success
-    assert_equal updated_samples.size, 2
-    assert_equal new_samples.size, 2
-    assert_equal possible_duplicates.size, 1
-
-    post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                               sample_type_id: sample_collection_sample_type.id }
-
-    assert_response :success
-
-    assert_select 'table#create-samples-table', count: 1 do
-      assert_select "tbody tr", count: new_samples.size
-    end
-
-    assert_select 'table#update-samples-table', count: 1 do
-      update_sample_ids = updated_samples.map { |s| s['id'] }
-      update_sample_ids.map do |sample_id|
-        row_id_updated = "update-sample-#{sample_id}-updated"
-        assert_select "tr##{row_id_updated}", count: 1
-
-        row_id_original = "update-sample-#{sample_id}-original"
-        assert_select "tr##{row_id_original}", count: 1
-      end
-    end
-
-    assert_select 'table#duplicate-samples-table', count: 1 do
-      dup_sample_ids = possible_duplicates.map { |s| s['duplicate']['id'] }
-      dup_sample_ids.map do |sample_id|
-        row_id = "duplicate-sample-#{sample_id}"
-        assert_select "tr##{row_id}-1", count: 1
-        assert_select "tr##{row_id}-2", count: 1
-      end
-    end
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal [], json['data']
   end
 
-  test 'Should update, create and detect duplicate samples when uploading to a assay Sample Type' do
-    project, assay_sample_type = setup_file_upload.values_at(
-      :project, :assay_sample_type
-    )
+  test 'dynamic table data should not return a study belonging to a different project' do
+    other_project = FactoryBot.create(:project)
+    other_investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, policy: FactoryBot.create(:public_policy),
+                                      projects: [other_project])
+    other_study = FactoryBot.create(:isa_json_compliant_study, investigation: other_investigation, policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:isa_source, sample_type: other_study.sample_types.first, policy: FactoryBot.create(:public_policy))
 
-    file_path = 'upload_single_page/04_combo_update_assay_samples_spreadsheet.xlsx'
-    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-    post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                               sample_type_id: assay_sample_type.id }
-
-    response_data = JSON.parse(response.body)['uploadData']
-    updated_samples = response_data['updateSamples']
-    new_samples = response_data['newSamples']
-    possible_duplicates = response_data['possibleDuplicates']
+    get :dynamic_table_data, params: { id: @project.id, study_id: other_study.id }
 
     assert_response :success
-    assert_equal updated_samples.size, 2
-    assert_equal new_samples.size, 1
-    assert_equal possible_duplicates.size, 1
-
-    post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                               sample_type_id: assay_sample_type.id }
-
-    assert_response :success
-
-    assert_select 'table#create-samples-table', count: 1 do
-      assert_select "tbody tr", count: new_samples.size
-    end
-
-    assert_select 'table#update-samples-table', count: 1 do
-      update_sample_ids = updated_samples.map { |s| s['id'] }
-      update_sample_ids.map do |sample_id|
-        row_id_updated = "update-sample-#{sample_id}-updated"
-        assert_select "tr##{row_id_updated}", count: 1
-
-        row_id_original = "update-sample-#{sample_id}-original"
-        assert_select "tr##{row_id_original}", count: 1
-      end
-    end
-
-    assert_select 'table#duplicate-samples-table', count: 1 do
-      dup_sample_ids = possible_duplicates.map { |s| s['duplicate']['id'] }
-      dup_sample_ids.map do |sample_id|
-        row_id = "duplicate-sample-#{sample_id}"
-        assert_select "tr##{row_id}-1", count: 1
-        assert_select "tr##{row_id}-2", count: 1
-      end
-    end
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal [], json['data']
   end
 
-  test 'Should show permission conflicts for samples' do
-    unauthorized_user = FactoryBot.create(:user)
-    login_as unauthorized_user
-    project, source_sample_type = setup_file_upload.values_at(
-      :project, :source_sample_type
-    )
+  test 'dynamic table data should not return an assay that does not belong to the requested study' do
+    other_investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, policy: FactoryBot.create(:public_policy),
+                                            projects: [@project])
+    other_study = FactoryBot.create(:isa_json_compliant_study, investigation: other_investigation, policy: FactoryBot.create(:public_policy))
+    other_study.sample_types.each { |st| st.update!(projects: [@project]) }
 
-    file_path = 'upload_single_page/01_combo_update_sources_spreadsheet.xlsx'
-    file = fixture_file_upload(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    other_source_sample_type = other_study.sample_types.first
+    other_sample_collection_sample_type = other_study.sample_types.second
 
-    post :upload_samples, as: :json, params: { file:, project_id: project.id,
-                                               sample_type_id: source_sample_type.id }
+    other_source = FactoryBot.create(:isa_source, sample_type: other_source_sample_type, policy: FactoryBot.create(:public_policy))
+    other_sample = FactoryBot.create(:isa_sample, sample_type: other_sample_collection_sample_type, linked_samples: [other_source],
+                                     policy: FactoryBot.create(:public_policy))
 
-    response_data = JSON.parse(response.body)['uploadData']
-    updated_samples = response_data['updateSamples']
-    unauthorized_samples = response_data['unauthorized_samples']
-    new_samples = response_data['newSamples']
+    source = FactoryBot.create(:isa_source, sample_type: @source_sample_type, policy: FactoryBot.create(:public_policy))
+    sample = FactoryBot.create(:isa_sample, sample_type: @sample_collection_sample_type, linked_samples: [source],
+                               policy: FactoryBot.create(:public_policy))
 
-    assert_response :success
-    assert_equal updated_samples.size, 0
-    assert_equal unauthorized_samples.size, 2
-    assert_equal new_samples.size, 2
+    FactoryBot.create(:isa_material_assay_sample, sample_type: @material_assay_sample_type, linked_samples: [sample],
+                      policy: FactoryBot.create(:public_policy))
 
-    possible_duplicates = response_data['possibleDuplicates']
-    assert(possible_duplicates.size, 1)
-
-    post :upload_samples, as: :html, params: { file:, project_id: project.id,
-                                               sample_type_id: source_sample_type.id }
+    # The assay belongs to `study`, not the requested `other_study`, so it should be rejected
+    # even though both are public and in the same project.
+    get :dynamic_table_data, params: { id: @project.id, study_id: other_study.id, assay_id: @assay.id }
 
     assert_response :success
-
-    assert_select 'table#create-samples-table', count: 1 do
-      assert_select "tbody tr", count: new_samples.size
-    end
-
-    assert_select 'table#update-samples-table', count: 0
-
-    assert_select 'table#unauthorized-samples-table', count: 1 do
-      unauthorized_sample_ids = unauthorized_samples.map { |s| s['id'] }
-      unauthorized_sample_ids.map do |sample_id|
-        row_id = "unauthorized-sample-#{sample_id}"
-          assert_select "tr##{row_id}", count: 1
-      end
-    end
-  end
-
-  test 'Should not be able to use the download feature if isa_json_compliance_enabled is false' do
-    with_config_value(:isa_json_compliance_enabled, false) do
-      id_label, person, project, study, source_sample_type, sources = setup_file_upload.values_at(
-        :id_label, :person, :project, :study, :source_sample_type, :sources
-      )
-
-      source_ids = sources.map { |s| { id_label => s.id } }
-      sample_type_id = source_sample_type.id
-      study_id = study.id
-      assay_id = nil
-
-      post_params = { sample_ids: source_ids.to_json,
-                      sample_type_id: sample_type_id.to_json,
-                      study_id: study_id.to_json,
-                      assay_id: assay_id.to_json }
-
-      post :export_to_excel, params: post_params, format: :json
-
-      assert_response :unprocessable_entity
-
-      response_body = JSON.parse(response.body)
-      assert_equal response_body, {"title" => "ISA JSON compliance are disabled"}
-    end
-  end
-
-  private
-
-  def setup_file_upload
-    id_label = "#{Seek::Config.instance_name} id"
-    person = @member.person
-    institution = FactoryBot.create(:institution, title: 'Legion Of Doooooooooom', country: 'AQ')
-    project = FactoryBot.create(:project, id: 10_000)
-    person.add_to_project_and_institution(project, institution)
-    investigation = FactoryBot.create(:investigation, id: 10_000, is_isa_json_compliant: true, projects: [project], contributor: person)
-    study = FactoryBot.create(:study, id: 10_001, investigation: investigation, contributor: person)
-    assay = FactoryBot.create(:assay, id: 10_002, study:, contributor: person)
-
-    source_sample_type_template = FactoryBot.create(:isa_source_template, id: 10_006)
-    source_sample_type = FactoryBot.create(:isa_source_sample_type,
-                                           id: 10_003,
-                                           contributor: person,
-                                           project_ids: [project.id],
-                                           isa_template: source_sample_type_template,
-                                           studies: [study])
-
-    sample_collection_sample_type_template = FactoryBot.create(:isa_sample_collection_template, id: 10_007)
-    sample_collection_sample_type = FactoryBot.create(:isa_sample_collection_sample_type,
-                                                      id: 10_004,
-                                                      contributor: person,
-                                                      project_ids: [project.id],
-                                                      isa_template: sample_collection_sample_type_template,
-                                                      studies: [study],
-                                                      linked_sample_type: source_sample_type)
-
-    assay_sample_type_template = FactoryBot.create(:isa_assay_material_template, id: 10_008)
-    assay_sample_type = FactoryBot.create(:isa_assay_material_sample_type,
-                                          id: 10_005,
-                                          contributor: person,
-                                          isa_template: assay_sample_type_template,
-                                          projects: [project],
-                                          studies: [study],
-                                          linked_sample_type: sample_collection_sample_type)
-
-    sources = (1..5).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_010 + n,
-        title: "source_#{n}",
-        sample_type: source_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          'Source Name': "Source #{n}",
-          'Source Characteristic 1': 'Source Characteristic 1',
-          'Source Characteristic 2':
-            source_sample_type
-              .sample_attributes
-              .find_by_title('Source Characteristic 2')
-              .sample_controlled_vocab
-              .sample_controlled_vocab_terms
-              .first
-              .label
-        }
-      )
-    end
-
-    study_samples = (1..4).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_020 + n,
-        title: "Sample collection #{n}",
-        sample_type: sample_collection_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          Input: [sources[n - 1].id, sources[n].id],
-          'sample collection': 'sample collection',
-          'sample collection parameter value 1': 'sample collection parameter value 1',
-          'Sample Name': "sample nr. #{n}",
-          'sample characteristic 1': 'sample characteristic 1'
-        }
-      )
-    end
-
-    assay_samples = (1..3).map do |n|
-      FactoryBot.create(
-        :sample,
-        id: 10_030 + n,
-        title: "Assay Sample #{n}",
-        sample_type: assay_sample_type,
-        project_ids: [project.id],
-        contributor: person,
-        data: {
-          Input: [study_samples[n - 1].id, study_samples[n].id],
-          'Protocol Assay 1': 'How to make concentrated dark matter',
-          'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
-          'Extract Name': "Extract nr. #{n}",
-          'other material characteristic 1': 'other material characteristic 1'
-        }
-      )
-    end
-
-    {
-      "id_label": id_label,
-      "person": person,
-      "project": project,
-      "investigation": investigation,
-      "study": study,
-      "assay": assay,
-      "source_sample_type": source_sample_type,
-      "sample_collection_sample_type": sample_collection_sample_type,
-      "assay_sample_type": assay_sample_type,
-      "sources": sources,
-      "study_samples": study_samples,
-      "assay_samples": assay_samples
-    }
+    json = JSON.parse(response.body)
+    refute json.key?('error')
+    assert_equal [], json['data']
   end
 end

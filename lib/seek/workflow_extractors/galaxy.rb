@@ -39,7 +39,7 @@ module Seek
         end
 
         metadata[:description] = galaxy['annotation'] if galaxy['annotation'].present?
-        metadata[:license] = galaxy['license'] if galaxy['license'].present?
+        metadata[:license] = Seek::License.normalize(galaxy['license']) if galaxy['license'].present?
 
         if galaxy['creator']
           people, others = Array(galaxy['creator']).partition { |c| c['class'] == 'Person' }

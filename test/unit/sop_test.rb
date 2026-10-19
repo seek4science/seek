@@ -1,8 +1,8 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class SopTest < ActiveSupport::TestCase
 
-  fixtures :all
 
   def setup
     @person = FactoryBot.create(:person)
@@ -367,4 +367,41 @@ class SopTest < ActiveSupport::TestCase
     assert_equal [sample1, sample2].sort_by(&:id), sop.related_samples.sort_by(&:id)
   end
 
+  test 'Add SOP type annotation to a SOP' do
+    person = FactoryBot.create(:person)
+    User.current_user = person.user
+    sop = FactoryBot.create(:sop, contributor: person)
+    sop_type_cv = SampleControlledVocab::SystemVocabs.vocab_for_property(:sop_types) || FactoryBot.create(:sop_types_controlled_vocab)
+    sop_type1 = sop_type_cv.sample_controlled_vocab_terms.detect { |term| term.label == 'enrichment protocol' }
+    sop.sop_type_annotations = sop_type1.label
+
+    sop.save!
+
+    assert_equal [sop_type1.iri], sop.sop_type_annotations
+  end
+
+  test 'removes from solr index on destroy if solr enabled' do
+    sop = FactoryBot.create(:sop)
+
+    removed_item = nil
+    Sunspot.session.stub(:remove, -> (obj, *) { removed_item = obj }) do
+      with_config_value(:solr_enabled, true) do
+        disable_authorization_checks { sop.destroy }
+
+        assert_equal sop, removed_item
+      end
+    end
+  end
+
+  test 'does not remove from solr index on destroy if solr disabled' do
+    sop = FactoryBot.create(:sop)
+
+    Sunspot.session.stub(:remove, -> (*) { raise 'Solr error!!!' }) do
+      with_config_value(:solr_enabled, false) do
+        assert_nothing_raised do
+          disable_authorization_checks { sop.destroy }
+        end
+      end
+    end
+  end
 end

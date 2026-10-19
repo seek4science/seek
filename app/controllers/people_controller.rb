@@ -228,7 +228,7 @@ class PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit(:first_name, :last_name, :orcid, :description, :email, :web_page, :phone,
-                                   :skype_name, { discipline_ids: [] }, { expertise: [] }, { tools: [] },
+                                   { discipline_ids: [] }, { expertise: [] }, { tools: [] },
                                    project_subscriptions_attributes: %i[id project_id _destroy frequency])
   end
 

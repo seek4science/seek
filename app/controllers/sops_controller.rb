@@ -88,7 +88,6 @@ class SopsController < ApplicationController
     end
   end
 
-
   private
 
   def sop_params
@@ -97,6 +96,7 @@ class SopsController < ApplicationController
                                 { assay_assets_attributes: [:assay_id] },
                                 { publication_ids: [] }, {workflow_ids: []},
                                 { extended_metadata_attributes: determine_extended_metadata_keys },
+                                { sop_type_annotations: [] },
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

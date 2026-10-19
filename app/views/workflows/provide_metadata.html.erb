@@ -1,4 +1,7 @@
-<h1>New <%= t('workflow') %></h1>
+<h1>
+  New <%= t('workflow') %>
+  <%= 'Version' unless @workflow.new_record? %>
+</h1>
 
 <%= form_tag(@workflow.new_record? ? create_metadata_workflows_path : create_version_metadata_workflow_path(@workflow), multipart: true) do -%>
   <%= hidden_field_tag 'content_blob_uuid', @content_blob&.uuid %>
@@ -30,6 +33,7 @@
     <% end %>
 
     <%= error_messages_for :workflow -%>
+    <%= error_messages_for(@workflow.latest_version) unless @workflow.new_record? -%>
 
     <div class="form-group">
       <%= render partial: 'workflow_class_form', locals: { name: 'workflow[workflow_class_id]', selected: @workflow.workflow_class_id } %>

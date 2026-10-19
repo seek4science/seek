@@ -57,7 +57,7 @@ email_enabled:
 jws_enabled:
 copasi_enabled:
 morpheus_enabled:
-external_search_enabled:
+external_search_adaptors:
 piwik_analytics_enabled:
 piwik_analytics_tracking_notice:
 custom_analytics_snippet_enabled:
@@ -98,7 +98,6 @@ profile_select_by_default:
 recaptcha_public_key:
 recaptcha_private_key:
 support_email_address:
-show_as_external_link_enabled:
 doi_minting_enabled:
 datacite_username:
 datacite_password:
@@ -119,11 +118,15 @@ zenodo_client_id:
 zenodo_client_secret:
 programme_user_creation_enabled:
 programmes_open_for_projects_enabled:
+show_as_external_link_enabled:
+block_file_uploads:
 cache_remote_files:
 orcid_required:
 max_cachable_size:
   convert: :to_i
 hard_max_cachable_size:
+  convert: :to_i
+cache_max_redis_item_size:
   convert: :to_i
 tag_threshold:
   convert: :to_i
@@ -218,8 +221,11 @@ workflows_enabled:
 collections_enabled:
 file_templates_enabled:
 placeholders_enabled:
+# Standard login panel
+standard_login_enabled:
 # Omniauth
 omniauth_enabled:
+omniauth_skip_login_page:
 omniauth_user_create:
 omniauth_user_activate:
 omniauth_elixir_aai_enabled:
@@ -266,8 +272,6 @@ bio_tools_enabled:
 require_cookie_consent:
 galaxy_tool_sources:
 metadata_license:
-regular_job_offset:
-  convert: :to_i
 auto_activate_programmes:
 auto_activate_site_managed_projects:
 fair_data_station_enabled:
@@ -276,3 +280,8 @@ sandbox_instance_name:
 scraper_config:
 max_filters:
   convert: :to_i
+reindex_all_batch_size:
+  convert: :to_i
+default_citation_style:
+obfuscate_filters:
+  

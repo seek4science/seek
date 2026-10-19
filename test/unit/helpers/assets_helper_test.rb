@@ -70,6 +70,22 @@ class AssetsHelperTest < ActionView::TestCase
     assert rendered_asset_view(pres).blank?
   end
 
+  test 'rendered_asset_view when the content blob file is missing on disk' do
+    person = FactoryBot.create(:admin)
+    User.current_user = person.user
+
+    df = FactoryBot.create(:data_file, content_blob: FactoryBot.create(:txt_content_blob),
+                            policy: FactoryBot.create(:public_policy))
+    assert df.content_blob.file_exists?
+    refute rendered_asset_view(df).blank?
+
+    File.delete(df.content_blob.filepath)
+    refute df.content_blob.file_exists?
+    assert_nothing_raised do
+      assert rendered_asset_view(df).blank?
+    end
+  end
+
   test 'authorised assets with lookup' do
     @assets = create_a_bunch_of_assets
     with_auth_lookup_enabled do
@@ -196,6 +212,23 @@ class AssetsHelperTest < ActionView::TestCase
       end
       refute_includes options, "Add new #{t('data_file')}"
     end
+  end
+
+  test 'upload_box_text' do
+    assert_equal 'You can register a Data file by selecting a file.',
+                 upload_box_text('DataFile', 'register a Data file', true, false)
+    assert_equal 'You can register an Assay by selecting a file.',
+                 upload_box_text('Assay', nil, true, false)
+    assert_equal 'You can register a Data file by registering a URL to a remote file or web page.',
+                 upload_box_text('Data file', nil, false, true)
+    assert_equal 'You can register an Assay by registering a URL to a remote file or web page.',
+                 upload_box_text('Assay', nil, false, true)
+    assert_equal 'You can register an Assay by either directly uploading a file, or registering a URL to a remote file or web page.',
+                 upload_box_text('Assay', nil, false, false)
+    assert_equal 'You can register a Data file by either directly uploading a file or zipped folder, or registering a URL to a remote file or web page.',
+                 upload_box_text('Data file', nil, false, false)
+    assert_equal 'Both uploading a file or registering a URL to a remote file or web page are currently unavailable.',
+                 upload_box_text('Data file', nil, true, true)
   end
 
   private

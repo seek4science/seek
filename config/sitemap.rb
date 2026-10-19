@@ -6,7 +6,7 @@ SitemapGenerator::Sitemap.include_root = false
 SitemapGenerator::Sitemap.default_host = URI.parse(Seek::Config.site_base_url)
 
 SitemapGenerator::Sitemap.create do
-  types = Seek::Util.searchable_types
+  types = Seek::Util.searchable_types.reject { |t| t == ISATag }
 
   group(filename: :site) do
     add root_path, changefreq: 'daily', priority: 1.0

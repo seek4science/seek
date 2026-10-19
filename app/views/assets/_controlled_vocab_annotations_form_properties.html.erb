@@ -1,12 +1,13 @@
 <% return unless resource.supports_controlled_vocab_annotations? %>
 
-<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :topics} -%>
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :topics, allow_new: false, limit: 10} -%>
 
-<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :operations} -%>
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :operations, allow_new: false, limit: 10} -%>
 
-<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :data_types} -%>
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :data_types, allow_new: false, limit: 10} -%>
 
-<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :data_formats} -%>
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :data_formats, allow_new: false, limit: 10} -%>
 
-<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :disciplines} -%>
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :disciplines, allow_new: false, limit: 10} -%>
 
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :sop_types, allow_new: false, limit: 1} -%>

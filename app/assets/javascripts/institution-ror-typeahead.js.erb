@@ -90,7 +90,7 @@ function rorQuerySource(query, processSync, processAsync) {
 function localSuggestionTemplate(data) {
     return `
         <div>
-            <strong>${data.department ? `${data.department}, ` : ''}${data.text}</strong>
+w            <strong>${data.department ? data.department + ', ' : ''}${data.base_title}</strong>
             <small>${data.hint || ''}</small>
         </div>`;
 }
@@ -161,11 +161,11 @@ $j(document).ready(function () {
         {
             name: 'institutions',
             limit: 10,
-            display: 'text', // Display the 'text' field in the dropdown
+            display: function (data) { return data.base_title; }, // Use base_title for display
             source: function (query, syncResults, asyncResults) {
                 const bloodhound = initializeLocalInstitutions(query);
                 bloodhound.search(query, syncResults, asyncResults);
-            }, // Local data source
+            },
             templates: {
                 header: '<div class="league-name">Institutions saved locally</div>',
                 suggestion: localSuggestionTemplate
@@ -220,8 +220,8 @@ $j(document).ready(function () {
     $j('#combined_typeahead .typeahead').bind('typeahead:select', function (ev, data) {
         $j('#combined_typeahead .typeahead').typeahead('close');
 
-        if (data.hasOwnProperty("text")) {
-            $j('#institution_title').val(data.text);
+        if (data.hasOwnProperty("base_title")) {
+            $j('#institution_title').val(data.base_title); // Use base_title for value
             $j('#institution_id').val(data.id);
             $j('#institution_ror_id').val(data.ror_id);
             $j('#institution_department').val(data.department);

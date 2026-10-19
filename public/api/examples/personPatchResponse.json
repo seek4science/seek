@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1652",
+    "id": "1040000133",
     "type": "people",
     "attributes": {
       "avatar": null,
@@ -19,13 +19,13 @@
         "Gromacs",
         "Python"
       ],
-      "login": "user1642"
+      "login": "user934"
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "1482",
+            "id": "1022264179",
             "type": "projects"
           }
         ]
@@ -33,81 +33,57 @@
       "institutions": {
         "data": [
           {
-            "id": "1680",
+            "id": "980204705",
             "type": "institutions"
           }
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       },
       "collections": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/people/1652"
+      "self": "/people/1040000133"
     },
     "meta": {
-      "created": "2024-11-20T10:14:45.000Z",
-      "modified": "2024-11-20T10:14:45.000Z",
+      "created": "2026-08-27T08:38:12.003Z",
+      "modified": "2026-08-27T08:38:12.079Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "30b208c0-8956-013d-24a2-0a81884ed284"
+      "uuid": "a7509272-cd00-47a5-9007-d6bf8c3ec536"
     }
   },
   "jsonapi": {

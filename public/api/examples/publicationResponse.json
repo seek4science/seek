@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "345",
+    "id": "497",
     "type": "publications",
     "attributes": {
       "policy": {
@@ -8,14 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "4984",
+              "id": "1040004050",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "4996",
+              "id": "1040004062",
               "type": "people"
             },
             "access": "manage"
@@ -24,35 +24,33 @@
       },
       "discussion_links": [
         {
-          "id": "274",
+          "id": "395",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
       "misc_links": [
         {
-          "id": "275",
+          "id": "396",
           "label": "A link",
           "url": "http://www.slack.com/"
         }
       ],
       "title": "A Maximal Publication",
       "latest_version": 1,
-      "tags": [
-
-      ],
+      "tags": [],
       "versions": [
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/publications/345?version=1",
+          "url": "http://localhost:3000/publications/497?version=1",
           "doi": "10.5072/abcd"
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-11-20T10:22:27.000Z",
-      "updated_at": "2024-11-20T10:22:27.000Z",
+      "created_at": "2026-08-27T08:54:01.387Z",
+      "updated_at": "2026-08-27T08:54:01.387Z",
       "doi": "10.5072/abcd",
       "content_blobs": [
         {
@@ -61,12 +59,18 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/publications/345/content_blobs/1452",
+          "link": "http://localhost:3000/publications/497/content_blobs/1050456992",
           "size": 8
         }
       ],
       "creators": [
-
+        {
+          "profile": "/people/1040004050",
+          "family_name": "Last",
+          "given_name": "Person4132",
+          "affiliation": "An Institution: 4933",
+          "orcid": null
+        }
       ],
       "other_creators": null,
       "journal": "Journal of Molecular Biology",
@@ -79,7 +83,8 @@
       "publisher": "Heidelberg University Library, heiBOOKS",
       "url": null,
       "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
-      "publication_type": "Journal",
+      "publication_type": "Journal Article",
+      "registered_mode": "by DOI",
       "authors": [
         "Author_non_registered LastNonReg",
         "Author_registered LastReg"
@@ -88,13 +93,16 @@
     "relationships": {
       "creators": {
         "data": [
-
+          {
+            "id": "1040004050",
+            "type": "people"
+          }
         ]
       },
       "submitter": {
         "data": [
           {
-            "id": "4996",
+            "id": "1040004062",
             "type": "people"
           }
         ]
@@ -102,7 +110,11 @@
       "people": {
         "data": [
           {
-            "id": "4996",
+            "id": "1040004050",
+            "type": "people"
+          },
+          {
+            "id": "1040004062",
             "type": "people"
           }
         ]
@@ -110,7 +122,7 @@
       "projects": {
         "data": [
           {
-            "id": "4922",
+            "id": "1022268092",
             "type": "projects"
           }
         ]
@@ -118,7 +130,7 @@
       "investigations": {
         "data": [
           {
-            "id": "874",
+            "id": "973656272",
             "type": "investigations"
           }
         ]
@@ -126,7 +138,7 @@
       "studies": {
         "data": [
           {
-            "id": "772",
+            "id": "1060386088",
             "type": "studies"
           }
         ]
@@ -134,7 +146,7 @@
       "assays": {
         "data": [
           {
-            "id": "614",
+            "id": "1035387666",
             "type": "assays"
           }
         ]
@@ -142,7 +154,7 @@
       "data_files": {
         "data": [
           {
-            "id": "298",
+            "id": "1055251026",
             "type": "data_files"
           }
         ]
@@ -150,7 +162,7 @@
       "models": {
         "data": [
           {
-            "id": "251",
+            "id": "1004285959",
             "type": "models"
           }
         ]
@@ -158,7 +170,7 @@
       "presentations": {
         "data": [
           {
-            "id": "138",
+            "id": "245",
             "type": "presentations"
           }
         ]
@@ -166,7 +178,7 @@
       "events": {
         "data": [
           {
-            "id": "169",
+            "id": "1025618876",
             "type": "events"
           }
         ]
@@ -174,21 +186,25 @@
       "workflows": {
         "data": [
           {
-            "id": "222",
+            "id": "1524",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/publications/345?version=1"
+      "self": "/publications/497?version=1"
     },
     "meta": {
-      "created": "2024-11-20T10:22:27.000Z",
-      "modified": "2024-11-20T10:22:27.000Z",
+      "created": "2026-08-27T08:54:00.922Z",
+      "modified": "2026-08-27T08:54:00.922Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "440fc010-8957-013d-24a2-0a81884ed284"
+      "uuid": "d172c5e7-fbb9-4638-a765-870a4174967c",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

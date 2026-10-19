@@ -55,7 +55,7 @@ class Strain < ApplicationRecord
       text :provider_id do
         provider_id
       end
-  end if Seek::Config.solr_enabled
+  end
 
   def is_default?
     title=="default" && is_dummy==true

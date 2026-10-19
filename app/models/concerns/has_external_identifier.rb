@@ -10,10 +10,8 @@ module HasExternalIdentifier
       include HasExternalIdentifier::InstanceMethods
       validate :check_external_identifier_unique_for_project
 
-      if Seek::Config.solr_enabled
-        searchable(auto_index: false) do
-          text :external_identifier
-        end
+      searchable(auto_index: false) do
+        text :external_identifier
       end
     end
 

@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class StudiesControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -337,8 +336,8 @@ class StudiesControllerTest < ActionController::TestCase
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     study = FactoryBot.create(:study, contributor: User.current_user.person,
-                            investigation: FactoryBot.create(:investigation, contributor: User.current_user.person),
-                            policy: FactoryBot.create(:policy,
+                                      investigation: FactoryBot.create(:investigation, contributor: User.current_user.person),
+                                      policy: FactoryBot.create(:policy,
                                             access_type: Policy::NO_ACCESS,
                                             permissions: [FactoryBot.create(:permission, contributor: proj, access_type: Policy::EDITING)]))
     get :edit, params: { id: study.id }
@@ -360,7 +359,7 @@ class StudiesControllerTest < ActionController::TestCase
     person = User.current_user.person
     inv = FactoryBot.create :investigation, policy: FactoryBot.create(:public_policy), contributor:person
     study = FactoryBot.create :study, title: 'the study', policy: FactoryBot.create(:public_policy),
-                            investigation: inv, contributor:person
+                                      investigation: inv, contributor:person
     get :new_object_based_on_existing_one, params: { id: study.id }
     assert_response :success
     assert_select '#study_title[value=?]', 'the study'
@@ -606,8 +605,8 @@ class StudiesControllerTest < ActionController::TestCase
     # check sharing form exists
     assert_select 'div#sharing_form', count:1
 
-    #no sharing link, not for Investigation, Study and Assay
-    assert_select 'div#temporary_links', count:0
+    # check temporary sharing links section exists
+    assert_select 'div#temporary_links', count:1
 
     assert_select 'div#author-form', count:1
   end
@@ -698,10 +697,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                   "name":'fred',
-                                                   "age":22}}}
+      cm_attributes = {extended_metadata_attributes: { extended_metadata_type_id: cmt.id,
+                                                       data: {
+                                                   "name": 'fred',
+                                                   "age": 22}}}
 
       post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -711,15 +710,15 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
-    assert_nil cm.get_attribute_value('date')
+    assert_nil cm.get_attribute_value('datetime')
 
     # test update
     old_id = cm.id
     assert_no_difference('Study.count') do
       assert_no_difference('ExtendedMetadata.count') do
         put :update, params: { id: study.id, study: { title: "new title",
-          extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
-                                        data: {
+                                                      extended_metadata_attributes: { extended_metadata_type_id: cmt.id, id: cm.id,
+                                                                                      data: {
                                           "name": 'max',
                                           "age": 20 } }
         }
@@ -743,10 +742,10 @@ class StudiesControllerTest < ActionController::TestCase
       assert_no_difference('ExtendedMetadata.count') do
         investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
         study_attributes = { title: 'test', investigation_id: investigation.id }
-        cm_attributes = {extended_metadata_attributes:{ extended_metadata_type_id: cmt.id,
-                                                        data:{
-                                                          "name":'fred',
-                                                          "age":22}}}
+        cm_attributes = {extended_metadata_attributes: { extended_metadata_type_id: cmt.id,
+                                                         data: {
+                                                          "name": 'fred',
+                                                          "age": 22}}}
 
         post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
       end
@@ -840,10 +839,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                   "full name":'Paul Jones',
-                                                   "full address":'London, UK'}}}
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                   "full name": 'Paul Jones',
+                                                   "full address": 'London, UK'}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -866,11 +865,11 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                   "full name":'full name',
-                                                   "Full name":'Full name',
-                                                   "full  name":'full  name'}}}
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                   "full name": 'full name',
+                                                   "Full name": 'Full name',
+                                                   "full  name": 'full  name'}}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
     end
@@ -894,12 +893,12 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                        data:{
-                                            "+name":'+name',
-                                            "-name":'-name',
-                                            "&name":'&name',
-                                            "name(name)":'name(name)'
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                            "+name": '+name',
+                                            "-name": '-name',
+                                            "&name": '&name',
+                                            "name(name)": 'name(name)'
                                         }}}
 
       put :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
@@ -924,10 +923,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count') do
       investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
       study_attributes = { title: 'test', investigation_id: investigation.id }
-      cm_attributes = {extended_metadata_attributes:{extended_metadata_type_id: cmt.id,
-                                                   data:{
-                                                     "apple name":"Newton's Apple",
-                                                     "apple list":['Granny Smith','Bramley'],
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                     "apple name": "Newton's Apple",
+                                                     "apple list": ['Granny Smith','Bramley','random apple'],
                                                      "apple controlled vocab": ['Granny Smith']}}}
 
       post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
@@ -940,12 +939,30 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal cmt, cm.extended_metadata_type
     assert_equal "Newton's Apple",cm.get_attribute_value('apple name')
     assert_equal 'Granny Smith',cm.get_attribute_value('apple controlled vocab')
-    assert_equal ['Granny Smith','Bramley'],cm.get_attribute_value('apple list')
+    assert_equal ['Granny Smith','Bramley','random apple'],cm.get_attribute_value('apple list')
 
     get :show, params: { id: study }
     assert_response :success
 
     assert_select 'div.extended_metadata',text:/Granny Smith/, count:2
+
+    assert_no_difference('Study.count') do
+      investigation = FactoryBot.create(:investigation,projects:User.current_user.person.projects,contributor:User.current_user.person)
+      study_attributes = { title: 'test', investigation_id: investigation.id }
+      cm_attributes = {extended_metadata_attributes: {extended_metadata_type_id: cmt.id,
+                                                      data: {
+                                                       "apple name": "Newton's Apple",
+                                                       "apple list": ['Granny Smith','Bramley'],
+                                                       "apple controlled vocab": ['random apple']}}}
+
+      post :create, params: { study: study_attributes.merge(cm_attributes), sharing: valid_sharing }
+    end
+
+
+
+    assert study=assigns(:study)
+    refute study.valid?
+
   end
 
   test 'should create and update study with linked extended metadata type' do
@@ -960,10 +977,10 @@ class StudiesControllerTest < ActionController::TestCase
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id, data: {
-            "role_email":"alice@email.com",
-            "role_phone":"0012345",
+            "role_email": "alice@email.com",
+            "role_phone": "0012345",
             "role_name": {
-                "first_name":"alice",
+                "first_name": "alice",
                 "last_name": "liddell"
               }
           }
@@ -993,9 +1010,9 @@ class StudiesControllerTest < ActionController::TestCase
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
                                                       extended_metadata_attributes: {
                                                         extended_metadata_type_id: cmt.id, id:cm.id, data: {
-                                                          "role_email":"rabbit@email.com",
+                                                          "role_email": "rabbit@email.com",
                                                           "role_name": {
-                                                            "first_name":"rabbit"
+                                                            "first_name": "rabbit"
                                                           }
                                                         }
                                                       }
@@ -1020,9 +1037,9 @@ class StudiesControllerTest < ActionController::TestCase
         study_attributes = { title: 'Family', investigation_id: investigation.id }
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id, data: {
-            "dad":{"first_name":"john", "last_name":"liddell"},
-            "mom":{"first_name":"lily", "last_name":"liddell"},
-            "child":{"0":{"first_name":"alice", "last_name":"liddell"}}
+            "dad": {"first_name":"john", "last_name":"liddell"},
+            "mom": {"first_name":"lily", "last_name":"liddell"},
+            "child": {"0":{"first_name":"alice", "last_name":"liddell"}}
             }
           }
         }
@@ -1050,8 +1067,8 @@ class StudiesControllerTest < ActionController::TestCase
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
                                                       extended_metadata_attributes: {
                                                         extended_metadata_type_id: cmt.id, id:cm.id, data: {
-                                                          "dad":{"first_name":"tom", "last_name":"liddell"},
-                                                          "child":{"0":{"first_name":"rabbit", "last_name":"wonderland"},"1":{"first_name":"mad", "last_name":"hatter"}}
+                                                          "dad": {"first_name":"tom", "last_name":"liddell"},
+                                                          "child": {"0":{"first_name":"rabbit", "last_name":"wonderland"},"1":{"first_name":"mad", "last_name":"hatter"}}
                                                         }
                                                       }
         }
@@ -1113,8 +1130,8 @@ class StudiesControllerTest < ActionController::TestCase
         study_attributes = { title: 'Alice in Wonderland', investigation_id: investigation.id }
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id, data: {
-            "role_email":"alice@email.com",
-            "role_phone":"0012345",
+            "role_email": "alice@email.com",
+            "role_phone": "0012345",
             "role_name": {"first_name":"alice", "last_name": "liddell"},
             "role_address": {"street":"wonder","city": "land" }
           }
@@ -1145,9 +1162,9 @@ class StudiesControllerTest < ActionController::TestCase
         put :update, params: { id: study.id, study: { title: "Alice Through the Looking Glass",
                                                       extended_metadata_attributes: {
                                                         extended_metadata_type_id: cmt.id, id:cm.id, data: {
-                                                          "role_email":"rabbit@email.com",
-                                                          "role_name":{
-                                                              "first_name":"rabbit"
+                                                          "role_email": "rabbit@email.com",
+                                                          "role_name": {
+                                                              "first_name": "rabbit"
                                                           }
                                                         }
                                                       }
@@ -1178,38 +1195,38 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "study_title":"happy study",
-            "study_sites":{
-              "0":{
-                  "study_site_name":"site1",
-                  "study_site_location":"fairyland",
-                  "participants":{
-                    "0":{
-                      "participant_name":{
-                        "first_name":"alice",
-                        "last_name":"liddell"
+            "study_title": "happy study",
+            "study_sites": {
+              "0": {
+                  "study_site_name": "site1",
+                  "study_site_location": "fairyland",
+                  "participants": {
+                    "0": {
+                      "participant_name": {
+                        "first_name": "alice",
+                        "last_name": "liddell"
                       },
-                      "participant_age":"7"
+                      "participant_age": "7"
                     },
-                    "1":{
-                      "participant_name":{
-                        "first_name":"pippi",
-                        "last_name":"langstrumpf"
+                    "1": {
+                      "participant_name": {
+                        "first_name": "pippi",
+                        "last_name": "langstrumpf"
                       },
-                      "participant_age":"9"
+                      "participant_age": "9"
                     }
                   }
               },
-              "1":{
-                "study_site_name":"site2",
-                "study_site_location":"space",
-                "participants":{
-                  "0":{
-                    "participant_name":{
-                      "first_name":"arthur",
-                      "last_name":"Dent"
+              "1": {
+                "study_site_name": "site2",
+                "study_site_location": "space",
+                "participants": {
+                  "0": {
+                    "participant_name": {
+                      "first_name": "arthur",
+                      "last_name": "Dent"
                     },
-                    "participant_age":"40"
+                    "participant_age": "40"
                   }
                 }
               }
@@ -1247,28 +1264,28 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
-                "study_title":"happy study new",
-                "study_sites":{
-                  "0":{
-                    "study_site_name":"site1",
-                    "study_site_location":"better fairyland",
-                    "participants":{
-                      "0":{
-                        "participant_name":{
-                          "first_name":"mad",
-                          "last_name":"hatter"
+                "study_title": "happy study new",
+                "study_sites": {
+                  "0": {
+                    "study_site_name": "site1",
+                    "study_site_location": "better fairyland",
+                    "participants": {
+                      "0": {
+                        "participant_name": {
+                          "first_name": "mad",
+                          "last_name": "hatter"
                         },
-                        "participant_age":"unknown"
+                        "participant_age": "unknown"
                       },
-                      "1":{
-                        "participant_name":{
-                          "first_name":"pippi",
-                          "last_name":"langstrumpf"
+                      "1": {
+                        "participant_name": {
+                          "first_name": "pippi",
+                          "last_name": "langstrumpf"
                         },
-                        "participant_age":"9"
+                        "participant_age": "9"
                       }
                     }
                   }
@@ -1305,10 +1322,10 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1347,10 +1364,10 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{ "identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": { "identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1387,7 +1404,7 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1424,7 +1441,7 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1467,7 +1484,7 @@ class StudiesControllerTest < ActionController::TestCase
           study: {
             title: 'Updated Study',
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1516,10 +1533,10 @@ class StudiesControllerTest < ActionController::TestCase
         cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1561,10 +1578,10 @@ class StudiesControllerTest < ActionController::TestCase
           cm_attributes = { extended_metadata_attributes: {
             extended_metadata_type_id: cmt.id,
             data: {
-              "role_affiliation_name":"HITS",
-              "role_affiliation_identifiers":{
-                "0":{"identifier":"", "scheme":"ROR"},
-                "1":{"identifier":"grid.424699.4", "scheme":""}
+              "role_affiliation_name": "HITS",
+              "role_affiliation_identifiers": {
+                "0": {"identifier":"", "scheme":"ROR"},
+                "1": {"identifier":"grid.424699.4", "scheme":""}
               }
             }
           }
@@ -1609,10 +1626,10 @@ class StudiesControllerTest < ActionController::TestCase
     cm_attributes = { extended_metadata_attributes: {
           extended_metadata_type_id: cmt.id,
           data: {
-            "role_affiliation_name":"HITS",
-            "role_affiliation_identifiers":{
-              "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-              "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+            "role_affiliation_name": "HITS",
+            "role_affiliation_identifiers": {
+              "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+              "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
             }
           }
         }
@@ -1634,7 +1651,7 @@ class StudiesControllerTest < ActionController::TestCase
             title: 'my new study title',
             investigation_id: nil,
             extended_metadata_attributes: {
-              id:cm.id,
+              id: cm.id,
               extended_metadata_type_id: cmt.id,
               data: {
                 "role_affiliation_name": "University of Manchester",
@@ -1701,10 +1718,10 @@ class StudiesControllerTest < ActionController::TestCase
     cm_attributes = { extended_metadata_attributes: {
       extended_metadata_type_id: cmt.id,
       data: {
-        "role_affiliation_name":"HITS",
-        "role_affiliation_identifiers":{
-          "0":{"identifier":"01f7bcy98", "scheme":"ROR"},
-          "1":{"identifier":"grid.424699.4", "scheme":"GRID"}
+        "role_affiliation_name": "HITS",
+        "role_affiliation_identifiers": {
+          "0": {"identifier":"01f7bcy98", "scheme":"ROR"},
+          "1": {"identifier":"grid.424699.4", "scheme":"GRID"}
         }
       }
     }
@@ -1724,7 +1741,7 @@ class StudiesControllerTest < ActionController::TestCase
             study: {
               title: 'my new study title',
               extended_metadata_attributes: {
-                id:cm.id,
+                id: cm.id,
                 extended_metadata_type_id: cmt.id,
                 data: {
                   "role_affiliation_name": "University of Manchester",
@@ -2050,7 +2067,7 @@ class StudiesControllerTest < ActionController::TestCase
     study_sample_sample_type = FactoryBot.create :isa_sample_collection_sample_type, linked_sample_type: study_source_sample_type, contributor: person
     study = FactoryBot.create(:study,
                               investigation: investigation ,
-                              policy:FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
+                              policy: FactoryBot.create(:private_policy, permissions:[FactoryBot.create(:permission,contributor: person, access_type:Policy::EDITING)]),
                               sample_types: [study_source_sample_type, study_sample_sample_type],
                               contributor: person)
 
@@ -2123,5 +2140,421 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     get :edit, params: { id: study.id }
     assert_response :success
+  end
+
+  # Tests for temporary link (special auth code) functionality
+
+  test 'should create temporary link for study' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    assert_difference('SpecialAuthCode.count', 1) do
+      post :manage_update, params: {
+        id: study.id,
+        study: {
+          title: study.title,
+          investigation_id: investigation.id,
+          special_auth_codes_attributes: {
+            '0' => {
+              code: SecureRandom.base64(30),
+              expiration_date: (Date.today + 7.days).to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    assert_redirected_to study_path(study)
+
+    study.reload
+    assert_equal 1, study.special_auth_codes.count
+
+    code = study.special_auth_codes.first
+    assert_not_nil code.code
+    assert_equal 40, code.code.length
+    assert code.expiration_date > Date.today
+  end
+
+  test 'should update existing temporary link for study' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    initial_code = nil
+    disable_authorization_checks do
+      initial_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    new_expiration = Date.today + 14.days
+
+    assert_no_difference('SpecialAuthCode.count') do
+      post :manage_update, params: {
+        id: study.id,
+        study: {
+          title: study.title,
+          investigation_id: investigation.id,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: initial_code.id,
+              code: initial_code.code,
+              expiration_date: new_expiration.to_s,
+              _destroy: '0'
+            }
+          }
+        }
+      }
+    end
+
+    initial_code.reload
+    assert_equal new_expiration, initial_code.expiration_date
+  end
+
+  test 'should revoke temporary link for study' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    code = nil
+    disable_authorization_checks do
+      code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    assert_difference('SpecialAuthCode.count', -1) do
+      post :manage_update, params: {
+        id: study.id,
+        study: {
+          title: study.title,
+          investigation_id: investigation.id,
+          special_auth_codes_attributes: {
+            '0' => {
+              id: code.id,
+              _destroy: '1'
+            }
+          }
+        }
+      }
+    end
+
+    study.reload
+    assert_equal 0, study.special_auth_codes.count
+  end
+
+  test 'temporary link code is saved to database for study with correct attributes' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+
+    expiration_date = Date.today + 10.days
+
+    post :manage_update, params: {
+      id: study.id,
+      study: {
+        title: study.title,
+        investigation_id: investigation.id,
+        special_auth_codes_attributes: {
+          '0' => {
+            code: SecureRandom.base64(30),
+            expiration_date: expiration_date.to_s,
+            _destroy: '0'
+          }
+        }
+      }
+    }
+
+    # Query database directly
+    code = SpecialAuthCode.where(
+      asset_type: 'Study',
+      asset_id: study.id
+    ).first
+
+    assert_not_nil code
+    assert_equal 'Study', code.asset_type
+    assert_equal study.id, code.asset_id
+    assert_equal expiration_date, code.expiration_date
+    assert_equal 40, code.code.length
+  end
+
+  # ===============================================
+  # Code-Based Authorization Controller Tests
+  # ===============================================
+
+  test 'study accessible with valid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    auth_code = nil
+    disable_authorization_checks do
+      auth_code = SpecialAuthCode.create!(
+        asset: study,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: study.id, code: auth_code.code }
+    assert_response :success
+    assert_select 'h1', text: study.title
+  end
+
+  test 'study accessible with parent investigation code' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    inv_code = nil
+    disable_authorization_checks do
+      inv_code = SpecialAuthCode.create!(
+        asset: investigation,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: study.id, code: inv_code.code }
+    assert_response :success
+    assert_select 'h1', text: study.title
+  end
+
+  test 'study not accessible with child assay code - no upward propagation' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    assay_code = nil
+    disable_authorization_checks do
+      assay_code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    # Try to access study with assay code - should fail
+    get :show, params: { id: study.id, code: assay_code.code }
+    assert_response :forbidden
+  end
+
+  test 'study not accessible with invalid code' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    logout
+
+    get :show, params: { id: study.id, code: 'invalid_code' }
+    assert_response :forbidden
+  end
+
+  # batch MIAPPE upload tests
+
+  test 'batch_uploader renders when miappe type exists' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    get :batch_uploader
+    assert_response :success
+    assert_select 'form'
+  end
+
+  test 'batch_uploader renders unavailable message when miappe type does not exist' do
+    get :batch_uploader
+    assert_response :success
+    assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+  end
+
+  test 'batch_uploader renders unavailable when file uploads blocked' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    with_config_value(:block_file_uploads, true) do
+      get :batch_uploader
+      assert_response :success
+      assert_select 'h1', text: 'Batch MIAPPE upload unavailable'
+    end
+  end
+
+  test 'preview_content without file shows error' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    post :preview_content, params: { content_blobs: [{}] }
+    assert_response :success
+    assert_template 'studies/batch_uploader'
+    assert_equal 'Please select a file to upload or provide a URL to the data.', flash.now[:error]
+  end
+
+  test 'preview_content with valid zip shows preview' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    zip_file = fixture_file_upload('study_batch.zip', 'application/zip')
+    post :preview_content, params: { content_blobs: [{ data: zip_file }] }
+    assert_response :success
+    assert_template 'studies/batch_preview'
+    assert_equal 3, assigns(:studies).count
+
+    # three study rows in the table
+    assert_select 'tbody tr', count: 3
+
+    # each MIAPPE study ID appears as a readonly input
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-F"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-I"]'
+    assert_select 'input[name="studies[id][]"][value="POPYOMICS-POP2-UK"]'
+
+    # study title populated in each title textarea
+    assert_select 'textarea[name="studies[title][]"]', count: 3,
+                  text: 'Clonal test of mapping pedigree 0504B in nursery'
+
+    # form submits to batch_create
+    assert_select "form[action='#{batch_create_studies_path}']"
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
+  test 'batch_create creates studies' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    study_params = batch_create_study_params(investigation)
+    assert_difference('Study.count', 1) do
+      post :batch_create, params: study_params
+    end
+    assert_redirected_to studies_path
+  end
+
+  test 'batch_create with existing_studies destroys old study and its dependents' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    old_study = FactoryBot.create(:study, investigation: investigation, contributor: person)
+    old_assay = FactoryBot.create(:assay, study: old_study, contributor: person)
+    old_assay_asset = FactoryBot.create(:assay_asset, assay: old_assay)
+
+    existing_study_json = { id: old_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: old_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    assert_difference('Study.count', 0) do  # one created, one destroyed
+      post :batch_create, params: params
+    end
+    assert_redirected_to studies_path
+
+    refute Study.exists?(old_study.id), 'old study should be destroyed'
+    refute Assay.exists?(old_assay.id), 'old assay should be destroyed'
+    refute AssayAsset.exists?(old_assay_asset.id), 'old assay_asset should be destroyed'
+  end
+
+  test 'batch_create with existing_studies does not destroy a study the user cannot manage' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    other_person = FactoryBot.create(:person)
+    other_investigation = FactoryBot.create(:investigation, contributor: other_person)
+    other_study = FactoryBot.create(:study, investigation: other_investigation,
+                                    contributor: other_person,
+                                    policy: FactoryBot.create(:private_policy))
+
+    existing_study_json = { id: other_study.id, metadata_id: nil,
+                            study_miappe_id: 'TEST-001', description: other_study.description }.to_json
+
+    params = batch_create_study_params(investigation).merge(existing_studies: [existing_study_json])
+
+    post :batch_create, params: params
+
+    assert Study.exists?(other_study.id), 'unauthorized study should not be destroyed'
+    assert flash[:error].present?
+  end
+
+  test 'batch_create assigns data files to the investigation projects' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+
+    upload_dir = StudyBatchUpload.upload_directory(User.current_user)
+    FileUtils.mkdir_p(upload_dir.join('data'))
+    File.write(upload_dir.join('data', 'test_data.csv'), "col1,col2\nval1,val2\n")
+
+    params = batch_create_study_params(investigation).deep_merge(
+      studies: { data_files: ['test_data'], data_file_description: ['Test data'] }
+    )
+
+    assert_difference('DataFile.count', 1) do
+      post :batch_create, params: params
+    end
+    assert_equal investigation.projects.sort, DataFile.last.projects.sort
+  ensure
+    FileUtils.rm_rf(StudyBatchUpload.upload_directory(User.current_user))
+  end
+
+  test 'batch_create with missing MIAPPE fields and data files specified does not raise' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    person = User.current_user.person
+    investigation = FactoryBot.create(:investigation, contributor: person)
+    # omit mandatory MIAPPE fields so the study fails compliance and is not saved,
+    # leaving no ExtendedMetadata row for create_batch_assay_asset to look up
+    params = {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: [''],
+        description: [''],
+        id: ['MISSING-001'],
+        startDate: [''],
+        endDate: [''],
+        contactInstitution: [''],
+        geographicLocationCountry: [''],
+        experimentalSiteName: [''],
+        latitude: [''], longitude: [''], altitude: [''],
+        descriptionOfTheExperimentalDesign: [''],
+        typeOfExperimentalDesign: [''],
+        observationUnitLevelHierarchy: [''],
+        observationUnitDescription: [''],
+        descriptionOfGrowthFacility: [''],
+        typeOfGrowthFacility: [''],
+        culturalPractices: [''],
+        data_files: ['some_data_file'],
+        data_file_description: [''],
+        license: 'CC-BY-4.0'
+      }
+    }
+    assert_no_difference('Study.count') do
+      post :batch_create, params: params
+    end
+    assert_redirected_to batch_uploader_studies_path
+    assert flash[:error].present?
+  end
+
+  private
+
+  def batch_create_study_params(investigation)
+    {
+      study: { investigation_id: investigation.id },
+      studies: {
+        title: ['Test MIAPPE Study'],
+        description: ['A test description'],
+        id: ['TEST-001'],
+        startDate: ['2023-01-01'],
+        endDate: ['2023-12-31'],
+        contactInstitution: ['Test Institute'],
+        geographicLocationCountry: ['Germany'],
+        experimentalSiteName: ['Test Site'],
+        latitude: ['51.5'],
+        longitude: ['9.9'],
+        altitude: ['100'],
+        descriptionOfTheExperimentalDesign: ['Randomised block design'],
+        typeOfExperimentalDesign: ['CO_715:0000145'],
+        observationUnitLevelHierarchy: ['block>plot'],
+        observationUnitDescription: ['Block of 30 plots'],
+        descriptionOfGrowthFacility: ['Open field'],
+        typeOfGrowthFacility: ['CO_715:0000162'],
+        culturalPractices: ['Irrigation'],
+        data_files: [''],
+        data_file_description: [''],
+        license: 'CC-BY-4.0'
+      }
+    }
   end
 end

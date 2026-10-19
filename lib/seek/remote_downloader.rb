@@ -120,7 +120,7 @@ module Seek
 
     # caches the result into a temporary file
     def cache(file_obj, data_result, url, username, password)
-      data_result[:uuid] = UUID.generate
+      data_result[:uuid] = SecureRandom.uuid
       key = generate_key url, username, password
 
       begin

@@ -34,12 +34,10 @@ class Organism < ApplicationRecord
     end
   end
 
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :title
-      text :searchable_terms
-      text :ncbi_id
-    end
+  searchable(auto_index: false) do
+    text :title
+    text :searchable_terms
+    text :ncbi_id
   end
 
   def can_delete?(user = User.current_user)

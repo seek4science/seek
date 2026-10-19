@@ -20,8 +20,11 @@
             <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
 
             <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_sop} %>
+
           </div>
         </div>
+
+        <%= rendered_asset_view(@display_sop) %>
 
         <%= render partial: 'extended_metadata/extended_metadata_attribute_values', locals: { resource: @sop } %>
 

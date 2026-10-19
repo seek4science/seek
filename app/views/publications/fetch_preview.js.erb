@@ -7,4 +7,13 @@
   $j('#publication_preview_container').show().highlight();
   $j('#publication_preview').highlight();
   $j('#publication_preview_container').html('<%= escape_javascript(render(partial: 'publications/publication_preview', locals: { publication: @publication, authors: @authors })) -%>');
+  // Auto-fill publication type in Register tab dropdown and preview hidden field
+  <% detected_id = @publication.publication_type&.id %>
+  $j('#Register #publication_publication_type_id').val(<%= detected_id.to_json %>);
+  $j('#publication_preview_container input[name="publication[publication_type_id]"]').val(<%= detected_id.to_json %>);
+  <% if @publication_type_missing %>
+  $j('#publication_type_warning').show();
+  <% else %>
+  $j('#publication_type_warning').hide();
+  <% end %>
 <% end %>

@@ -5,7 +5,7 @@ FactoryBot.define do
     after(:build) do |em|
       em.set_attribute_value(:name, 'Fred Bloggs')
       em.set_attribute_value(:age, 44)
-      em.set_attribute_value(:date, '2024-01-01')
+      em.set_attribute_value(:datetime, '2024-01-01')
     end
   end
 

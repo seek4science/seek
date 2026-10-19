@@ -14,6 +14,7 @@ class Template < ApplicationRecord
   validate :validate_template_attributes
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
+  scope :for_sample_type_creation, -> { where.not(group: Seek::ISATemplates::TemplateGroup::EXCLUDED_FROM_SAMPLE_TYPE_CREATION) }
 
   has_filter :isa_template_group
   def can_delete?(user = User.current_user)
@@ -33,7 +34,7 @@ class Template < ApplicationRecord
   end
 
   def validate_template_attributes
-    unless attributes_with_empty_isa_tag.none?
+    if attributes_with_empty_isa_tag.any?
       attributes_with_empty_isa_tag.map do |attribute|
         errors.add("[#{:template_attributes}]:", "Attribute '#{attribute.title}' is missing an ISA tag")
       end
@@ -63,7 +64,7 @@ class Template < ApplicationRecord
   end
 
   def attributes_with_empty_isa_tag
-    template_attributes.select { |ta| !ta.title.include?('Input') && ta.isa_tag_id.nil? }
+    template_attributes.select { |ta| ta.isa_tag_id.blank? }
   end
 
   def test_tag_occurences

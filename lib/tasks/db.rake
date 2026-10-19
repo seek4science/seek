@@ -7,7 +7,7 @@ require 'terrapin'
 Rake::Task['db:schema:dump'].enhance do
   begin
     cmd = Terrapin::CommandLine.new("sed -e 's/charset: \"[^\"]*\", //' -e 's/collation: \"[^\"]*\", //' db/schema.rb > db/schema2.rb " \
-      '&& mv db/schema2.rb db/schema.rb')
+                                      '&& mv db/schema2.rb db/schema.rb')
     cmd.run
   rescue StandardError => e
     puts "Failed to convert schema.rb to db agnostic - #{e.message}"

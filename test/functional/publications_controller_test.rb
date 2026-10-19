@@ -3,8 +3,6 @@ require 'minitest/mock'
 
 class PublicationsControllerTest < ActionController::TestCase
 
-  fixtures :all
-
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include RdfTestCases
@@ -493,6 +491,16 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_match(/.*url.*/, response.body)
   end
 
+  test 'handle pubmed no email error during export' do
+    publication_formatter_mock
+    publication = publication_for_export_tests
+    with_config_value :pubmed_api_email, '' do
+      get :show, params: { id: publication, format: 'bibtex' }
+    end
+    assert_redirected_to publication_path(publication)
+    assert_equal 'An email address must be configured to use the PubMed API. Please contact an administrator.', flash[:error]
+  end
+
   test 'should export pre-print publication as bibtex' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
@@ -641,6 +649,18 @@ class PublicationsControllerTest < ActionController::TestCase
       p = assigns(:publications)
       assert_equal 1, p.count
     end
+
+  end
+
+  test 'should handle no pubmed email error for list export' do
+    pub = publication_for_export_tests
+    refute_nil pub.pubmed_id
+
+    with_config_value(:pubmed_api_email, '') do
+      get :index, format: :enw
+    end
+    assert_redirected_to publications_path
+    assert_equal 'An email address must be configured to use the PubMed API. Please contact an administrator.', flash[:error]
 
   end
 
@@ -1281,6 +1301,30 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert response.body.include?('FAIRDOMHub: a repository')
+  end
+
+  test 'fetch_preview auto-detects publication type without pre-selection and hides warning' do
+    VCR.use_cassette('doi/doi_crossref_journal_article_response_1') do
+      post :fetch_preview, xhr: true, params: {
+        key: '10.1038/s41586-020-2649-2',
+        protocol: 'doi',
+        publication: { project_ids: [User.current_user.person.projects.first.id] }
+      }
+    end
+    assert_response :success
+    assert_match(/publication_type_warning.*hide/, response.body)
+  end
+
+  test 'fetch_preview shows warning when publication type cannot be detected' do
+    VCR.use_cassette('doi/doi_crossref_unknown_type_response_1') do
+      post :fetch_preview, xhr: true, params: {
+        key: '10.1037/0000001-000',
+        protocol: 'doi',
+        publication: { project_ids: [User.current_user.person.projects.first.id] }
+      }
+    end
+    assert_response :success
+    assert_match(/publication_type_warning.*show/, response.body)
   end
 
   test 'show original author name for associated person' do

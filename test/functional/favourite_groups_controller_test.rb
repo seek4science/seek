@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class FavouriteGroupsControllerTest < ActionController::TestCase
-  fixtures :all
 
   include AuthenticatedTestHelper
 

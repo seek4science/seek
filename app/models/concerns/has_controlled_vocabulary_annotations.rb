@@ -42,8 +42,6 @@ module HasControlledVocabularyAnnotations
     private
 
     def define_controlled_vocab_annotation_search_indexing(property)
-      return unless Seek::Config.solr_enabled
-
       searchable(auto_index: false) do
         text "#{property.to_s.singularize}_annotations".to_sym do
           controlled_vocab_annotation_labels(property)

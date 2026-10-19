@@ -30,16 +30,17 @@ class Policy < ApplicationRecord
   end
 
   def queue_update_auth_table
-    unless (saved_changes.keys - ['updated_at']).empty? || assets.empty?
-      AuthLookupUpdateQueue.enqueue(assets)
-    end
+    return if (saved_changes.keys - ['updated_at']).empty?
+
+    policy_assets = assets
+    AuthLookupUpdateQueue.enqueue(policy_assets) unless policy_assets.empty?
   end
 
   def queue_rdf_generation_job
+    return if (saved_changes.keys - ['updated_at']).empty?
+
     supported_assets = assets.select(&:rdf_supported?)
-    unless (saved_changes.keys - ['updated_at']).empty? || supported_assets.empty?
-      RdfGenerationQueue.enqueue(supported_assets)
-    end
+    RdfGenerationQueue.enqueue(supported_assets) unless supported_assets.empty?
   end
 
   def assets

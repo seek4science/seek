@@ -79,8 +79,12 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.allow_required?(attr)
 
     # should refute if inherited from a template
+    person = c.sample_type.contributor
+    project = c.sample_type.projects.first
     template = FactoryBot.create(:isa_source_template)
-    sample_type_from_template = create_sample_type_from_template(template, c.sample_type.projects.first, c.sample_type.contributor)
+    inv = FactoryBot.create(:investigation, projects: [project], contributor: person, is_isa_json_compliant: true)
+    study = FactoryBot.create(:study, contributor: person, investigation: inv)
+    sample_type_from_template = create_sample_type_from_template(template, project, person, [study])
     sample_type_from_template.sample_attributes << FactoryBot.create(:sample_attribute, title: 'Extra Source Characteristic', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id, sample_type: sample_type_from_template)
 
     c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
@@ -145,22 +149,24 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
   test 'allow editing isa tag' do
     person = FactoryBot.create(:person)
     project = person.projects.first
-    template = FactoryBot.create(:isa_source_template)
-    sample_type_from_template = create_sample_type_from_template(template, project, person)
+    template = FactoryBot.create(:isa_source_template, contributor: person, projects: [project])
+    inv = FactoryBot.create(:investigation, projects: [project], contributor: person, is_isa_json_compliant: true)
+    study = FactoryBot.create(:study, contributor: person, investigation: inv)
+    study_sample_type_from_template = create_sample_type_from_template(template, project, person, [study])
     sample_type = FactoryBot.create(:isa_source_sample_type, projects: [project], contributor: person)
 
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
-    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
-    sample_type.sample_attributes.map { |attribute| refute c.send(:inherited?, attribute) }
-    sample_type_from_template.sample_attributes.map { |attribute| assert c_inherited.send(:inherited?, attribute) }
-    sample_type_from_template.sample_attributes.map { |attribute| refute c_inherited.allow_isa_tag_change?(attribute) }
-    sample_type.sample_attributes.map { |attribute| assert c.allow_isa_tag_change?(attribute) }
+    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(study_sample_type_from_template)
+    assert sample_type.sample_attributes.none? { |attribute| c.send(:inherited?, attribute) }
+    assert study_sample_type_from_template.sample_attributes.all? { |attribute| c_inherited.send(:inherited?, attribute) }
+    assert study_sample_type_from_template.sample_attributes.none? { |attribute| c_inherited.allow_isa_tag_change?(attribute) }
+    assert sample_type.sample_attributes.all? { |attribute| c.allow_isa_tag_change?(attribute) }
 
     # Adding an extra attribute to the sample_type
-    sample_type_from_template.sample_attributes << FactoryBot.create(:sample_attribute, title: 'Extra Source Characteristic', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id, sample_type: sample_type_from_template)
-    sample_type_from_template.reload
-    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
-    extra_source_characteristic = sample_type_from_template.sample_attributes.detect { |sa| sa.title == 'Extra Source Characteristic' }
+    study_sample_type_from_template.sample_attributes << FactoryBot.create(:sample_attribute, title: 'Extra Source Characteristic', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: false, isa_tag_id: FactoryBot.create(:source_characteristic_isa_tag).id, sample_type: study_sample_type_from_template)
+    study_sample_type_from_template.reload
+    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(study_sample_type_from_template)
+    extra_source_characteristic = study_sample_type_from_template.sample_attributes.detect { |sa| sa.title == 'Extra Source Characteristic' }
     refute extra_source_characteristic.nil?
     ## Extra source characteristic should be all blank, since there are no samples
     assert c_inherited.send(:all_blank?, extra_source_characteristic.accessor_name)
@@ -170,27 +176,107 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c_inherited.allow_isa_tag_change?(extra_source_characteristic)
 
     # Add sample to the sample type but leave the extra characteristic empty
-    isa_source_no_extra_char = FactoryBot.create(:isa_source, sample_type: sample_type_from_template, contributor: person)
-    sample_type_from_template.samples << isa_source_no_extra_char
-    sample_type_from_template.save
+    isa_source_no_extra_char = FactoryBot.create(:isa_source, sample_type: study_sample_type_from_template, contributor: person)
+    study_sample_type_from_template.samples << isa_source_no_extra_char
+    study_sample_type_from_template.save
     ## Extra source characteristic should be all blank
     assert c_inherited.send(:all_blank?, extra_source_characteristic.accessor_name)
     ## The first attribute has a sample which is filled in => Not allowed to change ISA tag
-    refute c_inherited.allow_isa_tag_change?(sample_type_from_template.sample_attributes.first)
+    refute c_inherited.allow_isa_tag_change?(study_sample_type_from_template.sample_attributes.first)
     ## Extra source characteristic is completely empty => Allowed to change ISA tag
     assert c_inherited.allow_isa_tag_change?(extra_source_characteristic)
 
     # Add sample to the sample type with an extra characteristic value
-    isa_source_with_extra_char = FactoryBot.create(:isa_source, sample_type: sample_type_from_template, contributor: person)
+    isa_source_with_extra_char = FactoryBot.create(:isa_source, sample_type: study_sample_type_from_template, contributor: person)
     isa_source_with_extra_char.set_attribute_value('Extra Source Characteristic', 'Blue')
     isa_source_with_extra_char.save
-    sample_type_from_template.samples << isa_source_with_extra_char
-    sample_type_from_template.save
-    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_from_template)
+    study_sample_type_from_template.samples << isa_source_with_extra_char
+    study_sample_type_from_template.save
+    c_inherited = Seek::Samples::SampleTypeEditingConstraints.new(study_sample_type_from_template)
     ## Extra source characteristic isn't all blank anymore
     refute c_inherited.send(:all_blank?, extra_source_characteristic.accessor_name)
     ## Extra source characteristic is not empty => Not allowed to change ISA tag
     refute c_inherited.allow_isa_tag_change?(extra_source_characteristic)
+  end
+
+  test 'allow_change_at_creation?' do
+    template = FactoryBot.create(:isa_source_template)
+
+    # nil attr is always allowed (represents a brand-new attribute row)
+    c = Seek::Samples::SampleTypeEditingConstraints.new(SampleType.new)
+    assert c.allow_change_at_creation?(nil)
+
+    # new record, attribute without template_attribute_id -> allowed
+    non_inherited_attr = SampleAttribute.new(title: 'Custom')
+    assert c.allow_change_at_creation?(non_inherited_attr)
+
+    # new record, template_id set -> sample type is ISA JSON compliant
+    # attribute with template_attribute_id -> NOT allowed (inherited from template)
+    new_type_with_template = SampleType.new(template_id: template.id)
+    new_type_with_template.create_sample_attributes_from_isa_template(template)
+    c_template = Seek::Samples::SampleTypeEditingConstraints.new(new_type_with_template)
+    assert new_type_with_template.is_isa_json_compliant?,
+           'New sample type with template_id set should be ISA JSON compliant'
+
+    # Inherited attributes should return false
+    assert new_type_with_template.sample_attributes.none? { |attribute| c_template.allow_change_at_creation?(attribute) },
+           'Inherited attributes should not be changeable at creation time'
+
+    # nil or non-inherited attr is still allowed even on a template-linked sample type
+    assert c_template.allow_change_at_creation?(nil)
+    assert c_template.allow_change_at_creation?(SampleAttribute.new(title: 'Custom'))
+
+    # existing (saved) record -> always returns true regardless of inheritance
+    person = FactoryBot.create(:person)
+    saved_type = create_sample_type_from_template(template, person.projects.first, person)
+    refute saved_type.new_record?
+    c_saved = Seek::Samples::SampleTypeEditingConstraints.new(saved_type)
+    saved_type.sample_attributes.each do |attr|
+      assert c_saved.allow_change_at_creation?(attr),
+             "#{attr.title}: allow_change_at_creation? should return true for an existing record"
+    end
+  end
+
+  test 'allow editing unit' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+
+    # Create sample type
+    # 'weight' attribute has a unit with symbol 'g'
+    sample_type = FactoryBot.create(:patient_sample_type,
+                                    projects: [project],
+                                    contributor: person)
+    weight_attribute = sample_type.sample_attributes.detect { |sa| sa.title == 'weight' }
+
+    # Allow attribute unit to change when there are no samples
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    assert c.allow_unit_change?(weight_attribute)
+    # nil (new form row) always allowed
+    assert c.allow_unit_change?(nil)
+    # unsaved attribute always allowed
+    new_attr = SampleAttribute.new
+    assert c.allow_unit_change?(new_attr)
+
+    # Adding samples that have no value for the weight attribute should still allow users to change the attribute's unit
+    sample_no_weight = Sample.new(sample_type: sample_type, projects: [project], contributor: person)
+    sample_no_weight.set_attribute_value('full name', 'Anakin Skywalker')
+    sample_no_weight.set_attribute_value(:age, 49)
+    sample_no_weight.save
+    assert sample_no_weight.valid?
+    assert_equal sample_type.samples.count, 1
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    assert c.allow_unit_change?(weight_attribute)
+
+    # Adding samples that do have a value for the weight attribute should prevent users to change the attribute's unit
+    sample_with_weight = Sample.new(sample_type: sample_type, projects: [project], contributor: person)
+    sample_with_weight.set_attribute_value('full name', 'Luke Skywalker')
+    sample_with_weight.set_attribute_value(:age, 25)
+    sample_with_weight.set_attribute_value(:weight, 75111.1)
+    sample_with_weight.save
+    assert sample_with_weight.valid?
+    assert_equal sample_type.samples.count, 2
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type)
+    refute c.allow_unit_change?(weight_attribute)
   end
 
   private
@@ -234,7 +320,7 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     sample_type
   end
 
-  def create_sample_type_from_template(template, project, person)
+  def create_sample_type_from_template(template, project, person, studies=[], assays=[])
     sample_attributes = template.template_attributes.map do |temp_attr|
       SampleAttribute.new(
         title: temp_attr.title,
@@ -255,7 +341,8 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
                       projects:[project],
                       contributor: person,
                       template_id: template.id,
-                      assays: [FactoryBot.build(:assay, contributor: person)],
+                      studies: studies,
+                      assays: assays,
                       sample_attributes: )
   end
 end

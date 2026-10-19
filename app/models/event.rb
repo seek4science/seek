@@ -4,6 +4,10 @@ class Event < ApplicationRecord
   has_and_belongs_to_many :presentations, -> { distinct }
   has_and_belongs_to_many :documents, -> { distinct }
 
+  # no presence validation so value can be nil (Not specified)
+  enum :location_type, { in_person: 0, hybrid: 1, online: 2 }
+  belongs_to :event_type, optional: true
+
   before_destroy {documents.clear}
 
   before_save :set_timezone
@@ -18,7 +22,7 @@ class Event < ApplicationRecord
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index: false) do
     text :address, :city, :country, :url
-  end if Seek::Config.solr_enabled
+  end
 
   acts_as_authorized
   acts_as_uniquely_identifiable
@@ -41,6 +45,7 @@ class Event < ApplicationRecord
   validates :country, country:true, allow_blank: true
 
   has_filter :country
+  has_filter :event_type
   has_filter start_date: Seek::Filtering::DateFilter.new(field: :start_date)
 
   validate :validate_data_files

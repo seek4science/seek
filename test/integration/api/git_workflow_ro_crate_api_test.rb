@@ -241,6 +241,35 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'can submit RO-Crate that adds a version to an existing remote workflow' do
+    workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+
+    assert_no_difference('Workflow.count') do
+      assert_difference('Git::Version.count', 1) do
+        post submit_workflows_path, params: {
+          ro_crate: fixture_file_upload('workflows/ro-crate-with-id.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          }
+        }, headers: { 'Authorization' => write_access_auth }
+
+        assert_response :success
+        assert_equal 'Galaxy', assigns(:workflow).workflow_class.title
+        assert_equal 'sort-and-change-case', assigns(:workflow).title
+        assert assigns(:workflow).git_version.total_size > 100
+        assert_equal 'sort-and-change-case.ga', assigns(:workflow).ro_crate.main_workflow.id
+        assert_equal '1.0.0', assigns(:workflow).git_version.name
+
+        workflow.reload
+        assert_equal 2, workflow.version
+        old_version = workflow.find_version(1)
+        new_version = workflow.git_version
+        assert new_version.file_exists?('sort-and-change-case.ga')
+        assert old_version.file_exists?('sort-and-change-case.ga')
+      end
+    end
+  end
+
   test 'duplicate version ignored when submitting RO-Crate' do
     workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
     disable_authorization_checks { workflow.git_version.update!(name: '1.0.0') }

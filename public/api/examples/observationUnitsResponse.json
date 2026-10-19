@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "29",
+      "id": "78",
       "type": "observation_units",
       "attributes": {
         "title": "Max observation unit"
       },
       "links": {
-        "self": "/observation_units/29"
+        "self": "/observation_units/78"
       }
     },
     {
-      "id": "28",
+      "id": "77",
       "type": "observation_units",
       "attributes": {
         "title": "A Minimal Observation Unit"
       },
       "links": {
-        "self": "/observation_units/28"
+        "self": "/observation_units/77"
       }
     }
   ],

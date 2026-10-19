@@ -24,6 +24,8 @@ require 'integration/api/read_api_test_suite'
 require 'integration/api/write_api_test_suite'
 require 'rdf_test_cases'
 require 'rack_test_cookie_jar_extensions'
+require 'single_page_test_utils'
+require 'jobs_dashboard_test_helper'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,
@@ -118,6 +120,7 @@ class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   include ActionMailer::TestHelper
 
+  fixtures :all
   setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
@@ -143,6 +146,18 @@ class ActiveSupport::TestCase
   def clear_rails_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
+  end
+
+  # Swaps Rails.logger for a Logger writing to a StringIO for the duration of the block, returning
+  # everything logged as a String.
+  def capture_log
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = original_logger
   end
 
   def clear_current_user
@@ -182,10 +197,6 @@ class ActiveSupport::TestCase
   self.use_instantiated_fixtures = false
 
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
-  #
-  # Note: You'll currently still have to declare fixtures explicitly in integration tests
-  # -- they do not yet inherit this setting
-  # fixtures :all
 
   set_fixture_class sop_versions: Sop::Version
   set_fixture_class model_versions: Model::Version
@@ -259,6 +270,15 @@ class ActiveSupport::TestCase
   def open_fixture_file(path)
     File.open(File.join(Rails.root, 'test', 'fixtures', 'files', *path.split('/')))
   end
+
+  def disable_std_output
+    @original_std_out = $stdout
+    $stdout = File.open(File::NULL, 'w')
+  end
+
+  def enable_std_output
+    $stdout = @original_std_out
+  end
 end
 
 # Load seed data
@@ -271,8 +291,11 @@ VCR.configure do |config|
   # ignore sparql requests, for some of the RDF integration tests
   # fixme: in the future it would be good to make the sparql data consistent enough to work with VCR
   config.ignore_request do |request|
-    request.uri =~ /sparql-auth/
+    request.uri =~ /sparql-auth/ || request.uri =~ /localhost:8890/
   end
+
+  # Disable VCR recording when running in CI to detect missing cassettes and avoid making live requests.
+  config.default_cassette_options = { record: ENV['CI'] ? :none : :once }
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time
@@ -280,6 +303,20 @@ WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line 
 # Clear testing filestore before test run (but check its under tmp for safety)
 if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
   FileUtils.rm_r(Seek::Config.filestore_path)
+end
+
+# Integration tests exercise the full stack, so they use the Redis-backed throttle store the app
+# actually runs with (the CI workflow provides a Redis server, which the session store needs
+# regardless). Unit and functional tests keep the in-memory store set up by the initializer.
+class ActionDispatch::IntegrationTest
+  setup do
+    @rack_attack_memory_store = Rack::Attack.cache.store
+    Rack::Attack.cache.store = Seek::RackAttackStore.build
+  end
+
+  teardown do
+    Rack::Attack.cache.store = @rack_attack_memory_store
+  end
 end
 
 class ActionController::TestCase

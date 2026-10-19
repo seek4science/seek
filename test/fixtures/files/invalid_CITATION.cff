@@ -1,0 +1,7 @@
+cff-version: 1.0.0
+message: "If you use this software, please cite it as below."
+authors:
+title: "My Workflow"
+version: 1.2.3
+date-released: 2021-02-13
+url: "https://example.com/fake-workflow"

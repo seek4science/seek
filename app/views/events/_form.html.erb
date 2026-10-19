@@ -1,4 +1,3 @@
-<% current_user_authorized_to_manage = @event.new_record?|| @event.can_manage? -%>
 <% default_time_zone = 'Etc/UTC' -%>
 
 <h1><%= @event.new_record? ? "New #{t('event')}" : ("Editing #{t('event')}: ".html_safe + link_to(@event.title, event_path(@event))) -%></h1>
@@ -21,22 +20,46 @@
 
       <div class="form-group">
         <div class="row">
-          <div class="col-md-8 col-xs-12">
-            <%= f.label :start_date, class: 'required' %>
-            <%= f.text_field :start_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+          <div class="col-md-6 col-xs-12">
+            <%= f.label :event_type_id, "#{t('event')} type" %>
+            <% event_type_options = EventType.order(:title).map do |et|
+              tooltip_attributes = et.description.present? ? { title: et.description } : {}
+              [et.title, et.id, tooltip_attributes]
+            end %>
+            <%= f.select :event_type_id,
+                         options_for_select(event_type_options, f.object.event_type_id),
+                         { include_blank: 'Not specified' },
+                         class: 'form-control' %>
           </div>
-          <div class="col-md-4 col-xs-12">
-            <%= f.label :time_zone %>
-            <%= f.select :time_zone, options_for_select(ActiveSupport::TimeZone.all.map { |z| [z.to_s, z.tzinfo.name] }, selected: f.object.time_zone || default_time_zone), {}, class: 'form-control' %>
+          <div class="col-md-6 col-xs-12">
+            <%= f.label :location_type, "Location type" %>
+            <%= f.select :location_type,
+                         Event.location_types.keys.map { |k| [k.humanize, k] },
+                         { include_blank: 'Not specified' },
+                         { class: 'form-control' } %>
           </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <div class="row">
-          <div class="col-md-8 col-xs-12">
-            <%= f.label :end_date %>
-            <%= f.text_field :end_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+      <div id="event-dates">
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-8 col-xs-12">
+              <%= f.label :start_date, class: 'required' %>
+              <%= f.text_field :start_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+            </div>
+            <div class="col-md-4 col-xs-12">
+              <%= f.label :time_zone %>
+              <%= f.select :time_zone, options_for_select(ActiveSupport::TimeZone.all.map { |z| [z.to_s, z.tzinfo.name] }, selected: f.object.time_zone || default_time_zone), {}, class: 'form-control' %>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-8 col-xs-12">
+              <%= f.label :end_date %>
+              <%= f.text_field :end_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+            </div>
           </div>
         </div>
       </div>

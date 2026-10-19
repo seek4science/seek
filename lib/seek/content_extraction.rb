@@ -82,7 +82,12 @@ module Seek
     end
 
     def extract_csv()
-      File.read(filepath)
+      content = File.read(filepath)
+      # Some CSV files are not UTF-8 (e.g. ISO-8859-1/Latin-1), which would cause
+      # CSV parsing to raise CSV::InvalidEncodingError. Fall back to interpreting
+      # the bytes as ISO-8859-1 and transcode to UTF-8 when they aren't valid UTF-8.
+      content = content.encode('UTF-8', 'ISO-8859-1') unless content.valid_encoding?
+      content
     end
 
     def to_spreadsheet_xml

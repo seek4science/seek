@@ -1,6 +1,6 @@
 name: BioModels Database
 adaptor_class_name: Seek::BiomodelsSearch::SearchBiomodelsAdaptor
+key: biomodels
 search_type: models
-enabled: true
 legal: "Please retain original author attributes"
 partial_path: "search/partials/biomodels_resource_list_item"

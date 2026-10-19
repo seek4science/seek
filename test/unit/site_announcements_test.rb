@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SiteAnnouncementsTest < ActiveSupport::TestCase
-  fixtures :site_announcements
 
   test 'using fixtures' do
     assert_not_nil SiteAnnouncement.first

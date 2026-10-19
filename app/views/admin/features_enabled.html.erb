@@ -3,8 +3,11 @@
 <%= form_tag({ action: 'update_features_enabled' }, multipart: true) do -%>
   <h2>SEEK services</h2>
   <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
-                             "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.") %>
-
+                             "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.",
+                             onchange: toggle_appear_javascript('external-search-details')) %>
+  <div id="external-search-details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.solr_enabled -%>">
+    <%= external_search_adaptor_settings %>
+  </div>
   <%= admin_checkbox_setting(:filtering_enabled, 1, Seek::Config.filtering_enabled,
                              "Filtering enabled", "Whether filtering system is enabled on index pages.",
                              onchange: toggle_appear_javascript('filtering_details')) %>

@@ -4,14 +4,16 @@ require 'uri'
 
 module Seek
   class Citations
-    DEFAULT = 'apa' # This could be a setting one day
-
     def self.from_doi(doi, style)
-      generate(doi_to_csl(doi), style)
+      validate_style(style)
+      csl = doi_to_csl(doi)
+      generate(csl, style)
     end
 
     def self.from_cff(blob, style)
-      generate(cff_to_csl(blob), style)
+      validate_style(style)
+      csl = cff_to_csl(blob)
+      generate(csl, style)
     end
 
     def self.generate(csl, style)
@@ -26,6 +28,10 @@ module Seek
       end
     end
 
+    def self.valid_styles
+      @valid_styles ||= Set.new(style_pairs.map(&:last))
+    end
+
     def self.doi_to_csl(doi)
       Rails.cache.fetch("citation-#{doi}") do
         resp = RestClient.get("https://doi.org/#{Addressable::URI.escape(doi)}", accept: 'application/vnd.citationstyles.csl+json')
@@ -36,6 +42,7 @@ module Seek
     def self.cff_to_csl(blob)
       Rails.cache.fetch("citation-cff-#{blob.cache_key}") do
         cff = ::CFF::File.read(blob.file)
+        cff.validate!(fail_on_filename: false)
         BibTeX.parse(cff.to_bibtex).to_citeproc.first
       end
     end
@@ -46,6 +53,16 @@ module Seek
 
     def self.style_dictionary_path
       Rails.root.join('config/default_data/csl_styles.yml')
+    end
+
+    def self.valid_style?(style)
+      valid_styles.include?(style)
+    end
+
+    private
+
+    def self.validate_style(style)
+      raise Seek::Citations::InvalidStyleException unless valid_style?(style)
     end
   end
 end

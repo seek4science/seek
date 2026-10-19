@@ -14,6 +14,10 @@ $j(document).ready(function () {
 
         // Tabs
         var activateTab = function (id) {
+            // only continue if the tab to activate exists
+            if ($j('[data-role="seek-upload-field-tab"][data-tab-target="' + id + '"]', field).length === 0) {
+                return;
+            }
             $j('[data-role="seek-upload-field-tab"]', field).closest('li').removeClass('active');
             $j('[data-role="seek-upload-field-tab"][data-tab-target="' + id + '"]', field).closest('li').addClass('active');
             $j('[data-role="seek-upload-field-tab-pane"]', field).removeClass('active');
@@ -32,7 +36,7 @@ $j(document).ready(function () {
         // Local file
         var addLocalFile = function () {
             var newField = HandlebarsTemplates['upload/file_field']();
-            $j(this).parent().append(newField);
+            $j(this).parent().append($j(newField).addClass('hide-no-file-text'));
             var filename = this.value.split(/\\/)[this.value.split(/\\/).length - 1];
             var listItem = $j(HandlebarsTemplates['upload/local_file']({ text: filename }));
             pending.append(listItem);
@@ -40,6 +44,12 @@ $j(document).ready(function () {
         };
 
         field.on('change', 'input[type=file][data-batch-upload=true]', addLocalFile);
+
+        // When existing files are already listed (e.g. after a validation error re-render),
+        // hide the "No file chosen" text beside the file input since files are already shown.
+        if (pending.children().length > 0) {
+            $j('input[type=file][data-batch-upload=true]', field).first().addClass('hide-no-file-text');
+        }
 
         // Remote file
         var addRemoteFile = function () {
@@ -69,6 +79,7 @@ $j(document).ready(function () {
                 filenameInput.val('');
                 $j('[data-role="seek-url-checker-msg-success"]', field).hide();
                 $j('[data-role="seek-url-checker-msg-too-big"]', field).hide();
+                $j('[data-role="seek-url-checker-msg-blocked-uploads"]', field).hide();
                 $j('[role="seek-url-checker-remind-to-add-file"]',field).hide();
                 pending.append(HandlebarsTemplates['upload/remote_file'](remoteFile));
             }
@@ -85,20 +96,22 @@ $j(document).ready(function () {
 
     // Code for checking URL and showing preview
     $j('[data-role="seek-url-checker"]').each(function () {
-        var checker = $j(this);
-        var field = checker.parents('[data-role="seek-upload-field"]');
-        var input = $j('input', checker);
-        var btn = $j('a.btn', checker);
-        var url = checker.data('path');
-        var result = field.find('[data-role="seek-url-checker-result"]');
-        var copyDialog = $j('[data-role="seek-url-checker-msg-success"]', field);
-        var tooBig = $j('[data-role="seek-url-checker-msg-too-big"]', field);
-        var addReminder = $j('[role="seek-url-checker-remind-to-add-file"]',field);
+        const checker = $j(this);
+        const field = checker.parents('[data-role="seek-upload-field"]');
+        const input = $j('input', checker);
+        const btn = $j('a.btn', checker);
+        const url = checker.data('path');
+        const result = field.find('[data-role="seek-url-checker-result"]');
+        const copyDialog = $j('[data-role="seek-url-checker-msg-success"]', field);
+        const tooBigDialog = $j('[data-role="seek-url-checker-msg-too-big"]', field);
+        const blockedUploadsDialog = $j('[data-role="seek-url-checker-msg-blocked-uploads"]', field);
+        const addReminder = $j('[role="seek-url-checker-remind-to-add-file"]',field);
 
         var submitUrl = function () {
             result.html('').spinner('add');
             copyDialog.hide();
-            tooBig.hide();
+            tooBigDialog.hide();
+            blockedUploadsDialog.hide();
             $j.ajax({
                 url: url,
                 method: 'POST',
@@ -114,8 +127,11 @@ $j(document).ready(function () {
                     if (info.allow_copy) {
                         copyDialog.show();
                         addReminder.show();
+                    }
+                    else if (info.blocked_file_uploads) {
+                        blockedUploadsDialog.show();
                     } else {
-                        tooBig.show();
+                        tooBigDialog.show();
                     }
                 }
                 lastTestedUrl = input.val();
@@ -143,7 +159,7 @@ $j(document).ready(function () {
                 if (lastTestedUrl !== input.val()) { // Prevent double query, 1 from keypress and 1 from text box losing focus.
                     submitUrl();
                 }
-            }, 100);
+            }, 700);
             return true;
         });
 

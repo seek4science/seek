@@ -37,9 +37,9 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
     refute cm.valid?
     cm.set_attribute_value('age', '78')
     assert cm.valid?
-    cm.set_attribute_value('date', 'not a date')
+    cm.set_attribute_value('datetime', 'not a date')
     refute cm.valid?
-    cm.set_attribute_value('date', Time.now.to_s)
+    cm.set_attribute_value('datetime', Time.now.to_s)
     assert cm.valid?
   end
 
@@ -47,16 +47,16 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
     cm = simple_test_object
     date = Time.now.to_s
     refute cm.valid?
-    cm.update(data: { name: 'Fred', age: 25, date: date })
+    cm.update(data: { name: 'Fred', age: 25, datetime: date })
     assert cm.valid?
     assert_equal 'Fred', cm.get_attribute_value('name')
     assert_equal 25, cm.get_attribute_value('age')
-    assert_equal date, cm.get_attribute_value('date')
+    assert_equal date, cm.get_attribute_value('datetime')
 
     # also handles symbols
     assert_equal 'Fred', cm.get_attribute_value(:name)
     assert_equal 25, cm.get_attribute_value(:age)
-    assert_equal date, cm.get_attribute_value(:date)
+    assert_equal date, cm.get_attribute_value(:datetime)
   end
 
   test 'mass assign attribute with linked extended metadata' do
@@ -161,7 +161,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
                         contributor: contributor,
                         extended_metadata: ExtendedMetadata.new(
                           extended_metadata_type: metadata_type,
-                          data: { name: 'Fred', age: 25, date: date }
+                          data: { name: 'Fred', age: 25, datetime: date }
                         ))
       assert study.valid?
       study.save!
@@ -171,7 +171,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
       assert_equal 'test study', study.title
       assert_equal 'Fred', study.extended_metadata.get_attribute_value(:name)
       assert_equal 25, study.extended_metadata.get_attribute_value(:age)
-      assert_equal date, study.extended_metadata.get_attribute_value(:date)
+      assert_equal date, study.extended_metadata.get_attribute_value(:datetime)
 
       ## constructed in 2 steps
 
@@ -180,7 +180,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
                          contributor: contributor)
       study2.extended_metadata = ExtendedMetadata.new(
         extended_metadata_type: metadata_type,
-        data: { name: 'Fred', age: 25, date: date }
+        data: { name: 'Fred', age: 25, datetime: date }
       )
 
       assert study2.valid?
@@ -191,7 +191,7 @@ class ExtendedMetadataTest < ActiveSupport::TestCase
       assert_equal 'test study 2', study2.title
       assert_equal 'Fred', study2.extended_metadata.get_attribute_value(:name)
       assert_equal 25, study2.extended_metadata.get_attribute_value(:age)
-      assert_equal date, study2.extended_metadata.get_attribute_value(:date)
+      assert_equal date, study2.extended_metadata.get_attribute_value(:datetime)
     end
   end
 

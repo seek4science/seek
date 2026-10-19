@@ -13,8 +13,13 @@ end
 module SEEK
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.2
+    config.load_defaults 8.1
     config.active_record.default_column_serializer = YAML
+
+    # Active Storage is unused, but its variant processor is resolved on boot and
+    # logs a warning unless the image_processing gem is present.
+    config.active_storage.variant_processor = :disabled
+
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
@@ -61,6 +66,9 @@ module SEEK
 
     config.exceptions_app = self.routes
 
+    # Governs to_json, used by the views that inline JSON into a <script> block.
+    # Responses from `render json:` are separately governed by
+    # action_controller.escape_json_responses, which is false.
     config.active_support.escape_html_entities_in_json = true
 
     #uncomment and set the value if running under a suburi or use RAILS_RELATIVE_URL_ROOT
@@ -75,7 +83,7 @@ module SEEK
 
     config.action_mailer.deliver_later_queue_name = 'mailers'
 
-    config.active_job.queue_adapter = :delayed_job
+    config.active_job.queue_adapter = :solid_queue
 
     # Revert Rails 7 change that auto loads nested locale files
     initializer :avoid_nested_locale_directories, before: :add_locales do

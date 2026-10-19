@@ -4,7 +4,6 @@ require 'minitest/mock'
 class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
 
-  fixtures :users, :people
 
   test 'should not work if disabled' do
     with_config_value(:ga4gh_trs_api_enabled, false) do

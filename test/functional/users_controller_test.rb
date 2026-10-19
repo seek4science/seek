@@ -5,7 +5,6 @@ class UsersControllerTest < ActionController::TestCase
   # Then, you can remove it from this and the units test.
   include AuthenticatedTestHelper
 
-  fixtures :all
 
   def test_title
     get :new
@@ -360,7 +359,7 @@ class UsersControllerTest < ActionController::TestCase
                          omniauth_oidc_enabled: true) do
         get :new
         assert_response :success
-        assert_select 'div#register-terms-and-conds input#tc_agree[type=checkbox]', count: 1
+        assert_select 'div.register-terms-and-conds input[name=tc_agree][type=checkbox]', count: 5
         assert_select 'form.new_user input.btn[type=submit][disabled]', count: 1
         assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 0
         # all the buttons, including 3rd party auth
@@ -380,7 +379,7 @@ class UsersControllerTest < ActionController::TestCase
                          omniauth_oidc_enabled: true) do
         get :new
         assert_response :success
-        assert_select 'div#register-terms-and-conds input#tc_agree[type=checkbox]', count: 0
+        assert_select 'div.register-terms-and-conds input[name=tc_agree][type=checkbox]', count: 0
         assert_select 'form.new_user input.btn[type=submit][disabled]', count: 0
         assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 1
         # all the buttons, including 3rd party auth
@@ -398,7 +397,7 @@ class UsersControllerTest < ActionController::TestCase
                          omniauth_oidc_enabled: true) do
         get :new
         assert_response :success
-        assert_select 'div#register-terms-and-conds input#tc_agree[type=checkbox]', count: 0
+        assert_select 'div.register-terms-and-conds input[name=tc_agree][type=checkbox]', count: 0
         assert_select 'form.new_user input.btn[type=submit][disabled]', count: 0
         assert_select 'form.new_user input.btn[type=submit]:not([disabled])', count: 1
         # all the buttons, including 3rd party auth
@@ -503,6 +502,118 @@ class UsersControllerTest < ActionController::TestCase
         get :new
         assert_response :success
         assert_select '#oidc_registration a', 1
+      end
+    end
+  end
+
+  test 'should hide standard login if disabled' do
+    with_config_values(standard_login_enabled: true, omniauth_enabled: false,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: false) do
+
+
+      # enabled, with no omniauth options
+      get :new
+      assert_response :success
+      assert_select 'div.tab-content div#password_registration'
+
+      # still shown without omniauth enabled
+      with_config_value(:omniauth_enabled, false) do
+        with_config_value(:omniauth_ldap_enabled, false) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'div.tab-content div#password_registration'
+          end
+        end
+      end
+      # still shown with omniauth enabled but no auth options setup
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, false) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'div.tab-content div#password_registration'
+          end
+        end
+      end
+
+      # hidden when disabled and with omniauth options (first check if shown with tab when enabled)
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, true) do
+            get :new
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]', '#password_registration'
+            assert_select 'div.tab-content div#password_registration'
+          end
+        end
+      end
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]', '#password_registration', count: 0
+            assert_select 'div.tab-content div#password_registration', count: 0
+          end
+        end
+      end
+
+      # force display with special flag
+      with_config_value(:omniauth_enabled, true) do
+        with_config_value(:omniauth_ldap_enabled, true) do
+          with_config_value(:standard_login_enabled, false) do
+            get :new, params: { show_standard_login: true }
+            assert_response :success
+            assert_select 'ul.nav-tabs a[href=?]', '#password_registration'
+            assert_select 'div.tab-content div#password_registration'
+          end
+        end
+      end
+    end
+  end
+
+  test 'should not register when registration is disabled' do
+    with_config_value(:registration_disabled, true) do
+      assert_no_difference('User.count') do
+        create_user
+      end
+      assert_redirected_to root_path
+      assert_equal Seek::Config.registration_disabled_description, flash[:error]
+    end
+  end
+
+  test 'should hide the register link when registration is disabled' do
+    get :new
+    assert_response :success
+    assert_select 'a[href=?]', signup_path
+
+    with_config_value(:registration_disabled, true) do
+      get :new
+      assert_response :success
+      assert_select 'a[href=?]', signup_path, count: 0
+      assert_select '#home_description', 1
+    end
+  end
+
+  # unlike logging in, registering is never sent straight to the provider - the terms and
+  # conditions have to be accepted first, and they are only presented on this page
+  test 'should not skip the registration page when there is a single omniauth provider' do
+    with_config_values(standard_login_enabled: false, omniauth_enabled: true,
+                       omniauth_ldap_enabled: false, omniauth_github_enabled: false,
+                       omniauth_elixir_aai_enabled: false, omniauth_oidc_enabled: true) do
+      get :new
+      assert_response :success
+      assert_select 'form#auto-login-form', count: 0
+      assert_select '#login-panel', 1
+      assert_select '#oidc_registration a[name=?]', 'commit', 1
+
+      with_config_value(:terms_enabled, true) do
+        get :new
+        assert_response :success
+        assert_select 'form#auto-login-form', count: 0
+        assert_select '#oidc_registration input[name=?]', 'tc_agree', 1
       end
     end
   end

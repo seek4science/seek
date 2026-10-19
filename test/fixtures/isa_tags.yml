@@ -28,3 +28,6 @@ data_file_comment_isa_tag:
 
 parameter_value_isa_tag:
   title: parameter_value
+
+input_isa_tag:
+  title: input

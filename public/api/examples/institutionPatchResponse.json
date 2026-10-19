@@ -1,11 +1,9 @@
 {
   "data": {
-    "id": "980192435",
+    "id": "980207537",
     "type": "institutions",
     "attributes": {
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "avatar": null,
       "title": "University of Manchester",
       "department": null,
@@ -18,25 +16,21 @@
     },
     "relationships": {
       "people": {
-        "data": [
-
-        ]
+        "data": []
       },
       "projects": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/institutions/980192435"
+      "self": "/institutions/980207537"
     },
     "meta": {
-      "created": "2025-05-12T10:01:49.310Z",
-      "modified": "2025-05-12T10:01:49.326Z",
+      "created": "2026-08-27T08:46:04.044Z",
+      "modified": "2026-08-27T08:46:04.098Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "0b6c3040-1146-013e-72d8-7efdca78d793"
+      "uuid": "998dc956-47e9-43de-a57f-6e87f78caeeb"
     }
   },
   "jsonapi": {

@@ -1,8 +1,19 @@
 # Be sure to restart your server when you modify this file.
 
-# Use the database for sessions instead of the cookie-based default,
-# which shouldn't be used to store highly confidential information
-# (create the session table with "rails generate session_migration")
-# FIXME: Use Seek::Config.session_store_timeout somehow
-SEEK::Application.config.session_store(:active_record_store, key: '_seek_session',
-                                       expire_after: 30.minutes, same_site: :lax)
+require_relative '../../lib/seek/redis_config'
+
+# The session namespace lives on the same DB as the cache (Seek::RedisConfig.url), under the
+# /session path, so cache and sessions share one authenticated connection URL.
+session_url = "#{Seek::RedisConfig.url}/session"
+
+session_options = {
+  servers: [session_url],
+  expire_after: 30.minutes,
+  key: '_seek_session',
+  threadsafe: true,
+  same_site: :lax,
+  httponly: true
+}
+
+# Define the redis session store
+SEEK::Application.config.session_store(:redis_store, **session_options)

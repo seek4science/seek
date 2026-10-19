@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "103",
+    "id": "179",
     "type": "presentations",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "2775",
+              "id": "1022266083",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximal Presentation",
       "license": "CC-BY-4.0",
       "description": "This is the description",
@@ -30,13 +28,15 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/presentations/103?version=1"
+          "url": "http://localhost:3000/presentations/179?version=1",
+          "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2024-11-20T10:17:33.000Z",
-      "updated_at": "2024-11-20T10:17:33.000Z",
+      "created_at": "2026-08-27T08:43:32.503Z",
+      "updated_at": "2026-08-27T08:43:32.503Z",
+      "doi": null,
       "content_blobs": [
         {
           "original_filename": "a_pdf_file.pdf",
@@ -44,16 +44,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/presentations/103/content_blobs/790",
+          "link": "http://localhost:3000/presentations/179/content_blobs/1050456393",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/2891",
+          "profile": "/people/1040001999",
           "family_name": "Last",
-          "given_name": "Person2416",
-          "affiliation": "An Institution: 2938",
+          "given_name": "Person2430",
+          "affiliation": "An Institution: 2832",
           "orcid": null
         }
       ],
@@ -63,7 +63,7 @@
       "creators": {
         "data": [
           {
-            "id": "2891",
+            "id": "1040001999",
             "type": "people"
           }
         ]
@@ -71,7 +71,7 @@
       "submitter": {
         "data": [
           {
-            "id": "2889",
+            "id": "1040001997",
             "type": "people"
           }
         ]
@@ -79,11 +79,11 @@
       "people": {
         "data": [
           {
-            "id": "2889",
+            "id": "1040001997",
             "type": "people"
           },
           {
-            "id": "2891",
+            "id": "1040001999",
             "type": "people"
           }
         ]
@@ -91,30 +91,24 @@
       "projects": {
         "data": [
           {
-            "id": "2775",
+            "id": "1022266083",
             "type": "projects"
           }
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
         "data": [
           {
-            "id": "178",
+            "id": "321",
             "type": "publications"
           }
         ]
@@ -122,7 +116,7 @@
       "events": {
         "data": [
           {
-            "id": "135",
+            "id": "1025618797",
             "type": "events"
           }
         ]
@@ -130,21 +124,25 @@
       "workflows": {
         "data": [
           {
-            "id": "157",
+            "id": "1437",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/presentations/103?version=1"
+      "self": "/presentations/179?version=1"
     },
     "meta": {
-      "created": "2024-11-20T10:17:33.000Z",
-      "modified": "2024-11-20T10:17:33.000Z",
+      "created": "2026-08-27T08:43:32.473Z",
+      "modified": "2026-08-27T08:43:32.503Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "947a6640-8956-013d-24a2-0a81884ed284"
+      "uuid": "fb17f22d-9fc9-4a09-9d49-532466d7cd04",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

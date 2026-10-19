@@ -1,0 +1,127 @@
+{
+  "data": {
+    "id": "120",
+    "type": "isa_assays",
+    "attributes": {
+      "assay": {
+        "id": "120",
+        "title": "A Material ISA Assay",
+        "description": "An ISA assay measuring other material outputs",
+        "other_creators": null,
+        "position": 1,
+        "study_id": "2",
+        "assay_class": {
+          "title": "Experimental assay",
+          "key": "EXP"
+        },
+        "assay_type": {
+          "label": "Experimental assay type",
+          "uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+        },
+        "technology_type": {
+          "label": "Technology type",
+          "uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
+        }
+      },
+      "sample_type": {
+        "id": "122",
+        "title": "Material Assay Output",
+        "description": "Output sample type for the material assay",
+        "template_id": "3",
+        "sample_attributes": [
+          {
+            "id": "310",
+            "title": "Input (Sample Name)",
+            "pos": 1,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": "11",
+            "template_attribute_id": "6",
+            "sample_attribute_type": {
+              "id": "13",
+              "title": "SEEK Sample Multi"
+            },
+            "linked_sample_type_id": "121",
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "311",
+            "title": "Other Material Name",
+            "pos": 2,
+            "required": true,
+            "is_title": true,
+            "isa_tag_id": "6",
+            "template_attribute_id": "7",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "312",
+            "title": "Processing Protocol",
+            "pos": 3,
+            "required": true,
+            "is_title": false,
+            "isa_tag_id": "5",
+            "template_attribute_id": "8",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          },
+          {
+            "id": "313",
+            "title": "Material Characteristic",
+            "pos": 4,
+            "required": false,
+            "is_title": false,
+            "isa_tag_id": "7",
+            "template_attribute_id": "9",
+            "sample_attribute_type": {
+              "id": "9",
+              "title": "String"
+            },
+            "linked_sample_type_id": null,
+            "unit": null,
+            "description": null,
+            "pid": null
+          }
+        ],
+        "samples": [
+          {
+            "id": "4",
+            "title": "Extract 1",
+            "data": {
+              "Input (Sample Name)": [{ "id": "3", "title": "Sample 1" }],
+              "Other Material Name": "Extract 1",
+              "Processing Protocol": "Extraction protocol B",
+              "Material Characteristic": "leaf tissue"
+            }
+          }
+        ]
+      },
+      "input_sample_type_id": "121"
+    },
+    "meta": {
+      "created": "2026-03-19T16:37:56.251Z",
+      "modified": "2026-03-19T16:37:56.300Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "e811ef40-05df-013f-f2a8-00155d52079b"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -239,7 +239,7 @@ class NelsControllerTest < ActionController::TestCase
   end
 
   test 'fetch file valid key' do
-    key = UUID.generate
+    key = SecureRandom.uuid
     path = "/tmp/nels-download-#{key}"
     file = File.new(path, 'wb')
     file.write('wibble')
@@ -253,7 +253,7 @@ class NelsControllerTest < ActionController::TestCase
   end
 
   test 'fetch file missing file' do
-    key = UUID.generate
+    key = SecureRandom.uuid
 
     assert_raises Nels::Rest::Client::FetchFileError, match: /temp copy of file doesnt exist/ do
       get :fetch_file, params: {filename:'wibble.txt', file_key: key}

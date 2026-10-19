@@ -73,6 +73,9 @@ class CopasiTest < ActionController::TestCase
       assert_select 'h1', text: /#{model.title} - Copasi Model Simulation/
       assert_select 'a[onclick="simulate()"]', text: 'Simulate Online'
 
+      # the copasi/plotly bundle is loaded here, and only here - see copasi/index.js
+      assert_select 'script[src*=?]', 'copasi/index', count: 1
+
       expected_href = "copasi://process?downloadUrl=http://#{request.host_with_port}/models/#{model.id}/content_blobs/#{model.content_blobs.first.id}/download&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
       assert_select 'a[href=?]', expected_href, text: 'Simulate in CopasiUI'
     end
@@ -154,34 +157,23 @@ class CopasiTest < ActionController::TestCase
     with_config_value(:copasi_enabled, true) do
       model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
 
+      FactoryBot.create(:model_version_with_blob, model: model,
+                        content_blobs: [FactoryBot.create(:teusink_model_content_blob)])
+      little_blob = FactoryBot.create(:little_file_content_blob)
+      FactoryBot.create(:model_version_with_blob, model: model, content_blobs: [little_blob])
+
       get :copasi_simulate, params: { id: model.id, version: 1 }
       assert_response :success
       assert_select 'div.version', text:/Version 1/
-
-
-      assert_difference('Model::Version.count', 1) do
-        post :create_version, params: { id: model, model: { title: model.title },
-                                        content_blobs:[{ data: fixture_file_upload('Teusink.xml') }],
-                                        revision_comments: 'This is a new revision'}
-
-        assert_redirected_to model_path(assigns(:model))
-      end
 
       get :copasi_simulate, params: { id: model.id, version: 2 }
       assert_response :success
       assert_select 'div.version', text:/Version 2/
 
-      assert_difference('Model::Version.count', 1) do
-        post :create_version, params: { id: model, model: { title: model.title },
-                                        content_blobs:[{ data: fixture_file_upload('little_file.txt') }],
-                                        revision_comments: 'This is a new revision'}
-
-        get :copasi_simulate, params: { id: model.id, version: 3 }
-        assert_response :success
-        assert_select 'div.version', text:/Version 3/
-        assert_select 'div#error_flash', text:/The selected version does not contain a format supported by COPASI./
-
-      end
+      get :copasi_simulate, params: { id: model.id, version: 3 }
+      assert_response :success
+      assert_select 'div.version', text:/Version 3/
+      assert_select 'div#error_flash', text:/The selected version does not contain a format supported by COPASI./
     end
   end
 
@@ -208,6 +200,22 @@ class CopasiTest < ActionController::TestCase
       assert_select 'strong', text: /Downloads/, count: 1
       assert_select 'strong', text: /Runs:/, count: 0
     end
+  end
+
+  test 'copasi bundle is not loaded outside the simulation page' do
+    with_config_value(:copasi_enabled, true) do
+      model = FactoryBot.create(:copasi_model, policy: FactoryBot.create(:public_policy))
+      get :show, params: { id: model }
+      assert_response :success
+      assert_select 'script[src*=?]', 'copasi/index', count: 0
+    end
+  end
+
+  # copasijs.js is ~9.4MB, so it must never go back into the global bundle
+  test 'copasi and plotly are not required by application.js' do
+    source = File.read(Rails.root.join('app', 'assets', 'javascripts', 'application.js'))
+    refute_match(%r{^\s*//=\s*require\s+copasi/}, source)
+    refute_match(/^\s*\/\/=\s*require\s+plotly/, source)
   end
 
 end

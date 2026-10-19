@@ -32,6 +32,13 @@ function validateUploadFormFields(resourceName=null, parentId=null) {
     }
 
     var hasFiles = files.toArray().some(function (f) { return f.value }); // Count non-blank file fields
+
+    // Also count retained blobs from a previous upload attempt (shown after a validation error)
+    if (!hasFiles) {
+        const retainedSelector = 'input[name="retained_content_blob_ids[]"]';
+        const retained = parentId ? $j(`#${parentId} ${retainedSelector}`) : $j(retainedSelector);
+        hasFiles = retained.toArray().some(function (f) { return f.value; });
+    }
     var valid = true;
 
     if ($j('#model_image_image_file').length) { // If it's a model...
