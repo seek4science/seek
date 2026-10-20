@@ -74,10 +74,11 @@ module Git
         oid == other.oid
     end
 
-    def to_crate_entity(crate, type: ::ROCrate::File, properties: {})
+    def to_crate_entity(crate, type: ::ROCrate::File, content_url: nil, properties: {})
       type.new(crate, self, path).tap do |entity|
         entity['url'] = url if url.present?
         entity['contentSize'] = size
+        entity['contentUrl'] = content_url if content_url.present?
         entity.properties = entity.raw_properties.merge(properties)
       end
     end
