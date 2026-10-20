@@ -10,7 +10,10 @@ module Seek
     class Discovery
       class Error < StandardError; end
 
-      JWKS_CACHE_TTL = 12.hours
+      # Caps how long a signing key the provider has withdrawn stays trusted here. A refetch is
+      # triggered by a token naming a key the set does not hold, which covers a key being added
+      # but never one being removed, so this expiry is the only thing that retires it.
+      JWKS_CACHE_TTL = 1.hour
       DISCOVERY_CACHE_TTL = 1.hour
       REFRESH_COOLDOWN = 5.minutes
       PROVIDER_UNAVAILABLE_TTL = 1.minute
@@ -84,7 +87,7 @@ module Seek
       end
 
       # Read before being handed back to be cached for JWKS_CACHE_TTL, so that a response which is
-      # not a key set is never stored, failing identically for half a day.
+      # not a key set is never stored, failing identically until it expires.
       def fetch_jwks_json
         body = BoundedFetch.get(jwks_uri)
         parse(body)

@@ -64,7 +64,7 @@ sequenceDiagram
     SEEK->>SEEK: plausible_jwt?, two dots and under 8 KB
     SEEK->>C: Key set for this issuer
     alt Warm, the ordinary case
-        C-->>SEEK: JWKS, held 12 hours
+        C-->>SEEK: JWKS, held 1 hour
     else Cold, or an unnamed kid, at most once every 5 minutes
         SEEK->>KC: GET /.well-known/openid-configuration
         KC-->>SEEK: jwks_uri, held 1 hour
@@ -129,7 +129,7 @@ that adding a second provider later needs no change here:
 
 | Cached | TTL |
 | --- | --- |
-| The key set, as raw JSON | 12 hours |
+| The key set, as raw JSON | 1 hour |
 | `jwks_uri` from the discovery document | 1 hour |
 | Key-rotation refresh cooldown | 5 minutes |
 | "Provider unreachable" marker | 1 minute |
@@ -347,7 +347,7 @@ Key rotation still has to work, so an unrecognised key id does trigger a refetch
 once every five minutes across the whole deployment, guarded by a cache write with
 `unless_exist: true`. That becomes Redis `SET NX`, a single atomic operation, so the bound holds
 across every worker rather than merely within one process. A genuine rotation is picked up
-within five minutes instead of twelve hours; a million invented key ids cost one request.
+within five minutes instead of an hour; a million invented key ids cost one request.
 
 Separately, a provider that cannot be reached is remembered for a minute. `Rails.cache.fetch`
 does not cache exceptions, so without this an outage would cost a fresh connection attempt, and
@@ -386,10 +386,10 @@ The key set is built one key at a time. `JWT::JWK.create_from` raises for a key 
 cannot represent — anything but RSA, EC and `oct` — and building the set in one call would
 discard every usable key alongside it. Providers do publish mixed sets, an EdDSA key next to RSA
 ones being the common case, and the failure would be both sticky and misleading: the valid JSON
-stays cached for twelve hours while the error reads as the provider being unavailable. A key
+stays cached for an hour while the error reads as the provider being unavailable. A key
 that cannot be built is logged and skipped. For the same reason the body is read as a key set
 before it is cached at all, so a response that is not one is never stored to fail identically
-for half a day.
+until it expires.
 
 ### Never raising
 
