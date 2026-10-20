@@ -255,15 +255,15 @@ module WorkflowExtraction
     Seek::Util.routes.polymorphic_url(resource, version: version)
   end
 
-  def main_workflow_url
+  def content_url(blob)
     return unless is_git_versioned?
 
-    return unless main_workflow_blob
+    return unless blob
 
-    return main_workflow_blob.url if main_workflow_blob.remote? && main_workflow_blob.fetched?
+    return blob.url if blob.remote? && blob.fetched?
 
     resource = is_a_version? ? parent : self
-    Seek::Util.routes.polymorphic_url([resource, :git_download], version: version, path: main_workflow_blob.path)
+    Seek::Util.routes.polymorphic_url([resource, :git_download], version: version, path: blob.path)
   end
 
   [:main_workflow, :diagram, :abstract_cwl].each do |type|
