@@ -1,0 +1,14 @@
+config:
+  aws:region: eu-west-2
+  aws:defaultTags:
+    tags:
+      Environment: staging
+      ManagedBy: pulumi
+  biofair-mc-workflow-hub-data:environment: staging
+  biofair-mc-workflow-hub-data:vpcCidr: 10.30.0.0/16
+  # Staging is for trials: let `pulumi destroy` delete the data outright.
+  biofair-mc-workflow-hub-data:protectData: "false"
+  biofair-mc-workflow-hub-data:dbInstanceClass: db.t3.medium
+  biofair-mc-workflow-hub-data:dbAllocatedStorage: "100"
+  biofair-mc-workflow-hub-data:dbDeletionProtection: "false"
+  biofair-mc-workflow-hub-data:dbSkipFinalSnapshot: "true"

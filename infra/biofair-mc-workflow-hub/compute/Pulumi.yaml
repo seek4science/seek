@@ -1,21 +1,19 @@
-name: biofair-mc-workflow-hub
+name: biofair-mc-workflow-hub-compute
 runtime: yaml
 description: >-
   AWS infrastructure for the WorkflowHub (SEEK) component of the BioFAIR
-  Methods Commons Spoke, in the biofair-mc-workflow-hub account. Phase 1:
-  front-end and workers as Docker containers on EC2 Auto Scaling groups,
-  MySQL on RDS, Redis on ElastiCache, filestore on EFS, and Solr on its own
-  EC2 instance, served over HTTPS with a self-signed certificate at the load
-  balancer's own hostname. Creates no IAM resources.
+  Methods Commons Spoke, in the biofair-mc-workflow-hub account: the
+  disposable compute stack, on top of the data stack (../data). The NAT
+  gateway, Redis on ElastiCache, Solr on its own EC2 instance, and the
+  front-end and workers as Docker containers on EC2 Auto Scaling groups
+  behind a load balancer serving HTTPS with a self-signed certificate.
+  Destroying it leaves the database, filestore and Solr index untouched.
+  Creates no IAM resources.
 
-# See README.md for deploying it.
+# See ../README.md for deploying it. Deploy the data stack first, and destroy
+# this stack before it.
 
 config:
-  # Environment name (staging, production), used in resource names.
-  environment:
-    type: string
-  vpcCidr:
-    type: string
   # Existing SSM-only instance profile, looked up rather than created.
   ssmInstanceProfileName:
     type: string
@@ -50,38 +48,41 @@ config:
   workerInstanceType:
     type: string
     default: t3.large
-  # db.t4g classes are not offered in eu-west-2a/2b, the VPC's zones.
-  dbInstanceClass:
-    type: string
-    default: db.t3.medium
-  dbAllocatedStorage:
-    type: integer
-    default: 100
-  # Protect the database from deletion, and snapshot it when it is deleted.
-  # Turn both off for throwaway trials so `pulumi destroy` completes.
-  dbDeletionProtection:
-    type: boolean
-    default: true
-  dbSkipFinalSnapshot:
-    type: boolean
-    default: false
   redisNodeType:
     type: string
     default: cache.t4g.small
   solrInstanceType:
     type: string
     default: t3.medium
-  # Size of the volume holding the Solr index.
-  solrDataSizeGb:
-    type: integer
-    default: 20
-  dbPassword:
-    type: string
-    secret: true
 
 variables:
-  # e.g. biofair-mc-workflow-hub-staging
-  namePrefix: ${pulumi.project}-${environment}
+  # Names, networking and data stores from the data stack, for the same
+  # environment as this stack.
+  namePrefix: ${data.outputs["namePrefix"]}
+  environment: ${data.outputs["environment"]}
+  vpcId: ${data.outputs["vpcId"]}
+  publicSubnetIds: ${data.outputs["publicSubnetIds"]}
+  privateSubnetIds: ${data.outputs["privateSubnetIds"]}
+  albSgId: ${data.outputs["albSgId"]}
+  appSgId: ${data.outputs["appSgId"]}
+  solrSgId: ${data.outputs["solrSgId"]}
+  dataSgId: ${data.outputs["dataSgId"]}
+  databaseEndpoint: ${data.outputs["databaseEndpoint"]}
+  sharedFsId: ${data.outputs["sharedFsId"]}
+
+  # The private subnets' route tables, which get the default route through
+  # the NAT gateway. Looked up here rather than in the data stack, where the
+  # lookup could run before the subnets are associated with their tables.
+  privateRouteTableA:
+    fn::invoke:
+      function: aws:ec2:getRouteTable
+      arguments:
+        subnetId: ${privateSubnetIds[0]}
+  privateRouteTableB:
+    fn::invoke:
+      function: aws:ec2:getRouteTable
+      arguments:
+        subnetId: ${privateSubnetIds[1]}
 
   # Solr's name in the VPC's private DNS zone. The web and worker instances
   # use it rather than Solr's IP, so replacing Solr does not change their
@@ -93,15 +94,6 @@ variables:
       function: aws:iam:getInstanceProfile
       arguments:
         name: ${ssmInstanceProfileName}
-
-  # The Solr instance's subnet. Its data volume must be in the same AZ, and is
-  # placed by this lookup rather than by the instance, so it does not depend
-  # on the instance it outlives.
-  solrSubnet:
-    fn::invoke:
-      function: aws:ec2:getSubnet
-      arguments:
-        id: ${vpc.privateSubnetIds[0]}
 
   al2023:
     fn::invoke:
@@ -142,13 +134,13 @@ variables:
     # as. Sharing the cache lets any instance serve a large generated file
     # that another has already produced.
     mkdir -p /mnt/filestore /mnt/cache
-    echo "${sharedFs.id}:/ /mnt/filestore efs _netdev,tls,accesspoint=${filestoreAccessPoint.id} 0 0" >> /etc/fstab
-    echo "${sharedFs.id}:/ /mnt/cache efs _netdev,tls,accesspoint=${cacheAccessPoint.id} 0 0" >> /etc/fstab
+    echo "${sharedFsId}:/ /mnt/filestore efs _netdev,tls,accesspoint=${data.outputs["filestoreAccessPointId"]} 0 0" >> /etc/fstab
+    echo "${sharedFsId}:/ /mnt/cache efs _netdev,tls,accesspoint=${data.outputs["cacheAccessPointId"]} 0 0" >> /etc/fstab
     mount /mnt/filestore
     mount /mnt/cache
 
     # The SSM instance role can read Parameter Store.
-    DB_PASSWORD=$(aws ssm get-parameter --region ${region} --name ${dbPasswordParam.name} --with-decryption --query Parameter.Value --output text)
+    DB_PASSWORD=$(aws ssm get-parameter --region ${region} --name ${data.outputs["dbPasswordParamName"]} --with-decryption --query Parameter.Value --output text)
     REDIS_PASSWORD=$(aws ssm get-parameter --region ${region} --name ${redisAuthTokenParam.name} --with-decryption --query Parameter.Value --output text)
 
     # The CA bundle for RDS's certificates, mounted into the container so
@@ -173,7 +165,7 @@ variables:
     SOLR_PORT=8983
     SOLR_URL=https://${solrHost}:8983/solr/seek
     SSL_CERT_DIR=/etc/seek/ca.d
-    MYSQL_HOST=${db.address}
+    MYSQL_HOST=${databaseEndpoint}
     MYSQL_DATABASE=seek_production
     MYSQL_USER=seek
     MYSQL_PASSWORD=$DB_PASSWORD
@@ -189,161 +181,45 @@ variables:
     EOF
 
 resources:
-  # -------------------------------------------------------------------------
-  # Networking: two AZs, public and private subnets, a single NAT gateway.
-  # -------------------------------------------------------------------------
-  vpc:
-    type: awsx:ec2:Vpc
+  # The data stack of the same name as this stack (e.g. staging).
+  data:
+    type: pulumi:pulumi:StackReference
     properties:
-      cidrBlock: ${vpcCidr}
-      # EFS mount names only resolve with DNS hostnames enabled.
-      enableDnsHostnames: true
-      numberOfAvailabilityZones: 2
-      natGateways:
-        strategy: Single
+      name: organization/biofair-mc-workflow-hub-data/${pulumi.stack}
+
+  # -------------------------------------------------------------------------
+  # Outbound internet for the private subnets: one NAT gateway, and a default
+  # route through it in each private subnet's route table. Everything that
+  # boots here needs it, to install packages and pull its image.
+  # -------------------------------------------------------------------------
+  natEip:
+    type: aws:ec2:Eip
+    properties:
+      domain: vpc
       tags:
-        Name: ${namePrefix}
+        Name: ${namePrefix}-nat
 
-  albSg:
-    type: aws:ec2:SecurityGroup
+  natGateway:
+    type: aws:ec2:NatGateway
     properties:
-      name: ${namePrefix}-alb-sg
-      vpcId: ${vpc.vpcId}
-      description: Public ingress to the load balancer
-      ingress:
-        - protocol: tcp
-          fromPort: 443
-          toPort: 443
-          cidrBlocks: ["0.0.0.0/0"]
-        - protocol: tcp
-          fromPort: 80
-          toPort: 80
-          cidrBlocks: ["0.0.0.0/0"]
-      egress:
-        - protocol: "-1"
-          fromPort: 0
-          toPort: 0
-          cidrBlocks: ["0.0.0.0/0"]
+      allocationId: ${natEip.allocationId}
+      subnetId: ${publicSubnetIds[0]}
+      tags:
+        Name: ${namePrefix}-nat
 
-  # The web and worker instances. The data stores and Solr admit this group.
-  appSg:
-    type: aws:ec2:SecurityGroup
+  natRouteA:
+    type: aws:ec2:Route
     properties:
-      name: ${namePrefix}-app-sg
-      vpcId: ${vpc.vpcId}
-      description: SEEK web and worker instances
-      egress:
-        - protocol: "-1"
-          fromPort: 0
-          toPort: 0
-          cidrBlocks: ["0.0.0.0/0"]
+      routeTableId: ${privateRouteTableA.id}
+      destinationCidrBlock: 0.0.0.0/0
+      natGatewayId: ${natGateway.id}
 
-  appFromAlb:
-    type: aws:ec2:SecurityGroupRule
+  natRouteB:
+    type: aws:ec2:Route
     properties:
-      type: ingress
-      securityGroupId: ${appSg.id}
-      sourceSecurityGroupId: ${albSg.id}
-      protocol: tcp
-      fromPort: 3000
-      toPort: 3000
-
-  # Solr, in a group of its own: reachable on 8983 from the web and worker
-  # instances only, and not admitted by the data stores, which it never uses.
-  solrSg:
-    type: aws:ec2:SecurityGroup
-    properties:
-      name: ${namePrefix}-solr-sg
-      vpcId: ${vpc.vpcId}
-      description: Solr, reachable only from the web and worker instances
-      ingress:
-        - protocol: tcp
-          fromPort: 8983
-          toPort: 8983
-          securityGroups: ["${appSg.id}"]
-      egress:
-        - protocol: "-1"
-          fromPort: 0
-          toPort: 0
-          cidrBlocks: ["0.0.0.0/0"]
-
-  dataSg:
-    type: aws:ec2:SecurityGroup
-    properties:
-      name: ${namePrefix}-data-sg
-      vpcId: ${vpc.vpcId}
-      description: RDS, ElastiCache and EFS, reachable only from appSg
-      ingress:
-        - protocol: tcp
-          fromPort: 3306
-          toPort: 3306
-          securityGroups: ["${appSg.id}"]
-        - protocol: tcp
-          fromPort: 6379
-          toPort: 6379
-          securityGroups: ["${appSg.id}"]
-        - protocol: tcp
-          fromPort: 2049
-          toPort: 2049
-          securityGroups: ["${appSg.id}"]
-      egress:
-        - protocol: "-1"
-          fromPort: 0
-          toPort: 0
-          cidrBlocks: ["0.0.0.0/0"]
-
-  # -------------------------------------------------------------------------
-  # MySQL
-  # -------------------------------------------------------------------------
-  # Read at boot by the web and worker instances.
-  dbPasswordParam:
-    type: aws:ssm:Parameter
-    properties:
-      name: /${namePrefix}/db-password
-      type: SecureString
-      value: ${dbPassword}
-
-  dbSubnets:
-    type: aws:rds:SubnetGroup
-    properties:
-      name: ${namePrefix}-db-subnets
-      subnetIds: ${vpc.privateSubnetIds}
-
-  dbParams:
-    type: aws:rds:ParameterGroup
-    properties:
-      name: ${namePrefix}-db-params
-      family: mysql8.4
-      parameters:
-        - name: character_set_server
-          value: utf8mb4
-        - name: collation_server
-          value: utf8mb4_unicode_ci
-        # SEEK connects over TLS (MYSQL_SSL_CA), so refuse plain connections.
-        - name: require_secure_transport
-          value: "1"
-
-  db:
-    type: aws:rds:Instance
-    properties:
-      engine: mysql
-      engineVersion: "8.4"
-      instanceClass: ${dbInstanceClass}
-      allocatedStorage: ${dbAllocatedStorage}
-      maxAllocatedStorage: 500
-      # Fixed 3,000 IOPS baseline, rather than gp2's 3 per GB, at the same price.
-      storageType: gp3
-      dbName: seek_production
-      username: seek
-      password: ${dbPassword}
-      dbSubnetGroupName: ${dbSubnets.name}
-      vpcSecurityGroupIds: ["${dataSg.id}"]
-      parameterGroupName: ${dbParams.name}
-      storageEncrypted: true
-      backupRetentionPeriod: 14
-      deletionProtection: ${dbDeletionProtection}
-      skipFinalSnapshot: ${dbSkipFinalSnapshot}
-      finalSnapshotIdentifier: ${namePrefix}-final
+      routeTableId: ${privateRouteTableB.id}
+      destinationCidrBlock: 0.0.0.0/0
+      natGatewayId: ${natGateway.id}
 
   # -------------------------------------------------------------------------
   # Redis: cache, sessions and throttle counters; no durable data, since
@@ -353,7 +229,7 @@ resources:
     type: aws:elasticache:SubnetGroup
     properties:
       name: ${namePrefix}-redis-subnets
-      subnetIds: ${vpc.privateSubnetIds}
+      subnetIds: ${privateSubnetIds}
 
   # As in compose. The default policy only evicts keys with an expiry, and
   # SEEK's cache entries mostly have none.
@@ -394,7 +270,7 @@ resources:
       port: 6379
       parameterGroupName: ${redisParams.name}
       subnetGroupName: ${redisSubnets.name}
-      securityGroupIds: ["${dataSg.id}"]
+      securityGroupIds: ["${dataSgId}"]
       atRestEncryptionEnabled: true
       transitEncryptionEnabled: true
       authToken: ${redisAuthToken.result}
@@ -407,78 +283,9 @@ resources:
       replaceOnChanges: ["authToken"]
 
   # -------------------------------------------------------------------------
-  # EFS: the shared filestore. One mount target per AZ.
+  # Solr: the derived image on an EC2 instance, with the index on the data
+  # stack's volume, which a new instance reattaches.
   # -------------------------------------------------------------------------
-  sharedFs:
-    type: aws:efs:FileSystem
-    properties:
-      encrypted: true
-      throughputMode: elastic
-      tags:
-        Name: ${namePrefix}-shared
-
-  efsMountA:
-    type: aws:efs:MountTarget
-    properties:
-      fileSystemId: ${sharedFs.id}
-      subnetId: ${vpc.privateSubnetIds[0]}
-      securityGroups: ["${dataSg.id}"]
-
-  efsMountB:
-    type: aws:efs:MountTarget
-    properties:
-      fileSystemId: ${sharedFs.id}
-      subnetId: ${vpc.privateSubnetIds[1]}
-      securityGroups: ["${dataSg.id}"]
-
-  # The SEEK image runs as www-data, uid/gid 33 in its Debian base. A wrong
-  # owner here lets SEEK start but fail to write uploads.
-  filestoreAccessPoint:
-    type: aws:efs:AccessPoint
-    properties:
-      fileSystemId: ${sharedFs.id}
-      posixUser:
-        uid: 33
-        gid: 33
-      rootDirectory:
-        path: /filestore
-        creationInfo:
-          ownerUid: 33
-          ownerGid: 33
-          permissions: "0755"
-
-  # SEEK's file cache (tmp/cache): the few generated files too large for
-  # Redis. Shared by every web and worker instance.
-  cacheAccessPoint:
-    type: aws:efs:AccessPoint
-    properties:
-      fileSystemId: ${sharedFs.id}
-      posixUser:
-        uid: 33
-        gid: 33
-      rootDirectory:
-        path: /cache
-        creationInfo:
-          ownerUid: 33
-          ownerGid: 33
-          permissions: "0755"
-
-  # -------------------------------------------------------------------------
-  # Solr: the derived image on an EC2 instance, with the index on its own EBS
-  # volume. The volume is a separate resource, so replacing the instance
-  # reattaches the same index rather than starting empty and needing a full,
-  # slow reindex.
-  # -------------------------------------------------------------------------
-  solrData:
-    type: aws:ebs:Volume
-    properties:
-      availabilityZone: ${solrSubnet.availabilityZone}
-      size: ${solrDataSizeGb}
-      type: gp3
-      encrypted: true
-      tags:
-        Name: ${namePrefix}-solr-data
-
   # Solr's TLS certificate: self-signed, for the name SEEK uses and for
   # localhost, which Solr's health check uses and Jetty requires the
   # certificate to cover. The web and worker instances trust this certificate
@@ -519,8 +326,9 @@ resources:
     properties:
       ami: ${al2023.id}
       instanceType: ${solrInstanceType}
-      subnetId: ${vpc.privateSubnetIds[0]}
-      vpcSecurityGroupIds: ["${solrSg.id}"]
+      # In the data stack's Solr subnet, the AZ of the index volume.
+      subnetId: ${data.outputs["solrSubnetId"]}
+      vpcSecurityGroupIds: ["${solrSgId}"]
       iamInstanceProfile: ${ssmProfile.name}
       rootBlockDevice:
         volumeSize: 20
@@ -542,7 +350,7 @@ resources:
         # The data volume, found by its ID: on Nitro instances the attachment's
         # device name is only a hint. Wait up to ten minutes for it to attach,
         # format it only if it is blank, and mount it at /var/solr by UUID.
-        VOL=${solrData.id}
+        VOL=${data.outputs["solrDataVolumeId"]}
         DEV=/dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_$(echo "$VOL" | tr -d -)
         for i in $(seq 1 300); do [ -e "$DEV" ] && break; sleep 2; done
         [ -e "$DEV" ]
@@ -587,38 +395,32 @@ resources:
           ${solrImage}
     options:
       # The AMI lookup returns the newest image, which would otherwise replace
-      # the instance whenever Amazon publishes one. Replacing it is now safe,
-      # but means a search outage while the new instance boots, so it is left
-      # to a deliberate `pulumi up --replace`.
+      # the instance whenever Amazon publishes one. Replacing it is safe, but
+      # means a search outage while the new instance boots, so it is left to a
+      # deliberate `pulumi up --replace`.
       ignoreChanges: ["ami"]
       # The data volume can only be attached to one instance, so a replacement
       # must detach it and delete the old instance before creating the new.
       deleteBeforeReplace: true
+      dependsOn:
+        - ${natRouteA}
+        - ${natRouteB}
 
   solrAttach:
     type: aws:ec2:VolumeAttachment
     properties:
       deviceName: /dev/sdf
-      volumeId: ${solrData.id}
+      volumeId: ${data.outputs["solrDataVolumeId"]}
       instanceId: ${solrInstance.id}
       # Stop Solr cleanly rather than pull the disk from under it.
       stopInstanceBeforeDetaching: true
     options:
       deleteBeforeReplace: true
 
-  # Private DNS for the VPC, so Solr is reachable by name.
-  internalZone:
-    type: aws:route53:Zone
-    properties:
-      name: seek.internal
-      comment: Internal names for ${namePrefix}
-      vpcs:
-        - vpcId: ${vpc.vpcId}
-
   solrRecord:
     type: aws:route53:Record
     properties:
-      zoneId: ${internalZone.zoneId}
+      zoneId: ${data.outputs["internalZoneId"]}
       name: ${solrHost}
       type: A
       ttl: 60
@@ -671,8 +473,8 @@ resources:
   alb:
     type: awsx:lb:ApplicationLoadBalancer
     properties:
-      subnetIds: ${vpc.publicSubnetIds}
-      securityGroups: ["${albSg.id}"]
+      subnetIds: ${publicSubnetIds}
+      securityGroups: ["${albSgId}"]
       listeners:
         - port: 80
           protocol: HTTP
@@ -689,7 +491,7 @@ resources:
         port: 3000
         protocol: HTTPS
         targetType: instance
-        vpcId: ${vpc.vpcId}
+        vpcId: ${vpcId}
         deregistrationDelay: 30
         healthCheck:
           protocol: HTTPS
@@ -708,7 +510,7 @@ resources:
       instanceType: ${webInstanceType}
       iamInstanceProfile:
         arn: ${ssmProfile.arn}
-      vpcSecurityGroupIds: ["${appSg.id}"]
+      vpcSecurityGroupIds: ["${appSgId}"]
       blockDeviceMappings:
         - deviceName: /dev/xvda
           ebs:
@@ -748,7 +550,7 @@ resources:
       # No desiredCapacity: autoscaling owns it, starting at minSize.
       minSize: ${webCount}
       maxSize: ${webCountMax}
-      vpcZoneIdentifiers: ${vpc.privateSubnetIds}
+      vpcZoneIdentifiers: ${privateSubnetIds}
       targetGroupArns: ["${alb.defaultTargetGroup.arn}"]
       # SEEK's first boot creates the database, which takes a while.
       healthCheckType: ELB
@@ -765,6 +567,10 @@ resources:
         preferences:
           minHealthyPercentage: 100
           maxHealthyPercentage: 200
+    options:
+      dependsOn:
+        - ${natRouteA}
+        - ${natRouteB}
 
   # Adds web instances when average CPU is above webCpuTarget, and removes
   # them when it is well below.
@@ -787,7 +593,7 @@ resources:
       instanceType: ${workerInstanceType}
       iamInstanceProfile:
         arn: ${ssmProfile.arn}
-      vpcSecurityGroupIds: ["${appSg.id}"]
+      vpcSecurityGroupIds: ["${appSgId}"]
       blockDeviceMappings:
         - deviceName: /dev/xvda
           ebs:
@@ -827,7 +633,7 @@ resources:
       minSize: ${workerCount}
       maxSize: ${workerCount}
       desiredCapacity: ${workerCount}
-      vpcZoneIdentifiers: ${vpc.privateSubnetIds}
+      vpcZoneIdentifiers: ${privateSubnetIds}
       healthCheckType: EC2
       launchTemplate:
         id: ${workerLaunchTemplate.id}
@@ -837,12 +643,16 @@ resources:
         preferences:
           minHealthyPercentage: 100
           maxHealthyPercentage: 200
+    options:
+      dependsOn:
+        - ${natRouteA}
+        - ${natRouteB}
 
 outputs:
   url: https://${alb.loadBalancer.dnsName}
-  databaseEndpoint: ${db.address}
+  databaseEndpoint: ${databaseEndpoint}
   redisEndpoint: ${redis.primaryEndpointAddress}
-  sharedFsId: ${sharedFs.id}
+  sharedFsId: ${sharedFsId}
   webGroupName: ${webGroup.name}
   workerGroupName: ${workerGroup.name}
   solrPrivateIp: ${solrInstance.privateIp}

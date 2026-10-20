@@ -1,0 +1,17 @@
+config:
+  aws:region: eu-west-2
+  aws:defaultTags:
+    tags:
+      Environment: staging
+      ManagedBy: pulumi
+  # Built from the pulumi branch of the SEEK repo and pushed when ready to
+  # deploy. Build both images from the same commit, so the Solr configset
+  # matches the code.
+  biofair-mc-workflow-hub-compute:seekImage: fairdom/seek:workflowhub-pulumi
+  biofair-mc-workflow-hub-compute:solrImage: fairdom/seek-solr:pulumi
+  biofair-mc-workflow-hub-compute:webCount: "1" # the minimum; keep at 1 until the schema exists
+  biofair-mc-workflow-hub-compute:webCountMax: "8"
+  biofair-mc-workflow-hub-compute:workerCount: "1"
+  biofair-mc-workflow-hub-compute:webInstanceType: t3.large
+  biofair-mc-workflow-hub-compute:workerInstanceType: t3.large
+  biofair-mc-workflow-hub-compute:redisNodeType: cache.t4g.small
