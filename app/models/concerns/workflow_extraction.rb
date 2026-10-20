@@ -102,7 +102,7 @@ module WorkflowExtraction
       remotes = git_version.remote_sources
       m = main_workflow_blob
       if m
-        crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow)
+        crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow, content_url: content_url(m))
         remotes.delete(main_workflow_blob.path)
         crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA)
       end
@@ -110,7 +110,7 @@ module WorkflowExtraction
       d = diagram_blob
       if d
         remotes.delete(d.path)
-        diagram_entity = d.to_crate_entity(crate, type: ROCrate::WorkflowDiagram)
+        diagram_entity = d.to_crate_entity(crate, type: ROCrate::WorkflowDiagram, content_url: content_url(d))
         crate.add_data_entity(diagram_entity)
         crate.main_workflow.diagram = diagram_entity if crate.main_workflow
       else # Was the diagram generated?
@@ -125,7 +125,7 @@ module WorkflowExtraction
       c = abstract_cwl_blob
       if c
         remotes.delete(c.path)
-        cwl_entity = c.to_crate_entity(crate, type: ROCrate::WorkflowDescription)
+        cwl_entity = c.to_crate_entity(crate, type: ROCrate::WorkflowDescription, content_url: content_url(c))
         crate.add_data_entity(cwl_entity)
         crate.main_workflow.cwl_description = cwl_entity if crate.main_workflow
       end
@@ -161,7 +161,6 @@ module WorkflowExtraction
     crate['datePublished'] = Time.now unless crate['datePublished']
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
-    crate['contentUrl'] = main_workflow_url
 
     crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
 
