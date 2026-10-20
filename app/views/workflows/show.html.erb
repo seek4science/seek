@@ -39,7 +39,13 @@
                     <%= content_tag(:embed, '', type: 'image/svg+xml', src: diagram_path, class: 'svg-pan-zoom', width: 1000, height: 500)  %>
                     <p class="help-block">Click and drag the diagram to pan, double click or use the controls to zoom.</p>
                   <% else %>
-                    <%= image_tag(diagram_path) %>
+                    <% if @display_workflow.diagram_exists? %>
+                      <%= image_tag(diagram_path) %>
+                    <% else %>
+                      <div class="alert alert-warning" style="width: fit-content">
+                        Unable to display diagram
+                      </div>
+                    <% end %>
                   <% end %>
                 </div>
               </div>
