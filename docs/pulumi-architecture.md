@@ -8,9 +8,10 @@ and how the project is put together. For deploy steps, see the project's
 each later phase needs, [`pulumi-next-phase.md`](pulumi-next-phase.md); for the
 original design, [`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md).
 
-The diagrams show what the program deploys: phase 1 and phase 2. Parts still
-to come are drawn with dashed outlines: the Solr volume's scheduled snapshots,
-which wait on an IAM role from the Hub, and phase 3's data and compute stacks.
+The diagrams show what the program deploys: phases 1 and 2, and phase 3's
+data and compute stacks. The one part still to come is drawn with a dashed
+outline: the Solr volume's scheduled snapshots, which wait on an IAM role from
+the Hub.
 Phase 4 (a real domain, backups, CloudWatch logs, higher availability, email
 delivery) is not shown.
 
@@ -143,7 +144,7 @@ flowchart TB
     subgraph vpc["VPC: vpcCidr, e.g. 10.30.0.0/16"]
         subgraph public["Public subnets, AZ a and b"]
             alb["ALB<br/>SG: albSg"]
-            nat["NAT Gateway<br/>single, AZ a"]
+            nat["NAT Gateway<br/>single, AZ a, compute stack"]
         end
 
         subgraph appsg["Private subnets, SG: appSg"]
@@ -186,49 +187,47 @@ No security group opens port 22. Every instance uses the account's existing
 `ssm-instance-profile`, and administrative access is through SSM Session
 Manager. The program creates no IAM resources.
 
-## Planned: data and compute stacks (phase 3)
+## Data and compute stacks
 
-Phase 3 splits the program into two Pulumi stacks, so the compute can be
-destroyed between uses without touching the data, and protects the database
-and EFS with Pulumi's `protect: true`.
+The program is two Pulumi projects, each with a `staging` stack, so the
+compute can be destroyed between uses without touching the data. The data
+stack's database, filestore and Solr volume are protected by Pulumi's
+`protect` when `protectData` is on (off for staging).
 
 ```mermaid
 flowchart LR
-    subgraph data["Data stack: long-lived"]
-        vpc["VPC and subnets"]
+    subgraph data["data/: long-lived"]
+        vpc["VPC and subnets<br/>no NAT gateway"]
         sgs["Security groups"]
-        rds[("RDS<br/>protect: true")]
-        efs[("EFS<br/>protect: true")]
+        rds[("RDS<br/>protect")]
+        efs[("EFS<br/>protect")]
         param["DB password parameter"]
         zone["Private DNS zone"]
-        solrvol[("Solr data volume")]
+        solrvol[("Solr data volume<br/>protect")]
     end
 
-    subgraph compute["Compute stack: disposable"]
-        nat["NAT gateway<br/>and default route"]
+    subgraph compute["compute/: disposable"]
+        nat["NAT gateway, and the private<br/>subnets' default route"]
         alb["Load balancer<br/>certificate, listeners"]
         groups["Web and worker<br/>Auto Scaling groups"]
         solr["Solr instance, DNS record<br/>and TLS certificate"]
         redis[("ElastiCache<br/>and its auth token")]
     end
 
-    data -- "stack reference:<br/>subnet and security group IDs,<br/>DB address, EFS IDs" --> compute
-
-    classDef planned stroke-dasharray:5 5,color:#777
-    class data,compute planned
+    data -- "stack reference:<br/>subnet and security group IDs,<br/>DB address, EFS, zone and volume IDs" --> compute
 ```
 
-## Inside `Pulumi.yaml`
+## Inside the `Pulumi.yaml` files
 
-The program is a single Pulumi YAML file in four sections:
+Each project is a single Pulumi YAML file in four sections:
 
-| Section | Contents |
-|---|---|
-| `config` | Per-stack settings: `environment`, `vpcCidr`, image tags, web and worker counts and the CPU target, instance sizes, database size and deletion settings, and the `dbPassword` secret |
-| `variables` | The `namePrefix` (`biofair-mc-workflow-hub-<environment>`), Solr's DNS name, lookups of the SSM instance profile, the Amazon Linux AMI and the region, and `hostSetup`, the web and worker instances' shared user data |
-| `resources` | VPC and security groups; the password parameter, RDS and its parameter group; the generated Redis auth token, its parameter and ElastiCache; EFS; the Solr instance, its data volume, private DNS name, and TLS key, certificate and key parameter; the load balancer's self-signed certificate and the load balancer; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
-| `outputs` | Site URL, database and Redis endpoints, EFS ID, web and worker group names, Solr's private IP |
+| Section | `data/Pulumi.yaml` | `compute/Pulumi.yaml` |
+|---|---|---|
+| `config` | `environment`, `vpcCidr`, `protectData`, database size and deletion settings, `solrDataSizeGb`, and the `dbPassword` secret | Image tags, web and worker counts and the CPU target, instance types, `redisNodeType`, the SSM instance profile's name |
+| `variables` | The `namePrefix` (`biofair-mc-workflow-hub-<environment>`), and the lookup of the subnet for the Solr volume | The data stack's outputs, Solr's DNS name, lookups of the private route tables, the SSM instance profile, the Amazon Linux AMI and the region, and `hostSetup`, the web and worker instances' shared user data |
+| `resources` | VPC and security groups; the password parameter, RDS and its parameter group; EFS, its mount targets and access points; the Solr volume; the private DNS zone | The stack reference; the NAT gateway and routes; the generated Redis auth token, its parameter and ElastiCache; the Solr instance, its attachment, DNS record, and TLS key, certificate and key parameter; the load balancer's self-signed certificate and the load balancer; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
+| `outputs` | The IDs, addresses and names the compute stack needs | Site URL, database and Redis endpoints, EFS ID, web and worker group names, Solr's private IP |
 
 Every resource is tagged `Environment` and `ManagedBy: pulumi` through the AWS
-provider's `defaultTags` in the stack config, and the instances and their disks
-are named after their role (`<prefix>-web`, `-worker`, `-solr`).
+provider's `defaultTags` in each stack config, and the instances and their
+disks are named after their role (`<prefix>-web`, `-worker`, `-solr`).

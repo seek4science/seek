@@ -433,10 +433,11 @@ like `biofair-mc-galaxy/` in
 [biofair-mc-infra](https://github.com/BioFAIRUK/biofair-mc-infra) and named after
 the AWS account it targets:
 
-- `Pulumi.yaml`: the program.
-- `Pulumi.staging.yaml`: the `staging` stack's config, committed. Each
-  deployer's local stack adds its salt and encrypted secrets to it, which are
-  not committed.
+- `data/Pulumi.yaml` and `compute/Pulumi.yaml`: the program, as two projects,
+  the long-lived data and the disposable compute on top of it (phase 3).
+- `data/Pulumi.staging.yaml` and `compute/Pulumi.staging.yaml`: the `staging`
+  stacks' config, committed. Each deployer's local stacks add their salts and
+  encrypted secrets to them, which are not committed.
 - `README.md`: scope and getting started.
 - `tech-notes.md`: how it works, setting up access, and operating the stack.
 

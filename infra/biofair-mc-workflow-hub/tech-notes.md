@@ -3,8 +3,11 @@
 Details behind the [README](README.md): how the deployment works, setting up
 access, and operating the stack. This project, on the SEEK repository's
 `pulumi` branch, is the authoritative copy; biofair-mc-infra's
-`biofair-mc-workflow-hub/` holds a copy of it, updated from here. Run commands from this directory with
-`AWS_PROFILE` set (see [AWS credentials](#aws-credentials)).
+`biofair-mc-workflow-hub/` holds a copy of it, updated from here. Run
+commands from `data/` or `compute/`, whichever stack they concern, with
+`AWS_PROFILE` and the Pulumi passphrase set (see
+[AWS credentials](#aws-credentials) and
+[Pulumi backend and stacks](#pulumi-backend-and-stacks)).
 
 ## How it works
 
@@ -27,8 +30,35 @@ to what is needed to prove SEEK runs on it:
   attached to the VPC
 
 It creates no IAM resources: every instance uses the account's existing
-`ssm-instance-profile`, and is reached through SSM. Comments in `Pulumi.yaml`
-refer to sections of the handover as "handover 4.4" and so on.
+`ssm-instance-profile`, and is reached through SSM. Comments in the
+`Pulumi.yaml` files refer to sections of the handover as "handover 4.4" and so
+on.
+
+### Data and compute stacks
+
+The program is two Pulumi projects, each with a `staging` stack:
+
+| `data/` (long-lived) | `compute/` (disposable) |
+|---|---|
+| VPC and subnets, without a NAT gateway | NAT gateway, and the private subnets' default route through it |
+| Security groups | Redis, its auth token and parameter |
+| RDS, its subnet and parameter groups, the password parameter | Solr instance, its TLS key and certificate, and its DNS record |
+| EFS, mount targets and access points | Load balancer and its certificate |
+| Private DNS zone | Web and worker launch templates, groups and scaling policy |
+| Solr index volume | |
+
+The compute stack reads the data stack's outputs (IDs, addresses and the
+password parameter's name) through a stack reference to the data stack of the
+same name, so deploy the data stack first and destroy it last. Destroying the
+compute stack leaves the database, filestore and Solr index as they are; a
+new compute stack reattaches them. The NAT gateway is in the compute stack
+because it is charged by the hour, so the data stack on its own has no route
+to the internet, which nothing in it needs.
+
+`protectData` (default true) sets Pulumi's `protect` on the database, the
+filestore and the Solr volume, so a `destroy`, or a change that would
+replace them, fails rather than deleting them. The staging config turns it
+off, so staging can be torn down completely.
 
 ### Web and worker instances
 
@@ -113,14 +143,14 @@ settings cannot index, and SEEK rescues the errors, so those updates are
 lost: run `bundle exec rake seek:reindex_all` in the worker container once
 the groups have rolled.
 
-The index is on its own 20 GB EBS volume (`solrDataSizeGb`), mounted at
-`/var/solr`. Solr's user data finds the volume by its ID, formats it only if
+The index is on its own 20 GB EBS volume (`solrDataSizeGb`) in the data
+stack, mounted at `/var/solr`. Solr's user data finds the volume by its ID, formats it only if
 it is blank, and mounts it by UUID, so a new Solr instance picks up the
 existing index. Pulumi does not replace the Solr instance for a new Amazon
-Linux AMI; to replace it deliberately:
+Linux AMI; to replace it deliberately, in `compute/`:
 
 ```console
-pulumi up --replace 'urn:pulumi:staging::biofair-mc-workflow-hub::aws:ec2/instance:Instance::solrInstance'
+pulumi up --replace 'urn:pulumi:staging::biofair-mc-workflow-hub-compute::aws:ec2/instance:Instance::solrInstance'
 ```
 
 Pulumi detaches the volume and deletes the old instance before creating the
@@ -129,7 +159,7 @@ search is unavailable for a few minutes. There are no scheduled snapshots of
 the volume yet (they need an IAM role from the Hub); take one by hand before
 anything risky with `aws ec2 create-snapshot --volume-id <volume id>`.
 
-To grow the volume, raise `solrDataSizeGb` and `pulumi up`; EBS resizes it in
+To grow the volume, raise `solrDataSizeGb` and `pulumi up` the data stack; EBS resizes it in
 place, at most once every six hours. Then, on the Solr instance, grow the
 file system with `sudo resize2fs /dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_<volume id without the dash>`.
 A volume cannot be shrunk.
@@ -165,7 +195,7 @@ carry forward unchanged either way.
 
 ### Next phase
 
-What phase 2 adds, what each part needs and what blocks it is in
+What each later phase adds, what each part needs and what blocks it is in
 [`docs/pulumi-next-phase.md`](../../docs/pulumi-next-phase.md).
 
 ## Open questions
@@ -241,25 +271,33 @@ docker push fairdom/seek:workflowhub-pulumi
 docker push fairdom/seek-solr:pulumi
 ```
 
-### Pulumi backend and stack
+### Pulumi backend and stacks
 
-`Pulumi.staging.yaml` holds the stack's configuration, but the stack itself,
-which records what Pulumi has deployed, has to be created in a backend. The
-shared backend is still an open question. Until it is settled, use a local
-one, which keeps state in `~/.pulumi` on your machine:
+Each project's `Pulumi.staging.yaml` holds its stack's configuration, but the
+stacks themselves, which record what Pulumi has deployed, have to be created
+in a backend. The shared backend is still an open question. Until it is
+settled, use a local one, which keeps state in `~/.pulumi` on your machine:
 
 ```console
+export PULUMI_CONFIG_PASSPHRASE_FILE=~/.workflowhub-passphrase   # a file only you can read
 pulumi login --local
-pulumi stack init staging
+cd data && pulumi stack init staging
 pulumi config set --secret dbPassword "$(openssl rand -hex 16)"
+cd ../compute && pulumi stack init staging
 ```
 
-A local backend encrypts secrets with a passphrase, which `stack init` asks
-for and every later command needs. Set `PULUMI_CONFIG_PASSPHRASE`, or point
-`PULUMI_CONFIG_PASSPHRASE_FILE` at a file only you can read, to avoid the
-prompt. `stack init` adds an `encryptionsalt` to `Pulumi.staging.yaml`, and
-`config set --secret` adds the encrypted `dbPassword`. Both are tied to your
-local stack, so don't commit them.
+A local backend encrypts secrets with a passphrase, which every command needs.
+Give it through `PULUMI_CONFIG_PASSPHRASE_FILE` (or
+`PULUMI_CONFIG_PASSPHRASE`), not at the prompt, and use the same one for both
+stacks: the compute stack's stack reference has to open the data stack's
+state, and cannot prompt for its passphrase. Typed at the prompt, the compute
+stack's preview stalls and fails with `constructing secrets manager of type
+"passphrase": ... EOF`; with different passphrases, it fails with
+`incorrect passphrase`.
+
+`stack init` adds an `encryptionsalt` to each `Pulumi.staging.yaml`, and
+`config set --secret` adds the encrypted `dbPassword` to the data stack's.
+They are tied to your local stacks, so don't commit them.
 
 Use letters and digits only for `dbPassword`, 8-41 characters, as the command
 above does. SEEK's database config and startup scripts use it unquoted, so
@@ -271,26 +309,30 @@ password, and in Parameter Store. To replace it, for instance after it has
 been exposed:
 
 ```console
-pulumi up --replace 'urn:pulumi:staging::biofair-mc-workflow-hub::random:index/randomPassword:RandomPassword::redisAuthToken'
+pulumi up --replace 'urn:pulumi:staging::biofair-mc-workflow-hub-compute::random:index/randomPassword:RandomPassword::redisAuthToken'
 ```
 
 A changed token replaces the Redis group (`replaceOnChanges`), because
 changing it in place leaves it optional until a separate step; the instances
 are then refreshed, and sessions and the cache start empty.
 
+That command is run in `compute/`, like everything else about Redis, Solr and
+the instances. A new compute stack generates a new token anyway.
+
 State in a local backend is only on your machine, so use it for previewing and
-trying phase 1, not for a deployment anyone else needs to manage.
+trying the deployment, not for one anyone else needs to manage.
 
 ## Operating the stack
 
 ### First deploy
 
-The stack config starts with `webCount: 1`. On an empty database the SEEK web
+Deploy the data stack, then the compute stack. The compute stack config
+starts with `webCount: 1`. On an empty database the SEEK web
 container runs `rake db:setup` at boot, and several instances doing so at once
 would race (handover 4.4). Once the first instance is healthy and the schema
 exists, `webCount` can be raised. Then run the initial Solr index.
 
-After `pulumi up`, SEEK is at the `url` stack output once the web instance has
+After `pulumi up`, SEEK is at the compute stack's `url` output once the web instance has
 booted and passed its health check, which takes several minutes on first
 boot. Until then the load balancer returns 502. The address is HTTPS with a
 self-signed certificate, so the browser warns first.
@@ -305,7 +347,7 @@ the groups as they are; this only happens once per account.
 
 ### Reaching the instances
 
-Find an instance's ID in the console or with:
+Find an instance's ID in the console or, in `compute/`, with:
 
 ```console
 aws ec2 describe-instances \
@@ -348,86 +390,79 @@ docker run --rm --env-file /etc/seek.env \
   fairdom/seek:<new-tag> docker/upgrade.sh
 ```
 
-then set `seekImage` to the new tag in the stack config and `pulumi up`, which
-rolls both groups onto it.
+then set `seekImage` to the new tag in the compute stack config and
+`pulumi up` there, which rolls both groups onto it.
 
 ### Pausing and resuming
 
-`pulumi destroy` deletes the data too. To stop paying for compute but keep the
-database, filestore and Solr index, stop or empty the parts that compute and
-leave the storage:
+To stop paying for compute but keep the data, destroy the compute stack and
+stop the database:
 
 ```console
-# Pause: empty both groups, then stop Solr and the database
-for g in "$(pulumi stack output webGroupName)" "$(pulumi stack output workerGroupName)"; do
-  aws autoscaling update-auto-scaling-group --auto-scaling-group-name "$g" \
-    --min-size 0 --max-size 0 --desired-capacity 0
-done
-SOLR=$(aws ec2 describe-instances \
-  --filters Name=private-ip-address,Values="$(pulumi stack output solrPrivateIp)" \
-  --query 'Reservations[].Instances[].InstanceId' --output text)
+# Pause
+cd compute && pulumi destroy
+cd ../data
 DB=$(aws rds describe-db-instances \
   --query "DBInstances[?Endpoint.Address=='$(pulumi stack output databaseEndpoint)'].DBInstanceIdentifier" \
   --output text)
-aws ec2 stop-instances --instance-ids "$SOLR"
 aws rds stop-db-instance --db-instance-identifier "$DB"
 ```
 
 ```console
-# Resume: start the database and Solr, wait, then restore the groups.
+# Resume: start the database, wait, then bring the compute back.
 # A database still stopping after a pause cannot be started yet.
 db_status() { aws rds describe-db-instances --db-instance-identifier "$DB" --query 'DBInstances[0].DBInstanceStatus' --output text; }
 until [ "$(db_status)" = stopped ]; do sleep 15; done
 aws rds start-db-instance --db-instance-identifier "$DB"
-aws ec2 start-instances --instance-ids "$SOLR"
 aws rds wait db-instance-available --db-instance-identifier "$DB"
-pulumi up --refresh
+cd ../compute && pulumi up
 ```
 
-`pulumi up --refresh` notices the emptied groups and sets their sizes back
-from the stack config, starting the web group at `webCount`. The new instances find the existing database
-and carry on, without setting it up again. Set `SOLR` and `DB` again as above
-if resuming from a new shell. Starting a stopped database takes 5-10 minutes,
-including a recovery step; its progress is on the database's **Logs &
-events** tab in the console.
+The new compute finds the existing database, filestore and Solr index, and
+carries on without setting them up again. Redis starts empty, so everyone is
+logged out. Set `DB` again as above if resuming from a new shell. Starting a
+stopped database takes 5-10 minutes, including a recovery step; its progress
+is on the database's **Logs & events** tab in the console.
 
-While paused, the stack still costs roughly a third of its running cost: the
-NAT gateway, load balancer and ElastiCache cannot be stopped, and the database
-and filestore are billed for storage. AWS restarts a stopped database
+Paused, only storage is billed: roughly $0.02 an hour for the database's
+storage, the filestore and the Solr volume. AWS restarts a stopped database
 automatically after seven days, so for a longer pause, stop it again when it
-restarts. Paying nothing while keeping the data needs a snapshot to restore
-from, or the data stores in a stack of their own (phase 3); neither is set up
-yet.
+restarts; running, the database costs about $0.09 an hour more.
 
 ### Tearing down
 
+Destroy the compute stack first, then the data stack:
+
 ```console
-pulumi destroy
-pulumi stack rm --preserve-config staging
+cd compute && pulumi destroy && pulumi stack rm --preserve-config staging
+cd ../data && pulumi destroy && pulumi stack rm --preserve-config staging
 ```
 
-`--preserve-config` keeps `Pulumi.staging.yaml`, which `stack rm` otherwise
-deletes along with the stack. It still holds the old stack's `encryptionsalt`
-and encrypted `dbPassword`; remove those lines before creating the stack again
-with `pulumi stack init`.
+`--preserve-config` keeps each `Pulumi.staging.yaml`, which `stack rm`
+otherwise deletes along with the stack. They still hold the old stacks'
+`encryptionsalt` and the encrypted `dbPassword`; remove those lines before
+creating the stacks again with `pulumi stack init`.
 
 `destroy` needs the same machine, local backend and passphrase as `up`, and a
 current AWS sign-in. Every resource is tagged `ManagedBy: pulumi` and
 `Environment: staging`, so anything left behind can be found in the console's
 Tag Editor.
 
-The staging stack config turns off the database's deletion protection and
-final snapshot (`dbDeletionProtection`, `dbSkipFinalSnapshot`), so `destroy`
-deletes it outright. Both default to on, for stacks holding real data; there,
-`destroy` stops at the database until protection is turned off, and leaves a
-`<prefix>-final` snapshot. Changing these settings only takes effect through
-`pulumi up`, not during a `destroy`.
+The staging data stack config turns off `protectData`, the database's
+deletion protection and its final snapshot (`dbDeletionProtection`,
+`dbSkipFinalSnapshot`), so `destroy` deletes everything outright. All three
+default to on, for stacks holding real data. There, `destroy` refuses to
+delete the protected database, filestore and Solr volume, and the database
+leaves a `<prefix>-final` snapshot when it is deleted. Changing these settings
+only takes effect through `pulumi up`, not during a `destroy`; to delete
+protected resources, set `protectData` to false and `pulumi up` first.
 
 ### Costs
 
-At London on-demand prices, the staging stack costs roughly $0.38 an hour
-for everything except the web instances (the worker and Solr instances, RDS,
+At London on-demand prices, staging costs roughly $0.38 an hour for
+everything except the web instances (the worker and Solr instances, RDS,
 ElastiCache, the load balancer and the NAT gateway), plus about $0.10 an hour
 for each web instance: about $0.48 an hour at the minimum of one, $0.68 at
 three and $1.17 at the maximum of eight. A busy `t3` instance adds about
-$0.03 an hour in CPU credits. Paused, roughly $0.15 an hour.
+$0.03 an hour in CPU credits. With only the data stack up, about $0.11 an
+hour with the database running and $0.02 with it stopped.

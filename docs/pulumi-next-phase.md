@@ -19,7 +19,9 @@ than ECS Fargate. It was deployed in the `biofair-mc-workflow-hub`
 account, paused and resumed with its data intact, and destroyed cleanly. It
 needs no IAM permissions beyond the `Developer` permission set. All seven
 phase 2 items have since been completed, and are marked below; only the Solr
-volume's scheduled snapshots wait, on an IAM role from the Hub.
+volume's scheduled snapshots wait, on an IAM role from the Hub. Phase 3's
+first two items, the data and compute stacks and protecting the data, are
+complete too.
 
 The full design, before phase 1 cut it down, is in the history at commit
 `6550a42c0b`. Most items below were already written there and can be adapted
@@ -172,48 +174,56 @@ that blocks it.
 
 ## Phase 3: protecting the data, and sizing
 
-### 1. Data and compute stacks
+### 1. **Completed:** Data and compute stacks
 
 - **Adds:** a `pulumi destroy` of the compute that cannot touch the database,
   filestore or Solr index, and a cheaper way to take the deployment down
-  between uses. Destroying the compute stack, and stopping the database,
-  leaves roughly $0.025 an hour of storage, against $0.15 an hour for
-  today's pause, which cannot stop the NAT gateway, load balancer or
-  ElastiCache.
-- **Split:**
+  between uses: with the compute destroyed and the database stopped, only
+  storage is billed, about $0.02 an hour, against $0.15 an hour for the old
+  pause, which could not stop the NAT gateway, load balancer or ElastiCache.
+- **Done as:** two Pulumi projects under `infra/biofair-mc-workflow-hub/`,
+  each with a `staging` stack:
 
-  | Data stack (long-lived) | Compute stack (disposable) |
+  | `data/` (long-lived) | `compute/` (disposable) |
   |---|---|
-  | VPC and subnets | NAT gateway, and the private subnets' default route through it |
-  | Security groups (`appSg`, `dataSg`, `albSg`), which reference each other | Load balancer, certificate and listeners |
-  | RDS, its subnet and parameter groups, the password parameter | Web and worker launch templates and Auto Scaling groups |
-  | EFS, mount targets and access points | Solr instance and its DNS record |
-  | The private DNS zone | ElastiCache, which holds only cache and sessions |
-  | The Solr data volume, once phase 2 adds it | |
+  | VPC and subnets (`awsx`, `natGateways: None`) | NAT gateway and Elastic IP, and a default route through it in each private route table |
+  | Security groups (`albSg`, `appSg`, `solrSg`, `dataSg`), which reference each other | Redis, its auth token and parameter |
+  | RDS, its subnet and parameter groups, the password parameter | Solr instance, attachment, TLS key and certificate, DNS record |
+  | EFS, mount targets and access points | Load balancer and its certificate |
+  | The private DNS zone | Web and worker launch templates and groups, scaling policy |
+  | The Solr data volume | |
 
-- **Needs:** two Pulumi projects (e.g. `data/` and `app/` under
-  `infra/biofair-mc-workflow-hub/`), deployed in that order and destroyed in
-  reverse; the compute stack reading the data stack's outputs (subnet and
-  security group IDs, database address, EFS IDs) through a
-  `pulumi:pulumi:StackReference`, which the local backend supports. The data
-  stack turns off `awsx`'s NAT gateway, and the compute stack adds it and the
-  private route tables' default route.
-- **Consider:** splitting is a rewrite and a fresh deploy while there is no
-  real data; once there is, it means moving live resources between stacks
-  with Pulumi's state tools.
+  The compute stack reads the data stack's outputs through a
+  `pulumi:pulumi:StackReference` to the data stack of the same name. It looks
+  up the private route tables by subnet itself, since in the data stack the
+  lookup could run before `awsx` associates the subnets with their tables,
+  and the Solr instance and both groups depend on its NAT routes, so nothing
+  boots before it can pull its image. `namePrefix` is set explicitly, so
+  resource names are unchanged.
+- **Found:** with the local backend, the stack reference has to open the
+  data stack's state, and cannot prompt for its passphrase: both stacks need
+  the same passphrase, given through `PULUMI_CONFIG_PASSPHRASE(_FILE)`.
+- **Tested:** both stacks deploy on staging, and the site, Solr and MySQL over
+  TLS, Redis and the workers work; destroying and recreating the compute
+  stack keeps the database, the filestore and the Solr index.
+- **Later, for production:** a deployment that already holds data would move
+  its live resources between stacks with Pulumi's state tools (`pulumi state
+  move`) rather than redeploying; staging was simply rebuilt.
 
-### 2. Protect the database and EFS
+### 2. **Completed:** Protect the database, EFS and the Solr volume
 
-- **Adds:** Pulumi refuses to delete the RDS instance or the EFS filesystem;
-  a `destroy` or a change that would replace them fails instead. This guards
-  the data inside Pulumi, alongside RDS's own deletion protection, and covers
-  EFS, which has no protection of its own.
-- **Needs:** `options: protect: true` on `db` and `sharedFs` (in the data
-  stack, after item 1).
-- **Consider:** removing a protected resource then needs a deliberate
-  `pulumi state unprotect` first. Staging trials that are torn down
-  completely, as now, would want it off, so tie it to config in the same way
-  as `dbDeletionProtection`.
+- **Adds:** Pulumi refuses to delete the RDS instance, the EFS filesystem or
+  the Solr volume; a `destroy` or a change that would replace them fails
+  instead. This guards the data inside Pulumi, alongside RDS's own deletion
+  protection, and covers EFS and EBS, which have no protection of their own.
+- **Done as:** `options: protect: ${protectData}` on `db`, `sharedFs` and
+  `solrData` in the data stack; `protectData` defaults to true, and the
+  staging config turns it off so staging can be torn down completely, as
+  with `dbDeletionProtection`. Removing protected resources needs
+  `protectData` set to false and a `pulumi up` first.
+- **Checked:** a preview sets `protect` with `protectData` true and leaves it
+  unset with false. A `destroy` refused by protection on staging is still to
+  be tried.
 
 ### 3. Review instance types and sizes
 
@@ -263,7 +273,7 @@ For once the deployment moves beyond staging.
 
 - **Adds:** a real hostname and a certificate browsers trust, replacing the
   self-signed one generated by the program (`tlsKey`, `tlsCert` and
-  `certificate` in `Pulumi.yaml`).
+  `certificate` in `compute/Pulumi.yaml`).
 - **Needs:** an ACM certificate in `eu-west-2` with DNS validation, used by
   the existing 443 listener; and a DNS record for the domain pointing at the
   load balancer's DNS name, never its IPs, which change. In Route 53 that is
@@ -313,7 +323,8 @@ For once the deployment moves beyond staging.
 
 ### 4. Higher availability
 
-A NAT gateway per AZ (`strategy: OnePerAz`), Multi-AZ RDS, an ElastiCache
+A NAT gateway per AZ (in the compute stack, each private subnet routing
+through its own AZ's), Multi-AZ RDS, an ElastiCache
 replica with automatic failover, and Solr in an Auto Scaling group of one.
 Each roughly doubles the cost of that part.
 

@@ -1,18 +1,21 @@
 # WorkflowHub
 
 Pulumi component provisioning the `biofair-mc-workflow-hub` account's AWS
-infrastructure for WorkflowHub, which runs SEEK. It is written in Pulumi YAML.
+infrastructure for WorkflowHub, which runs SEEK. It is written in Pulumi YAML,
+as two projects: `data/`, the long-lived VPC, database, filestore and Solr
+index, and `compute/`, everything that runs on top of them, which can be
+destroyed between uses without touching the data.
 
 ## Current scope
 
-Phase 1 and the completed parts of phase 2: a VPC, a load balancer serving
-HTTPS with a self-signed certificate in front of SEEK web instances,
+Phase 1, phase 2 and the completed parts of phase 3: a VPC, a load balancer
+serving HTTPS with a self-signed certificate in front of SEEK web instances,
 autoscaled on CPU, and a worker instance, in EC2 Auto Scaling groups, MySQL on
 RDS, Redis on ElastiCache, the filestore and a shared file cache on EFS, and
 Solr on its own instance, with its index on a separate volume, reached by a
-private DNS name. Every connection between them is encrypted. It needs no IAM
-permissions beyond the `Developer` permission set, and has been deployed and
-torn down successfully.
+private DNS name. Every connection between them is encrypted, and the data
+lives in a stack of its own. It needs no IAM permissions beyond the
+`Developer` permission set, and has been deployed and torn down successfully.
 
 ## Phase 2
 
@@ -29,10 +32,11 @@ torn down successfully.
 
 ## Phase 3
 
-- Separate stacks for data and compute, so the compute can be taken down
-  without touching the database, filestore or Solr index
-- Pulumi `protect: true` on the database and EFS, so a `destroy` fails rather
-  than deleting them
+- **Completed:** Separate stacks for data and compute, so the compute can be
+  taken down without touching the database, filestore or Solr index
+- **Completed:** Pulumi `protect` on the database, EFS and the Solr volume, so
+  a `destroy` fails rather than deleting them (`protectData`, off for
+  staging)
 - Review the instance types and sizes against measured use
   - followed up by setting the number of Puma workers, and the Solr JVM memory
 - Autoscaling for memory also ?
@@ -52,27 +56,42 @@ Prerequisites: the [Pulumi CLI](https://www.pulumi.com/docs/iac/download-install
 the AWS CLI v2 with its `session-manager-plugin`, and AWS credentials for the
 `biofair-mc-workflow-hub` account from `aws configure sso` (SSO region
 `eu-north-1`, default region `eu-west-2`). The SEEK and Solr images named in
-`Pulumi.staging.yaml` must already be pushed to Docker Hub.
+`compute/Pulumi.staging.yaml` must already be pushed to Docker Hub.
+
+Both stacks use the same passphrase, and it must come from the environment:
+the compute stack reads the data stack's outputs, and cannot prompt for its
+passphrase.
 
 ```console
 export AWS_PROFILE=workflowhub   # the profile name you chose in aws configure sso
-
+export PULUMI_CONFIG_PASSPHRASE_FILE=~/.workflowhub-passphrase   # a file only you can read
 pulumi login --local
+
+cd data
 pulumi stack init staging
 pulumi config set --secret dbPassword "$(openssl rand -hex 16)"
+pulumi up
 
-pulumi preview
+cd ../compute
+pulumi stack init staging
 pulumi up
 ```
 
-SEEK is then at `pulumi stack output url`, a few minutes after `up` finishes;
-the browser warns about the self-signed certificate.
-`stack init` and `config set --secret` add your stack's salt and encrypted
-password to `Pulumi.staging.yaml`; don't commit them.
+SEEK is then at `pulumi stack output url` (in `compute/`), a few minutes after
+`up` finishes; the browser warns about the self-signed certificate.
+`stack init` and `config set --secret` add your stacks' salts and the
+encrypted password to the `Pulumi.staging.yaml` files; don't commit them.
 
-To remove everything, including the data:
+To take down the compute and keep the data, in `compute/`:
 
 ```console
 pulumi destroy
-pulumi stack rm --preserve-config staging
+```
+
+and `pulumi up` there brings it back. To remove everything, including the
+data, destroy the compute stack first, then the data stack:
+
+```console
+cd compute && pulumi destroy && pulumi stack rm --preserve-config staging
+cd ../data && pulumi destroy && pulumi stack rm --preserve-config staging
 ```
