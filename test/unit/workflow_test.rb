@@ -988,4 +988,10 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal '2021-03-31 15:01:47 UTC', FactoryBot.create(:remote_git_workflow).ro_crate['datePublished'].utc.to_s,
                  'Should set datePublished to time of git commit'
   end
+
+  test 'sets contentUrl in RO-Crate metadata' do
+    workflow = FactoryBot.create(:remote_git_workflow)
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.ga",
+                 workflow.ro_crate['contentUrl']
+  end
 end
