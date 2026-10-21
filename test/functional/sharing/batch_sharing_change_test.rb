@@ -169,17 +169,20 @@ class BatchSharingChangeTest < ActionController::TestCase
   test 'should not change sharing of items the user cannot manage' do
     victim = people(:quentin_person)
     df = FactoryBot.create(:data_file, contributor: victim, policy: FactoryBot.create(:private_policy))
+    # a data file aaron owns and may manage, submitted alongside the victim's item
+    my_df = FactoryBot.create(:data_file, contributor: @person, policy: FactoryBot.create(:private_policy))
 
-    # aaron (the logged in user) has no access to the victim's data file
+    # aaron (the logged in user) has no access to the victim's data file, but manages his own
     refute df.can_view?(@person.user)
     refute df.can_manage?(@person.user)
+    assert my_df.can_manage?(@person.user)
 
     original_permission_count = df.policy.permissions.count
 
-    # attempt to grant aaron MANAGING rights on the victim's item via the bulk endpoint
+    # attempt to grant aaron MANAGING rights on both items via the bulk endpoint
     params = { publish: {} }
-    params[:publish][df.class.name] = { df.id.to_s => '1' }
-    params[:policy_attributes] = { access_type: Policy::NO_ACCESS,
+    params[:publish][df.class.name] = { df.id.to_s => '1', my_df.id.to_s => '1' }
+    params[:policy_attributes] = { access_type: Policy::VISIBLE,
                                    permissions_attributes: { '1': { contributor_type: 'Person',
                                                                     contributor_id: @person.id,
                                                                     access_type: Policy::MANAGING } } }
@@ -188,12 +191,19 @@ class BatchSharingChangeTest < ActionController::TestCase
     assert_response :success
 
     df.reload
-    # no permission was granted and the item is still inaccessible to aaron
+    # the victim's item is untouched: no permission granted and still inaccessible to aaron
     assert_equal original_permission_count, df.policy.permissions.count
     refute df.policy.permissions.where(contributor_type: 'Person', contributor_id: @person.id).exists?
+    assert_equal Policy::NO_ACCESS, df.policy.access_type
     refute df.can_view?(@person.user)
     refute df.can_manage?(@person.user)
     refute df.can_download?(@person.user)
+
+    my_df.reload
+    # the manageable item was still changed: the operation is not aborted by the excluded item
+    assert_equal Policy::VISIBLE, my_df.policy.access_type
+    assert my_df.policy.permissions.where(contributor_type: 'Person', contributor_id: @person.id,
+                                          access_type: Policy::MANAGING).exists?
   end
 
   test 'should notify gatekeeper and create logs if necessary' do
