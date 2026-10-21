@@ -54,6 +54,13 @@ config:
   workerCount:
     type: integer
     default: 1
+  # Puma worker processes per web instance, each serving one request at a
+  # time, so the number of requests an instance serves at once. Each needs
+  # several hundred MB; raise it within webInstanceType's memory, and
+  # webRequestTarget in proportion.
+  webPumaWorkers:
+    type: integer
+    default: 2
   webInstanceType:
     type: string
     default: t3.large
@@ -126,15 +133,15 @@ variables:
 
   # First half of the web and worker instances' user data: install Docker,
   # mount the filestore, and write the container environment. Each launch
-  # template appends its own `docker run`. NO_ENTRYPOINT_WORKERS and NGINX_TLS
-  # are only read by the web entrypoint and QUIET_SUPERCRONIC only by the
-  # workers, so one environment serves both. REDIS_TLS, MYSQL_SSL_CA and
-  # NGINX_TLS need a SEEK image recent enough to support them; without
-  # MYSQL_SSL_CA support, SEEK cannot connect, since the database requires
-  # TLS. BOOTSNAP_CACHE_DIR keeps bootsnap's cache in the container, out of
-  # the shared file cache on EFS, where instances booting at once (or on
-  # different images) leave each other stale NFS handles and Puma fails to
-  # start.
+  # template appends its own `docker run`. NO_ENTRYPOINT_WORKERS, NGINX_TLS
+  # and PUMA_WORKERS_NUM are only read by the web entrypoint and
+  # QUIET_SUPERCRONIC only by the workers, so one environment serves both.
+  # REDIS_TLS, MYSQL_SSL_CA and NGINX_TLS need a SEEK image recent enough to
+  # support them; without MYSQL_SSL_CA support, SEEK cannot connect, since
+  # the database requires TLS. BOOTSNAP_CACHE_DIR keeps bootsnap's cache in
+  # the container, out of the shared file cache on EFS, where instances
+  # booting at once (or on different images) leave each other stale NFS
+  # handles and Puma fails to start.
   hostSetup: |
     #!/bin/bash
     set -euo pipefail
@@ -186,7 +193,7 @@ variables:
     REDIS_PASSWORD=$REDIS_PASSWORD
     REDIS_TLS=1
     BOOTSNAP_CACHE_DIR=/seek/tmp/bootsnap
-    PUMA_WORKERS_NUM=2
+    PUMA_WORKERS_NUM=${webPumaWorkers}
     NO_ENTRYPOINT_WORKERS=1
     NGINX_TLS=1
     QUIET_SUPERCRONIC=1
@@ -523,6 +530,10 @@ resources:
       iamInstanceProfile:
         arn: ${ssmProfile.arn}
       vpcSecurityGroupIds: ["${appSgId}"]
+      # CPU every minute rather than every five, so the CPU policy reacts
+      # minutes sooner.
+      monitoring:
+        enabled: true
       blockDeviceMappings:
         - deviceName: /dev/xvda
           ebs:
