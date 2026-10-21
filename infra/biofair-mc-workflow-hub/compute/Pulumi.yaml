@@ -39,6 +39,18 @@ config:
   webCpuTarget:
     type: integer
     default: 50
+  # Requests a minute per web instance that autoscaling aims for, counted at
+  # the load balancer. Each instance serves only PUMA_WORKERS_NUM requests at
+  # a time, so this tracks load that leaves CPU low, such as requests waiting
+  # on the database or Solr. Provisional: set from a load test.
+  webRequestTarget:
+    type: integer
+    default: 300
+  # Average response time, in whole seconds, that adds web instances when
+  # exceeded for three minutes: requests queueing for a free Puma worker.
+  webResponseTimeLimit:
+    type: integer
+    default: 2
   workerCount:
     type: integer
     default: 1
@@ -572,6 +584,11 @@ resources:
         - ${natRouteA}
         - ${natRouteB}
 
+  # Three policies scale the web group. The two target tracking policies add
+  # instances when either average CPU or requests per instance is above its
+  # target, and remove them only when both are well below. The step policy
+  # adds instances when responses are slow, whatever the cause.
+  #
   # Adds web instances when average CPU is above webCpuTarget, and removes
   # them when it is well below.
   webScalePolicy:
@@ -584,6 +601,62 @@ resources:
         predefinedMetricSpecification:
           predefinedMetricType: ASGAverageCPUUtilization
         targetValue: ${webCpuTarget}
+
+  # Adds web instances when requests a minute per instance are above
+  # webRequestTarget, and removes them when they are well below.
+  webRequestPolicy:
+    type: aws:autoscaling:Policy
+    properties:
+      name: ${namePrefix}-web-requests
+      autoscalingGroupName: ${webGroup.name}
+      policyType: TargetTrackingScaling
+      targetTrackingConfiguration:
+        predefinedMetricSpecification:
+          predefinedMetricType: ALBRequestCountPerTarget
+          resourceLabel: ${alb.loadBalancer.arnSuffix}/${alb.defaultTargetGroup.arnSuffix}
+        targetValue: ${webRequestTarget}
+
+  # Adds a web instance when the average response time has been above
+  # webResponseTimeLimit for three minutes, and two when it is above twice
+  # that. It never removes any: the target tracking policies do that once CPU
+  # and requests are low. Slowness caused by the database or Solr rather than
+  # by busy Puma workers also triggers it, and more web instances do not cure
+  # that, so the target tracking policies then remove them again.
+  webResponseTimePolicy:
+    type: aws:autoscaling:Policy
+    properties:
+      name: ${namePrefix}-web-response-time
+      autoscalingGroupName: ${webGroup.name}
+      policyType: StepScaling
+      adjustmentType: ChangeInCapacity
+      # As defaultInstanceWarmup: a new instance's boot does not count twice.
+      estimatedInstanceWarmup: 300
+      stepAdjustments:
+        - metricIntervalLowerBound: "0"
+          metricIntervalUpperBound: ${webResponseTimeLimit}
+          scalingAdjustment: 1
+        - metricIntervalLowerBound: ${webResponseTimeLimit}
+          scalingAdjustment: 2
+
+  webResponseTimeAlarm:
+    type: aws:cloudwatch:MetricAlarm
+    properties:
+      name: ${namePrefix}-web-response-time
+      alarmDescription: Web responses slower than webResponseTimeLimit; adds web instances
+      namespace: AWS/ApplicationELB
+      metricName: TargetResponseTime
+      dimensions:
+        LoadBalancer: ${alb.loadBalancer.arnSuffix}
+        TargetGroup: ${alb.defaultTargetGroup.arnSuffix}
+      statistic: Average
+      period: 60
+      evaluationPeriods: 3
+      threshold: ${webResponseTimeLimit}
+      comparisonOperator: GreaterThanThreshold
+      # No requests means no data, which is not slowness.
+      treatMissingData: notBreaching
+      alarmActions:
+        - ${webResponseTimePolicy.arn}
 
   workerLaunchTemplate:
     type: aws:ec2:LaunchTemplate
