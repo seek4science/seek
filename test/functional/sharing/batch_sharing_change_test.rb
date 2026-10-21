@@ -104,7 +104,7 @@ class BatchSharingChangeTest < ActionController::TestCase
     params[:publish][model.class.name] ||= {}
     params[:publish][model.class.name][model.id.to_s] = '1'
 
-    df = data_with_isa
+    df = FactoryBot.create(:data_file, contributor: @person, projects: [@person.projects.first])
     params[:publish][df.class.name] ||= {}
     params[:publish][df.class.name][df.id.to_s] = '1'
     post :batch_change_permission_for_selected_items, params: params.merge(id: @person.id)
@@ -164,6 +164,36 @@ class BatchSharingChangeTest < ActionController::TestCase
     refute df.can_download?
     refute obs_unit.can_download?
 
+  end
+
+  test 'should not change sharing of items the user cannot manage' do
+    victim = people(:quentin_person)
+    df = FactoryBot.create(:data_file, contributor: victim, policy: FactoryBot.create(:private_policy))
+
+    # aaron (the logged in user) has no access to the victim's data file
+    refute df.can_view?(@person.user)
+    refute df.can_manage?(@person.user)
+
+    original_permission_count = df.policy.permissions.count
+
+    # attempt to grant aaron MANAGING rights on the victim's item via the bulk endpoint
+    params = { publish: {} }
+    params[:publish][df.class.name] = { df.id.to_s => '1' }
+    params[:policy_attributes] = { access_type: Policy::NO_ACCESS,
+                                   permissions_attributes: { '1': { contributor_type: 'Person',
+                                                                    contributor_id: @person.id,
+                                                                    access_type: Policy::MANAGING } } }
+    params = params.merge(id: @person.id)
+    post :batch_sharing_permission_changed, params: params
+    assert_response :success
+
+    df.reload
+    # no permission was granted and the item is still inaccessible to aaron
+    assert_equal original_permission_count, df.policy.permissions.count
+    refute df.policy.permissions.where(contributor_type: 'Person', contributor_id: @person.id).exists?
+    refute df.can_view?(@person.user)
+    refute df.can_manage?(@person.user)
+    refute df.can_download?(@person.user)
   end
 
   test 'should notify gatekeeper and create logs if necessary' do
@@ -284,23 +314,6 @@ class BatchSharingChangeTest < ActionController::TestCase
         FactoryBot.create(klass.name.underscore.to_sym, contributor: User.current_user.person)
       end
     end
-  end
-
-  def data_file_for_sharing(owner = users(:datafile_owner))
-    FactoryBot.create(:data_file, contributor: owner.person)
-  end
-
-  def data_with_isa
-    df = data_file_for_sharing
-    other_user = users(:quentin)
-    assay = FactoryBot.create :experimental_assay, contributor: df.contributor,
-                    study: FactoryBot.create(:study, contributor: df.contributor,
-                                   investigation: FactoryBot.create(:investigation, contributor: df.contributor))
-    other_persons_data_file = FactoryBot.create(:data_file, contributor: other_user.person, policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
-    assay.associate(df)
-    assay.associate(other_persons_data_file)
-    refute other_persons_data_file.can_manage?
-    df
   end
 
 end
