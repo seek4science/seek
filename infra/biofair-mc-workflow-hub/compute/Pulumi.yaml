@@ -512,13 +512,25 @@ resources:
         targetType: instance
         vpcId: ${vpcId}
         deregistrationDelay: 30
+        # Each request goes to the instance with the fewest in progress,
+        # rather than to each in turn: SEEK's requests vary widely in length,
+        # an overloaded instance gets fewer new ones, and a newly healthy
+        # one takes its share at once.
+        loadBalancingAlgorithmType: least_outstanding_requests
+        # /up queues behind other requests for a free Puma worker, so an
+        # overloaded instance answers it slowly. The web group replaces
+        # instances that fail this check, so it tolerates slowness: an
+        # instance is unhealthy only after five minutes of failures (ten at
+        # 30-second intervals, the most the load balancer allows), long
+        # enough for scaling out to relieve it, but a hung instance is still
+        # replaced.
         healthCheck:
           protocol: HTTPS
           path: /up
           interval: 30
-          timeout: 5
+          timeout: 10
           healthyThreshold: 2
-          unhealthyThreshold: 5
+          unhealthyThreshold: 10
           matcher: "200"
 
   webLaunchTemplate:
@@ -582,6 +594,12 @@ resources:
       # start-up does not trigger further scaling. A new web instance is
       # healthy within about five minutes.
       defaultInstanceWarmup: 300
+      # When the group removes an instance, to scale in or to rebalance
+      # across zones, remove the newest: one still booting or barely warmed
+      # up, rather than the oldest, which may be the one carrying the load.
+      # Rebalancing does not wait for new instances to be healthy before
+      # removing one.
+      terminationPolicies: ["NewestInstance"]
       launchTemplate:
         id: ${webLaunchTemplate.id}
         version: ${webLaunchTemplate.latestVersion}
@@ -595,10 +613,11 @@ resources:
         - ${natRouteA}
         - ${natRouteB}
 
-  # Three policies scale the web group. The two target tracking policies add
+  # Four policies scale the web group. The two target tracking policies add
   # instances when either average CPU or requests per instance is above its
-  # target, and remove them only when both are well below. The step policy
-  # adds instances when responses are slow, whatever the cause.
+  # target, and remove them only when both are well below. Two step policies
+  # only add: one sooner than target tracking when requests per instance
+  # surge, the other when responses are slow, whatever the cause.
   #
   # Adds web instances when average CPU is above webCpuTarget, and removes
   # them when it is well below.
@@ -626,6 +645,46 @@ resources:
           predefinedMetricType: ALBRequestCountPerTarget
           resourceLabel: ${alb.loadBalancer.arnSuffix}/${alb.defaultTargetGroup.arnSuffix}
         targetValue: ${webRequestTarget}
+
+  # Target tracking's alarms need three minutes of data. This one acts on two:
+  # it adds a web instance when requests per instance have been above
+  # webRequestTarget for two minutes, and two when they are above twice that,
+  # so a sudden surge gets capacity a minute or more sooner, and in bigger
+  # steps. Like the response-time policy, it never removes instances.
+  webRequestSurgePolicy:
+    type: aws:autoscaling:Policy
+    properties:
+      name: ${namePrefix}-web-request-surge
+      autoscalingGroupName: ${webGroup.name}
+      policyType: StepScaling
+      adjustmentType: ChangeInCapacity
+      estimatedInstanceWarmup: 300
+      # Bounds are relative to the alarm's threshold, webRequestTarget.
+      stepAdjustments:
+        - metricIntervalLowerBound: "0"
+          metricIntervalUpperBound: ${webRequestTarget}
+          scalingAdjustment: 1
+        - metricIntervalLowerBound: ${webRequestTarget}
+          scalingAdjustment: 2
+
+  webRequestSurgeAlarm:
+    type: aws:cloudwatch:MetricAlarm
+    properties:
+      name: ${namePrefix}-web-request-surge
+      alarmDescription: Requests per web instance above webRequestTarget for two minutes; adds web instances
+      namespace: AWS/ApplicationELB
+      metricName: RequestCountPerTarget
+      dimensions:
+        LoadBalancer: ${alb.loadBalancer.arnSuffix}
+        TargetGroup: ${alb.defaultTargetGroup.arnSuffix}
+      statistic: Sum
+      period: 60
+      evaluationPeriods: 2
+      threshold: ${webRequestTarget}
+      comparisonOperator: GreaterThanThreshold
+      treatMissingData: notBreaching
+      alarmActions:
+        - ${webRequestSurgePolicy.arn}
 
   # Adds a web instance when the average response time has been above
   # webResponseTimeLimit for three minutes, and two when it is above twice
