@@ -27,7 +27,7 @@ flowchart LR
     alb["Load balancer<br/>HTTPS, self-signed certificate"]
 
     subgraph app[" "]
-        web["Front-end<br/>1-8 instances, autoscaled on CPU"]
+        web["Front-end<br/>1-6 instances, autoscaled on CPU and requests"]
         workers["Workers<br/>1 instance"]
     end
 
@@ -51,7 +51,7 @@ flowchart LR
 
 | Service | Runs as | Instances |
 |---|---|---|
-| Front-end | SEEK container on EC2, in an Auto Scaling group | 1-8, scaled on CPU (`webCount`, `webCountMax`, `webCpuTarget`) |
+| Front-end | SEEK container on EC2, in an Auto Scaling group | 1-6, scaled on CPU, requests per instance and response time (`webCount`, `webCountMax`, `webCpuTarget`, `webRequestTarget`, `webResponseTimeLimit`) |
 | Workers | SEEK container on EC2, in an Auto Scaling group | 1 (`workerCount`) |
 | Solr | `fairdom/seek-solr` container on a dedicated EC2 instance | 1 |
 | MySQL | RDS, managed | single instance |
@@ -70,7 +70,7 @@ flowchart TB
     subgraph aws["AWS account: biofair-mc-workflow-hub (eu-west-2)"]
         alb["Application Load Balancer<br/>HTTPS 443, self-signed certificate in ACM<br/>HTTP 80 redirects"]
 
-        subgraph webasg["Web Auto Scaling group, 1-8"]
+        subgraph webasg["Web Auto Scaling group, 1-6"]
             web["SEEK container<br/>nginx HTTPS :3000 to Puma"]
         end
         subgraph workerasg["Worker Auto Scaling group, 1"]

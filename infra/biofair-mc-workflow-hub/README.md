@@ -37,9 +37,18 @@ lives in a stack of its own. It needs no IAM permissions beyond the
 - **Completed:** Pulumi `protect` on the database, EFS and the Solr volume, so
   a `destroy` fails rather than deleting them (`protectData`, off for
   staging)
-- Review the instance types and sizes against measured use
-  - followed up by setting the number of Puma workers, and the Solr JVM memory
-- Autoscaling for memory also ?
+- **Completed for the web tier:** Instance sizes from load testing: four Puma
+  workers per `t3.large` (configurable), and its CPU the limit; the worker,
+  Solr and database still to review, and the Solr JVM memory to make
+  configurable
+- **Completed:** Autoscaling on requests per instance and on slow responses as
+  well as CPU, with a health check that tolerates overload, the newest
+  instance removed first, and requests routed to the least busy instance
+- Faster scaling out: instances that boot faster (a prepared image or a warm
+  pool), a minimum of two web instances, and load shedding under overload
+- A vCPU quota above 16, to allow more than six web instances
+- Scaling on Puma's own fullness or memory (needs CloudWatch permissions from
+  the Hub)
 
 ## Phase 4 (post-staging)
 

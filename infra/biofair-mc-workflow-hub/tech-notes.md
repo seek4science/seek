@@ -20,8 +20,8 @@ to what is needed to prove SEEK runs on it:
 - an Application Load Balancer at its own AWS hostname, serving HTTPS with a
   self-signed certificate, and redirecting HTTP to HTTPS
 - SEEK web and Solid Queue worker instances in Auto Scaling groups, running
-  the SEEK image with Docker on Amazon Linux 2023: 1-8 web instances,
-  autoscaled on CPU, and one worker
+  the SEEK image with Docker on Amazon Linux 2023: 1-6 web instances (the
+  vCPU quota), autoscaled on CPU, requests and response time, and one worker
 - MySQL on RDS (TLS required), Redis on ElastiCache (TLS and an auth token), and the filestore
   and a shared file cache on EFS, each through its own access point
 - Solr on its own EC2 instance running the `fairdom/seek-solr` image, in its
@@ -170,18 +170,80 @@ instance boots and passes its health check before an old one is terminated.
 
 ### Autoscaling
 
-The web group runs between `webCount` (1) and `webCountMax` (8) instances. A
-target tracking policy adds instances while average CPU across the group is
-above `webCpuTarget` (50%), and removes them once it has been well below
-(under 35%) for 15 minutes. A new instance is left out of the average for
-its first five minutes, while it boots and pulls the image. Pulumi does not
-set the group's desired capacity, so a `pulumi up` leaves the current number
-of instances alone.
+The web group runs between `webCount` (1) and `webCountMax` instances, six
+for staging: the account's quota for standard instances is 16 vCPUs, and
+Solr and the worker use 4 of them. Each instance runs `webPumaWorkers` (4)
+single-threaded Puma workers, so serves four requests at a time. Pulumi does
+not set the group's desired capacity, so a `pulumi up` leaves the current
+number of instances alone; after changing the group by hand, use
+`pulumi up --refresh` so Pulumi notices.
 
-EC2's basic monitoring reports CPU every five minutes, so scaling reacts a
-few minutes late in both directions. Watch it in the console under the
-group's **Activity** tab, or the CloudWatch alarms named
-`TargetTracking-<group>-AlarmHigh` and `-AlarmLow`.
+Four policies scale it:
+
+| Policy | Acts on | Scales |
+|---|---|---|
+| `-web-cpu`, target tracking | average CPU, aiming for `webCpuTarget` (50%) | out and in |
+| `-web-requests`, target tracking | the load balancer's requests a minute per instance, aiming for `webRequestTarget` (250) | out and in |
+| `-web-request-surge`, step | requests per instance above `webRequestTarget` for two minutes: one instance, or two above twice that | out only |
+| `-web-response-time`, step | average response time above `webResponseTimeLimit` (2 s) for three minutes: one instance, or two above twice that | out only |
+
+The group scales out when any policy asks, and in only when both target
+tracking policies agree, after 15 minutes well below target. Target
+tracking's alarms need three minutes of data, which the step policies do not
+wait for. Detailed monitoring reports the web instances' CPU every minute.
+A new instance is left out of the averages for its first five minutes.
+
+Measured on staging with a load test (requests arriving at a set rate, as
+independent users do, rather than clients waiting for each other):
+
+- One `t3.large` with four workers serves about 5-6 page views a second,
+  about 350 requests a minute, before response times climb; its two vCPUs
+  are then saturated, with memory to spare (2 GB of 7.6 used), so more
+  workers would not add throughput. `webRequestTarget` is about 70% of that.
+- From a sudden surge to the first new instance serving takes about seven
+  minutes: three and a half to notice (CPU fires first, as the load
+  balancer's request counts arrive later than EC2's CPU), and about four for
+  the instance to boot, of which installing packages and pulling the image
+  is two and a half. At 20 page views a second the group settled at six
+  instances, each at about 45% CPU, with 0.3 s median responses.
+
+Three settings keep scaling from making things worse:
+
+- The load balancer's health check allows 10 s and 10 failures at 30 s
+  intervals, so only five minutes of failures replace an instance. An
+  overloaded instance answers `/up` slowly, since it queues behind other
+  requests, and replacing it removes capacity when it is most needed.
+- The group's termination policy is `NewestInstance`. Rebalancing across
+  zones removes an instance without waiting for its replacement to be
+  healthy, and once removed the one instance serving traffic.
+- The target group routes each request to the instance with the fewest in
+  progress (`least_outstanding_requests`), so a newly healthy instance takes
+  its share at once and an overloaded one gets fewer.
+
+Under sustained overload, requests still queue without limit: they take up to
+the load balancer's 60-second timeout, and an instance whose connections are
+exhausted makes the load balancer answer 502. Faster boots (a prepared image
+or a warm pool), load shedding in nginx, and a minimum of two instances are
+in `docs/pulumi-next-phase.md`, phase 3.
+
+Watch it in the console under the group's **Activity** tab, or the CloudWatch
+alarms named `TargetTracking-<group>-AlarmHigh` and `-AlarmLow`,
+`<prefix>-web-request-surge` and `<prefix>-web-response-time`.
+
+### The shared file cache and SEEK
+
+`tmp/cache` is shared by every web and worker process on every instance, and
+SEEK's code was written for one server. Two problems found so far:
+
+- **Occasional 500s from i18n-js** (`Errno::ENOENT … tmp/cache/i18n-js.yml`),
+  when instances or Puma workers start. SEEK registers i18n-js's development
+  middleware in every environment; each new worker deletes its file in the
+  shared cache while other processes are reading it. Needs a SEEK change:
+  register the middleware in development only.
+- **`Errno::ENOENT … @ dir_initialize - tmp/cache/XXX/YYY`** in jobs: Rails'
+  file cache store walks its directories (`cleanup`, `delete_matched`) while
+  other processes remove emptied ones. This also happens on a single server.
+  Needs a SEEK change: tolerate directories that vanish during the walk.
 
 ### Why not Fargate
 
@@ -463,6 +525,6 @@ At London on-demand prices, staging costs roughly $0.38 an hour for
 everything except the web instances (the worker and Solr instances, RDS,
 ElastiCache, the load balancer and the NAT gateway), plus about $0.10 an hour
 for each web instance: about $0.48 an hour at the minimum of one, $0.68 at
-three and $1.17 at the maximum of eight. A busy `t3` instance adds about
+three and $0.98 at staging's maximum of six. A busy `t3` instance adds about
 $0.03 an hour in CPU credits. With only the data stack up, about $0.11 an
 hour with the database running and $0.02 with it stopped.

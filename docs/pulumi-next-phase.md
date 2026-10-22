@@ -21,7 +21,7 @@ needs no IAM permissions beyond the `Developer` permission set. All seven
 phase 2 items have since been completed, and are marked below; only the Solr
 volume's scheduled snapshots wait, on an IAM role from the Hub. Phase 3's
 first two items, the data and compute stacks and protecting the data, are
-complete too.
+complete too, and the web tier has been sized and its scaling load tested.
 
 The full design, before phase 1 cut it down, is in the history at commit
 `6550a42c0b`. Most items below were already written there and can be adapted
@@ -63,7 +63,8 @@ that blocks it.
 
 ### 3. **Completed:** Front-end autoscaling
 
-- **Adds:** 1-8 web instances, scaled on CPU.
+- **Adds:** 1-8 web instances, scaled on CPU (six for now, the vCPU quota;
+  scaling on requests and response time came later, item 4 of phase 3).
 - **Done as:** `webGroup` runs between `webCount` and `webCountMax`, with no
   desired capacity set, so autoscaling owns it; `webScalePolicy`, a target
   tracking policy on `ASGAverageCPUUtilization` at `webCpuTarget` (50%, low
@@ -225,45 +226,70 @@ that blocks it.
   unset with false. A `destroy` refused by protection on staging is still to
   be tried.
 
-### 3. Review instance types and sizes
+### 3. Review instance types and sizes (web tier done)
 
 - **Adds:** sizes based on measured use rather than estimates, before the
   deployment holds real data and costs start to matter.
-- **Current:** web and worker `t3.large` (2 vCPU, 8 GiB), Solr `t3.medium`,
-  RDS `db.t3.medium`, ElastiCache `cache.t4g.small`, with `PUMA_WORKERS_NUM`
-  fixed at 2 in `hostSetup`.
-- **Measure:** memory and CPU of each container (`docker stats` on the
-  instances, CloudWatch CPU for each group and the database) under realistic
-  use and under a load test (many parallel requests through the load
-  balancer for 15-20 minutes, enough to make the web group scale).
-- **Consider:**
-  - Smaller web instances, more of them, now that the web tier autoscales;
-    and Puma workers sized to each instance's memory.
-  - A smaller worker instance if job load stays light.
-  - Burstable (`t3`) instances under sustained load run in unlimited mode
-    and are charged for CPU above their baseline; a steadily busy tier may be
-    cheaper as `m`-class.
-  - Graviton (`t4g`, `m7g`) is cheaper, but needs arm64 builds of the SEEK
-    and Solr images (the SEEK Dockerfile fetches an amd64 supercronic), and
-    `db.t4g` classes are not offered in the VPC's zones (eu-west-2a/2b).
-  - Reserved instances or a savings plan once sizes settle, for a
-    long-running deployment.
-- **Then:** set the number of Puma workers and the Solr JVM memory to match
-  the chosen sizes. Both are fixed today (`PUMA_WORKERS_NUM=2` in
-  `hostSetup`; `SOLR_JAVA_MEM="-Xms512m -Xmx1024m"` in the Solr user data),
-  so they would become stack config alongside the instance types.
+- **Done for the web tier**, by load testing staging with k6, requests
+  arriving at a set rate so they overlap as SEEK slows:
+  - One `t3.large` with four Puma workers serves about 5-6 page views a
+    second (about 350 requests a minute) before response times climb, with
+    both vCPUs saturated and 2 GB of 7.6 used. More workers would add memory
+    use but not throughput; more throughput per instance needs more CPU
+    (`c7i`/`m7i`), and two `t3.large` cost less than one `m7i.xlarge`.
+  - `webPumaWorkers` (default 2) is now stack config, set to 4 for staging,
+    and `webRequestTarget` is 250, about 70% of the measured limit.
+  - The account's quota for standard instances is 16 vCPUs, which caps
+    staging at six web instances (`webCountMax` 6); an increase to 32 has
+    been asked of the Hub.
+- **Still open:** the worker, Solr, RDS and ElastiCache sizes under real
+  use; the Solr JVM memory as config (`SOLR_JAVA_MEM` is fixed in the Solr
+  user data); reserved instances or a savings plan once sizes settle.
+  Graviton (`t4g`, `m7g`) is cheaper, but needs arm64 builds of the SEEK
+  and Solr images (the SEEK Dockerfile fetches an amd64 supercronic), and
+  `db.t4g` classes are not offered in the VPC's zones.
 
-### 4. Scaling on more than CPU (to investigate)
+### 4. Scaling on more than CPU (partly done)
 
-- **Question:** whether the web group should also scale on memory, or on
-  something closer to load than CPU.
-- **Notes:** Auto Scaling's built-in target tracking metrics are CPU,
-  network traffic, and the load balancer's requests per target; memory is
-  not one of them. Scaling on memory needs the CloudWatch agent on the
-  instances publishing it, which needs CloudWatch permissions on the
-  instance role (the same Hub request as container logs, phase 4). Requests
-  per target needs no extra permissions, and may track Puma's capacity (a
-  fixed number of single-threaded workers per instance) better than CPU.
+- **Done:**
+  - Target tracking on the load balancer's requests per instance
+    (`webRequestTarget`) alongside CPU, and step scaling on a two-minute
+    request surge and on slow responses (`webResponseTimeLimit`).
+  - Detailed monitoring on the web instances, so CPU is reported every
+    minute.
+  - Found by load testing, and fixed: the health check replaced overloaded
+    instances after 2.5 minutes (now five minutes of failures); rebalancing
+    across zones terminated the one instance serving traffic (now
+    `NewestInstance`); requests were dealt round-robin to overloaded
+    instances (now `least_outstanding_requests`).
+  - Result: a surge to three times one instance's capacity reached six
+    instances and 0.3 s median responses with no instance lost, but took
+    about seven minutes to the first new instance serving: three and a half
+    to notice (CPU is the fastest signal; the load balancer's request counts
+    arrive later) and four to boot.
+- **Still open, roughly in order of value:**
+  - **Faster boots.** Installing packages and pulling the SEEK image take
+    two and a half of a new instance's four minutes. A prepared AMI with
+    Docker, the EFS helper and the image would save most of that (about
+    $0.50 a month per image version kept; one per SEEK release, and needs
+    `ec2:CreateImage`). A warm pool of stopped instances would make a scale
+    out about a minute (about $2.80 a month each, for the disk), but user
+    data only runs on first boot and Auto Scaling may stop an instance
+    before it finishes, and the instance role cannot complete a lifecycle
+    hook; it needs the setup moved into a service that runs, safely, at
+    every boot.
+  - **A minimum of two web instances**, at least in working hours (a
+    scheduled action), so one overloaded or replaced instance never leaves
+    none healthy; about $0.10 an hour.
+  - **Load shedding:** limit each instance's queue in nginx (`limit_conn`,
+    answering 503 at a few times the Puma worker count), so excess requests
+    fail fast rather than waiting 60 s and exhausting connections. A SEEK
+    change to `docker/nginx.conf.template`; `/up` must not be shed.
+  - **Predictive scaling** once there is real traffic to learn from.
+  - **Scaling on Puma's own fullness** (busy workers and backlog, from its
+    control app) would measure capacity directly, but publishing it needs
+    `cloudwatch:PutMetricData` on the instance role, which the Hub manages:
+    the same request as container logs (phase 4).
 
 ## Phase 4 (post-staging)
 
@@ -359,6 +385,19 @@ Each roughly doubles the cost of that part.
   database password, the Redis token, the certificate's private key) are
   encrypted with the deployer's passphrase; a shared backend needs a
   secrets provider others can use, such as a KMS key or Pulumi Cloud.
+- **SEEK on a shared `tmp/cache`.** The web and worker processes on every
+  instance share the file cache on EFS, and two SEEK problems show up (see
+  the tech notes): i18n-js's development middleware, registered in every
+  environment, deletes `tmp/cache/i18n-js.yml` whenever a Puma worker
+  starts, causing occasional 500s (fix: register it in development only);
+  and Rails' file cache store fails walking directories other processes
+  remove (fix: tolerate vanished directories). Both are SEEK changes, and
+  the second also affects single-server deployments.
+- **Requests to the Hub,** collected: a vCPU quota for standard instances of
+  32 rather than 16 (asked); CloudWatch permissions on the instance role
+  (`cloudwatch:PutMetricData`, CloudWatch Logs) for container logs, memory
+  and Puma metrics; IAM roles for scheduled snapshots of the Solr volume and
+  for database and EFS backups; DNS and ACM for a real domain.
 - **VPC ownership.** Whether the Hub provides networking, in which case the
   program's VPC is replaced by lookups.
 - **A production stack** once a production account exists, with deletion
