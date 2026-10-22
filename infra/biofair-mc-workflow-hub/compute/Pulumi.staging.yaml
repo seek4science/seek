@@ -10,7 +10,15 @@ config:
   biofair-mc-workflow-hub-compute:seekImage: fairdom/seek:workflowhub-pulumi
   biofair-mc-workflow-hub-compute:solrImage: fairdom/seek-solr:pulumi
   biofair-mc-workflow-hub-compute:webCount: "1" # the minimum; keep at 1 until the schema exists
-  biofair-mc-workflow-hub-compute:webCountMax: "8"
+  # The account's quota for standard instances is 16 vCPUs; Solr and the
+  # worker use 4, leaving room for six t3.large web instances.
+  biofair-mc-workflow-hub-compute:webCountMax: "6"
+  # Measured on a t3.large with four Puma workers: response times climb past
+  # about 350 requests a minute (load balancer count, assets included), with
+  # the two vCPUs saturated and memory to spare. More workers would not add
+  # throughput; the request target is about 70% of that limit.
+  biofair-mc-workflow-hub-compute:webPumaWorkers: "4"
+  biofair-mc-workflow-hub-compute:webRequestTarget: "250"
   biofair-mc-workflow-hub-compute:workerCount: "1"
   biofair-mc-workflow-hub-compute:webInstanceType: t3.large
   biofair-mc-workflow-hub-compute:workerInstanceType: t3.large
