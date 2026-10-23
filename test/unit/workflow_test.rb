@@ -1001,7 +1001,7 @@ class WorkflowTest < ActiveSupport::TestCase
                  workflow.ro_crate.main_workflow_diagram['contentUrl']
 
     assert workflow.ro_crate.main_workflow_cwl.present?
-    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/diagram.png",
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/README.md",
                  workflow.ro_crate.main_workflow_cwl['contentUrl']
   end
 end

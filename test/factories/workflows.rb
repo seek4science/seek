@@ -236,7 +236,7 @@ FactoryBot.define do
         commit: 'b6312caabe582d156dd351fab98ce78356c4b74c',
         main_workflow_path: 'concat_two_files.ga',
         diagram_path: 'diagram.png',
-        abstract_cwl_path: 'diagram.png'
+        abstract_cwl_path: 'README.md'
       }
     }
   end
