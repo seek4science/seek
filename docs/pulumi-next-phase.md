@@ -296,7 +296,7 @@ that blocks it.
 
 For once the deployment moves beyond staging.
 
-### 1. **Configured, not yet deployed:** A real domain
+### 1. **Completed:** A real domain
 
 - **Adds:** a real hostname and a certificate browsers trust, replacing the
   self-signed one the program generated.
@@ -316,6 +316,9 @@ For once the deployment moves beyond staging.
   create the zone alone (`pulumi up --target` its URN), add its name servers
   as NS records at GoDaddy, then `pulumi up` the data stack and the compute
   stack. Then set the site's base host in SEEK's admin settings.
+- **Tested:** on staging, `https://wfh.fairdom-seek.org` resolves through the
+  delegation to the load balancer and serves with the ACM certificate
+  (issued by Amazon, renewed automatically); HTTP redirects to HTTPS.
 - **Production:** the same, with the production domain, once its DNS and
   who issues its certificate are agreed with the Hub.
 

@@ -54,8 +54,8 @@ lives in a stack of its own. It needs no IAM permissions beyond the
 
 ## Phase 4 (post-staging)
 
-- **Configured, not yet deployed:** A real domain, `wfh.fairdom-seek.org` for
-  staging, delegated to Route 53, with a certificate from ACM
+- **Completed:** A real domain, `wfh.fairdom-seek.org` for staging, delegated
+  to Route 53, with a certificate from ACM
 - Database and EFS backups
 - Container logs in CloudWatch
 - Higher availability for production: a NAT gateway per AZ, Multi-AZ RDS, a

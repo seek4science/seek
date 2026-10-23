@@ -12,9 +12,8 @@ The diagrams show what the program deploys: phases 1 and 2, and phase 3's
 data and compute stacks. The one part still to come is drawn with a dashed
 outline: the Solr volume's scheduled snapshots, which wait on an IAM role from
 the Hub.
-The site's domain is configured but not yet deployed. The rest of phase 4
-(backups, CloudWatch logs, higher availability, email delivery) is not
-shown.
+Phase 4's domain is shown; the rest of phase 4 (backups, CloudWatch logs,
+higher availability, email delivery) is not.
 
 ## Services overview
 
