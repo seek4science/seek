@@ -98,7 +98,7 @@ class ContentBlob < ApplicationRecord
     begin
       yield copy_path
     ensure
-      FileUtils.rm(copy_path)
+      FileUtils.rm_f(copy_path)
     end
   end
 
@@ -128,7 +128,9 @@ class ContentBlob < ApplicationRecord
   end
 
   def make_temp_copy
-    temp_name = "#{Time.now.strftime('%Y%m%d%H%M%S%L')}-#{original_filename}"
+    # A random component keeps the name unique even when the same blob is copied twice within the
+    # same millisecond (e.g. nested with_temporary_copy calls when comparing a model with itself).
+    temp_name = "#{Time.now.strftime('%Y%m%d%H%M%S%L')}-#{SecureRandom.hex(4)}-#{original_filename}"
     temp_path = File.join(Seek::Config.temporary_filestore_path, temp_name).to_s
     local = storage_adapter.full_path(storage_key)
     if local
