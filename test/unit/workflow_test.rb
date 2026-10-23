@@ -990,8 +990,18 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'sets contentUrl in RO-Crate metadata' do
-    workflow = FactoryBot.create(:remote_git_workflow)
+    workflow = FactoryBot.create(:remote_git_workflow_cwl)
+
+    assert workflow.ro_crate.main_workflow.present?
     assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.ga",
-                 workflow.ro_crate['contentUrl']
+                 workflow.ro_crate.main_workflow['contentUrl']
+
+    assert workflow.ro_crate.main_workflow_diagram.present?
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/diagram.png",
+                 workflow.ro_crate.main_workflow_diagram['contentUrl']
+
+    assert workflow.ro_crate.main_workflow_cwl.present?
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/diagram.png",
+                 workflow.ro_crate.main_workflow_cwl['contentUrl']
   end
 end

@@ -219,7 +219,24 @@ FactoryBot.define do
         ref: 'refs/heads/main',
         commit: 'b6312caabe582d156dd351fab98ce78356c4b74c',
         main_workflow_path: 'concat_two_files.ga',
+        diagram_path: 'diagram.png'
+      }
+    }
+  end
+
+  factory(:remote_git_workflow_cwl, class: Workflow) do
+    title { 'Concat two files' }
+    with_project_contributor
+    association :content_blob, factory: :cwl_content_blob
+    workflow_class { WorkflowClass.find_by_key('cwl') || FactoryBot.create(:cwl_workflow_class) }
+    git_version_attributes {
+      repo = FactoryBot.create(:remote_repository)
+      { git_repository_id: repo.id,
+        ref: 'refs/heads/main',
+        commit: 'b6312caabe582d156dd351fab98ce78356c4b74c',
+        main_workflow_path: 'concat_two_files.ga',
         diagram_path: 'diagram.png',
+        abstract_cwl_path: 'diagram.png'
       }
     }
   end
