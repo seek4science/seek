@@ -120,6 +120,23 @@ module Seek
         presigner.presigned_url(:get_object, **params)
       end
 
+      # Returns a presigned PUT URL so a browser can upload an object directly to S3, bypassing SEEK.
+      # Signed with the public endpoint for the same reason as presigned_url: the URL is used by the
+      # browser, which may not be able to reach the internal endpoint.
+      #
+      # When content_type is given it becomes part of the signature, so the uploader must send exactly
+      # that Content-Type header or S3 rejects the request with SignatureDoesNotMatch.
+      def presigned_upload_url(key, content_type: nil, expires_in: 900)
+        presigner = Aws::S3::Presigner.new(client: @presigning_client)
+        params = {
+          bucket: @bucket,
+          key: object_key(key),
+          expires_in: expires_in
+        }
+        params[:content_type] = content_type if content_type.present?
+        presigner.presigned_url(:put_object, **params)
+      end
+
       private
 
       def build_client(opts)

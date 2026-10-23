@@ -134,6 +134,39 @@ class S3AdapterTest < ActiveSupport::TestCase
     assert_not_includes decoded, 'response-content-type='
   end
 
+  # --- presigned_upload_url ---
+
+  test 'presigned_upload_url returns a signed PUT URL for the prefixed object key' do
+    url = @adapter.presigned_upload_url(KEY, expires_in: 120)
+    assert_kind_of String, url
+    assert_includes url, "#{PREFIX}/#{KEY}"
+    assert_includes url, 'X-Amz-Signature='
+    assert_includes url, 'X-Amz-Expires=120'
+  end
+
+  test 'presigned_upload_url signs the content type when given' do
+    with_type    = CGI.unescape(@adapter.presigned_upload_url(KEY, content_type: 'text/plain'))
+    without_type = CGI.unescape(@adapter.presigned_upload_url(KEY))
+    assert_includes with_type, 'content-type'
+    assert_not_includes without_type, 'content-type'
+  end
+
+  test 'presigned_upload_url defaults to a 15 minute expiry' do
+    assert_includes @adapter.presigned_upload_url(KEY), 'X-Amz-Expires=900'
+  end
+
+  test 'presigned_upload_url signs against the public endpoint when one is configured' do
+    adapter = Seek::Storage::S3Adapter.new(
+      bucket: BUCKET, prefix: 'uploads', region: 'us-east-1',
+      access_key_id: 'test', secret_access_key: 'test',
+      endpoint: 'http://seaweedfs:8333', public_endpoint: 'https://s3.example.org',
+      force_path_style: true
+    )
+    url = adapter.presigned_upload_url(KEY)
+    assert url.start_with?("https://s3.example.org/#{BUCKET}/uploads/#{KEY}"), url
+    assert_not_includes url, 'seaweedfs:8333'
+  end
+
   test 'test_connection returns success when list_objects_v2 succeeds' do
     client.stub_responses(:list_objects_v2, { contents: [] })
     assert @adapter.test_connection[:success]
