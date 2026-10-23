@@ -1,14 +1,23 @@
 #!/bin/sh
 
+# With MYSQL_SSL_CA set, connect over TLS and verify the server's certificate
+# against that CA bundle, overriding the image's skip-ssl client default.
+function mysql_tls_args {
+    if [ ! -z $MYSQL_SSL_CA ]
+    then
+        echo "--ssl --ssl-ca=$MYSQL_SSL_CA --ssl-verify-server-cert"
+    fi
+}
+
 function wait_for_mysql {
-    while ! mysqladmin ping -h $MYSQL_HOST --silent; do
+    while ! mysqladmin $(mysql_tls_args) ping -h $MYSQL_HOST --silent; do
             echo "WAITING FOR MYSQL"
             sleep 2
     done
 }
 
 function wait_for_database {
-    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
+    while ! mysql $(mysql_tls_args) -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
     do
             echo "WAITING FOR DATABASE"
             sleep 2
@@ -36,12 +45,34 @@ function check_mysql {
 
         wait_for_mysql
 
-        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
+        if ! mysql $(mysql_tls_args) -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null 2>&1
         then
             echo "SETTING UP MYSQL DB"
             bundle exec rake db:setup
         fi
     fi
+}
+
+# With NGINX_TLS set (1, true or yes), nginx serves HTTPS on port 3000 with a
+# self-signed certificate generated at each start, for a proxy in front that
+# encrypts its connection to the container but does not verify the
+# certificate, such as an AWS load balancer. Otherwise it serves plain HTTP.
+function configure_nginx_listen {
+    case "${NGINX_TLS,,}" in
+        1|true|yes)
+            echo "NGINX TLS ENABLED"
+            mkdir -p /tmp/nginx-tls
+            openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes \
+                -days 3650 -subj "/CN=seek" \
+                -keyout /tmp/nginx-tls/key.pem -out /tmp/nginx-tls/cert.pem
+            export SEEK_LISTEN="listen 3000 ssl;
+                ssl_certificate /tmp/nginx-tls/cert.pem;
+                ssl_certificate_key /tmp/nginx-tls/key.pem;"
+            ;;
+        *)
+            export SEEK_LISTEN="listen 3000;"
+            ;;
+    esac
 }
 
 function enable_search {
