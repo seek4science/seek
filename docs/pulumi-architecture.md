@@ -12,8 +12,9 @@ The diagrams show what the program deploys: phases 1 and 2, and phase 3's
 data and compute stacks. The one part still to come is drawn with a dashed
 outline: the Solr volume's scheduled snapshots, which wait on an IAM role from
 the Hub.
-Phase 4 (a real domain, backups, CloudWatch logs, higher availability, email
-delivery) is not shown.
+The site's domain is configured but not yet deployed. The rest of phase 4
+(backups, CloudWatch logs, higher availability, email delivery) is not
+shown.
 
 ## Services overview
 
@@ -24,7 +25,7 @@ balancer and to Solr, TLS to MySQL and Redis, and NFS over TLS to EFS.
 ```mermaid
 flowchart LR
     users(["Users"])
-    alb["Load balancer<br/>HTTPS, self-signed certificate"]
+    alb["Load balancer<br/>HTTPS, wfh.fairdom-seek.org"]
 
     subgraph app[" "]
         web["Front-end<br/>1-6 instances, autoscaled on CPU and requests"]
@@ -66,9 +67,10 @@ How a request reaches SEEK, and which services each part of SEEK depends on.
 flowchart TB
     users(["Users"])
     hub[("Docker Hub<br/>fairdom/seek:workflowhub-pulumi<br/>fairdom/seek-solr:pulumi")]
+    parent["fairdom-seek.org DNS at GoDaddy<br/>NS records for wfh"]
 
     subgraph aws["AWS account: biofair-mc-workflow-hub (eu-west-2)"]
-        alb["Application Load Balancer<br/>HTTPS 443, self-signed certificate in ACM<br/>HTTP 80 redirects"]
+        alb["Application Load Balancer<br/>HTTPS 443, ACM certificate<br/>HTTP 80 redirects"]
 
         subgraph webasg["Web Auto Scaling group, 1-6"]
             web["SEEK container<br/>nginx HTTPS :3000 to Puma"]
@@ -81,6 +83,7 @@ flowchart TB
         end
 
         privdns["Route 53 private zone<br/>solr.seek.internal"]
+        pubdns["Route 53 public zone<br/>wfh.fairdom-seek.org"]
         rds[("RDS MySQL 8.4, TLS<br/>db.t3.medium, gp3<br/>app data + job queue")]
         redis[("ElastiCache Redis 7.1, TLS, auth token<br/>cache, sessions, throttling")]
         efs[("EFS<br/>/filestore and /cache access points")]
@@ -91,6 +94,9 @@ flowchart TB
     end
 
     users --> alb --> web
+    users -. "look up wfh.fairdom-seek.org" .-> parent
+    parent -. "delegates" .-> pubdns
+    pubdns -. "alias" .-> alb
     web --> rds
     web --> redis
     web --> efs
@@ -204,11 +210,12 @@ flowchart LR
         param["DB password parameter"]
         zone["Private DNS zone"]
         solrvol[("Solr data volume<br/>protect")]
+        site["Site's public DNS zone<br/>and ACM certificate"]
     end
 
     subgraph compute["compute/: disposable"]
         nat["NAT gateway, and the private<br/>subnets' default route"]
-        alb["Load balancer<br/>certificate, listeners"]
+        alb["Load balancer, listeners,<br/>and the domain's alias record"]
         groups["Web and worker<br/>Auto Scaling groups"]
         solr["Solr instance, DNS record<br/>and TLS certificate"]
         redis[("ElastiCache<br/>and its auth token")]
@@ -223,9 +230,9 @@ Each project is a single Pulumi YAML file in four sections:
 
 | Section | `data/Pulumi.yaml` | `compute/Pulumi.yaml` |
 |---|---|---|
-| `config` | `environment`, `vpcCidr`, `protectData`, database size and deletion settings, `solrDataSizeGb`, and the `dbPassword` secret | Image tags, web and worker counts and the CPU target, instance types, `redisNodeType`, the SSM instance profile's name |
+| `config` | `environment`, `domainName`, `vpcCidr`, `protectData`, database size and deletion settings, `solrDataSizeGb`, and the `dbPassword` secret | Image tags, web and worker counts and the CPU target, instance types, `redisNodeType`, the SSM instance profile's name |
 | `variables` | The `namePrefix` (`biofair-mc-workflow-hub-<environment>`), and the lookup of the subnet for the Solr volume | The data stack's outputs, Solr's DNS name, lookups of the private route tables, the SSM instance profile, the Amazon Linux AMI and the region, and `hostSetup`, the web and worker instances' shared user data |
-| `resources` | VPC and security groups; the password parameter, RDS and its parameter group; EFS, its mount targets and access points; the Solr volume; the private DNS zone | The stack reference; the NAT gateway and routes; the generated Redis auth token, its parameter and ElastiCache; the Solr instance, its attachment, DNS record, and TLS key, certificate and key parameter; the load balancer's self-signed certificate and the load balancer; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
+| `resources` | VPC and security groups; the password parameter, RDS and its parameter group; EFS, its mount targets and access points; the Solr volume; the private DNS zone; the site's public DNS zone, and its ACM certificate with the validation record | The stack reference; the NAT gateway and routes; the generated Redis auth token, its parameter and ElastiCache; the Solr instance, its attachment, DNS record, and TLS key, certificate and key parameter; the load balancer and the domain's alias record; and the web and worker launch templates, Auto Scaling groups and the web scaling policy |
 | `outputs` | The IDs, addresses and names the compute stack needs | Site URL, database and Redis endpoints, EFS ID, web and worker group names, Solr's private IP |
 
 Every resource is tagged `Environment` and `ManagedBy: pulumi` through the AWS

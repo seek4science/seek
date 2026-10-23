@@ -17,8 +17,8 @@ to what is needed to prove SEEK runs on it:
 
 - a VPC with public and private subnets across two Availability Zones and a
   single NAT Gateway
-- an Application Load Balancer at its own AWS hostname, serving HTTPS with a
-  self-signed certificate, and redirecting HTTP to HTTPS
+- an Application Load Balancer serving HTTPS at the site's domain, with an
+  ACM certificate, and redirecting HTTP to HTTPS
 - SEEK web and Solid Queue worker instances in Auto Scaling groups, running
   the SEEK image with Docker on Amazon Linux 2023: 1-6 web instances (the
   vCPU quota), autoscaled on CPU, requests and response time, and one worker
@@ -43,7 +43,7 @@ The program is two Pulumi projects, each with a `staging` stack:
 | VPC and subnets, without a NAT gateway | NAT gateway, and the private subnets' default route through it |
 | Security groups | Redis, its auth token and parameter |
 | RDS, its subnet and parameter groups, the password parameter | Solr instance, its TLS key and certificate, and its DNS record |
-| EFS, mount targets and access points | Load balancer and its certificate |
+| EFS, mount targets and access points | Load balancer, and the domain's alias record |
 | Private DNS zone | Web and worker launch templates, groups and scaling policy |
 | Solr index volume | |
 
@@ -93,15 +93,38 @@ cannot connect at all.
 
 Container logs stay on each instance (`docker logs seek`).
 
-### HTTPS
+### HTTPS and the domain
 
-Pulumi's `tls` provider generates a private key and a self-signed certificate
-(valid for a year, named `<prefix>.seek.internal`), which the program imports
-into ACM for the load balancer's 443 listener. Port 80 redirects to 443.
-Browsers warn about the certificate; accept the warning to continue. The
-private key is held encrypted in the Pulumi state. The load balancer only
-accepts certificates for a fully qualified domain name, hence the
-`.seek.internal` name, though nothing resolves it.
+The site is at `domainName` (`wfh.fairdom-seek.org` for staging), served
+over HTTPS by the load balancer with a certificate from ACM. Port 80
+redirects to 443.
+
+The domain's DNS is delegated to a public Route 53 zone in the data stack
+(`publicZone`): the parent domain (`fairdom-seek.org`, at GoDaddy) has NS
+records for `wfh` pointing at the zone's four name servers (`pulumi stack
+output nameServers` in `data/`). The data stack also requests the ACM
+certificate and puts its DNS validation record in that zone, so ACM issues
+and later renews it by itself; keep that record. The compute stack points
+the domain at its load balancer with an alias record, so recreating the
+compute, which gives the load balancer a new name, needs nothing changed by
+hand.
+
+Setting it up takes two passes of the data stack, since the certificate's
+validation waits until ACM can see the delegation:
+
+```console
+cd data
+pulumi up --target 'urn:pulumi:staging::biofair-mc-workflow-hub-data::aws:route53/zone:Zone::publicZone'
+pulumi stack output nameServers     # add as NS records for the domain at the parent's DNS host
+dig +short NS wfh.fairdom-seek.org  # until it lists them
+pulumi up                           # certificate and validation
+cd ../compute && pulumi up          # listener and alias record
+```
+
+Then set the site's base host in SEEK's admin settings to
+`https://<domainName>`, so links in emails use it. Destroying the data stack
+deletes the zone; a new zone has new name servers, and the parent's NS
+records must be changed to match.
 
 The connection on from the load balancer to the web instances is HTTPS too.
 The web containers run with `NGINX_TLS`, so nginx generates a self-signed
@@ -109,8 +132,7 @@ certificate at each start and serves HTTPS on port 3000, and the target group
 and its health check use HTTPS. The load balancer does not verify target
 certificates, so nothing needs distributing or renewing. It passes
 `X-Forwarded-Proto: https` through nginx to Rails, so SEEK generates
-`https://` links. A real domain
-replaces only the certificate (`docs/pulumi-next-phase.md`, phase 4).
+`https://` links.
 
 The instances reach Solr as `solr.seek.internal` rather than by its IP. If the
 Solr instance is replaced, `pulumi up` updates that record (60-second TTL),
@@ -268,7 +290,9 @@ Shared with biofair-mc-infra's `docs/aws-context.md`, "Still needs a decision":
   answer.
 - **Pulumi state backend.** Not set up yet; must be the same for everyone
   working on this stack.
-- **DNS and ACM certificate issuance.** Not needed until phase 4.
+- **DNS and ACM certificate issuance.** Staging delegates
+  `wfh.fairdom-seek.org` to Route 53 and uses an ACM certificate; a
+  production domain may need agreeing with the Hub.
 
 ## Setting up
 
@@ -396,8 +420,7 @@ exists, `webCount` can be raised. Then run the initial Solr index.
 
 After `pulumi up`, SEEK is at the compute stack's `url` output once the web instance has
 booted and passed its health check, which takes several minutes on first
-boot. Until then the load balancer returns 502. The address is HTTPS with a
-self-signed certificate, so the browser warns first.
+boot. Until then the load balancer returns 502 or 503.
 
 The first Auto Scaling group created in an account makes AWS create the
 `AWSServiceRoleForAutoScaling` service-linked role. The groups' first launch

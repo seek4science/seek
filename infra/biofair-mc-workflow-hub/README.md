@@ -9,7 +9,8 @@ destroyed between uses without touching the data.
 ## Current scope
 
 Phase 1, phase 2 and the completed parts of phase 3: a VPC, a load balancer
-serving HTTPS with a self-signed certificate in front of SEEK web instances,
+serving HTTPS at the site's domain (`wfh.fairdom-seek.org` for staging) in
+front of SEEK web instances,
 autoscaled on CPU, and a worker instance, in EC2 Auto Scaling groups, MySQL on
 RDS, Redis on ElastiCache, the filestore and a shared file cache on EFS, and
 Solr on its own instance, with its index on a separate volume, reached by a
@@ -19,7 +20,8 @@ lives in a stack of its own. It needs no IAM permissions beyond the
 
 ## Phase 2
 
-- **Completed:** HTTPS, with a self-signed certificate for testing
+- **Completed:** HTTPS, first with a self-signed certificate, now with an ACM
+  certificate for the site's domain (see phase 4)
 - **Completed:** A private DNS name for Solr
 - **Completed:** Front-end autoscaling
 - **Completed:** A shared file cache across web instances
@@ -52,7 +54,8 @@ lives in a stack of its own. It needs no IAM permissions beyond the
 
 ## Phase 4 (post-staging)
 
-- A real domain, with a trusted certificate in place of the self-signed one
+- **Configured, not yet deployed:** A real domain, `wfh.fairdom-seek.org` for
+  staging, delegated to Route 53, with a certificate from ACM
 - Database and EFS backups
 - Container logs in CloudWatch
 - Higher availability for production: a NAT gateway per AZ, Multi-AZ RDS, a
@@ -79,6 +82,11 @@ pulumi login --local
 cd data
 pulumi stack init staging
 pulumi config set --secret dbPassword "$(openssl rand -hex 16)"
+# First the site's DNS zone alone, then delegate the domain to it
+pulumi up --target 'urn:pulumi:staging::biofair-mc-workflow-hub-data::aws:route53/zone:Zone::publicZone'
+pulumi stack output nameServers
+# ...add these as NS records for the domain at the parent domain's DNS host
+# (e.g. host "wfh" in fairdom-seek.org), wait for them to resolve, then:
 pulumi up
 
 cd ../compute
@@ -87,7 +95,7 @@ pulumi up
 ```
 
 SEEK is then at `pulumi stack output url` (in `compute/`), a few minutes after
-`up` finishes; the browser warns about the self-signed certificate.
+`up` finishes.
 `stack init` and `config set --secret` add your stacks' salts and the
 encrypted password to the `Pulumi.staging.yaml` files; don't commit them.
 
