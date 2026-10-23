@@ -1,12 +1,7 @@
 # WorkflowHub on AWS: Pulumi architecture
 
-Diagrams of what the Pulumi project in
-[`infra/biofair-mc-workflow-hub/`](../infra/biofair-mc-workflow-hub/) deploys,
-and how the project is put together. For deploy steps, see the project's
-[README](../infra/biofair-mc-workflow-hub/README.md) and
-[`tech-notes.md`](../infra/biofair-mc-workflow-hub/tech-notes.md); for what
-each later phase needs, [`pulumi-next-phase.md`](pulumi-next-phase.md); for the
-original design, [`SEEK-pulumi-handover.md`](SEEK-pulumi-handover.md).
+Diagrams of what the WorkflowHub Pulumi project deploys, and how the project
+is put together.
 
 The diagrams show what the program deploys: phases 1 and 2, and phase 3's
 data and compute stacks. The one part still to come is drawn with a dashed
@@ -133,8 +128,7 @@ over TLS, reads the database password and Redis auth token from Parameter
 Store, fetches the RDS CA bundle, trusts Solr's self-signed certificate,
 writes the container environment, and runs the SEEK container. The Solr
 instance's user data mounts the index volume, builds Solr's TLS keystore from
-the key in Parameter Store, and runs Solr; see
-[`tech-notes.md`](../infra/biofair-mc-workflow-hub/tech-notes.md).
+the key in Parameter Store, and runs Solr.
 
 ## Network and security groups
 
