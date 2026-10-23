@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+# Check the Docker daemon is reachable. Works on Linux (native daemon) and
+# macOS/Docker Desktop (daemon in a VM).
+if ! docker info >/dev/null 2>&1
+then
+    echo "the Docker service isn't running"
+    exit 1
+fi
+
+if docker ps | grep -qw seek-seaweedfs
+then
+    echo "container named seek-seaweedfs is currently running, stop first"
+    exit 1
+fi
+
+echo "deleting seek-seaweedfs container and seek-seaweedfs-data-volume volume (all stored objects)"
+if docker ps -a | grep -qw seek-seaweedfs
+then
+    docker rm seek-seaweedfs > /dev/null
+    echo "deleted container"
+else
+    echo "container seek-seaweedfs does not exist, skipping"
+fi
+docker volume rm seek-seaweedfs-data-volume > /dev/null 2>&1 || true
+echo "deleted volume"
