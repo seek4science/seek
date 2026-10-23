@@ -6,7 +6,7 @@ description: >-
   disposable compute stack, on top of the data stack (../data). The NAT
   gateway, Redis on ElastiCache, Solr on its own EC2 instance, and the
   front-end and workers as Docker containers on EC2 Auto Scaling groups
-  behind a load balancer serving HTTPS with a self-signed certificate.
+  behind a load balancer serving HTTPS at the site's domain.
   Destroying it leaves the database, filestore and Solr index untouched.
   Creates no IAM resources.
 
@@ -454,41 +454,10 @@ resources:
   # rolls the group's instances: each new one boots and pulls the image
   # before the old one is terminated.
   # -------------------------------------------------------------------------
-  # A self-signed certificate for HTTPS until there is a real domain, so
-  # browsers warn. Generated here and imported into ACM; the private key is
-  # held encrypted in the Pulumi state.
-  tlsKey:
-    type: tls:PrivateKey
-    properties:
-      algorithm: RSA
-      rsaBits: 2048
-
-  tlsCert:
-    type: tls:SelfSignedCert
-    properties:
-      privateKeyPem: ${tlsKey.privateKeyPem}
-      # The load balancer only accepts certificates for a fully qualified
-      # domain name; any will do for a self-signed one.
-      subject:
-        commonName: ${namePrefix}.seek.internal
-      dnsNames:
-        - ${namePrefix}.seek.internal
-      validityPeriodHours: 8760
-      allowedUses:
-        - key_encipherment
-        - digital_signature
-        - server_auth
-
-  certificate:
-    type: aws:acm:Certificate
-    properties:
-      privateKey: ${tlsKey.privateKeyPem}
-      certificateBody: ${tlsCert.certPem}
-
-  # HTTPS on 443; plain HTTP on 80 redirects to it. The connection on to the
-  # web instances is HTTPS too (NGINX_TLS): the container's certificate is
-  # self-signed, which the load balancer accepts, as it does not verify
-  # target certificates.
+  # HTTPS on 443 for the site's domain; plain HTTP on 80 redirects to it. The
+  # connection on to the web instances is HTTPS too (NGINX_TLS): the
+  # container's certificate is self-signed, which the load balancer accepts,
+  # as it does not verify target certificates.
   alb:
     type: awsx:lb:ApplicationLoadBalancer
     properties:
@@ -505,7 +474,8 @@ resources:
                 statusCode: HTTP_301
         - port: 443
           protocol: HTTPS
-          certificateArn: ${certificate.arn}
+          # The data stack's certificate for the site's domain.
+          certificateArn: ${data.outputs["certificateArn"]}
       defaultTargetGroup:
         port: 3000
         protocol: HTTPS
@@ -532,6 +502,19 @@ resources:
           healthyThreshold: 2
           unhealthyThreshold: 10
           matcher: "200"
+
+  # The site's domain, in the data stack's public zone, pointing at this
+  # load balancer, whose own name changes each time it is recreated.
+  siteRecord:
+    type: aws:route53:Record
+    properties:
+      zoneId: ${data.outputs["publicZoneId"]}
+      name: ${data.outputs["domainName"]}
+      type: A
+      aliases:
+        - name: ${alb.loadBalancer.dnsName}
+          zoneId: ${alb.loadBalancer.zoneId}
+          evaluateTargetHealth: true
 
   webLaunchTemplate:
     type: aws:ec2:LaunchTemplate
@@ -792,7 +775,7 @@ resources:
         - ${natRouteB}
 
 outputs:
-  url: https://${alb.loadBalancer.dnsName}
+  url: https://${data.outputs["domainName"]}
   databaseEndpoint: ${databaseEndpoint}
   redisEndpoint: ${redis.primaryEndpointAddress}
   sharedFsId: ${sharedFsId}

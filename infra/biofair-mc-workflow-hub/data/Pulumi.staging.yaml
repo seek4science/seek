@@ -5,6 +5,7 @@ config:
       Environment: staging
       ManagedBy: pulumi
   biofair-mc-workflow-hub-data:environment: staging
+  biofair-mc-workflow-hub-data:domainName: wfh.fairdom-seek.org
   biofair-mc-workflow-hub-data:vpcCidr: 10.30.0.0/16
   # Staging is for trials: let `pulumi destroy` delete the data outright.
   biofair-mc-workflow-hub-data:protectData: "false"

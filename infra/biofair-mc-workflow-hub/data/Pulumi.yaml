@@ -4,9 +4,9 @@ description: >-
   AWS infrastructure for the WorkflowHub (SEEK) component of the BioFAIR
   Methods Commons Spoke, in the biofair-mc-workflow-hub account: the
   long-lived data stack. The VPC, security groups, MySQL on RDS, the
-  filestore on EFS, the private DNS zone and the Solr index volume. The
-  compute stack (../compute) runs everything else on top of it. Creates no
-  IAM resources.
+  filestore on EFS, the private DNS zone, the Solr index volume, and the
+  site's public DNS zone and certificate. The compute stack (../compute)
+  runs everything else on top of it. Creates no IAM resources.
 
 # See ../README.md for deploying it. Deploy this stack before the compute
 # stack, and destroy it after.
@@ -14,6 +14,11 @@ description: >-
 config:
   # Environment name (staging, production), used in resource names.
   environment:
+    type: string
+  # The site's address, e.g. wfh.fairdom-seek.org. Its DNS is delegated to a
+  # public Route 53 zone here: the parent domain needs NS records pointing at
+  # this stack's nameServers output.
+  domainName:
     type: string
   vpcCidr:
     type: string
@@ -297,6 +302,52 @@ resources:
     options:
       protect: ${protectData}
 
+  # -------------------------------------------------------------------------
+  # The site's domain: a public zone and a certificate for it, here rather
+  # than in the compute stack so they outlive it. The compute stack points
+  # the domain at its load balancer.
+  #
+  # Create the zone first on its own (pulumi up --target the zone's URN), add
+  # its name servers as NS records for the domain at the parent domain's DNS
+  # host, and then pulumi up the rest: the certificate's validation waits
+  # until ACM can see the validation record through that delegation.
+  # Destroying this stack deletes the zone, and a new zone has new name
+  # servers, which the parent's NS records then need changing to.
+  # -------------------------------------------------------------------------
+  publicZone:
+    type: aws:route53:Zone
+    properties:
+      name: ${domainName}
+      comment: Public DNS for ${namePrefix}
+
+  siteCertificate:
+    type: aws:acm:Certificate
+    properties:
+      domainName: ${domainName}
+      validationMethod: DNS
+      tags:
+        Name: ${namePrefix}
+
+  # The record ACM checks to issue the certificate, and to renew it; keep it.
+  siteCertificateValidationRecord:
+    type: aws:route53:Record
+    properties:
+      zoneId: ${publicZone.zoneId}
+      name: ${siteCertificate.domainValidationOptions[0].resourceRecordName}
+      type: ${siteCertificate.domainValidationOptions[0].resourceRecordType}
+      records:
+        - ${siteCertificate.domainValidationOptions[0].resourceRecordValue}
+      ttl: 300
+      allowOverwrite: true
+
+  # Waits until ACM has issued the certificate.
+  siteCertificateValidation:
+    type: aws:acm:CertificateValidation
+    properties:
+      certificateArn: ${siteCertificate.arn}
+      validationRecordFqdns:
+        - ${siteCertificateValidationRecord.fqdn}
+
   # Private DNS for the VPC, so Solr is reachable by name. The compute stack
   # adds the record.
   internalZone:
@@ -310,6 +361,12 @@ resources:
 # Read by the compute stack through a stack reference.
 outputs:
   namePrefix: ${namePrefix}
+  domainName: ${domainName}
+  publicZoneId: ${publicZone.zoneId}
+  # For the parent domain's NS records.
+  nameServers: ${publicZone.nameServers}
+  # Issued and validated.
+  certificateArn: ${siteCertificateValidation.certificateArn}
   environment: ${environment}
   vpcId: ${vpc.vpcId}
   publicSubnetIds: ${vpc.publicSubnetIds}
