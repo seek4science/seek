@@ -8,7 +8,7 @@ development:
   region: us-east-1
   access_key_id: seek
   secret_access_key: seek1234
-  endpoint: http://localhost:9000
+  endpoint: http://localhost:8333
   force_path_style: true
 
 test:

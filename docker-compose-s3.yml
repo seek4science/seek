@@ -132,7 +132,7 @@ services:
       - seek-seaweedfs-data:/data
       - ./docker/seaweedfs-s3-config.json:/etc/seaweedfs/s3.json:ro
     ports:
-      - "9000:8333" # S3 API (matches the old Minio port for convenience)
+      - "8333:8333" # S3 API (SeaweedFS default port)
       - "8888:8888" # Filer web UI — browse buckets at http://localhost:8888/buckets/
       - "9333:9333" # Master UI/API — cluster status at http://localhost:9333/
     healthcheck:
