@@ -12,8 +12,8 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal '1000x1000', ModelImage::LARGE_SIZE
   end
 
-  # Option A (Step 06): on the S3 backend the master model image is stored through the storage
-  # adapter, not just on local disk — so it survives on a node that never wrote it.
+  # On the S3 backend the master model image is stored through the storage adapter, not just on
+  # local disk — so it survives on a node that never wrote it.
   test 'master image is stored via the adapter on S3' do
     png_bytes = File.binread("#{Rails.root}/test/fixtures/files/file_picture.png")
 

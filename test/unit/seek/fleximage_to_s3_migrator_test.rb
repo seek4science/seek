@@ -2,7 +2,7 @@ require 'test_helper'
 require 'storage_stub_helper'
 require 'seek/storage/fleximage_to_s3_migrator'
 
-# Covers migrating legacy on-disk Avatar/ModelImage master images to S3 (Step 06, Option A').
+# Covers migrating legacy on-disk Avatar/ModelImage master images to S3.
 # Records are created on the local backend so their master stays on disk, then the migrator runs
 # under a stubbed S3 backend. Runs are scoped to specific records (via relations) to avoid picking
 # up any other avatars/model images in the test database.

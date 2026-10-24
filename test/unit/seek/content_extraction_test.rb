@@ -280,7 +280,7 @@ class ContentExtractionTest < ActiveSupport::TestCase
   end
 
   # ---------------------------------------------------------------------------
-  # Cycle 6b — legacy_convert_to_pdf removed; convert_to_pdf is adapter-only
+  # convert_to_pdf is adapter-only (the legacy local-path variant was removed)
   # ---------------------------------------------------------------------------
 
   test 'convert_to_pdf with no arguments uses the adapter path' do

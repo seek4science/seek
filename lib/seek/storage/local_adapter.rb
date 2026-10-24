@@ -56,7 +56,7 @@ module Seek
       end
 
       # Returns the absolute filesystem path for key.
-      # Used by send_file (Cycle 5) and make_temp_copy.
+      # Used by send_file and make_temp_copy.
       def full_path(key)
         File.join(@base_path, key)
       end
