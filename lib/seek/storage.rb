@@ -25,10 +25,30 @@ module Seek
       @adapters[adapter_key] ||= build_adapter_for(adapter_key)
     end
 
+    # True when files can be uploaded by the browser directly to the object store.
+    # Only the S3 backend supports this; on local storage uploads always go through SEEK.
+    def self.direct_upload_enabled?
+      config[:backend].to_s == 's3'
+    end
+
+    # Adapter for the staging area used by direct browser uploads: objects land under 'uploads/'
+    # and are promoted to 'assets/' by ContentBlob once the upload is finalized. Kept separate from
+    # adapter_for so half-finished uploads never share a prefix with real files, and so a lifecycle
+    # rule on 'uploads/' can expire abandoned ones. Returns nil on the local backend.
+    def self.upload_adapter
+      return nil unless direct_upload_enabled?
+
+      @upload_adapter ||= begin
+        require 'seek/storage/s3_adapter'
+        S3Adapter.new(**config.merge(prefix: 'uploads'))
+      end
+    end
+
     # Reset all memoized state. Call in tests that swap config or paths.
     def self.reset!
-      @adapters = nil
-      @config   = nil
+      @adapters       = nil
+      @upload_adapter = nil
+      @config         = nil
     end
 
     # Returns a hash of non-sensitive configuration info safe for display in the UI.

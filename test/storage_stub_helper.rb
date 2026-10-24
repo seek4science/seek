@@ -27,18 +27,32 @@ module StorageStubHelper
     adapter.send(:instance_variable_get, :@client)
   end
 
-  # Routes Seek::Storage.adapter_for through stubbed S3 adapters for the duration of the block.
-  # 'dat' resolves to the assets adapter; any other format to the converted adapter.
-  # Yields both adapters so the caller can configure stub_responses on their clients.
+  # Routes Seek::Storage through stubbed S3 adapters for the duration of the block, as if the S3
+  # backend were configured:
+  #   adapter_for('dat')      -> the assets adapter
+  #   adapter_for(<other>)    -> the converted adapter
+  #   upload_adapter          -> the uploads (direct-upload staging) adapter
+  #   direct_upload_enabled?  -> true
+  # Yields all three adapters so the caller can configure stub_responses on their clients.
+  # Existing callers that take only |dat, converted| keep working.
   def with_stubbed_s3_storage
     require 'aws-sdk-s3'
     Aws.config.update(stub_responses: true)
     dat = build_s3_adapter('assets')
     converted = build_s3_adapter('converted')
-    Seek::Storage.stub(:adapter_for, ->(format = 'dat') { format == 'dat' ? dat : converted }) do
-      yield dat, converted
-    end
+    uploads = build_s3_adapter('uploads')
+    stub_seek_storage(dat, converted, uploads) { yield dat, converted, uploads }
   ensure
     Aws.config.update(stub_responses: false)
+  end
+
+  private
+
+  def stub_seek_storage(dat, converted, uploads, &block)
+    Seek::Storage.stub(:adapter_for, ->(format = 'dat') { format == 'dat' ? dat : converted }) do
+      Seek::Storage.stub(:upload_adapter, uploads) do
+        Seek::Storage.stub(:direct_upload_enabled?, true, &block)
+      end
+    end
   end
 end

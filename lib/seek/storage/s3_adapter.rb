@@ -77,8 +77,8 @@ module Seek
       end
 
       # S3 has no local filesystem path. Returns nil.
-      # Callers that need a local copy (e.g. make_temp_copy) must be updated
-      # to use with_local_copy instead — that is handled in Cycle 6.
+      # Callers treat nil as "remote": ContentBlob#make_temp_copy streams the object to a
+      # tempfile instead of copying a local file, and downloads use a presigned URL.
       def full_path(_key)
         nil
       end
@@ -137,6 +137,13 @@ module Seek
         presigner.presigned_url(:put_object, **params)
       end
 
+      # The full object key inside the bucket for a storage key, e.g. "abc.dat" -> "assets/abc.dat".
+      # Public because a server-side copy between adapters (uploads/ -> assets/) needs the source
+      # object's full key, which only the source adapter knows how to build.
+      def full_key(key)
+        "#{@prefix}/#{key}"
+      end
+
       private
 
       def build_client(opts)
@@ -149,9 +156,8 @@ module Seek
         )
       end
 
-      def object_key(key)
-        "#{@prefix}/#{key}"
-      end
+      alias object_key full_key
+      private :object_key
     end
   end
 end
