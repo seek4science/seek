@@ -155,6 +155,39 @@ class S3AdapterTest < ActiveSupport::TestCase
     assert_includes @adapter.presigned_upload_url(KEY), 'X-Amz-Expires=900'
   end
 
+  # --- copy_object ---
+
+  test 'copy_object below the single-copy limit issues one CopyObject with REPLACE' do
+    @adapter.copy_object('uploads/tok', KEY, size: 10 * 1024 * 1024)
+    copies = client.api_requests.select { |r| r[:operation_name] == :copy_object }
+    assert_equal 1, copies.size
+    params = copies.first[:params]
+    assert_equal "#{BUCKET}/uploads/tok", params[:copy_source]
+    assert_equal BUCKET, params[:bucket]
+    assert_equal "#{PREFIX}/#{KEY}", params[:key]
+    assert_equal 'REPLACE', params[:metadata_directive]
+    assert_empty(client.api_requests.select { |r| r[:operation_name] == :create_multipart_upload })
+  end
+
+  test 'copy_object at exactly the single-copy limit still uses one CopyObject' do
+    @adapter.copy_object('uploads/tok', KEY, size: Seek::Storage::S3Adapter::SINGLE_COPY_LIMIT)
+    ops = client.api_requests.map { |r| r[:operation_name] }
+    assert_equal [:copy_object], ops
+  end
+
+  test 'copy_object above the single-copy limit performs a multipart copy' do
+    @adapter.copy_object('uploads/tok', KEY, size: Seek::Storage::S3Adapter::SINGLE_COPY_LIMIT + 1)
+    ops = client.api_requests.map { |r| r[:operation_name] }
+    assert_not_includes ops, :copy_object
+    assert_equal 1, ops.count(:create_multipart_upload)
+    assert_operator ops.count(:upload_part_copy), :>, 1
+    assert_equal 1, ops.count(:complete_multipart_upload)
+    create = client.api_requests.find { |r| r[:operation_name] == :create_multipart_upload }[:params]
+    assert_equal "#{PREFIX}/#{KEY}", create[:key]
+    part = client.api_requests.find { |r| r[:operation_name] == :upload_part_copy }[:params]
+    assert_equal "#{BUCKET}/uploads/tok", part[:copy_source]
+  end
+
   test 'presigned_upload_url signs against the public endpoint when one is configured' do
     adapter = Seek::Storage::S3Adapter.new(
       bucket: BUCKET, prefix: 'uploads', region: 'us-east-1',

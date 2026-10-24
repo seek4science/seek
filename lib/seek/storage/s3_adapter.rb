@@ -9,6 +9,9 @@ module Seek
     #   assets/uuid.dat        (prefix: 'assets')
     #   converted/uuid.pdf     (prefix: 'converted')
     class S3Adapter
+      # Largest object a single CopyObject call can handle; above this S3 requires a multipart copy.
+      SINGLE_COPY_LIMIT = 5 * 1024 * 1024 * 1024
+
       def initialize(bucket:, prefix:, **s3_options)
         @bucket = bucket
         @prefix = prefix
@@ -135,6 +138,24 @@ module Seek
         }
         params[:content_type] = content_type if content_type.present?
         presigner.presigned_url(:put_object, **params)
+      end
+
+      # Copies an object that already exists in the bucket (source_full_key, e.g. "uploads/<token>")
+      # to this adapter's key, entirely server-side: the bytes never pass through SEEK. Used to
+      # promote a browser-uploaded object from the staging prefix to its permanent key.
+      #
+      # size is the source object's size in bytes. The SDK does not pick a copy strategy on its own:
+      # a multipart copy is mandatory above SINGLE_COPY_LIMIT, but refuses objects under 5 MB, so
+      # the choice is made here. metadata_directive REPLACE drops whatever Content-Type the uploader
+      # set on the staging object, matching objects written through #write, which carry none.
+      def copy_object(source_full_key, key, size:)
+        target = Aws::S3::Object.new(bucket_name: @bucket, key: object_key(key), client: @client)
+        source = "#{@bucket}/#{source_full_key}"
+        if size > SINGLE_COPY_LIMIT
+          target.copy_from(source, multipart_copy: true, content_length: size, metadata_directive: 'REPLACE')
+        else
+          target.copy_from(source, metadata_directive: 'REPLACE')
+        end
       end
 
       # The full object key inside the bucket for a storage key, e.g. "abc.dat" -> "assets/abc.dat".
