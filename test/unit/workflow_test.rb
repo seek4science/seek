@@ -990,7 +990,14 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'sets contentUrl in RO-Crate metadata' do
-    workflow = FactoryBot.create(:remote_git_workflow_cwl)
+    workflow = FactoryBot.create(:local_git_workflow)
+    disable_authorization_checks do
+      gv = workflow.git_version
+      c = gv.add_file('concat_two_files.cwl', StringIO.new(SecureRandom.random_bytes(50)))
+      gv.update_column(:commit, c)
+      gv.abstract_cwl_path = 'concat_two_files.cwl'
+      gv.save!
+    end
 
     assert workflow.ro_crate.main_workflow.present?
     assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.ga",
@@ -1001,7 +1008,7 @@ class WorkflowTest < ActiveSupport::TestCase
                  workflow.ro_crate.main_workflow_diagram['contentUrl']
 
     assert workflow.ro_crate.main_workflow_cwl.present?
-    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/README.md",
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.cwl",
                  workflow.ro_crate.main_workflow_cwl['contentUrl']
   end
 end
