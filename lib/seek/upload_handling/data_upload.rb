@@ -30,7 +30,7 @@ module Seek
         end
 
         unless json_api_request?
-          blob_params.reject! { |params| (params[:data].blank? && params[:data_url].blank? && params[:base64_data].blank?) }
+          blob_params.select! { |params| check_for_data_or_url(params) }
         end
 
         blob_params.each do |item_params|
@@ -43,6 +43,8 @@ module Seek
             return false unless add_data_for_upload(item_params)
           elsif add_from_base64?(item_params)
             return false unless add_data_for_base64(item_params)
+          elsif add_from_direct_upload?(item_params)
+            return false unless add_data_for_direct_upload(item_params)
           elsif add_from_url?(item_params)
             return false unless add_data_for_url(item_params)
           end
@@ -56,6 +58,10 @@ module Seek
       def add_data_for_upload(item_params)
         return false unless check_for_empty_data_if_present(item_params)
         process_upload(item_params)
+      end
+
+      def add_data_for_direct_upload(item_params)
+        process_direct_upload(item_params)
       end
 
       def add_data_for_base64(item_params)
@@ -80,7 +86,8 @@ module Seek
             next if !json_api_request? &&
                     item_params[:tmp_io_object].blank? &&
                     item_params[:data_url].blank? &&
-                    item_params[:base64_data].blank?
+                    item_params[:base64_data].blank? &&
+                    item_params[:direct_upload_key].blank?
 
             attributes = build_attributes_hash_for_content_blob(item_params, version)
             if asset.respond_to?(:content_blobs)
@@ -108,6 +115,7 @@ module Seek
 
       def build_attributes_hash_for_content_blob(item_params, version)
         { tmp_io_object: item_params[:tmp_io_object],
+          direct_upload_key: item_params[:direct_upload_key],
           url: item_params[:data_url],
           external_link: !item_params[:make_local_copy] == '1',
           original_filename: item_params[:original_filename],
@@ -157,6 +165,43 @@ module Seek
         blob_params[:original_filename] = data.original_filename
         blob_params[:tmp_io_object] = data
         blob_params[:content_type] = data.content_type || content_type_from_filename(blob_params[:original_filename])
+      end
+
+      # The file was uploaded by the browser straight into the storage backend's staging area, and the form
+      # carries only the staging key. Confirm the object is really there and not empty, then describe the
+      # blob so that ContentBlob promotes it to its permanent key on save.
+      def process_direct_upload(blob_params)
+        unless Seek::Storage.direct_upload_enabled?
+          return reject_upload('Direct upload is not available on this instance.')
+        end
+
+        staging = Seek::Storage.upload_adapter
+        key = blob_params[:direct_upload_key]
+        unless staging.exist?(key)
+          return reject_upload('The uploaded file could not be found. Please try uploading it again.')
+        end
+
+        size = staging.size(key)
+        if size.zero?
+          return reject_upload('The file that you are uploading is empty. Please check your selection and try again!')
+        end
+
+        describe_direct_upload(blob_params, size)
+      end
+
+      def reject_upload(message)
+        flash.now[:error] = message
+        false
+      end
+
+      def describe_direct_upload(blob_params, size)
+        blob_params.delete(:data)
+        blob_params.delete(:data_url)
+        blob_params[:original_filename] = blob_params[:original_filename].presence || 'data'
+        blob_params[:content_type] = blob_params[:content_type].presence ||
+                                     content_type_from_filename(blob_params[:original_filename])
+        blob_params[:file_size] = size
+        true
       end
 
       def process_from_base64(blob_params)
@@ -214,6 +259,10 @@ module Seek
 
       def add_from_base64?(blob_params)
         !blob_params[:base64_data].blank?
+      end
+
+      def add_from_direct_upload?(blob_params)
+        !blob_params[:direct_upload_key].blank?
       end
 
       def add_from_url?(blob_params)
