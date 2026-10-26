@@ -22,28 +22,38 @@ module Seek
         true
       end
 
-      def generate_diagram
-        begin
-          f = Tempfile.new('diagram.dot')
-          wf = WorkflowInternals::Structure.new(metadata[:internals])
-          Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
-          f.rewind
-          out = ''
-          err = ''
-          Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
-            stdin.puts(f.read)
-            stdin.close
-            out = stdout.read
-            err = stderr.read
-            stdout.close
-            stderr.close
-          end
-          Rails.logger.error(err) if err.length > 0
-          out
-        rescue StandardError => e
-          Rails.logger.error(e)
-          nil
+      def extract_diagram
+        f = Tempfile.new('diagram.dot')
+        wf = WorkflowInternals::Structure.new(metadata[:internals])
+        Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
+        f.rewind
+        out = ''
+        err = ''
+        Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
+          stdin.puts(f.read)
+          stdin.close
+          out = stdout.read
+          err = stderr.read
+          stdout.close
+          stderr.close
         end
+        Rails.logger.error(err) if err.length > 0
+        out
+      end
+
+      def generate_diagram
+        extract_diagram
+      rescue StandardError => e
+        Rails.logger.error(e)
+        nil
+      end
+
+      def diagram_generation_error?
+        extract_diagram
+        false
+      rescue StandardError => e
+        Rails.logger.error(e)
+        true
       end
 
       def metadata
