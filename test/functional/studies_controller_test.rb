@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'storage_stub_helper'
 
 class StudiesControllerTest < ActionController::TestCase
 
@@ -6,6 +7,7 @@ class StudiesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
+  include StorageStubHelper
 
   def setup
     login_as FactoryBot.create(:admin).user
@@ -2362,6 +2364,18 @@ class StudiesControllerTest < ActionController::TestCase
     get :batch_uploader
     assert_response :success
     assert_select 'form'
+  end
+
+  # batch_create reads the uploaded file itself, so the shared upload box must not offer a
+  # direct-to-store upload here even when the S3 backend would allow it elsewhere
+  test 'batch_uploader never offers direct upload' do
+    FactoryBot.create(:study_extended_metadata_type_for_MIAPPE)
+    with_stubbed_s3_storage do
+      get :batch_uploader
+      assert_response :success
+      assert_select '[data-role="seek-upload-field"]'
+      assert_select '[data-direct-upload-url]', count: 0
+    end
   end
 
   test 'batch_uploader renders unavailable message when miappe type does not exist' do

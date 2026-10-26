@@ -7,6 +7,13 @@
   file_field_opts ||= {}
   hide_remote ||= false
   hide_local ||= false
+  # When true (and the storage backend supports it), the page tells the browser where to ask for a signed
+  # URL so the file goes straight to the object store instead of through this form. Only forms whose
+  # controller runs handle_upload_data may turn this on; it must stay off wherever the file is sent elsewhere.
+  direct_upload ||= false
+  direct_upload_url = if direct_upload && Seek::Storage.direct_upload_enabled? && !Seek::Config.block_file_uploads
+                        direct_upload_content_blobs_path
+                      end
 
   url_from_params = nil
   original_filename_from_params = nil
@@ -19,7 +26,7 @@
   end
 %>
 
-<div role="tabpanel" data-role="seek-upload-field">
+<div role="tabpanel" data-role="seek-upload-field"<%= tag.attributes('data-direct-upload-url': direct_upload_url) if direct_upload_url %>>
   <ul class="nav nav-tabs" role="tablist">
     <% unless hide_local %>
       <li role="presentation" class="upload-field-tab active">

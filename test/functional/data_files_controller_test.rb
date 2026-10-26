@@ -183,6 +183,32 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'h1', text: "New #{I18n.t('data_file')}"
   end
 
+  test 'new form offers direct upload on the S3 backend' do
+    with_stubbed_s3_storage do
+      get :new
+      assert_response :success
+      assert_select '[data-role="seek-upload-field"][data-direct-upload-url=?]', direct_upload_content_blobs_path
+    end
+  end
+
+  test 'new form does not offer direct upload on the local backend' do
+    assert_not Seek::Storage.direct_upload_enabled?
+    get :new
+    assert_response :success
+    assert_select '[data-role="seek-upload-field"]'
+    assert_select '[data-direct-upload-url]', count: 0
+  end
+
+  test 'new form does not offer direct upload when file uploads are blocked' do
+    with_stubbed_s3_storage do
+      with_config_value(:block_file_uploads, true) do
+        get :new
+        assert_response :success
+        assert_select '[data-direct-upload-url]', count: 0
+      end
+    end
+  end
+
   test 'should correctly handle bad data url' do
     stub_request(:head, 'http://sdfsdfds.com/sdf.png')
       .to_raise(SocketError)

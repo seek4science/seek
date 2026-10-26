@@ -11,7 +11,8 @@
     <div class="asset_form">
       <%= error_messages_for :data_file -%>
 
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
+      <%# this form posts to studies#batch_create, which reads the file itself, so a direct-to-store upload must stay off %>
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file, :direct_upload=>false} -%>
 
       <div>
         <%= create_button id:"study_file_submit_btn",

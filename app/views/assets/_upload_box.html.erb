@@ -7,6 +7,12 @@
   extra_content ||= nil
   hide_remote ||= false
   hide_local = Seek::Config.block_file_uploads unless local_assigns.key?(:hide_local)
+  # Direct-to-store upload is offered only when this box is creating a real asset (DataFile, Sop, Model, ...),
+  # i.e. the form posts to a controller that runs handle_upload_data. Callers that reuse the box for another
+  # destination (NeLS dialogs pass no resource; the study batch uploader passes direct_upload: false) stay off.
+  unless local_assigns.key?(:direct_upload)
+    direct_upload = resource.present? && resource.class.respond_to?(:is_asset?) && resource.class.is_asset?
+  end
 %>
 <%= panel(title, id: id) do %>
   <div>
@@ -19,9 +25,11 @@
 
   <% if !resource.nil? && Seek::Util.is_multi_file_asset_type?(resource.class) %>
     <%= render partial: 'assets/upload', locals: { existing_objects: resource.content_blobs, batch: true,
-                                                   hide_remote: hide_remote, hide_local: hide_local } -%>
+                                                   hide_remote: hide_remote, hide_local: hide_local,
+                                                   direct_upload: direct_upload } -%>
   <% else %>
-    <%= render partial: 'assets/upload', locals: { hide_remote: hide_remote, hide_local: hide_local } -%>
+    <%= render partial: 'assets/upload', locals: { hide_remote: hide_remote, hide_local: hide_local,
+                                                   direct_upload: direct_upload } -%>
   <% end %>
 
   <%= extra_content if extra_content %>
