@@ -619,6 +619,7 @@ SEEK::Application.routes.draw do
   resources :content_blobs, except: [:show, :index, :update, :create, :destroy] do
     collection do
       post :examine_url
+      post :direct_upload
     end
   end
   resources :programmes, concerns: [:has_avatar] do

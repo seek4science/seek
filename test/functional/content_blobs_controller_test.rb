@@ -1057,6 +1057,81 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert assigns(:warning_msg)
   end
 
+  # --- direct_upload: hand the browser a signed URL to upload straight into the staging area ---
+
+  test 'direct_upload returns a signed PUT URL for a project member on the S3 backend' do
+    with_stubbed_s3_storage do
+      post :direct_upload, params: { filename: 'results.csv', content_type: 'text/csv', size: 1234 }, format: :json
+      assert_response :success
+      body = JSON.parse(@response.body)
+      assert_equal 'put', body['strategy']
+      assert_match(/\A[0-9a-f-]{36}\z/, body['key'], 'key is a random uuid naming the staging object')
+      assert_includes body['url'], "uploads/#{body['key']}"
+      assert_includes body['url'], 'X-Amz-Signature='
+      assert_equal 900, body['expires_in']
+      assert_equal({ 'Content-Type' => 'text/csv' }, body['headers'])
+    end
+  end
+
+  test 'direct_upload derives the content type from the filename when the browser gives none' do
+    with_stubbed_s3_storage do
+      post :direct_upload, params: { filename: 'notes.txt', size: 10 }, format: :json
+      assert_response :success
+      assert_equal 'text/plain', JSON.parse(@response.body)['headers']['Content-Type']
+    end
+  end
+
+  test 'direct_upload issues a different key and URL for every request' do
+    with_stubbed_s3_storage do
+      keys = 2.times.map do
+        post :direct_upload, params: { filename: 'a.txt', size: 10 }, format: :json
+        JSON.parse(@response.body)['key']
+      end
+      assert_not_equal keys[0], keys[1]
+    end
+  end
+
+  test 'direct_upload is not found on the local storage backend' do
+    assert_not Seek::Storage.direct_upload_enabled?
+    post :direct_upload, params: { filename: 'a.txt', size: 10 }, format: :json
+    assert_response :not_found
+  end
+
+  test 'direct_upload is forbidden when file uploads are blocked' do
+    with_stubbed_s3_storage do
+      with_config_value(:block_file_uploads, true) do
+        post :direct_upload, params: { filename: 'a.txt', size: 10 }, format: :json
+        assert_response :forbidden
+        assert_includes JSON.parse(@response.body)['error'], 'not allowed'
+      end
+    end
+  end
+
+  test 'direct_upload is forbidden for an anonymous user' do
+    logout
+    with_stubbed_s3_storage do
+      post :direct_upload, params: { filename: 'a.txt', size: 10 }, format: :json
+      assert_response :forbidden
+    end
+  end
+
+  test 'direct_upload is forbidden for a logged-in user who is not a project member' do
+    login_as(FactoryBot.create(:person_not_in_project))
+    with_stubbed_s3_storage do
+      post :direct_upload, params: { filename: 'a.txt', size: 10 }, format: :json
+      assert_response :forbidden
+    end
+  end
+
+  test 'direct_upload rejects an empty or missing size' do
+    with_stubbed_s3_storage do
+      post :direct_upload, params: { filename: 'a.txt', size: 0 }, format: :json
+      assert_response :unprocessable_entity
+      post :direct_upload, params: { filename: 'a.txt' }, format: :json
+      assert_response :unprocessable_entity
+    end
+  end
+
   private
 
   def mock_http

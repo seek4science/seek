@@ -8,6 +8,7 @@ class ContentBlobsController < ApplicationController
   include RawDisplay
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
+  include Seek::UploadHandling::DirectUpload
 
   api_actions :show, :update, :download
 
