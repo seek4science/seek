@@ -185,6 +185,53 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert check_for_data_or_url(data_url: ['hhhh'])
   end
 
+  test 'a direct upload key counts as content and as an upload' do
+    assert check_for_data_or_url(direct_upload_key: 'tok')
+    refute check_for_data_or_url(direct_upload_key: '')
+    assert add_from_direct_upload?(direct_upload_key: 'tok')
+    refute add_from_direct_upload?(data: 'x')
+    # so that Seek::Config.block_file_uploads also blocks directly uploaded files
+    assert check_for_data_upload_params(direct_upload_key: 'tok')
+    assert check_for_data_upload_params(direct_upload_key: '')
+    refute check_for_data_upload_params(data_url: 'http://example.com/x')
+  end
+
+  test 'process_direct_upload describes the staged object and keeps the key' do
+    with_stubbed_s3_storage do |_dat, _converted, uploads|
+      s3_client(uploads).stub_responses(:head_object, content_length: 321)
+      params = { direct_upload_key: 'tok', original_filename: 'results.csv', data: nil, data_url: '' }
+      assert process_direct_upload(params)
+      assert_equal 'tok', params[:direct_upload_key]
+      assert_equal 'results.csv', params[:original_filename]
+      assert_equal 'text/csv', params[:content_type]
+      assert_equal 321, params[:file_size]
+      refute params.key?(:data)
+      refute params.key?(:data_url)
+    end
+  end
+
+  test 'process_direct_upload fails with a message when the staged object is missing' do
+    with_stubbed_s3_storage do |_dat, _converted, uploads|
+      s3_client(uploads).stub_responses(:head_object, 'NotFound')
+      refute process_direct_upload(direct_upload_key: 'gone', original_filename: 'x.txt')
+      assert_match(/could not be found/, flash.now[:error])
+    end
+  end
+
+  test 'process_direct_upload fails when the staged object is empty' do
+    with_stubbed_s3_storage do |_dat, _converted, uploads|
+      s3_client(uploads).stub_responses(:head_object, content_length: 0)
+      refute process_direct_upload(direct_upload_key: 'empty', original_filename: 'x.txt')
+      assert_match(/empty/, flash.now[:error])
+    end
+  end
+
+  test 'process_direct_upload fails on the local backend' do
+    refute Seek::Storage.direct_upload_enabled?
+    refute process_direct_upload(direct_upload_key: 'tok', original_filename: 'x.txt')
+    assert_match(/not available/, flash.now[:error])
+  end
+
   test 'retained content blob ids' do
     @params = { retained_content_blob_ids: [1, 2] }
     assert_equal [1, 2], retained_content_blob_ids
@@ -278,9 +325,10 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   end
 
-  # allows some methods to be tested the rely on flash.now[:error]
+  # allows some methods to be tested the rely on flash.now[:error]; memoised so a test can read back
+  # the message a method set
   def flash
-    ActionDispatch::Flash::FlashHash.new
+    @flash ||= ActionDispatch::Flash::FlashHash.new
   end
 
   # mock out the params method, set @params for the desired params for the test

@@ -2,11 +2,13 @@
 require 'test_helper'
 require 'libxml'
 require 'openbis_test_helper'
+require 'storage_stub_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
 
 
   include AuthenticatedTestHelper
+  include StorageStubHelper
   include RdfTestCases
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
@@ -208,6 +210,84 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_not_nil flash.now[:error]
+  end
+
+  # --- creating from a file the browser uploaded straight into the S3 staging area ---
+
+  test 'should create data file from a directly uploaded object' do
+    with_stubbed_s3_storage do |dat, _converted, uploads|
+      s3_client(uploads).stub_responses(:head_object, content_length: 2048)
+      s3_client(dat).stub_responses(:head_object, content_length: 2048)
+      blob_params = { direct_upload_key: 'tok-create', original_filename: 'results.csv', content_type: 'text/csv' }
+
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: { data_file: valid_data_file.first, content_blobs: [blob_params],
+                                  policy_attributes: valid_sharing }
+        end
+      end
+
+      data_file = assigns(:data_file)
+      assert_redirected_to data_file_path(data_file)
+      blob = data_file.content_blob
+      assert_equal 'results.csv', blob.original_filename
+      assert_equal 'text/csv', blob.content_type
+      assert_equal 2048, blob.file_size
+      assert_nil blob.direct_upload_key, 'the key is consumed on save'
+
+      copy = s3_client(dat).api_requests.find { |r| r[:operation_name] == :copy_object }
+      assert copy, 'the staged object is promoted with a server-side copy'
+      assert_equal 'test-bucket/uploads/tok-create', copy[:params][:copy_source]
+      assert_equal "assets/#{blob.uuid}.dat", copy[:params][:key]
+      assert_includes s3_client(uploads).api_requests.map { |r| r[:operation_name] }, :delete_object
+      assert_not_includes s3_client(dat).api_requests.map { |r| r[:operation_name] }, :put_object
+    end
+  end
+
+  test 'should re-render new with an error when the directly uploaded object is missing' do
+    with_stubbed_s3_storage do |_dat, _converted, uploads|
+      s3_client(uploads).stub_responses(:head_object, 'NotFound')
+      assert_no_difference('DataFile.count') do
+        post :create, params: { data_file: valid_data_file.first,
+                                content_blobs: [{ direct_upload_key: 'gone', original_filename: 'x.txt' }],
+                                policy_attributes: valid_sharing }
+      end
+      assert_response :success
+      assert_template :new
+      assert_match(/could not be found/, flash.now[:error])
+    end
+  end
+
+  test 'a direct upload is blocked when file uploads are blocked' do
+    with_stubbed_s3_storage do
+      with_config_value(:block_file_uploads, true) do
+        assert_no_difference('DataFile.count') do
+          post :create, params: { data_file: valid_data_file.first,
+                                  content_blobs: [{ direct_upload_key: 'tok', original_filename: 'x.txt' }],
+                                  policy_attributes: valid_sharing }
+        end
+        assert_match(/not allowed/, flash[:error])
+      end
+    end
+  end
+
+  test 'should create a new version from a directly uploaded object' do
+    df = FactoryBot.create(:data_file, contributor: User.current_user.person)
+    with_stubbed_s3_storage do |dat, _converted, uploads|
+      s3_client(uploads).stub_responses(:head_object, content_length: 99)
+      s3_client(dat).stub_responses(:head_object, content_length: 99)
+      assert_difference('ContentBlob.count') do
+        post :create_version, params: { id: df, data_file: { title: nil },
+                                        content_blobs: [{ direct_upload_key: 'tok-v2', original_filename: 'v2.txt' }],
+                                        revision_comments: 'direct upload' }
+      end
+      df.reload
+      assert_equal 2, df.version
+      assert_equal 'v2.txt', df.content_blob.original_filename
+      assert_equal 99, df.content_blob.file_size
+      copy = s3_client(dat).api_requests.find { |r| r[:operation_name] == :copy_object }
+      assert_equal 'test-bucket/uploads/tok-v2', copy[:params][:copy_source]
+    end
   end
 
   test 'should create data file with http_url' do
