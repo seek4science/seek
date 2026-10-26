@@ -22,6 +22,12 @@ class ContentBlob < ApplicationRecord
   # if the file doesn't exist an error occurs
   attr_writer :tmp_io_object
 
+  # The third way to supply content, next to :data and :tmp_io_object: the name of an object the
+  # browser has already uploaded into the storage backend's staging area (Seek::Storage.upload_adapter).
+  # On save the object is copied server-side to this blob's own key and the staging copy is removed,
+  # so the bytes never pass through SEEK. Only valid on the S3 backend. Not stored in the database.
+  attr_accessor :direct_upload_key
+
   # Store HTTP headers to stop SEEK performing multiple requests when getting info
   attr_writer :headers
 
@@ -215,7 +221,9 @@ class ContentBlob < ApplicationRecord
   def dump_data_to_file
     raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     check_uuid
-    if @tmp_io_object.nil?
+    if direct_upload_key.present?
+      promote_direct_upload
+    elsif @tmp_io_object.nil?
       dump_data_object_to_file
     else
       dump_tmp_io_object_to_file
@@ -323,6 +331,26 @@ class ContentBlob < ApplicationRecord
 
   def dump_data_object_to_file
     storage_adapter.write(storage_key, @data) unless @data.nil?
+  end
+
+  # Moves a directly uploaded object from the staging area to this blob's permanent key. Runs as the
+  # first before_save, so calculate_file_size and the content-type callbacks see the final object.
+  def promote_direct_upload
+    check_direct_upload_allowed
+    staging = Seek::Storage.upload_adapter
+    source_key = staging.full_key(direct_upload_key)
+    storage_adapter.copy_object(source_key, storage_key, size: staging.size(direct_upload_key))
+    staging.delete(direct_upload_key)
+    self.direct_upload_key = nil
+  end
+
+  def check_direct_upload_allowed
+    unless @data.nil? && @tmp_io_object.nil?
+      raise ArgumentError, 'You cannot define a :direct_upload_key together with :data or a :tmp_io_object'
+    end
+    return if Seek::Storage.direct_upload_enabled?
+
+    raise Seek::Storage::ConfigurationError, 'direct_upload_key requires the S3 storage backend'
   end
 
   def dump_tmp_io_object_to_file

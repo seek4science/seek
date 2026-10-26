@@ -1012,6 +1012,64 @@ class ContentBlobTest < ActiveSupport::TestCase
     FileUtils.rm_f(blob.full_cache_path('100')) if blob
   end
 
+  # --- direct_upload_key: content already uploaded by the browser into the staging area ---
+
+  test 'saving with direct_upload_key copies the staged object to the blob key and removes the staging copy' do
+    with_stubbed_s3_storage do |dat, _converted, uploads|
+      s3_client(uploads).stub_responses(:head_object, content_length: 1234)
+      s3_client(dat).stub_responses(:head_object, content_length: 1234)
+
+      blob = ContentBlob.new(original_filename: 'direct.txt', content_type: 'text/plain', direct_upload_key: 'tok-1')
+      blob.save!
+
+      copy = s3_client(dat).api_requests.find { |r| r[:operation_name] == :copy_object }
+      assert copy, 'expected a server-side copy on the assets adapter'
+      assert_equal 'test-bucket/uploads/tok-1', copy[:params][:copy_source]
+      assert_equal "assets/#{blob.uuid}.dat", copy[:params][:key]
+
+      staging_ops = s3_client(uploads).api_requests.map { |r| r[:operation_name] }
+      assert_includes staging_ops, :head_object, 'size of the staged object is read before copying'
+      assert_includes staging_ops, :delete_object, 'staging copy is removed after the copy'
+      assert_not_includes s3_client(dat).api_requests.map { |r| r[:operation_name] }, :put_object,
+                          'no bytes are written through SEEK'
+
+      assert_equal 1234, blob.file_size
+      assert_nil blob.direct_upload_key, 'the key is consumed by the save'
+      assert blob.file_exists?
+    end
+  end
+
+  test 'direct_upload_key together with data raises' do
+    with_stubbed_s3_storage do
+      blob = ContentBlob.new(original_filename: 'x.txt', data: 'bytes', direct_upload_key: 'tok-2')
+      err = assert_raises(ArgumentError) { blob.save! }
+      assert_match(/direct_upload_key/, err.message)
+    end
+  end
+
+  test 'direct_upload_key together with tmp_io_object raises' do
+    with_stubbed_s3_storage do
+      blob = ContentBlob.new(original_filename: 'x.txt', tmp_io_object: StringIO.new('bytes'),
+                             direct_upload_key: 'tok-3')
+      err = assert_raises(ArgumentError) { blob.save! }
+      assert_match(/direct_upload_key/, err.message)
+    end
+  end
+
+  test 'direct_upload_key is refused on the local storage backend' do
+    assert_not Seek::Storage.direct_upload_enabled?, 'test environment is expected to use local storage'
+    blob = ContentBlob.new(original_filename: 'x.txt', direct_upload_key: 'tok-4')
+    assert_raises(Seek::Storage::ConfigurationError) { blob.save! }
+    assert_not blob.persisted?
+  end
+
+  test 'a blob without direct_upload_key saves exactly as before' do
+    blob = ContentBlob.new(original_filename: 'plain.txt', data: 'plain content')
+    blob.save!
+    assert_nil blob.direct_upload_key
+    assert_equal 'plain content', File.read(blob.filepath)
+  end
+
   # --- Storage adapter characterisation tests ---
   # These lock down the exact file I/O behaviour before we introduce the
   # storage adapter abstraction. They act as a regression suite for later cycles.
