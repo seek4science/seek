@@ -43,7 +43,11 @@
                       <%= image_tag(diagram_path) %>
                     <% else %>
                       <div class="alert alert-warning" style="width: fit-content">
-                        Unable to display diagram
+                        <% if @display_workflow.diagram_generation_error? %>
+                          An error ocurred when generating the diagram
+                        <% else %>
+                          Unable to display diagram
+                        <% end %>
                       </div>
                     <% end %>
                   <% end %>
