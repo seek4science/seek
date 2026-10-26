@@ -31,7 +31,8 @@ module Seek
       end
 
       def check_for_data_or_url(blob_param)
-        blob_param[:data].present? || blob_param[:data_url].present? || blob_param[:base64_data].present?
+        blob_param[:data].present? || blob_param[:data_url].present? || blob_param[:base64_data].present? ||
+          blob_param[:direct_upload_key].present?
       end
 
       def missing_content_error(blob_param)
@@ -53,9 +54,11 @@ module Seek
         end
       end
 
-      # returns true if the `data` or `base64_data` parameter is present, regardless of whether it is blank or not
+      # returns true if the `data`, `base64_data` or `direct_upload_key` parameter is present, regardless of
+      # whether it is blank or not. A directly uploaded file counts as an upload, so blocking uploads blocks it too.
       def check_for_data_upload_params(blob_params)
-        return true if blob_params.include?(:data) || blob_params.include?(:base64_data)
+        return true if blob_params.include?(:data) || blob_params.include?(:base64_data) ||
+                       blob_params.include?(:direct_upload_key)
 
         false
       end
