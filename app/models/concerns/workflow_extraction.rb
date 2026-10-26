@@ -82,6 +82,10 @@ module WorkflowExtraction
     path && File.exist?(path)
   end
 
+  def diagram_generation_error?
+    extractor.diagram_generation_error?
+  end
+
   def diagram
     path = Dir.glob(cached_diagram_path('*')).last
 
