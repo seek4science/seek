@@ -1,0 +1,28 @@
+name: Update Ruby patch version
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-ruby:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Update .ruby-version
+        run: echo "ruby-$(ruby -e 'print RUBY_VERSION')" > .ruby-version
+      - uses: peter-evans/create-pull-request@v8.1.1
+        with:
+          add-paths: .ruby-version
+          branch: automation/update-ruby-patch
+          commit-message: Update Ruby patch version
+          title: Update Ruby patch version
+          body: Update the Ruby 3.3 patch version in `.ruby-version`.
