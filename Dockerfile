@@ -1,4 +1,4 @@
-FROM ruby:3.3-slim-trixie AS base
+FROM ruby:3.3.13-slim-trixie AS base
 LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 ARG SOURCE_COMMIT
 
