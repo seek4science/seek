@@ -739,7 +739,19 @@ class PersonTest < ActiveSupport::TestCase
     end
     p = Person.find(p.id)
     refute_nil p.notifiee_info
-    assert p.receive_notifications?
+    assert p.notifiee_info.receive_notifications?
+  end
+
+  test 'receive notifications only if registered' do
+    registered = FactoryBot.create(:person)
+    assert registered.receive_notifications?
+    registered.notifiee_info.update_column(:receive_notifications, false)
+    refute registered.reload.receive_notifications?
+
+    unregistered = FactoryBot.create(:person_in_project)
+    refute unregistered.registered?
+    assert unregistered.notifiee_info.receive_notifications?
+    refute unregistered.receive_notifications?
   end
 
   def test_dependent_notifiee_info_is_destroyed_with_person

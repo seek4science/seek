@@ -25,4 +25,22 @@ class SendImmediateEmailsJobTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'perform does not email unregistered subscribers' do
+    registered = FactoryBot.create(:person)
+    unregistered = FactoryBot.create(:person_in_project)
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    [registered, unregistered].each do |person|
+      project_subscription = ProjectSubscription.create(person_id: person.id, project_id: sop.projects.first.id, frequency: 'immediately')
+      ProjectSubscriptionJob.perform_now(project_subscription)
+    end
+    assert sop.subscribed?(unregistered)
+
+    assert_enqueued_emails 1 do
+      disable_authorization_checks do
+        al = ActivityLog.create(activity_loggable: sop, culprit: FactoryBot.create(:user), action: 'create')
+        ImmediateSubscriptionEmailJob.perform_now(al)
+      end
+    end
+  end
 end
