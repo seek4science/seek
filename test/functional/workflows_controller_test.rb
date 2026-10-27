@@ -2147,5 +2147,14 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_select 'strong', text: /Runs/, count: 0
     end
   end
-end
 
+  test 'should display workflow diagram' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'img[src=?]', diagram_workflow_path(workflow, version: 1)
+    end
+  end
+end
