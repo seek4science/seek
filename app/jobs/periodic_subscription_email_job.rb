@@ -54,7 +54,7 @@ class PeriodicSubscriptionEmailJob < ApplicationJob
 
   # Get all the subscribers who should be notified about the given log event
   def subscribers(log)
-    Person.notifiable.joins(:subscriptions).where(subscriptions: {
+    Person.notifiable.joins(:user, :subscriptions).where(subscriptions: {
       subscribable_type: log.activity_loggable_type,
       subscribable_id: log.activity_loggable_id })
   end

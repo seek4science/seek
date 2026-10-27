@@ -31,7 +31,7 @@ module SiteAnnouncements
     end
 
     def receive_notifications?
-      self.notifiee_info.try(:receive_notifications?)
+      registered? && self.notifiee_info.try(:receive_notifications?)
     end
 
   end
