@@ -61,9 +61,10 @@ script/delete-docker-redis.sh         # Remove the stopped container and its dat
 ```
 
 `REDIS_MAXMEMORY` (default `256mb`) sets the `maxmemory` limit. For `docker-compose.yml` it is read
-from `docker/redis.env`; for the scripts and the other compose variants it is a host env var. Redis
-backs `Rails.cache`, sessions and the `Rack::Attack` throttle counters on one instance
-(`allkeys-lru`). `Seek::RedisConfig.url` (`lib/seek/redis_config.rb`) is the single source of truth
+from `docker/redis.env`; for the scripts and the other compose variants it is a host env var. If
+`REDIS_PASSWORD` is set, `start-docker-redis.sh` starts Redis with `--requirepass`. SEEK reads the
+same variable, so export it in the shell that runs the server and workers too. Redis backs
+`Rails.cache`, sessions and the `Rack::Attack` throttle counters on one instance (`allkeys-lru`). `Seek::RedisConfig.url` (`lib/seek/redis_config.rb`) is the single source of truth
 for the connection URL.
 
 ### Linting
