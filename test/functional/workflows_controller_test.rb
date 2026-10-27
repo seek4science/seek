@@ -2157,4 +2157,14 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_select 'img[src=?]', diagram_workflow_path(workflow, version: 1)
     end
   end
+
+  test 'display .svg workflow diagram' do
+    workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'embed[src=?]', diagram_workflow_path(workflow, version: 1)
+    end
+  end
 end
