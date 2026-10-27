@@ -2148,7 +2148,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should display workflow diagram' do
+  test 'display non .svg workflow diagram' do
     workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
     get :show, params: { id: workflow }
