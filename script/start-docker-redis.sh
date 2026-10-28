@@ -22,18 +22,14 @@ then
   docker volume create --name=seek-redis-data-volume
 fi
 
-# When REDIS_PASSWORD is set Redis requires it. SEEK reads the same variable (Seek::RedisConfig), so
-# exporting it once covers both.
-if [ -n "${REDIS_PASSWORD:-}" ]
-then
-  set -- --requirepass "$REDIS_PASSWORD"
-else
-  set --
-fi
-
+# REDIS_PASSWORD, if set, is passed as an env var and expanded in the container to keep it out of the
+# command line. docker-entrypoint.sh still drops root to the redis user.
 docker rm seek-redis > /dev/null 2>&1 || true
 echo "creating and starting seek-redis container"
-docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" redis:8.6-alpine redis-server --appendonly yes --maxmemory "${REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru "$@"
+docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" \
+  ${REDIS_PASSWORD:+-e REDIS_PASSWORD} redis:8.6-alpine \
+  sh -c 'exec docker-entrypoint.sh redis-server "$@" ${REDIS_PASSWORD:+--requirepass "$REDIS_PASSWORD"}' sh \
+  --appendonly yes --maxmemory "${REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
 
 echo "waiting for Redis to be ready ..."
 retries=0
