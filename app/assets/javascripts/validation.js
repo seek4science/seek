@@ -24,12 +24,12 @@ function validateResourceFields(resourceName, parentId=null) {
 }
 
 function validateUploadFormFields(resourceName=null, parentId=null) {
-    if (parentId) {
-        var files= $j(`#${parentId} input[type="file"][name="content_blobs[][data]"], input[type="hidden"][name="content_blobs[][data_url]"]`);
-    }
-    else {
-        var files= $j('input[type="file"][name="content_blobs[][data]"], input[type="hidden"][name="content_blobs[][data_url]"]');
-    }
+    // A file is present if it is in a file input, a remote URL, or has already been uploaded straight to
+    // the object store (in which case the form holds the key it was stored under).
+    var fileSelectors = 'input[type="file"][name="content_blobs[][data]"], ' +
+        'input[type="hidden"][name="content_blobs[][data_url]"], ' +
+        'input[type="hidden"][name="content_blobs[][direct_upload_key]"]';
+    var files = parentId ? $j(`#${parentId} ${fileSelectors}`) : $j(fileSelectors);
 
     var hasFiles = files.toArray().some(function (f) { return f.value }); // Count non-blank file fields
 

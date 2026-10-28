@@ -43,7 +43,87 @@ $j(document).ready(function () {
             listItem.append($j(this).hide());
         };
 
-        field.on('change', 'input[type=file][data-batch-upload=true]', addLocalFile);
+        // Direct upload: the file goes from the browser straight to the object store, and the form only
+        // carries the key it was stored under. Used when the server has marked the field with the URL
+        // of the endpoint that hands out signed upload URLs.
+        var directUploadUrl = field.data('directUploadUrl');
+
+        var sendToStore = function (file, ticket, listItem) {
+            var progress = $j('progress', listItem);
+            var status = $j('[data-role="seek-direct-upload-status"]', listItem);
+            var xhr = new XMLHttpRequest();
+            listItem.data('directUploadXhr', xhr);
+
+            xhr.upload.onprogress = function (event) {
+                if (event.lengthComputable) {
+                    progress.val(Math.round(100 * event.loaded / event.total));
+                }
+            };
+            xhr.onload = function () {
+                listItem.removeData('directUploadXhr');
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    progress.val(100);
+                    $j('input[name="content_blobs[][direct_upload_key]"]', listItem).val(ticket.key);
+                    $j('input[name="content_blobs[][content_type]"]', listItem).val(ticket.headers['Content-Type'] || '');
+                    listItem.addClass('direct-upload-done');
+                } else {
+                    xhr.onerror();
+                }
+            };
+            xhr.onerror = function () {
+                listItem.removeData('directUploadXhr');
+                listItem.addClass('direct-upload-failed');
+                status.text('Upload failed. Remove this file and try again.');
+            };
+
+            xhr.open('PUT', ticket.url);
+            Object.keys(ticket.headers || {}).forEach(function (name) {
+                xhr.setRequestHeader(name, ticket.headers[name]);
+            });
+            xhr.send(file);
+        };
+
+        var addDirectFile = function () {
+            var input = this;
+            var file = input.files && input.files[0];
+            if (!file) {
+                return;
+            }
+            var batch = $j(input).data('batchUpload') === true;
+            if (!batch) {
+                // A single-file form holds at most one uploaded file; picking another replaces it.
+                $j('[data-role="seek-direct-upload-file"]', pending).remove();
+            }
+
+            var listItem = $j(HandlebarsTemplates['upload/direct_file']({ text: file.name }));
+            $j('input[name="content_blobs[][original_filename]"]', listItem).val(file.name);
+            pending.append(listItem);
+
+            // The signed URL is tied to one key and one content type, so a fresh one is requested per file.
+            $j.ajax({
+                url: directUploadUrl,
+                method: 'POST',
+                data: { filename: file.name, content_type: file.type, size: file.size },
+                dataType: 'json'
+            }).done(function (ticket) {
+                // The file now travels on its own, so it must not also be posted with the form.
+                input.value = '';
+                $j(input).addClass('hide-no-file-text');
+                sendToStore(file, ticket, listItem);
+            }).fail(function () {
+                // No signed URL could be obtained, so fall back to sending the file through the form.
+                listItem.remove();
+                if (batch) {
+                    addLocalFile.call(input);
+                }
+            });
+        };
+
+        if (directUploadUrl) {
+            field.on('change', 'input[type=file]', addDirectFile);
+        } else {
+            field.on('change', 'input[type=file][data-batch-upload=true]', addLocalFile);
+        }
 
         // When existing files are already listed (e.g. after a validation error re-render),
         // hide the "No file chosen" text beside the file input since files are already shown.
@@ -89,7 +169,12 @@ $j(document).ready(function () {
 
         // Remove file
         pending.on('click', '.remove-file', function () {
-            $j(this).parent('li').remove();
+            var listItem = $j(this).parent('li');
+            var xhr = listItem.data('directUploadXhr');
+            if (xhr) {
+                xhr.abort();
+            }
+            listItem.remove();
             return false;
         });
     });

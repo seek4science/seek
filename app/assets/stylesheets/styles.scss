@@ -249,6 +249,27 @@ div.data_model_relationship span.relationship_type {
   padding-left: 0.75em;
 }
 
+// Rows for files sent straight to the object store: a progress bar while the upload runs,
+// then either a quiet finished state or a failure message beside the file name.
+.pending-files li.direct-upload-file progress {
+  width: 8em;
+  margin-left: 0.75em;
+  vertical-align: middle;
+}
+
+.pending-files li.direct-upload-done progress {
+  display: none;
+}
+
+.pending-files li.direct-upload-failed progress {
+  display: none;
+}
+
+.pending-files li.direct-upload-failed .direct-upload-status {
+  color: #a94442;
+  padding-left: 0.75em;
+}
+
 .isa-tree {
   margin-bottom: 0;
   margin-left: 1em;

@@ -1,0 +1,18 @@
+<li class="direct-upload-file" data-role="seek-direct-upload-file">
+    <span class="generic_file_icon"></span>
+    {{text}}
+    <progress class="direct-upload-progress" max="100" value="0"></progress>
+    <span class="direct-upload-status" data-role="seek-direct-upload-status"></span>
+    <a href="#" class="remove-file"><span class="remove_icon"></span></a>
+
+    {{!-- Rails groups content_blobs[][...] fields into one hash until a field name repeats, so the first two
+          names here are chosen to repeat whatever came before them (the empty file input and remote URL fields
+          above the list, or a previous row) and start a fresh hash for this row. --}}
+    <input type="hidden" name="content_blobs[][data_url]" value="" />
+    <input type="hidden" name="content_blobs[][original_filename]" value="" />
+
+    {{!-- Filled in by the browser once the file has been uploaded straight to the object store. Until then the
+          key stays empty, so a premature submit sends a row with no content that the server ignores. --}}
+    <input type="hidden" name="content_blobs[][direct_upload_key]" value="" />
+    <input type="hidden" name="content_blobs[][content_type]" value="" />
+</li>
