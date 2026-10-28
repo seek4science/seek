@@ -196,4 +196,50 @@ class ISAExporterTest < ActionController::TestCase
     characteristic_without_unit = isa_study['materials']['sources'].first['characteristics'].detect { |c| c['value'].is_a?(Hash) }
     assert_equal({ 'termSource' => '', 'termAccession' => '', 'comments' => [] }, characteristic_without_unit['unit'])
   end
+
+  test 'should keep the ontology annotation of ontology based values with a unit' do
+    investigation = FactoryBot.create(:investigation, contributor: @person, projects: [@person.projects.first], is_isa_json_compliant: true)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: investigation)
+    gram = Unit.find_or_create_by(symbol: 'g', comment: 'gram')
+
+    source_sample_type = study.sample_types.first
+    ontology_characteristic = source_sample_type.sample_attributes.find_by_title('Source Characteristic 3')
+    ontology_characteristic.update_column(:unit_id, gram.id)
+    term = ontology_characteristic.sample_controlled_vocab.sample_controlled_vocab_terms.find_by_label('anatomical entity')
+    term.update_column(:iri, 'http://www.ebi.ac.uk/efo/EFO_0000786')
+
+    FactoryBot.create(:sample, title: 'Source 1', contributor: @person, sample_type: source_sample_type.reload, project_ids: [study.projects.first.id],
+                      data: { 'Source Name': 'Source 1', 'Source Characteristic 1': 'source 1 characteristic 1', 'Source Characteristic 2': 'Bramley', 'Source Characteristic 3': 'anatomical entity' })
+
+    isa_study = JSON.parse(ISAExporter::Exporter.new(investigation, @person.user).export)['studies'].first
+
+    characteristic = isa_study['materials']['sources'].first['characteristics'].detect { |c| c['category']['@id'].include?("_#{ontology_characteristic.id}") }
+    assert_equal({ 'annotationValue' => 'anatomical entity', 'termSource' => 'EFO', 'termAccession' => 'http://www.ebi.ac.uk/efo/EFO_0000786' },
+                 characteristic['value'])
+    assert_equal({ '@id' => "#unit/#{gram.id}" }, characteristic['unit'])
+    assert_equal ["#unit/#{gram.id}"], isa_study['unitCategories'].map { |u| u['@id'] }
+  end
+
+  test 'should only declare units that are referenced' do
+    investigation = FactoryBot.create(:investigation, contributor: @person, projects: [@person.projects.first], is_isa_json_compliant: true)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: investigation)
+    source_sample_type = study.sample_types.first
+    source_sample_type.sample_attributes.find_by_title('Source Characteristic 1')
+                      .update_column(:unit_id, Unit.find_or_create_by(symbol: 'g', comment: 'gram').id)
+
+    # No samples, so no values reference the unit
+    isa_study = JSON.parse(ISAExporter::Exporter.new(investigation, @person.user).export)['studies'].first
+    assert_empty isa_study['unitCategories']
+
+    # Only hidden sources, which are exported without characteristics
+    other_person = FactoryBot.create(:person, project: study.projects.first)
+    FactoryBot.create(:sample, title: 'Hidden source', contributor: other_person, sample_type: source_sample_type.reload, project_ids: [study.projects.first.id],
+                      policy: FactoryBot.create(:private_policy),
+                      data: { 'Source Name': 'Hidden source', 'Source Characteristic 1': '12', 'Source Characteristic 2': 'Bramley' })
+
+    # Reload, as the first export cached the (then empty) samples of the sample types
+    isa_study = JSON.parse(ISAExporter::Exporter.new(investigation.reload, @person.user).export)['studies'].first
+    assert_equal ['#source/HIDDEN'], isa_study['materials']['sources'].map { |s| s['@id'] }
+    assert_empty isa_study['unitCategories']
+  end
 end

@@ -120,7 +120,8 @@ module ISAExporter
 
       isa_study[:assays] = study.assay_streams.map { |assay_stream| convert_assays(assay_stream, protocols_maps) }.compact
       isa_study[:factors] = []
-      isa_study[:unitCategories] = convert_unit_categories(study.sample_types)
+      # The assays declare their own units
+      isa_study[:unitCategories] = convert_unit_categories(isa_study.except(:assays))
 
       isa_study
     end
@@ -245,7 +246,7 @@ module ISAExporter
           convert_process_sequence(assay.sample_type,assay_protocols_map)
         end.flatten
       isa_assay[:dataFiles] = convert_data_files(all_sample_types)
-      isa_assay[:unitCategories] = convert_unit_categories(all_sample_types)
+      isa_assay[:unitCategories] = convert_unit_categories(isa_assay)
       isa_assay
     end
 
@@ -844,9 +845,10 @@ module ISAExporter
       str.tr!(' ', '_') || str
     end
 
-    # A value with a unit is a quantity, so it is exported as a plain value instead of an ontology annotation
+    # A value with a unit is a quantity, so it is exported as a plain value instead of an ontology annotation.
+    # Ontology based values keep their annotation, so their term source and accession are not lost.
     def convert_value(value, ontology, attribute)
-      return value if attribute.unit.present?
+      return value if attribute.unit.present? && !attribute.ontology_based?
 
       { annotationValue: value, termSource: ontology[:termSource], termAccession: ontology[:termAccession] }
     end
@@ -855,19 +857,33 @@ module ISAExporter
       "#unit/#{unit.id}"
     end
 
+    # Registers every referenced unit, so the unit categories can be declared from the references actually exported
     def get_unit(attribute = nil)
       return { termSource: '', termAccession: '', comments: [] } if attribute&.unit.blank?
 
-      { '@id': unit_id(attribute.unit) }
+      unit = attribute.unit
+      @referenced_units ||= {}
+      @referenced_units[unit_id(unit)] = unit
+      { '@id': unit_id(unit) }
     end
 
-    # Declares the units used by the characteristics and parameter values of the given sample types
-    def convert_unit_categories(sample_types)
-      sample_types.map(&:sample_attributes).flatten.select do |sa|
-        sa.unit.present? && (sa.isa_tag&.isa_source_characteristic? || sa.isa_tag&.isa_sample_characteristic? ||
-          sa.isa_tag&.isa_other_material_characteristic? || sa.isa_tag&.isa_parameter_value?)
-      end.map(&:unit).uniq.map do |unit|
-        { '@id': unit_id(unit), annotationValue: unit.symbol, termSource: '', termAccession: '', comments: [] }
+    # Declares the units referenced by the values in the given (part of an) ISA-JSON hash
+    def convert_unit_categories(isa_hash)
+      referenced_unit_ids(isa_hash).uniq.map do |id|
+        unit = @referenced_units[id]
+        { '@id': id, annotationValue: unit.symbol, termSource: '', termAccession: '', comments: [] }
+      end
+    end
+
+    def referenced_unit_ids(obj)
+      case obj
+      when Hash
+        ids = obj[:unit].is_a?(Hash) && obj[:unit][:'@id'] ? [obj[:unit][:'@id']] : []
+        ids + obj.values.flat_map { |v| referenced_unit_ids(v) }
+      when Array
+        obj.flat_map { |v| referenced_unit_ids(v) }
+      else
+        []
       end
     end
   end
