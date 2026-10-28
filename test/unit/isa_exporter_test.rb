@@ -159,4 +159,41 @@ class ISAExporterTest < ActionController::TestCase
     assert_equal isa_parameters.count, parameter_attributes.count
     assert parameter_attributes.all? { |title| isa_parameters.include? title }
   end
+
+  test 'should export units' do
+    investigation = FactoryBot.create(:investigation, contributor: @person, projects: [@person.projects.first], is_isa_json_compliant: true)
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: investigation)
+    gram = Unit.find_or_create_by(symbol: 'g', comment: 'gram')
+    millilitre = Unit.find_or_create_by(symbol: 'mL', comment: 'millilitre')
+
+    source_sample_type = study.sample_types.first
+    source_characteristic = source_sample_type.sample_attributes.find_by_title('Source Characteristic 1')
+    source_characteristic.update_column(:unit_id, gram.id)
+    sample_collection_sample_type = study.sample_types.last
+    parameter_value = sample_collection_sample_type.sample_attributes.find_by_title('sample collection parameter value 1')
+    parameter_value.update_column(:unit_id, millilitre.id)
+
+    source = FactoryBot.create(:sample, title: 'Source 1', contributor: @person, sample_type: source_sample_type.reload, project_ids: [study.projects.first.id],
+                               data: { 'Source Name': 'Source 1', 'Source Characteristic 1': '12', 'Source Characteristic 2': 'Bramley' })
+    FactoryBot.create(:sample, title: 'Sample 1', contributor: @person, sample_type: sample_collection_sample_type.reload, project_ids: [study.projects.first.id],
+                      data: { 'Sample Name': 'Sample 1', 'sample collection': 'Sample collection protocol', Input: [source.id], 'sample characteristic 1': 'value sample 1', 'sample collection parameter value 1': '5' })
+
+    isa_study = JSON.parse(ISAExporter::Exporter.new(investigation, @person.user).export)['studies'].first
+
+    assert_equal [{ '@id' => "#unit/#{gram.id}", 'annotationValue' => 'g', 'termSource' => '', 'termAccession' => '', 'comments' => [] },
+                  { '@id' => "#unit/#{millilitre.id}", 'annotationValue' => 'mL', 'termSource' => '', 'termAccession' => '', 'comments' => [] }],
+                 isa_study['unitCategories']
+
+    characteristic = isa_study['materials']['sources'].first['characteristics'].detect { |c| c['category']['@id'].include?("_#{source_characteristic.id}") }
+    assert_equal '12', characteristic['value']
+    assert_equal({ '@id' => "#unit/#{gram.id}" }, characteristic['unit'])
+
+    isa_parameter_value = isa_study['processSequence'].first['parameterValues'].detect { |pv| pv['category']['@id'] == "#parameter/#{parameter_value.id}" }
+    assert_equal '5', isa_parameter_value['value']
+    assert_equal({ '@id' => "#unit/#{millilitre.id}" }, isa_parameter_value['unit'])
+
+    # Attributes without a unit keep an ontology annotation as value and an empty unit
+    characteristic_without_unit = isa_study['materials']['sources'].first['characteristics'].detect { |c| c['value'].is_a?(Hash) }
+    assert_equal({ 'termSource' => '', 'termAccession' => '', 'comments' => [] }, characteristic_without_unit['unit'])
+  end
 end

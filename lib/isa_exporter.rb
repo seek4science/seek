@@ -120,7 +120,7 @@ module ISAExporter
 
       isa_study[:assays] = study.assay_streams.map { |assay_stream| convert_assays(assay_stream, protocols_maps) }.compact
       isa_study[:factors] = []
-      isa_study[:unitCategories] = []
+      isa_study[:unitCategories] = convert_unit_categories(study.sample_types)
 
       isa_study
     end
@@ -245,7 +245,7 @@ module ISAExporter
           convert_process_sequence(assay.sample_type,assay_protocols_map)
         end.flatten
       isa_assay[:dataFiles] = convert_data_files(all_sample_types)
-      isa_assay[:unitCategories] = []
+      isa_assay[:unitCategories] = convert_unit_categories(all_sample_types)
       isa_assay
     end
 
@@ -432,7 +432,7 @@ module ISAExporter
                   termSource: '',
                   termAccession: ''
                 },
-                unit: { termSource: '', termAccession: '', comments: [] }
+                unit: get_unit
               }
             ]
           }
@@ -448,12 +448,8 @@ module ISAExporter
           category: {
             '@id': normalize_id("#characteristic_category/#{attribute.title}_#{attribute.id}")
           },
-          value: {
-            annotationValue: value,
-            termSource: ontology[:termSource],
-            termAccession: ontology[:termAccession]
-          },
-          unit: get_unit
+          value: convert_value(value, ontology, attribute),
+          unit: get_unit(attribute)
         }
       end
     end
@@ -775,12 +771,8 @@ module ISAExporter
           category: {
             '@id': "#parameter/#{p.id}"
           },
-          value: {
-            annotationValue: value,
-            termSource: ontology[:termSource],
-            termAccession: ontology[:termAccession]
-          },
-          unit: get_unit
+          value: convert_value(value, ontology, p),
+          unit: get_unit(p)
         }
       end
     end
@@ -852,8 +844,31 @@ module ISAExporter
       str.tr!(' ', '_') || str
     end
 
-    def get_unit
-      { termSource: '', termAccession: '', comments: [] }
+    # A value with a unit is a quantity, so it is exported as a plain value instead of an ontology annotation
+    def convert_value(value, ontology, attribute)
+      return value if attribute.unit.present?
+
+      { annotationValue: value, termSource: ontology[:termSource], termAccession: ontology[:termAccession] }
+    end
+
+    def unit_id(unit)
+      "#unit/#{unit.id}"
+    end
+
+    def get_unit(attribute = nil)
+      return { termSource: '', termAccession: '', comments: [] } if attribute&.unit.blank?
+
+      { '@id': unit_id(attribute.unit) }
+    end
+
+    # Declares the units used by the characteristics and parameter values of the given sample types
+    def convert_unit_categories(sample_types)
+      sample_types.map(&:sample_attributes).flatten.select do |sa|
+        sa.unit.present? && (sa.isa_tag&.isa_source_characteristic? || sa.isa_tag&.isa_sample_characteristic? ||
+          sa.isa_tag&.isa_other_material_characteristic? || sa.isa_tag&.isa_parameter_value?)
+      end.map(&:unit).uniq.map do |unit|
+        { '@id': unit_id(unit), annotationValue: unit.symbol, termSource: '', termAccession: '', comments: [] }
+      end
     end
   end
 end
