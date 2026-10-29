@@ -65,14 +65,14 @@ $j(document).ready(function () {
                     progress.val(100);
                     $j('input[name="content_blobs[][direct_upload_key]"]', listItem).val(ticket.key);
                     $j('input[name="content_blobs[][content_type]"]', listItem).val(ticket.headers['Content-Type'] || '');
-                    listItem.addClass('direct-upload-done');
+                    listItem.removeClass('direct-upload-in-progress').addClass('direct-upload-done');
                 } else {
                     xhr.onerror();
                 }
             };
             xhr.onerror = function () {
                 listItem.removeData('directUploadXhr');
-                listItem.addClass('direct-upload-failed');
+                listItem.removeClass('direct-upload-in-progress').addClass('direct-upload-failed');
                 status.text('Upload failed. Remove this file and try again.');
             };
 
@@ -121,6 +121,17 @@ $j(document).ready(function () {
 
         if (directUploadUrl) {
             field.on('change', 'input[type=file]', addDirectFile);
+
+            // The form must not be sent while a file is still on its way to the store: the row's key is only
+            // filled in once the store has confirmed the upload. Most forms are stopped earlier by the submit
+            // button's validation; this catches any form that submits without it.
+            field.closest('form').on('submit', function (event) {
+                if ($j('.direct-upload-in-progress', pending).length > 0) {
+                    event.preventDefault();
+                    alert('Please wait for the file upload to finish.');
+                    return false;
+                }
+            });
         } else {
             field.on('change', 'input[type=file][data-batch-upload=true]', addLocalFile);
         }

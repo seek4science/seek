@@ -24,6 +24,17 @@ function validateResourceFields(resourceName, parentId=null) {
 }
 
 function validateUploadFormFields(resourceName=null, parentId=null) {
+    // A file that is still being uploaded straight to the object store has no key yet, so the form cannot
+    // be submitted until it has arrived. Say so, rather than complaining that no file was given.
+    var inProgressSelector = 'li.direct-upload-in-progress';
+    var inProgress = parentId ? $j(`#${parentId} ${inProgressSelector}`) : $j(inProgressSelector);
+    if (inProgress.length) {
+        alert("Please wait for the file upload to finish.");
+        inProgress.first()[0].scrollIntoView();
+        inProgress.highlight();
+        return false;
+    }
+
     // A file is present if it is in a file input, a remote URL, or has already been uploaded straight to
     // the object store (in which case the form holds the key it was stored under).
     var fileSelectors = 'input[type="file"][name="content_blobs[][data]"], ' +

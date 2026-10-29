@@ -1,4 +1,6 @@
-<li class="direct-upload-file" data-role="seek-direct-upload-file">
+{{!-- A row starts "in progress" and loses that class once the store has accepted or rejected the file.
+      While it is present the form refuses to submit, because the key below is still empty. --}}
+<li class="direct-upload-file direct-upload-in-progress" data-role="seek-direct-upload-file">
     <span class="generic_file_icon"></span>
     {{text}}
     <progress class="direct-upload-progress" max="100" value="0"></progress>
@@ -11,8 +13,7 @@
     <input type="hidden" name="content_blobs[][data_url]" value="" />
     <input type="hidden" name="content_blobs[][original_filename]" value="" />
 
-    {{!-- Filled in by the browser once the file has been uploaded straight to the object store. Until then the
-          key stays empty, so a premature submit sends a row with no content that the server ignores. --}}
+    {{!-- Filled in by the browser once the file has been uploaded straight to the object store. --}}
     <input type="hidden" name="content_blobs[][direct_upload_key]" value="" />
     <input type="hidden" name="content_blobs[][content_type]" value="" />
 </li>
