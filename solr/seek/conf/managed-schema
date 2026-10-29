@@ -28,7 +28,9 @@
               splitOnCaseChange="0"/>
       <filter class="solr.FlattenGraphFilterFactory"/>
       <filter class="solr.LowerCaseFilterFactory"/>
-      <filter class="solr.EdgeNGramFilterFactory" minGramSize="2" maxGramSize="50"/>
+      <!-- preserveOriginal keeps tokens shorter than minGramSize or longer than maxGramSize, which would otherwise
+           be dropped and so never match a query containing them, e.g. the "c" in "vitamin c" -->
+      <filter class="solr.EdgeNGramFilterFactory" minGramSize="2" maxGramSize="50" preserveOriginal="true"/>
     </analyzer>
     <analyzer type="query">
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
