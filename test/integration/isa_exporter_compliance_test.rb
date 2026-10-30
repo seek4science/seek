@@ -87,15 +87,25 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
     assert characteristics.all? { |c| categories.include?(c) }
   end
 
-  # # 10
-  # test 'Unit Categories declared should be referenced by at least one Unit' do
-  #   # Not implemented
-  # end
+  # 10
+  test 'Unit Categories declared should be referenced by at least one Unit' do
+    studies = @json['studies']
+    unit_categories = nested_hash_value(studies, 'unitCategories').flatten.map { |u| u['@id'] }
+    units = nested_hash_value(studies, 'unit').map { |u| u['@id'] }.compact
 
-  # # 11
-  # test 'Units must reference a Unit Category declaration.' do
-  #   # Not implemented
-  # end
+    assert_equal 3, unit_categories.uniq.count
+    assert unit_categories.all? { |u| units.include?(u) }
+  end
+
+  # 11
+  test 'Units must reference a Unit Category declaration.' do
+    studies = @json['studies']
+    unit_categories = nested_hash_value(studies, 'unitCategories').flatten.map { |u| u['@id'] }
+    units = nested_hash_value(studies, 'unit').map { |u| u['@id'] }.compact
+
+    assert units.any?
+    assert units.all? { |u| unit_categories.include?(u) }
+  end
 
   # 12
   test 'All Sources and Samples must be declared in the Study-level materials section' do
@@ -321,6 +331,14 @@ class IsaExporterComplianceTest < ActionDispatch::IntegrationTest
         isa_template: FactoryBot.build(:isa_assay_material_template),
         linked_sample_type: sample_collection
       )
+
+    # Give a characteristic and a parameter value a unit, so units get exported
+    source.sample_attributes.find_by_title('Source Characteristic 1')
+          .update_column(:unit_id, Unit.find_or_create_by(symbol: 'g', comment: 'gram').id)
+    sample_collection.sample_attributes.find_by_title('sample collection parameter value 1')
+                     .update_column(:unit_id, Unit.find_or_create_by(symbol: 'mL', comment: 'millilitre').id)
+    assay_sample_type.sample_attributes.find_by_title('other material characteristic 1')
+                     .update_column(:unit_id, Unit.find_or_create_by(symbol: 'h', comment: 'time').id)
 
     study =
       FactoryBot.create(
