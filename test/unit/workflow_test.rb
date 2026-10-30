@@ -1001,14 +1001,14 @@ class WorkflowTest < ActiveSupport::TestCase
 
     assert workflow.ro_crate.main_workflow.present?
     assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.ga",
-                 workflow.ro_crate.main_workflow['contentUrl']
+                 workflow.ro_crate.main_workflow.properties[:contentUrl]
 
     assert workflow.ro_crate.main_workflow_diagram.present?
     assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/diagram.png",
-                 workflow.ro_crate.main_workflow_diagram['contentUrl']
+                 workflow.ro_crate.main_workflow_diagram.properties[:contentUrl]
 
     assert workflow.ro_crate.main_workflow_cwl.present?
     assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.cwl",
-                 workflow.ro_crate.main_workflow_cwl['contentUrl']
+                 workflow.ro_crate.main_workflow_cwl.properties[:contentUrl]
   end
 end
