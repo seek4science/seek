@@ -2147,5 +2147,34 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_select 'strong', text: /Runs/, count: 0
     end
   end
-end
 
+  test 'display non .svg workflow diagram' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'img[src=?]', diagram_workflow_path(workflow, version: 1)
+    end
+  end
+
+  test 'display .svg workflow diagram' do
+    workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'embed[src=?]', diagram_workflow_path(workflow, version: 1)
+    end
+  end
+
+  test 'display message if cwl diagram has an error when generating' do
+    workflow = FactoryBot.create(:cwl_workflow_broken_diagram, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'div', 'An error ocurred when generating the diagram'
+    end
+  end
+end

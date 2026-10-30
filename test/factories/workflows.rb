@@ -128,6 +128,10 @@ FactoryBot.define do
   factory(:cwl_workflow, parent: :workflow) do
     association :content_blob, factory: :cwl_content_blob
   end
+
+  factory(:cwl_workflow_broken_diagram, parent: :workflow) do
+    association :content_blob, factory: :cwl_content_blob_broken_diagram
+  end
   
   factory(:cwl_packed_workflow, parent: :workflow) do
     association :content_blob, factory: :cwl_packed_content_blob

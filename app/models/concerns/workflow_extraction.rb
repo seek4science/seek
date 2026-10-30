@@ -82,13 +82,21 @@ module WorkflowExtraction
     path && File.exist?(path)
   end
 
+  def diagram_generation_error?
+    @diagram_generation_error = extractor.diagram_generation_error? if @diagram_generation_error.nil?
+    @diagram_generation_error
+  end
+
   def diagram
     path = Dir.glob(cached_diagram_path('*')).last
 
     unless path && File.exist?(path)
       e = extractor
       diagram = e.generate_diagram
-      return nil if diagram.nil? || diagram.length <= 1
+      if diagram.nil? || diagram.length <= 1
+        @diagram_generation_error = e.diagram_generation_error?
+        return nil
+      end
       path = Pathname.new(cached_diagram_path(e.diagram_extension))
       path.parent.mkdir unless path.parent.exist?
       File.binwrite(path, diagram)
