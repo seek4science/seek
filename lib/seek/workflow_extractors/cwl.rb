@@ -22,25 +22,6 @@ module Seek
         true
       end
 
-      def extract_diagram
-        f = Tempfile.new('diagram.dot')
-        wf = WorkflowInternals::Structure.new(metadata[:internals])
-        Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
-        f.rewind
-        out = ''
-        err = ''
-        Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
-          stdin.puts(f.read)
-          stdin.close
-          out = stdout.read
-          err = stderr.read
-          stdout.close
-          stderr.close
-        end
-        Rails.logger.error(err) if err.length > 0
-        out
-      end
-
       def generate_diagram
         extract_diagram
       rescue StandardError => e
@@ -98,6 +79,25 @@ module Seek
       end
 
       private
+
+      def extract_diagram
+        f = Tempfile.new('diagram.dot')
+        wf = WorkflowInternals::Structure.new(metadata[:internals])
+        Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
+        f.rewind
+        out = ''
+        err = ''
+        Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
+          stdin.puts(f.read)
+          stdin.close
+          out = stdout.read
+          err = stderr.read
+          stdout.close
+          stderr.close
+        end
+        Rails.logger.error(err) if err.length > 0
+        out
+      end
 
       def parse_metadata(existing_metadata, yaml_or_json_string)
         cwl = YAML.load(yaml_or_json_string)
