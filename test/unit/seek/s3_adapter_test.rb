@@ -217,6 +217,39 @@ class S3AdapterTest < ActiveSupport::TestCase
     assert_includes result[:message], 'access_key_id'
   end
 
+  # --- each_object ---
+
+  test 'each_object lists the prefix and yields keys without it' do
+    client.stub_responses(:list_objects_v2, {
+                            contents: [
+                              { key: "#{PREFIX}/one.dat", last_modified: Time.utc(2026, 1, 1) },
+                              { key: "#{PREFIX}/two.dat", last_modified: Time.utc(2026, 1, 2) }
+                            ]
+                          })
+    seen = @adapter.each_object.to_a
+    assert_equal [['one.dat', Time.utc(2026, 1, 1)], ['two.dat', Time.utc(2026, 1, 2)]], seen
+    req = client.api_requests.find { |r| r[:operation_name] == :list_objects_v2 }
+    assert_equal "#{PREFIX}/", req[:params][:prefix]
+  end
+
+  test 'each_object follows the listing across pages' do
+    first_page = { contents: [{ key: "#{PREFIX}/a.dat", last_modified: Time.utc(2026, 1, 1) }],
+                   is_truncated: true, next_continuation_token: 'page-2' }
+    second_page = { contents: [{ key: "#{PREFIX}/b.dat", last_modified: Time.utc(2026, 1, 1) }],
+                    is_truncated: false }
+    client.stub_responses(:list_objects_v2, [first_page, second_page])
+    keys = @adapter.each_object.map { |key, _modified| key }
+    assert_equal %w[a.dat b.dat], keys
+    lists = client.api_requests.select { |r| r[:operation_name] == :list_objects_v2 }
+    assert_equal 2, lists.size
+    assert_equal 'page-2', lists.last[:params][:continuation_token]
+  end
+
+  test 'each_object yields nothing for an empty prefix' do
+    client.stub_responses(:list_objects_v2, { contents: [] })
+    assert_empty @adapter.each_object.to_a
+  end
+
   private
 
   def client

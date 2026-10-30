@@ -158,6 +158,19 @@ module Seek
         end
       end
 
+      # Yields every object under this adapter's prefix as (key, last_modified), where key is the storage
+      # key without the prefix. Pages through the listing, so it is safe on prefixes with many objects.
+      # Used to find abandoned objects in the direct-upload staging area.
+      def each_object
+        return enum_for(:each_object) unless block_given?
+
+        @client.list_objects_v2(bucket: @bucket, prefix: "#{@prefix}/").each do |page|
+          page.contents.each do |object|
+            yield object.key.delete_prefix("#{@prefix}/"), object.last_modified
+          end
+        end
+      end
+
       # The full object key inside the bucket for a storage key, e.g. "abc.dat" -> "assets/abc.dat".
       # Public because a server-side copy between adapters (uploads/ -> assets/) needs the source
       # object's full key, which only the source adapter knows how to build.
