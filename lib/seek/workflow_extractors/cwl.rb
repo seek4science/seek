@@ -23,18 +23,31 @@ module Seek
       end
 
       def generate_diagram
-        extract_diagram
+        return @diagram if @diagram
+
+        if @invalid_diagram.nil?
+          @diagram = extract_diagram
+          @invalid_diagram = false
+        end
+
+        @diagram
       rescue StandardError => e
         Rails.logger.error(e)
+        @invalid_diagram = true
         nil
       end
 
       def diagram_generation_error?
-        extract_diagram
-        false
+        if @invalid_diagram.nil?
+          @diagram = extract_diagram
+          @invalid_diagram = false
+        end
+
+        @invalid_diagram
       rescue StandardError => e
         Rails.logger.error(e)
-        true
+        @invalid_diagram = true
+        @invalid_diagram
       end
 
       def metadata
