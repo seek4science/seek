@@ -25,8 +25,8 @@ class PeriodicSubscriptionEmailJob < ApplicationJob
       next unless resource # Skip resources that were destroyed
       log.reload # Load the full record from the ActivityLog table, since it was pared down by `SELECT` previously.
       subscribers(log).each do |person|
-        # Check if the person can view the resource, and if they have a subscription for the given frequency.
-        if resource.can_view?(person.user) &&
+        # Check if the person receives notifications, can view the resource, and if they have a subscription for the given frequency.
+        if person.receive_notifications? && resource.can_view?(person.user) &&
           # TODO: Allow this frequency check to be done in a DB query, then it can be done in the `subscribers` method.
           person.subscriptions.for_subscribable(resource).any? do |subscription|
             subscription.frequency == frequency
@@ -54,7 +54,7 @@ class PeriodicSubscriptionEmailJob < ApplicationJob
 
   # Get all the subscribers who should be notified about the given log event
   def subscribers(log)
-    Person.notifiable.joins(:subscriptions).where(subscriptions: {
+    Person.notifiable.joins(:user, :subscriptions).where(subscriptions: {
       subscribable_type: log.activity_loggable_type,
       subscribable_id: log.activity_loggable_id })
   end
