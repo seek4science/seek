@@ -29,6 +29,11 @@ module ReadApiTestSuite
     false
   end
 
+  # for resources whose serializer doesn't add the current user's permissions to meta
+  def skip_can_meta_test?
+    false
+  end
+
   def index_response_fragment
     "#/components/schemas/indexResponse"
   end
@@ -55,6 +60,34 @@ module ReadApiTestSuite
       perform_jsonapi_checks
       assert_nothing_raised { validate_json(response.body, index_response_fragment) }
     end
+  end
+
+  test 'meta includes what the current user can do with the resource' do
+    skip('resource meta does not include permissions') if skip_can_meta_test?
+    res = FactoryBot.create("max_#{singular_name}".to_sym)
+    user_login(res.contributor) if res.respond_to?(:contributor)
+    get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+
+    # some models check the logged in user rather than the user passed in
+    expected = User.with_current_user(@current_user) do
+      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.to_h do |action|
+        [action.to_s, !!res.can_perform?(action, @current_user)]
+      end
+    end
+    assert_equal expected, JSON.parse(response.body)['data']['meta']['can']
+  end
+
+  test 'index does not include meta for each item' do
+    skip('skipping index test') if skip_index_test? || skip_can_meta_test? || model == Sample
+    res = FactoryBot.create("max_#{singular_name}".to_sym)
+    user_login(res.contributor) if res.respond_to?(:contributor)
+    get collection_url, as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+
+    items = JSON.parse(response.body)['data']
+    refute_empty items
+    items.each { |item| refute item.key?('meta') }
   end
 
   test 'unauthorized user cannot get resource' do

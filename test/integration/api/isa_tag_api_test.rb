@@ -19,6 +19,10 @@ class ISATagApiTest < ActionDispatch::IntegrationTest
     true
   end
 
+  def skip_can_meta_test?
+    true
+  end
+
   test 'can get index if authenticated' do
     FactoryBot.create(:min_isa_tag)
     FactoryBot.create(:max_isa_tag)

@@ -15,6 +15,43 @@ class SopApiTest < ActionDispatch::IntegrationTest
     @workflow = FactoryBot.create(:workflow, projects: [@project], contributor: current_person)
   end
 
+  test 'meta shows owner can do everything' do
+    get sop_path(@sop), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+    assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => true, 'delete' => true },
+                 JSON.parse(response.body)['data']['meta']['can'])
+  end
+
+  test 'meta shows what another user can do' do
+    viewable_sop = FactoryBot.create(:sop, policy: FactoryBot.create(:publicly_viewable_policy))
+    downloadable_sop = FactoryBot.create(:sop, policy: FactoryBot.create(:downloadable_public_policy))
+    editable_sop = FactoryBot.create(:sop, policy: FactoryBot.create(:editing_public_policy))
+
+    get sop_path(viewable_sop), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+    assert_equal({ 'view' => true, 'download' => false, 'edit' => false, 'manage' => false, 'delete' => false },
+                 JSON.parse(response.body)['data']['meta']['can'])
+
+    get sop_path(downloadable_sop), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+    assert_equal({ 'view' => true, 'download' => true, 'edit' => false, 'manage' => false, 'delete' => false },
+                 JSON.parse(response.body)['data']['meta']['can'])
+
+    get sop_path(editable_sop), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+    assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => false, 'delete' => false },
+                 JSON.parse(response.body)['data']['meta']['can'])
+  end
+
+  test 'meta shows what an anonymous user can do' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:downloadable_public_policy))
+
+    get sop_path(sop), as: :json
+    assert_response :success
+    assert_equal({ 'view' => true, 'download' => true, 'edit' => false, 'manage' => false, 'delete' => false },
+                 JSON.parse(response.body)['data']['meta']['can'])
+  end
+
   test 'can add content to API-created sop' do
     sop = FactoryBot.create(:api_pdf_sop, contributor: current_person)
 
