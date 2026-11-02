@@ -927,4 +927,6 @@ SEEK::Application.routes.draw do
 
   # for the api docs avoids special rewrite rules
   get 'api' => 'homes#api_docs'
+
+  match '/mcp', to: 'mcp#handle', via: [:get, :post, :delete]
 end
