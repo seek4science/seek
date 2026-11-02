@@ -105,7 +105,15 @@ class BaseSerializer < SimpleBaseSerializer
   def _meta
     meta = super
     meta[:uuid] = object.uuid if object.respond_to?('uuid')
+    meta[:can] = current_user_permissions if object.respond_to?(:can_perform?)
     meta
+  end
+
+  # what the user making the request is allowed to do with the item
+  def current_user_permissions
+    Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.index_with do |action|
+      object.can_perform?(action, User.current_user)
+    end
   end
 
   def BaseSerializer.convert_policy policy
