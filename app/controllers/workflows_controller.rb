@@ -146,7 +146,7 @@ class WorkflowsController < ApplicationController
 
   def create_version_from_ro_crate
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(workflow: @workflow))
-    @workflow = @crate_extractor.build
+    @workflow = @crate_extractor.build(update_creators: false)
 
     respond_to do |format|
       if @crate_extractor.valid?
@@ -327,7 +327,7 @@ class WorkflowsController < ApplicationController
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, detect_workflow: true)
 
     if @crate_extractor.valid?
-      @workflow = @crate_extractor.build
+      @workflow = @crate_extractor.build(update_creators: true)
       new_version = !@workflow.id.nil?
 
       if @workflow.save && (!new_version || @workflow.git_version.save)

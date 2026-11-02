@@ -188,7 +188,7 @@ class Workflow < ApplicationRecord
     updated_assets_creators_attrs = metadata[:assets_creators_attributes]&.values || []
     return if updated_assets_creators_attrs.empty?
 
-    self.assets_creators = retained_and_new_creators(updated_assets_creators_attrs)
+    retained_and_new_creators(updated_assets_creators_attrs)
   end
 
   def workflow_data_files_attributes=(attributes)

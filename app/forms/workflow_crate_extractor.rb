@@ -12,7 +12,7 @@ class WorkflowCrateExtractor
   validate :source_url_and_version_present?, if: -> { detect_workflow }
   validate :find_workflows_matching_id, if: -> { detect_workflow }
 
-  def build
+  def build(update_creators: true)
     if valid?
       if detect_workflow && @existing_workflows.length == 1
         self.workflow = @existing_workflows.first
@@ -54,7 +54,7 @@ class WorkflowCrateExtractor
       git_version.replace_files(files)
 
       extractor = Seek::WorkflowExtractors::ROCrate.new(git_version)
-      workflow.provide_metadata(extractor.metadata, update_creators: true)
+      workflow.provide_metadata(extractor.metadata, update_creators: update_creators)
       workflow.assign_attributes(params) if params.present?
       git_version.set_resource_attributes(workflow.attributes)
     end
