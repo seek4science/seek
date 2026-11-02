@@ -337,12 +337,35 @@ meta:
       $ref: "#/components/schemas/nonEmptyString"
     metrics:
       $ref: '#/components/schemas/metrics'
+    can:
+      $ref: '#/components/schemas/can'
   required:
     - created
     - modified
     - uuid
     - base_url
     - api_version
+  additionalProperties: false
+can:
+  type: object
+  description: What the user making the request is allowed to do with the item
+  properties:
+    view:
+      type: boolean
+    download:
+      type: boolean
+    edit:
+      type: boolean
+    manage:
+      type: boolean
+    delete:
+      type: boolean
+  required:
+    - view
+    - download
+    - edit
+    - manage
+    - delete
   additionalProperties: false
 metrics:
   type: object
@@ -4880,6 +4903,8 @@ extendedMetadataTypeResponse:
               $ref: "#/components/schemas/uriString"
             api_version:
               $ref: "#/components/schemas/nonEmptyString"
+            can:
+              $ref: "#/components/schemas/can"
           required:
             - base_url
             - api_version
