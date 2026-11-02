@@ -112,7 +112,7 @@ class BaseSerializer < SimpleBaseSerializer
   # what the user making the request is allowed to do with the item
   def current_user_permissions
     Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.index_with do |action|
-      object.can_perform?(action, User.current_user)
+      !!object.can_perform?(action, User.current_user)
     end
   end
 
