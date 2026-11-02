@@ -24,6 +24,19 @@ class AssayApiTest < ActionDispatch::IntegrationTest
     @sample = FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy))
   end
 
+  test 'meta shows owner cannot delete an assay with linked assets' do
+    get assay_path(@assay), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+    assert JSON.parse(response.body)['data']['meta']['can']['delete']
+
+    FactoryBot.create(:assay_asset, assay: @assay, asset: @data_file)
+
+    get assay_path(@assay), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+    assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => true, 'delete' => false },
+                 JSON.parse(response.body)['data']['meta']['can'])
+  end
+
   test 'should not delete assay when not project member' do
     a = FactoryBot.create(:max_assay)
     person = FactoryBot.create(:person)
