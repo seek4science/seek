@@ -337,8 +337,8 @@ meta:
       $ref: "#/components/schemas/nonEmptyString"
     metrics:
       $ref: '#/components/schemas/metrics'
-    can:
-      $ref: '#/components/schemas/can'
+    user_access:
+      $ref: '#/components/schemas/userAccess'
   required:
     - created
     - modified
@@ -346,7 +346,7 @@ meta:
     - base_url
     - api_version
   additionalProperties: false
-can:
+userAccess:
   type: object
   description: What the user making the request is allowed to do with the item
   properties:
@@ -4903,8 +4903,8 @@ extendedMetadataTypeResponse:
               $ref: "#/components/schemas/uriString"
             api_version:
               $ref: "#/components/schemas/nonEmptyString"
-            can:
-              $ref: "#/components/schemas/can"
+            user_access:
+              $ref: "#/components/schemas/userAccess"
           required:
             - base_url
             - api_version

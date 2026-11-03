@@ -30,7 +30,7 @@ module ReadApiTestSuite
   end
 
   # for resources whose serializer doesn't add the current user's permissions to meta
-  def skip_can_meta_test?
+  def skip_user_access_meta_test?
     false
   end
 
@@ -63,7 +63,7 @@ module ReadApiTestSuite
   end
 
   test 'meta includes what the current user can do with the resource' do
-    skip('resource meta does not include permissions') if skip_can_meta_test?
+    skip('resource meta does not include permissions') if skip_user_access_meta_test?
     res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
     get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
@@ -75,11 +75,11 @@ module ReadApiTestSuite
         [action.to_s, !!res.can_perform?(action, @current_user)]
       end
     end
-    assert_equal expected, JSON.parse(response.body)['data']['meta']['can']
+    assert_equal expected, JSON.parse(response.body)['data']['meta']['user_access']
   end
 
   test 'index does not include meta for each item' do
-    skip('skipping index test') if skip_index_test? || skip_can_meta_test? || model == Sample
+    skip('skipping index test') if skip_index_test? || skip_user_access_meta_test? || model == Sample
     res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
     get collection_url, as: :json, headers: { 'Authorization' => read_access_auth }

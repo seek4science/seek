@@ -17,7 +17,7 @@ class CollectionItemApiTest < ActionDispatch::IntegrationTest
     "#/components/schemas/collectionItemsResponse"
   end
 
-  def skip_can_meta_test?
+  def skip_user_access_meta_test?
     true
   end
 
