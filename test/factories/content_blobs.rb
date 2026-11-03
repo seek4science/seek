@@ -405,6 +405,12 @@ FactoryBot.define do
     content_type { 'application/x-yaml' }
     data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl", 'rb').read }
   end
+
+  factory(:cwl_content_blob_broken_diagram, parent: :content_blob) do
+    original_filename { 'broken_cwl.cwl' }
+    content_type { 'application/x-yaml' }
+    data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/broken_cwl.cwl", 'rb').read }
+  end
   
   factory(:cwl_packed_content_blob, parent: :content_blob) do
     original_filename { 'rp2-to-rp2path-packed.cwl' }
