@@ -957,4 +957,37 @@ class ProgrammesControllerTest < ActionController::TestCase
       assert creator.has_role?('programme_administrator')
     end
   end
+
+  test 'instance admin can add project already associated with a programme' do
+    login_as(FactoryBot.create(:admin))
+    prog = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project)
+    other_programme = FactoryBot.create(:programme)
+    other_project = FactoryBot.create(:project, programme: other_programme)
+
+    put :update, params: { id: prog, programme: { project_ids: [project.id, other_project.id] } }
+
+    assert_redirected_to prog
+
+    assert_equal 2, assigns(:programme).projects.length
+    assert_equal assigns(:programme), project.reload.programme
+    assert_equal assigns(:programme), other_project.reload.programme
+  end
+
+  test 'non-instance admin cannot add project already associated with a programme' do
+    pa = FactoryBot.create(:programme_administrator)
+    login_as(pa)
+    prog = pa.programmes.first
+    project = FactoryBot.create(:project)
+    other_programme = FactoryBot.create(:programme)
+    other_project = FactoryBot.create(:project, programme: other_programme)
+
+    put :update, params: { id: prog, programme: { project_ids: [project.id, other_project.id] } }
+
+    assert_redirected_to prog
+
+    assert_equal 1, assigns(:programme).projects.length
+    assert_equal assigns(:programme), project.reload.programme
+    assert_equal other_programme, other_project.reload.programme
+  end
 end

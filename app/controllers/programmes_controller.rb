@@ -160,11 +160,18 @@ class ProgrammesController < ApplicationController
     end
     params[:programme][:programme_administrator_ids].uniq! if params[:programme][:programme_administrator_ids]
 
-    params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
+    p = params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
                                       :activation_rejection_reason, { funding_codes: [] },
                                       :open_for_projects,
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
+
+    # Filter projects that aren't already associated with a programme
+    if p[:project_ids] && !current_user.is_admin?
+      p[:project_ids] = Project.without_programme.where(id: p[:project_ids]).pluck(:id)
+    end
+
+    p
   end
 
 end
