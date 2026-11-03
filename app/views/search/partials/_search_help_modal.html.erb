@@ -1,0 +1,77 @@
+
+<div class="modal fade" id="search-help-modal" tabindex="-1" role="dialog" aria-labelledby="search-help-modal-title">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="search-help-modal-title">
+          <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Search tips
+        </h4>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          <strong>Partial words match automatically.</strong>
+          For example, <code>metabol</code> already finds <em>metabolomics</em>, so you rarely need a <code>*</code>.
+          Searches are not case-sensitive, accents are ignored (<code>Muller</code> finds <em>Müller</em>),
+          and hyphens and spaces in names don't matter (<code>Thy1</code> finds <em>Thy-1</em>).
+        </p>
+
+        <div class="table-responsive">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>To find…</th>
+              <th>Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Items containing both words</td>
+              <td><code>wnt AND signalling</code></td>
+            </tr>
+            <tr>
+              <td>Items containing either word</td>
+              <td><code>kinase OR phosphatase</code></td>
+            </tr>
+            <tr>
+              <td>Items without a word</td>
+              <td><code>cell NOT plant</code></td>
+            </tr>
+            <tr>
+              <td>A word that must / must not appear</td>
+              <td><code>+kinase -yeast</code></td>
+            </tr>
+            <tr>
+              <td>An exact phrase</td>
+              <td><code>"data file"</code></td>
+            </tr>
+            <tr>
+              <td>Combined conditions</td>
+              <td><code>(kinase OR phosphatase) AND assay</code></td>
+            </tr>
+            <tr>
+              <td>Wildcards: <code>*</code> for any number of characters, <code>?</code> for exactly one</td>
+              <td><code>*omics</code>, <code>d?tafile</code></td>
+            </tr>
+            <tr>
+              <td>Similar spellings, allowing for typos</td>
+              <td><code>charactaristic~</code></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="help-block">
+          <code>AND</code>, <code>OR</code> and <code>NOT</code> must be written in capital letters.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
