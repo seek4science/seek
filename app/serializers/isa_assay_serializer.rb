@@ -44,14 +44,8 @@ class ISAAssaySerializer < SimpleBaseSerializer
     object.input_sample_type_id&.to_s
   end
 
-  def _meta
-    meta = super
-    assay_obj = object.assay
-    meta[:uuid] = assay_obj&.uuid if assay_obj.respond_to?('uuid')
-    meta[:created] = assay_obj&.created_at if assay_obj.respond_to?('created_at')
-    meta[:modified] = assay_obj&.updated_at if assay_obj.respond_to?('updated_at')
-    meta[:user_access] = current_user_permissions(assay_obj) if assay_obj.try(:authorization_supported?)
-    meta
+  def meta_item
+    object.assay
   end
 
   private

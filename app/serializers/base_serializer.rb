@@ -102,13 +102,6 @@ class BaseSerializer < SimpleBaseSerializer
     attribute_name.to_s
   end
 
-  def _meta
-    meta = super
-    meta[:uuid] = object.uuid if object.respond_to?('uuid')
-    meta[:user_access] = current_user_permissions if object.try(:authorization_supported?)
-    meta
-  end
-
   def BaseSerializer.convert_policy policy
     { 'access' => (PolicyHelper::access_type_key policy.access_type),
       'permissions' => (BaseSerializer.permits policy) }
