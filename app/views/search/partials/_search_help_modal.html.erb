@@ -13,10 +13,11 @@
 
       <div class="modal-body">
         <p>
-          <strong>Partial words match automatically.</strong>
-          For example, <code>metabol</code> already finds <em>metabolomics</em>, so you rarely need a <code>*</code>.
-          Searches are not case-sensitive, accents are ignored (<code>Muller</code> finds <em>Müller</em>),
-          and hyphens and spaces in names don't matter (<code>Thy1</code> finds <em>Thy-1</em>).
+          <strong>Words match from the start.</strong>
+          For example, <code>metabol</code> already finds <em>metabolomics</em>, so you rarely need a <code>*</code> at the end.
+          To match the end of a word, put the <code>*</code> first, as in <code>*omics</code>.
+          Searches are not case-sensitive, and words with accents, hyphens or other punctuation can be found
+          with or without them (<code>Muller</code> finds <em>Müller</em>, <code>Thy1</code> finds <em>Thy-1</em>).
         </p>
 
         <%# Laid out with divs rather than a <table>, because this modal is rendered on every page
