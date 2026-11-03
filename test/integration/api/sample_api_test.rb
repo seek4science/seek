@@ -25,6 +25,28 @@ class SampleApiTest < ActionDispatch::IntegrationTest
 
   end
 
+  # samples can only be listed through the API for a sample type
+  def skip_index_test?
+    true
+  end
+
+  test 'index of all samples is not implemented' do
+    get collection_url, as: :json
+    assert_response :not_implemented
+  end
+
+  test 'can list samples for a sample type' do
+    other_sample = FactoryBot.create(:sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
+    refute_equal @sample_type, other_sample.sample_type
+
+    get sample_type_samples_url(@sample_type, format: :json), headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+
+    perform_jsonapi_checks
+    assert_nothing_raised { validate_json(response.body, index_response_fragment) }
+    assert_equal [@sample.id.to_s], JSON.parse(response.body)['data'].map { |s| s['id'] }
+  end
+
   test 'patching a couple of attributes retains others' do
     user_login
     sample = FactoryBot.create(:patient_sample, contributor: current_person, policy: FactoryBot.create(:public_policy))
