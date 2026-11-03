@@ -54,12 +54,8 @@ module ReadApiTestSuite
     FactoryBot.create("max_#{singular_name}".to_sym)
     get collection_url, as: :json
 
-    if model == Sample
-      assert_response :not_implemented
-    else
-      perform_jsonapi_checks
-      assert_nothing_raised { validate_json(response.body, index_response_fragment) }
-    end
+    perform_jsonapi_checks
+    assert_nothing_raised { validate_json(response.body, index_response_fragment) }
   end
 
   test 'meta includes what the current user can do with the resource' do
@@ -79,7 +75,7 @@ module ReadApiTestSuite
   end
 
   test 'index does not include meta for each item' do
-    skip('skipping index test') if skip_index_test? || skip_user_access_meta_test? || model == Sample
+    skip('skipping index test') if skip_index_test? || skip_user_access_meta_test?
     res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
     get collection_url, as: :json, headers: { 'Authorization' => read_access_auth }
