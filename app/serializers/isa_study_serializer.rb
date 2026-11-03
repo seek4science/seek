@@ -32,14 +32,8 @@ class ISAStudySerializer < SimpleBaseSerializer
     serialize_isa_sample_type(object.sample_collection)
   end
 
-  def _meta
-    meta = super
-    study_obj = object.study
-    meta[:uuid] = study_obj&.uuid if study_obj.respond_to?('uuid')
-    meta[:created] = study_obj&.created_at if study_obj.respond_to?('created_at')
-    meta[:modified] = study_obj&.updated_at if study_obj.respond_to?('updated_at')
-    meta[:user_access] = current_user_permissions(study_obj) if study_obj.try(:authorization_supported?)
-    meta
+  def meta_item
+    object.study
   end
 
   private
