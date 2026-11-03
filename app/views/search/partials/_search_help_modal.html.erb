@@ -19,49 +19,46 @@
           and hyphens and spaces in names don't matter (<code>Thy1</code> finds <em>Thy-1</em>).
         </p>
 
-        <div class="table-responsive">
-          <table class="table table-condensed">
-            <thead>
-            <tr>
-              <th>To find…</th>
-              <th>Type</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>Items containing both words</td>
-              <td><code>wnt AND signalling</code></td>
-            </tr>
-            <tr>
-              <td>Items containing either word</td>
-              <td><code>kinase OR phosphatase</code></td>
-            </tr>
-            <tr>
-              <td>Items without a word</td>
-              <td><code>cell NOT plant</code></td>
-            </tr>
-            <tr>
-              <td>A word that must / must not appear</td>
-              <td><code>+kinase -yeast</code></td>
-            </tr>
-            <tr>
-              <td>An exact phrase</td>
-              <td><code>"data file"</code></td>
-            </tr>
-            <tr>
-              <td>Combined conditions</td>
-              <td><code>(kinase OR phosphatase) AND assay</code></td>
-            </tr>
-            <tr>
-              <td>Wildcards: <code>*</code> for any number of characters, <code>?</code> for exactly one</td>
-              <td><code>*omics</code>, <code>d?tafile</code></td>
-            </tr>
-            <tr>
-              <td>Similar spellings, allowing for typos</td>
-              <td><code>charactaristic~</code></td>
-            </tr>
-            </tbody>
-          </table>
+        <%# Laid out with divs rather than a <table>, because this modal is rendered on every page
+            and a real table would affect tests that count table rows on those pages. %>
+
+        <div class="search-help-examples" role="table" aria-label="Search examples">
+          <div class="search-help-row search-help-header" role="row">
+            <div role="columnheader">To find…</div>
+            <div role="columnheader">Type</div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Items containing both words</div>
+            <div role="cell"><code>wnt AND signalling</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Items containing either word</div>
+            <div role="cell"><code>kinase OR phosphatase</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Items without a word</div>
+            <div role="cell"><code>cell NOT plant</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">A word that must / must not appear</div>
+            <div role="cell"><code>+kinase -yeast</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">An exact phrase</div>
+            <div role="cell"><code>"data file"</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Combined conditions</div>
+            <div role="cell"><code>(kinase OR phosphatase) AND assay</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Wildcards: <code>*</code> for any number of characters, <code>?</code> for exactly one</div>
+            <div role="cell"><code>*omics</code>, <code>d?tafile</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Similar spellings, allowing for typos</div>
+            <div role="cell"><code>charactaristic~</code></div>
+          </div>
         </div>
 
         <p class="help-block">
