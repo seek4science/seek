@@ -4903,8 +4903,6 @@ extendedMetadataTypeResponse:
               $ref: "#/components/schemas/uriString"
             api_version:
               $ref: "#/components/schemas/nonEmptyString"
-            user_access:
-              $ref: "#/components/schemas/userAccess"
           required:
             - base_url
             - api_version

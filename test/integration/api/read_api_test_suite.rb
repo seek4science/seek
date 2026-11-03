@@ -29,11 +29,6 @@ module ReadApiTestSuite
     false
   end
 
-  # for resources whose serializer doesn't add the current user's permissions to meta
-  def skip_user_access_meta_test?
-    false
-  end
-
   def index_response_fragment
     "#/components/schemas/indexResponse"
   end
@@ -59,7 +54,7 @@ module ReadApiTestSuite
   end
 
   test 'meta includes what the current user can do with the resource' do
-    skip('resource meta does not include permissions') if skip_user_access_meta_test?
+    skip unless model.respond_to?(:authorization_supported?) && model.authorization_supported?
     res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
     get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
@@ -74,8 +69,18 @@ module ReadApiTestSuite
     assert_equal expected, JSON.parse(response.body)['data']['meta']['user_access']
   end
 
-  test 'index does not include meta for each item' do
-    skip('skipping index test') if skip_index_test? || skip_user_access_meta_test?
+  test 'meta does not include user access for resources without a policy' do
+    skip if model.respond_to?(:authorization_supported?) && model.authorization_supported?
+    res = FactoryBot.create("max_#{singular_name}".to_sym)
+    user_login(res.contributor) if res.respond_to?(:contributor)
+    get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+
+    assert_nil JSON.parse(response.body)['data'].dig('meta', 'user_access')
+  end
+
+  test 'index does not include user access for each item' do
+    skip('skipping index test') if skip_index_test?
     res = FactoryBot.create("max_#{singular_name}".to_sym)
     user_login(res.contributor) if res.respond_to?(:contributor)
     get collection_url, as: :json, headers: { 'Authorization' => read_access_auth }
@@ -83,7 +88,7 @@ module ReadApiTestSuite
 
     items = JSON.parse(response.body)['data']
     refute_empty items
-    items.each { |item| refute item.key?('meta') }
+    items.each { |item| assert_nil item.dig('meta', 'user_access') }
   end
 
   test 'unauthorized user cannot get resource' do
