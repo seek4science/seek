@@ -105,7 +105,7 @@ class BaseSerializer < SimpleBaseSerializer
   def _meta
     meta = super
     meta[:uuid] = object.uuid if object.respond_to?('uuid')
-    meta[:can] = current_user_permissions if object.respond_to?(:can_perform?)
+    meta[:user_access] = current_user_permissions if object.respond_to?(:can_perform?)
     meta
   end
 

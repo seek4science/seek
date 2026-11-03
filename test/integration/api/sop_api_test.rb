@@ -19,7 +19,7 @@ class SopApiTest < ActionDispatch::IntegrationTest
     get sop_path(@sop), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
     assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => true, 'delete' => true },
-                 JSON.parse(response.body)['data']['meta']['can'])
+                 JSON.parse(response.body)['data']['meta']['user_access'])
   end
 
   test 'meta shows what another user can do' do
@@ -30,17 +30,17 @@ class SopApiTest < ActionDispatch::IntegrationTest
     get sop_path(viewable_sop), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
     assert_equal({ 'view' => true, 'download' => false, 'edit' => false, 'manage' => false, 'delete' => false },
-                 JSON.parse(response.body)['data']['meta']['can'])
+                 JSON.parse(response.body)['data']['meta']['user_access'])
 
     get sop_path(downloadable_sop), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
     assert_equal({ 'view' => true, 'download' => true, 'edit' => false, 'manage' => false, 'delete' => false },
-                 JSON.parse(response.body)['data']['meta']['can'])
+                 JSON.parse(response.body)['data']['meta']['user_access'])
 
     get sop_path(editable_sop), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
     assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => false, 'delete' => false },
-                 JSON.parse(response.body)['data']['meta']['can'])
+                 JSON.parse(response.body)['data']['meta']['user_access'])
   end
 
   test 'meta shows what an anonymous user can do' do
@@ -49,7 +49,7 @@ class SopApiTest < ActionDispatch::IntegrationTest
     get sop_path(sop), as: :json
     assert_response :success
     assert_equal({ 'view' => true, 'download' => true, 'edit' => false, 'manage' => false, 'delete' => false },
-                 JSON.parse(response.body)['data']['meta']['can'])
+                 JSON.parse(response.body)['data']['meta']['user_access'])
   end
 
   test 'can add content to API-created sop' do

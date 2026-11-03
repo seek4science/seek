@@ -2,7 +2,7 @@
 
 The **Read** operation returns a JSON object representing the instance.
 
-The `meta` block of the instance includes a `can` object, indicating whether the authenticated user (or an anonymous user, if not authenticated) is allowed to `view`, `download`, `edit`, `manage` and `delete` the instance.
+The `meta` block of the instance includes a `user_access` object, indicating whether the authenticated user (or an anonymous user, if not authenticated) is allowed to `view`, `download`, `edit`, `manage` and `delete` the instance.
 
 Success response codes:
 

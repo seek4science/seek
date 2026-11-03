@@ -19,7 +19,7 @@ class ISATagApiTest < ActionDispatch::IntegrationTest
     true
   end
 
-  def skip_can_meta_test?
+  def skip_user_access_meta_test?
     true
   end
 
