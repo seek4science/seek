@@ -29,6 +29,13 @@ class SimpleBaseSerializer < ActiveModel::Serializer
     meta
   end
 
+  # what the user making the request is allowed to do with the item
+  def current_user_permissions(item = object)
+    Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.index_with do |action|
+      !!item.can_perform?(action, User.current_user)
+    end
+  end
+
   def serialize_annotations(object, context = nil)
     tags = []
     object.annotations.each do |tag|

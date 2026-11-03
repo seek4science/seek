@@ -46,6 +46,19 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
     assert collection.present?
     assert_equal [], source['samples']
     assert_equal [], collection['samples']
+    assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => true, 'delete' => true },
+                 response_body['data']['meta']['user_access'])
+  end
+
+  test 'show ISA study - meta shows what another user can do' do
+    study = FactoryBot.create(:isa_json_compliant_study, policy: FactoryBot.create(:publicly_viewable_policy))
+
+    get isa_study_path(study.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    assert_equal({ 'view' => true, 'download' => false, 'edit' => false, 'manage' => false, 'delete' => false },
+                 JSON.parse(response.body)['data']['meta']['user_access'])
   end
 
   test 'show ISA study - samples are filtered by authorization' do

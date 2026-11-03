@@ -109,13 +109,6 @@ class BaseSerializer < SimpleBaseSerializer
     meta
   end
 
-  # what the user making the request is allowed to do with the item
-  def current_user_permissions
-    Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.index_with do |action|
-      !!object.can_perform?(action, User.current_user)
-    end
-  end
-
   def BaseSerializer.convert_policy policy
     { 'access' => (PolicyHelper::access_type_key policy.access_type),
       'permissions' => (BaseSerializer.permits policy) }
