@@ -1048,8 +1048,8 @@ class ProjectsController < ApplicationController
     groups_to_remove = params[:group_memberships_to_remove] || []
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
-      group_membership = GroupMembership.find(group)
-      next unless group_membership && group_membership.person_can_be_removed?
+      group_membership = @project.group_memberships.find_by_id(group)
+      next unless group_membership&.person_can_be_removed?
       # this slightly strange bit of code is required to trigger and after_remove callback, which should be revisted
       #
       # Finn: http://guides.rubyonrails.org/association_basics.html#the-has-many-through-association

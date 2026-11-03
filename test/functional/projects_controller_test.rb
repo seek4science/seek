@@ -1290,6 +1290,25 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person2.institutions, new_institution
   end
 
+  test 'cannot remove other project members as project administrator' do
+    other_person = FactoryBot.create(:person)
+    other_project = other_person.projects.first
+    person = FactoryBot.create(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    assert_no_difference('GroupMembership.count') do
+      assert_no_difference('WorkGroup.count') do
+        post :update_members, params: { id: project, group_memberships_to_remove: [other_person.group_memberships.first] }
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    assert_includes other_project.reload.people, other_person
+  end
+
   test 'can flag and unflag members as leaving as project administrator' do
     person = FactoryBot.create(:project_administrator)
     project = person.projects.first
