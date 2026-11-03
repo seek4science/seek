@@ -38,6 +38,7 @@ class ISAStudySerializer < SimpleBaseSerializer
     meta[:uuid] = study_obj&.uuid if study_obj.respond_to?('uuid')
     meta[:created] = study_obj&.created_at if study_obj.respond_to?('created_at')
     meta[:modified] = study_obj&.updated_at if study_obj.respond_to?('updated_at')
+    meta[:user_access] = current_user_permissions(study_obj) if study_obj.try(:authorization_supported?)
     meta
   end
 
