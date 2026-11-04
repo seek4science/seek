@@ -412,6 +412,23 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p.is_programme_administrator?(prog)
   end
 
+  test 'user cannot create programme when programme user creation is disabled' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    with_config_value(:programme_user_creation_enabled, false) do
+      refute Programme.can_create?
+
+      get :new
+      refute_nil flash[:error]
+
+      assert_no_difference('Programme.count') do
+        post :create, params: { programme: { title: 'A programme' } }
+      end
+      refute_nil flash[:error]
+    end
+    refute person.reload.is_programme_administrator_of_any_programme?
+  end
+
   test 'logged out user cannot create' do
     assert_no_difference('Programme.count') do
       post :create, params: { programme: { title: 'A programme' } }

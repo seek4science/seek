@@ -4,6 +4,7 @@ class ProgrammesController < ApplicationController
 
   before_action :programmes_enabled?
   before_action :login_required, except: [:show, :index]
+  before_action :auth_to_create, only: [:new, :create]
   before_action :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
   before_action :find_requested_item, only: [:show, :admin,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
   before_action :find_assets, only: [:index]
