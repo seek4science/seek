@@ -419,11 +419,13 @@ class ProgrammesControllerTest < ActionController::TestCase
       refute Programme.can_create?
 
       get :new
+      assert_redirected_to root_path
       refute_nil flash[:error]
 
       assert_no_difference('Programme.count') do
         post :create, params: { programme: { title: 'A programme' } }
       end
+      assert_redirected_to root_path
       refute_nil flash[:error]
     end
     refute person.reload.is_programme_administrator_of_any_programme?
