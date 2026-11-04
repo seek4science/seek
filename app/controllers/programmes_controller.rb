@@ -160,20 +160,15 @@ class ProgrammesController < ApplicationController
     end
     params[:programme][:programme_administrator_ids].uniq! if params[:programme][:programme_administrator_ids]
 
-    p = params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
-                                      { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
+    permitted = [:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
+                 :funding_details, { programme_administrator_ids: [] },
                                       :activation_rejection_reason, { funding_codes: [] },
                                       :open_for_projects,
-                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy]]
 
-    # Filter out projects that are in other programmes (unless instance admin)
-    if p[:project_ids].present? && !current_user.is_admin?
-      ids = [nil]
-      ids << @programme.id if @programme
-      p[:project_ids] = Project.where(programme_id: ids).where(id: p[:project_ids]).pluck(:id)
-    end
+    permitted << { project_ids: [] } if User.admin_logged_in?
 
-    p
+    params.require(:programme).permit(permitted)
   end
 
 end

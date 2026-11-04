@@ -974,7 +974,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal assigns(:programme), other_project.reload.programme
   end
 
-  test 'non-instance admin cannot add project already associated with a programme' do
+  test 'non-instance admin cannot add projects to a programme' do
     pa = FactoryBot.create(:programme_administrator)
     login_as(pa)
     prog = pa.programmes.first
@@ -982,41 +982,29 @@ class ProgrammesControllerTest < ActionController::TestCase
     other_programme = FactoryBot.create(:programme)
     other_project = FactoryBot.create(:project, programme: other_programme)
 
+    assert_equal 1, prog.projects.length
+
     put :update, params: { id: prog, programme: { project_ids: [project.id, other_project.id] } }
 
     assert_redirected_to prog
 
     assert_equal 1, assigns(:programme).projects.length
-    assert_equal assigns(:programme), project.reload.programme
+    assert_nil project.reload.programme
     assert_equal other_programme, other_project.reload.programme
   end
 
-  test 'non-instance admin can still remove projects from programme' do
+  test 'non-instance admin cannot remove projects from programme' do
     pa = FactoryBot.create(:programme_administrator)
     login_as(pa)
     prog = pa.programmes.first
     project = FactoryBot.create(:project, programme: prog)
+    assert_equal 2, prog.projects.length
 
     put :update, params: { id: prog, programme: { project_ids: [''] } }
 
     assert_redirected_to prog
 
-    assert_equal 0, assigns(:programme).projects.length
-    assert_nil project.reload.programme
-  end
-
-  test 'non-instance admin can still update programme without removing existing projects' do
-    pa = FactoryBot.create(:programme_administrator)
-    login_as(pa)
-    prog = pa.programmes.first
-    project = FactoryBot.create(:project, programme: prog)
-
-    put :update, params: { id: prog, programme: { title: 'Hello World', project_ids: [project.id] } }
-
-    assert_redirected_to prog
-
-    assert_equal 'Hello World', assigns(:programme).title
-    assert_equal 1, assigns(:programme).projects.length
+    assert_equal 2, assigns(:programme).projects.length
     assert_equal assigns(:programme), project.reload.programme
   end
 end
