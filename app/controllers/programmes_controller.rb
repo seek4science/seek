@@ -166,9 +166,9 @@ class ProgrammesController < ApplicationController
                                       :open_for_projects,
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
 
-    # Filter projects that aren't already associated with a programme
-    if p[:project_ids] && !current_user.is_admin?
-      p[:project_ids] = Project.without_programme.where(id: p[:project_ids]).pluck(:id)
+    # Filter out projects that are in other programmes (unless instance admin)
+    if p[:project_ids].present? && !current_user.is_admin?
+      p[:project_ids] = Project.where(programme_id: [nil, @programme.id]).where(id: p[:project_ids]).pluck(:id)
     end
 
     p

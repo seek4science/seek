@@ -990,4 +990,33 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal assigns(:programme), project.reload.programme
     assert_equal other_programme, other_project.reload.programme
   end
+
+  test 'non-instance admin can still remove projects from programme' do
+    pa = FactoryBot.create(:programme_administrator)
+    login_as(pa)
+    prog = pa.programmes.first
+    project = FactoryBot.create(:project, programme: prog)
+
+    put :update, params: { id: prog, programme: { project_ids: [''] } }
+
+    assert_redirected_to prog
+
+    assert_equal 0, assigns(:programme).projects.length
+    assert_nil project.reload.programme
+  end
+
+  test 'non-instance admin can still update programme without removing existing projects' do
+    pa = FactoryBot.create(:programme_administrator)
+    login_as(pa)
+    prog = pa.programmes.first
+    project = FactoryBot.create(:project, programme: prog)
+
+    put :update, params: { id: prog, programme: { title: 'Hello World', project_ids: [project.id] } }
+
+    assert_redirected_to prog
+
+    assert_equal 'Hello World', assigns(:programme).title
+    assert_equal 1, assigns(:programme).projects.length
+    assert_equal assigns(:programme), project.reload.programme
+  end
 end
