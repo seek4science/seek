@@ -100,6 +100,17 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal [prog], project.programmes
   end
 
+  test 'user without permission cannot create project' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    refute Project.can_create?
+
+    assert_no_difference('Project.count') do
+      post :create, params: { project: { title: 'unauthorized proj' } }
+    end
+    refute_nil flash[:error]
+  end
+
   test 'create project with start and end dates and funding codes' do
     person = FactoryBot.create(:admin)
     login_as(person)

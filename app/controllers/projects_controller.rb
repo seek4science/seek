@@ -32,7 +32,8 @@ class ProjectsController < ApplicationController
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
   before_action :find_assets, only: [:index]
-  before_action :auth_to_create, only: %i[new create, :administer_create_project_request, :administer_import_project_request, :respond_create_project_request, :respond_import_project_request]
+  before_action :auth_to_create, only: %i[new create administer_create_project_request administer_import_project_request
+                                          respond_create_project_request respond_import_project_request]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
