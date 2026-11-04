@@ -168,7 +168,9 @@ class ProgrammesController < ApplicationController
 
     # Filter out projects that are in other programmes (unless instance admin)
     if p[:project_ids].present? && !current_user.is_admin?
-      p[:project_ids] = Project.where(programme_id: [nil, @programme.id]).where(id: p[:project_ids]).pluck(:id)
+      ids = [nil]
+      ids << @programme.id if @programme
+      p[:project_ids] = Project.where(programme_id: ids).where(id: p[:project_ids]).pluck(:id)
     end
 
     p
