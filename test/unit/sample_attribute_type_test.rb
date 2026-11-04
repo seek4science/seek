@@ -115,10 +115,11 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     type = FactoryBot.create(:age_sample_attribute_type)
     type2 = FactoryBot.create(:weight_sample_attribute_type)
 
-    ta1 = FactoryBot.create(:template_attribute, sample_attribute_type: type)
-    ta2 = FactoryBot.create(:template_attribute, sample_attribute_type: type)
-    ta3 = FactoryBot.create(:template_attribute, sample_attribute_type: type)
-    ta4 = FactoryBot.create(:template_attribute, sample_attribute_type: type2)
+    template = FactoryBot.create(:min_template)
+    ta1 = FactoryBot.create(:template_attribute, template: , sample_attribute_type: type)
+    ta2 = FactoryBot.create(:template_attribute, template: , sample_attribute_type: type)
+    ta3 = FactoryBot.create(:template_attribute, template: , sample_attribute_type: type)
+    ta4 = FactoryBot.create(:template_attribute, template: , sample_attribute_type: type2)
 
     type.reload
     template_attributes = type.isa_template_attributes

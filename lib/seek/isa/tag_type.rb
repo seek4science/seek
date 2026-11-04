@@ -15,6 +15,17 @@ module Seek
       def self.valid?(value)
         ALL_TYPES.include?(value)
       end
+
+      def self.exactly_one?(isa_tag_title)
+        [
+          SOURCE,
+          INPUT,
+          SAMPLE,
+          PROTOCOL,
+          OTHER_MATERIAL,
+          DATA_FILE,
+        ].include?(isa_tag_title)
+      end
     end
   end
 end

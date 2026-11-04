@@ -5163,7 +5163,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'do not show related templates if isa_compliance disabled' do
-    template = FactoryBot.create(:template)
+    template = FactoryBot.create(:min_template)
     person = template.contributor
     project = template.projects.first
     login_as(person)
