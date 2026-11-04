@@ -93,7 +93,8 @@ module Seek
           assets = []
           Seek::Util.authorized_types.each do |klass|
             ids = params[klass.name]&.keys || []
-            assets += klass.where(id: ids).to_a if ids.any?
+            # Only resolve items the current user is allowed to manage.
+            assets += klass.where(id: ids).authorized_for('manage', current_user).to_a if ids.any?
           end
           assets.compact.uniq
         end

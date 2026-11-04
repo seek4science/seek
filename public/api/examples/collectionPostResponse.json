@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "31",
+    "id": "113",
     "type": "collections",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022252720",
+              "id": "1022263612",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximal Collection",
       "license": "CC-BY-4.0",
       "description": "This is the description",
@@ -25,14 +23,14 @@
         "tag1",
         "tag2"
       ],
-      "created_at": "2026-06-16T14:28:58.166Z",
-      "updated_at": "2026-06-16T14:28:58.132Z",
+      "created_at": "2026-08-27T08:36:23.102Z",
+      "updated_at": "2026-08-27T08:36:23.077Z",
       "creators": [
         {
-          "profile": "/people/1039988669",
+          "profile": "/people/1039999563",
           "family_name": "Last",
-          "given_name": "Person1893",
-          "affiliation": "An Institution: 2204",
+          "given_name": "Person312",
+          "affiliation": "An Institution: 374",
           "orcid": null
         }
       ],
@@ -42,7 +40,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039988669",
+            "id": "1039999563",
             "type": "people"
           }
         ]
@@ -50,7 +48,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039988667",
+            "id": "1039999561",
             "type": "people"
           }
         ]
@@ -58,11 +56,11 @@
       "people": {
         "data": [
           {
-            "id": "1039988667",
+            "id": "1039999561",
             "type": "people"
           },
           {
-            "id": "1039988669",
+            "id": "1039999563",
             "type": "people"
           }
         ]
@@ -70,32 +68,31 @@
       "projects": {
         "data": [
           {
-            "id": "1022252720",
+            "id": "1022263612",
             "type": "projects"
           }
         ]
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "items": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/collections/31",
-      "items": "/collections/31/items"
+      "self": "/collections/113",
+      "items": "/collections/113/items"
     },
     "meta": {
-      "created": "2026-06-16T14:28:58.166Z",
-      "modified": "2026-06-16T14:28:58.132Z",
+      "created": "2026-08-27T08:36:23.102Z",
+      "modified": "2026-08-27T08:36:23.077Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "d08cf3b8-a9c5-4008-8013-a7f13b01feaa"
+      "uuid": "475e16ca-d527-45fa-b8c2-730411163a84",
+      "metrics": {
+        "view_count": 0
+      }
     }
   },
   "jsonapi": {

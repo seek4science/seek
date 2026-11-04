@@ -1,0 +1,12 @@
+<%# Overrides the Mission Control partial of the same name, to add first and last page links
+    either side of the previous and next ones. The last page is unknown when the total count was
+    too large to establish (page.pages_count is then nil, shown as "..."), so that link is
+    disabled and stays put rather than guessing. %>
+<% last_index = page.pages_count %>
+<nav class="buttons is-right" role="navigation" aria-label="pagination">
+  <span class="mr-3"><%= page.index %> / <%= last_index || "..." %></span>
+  <%= link_to "First page", url_for(page: 1, **filter_param), class: "pagination-previous", disabled: page.first? %>
+  <%= link_to "Previous page", url_for(page: page.previous_index, **filter_param), class: "pagination-previous", disabled: page.first? %>
+  <%= link_to "Next page", url_for(page: page.next_index, **filter_param), class: "pagination-next", disabled: page.last? %>
+  <%= link_to "Last page", url_for(page: last_index || page.index, **filter_param), class: "pagination-next", disabled: last_index.nil? || page.last? %>
+</nav>

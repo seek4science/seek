@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1055250518",
+    "id": "1055250862",
     "type": "sops",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022251602",
+              "id": "1022264448",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximally Patched SOP",
       "license": "CC-BY-4.0",
       "description": "Protocol",
@@ -31,32 +29,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/sops/1055250518?version=1",
+          "url": "http://localhost:3000/sops/1055250862?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:24:04.653Z",
-      "updated_at": "2026-06-16T14:24:04.890Z",
+      "created_at": "2026-08-27T08:38:58.527Z",
+      "updated_at": "2026-08-27T08:38:58.709Z",
       "doi": null,
       "content_blobs": [
         {
           "original_filename": "sop.pdf",
           "url": null,
-          "md5sum": "62936251e0e7c37fd97b37b67e8b4fb8",
-          "sha1sum": "d8c09f42cb9e4cb37768672bf5bbb8766404c169",
+          "md5sum": "6dcc75f5e754a618411f9f11ae3f93c9",
+          "sha1sum": "047a679a491a6c5eb15f4aa1bb5117363a87530f",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/sops/1055250518/content_blobs/1050452841",
+          "link": "http://localhost:3000/sops/1055250862/content_blobs/1050455915",
           "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039987530",
+          "profile": "/people/1040000401",
           "family_name": "Last",
-          "given_name": "Person914",
-          "affiliation": "An Institution: 1064",
+          "given_name": "Person1043",
+          "affiliation": "An Institution: 1209",
           "orcid": null
         }
       ],
@@ -66,7 +64,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039987530",
+            "id": "1040000401",
             "type": "people"
           }
         ]
@@ -74,7 +72,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039987528",
+            "id": "1040000399",
             "type": "people"
           }
         ]
@@ -82,11 +80,11 @@
       "people": {
         "data": [
           {
-            "id": "1039987528",
+            "id": "1040000399",
             "type": "people"
           },
           {
-            "id": "1039987530",
+            "id": "1040000401",
             "type": "people"
           }
         ]
@@ -94,7 +92,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022251602",
+            "id": "1022264448",
             "type": "projects"
           }
         ]
@@ -102,7 +100,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655071",
+            "id": "973655590",
             "type": "investigations"
           }
         ]
@@ -110,7 +108,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385103",
+            "id": "1060385503",
             "type": "studies"
           }
         ]
@@ -118,34 +116,36 @@
       "assays": {
         "data": [
           {
-            "id": "1035386827",
+            "id": "1035387234",
             "type": "assays"
           }
         ]
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
         "data": [
           {
-            "id": "67",
+            "id": "1349",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/sops/1055250518?version=1"
+      "self": "/sops/1055250862?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:24:04.633Z",
-      "modified": "2026-06-16T14:24:04.830Z",
+      "created": "2026-08-27T08:38:58.511Z",
+      "modified": "2026-08-27T08:38:58.680Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "83b95271-6a12-4fed-a755-951cf0a39e30"
+      "uuid": "20d30979-0854-4147-ad2b-4c859bf76f1f",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

@@ -418,6 +418,24 @@ $j(document).ready(function () {
             });
         });
     });
+
+    // Turn obfuscated filter links into real ones
+    $j('span.filter-option').each(function () {
+        const span = $j(this)[0];
+        const a = document.createElement('a');
+        a.href = atob(span.dataset['filterLink'].replace(/-/g, '+').replace(/_/g, '/'));
+        // Copy attributes
+        for (const attr of span.attributes) {
+            if (attr.name !== 'data-filter-link') {
+                a.setAttribute(attr.name, attr.value);
+            }
+        }
+        // Move child elements
+        while (span.firstChild) {
+            a.appendChild(span.firstChild);
+        }
+        span.replaceWith(a);
+    })
 });
 
 

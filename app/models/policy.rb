@@ -30,16 +30,17 @@ class Policy < ApplicationRecord
   end
 
   def queue_update_auth_table
-    unless (saved_changes.keys - ['updated_at']).empty? || assets.empty?
-      AuthLookupUpdateQueue.enqueue(assets)
-    end
+    return if (saved_changes.keys - ['updated_at']).empty?
+
+    policy_assets = assets
+    AuthLookupUpdateQueue.enqueue(policy_assets) unless policy_assets.empty?
   end
 
   def queue_rdf_generation_job
+    return if (saved_changes.keys - ['updated_at']).empty?
+
     supported_assets = assets.select(&:rdf_supported?)
-    unless (saved_changes.keys - ['updated_at']).empty? || supported_assets.empty?
-      RdfGenerationQueue.enqueue(supported_assets)
-    end
+    RdfGenerationQueue.enqueue(supported_assets) unless supported_assets.empty?
   end
 
   def assets
@@ -155,21 +156,20 @@ class Policy < ApplicationRecord
           policy.sharing_scope = nil # This field should not be used anymore
         end
 
-        # Set attributes on the policy's permissions
+        # Set attributes on the policy's permissions. Build permissions in memory only;
+        # they are persisted together with the owning item's gated save, so a save that is
+        # aborted by the owner-access check leaves no permission rows behind.
         if policy_params[:permissions_attributes]
           current_permissions = policy.permissions
 
-          policy_params[:permissions_attributes].values.map do |perm_params|
+          policy_params[:permissions_attributes].values.each do |perm_params|
             permission = current_permissions.detect do |p|
               p.contributor_type == perm_params[:contributor_type] &&
-                  p.contributor_id == perm_params[:contributor_id].to_i
+                p.contributor_id == perm_params[:contributor_id].to_i
             end
 
-            permission ||= policy.permissions.create
-            permission.tap {|p| p.assign_attributes(perm_params)}
-            permission.save
-
-            current_permissions = policy.permissions
+            permission ||= policy.permissions.build
+            permission.assign_attributes(perm_params)
           end
         end
       end

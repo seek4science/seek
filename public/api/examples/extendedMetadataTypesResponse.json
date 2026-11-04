@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "81",
+      "id": "391",
       "type": "extended_metadata_types",
       "attributes": {
         "title": "A Min Extended Metadata Type"
       },
       "links": {
-        "self": "/extended_metadata_types/81"
+        "self": "/extended_metadata_types/391"
       }
     },
     {
-      "id": "82",
+      "id": "392",
       "type": "extended_metadata_types",
       "attributes": {
         "title": "A Max Extended Metadata Type"
       },
       "links": {
-        "self": "/extended_metadata_types/82"
+        "self": "/extended_metadata_types/392"
       }
     }
   ],

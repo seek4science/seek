@@ -1,109 +1,208 @@
 ---
-# SPARQL Example Queries
-# Format: 
-#   query_name:
-#     title: "Human readable title"
-#     description: "Optional description"
-#     query: |
-#       SPARQL query here
+# SPARQL Example Queries for SEEK
+# Uses JERM ontology: http://jermontology.org/ontology/JERMOntology#
+# Prefixes: jerm = http://jermontology.org/ontology/JERMOntology#
+#           dcterms = http://purl.org/dc/terms/
+#           foaf = http://xmlns.com/foaf/0.1/
 
-basic_exploration:
-  title: "List all classes"
-  description: "Find all RDF classes used in the dataset"
+investigations:
+  title: "List all investigations"
+  description: "Find all investigations with their titles"
   query: |
-    SELECT DISTINCT ?class
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?investigation ?title
     WHERE {
-      [] a ?class
+      ?investigation a jerm:Investigation ;
+                     dcterms:title ?title .
     }
-    LIMIT 20
 
-basic_triples:
-  title: "Sample triples"
-  description: "Show basic subject-predicate-object patterns"
+studies:
+  title: "List all studies"
+  description: "Find all studies and which investigation they belong to"
   query: |
-    SELECT ?subject ?predicate ?object
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?study ?title ?investigation
     WHERE {
-      ?subject ?predicate ?object .
+      ?study a jerm:Study ;
+             dcterms:title ?title ;
+             jerm:isPartOf ?investigation .
     }
-    LIMIT 10
 
-properties:
-  title: "List all properties"
-  description: "Find all predicates/properties used"
+assays:
+  title: "List all assays"
+  description: "Find all assays with their type and parent study"
   query: |
-    SELECT DISTINCT ?property
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?assay ?title ?type ?study
     WHERE {
-      [] ?property []
+      ?assay a ?class ;
+             dcterms:title ?title ;
+             jerm:isPartOf ?study .
+      FILTER(?class IN (jerm:Experimental_assay, jerm:Modelling_analysis))
+      OPTIONAL { ?assay jerm:hasType ?type }
     }
-    LIMIT 20
+
+data_files:
+  title: "List all data files"
+  description: "Find all data files with their titles and associated assays"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?datafile ?title ?assay
+    WHERE {
+      ?datafile a jerm:Data ;
+                dcterms:title ?title .
+      OPTIONAL { ?datafile jerm:isPartOf ?assay }
+    }
+
+models:
+  title: "List all models"
+  description: "Find all models with their titles and associated assays"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?model ?title ?assay
+    WHERE {
+      ?model a jerm:Model ;
+             dcterms:title ?title .
+      OPTIONAL { ?model jerm:isPartOf ?assay }
+    }
+
+sops:
+  title: "List all SOPs"
+  description: "Find all standard operating procedures"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?sop ?title ?assay
+    WHERE {
+      ?sop a jerm:SOP ;
+           dcterms:title ?title .
+      OPTIONAL { ?sop jerm:isPartOf ?assay }
+    }
+
+publications:
+  title: "List all publications"
+  description: "Find all publications and their associated assays"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?publication ?title ?assay
+    WHERE {
+      ?publication a jerm:Publication ;
+                   dcterms:title ?title .
+      OPTIONAL { ?publication jerm:isPartOf ?assay }
+    }
+
+people:
+  title: "List all people"
+  description: "Find all people with their names and associated projects"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    SELECT ?person ?name ?project
+    WHERE {
+      ?person a jerm:Person ;
+              foaf:name ?name .
+      OPTIONAL { ?person jerm:isAssociatedWith ?project }
+    }
+
+projects:
+  title: "List all projects"
+  description: "Find all projects with their people and investigations"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?project ?title ?person
+    WHERE {
+      ?project a jerm:Project ;
+               dcterms:title ?title .
+      OPTIONAL { ?project jerm:isAssociatedWith ?person }
+    }
+
+organisms:
+  title: "List all organisms"
+  description: "Find all organisms with their NCBI taxonomy IDs"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?organism ?title ?ncbi
+    WHERE {
+      ?organism a jerm:Organism ;
+                dcterms:title ?title .
+      OPTIONAL { ?organism jerm:NCBI_ID ?ncbi }
+    }
+
+samples:
+  title: "List all samples"
+  description: "Find all samples and which assay they belong to"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?sample ?title ?assay
+    WHERE {
+      ?sample a jerm:Sample ;
+              dcterms:title ?title .
+      OPTIONAL { ?sample jerm:hasPart ?assay }
+    }
+
+strains:
+  title: "List all strains"
+  description: "Find all strains with their provider IDs and organism links"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?strain ?title ?providerID
+    WHERE {
+      ?strain a jerm:Strain ;
+              dcterms:title ?title .
+      OPTIONAL { ?strain jerm:externalSupplierID ?providerID }
+    }
+
+isa_graph:
+  title: "Full ISA graph"
+  description: "Show the complete Investigation > Study > Assay hierarchy"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?investigationTitle ?studyTitle ?assayTitle
+    WHERE {
+      ?investigation a jerm:Investigation ;
+                     dcterms:title ?investigationTitle ;
+                     jerm:hasPart ?study .
+      ?study dcterms:title ?studyTitle ;
+             jerm:hasPart ?assay .
+      ?assay dcterms:title ?assayTitle .
+    }
+
+assets_by_person:
+  title: "Assets created by a person"
+  description: "Find all assets that a specific person has created"
+  query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX dcterms: <http://purl.org/dc/terms/>
+    SELECT ?personName ?asset ?assetTitle
+    WHERE {
+      ?person a jerm:Person ;
+              foaf:name ?personName ;
+              jerm:isCreatorOf ?asset .
+      ?asset dcterms:title ?assetTitle .
+    }
+    ORDER BY ?personName
 
 count_by_type:
   title: "Count entities by type"
-  description: "Count how many entities exist for each class"
+  description: "Count how many entities exist for each JERM class"
   query: |
+    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
     SELECT ?type (COUNT(?entity) as ?count)
     WHERE {
-      ?entity a ?type
+      ?entity a ?type .
+      FILTER(STRSTARTS(STR(?type), STR(jerm:)))
     }
     GROUP BY ?type
     ORDER BY DESC(?count)
-
-describe_example:
-  title: "Describe a resource"
-  description: "Get all information about a specific resource (replace with actual URI)"
-  query: |
-    DESCRIBE <http://example.org/resource>
-
-organisms:
-  title: "Find organisms"
-  description: "Look for organism-related data"
-  query: |
-    SELECT DISTINCT ?organism ?label
-    WHERE {
-      ?organism a ?type .
-      FILTER(CONTAINS(LCASE(STR(?type)), "organism") || 
-             CONTAINS(LCASE(STR(?type)), "species") ||
-             CONTAINS(LCASE(STR(?type)), "taxon"))
-      OPTIONAL { ?organism rdfs:label ?label }
-    }
-    LIMIT 10
-
-projects:
-  title: "Find projects"
-  description: "Look for project-related data"
-  query: |
-    SELECT DISTINCT ?project ?title
-    WHERE {
-      ?project a ?type .
-      FILTER(CONTAINS(LCASE(STR(?type)), "project"))
-      OPTIONAL { ?project dc:title ?title }
-      OPTIONAL { ?project dcterms:title ?title }
-      OPTIONAL { ?project rdfs:label ?title }
-    }
-    LIMIT 10
-
-studies:
-  title: "Find studies"
-  description: "Look for study-related data"
-  query: |
-    SELECT DISTINCT ?study ?title
-    WHERE {
-      ?study a ?type .
-      FILTER(CONTAINS(LCASE(STR(?type)), "study"))
-      OPTIONAL { ?study dc:title ?title }
-      OPTIONAL { ?study dcterms:title ?title }
-      OPTIONAL { ?study rdfs:label ?title }
-    }
-    LIMIT 10
-
-graph_exploration:
-  title: "List named graphs"
-  description: "Show all named graphs in the dataset"
-  query: |
-    SELECT DISTINCT ?graph
-    WHERE {
-      GRAPH ?graph {
-        ?s ?p ?o
-      }
-    }
-    LIMIT 10

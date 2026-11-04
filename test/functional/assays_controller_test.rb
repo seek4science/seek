@@ -2605,6 +2605,54 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
+  test 'response with sharing code has noindex headers, robots meta tag and canonical link' do
+    investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
+    study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:private_policy), contributor: User.current_user.person)
+
+    auth_code = nil
+    disable_authorization_checks do
+      auth_code = SpecialAuthCode.create!(
+        asset: assay,
+        code: SecureRandom.base64(30),
+        expiration_date: Date.today + 7.days
+      )
+    end
+
+    logout
+
+    get :show, params: { id: assay.id, code: auth_code.code }
+    assert_response :success
+    assert_equal 'noindex, nofollow', response.headers['X-Robots-Tag']
+    assert_equal 'no-referrer', response.headers['Referrer-Policy']
+    assert_select 'meta[name=robots][content=?]', 'noindex, nofollow'
+    assert_select 'link[rel=canonical][href=?]', assay_url(assay)
+  end
+
+  test 'response without sharing code has no noindex headers, robots meta tag or canonical link' do
+    assay = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
+
+    logout
+
+    get :show, params: { id: assay.id }
+    assert_response :success
+    assert_nil response.headers['X-Robots-Tag']
+    assert_equal 'strict-origin-when-cross-origin', response.headers['Referrer-Policy'] # the Rails default
+    assert_select 'meta[name=robots]', count: 0
+    assert_select 'link[rel=canonical]', count: 0
+  end
+
+  test 'response with invalid sharing code still has noindex headers' do
+    assay = FactoryBot.create(:assay, policy: FactoryBot.create(:private_policy))
+
+    logout
+
+    get :show, params: { id: assay.id, code: 'invalid_code' }
+    assert_response :forbidden
+    assert_equal 'noindex, nofollow', response.headers['X-Robots-Tag']
+    assert_equal 'no-referrer', response.headers['Referrer-Policy']
+  end
+
   test 'assay code grants access to associated data file' do
     investigation = FactoryBot.create(:investigation, contributor: User.current_user.person)
     study = FactoryBot.create(:study, investigation: investigation, contributor: User.current_user.person)

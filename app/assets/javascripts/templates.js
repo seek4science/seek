@@ -90,11 +90,11 @@ function loadTemplates(data) {
 
 
   $j.each(Object.keys(categorized), (i, key) => {
-    const elem = $j(`<optgroup label=${key}></optgroup>`);
+    const elem = $j("<optgroup></optgroup>").attr("label", key);
 
     $j.each(categorized[key], (j, sub_item) => {
       elem.append(
-        $j(`<option>${sub_item.title}</option>`).attr("value", sub_item.template_id).text(key.title)
+        $j("<option></option>").attr("value", sub_item.template_id).text(sub_item.title)
       );
     });
     $j("#source_select").append(elem);

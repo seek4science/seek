@@ -6,6 +6,10 @@
                              "Standard login enabled", "If disabled the standard username and password login will be hidden, forcing users to use an alternative provider.
                              It is only hidden if an alternative provider has been configured and enabled below.
                              <strong>WARNING:</strong>To avoid an administrator being locked out, the standard login option can always be displayed by including the special parameter <i>show_standard_login=true</i>, i.e: #{login_url(show_standard_login: true, host: Seek::Config.site_base_host)}") %>
+  <%= admin_checkbox_setting(:omniauth_skip_login_page, 1, Seek::Config.omniauth_skip_login_page,
+                             "Skip the login page", "When a single provider is the only way to log in, send the user straight to it rather than
+                             showing a login page containing one button. It has no effect while there is more than one option, or when the only
+                             option needs credentials entering in #{Seek::Config.instance_name} (LDAP, or the standard login).") %>
   <%= admin_checkbox_setting(:omniauth_user_create, 1, Seek::Config.omniauth_user_create,
                              "Omniauth user creation on login", "When a user logs in through an omniauth provider and does not exist as a #{Seek::Config.instance_name} user, they will be created using the information given by the provider.") %>
   <%= admin_checkbox_setting(:omniauth_user_activate, 1, Seek::Config.omniauth_user_activate,

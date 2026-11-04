@@ -371,6 +371,57 @@ class RenderersTest < ActiveSupport::TestCase
     assert_equal '<span class="subtle">No content to display</span>', renderer.render
   end
 
+  test 'text renderer with content that is not valid UTF-8' do
+    blob = FactoryBot.create(:txt_content_blob, asset: @asset, data: "invalid \xFF\xFE bytes\n")
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+    assert renderer.can_render?
+
+    content = renderer.render
+    assert content.valid_encoding?
+    @html = Nokogiri::HTML.parse(content)
+    assert_select 'pre', text: /invalid .+ bytes/
+
+    standalone = renderer.render_standalone
+    assert standalone.valid_encoding?
+    assert standalone.start_with?('invalid ')
+  end
+
+  test 'text renderer limits the size of content that has been made valid UTF-8' do
+    max = Seek::Renderers::TextRenderer::MAX_RENDERABLE_SIZE
+    # each invalid byte is replaced by a 3 byte character, so the content grows as it is made valid
+    blob = FactoryBot.create(:txt_content_blob, asset: @asset, data: "\xFF" * max)
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+
+    content = renderer.render
+    assert content.valid_encoding?
+    assert content.bytesize <= max + 1000, 'the rendered content should be limited after being made valid UTF-8'
+    @html = Nokogiri::HTML.parse(content)
+    assert_select 'p.subtle', text: /Only the first 1 MB of this file is shown/
+  end
+
+  test 'text renderer truncates large content' do
+    blob = FactoryBot.create(:large_txt_content_blob, asset: @asset)
+    assert blob.file_size > Seek::Renderers::TextRenderer::MAX_RENDERABLE_SIZE
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+    assert renderer.can_render?
+
+    content = renderer.render
+    assert content.bytesize < blob.file_size
+    @html = Nokogiri::HTML.parse(content)
+    assert_select 'pre' do |elements|
+      assert elements.first.text.bytesize <= Seek::Renderers::TextRenderer::MAX_RENDERABLE_SIZE
+    end
+    assert_select 'p.subtle', text: /Only the first 1 MB of this file is shown/
+
+    # rendering again reads the content from the start, rather than continuing where it left off
+    assert_equal content, renderer.render
+
+    standalone = renderer.render_standalone
+    assert standalone.bytesize < blob.file_size
+    assert standalone.start_with?(File.read(blob.filepath, 100))
+    assert standalone.include?('Only the first 1 MB of this file is shown')
+  end
+
   test 'image renderer' do
     blob = FactoryBot.create(:image_content_blob, asset: @asset)
     renderer = Seek::Renderers::ImageRenderer.new(blob)

@@ -3,6 +3,10 @@ module Seek
     class BlobRenderer
       include ActionView::Helpers
 
+      # forms part of the key for cached rendered content, and is bumped when a change to the
+      # renderers should invalidate content that has already been cached
+      CACHE_VERSION = 2
+
       attr_reader :blob, :params
 
       def initialize(git_blob_or_blob, url_options: {}, params: {})

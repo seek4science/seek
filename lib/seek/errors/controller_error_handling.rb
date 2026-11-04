@@ -13,12 +13,11 @@ module Seek
       }.freeze
 
       def self.included(base)
-        unless Rails.application.config.consider_all_requests_local
-          base.rescue_from Exception, with: :render_application_error
-        end
+        base.rescue_from Exception, with: :render_application_error
       end
 
       def render_application_error(exception)
+        raise exception if Rails.application.config.consider_all_requests_local
         logger.error "ERROR - #{exception.class.name} (#{exception.message})"
         status = error_response_code(exception)
         exception_notification(status, exception)

@@ -28,6 +28,9 @@ Rails.application.configure do
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass
 
+  # Minify JavaScript during asset precompilation.
+  config.assets.js_compressor = :terser
+
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
 
@@ -62,10 +65,6 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   config.cache_store = Seek::Caching::RedisWithFileOverflowStore.build("#{Rails.root}/tmp/cache")
-  config.settings_cache_store = ActiveSupport::Cache::RedisCacheStore.new(
-    url: Seek::RedisConfig.url,
-    namespace: 'settings-cache'
-  )
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque

@@ -79,6 +79,13 @@ def load_seek_testing_defaults!
       Settings.defaults[:solr_enabled] = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
 
+      # the spy has no Solr response behind it, so stub out the spellcheck block alongside the ones it already stubs
+      SunspotMatchers::SunspotSearchSpy.class_eval do
+        def solr_spellcheck
+          {}
+        end
+      end
+
       Settings.defaults[:filtering_enabled] = true
 
       Settings.defaults[:imprint_enabled]= false

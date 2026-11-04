@@ -39,7 +39,7 @@ http {
         # SSL Settings
         ##
 
-        ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+        ssl_protocols TLSv1.2 TLSv1.3;
         ssl_prefer_server_ciphers on;
 
         ##
@@ -63,7 +63,7 @@ http {
         # gzip_http_version 1.1;
 
         server {
-                listen 3000;
+                ${SEEK_LISTEN}
                 client_max_body_size 50G;
                 proxy_read_timeout 300;
                 proxy_send_timeout 300;

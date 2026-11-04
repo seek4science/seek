@@ -10,7 +10,7 @@ class SinglePagesController < ApplicationController
                 only: %i[show index project_folders]
   before_action :isa_json_compliance_enabled?
   before_action :check_user_logged_in,
-                except: %i[ show index ]
+                except: %i[ show index dynamic_table_data ]
   respond_to :html, :js
 
   def show
@@ -27,12 +27,33 @@ class SinglePagesController < ApplicationController
   def dynamic_table_data
     data = []
     if params[:sample_type_id]
-      sample_type = SampleType.find(params[:sample_type_id]) if params[:sample_type_id]
-      data = helpers.dt_data(sample_type)[:rows]
+      # Sample type must belong to the current project
+      # User must have at least viewing permission
+      sample_type = SampleType.where(id: params[:sample_type_id])
+                              .joins(:projects)
+                              .where(projects: { id: params[:id] })
+                              .authorized_for('view')
+                              .first
+      data = helpers.dt_data(sample_type)[:rows] unless sample_type.nil?
     elsif params[:study_id]
-      study = Study.find(params[:study_id]) if params[:study_id]
-      assay = Assay.find(params[:assay_id]) if params[:assay_id]
-      data = helpers.dt_aggregated(study, assay)[:rows]
+      # Study must belong to the current project
+      # User must have at least viewing permission
+      study = Study.where(id: params[:study_id])
+                   .joins(:projects)
+                   .where(projects: { id: params[:id] })
+                   .authorized_for('view')
+                   .first
+
+      if params[:assay_id]
+        # Assay must belong to the current study
+        # Assay must belong to the current project
+        # User must have at least viewing permission
+        assay = Assay.where(id: params[:assay_id], study_id: params[:study_id]).joins(:projects)
+                     .where(projects: { id: params[:id] }).authorized_for('view').first
+        data = helpers.dt_aggregated(study, assay)[:rows] unless assay.nil?
+      elsif !study.nil?
+        data = helpers.dt_aggregated(study)[:rows]
+      end
     end
     data = data.map { |row| row.unshift('') } if params[:rows_pad]
     render json: { data: }

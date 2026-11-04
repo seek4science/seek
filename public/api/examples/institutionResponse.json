@@ -1,11 +1,11 @@
 {
   "data": {
-    "id": "980194316",
+    "id": "980207533",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
         {
-          "id": "129",
+          "id": "357",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -22,25 +22,21 @@
     },
     "relationships": {
       "people": {
-        "data": [
-
-        ]
+        "data": []
       },
       "projects": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/institutions/980194316"
+      "self": "/institutions/980207533"
     },
     "meta": {
-      "created": "2026-06-16T14:32:56.643Z",
-      "modified": "2026-06-16T14:32:56.643Z",
+      "created": "2026-08-27T08:46:03.705Z",
+      "modified": "2026-08-27T08:46:03.705Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "41a4c732-f221-406b-9e21-7260d85296d5"
+      "uuid": "8011d72c-f90c-42e9-8075-c8e3d4287bf6"
     }
   },
   "jsonapi": {

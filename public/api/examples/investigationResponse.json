@@ -1,31 +1,27 @@
 {
   "data": {
-    "id": "973655664",
+    "id": "973655854",
     "type": "investigations",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
-          "id": "268",
+          "id": "302",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
-      "snapshots": [
-
-      ],
+      "snapshots": [],
       "title": "A Maximal Investigation",
       "description": "Investigation of the Human Genome",
       "other_creators": "Max Blumenthal, Ed Snowden",
       "position": null,
       "creators": [
         {
-          "profile": "/people/1039991399",
+          "profile": "/people/1040001362",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -37,7 +33,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039991399",
+            "id": "1040001362",
             "type": "people"
           }
         ]
@@ -45,7 +41,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039991400",
+            "id": "1040001363",
             "type": "people"
           }
         ]
@@ -53,11 +49,11 @@
       "people": {
         "data": [
           {
-            "id": "1039991399",
+            "id": "1040001362",
             "type": "people"
           },
           {
-            "id": "1039991400",
+            "id": "1040001363",
             "type": "people"
           }
         ]
@@ -65,7 +61,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022255478",
+            "id": "1022265460",
             "type": "projects"
           }
         ]
@@ -73,7 +69,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385622",
+            "id": "1060385706",
             "type": "studies"
           }
         ]
@@ -81,7 +77,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035387253",
+            "id": "1035387408",
             "type": "assays"
           }
         ]
@@ -89,7 +85,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883654561",
+            "id": "1055250839",
             "type": "data_files"
           }
         ]
@@ -97,7 +93,7 @@
       "models": {
         "data": [
           {
-            "id": "1004285724",
+            "id": "1004285885",
             "type": "models"
           }
         ]
@@ -105,7 +101,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250690",
+            "id": "1055250915",
             "type": "sops"
           }
         ]
@@ -113,7 +109,7 @@
       "publications": {
         "data": [
           {
-            "id": "342",
+            "id": "280",
             "type": "publications"
           }
         ]
@@ -121,21 +117,21 @@
       "documents": {
         "data": [
           {
-            "id": "287",
+            "id": "456",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/investigations/973655664"
+      "self": "/investigations/973655854"
     },
     "meta": {
-      "created": "2026-06-16T14:38:17.440Z",
-      "modified": "2026-06-16T14:38:17.440Z",
+      "created": "2026-08-27T08:41:53.358Z",
+      "modified": "2026-08-27T08:41:53.358Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "bcc0e8e5-c05b-49b2-a629-9b04ecd22898"
+      "uuid": "ff2a7526-a762-424e-b884-7be9debd9e57"
     }
   },
   "jsonapi": {

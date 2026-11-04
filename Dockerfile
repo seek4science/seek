@@ -8,8 +8,8 @@ ENV APP_DIR=/seek \
     BUNDLE_WITHOUT="development"
 
 # Supercronic variables
-ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.47/supercronic-linux-amd64 \
-    SUPERCRONIC_SHA1SUM=712d2ece75da6f6e530192a151488578153e4e96 \
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.49/supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=e63c11a9726b775a6a11801e81af4f3fb926aa68 \
     SUPERCRONIC=supercronic-linux-amd64
 
 
@@ -31,7 +31,8 @@ RUN PYTHON_VERSION=$(cat .python-version) && \
     curl default-mysql-client gettext git graphviz libjemalloc2 libreoffice libvips links locales \
     nodejs openjdk-21-jre poppler-utils postgresql-client python${PYTHON_VERSION} shared-mime-info sqlite3 telnet vim-tiny zip
 
-# Disable ssl from the mysql client
+# Disable ssl from the mysql client; setting MYSQL_SSL_CA turns it back on
+# (see docker/shared_functions.sh and docker/database.docker.mysql.yml)
 RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
 
 FROM base AS builder

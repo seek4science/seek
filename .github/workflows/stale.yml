@@ -1,0 +1,32 @@
+name: Mark and close stale issues
+
+on:
+  schedule:
+    - cron: '0 1 * * 1-5'  # runs Monday to Friday at 01:00 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  actions: write               # the resume cache lists and deletes Actions caches
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v11
+        with:
+          days-before-stale: 1461      # mark as stale after 4 years (365*4+1 leap year)
+          days-before-close: 14        # close 14 days after being marked stale
+          stale-issue-message: >
+            This issue has been inactive for 4 years and has been marked as stale.
+            It will be closed in 14 days unless there is new activity.
+            Apply the `not-stale` label to keep it open.
+          close-issue-message: >
+            Closing due to 4+ years of inactivity. Feel free to reopen if this is still relevant.
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'not-stale'
+          days-before-pr-stale: -1     # disable stale marking for PRs
+          days-before-pr-close: -1     # disable closing for PRs
+          operations-per-run: 100      # API budget per run; a fresh stale marking costs 3
+          ascending: true              # oldest issues first, so the 4-year backlog is reached first
+          enable-statistics: true      # logs a summary of what was processed

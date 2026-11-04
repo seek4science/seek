@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
+ActiveRecord::Schema[7.2].define(version: 2026_10_02_110000) do
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
     t.string "format"
@@ -109,12 +109,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
-  create_table "application_status", force: :cascade do |t|
-    t.integer "running_jobs"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "assay_assets", id: :integer, force: :cascade do |t|
     t.integer "assay_id"
     t.integer "asset_id"
@@ -191,6 +185,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "assay_stream_id"
     t.string "external_identifier", limit: 2048
     t.index ["assay_stream_id"], name: "index_assays_on_assay_stream_id"
+    t.index ["policy_id"], name: "index_assays_on_policy_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -225,6 +220,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "policy_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["policy_id"], name: "index_assets_on_policy_id"
   end
 
   create_table "assets_creators", id: :integer, force: :cascade do |t|
@@ -404,6 +400,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "visibility"
     t.index ["contributor_id"], name: "index_data_file_versions_contributor"
     t.index ["data_file_id"], name: "index_data_file_versions_on_data_file_id"
+    t.index ["policy_id"], name: "index_data_file_versions_on_policy_id"
   end
 
   create_table "data_file_versions_projects", id: false, force: :cascade do |t|
@@ -431,6 +428,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "zip_origin_id"
     t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
+    t.index ["policy_id"], name: "index_data_files_on_policy_id"
   end
 
   create_table "data_files_events", id: false, force: :cascade do |t|
@@ -507,6 +505,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "visibility"
     t.index ["contributor_id"], name: "index_document_versions_on_contributor"
     t.index ["document_id"], name: "index_document_versions_on_document_id"
+    t.index ["policy_id"], name: "index_document_versions_on_policy_id"
   end
 
   create_table "document_versions_projects", id: :integer, force: :cascade do |t|
@@ -532,6 +531,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "deleted_contributor"
     t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_documents_on_contributor"
+    t.index ["policy_id"], name: "index_documents_on_policy_id"
   end
 
   create_table "documents_events", id: false, force: :cascade do |t|
@@ -592,6 +592,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "time_zone"
     t.integer "location_type"
     t.bigint "event_type_id"
+    t.index ["policy_id"], name: "index_events_on_policy_id"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
@@ -700,6 +701,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.datetime "updated_at", null: false
     t.index ["contributor_id"], name: "index_fair_data_station_uploads_on_contributor_id"
     t.index ["investigation_id"], name: "index_fair_data_station_uploads_on_investigation_id"
+    t.index ["policy_id"], name: "index_fair_data_station_uploads_on_policy_id"
     t.index ["project_id"], name: "index_fair_data_station_uploads_on_project_id"
     t.index ["purpose"], name: "index_fair_data_station_uploads_on_purpose"
   end
@@ -982,6 +984,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "position"
     t.boolean "is_isa_json_compliant"
     t.string "external_identifier", limit: 2048
+    t.index ["policy_id"], name: "index_investigations_on_policy_id"
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|
@@ -1093,6 +1096,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "visibility"
     t.index ["contributor_id"], name: "index_model_versions_on_contributor"
     t.index ["model_id"], name: "index_model_versions_on_model_id"
+    t.index ["policy_id"], name: "index_model_versions_on_policy_id"
   end
 
   create_table "model_versions_projects", id: false, force: :cascade do |t|
@@ -1124,6 +1128,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "human_disease_id"
     t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_models_on_contributor"
+    t.index ["policy_id"], name: "index_models_on_policy_id"
   end
 
   create_table "models_projects", id: false, force: :cascade do |t|
@@ -1269,6 +1274,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.bigint "policy_id"
     t.string "first_letter", limit: 1
     t.string "external_identifier", limit: 2048
+    t.index ["policy_id"], name: "index_observation_units_on_policy_id"
   end
 
   create_table "observed_variable_sets", force: :cascade do |t|
@@ -1318,6 +1324,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.datetime "last_sync"
     t.datetime "last_cache_refresh"
     t.boolean "is_test", default: false
+    t.index ["policy_id"], name: "index_openbis_endpoints_on_policy_id"
   end
 
   create_table "organisms", id: :integer, force: :cascade do |t|
@@ -1451,6 +1458,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "deleted_contributor"
     t.integer "visibility"
     t.string "doi"
+    t.index ["policy_id"], name: "index_presentation_versions_on_policy_id"
   end
 
   create_table "presentation_versions_projects", id: false, force: :cascade do |t|
@@ -1473,6 +1481,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "deleted_contributor"
     t.string "external_identifier", limit: 2048
     t.string "doi"
+    t.index ["policy_id"], name: "index_presentations_on_policy_id"
   end
 
   create_table "presentations_projects", id: false, force: :cascade do |t|
@@ -1556,11 +1565,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
   create_table "projects_observed_variable_sets", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "observed_variable_set_id"
+    t.index ["observed_variable_set_id", "project_id"], name: "index_projects_ovs_on_ovs_id_and_project_id"
+    t.index ["project_id"], name: "index_projects_observed_variable_sets_on_project_id"
   end
 
   create_table "projects_publication_versions", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
+    t.index ["project_id"], name: "index_projects_publication_versions_on_project_id"
+    t.index ["version_id", "project_id"], name: "index_projects_pub_versions_on_version_id_and_project_id"
   end
 
   create_table "projects_publications", id: false, force: :cascade do |t|
@@ -1580,21 +1593,29 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
   create_table "projects_samples", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "sample_id"
+    t.index ["project_id"], name: "index_projects_samples_on_project_id"
+    t.index ["sample_id", "project_id"], name: "index_projects_samples_on_sample_id_and_project_id"
   end
 
   create_table "projects_sop_versions", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
+    t.index ["project_id"], name: "index_projects_sop_versions_on_project_id"
+    t.index ["version_id", "project_id"], name: "index_projects_sop_versions_on_version_id_and_project_id"
   end
 
   create_table "projects_sops", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "sop_id"
+    t.index ["project_id"], name: "index_projects_sops_on_project_id"
+    t.index ["sop_id", "project_id"], name: "index_projects_sops_on_sop_id_and_project_id"
   end
 
   create_table "projects_strains", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "strain_id"
+    t.index ["project_id"], name: "index_projects_strains_on_project_id"
+    t.index ["strain_id", "project_id"], name: "index_projects_strains_on_strain_id_and_project_id"
   end
 
   create_table "projects_templates", force: :cascade do |t|
@@ -1607,11 +1628,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
   create_table "projects_workflow_versions", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
+    t.index ["project_id"], name: "index_projects_workflow_versions_on_project_id"
+    t.index ["version_id", "project_id"], name: "index_projects_workflow_versions_on_version_id_and_project_id"
   end
 
   create_table "projects_workflows", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "workflow_id"
+    t.index ["project_id"], name: "index_projects_workflows_on_project_id"
+    t.index ["workflow_id", "project_id"], name: "index_projects_workflows_on_workflow_id_and_project_id"
   end
 
   create_table "publication_auth_lookup", force: :cascade do |t|
@@ -1669,6 +1694,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.text "url"
     t.integer "visibility"
     t.index ["contributor_id"], name: "index_publication_versions_on_contributor"
+    t.index ["policy_id"], name: "index_publication_versions_on_policy_id"
     t.index ["publication_id"], name: "index_publication_versions_on_publication_id"
   end
 
@@ -1698,6 +1724,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.text "other_creators"
     t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_publications_on_contributor"
+    t.index ["policy_id"], name: "index_publications_on_policy_id"
   end
 
   create_table "rdf_generation_queues", force: :cascade do |t|
@@ -1873,6 +1900,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.text "other_creators"
     t.integer "policy_id"
     t.string "external_identifier", limit: 2048
+    t.index ["policy_id"], name: "index_sample_types_on_policy_id"
   end
 
   create_table "sample_types_studies", force: :cascade do |t|
@@ -1898,6 +1926,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.bigint "observation_unit_id"
     t.string "external_identifier", limit: 2048
     t.index ["originating_data_file_id"], name: "index_samples_on_originating_data_file_id"
+    t.index ["policy_id"], name: "index_samples_on_policy_id"
     t.index ["sample_type_id"], name: "index_samples_on_sample_type_id"
   end
 
@@ -1956,6 +1985,134 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.text "description"
   end
 
+  create_table "solid_queue_blocked_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.string "queue_name", null: false
+    t.integer "priority", default: 0, null: false
+    t.string "concurrency_key", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.index ["concurrency_key", "priority", "job_id"], name: "index_solid_queue_blocked_executions_for_release"
+    t.index ["expires_at", "concurrency_key"], name: "index_solid_queue_blocked_executions_for_maintenance"
+    t.index ["job_id"], name: "index_solid_queue_blocked_executions_on_job_id", unique: true
+  end
+
+  create_table "solid_queue_claimed_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.bigint "process_id"
+    t.datetime "created_at", null: false
+    t.index ["job_id"], name: "index_solid_queue_claimed_executions_on_job_id", unique: true
+    t.index ["process_id", "job_id"], name: "index_solid_queue_claimed_executions_on_process_id_and_job_id"
+  end
+
+  create_table "solid_queue_failed_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.index ["job_id"], name: "index_solid_queue_failed_executions_on_job_id", unique: true
+  end
+
+  create_table "solid_queue_pauses", force: :cascade do |t|
+    t.string "queue_name", null: false
+    t.datetime "created_at", null: false
+    t.index ["queue_name"], name: "index_solid_queue_pauses_on_queue_name", unique: true
+  end
+
+  create_table "solid_queue_processes", force: :cascade do |t|
+    t.string "kind", null: false
+    t.datetime "last_heartbeat_at", null: false
+    t.bigint "supervisor_id"
+    t.integer "pid", null: false
+    t.string "hostname"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.index ["last_heartbeat_at"], name: "index_solid_queue_processes_on_last_heartbeat_at"
+    t.index ["name", "supervisor_id"], name: "index_solid_queue_processes_on_name_and_supervisor_id", unique: true
+    t.index ["supervisor_id"], name: "index_solid_queue_processes_on_supervisor_id"
+  end
+
+  create_table "solid_queue_ready_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.string "queue_name", null: false
+    t.integer "priority", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.index ["job_id"], name: "index_solid_queue_ready_executions_on_job_id", unique: true
+    t.index ["priority", "job_id"], name: "index_solid_queue_poll_all"
+    t.index ["queue_name", "priority", "job_id"], name: "index_solid_queue_poll_by_queue"
+  end
+
+  create_table "solid_queue_recurring_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.string "task_key", null: false
+    t.datetime "run_at", null: false
+    t.datetime "created_at", null: false
+    t.index ["job_id"], name: "index_solid_queue_recurring_executions_on_job_id", unique: true
+    t.index ["task_key", "run_at"], name: "index_solid_queue_recurring_executions_on_task_key_and_run_at", unique: true
+  end
+
+  create_table "solid_queue_recurring_tasks", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "schedule", null: false
+    t.string "command", limit: 2048
+    t.string "class_name"
+    t.text "arguments"
+    t.string "queue_name"
+    t.integer "priority", default: 0
+    t.boolean "static", default: true, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_solid_queue_recurring_tasks_on_key", unique: true
+    t.index ["static"], name: "index_solid_queue_recurring_tasks_on_static"
+  end
+
+  create_table "solid_queue_scheduled_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.string "queue_name", null: false
+    t.integer "priority", default: 0, null: false
+    t.datetime "scheduled_at", null: false
+    t.datetime "created_at", null: false
+    t.index ["job_id"], name: "index_solid_queue_scheduled_executions_on_job_id", unique: true
+    t.index ["scheduled_at", "priority", "job_id"], name: "index_solid_queue_dispatch_all"
+  end
+
+  # solid_queue_jobs is deliberately placed after every solid_queue_* table that holds a
+  # foreign key referencing it (rather than in alphabetical order), so that db:schema:load
+  # can safely drop-and-recreate on a MySQL database that already has the schema loaded.
+  # MySQL's DROP TABLE doesn't actually support CASCADE (the keyword is accepted but has no
+  # effect - see https://dev.mysql.com/doc/refman/8.4/en/drop-table.html), so a table with an
+  # active foreign key pointing at it can't be dropped until the referencing table is dropped
+  # first.
+  create_table "solid_queue_jobs", force: :cascade do |t|
+    t.string "queue_name", null: false
+    t.string "class_name", null: false
+    t.text "arguments"
+    t.integer "priority", default: 0, null: false
+    t.string "active_job_id"
+    t.datetime "scheduled_at"
+    t.datetime "finished_at"
+    t.string "concurrency_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active_job_id"], name: "index_solid_queue_jobs_on_active_job_id"
+    t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
+    t.index ["finished_at"], name: "index_solid_queue_jobs_on_finished_at"
+    t.index ["queue_name", "finished_at"], name: "index_solid_queue_jobs_for_filtering"
+    t.index ["scheduled_at", "finished_at"], name: "index_solid_queue_jobs_for_alerting"
+  end
+
+  create_table "solid_queue_semaphores", force: :cascade do |t|
+    t.string "key", null: false
+    t.integer "value", default: 1, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
+    t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
+    t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
+  end
+
   create_table "sop_auth_lookup", force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -1986,6 +2143,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "deleted_contributor"
     t.integer "visibility"
     t.index ["contributor_id"], name: "index_sop_versions_on_contributor"
+    t.index ["policy_id"], name: "index_sop_versions_on_policy_id"
     t.index ["sop_id"], name: "index_sop_versions_on_sop_id"
   end
 
@@ -2005,6 +2163,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "deleted_contributor"
     t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_sops_on_contributor"
+    t.index ["policy_id"], name: "index_sops_on_policy_id"
   end
 
   create_table "sops_studies", force: :cascade do |t|
@@ -2059,6 +2218,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "first_letter"
     t.string "deleted_contributor"
     t.string "external_identifier", limit: 2048
+    t.index ["policy_id"], name: "index_strains_on_policy_id"
   end
 
   create_table "studied_factor_links", id: :integer, force: :cascade do |t|
@@ -2099,6 +2259,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "deleted_contributor"
     t.integer "position"
     t.string "external_identifier", limit: 2048
+    t.index ["policy_id"], name: "index_studies_on_policy_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -2238,6 +2399,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.string "first_letter", limit: 1
     t.text "other_creators"
     t.string "external_identifier", limit: 2048
+    t.index ["policy_id"], name: "index_templates_on_policy_id"
     t.index ["title", "group"], name: "index_templates_title_group"
   end
 
@@ -2355,6 +2517,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "visibility"
     t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
+    t.index ["policy_id"], name: "index_workflow_versions_on_policy_id"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
 
@@ -2378,6 +2541,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
     t.integer "test_status"
     t.string "external_identifier", limit: 2048
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
+    t.index ["policy_id"], name: "index_workflows_on_policy_id"
   end
 
   create_table "worksheets", id: :integer, force: :cascade do |t|
@@ -2389,4 +2553,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_23_150237) do
 
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
 end

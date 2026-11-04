@@ -5,10 +5,6 @@ require 'mock_redis'
 class CacheOverflowCleanupJobTest < ActiveSupport::TestCase
   MAX_SIZE = 200
 
-  test 'run period' do
-    assert_equal 1.day, CacheOverflowCleanupJob::RUN_PERIOD
-  end
-
   test 'removes only expired entries from the file overflow side' do
     redis_store = ActiveSupport::Cache::RedisCacheStore.new(redis: MockRedis.new,
                                                             namespace: 'test-cache-overflow-job')

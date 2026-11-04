@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "41",
+    "id": "161",
     "type": "file_templates",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022253301",
+              "id": "1022267029",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximal FileTemplate",
       "license": "CC-BY-4.0",
       "description": "This is the description",
@@ -30,32 +28,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/file_templates/41?version=1",
+          "url": "http://localhost:3000/file_templates/161?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:31:15.220Z",
-      "updated_at": "2026-06-16T14:31:15.334Z",
+      "created_at": "2026-08-27T08:46:23.168Z",
+      "updated_at": "2026-08-27T08:46:23.308Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-205",
+          "original_filename": "file-223",
           "url": null,
-          "md5sum": "4d256733a61c8a25e3afd2b44e65f8e9",
-          "sha1sum": "8c09a7c05833618b2cfa4a79f038e40879388f35",
+          "md5sum": "175664215a2f0cd242664b61cff06dac",
+          "sha1sum": "b2bdce65adcfcf12181f097946ad5222b95387fe",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/41/content_blobs/1050453428",
+          "link": "http://localhost:3000/file_templates/161/content_blobs/1050456647",
           "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039989310",
+          "profile": "/people/1040003044",
           "family_name": "Last",
-          "given_name": "Person2404",
-          "affiliation": "An Institution: 2839",
+          "given_name": "Person3311",
+          "affiliation": "An Institution: 3900",
           "orcid": null
         }
       ],
@@ -77,7 +75,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039989310",
+            "id": "1040003044",
             "type": "people"
           }
         ]
@@ -85,7 +83,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039989308",
+            "id": "1040003042",
             "type": "people"
           }
         ]
@@ -93,11 +91,11 @@
       "people": {
         "data": [
           {
-            "id": "1039989308",
+            "id": "1040003042",
             "type": "people"
           },
           {
-            "id": "1039989310",
+            "id": "1040003044",
             "type": "people"
           }
         ]
@@ -105,31 +103,31 @@
       "projects": {
         "data": [
           {
-            "id": "1022253301",
+            "id": "1022267029",
             "type": "projects"
           }
         ]
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/file_templates/41?version=1"
+      "self": "/file_templates/161?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:31:15.207Z",
-      "modified": "2026-06-16T14:31:15.314Z",
+      "created": "2026-08-27T08:46:23.148Z",
+      "modified": "2026-08-27T08:46:23.280Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "f6a11f77-b23c-49ad-b1fd-dabebc4c635b"
+      "uuid": "73c22d78-919f-473e-b713-58f07da124b1",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

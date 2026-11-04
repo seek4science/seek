@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1055250508",
+    "id": "1055250852",
     "type": "sops",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022251507",
+              "id": "1022264353",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximal SOP",
       "license": "CC-BY-4.0",
       "description": "This is the description",
@@ -30,14 +28,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/sops/1055250508?version=1",
+          "url": "http://localhost:3000/sops/1055250852?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:23:47.375Z",
-      "updated_at": "2026-06-16T14:23:47.375Z",
+      "created_at": "2026-08-27T08:38:42.632Z",
+      "updated_at": "2026-08-27T08:38:42.632Z",
       "doi": null,
       "content_blobs": [
         {
@@ -46,16 +44,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/sops/1055250508/content_blobs/1050452809",
+          "link": "http://localhost:3000/sops/1055250852/content_blobs/1050455883",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039987435",
+          "profile": "/people/1040000306",
           "family_name": "Last",
-          "given_name": "Person830",
-          "affiliation": "An Institution: 969",
+          "given_name": "Person959",
+          "affiliation": "An Institution: 1114",
           "orcid": null
         }
       ],
@@ -65,7 +63,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039987435",
+            "id": "1040000306",
             "type": "people"
           }
         ]
@@ -73,7 +71,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039987433",
+            "id": "1040000304",
             "type": "people"
           }
         ]
@@ -81,11 +79,11 @@
       "people": {
         "data": [
           {
-            "id": "1039987433",
+            "id": "1040000304",
             "type": "people"
           },
           {
-            "id": "1039987435",
+            "id": "1040000306",
             "type": "people"
           }
         ]
@@ -93,7 +91,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022251507",
+            "id": "1022264353",
             "type": "projects"
           }
         ]
@@ -101,7 +99,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655050",
+            "id": "973655569",
             "type": "investigations"
           }
         ]
@@ -109,7 +107,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385084",
+            "id": "1060385484",
             "type": "studies"
           }
         ]
@@ -117,34 +115,36 @@
       "assays": {
         "data": [
           {
-            "id": "1035386810",
+            "id": "1035387217",
             "type": "assays"
           }
         ]
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
         "data": [
           {
-            "id": "60",
+            "id": "1342",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/sops/1055250508?version=1"
+      "self": "/sops/1055250852?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:23:47.344Z",
-      "modified": "2026-06-16T14:23:47.375Z",
+      "created": "2026-08-27T08:38:42.594Z",
+      "modified": "2026-08-27T08:38:42.632Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "5ef03688-00af-4d9d-8bbf-1bc69438ef19"
+      "uuid": "54393754-b7fa-407a-997d-a78ad1291870",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

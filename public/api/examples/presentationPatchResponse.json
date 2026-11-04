@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "113",
+    "id": "185",
     "type": "presentations",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022254425",
+              "id": "1022266116",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximally Patched Presentation",
       "license": "CC-BY-4.0",
       "description": "Presenting the research about the thing",
@@ -31,32 +29,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/presentations/113?version=1",
+          "url": "http://localhost:3000/presentations/185?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:35:07.077Z",
-      "updated_at": "2026-06-16T14:35:07.279Z",
+      "created_at": "2026-08-27T08:43:38.030Z",
+      "updated_at": "2026-08-27T08:43:38.273Z",
       "doi": null,
       "content_blobs": [
         {
           "original_filename": "test.pdf",
           "url": null,
-          "md5sum": "87b6cc0ef74a65fb5e7a214c6e6196a6",
-          "sha1sum": "bb9c167746f40dc1fa351b69248e831f18bae06a",
+          "md5sum": "e1c6ee0e8ab30c646bb99ff943a6c813",
+          "sha1sum": "59aef0e5d3ba8303785b41daa9ebd1e6a8de3068",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/presentations/113/content_blobs/1050453686",
+          "link": "http://localhost:3000/presentations/185/content_blobs/1050456403",
           "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039990394",
+          "profile": "/people/1040002041",
           "family_name": "Last",
-          "given_name": "Person3293",
-          "affiliation": "An Institution: 3973",
+          "given_name": "Person2467",
+          "affiliation": "An Institution: 2874",
           "orcid": null
         }
       ],
@@ -66,7 +64,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039990394",
+            "id": "1040002041",
             "type": "people"
           }
         ]
@@ -74,7 +72,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039990392",
+            "id": "1040002039",
             "type": "people"
           }
         ]
@@ -82,11 +80,11 @@
       "people": {
         "data": [
           {
-            "id": "1039990392",
+            "id": "1040002039",
             "type": "people"
           },
           {
-            "id": "1039990394",
+            "id": "1040002041",
             "type": "people"
           }
         ]
@@ -94,30 +92,24 @@
       "projects": {
         "data": [
           {
-            "id": "1022254425",
+            "id": "1022266116",
             "type": "projects"
           }
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
         "data": [
           {
-            "id": "265",
+            "id": "326",
             "type": "publications"
           }
         ]
@@ -125,7 +117,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618797",
+            "id": "1025618802",
             "type": "events"
           }
         ]
@@ -133,21 +125,25 @@
       "workflows": {
         "data": [
           {
-            "id": "196",
+            "id": "1442",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/presentations/113?version=1"
+      "self": "/presentations/185?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:35:07.063Z",
-      "modified": "2026-06-16T14:35:07.272Z",
+      "created": "2026-08-27T08:43:38.017Z",
+      "modified": "2026-08-27T08:43:38.264Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "a6a23b25-6cce-486f-ab45-476ae1636ac1"
+      "uuid": "e7ca5350-adb2-41be-9c5d-183401c20cc0",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

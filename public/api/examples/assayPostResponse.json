@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1035386759",
+    "id": "1035387520",
     "type": "assays",
     "attributes": {
       "policy": {
@@ -8,19 +8,15 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022251266",
+              "id": "1022266387",
               "type": "projects"
             },
             "access": "manage"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
-      "snapshots": [
-
-      ],
+      "discussion_links": [],
+      "snapshots": [],
       "title": "A Maximal experimental Assay",
       "description": "A Western Blot Assay",
       "other_creators": "Anonymous creator",
@@ -43,10 +39,10 @@
       ],
       "creators": [
         {
-          "profile": "/people/1039987195",
+          "profile": "/people/1040002313",
           "family_name": "Last",
-          "given_name": "Person624",
-          "affiliation": "An Institution: 727",
+          "given_name": "Person2707",
+          "affiliation": "An Institution: 3146",
           "orcid": null
         }
       ]
@@ -55,7 +51,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039987195",
+            "id": "1040002313",
             "type": "people"
           }
         ]
@@ -63,7 +59,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039987195",
+            "id": "1040002313",
             "type": "people"
           }
         ]
@@ -71,20 +67,18 @@
       "organisms": {
         "data": [
           {
-            "id": "627234325",
+            "id": "627234472",
             "type": "organisms"
           }
         ]
       },
       "human_diseases": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [
           {
-            "id": "1039987195",
+            "id": "1040002313",
             "type": "people"
           }
         ]
@@ -92,27 +86,27 @@
       "projects": {
         "data": [
           {
-            "id": "1022251266",
+            "id": "1022266387",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "973654992",
+          "id": "973655996",
           "type": "investigations"
         }
       },
       "study": {
         "data": {
-          "id": "1060385028",
+          "id": "1060385842",
           "type": "studies"
         }
       },
       "data_files": {
         "data": [
           {
-            "id": "883654339",
+            "id": "1055250874",
             "type": "data_files"
           }
         ]
@@ -120,20 +114,18 @@
       "samples": {
         "data": [
           {
-            "id": "30",
+            "id": "10390",
             "type": "samples"
           }
         ]
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
         "data": [
           {
-            "id": "1055250469",
+            "id": "1055250950",
             "type": "sops"
           }
         ]
@@ -141,34 +133,32 @@
       "publications": {
         "data": [
           {
-            "id": "88",
+            "id": "351",
             "type": "publications"
           }
         ]
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
         "data": [
           {
-            "id": "30",
+            "id": "532",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/assays/1035386759"
+      "self": "/assays/1035387520"
     },
     "meta": {
-      "created": "2026-06-16T14:22:58.167Z",
-      "modified": "2026-06-16T14:22:58.208Z",
+      "created": "2026-08-27T08:44:24.595Z",
+      "modified": "2026-08-27T08:44:24.642Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "45436da7-5688-4c4d-a61a-87256c7e8939"
+      "uuid": "c67214da-05bc-4664-bca5-7058946760ad"
     }
   },
   "jsonapi": {

@@ -61,8 +61,6 @@ class User < ApplicationRecord
 
   acts_as_uniquely_identifiable
 
-  cattr_accessor :current_user
-
   delegate :is_admin?, to: :person, allow_nil: true
   delegate :is_project_administrator?, to: :person, allow_nil: true
   delegate :is_admin_or_project_administrator?, to: :person, allow_nil: true
@@ -274,6 +272,14 @@ class User < ApplicationRecord
     ensure
       User.current_user = previous
     end
+  end
+
+  def self.current_user= user
+    Thread.current[:current_user] = user
+  end
+
+  def self.current_user
+    Thread.current[:current_user]
   end
 
   def reset_password

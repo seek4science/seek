@@ -198,4 +198,9 @@ class ApplicationRecord < ActiveRecord::Base
   def self.supports_extended_metadata?
     reflect_on_association(:extended_metadata).present?
   end
+
+  # Override the Sunspot "remove" method to conditionally check if search is enabled
+  def remove_from_index
+    solr_remove_from_index if self.class.searchable? && Seek::Config.solr_enabled
+  end
 end
