@@ -37,9 +37,12 @@ class SimpleBaseSerializer < ActiveModel::Serializer
     object
   end
 
-  # what the user making the request is allowed to do with the item
+  # what the user making the request is allowed to do with the item; download is only included for items that
+  # have something to download
   def current_user_permissions
-    Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.index_with do |action|
+    actions = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS
+    actions -= [:download] unless meta_item.is_downloadable?
+    actions.index_with do |action|
       !!meta_item.can_perform?(action, User.current_user)
     end
   end

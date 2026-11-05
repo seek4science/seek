@@ -354,6 +354,7 @@ userAccess:
       type: boolean
     download:
       type: boolean
+      description: Only included for items that have something to download
     edit:
       type: boolean
     manage:
@@ -362,7 +363,6 @@ userAccess:
       type: boolean
   required:
     - view
-    - download
     - edit
     - manage
     - delete

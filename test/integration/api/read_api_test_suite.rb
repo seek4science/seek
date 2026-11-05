@@ -62,7 +62,9 @@ module ReadApiTestSuite
 
     # some models check the logged in user rather than the user passed in
     expected = User.with_current_user(@current_user) do
-      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.to_h do |action|
+      actions = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS
+      actions -= [:download] unless res.is_downloadable?
+      actions.to_h do |action|
         [action.to_s, !!res.can_perform?(action, @current_user)]
       end
     end
