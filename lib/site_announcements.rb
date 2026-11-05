@@ -16,6 +16,7 @@ module SiteAnnouncements
   end
 
   module SingletonMethods
+    # Those who receive notifications, matching receive_notifications?: registered, with the flag set
     def notifiable
       joins(:user).includes(:notifiee_info).where(notifiee_infos: { receive_notifications: true })
     end
