@@ -1290,6 +1290,82 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person2.institutions, new_institution
   end
 
+  test 'programme administrator who is a project member cannot move project from another programme' do
+    other_programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: other_programme)
+    pa = FactoryBot.create(:programme_administrator)
+    prog = pa.programmes.first
+    pa.add_to_project_and_institution(project, FactoryBot.create(:institution))
+    pa.save!
+    assert project.can_edit?(pa.user)
+    refute project.can_manage?(pa.user)
+    login_as(pa)
+
+    put :update, params: { id: project, project: { programme_id: prog.id } }
+    assert_redirected_to project
+
+    assert_equal other_programme, project.reload.programme
+  end
+
+  test 'project administrator cannot move project to another open programme' do
+    person = FactoryBot.create(:project_administrator)
+    project = person.projects.first
+    original_programme = FactoryBot.create(:programme, projects: [project])
+    open_programme = FactoryBot.create(:programme, open_for_projects: true)
+    login_as(person)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert open_programme.can_associate_projects?(person.user)
+      put :update, params: { id: project, project: { programme_id: open_programme.id } }
+      assert_redirected_to project
+    end
+
+    assert_equal original_programme, project.reload.programme
+  end
+
+  test 'project administrator can associate project without programme to open programme' do
+    person = FactoryBot.create(:project_administrator)
+    project = person.projects.first
+    assert_nil project.programme
+    open_programme = FactoryBot.create(:programme, open_for_projects: true)
+    login_as(person)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      put :update, params: { id: project, project: { programme_id: open_programme.id } }
+      assert_redirected_to project
+    end
+
+    assert_equal open_programme, project.reload.programme
+  end
+
+  test 'project member cannot associate project without programme to open programme' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    assert_nil project.programme
+    refute project.can_manage?(person.user)
+    open_programme = FactoryBot.create(:programme, open_for_projects: true)
+    login_as(person)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      put :update, params: { id: project, project: { programme_id: open_programme.id } }
+      assert_redirected_to project
+    end
+
+    assert_nil project.reload.programme
+  end
+
+  test 'instance admin can move project to another programme' do
+    other_programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: other_programme)
+    prog = FactoryBot.create(:programme)
+    login_as(FactoryBot.create(:admin))
+
+    put :update, params: { id: project, project: { programme_id: prog.id } }
+    assert_redirected_to project
+
+    assert_equal prog, project.reload.programme
+  end
+
   test 'cannot remove other project members as project administrator' do
     other_person = FactoryBot.create(:person)
     other_project = other_person.projects.first

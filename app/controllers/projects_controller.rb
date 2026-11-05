@@ -1018,12 +1018,18 @@ class ProjectsController < ApplicationController
 
     if params[:project][:programme_id].present?
       prog = Programme.find_by_id(params[:project][:programme_id])
-      if prog&.can_associate_projects?
+      if prog&.can_associate_projects? && can_change_programme?
         permitted_params += [:programme_id]
       end
     end
 
     params.require(:project).permit(permitted_params)
+  end
+
+  def can_change_programme?
+    return true if @project.new_record? || User.admin_logged_in?
+
+    @project.programme_id.nil? && @project.can_manage?(current_user)
   end
 
   def check_investigations_are_for_this_project
