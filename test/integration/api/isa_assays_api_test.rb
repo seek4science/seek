@@ -47,6 +47,20 @@ class ISAAssaysApiTest < ActionDispatch::IntegrationTest
     assert sample_type.present?
     assert response_body['data']['attributes']['input_sample_type_id'].present?
     assert_equal [], sample_type['samples']
+    assert_equal({ 'view' => true, 'edit' => true, 'manage' => true, 'delete' => true },
+                 response_body['data']['meta']['user_access'])
+  end
+
+  test 'show ISA assay - meta shows what another user can do' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, linked_sample_type: @study.sample_types.last,
+                                                                  policy: FactoryBot.create(:publicly_viewable_policy))
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    assert_equal({ 'view' => true, 'edit' => false, 'manage' => false, 'delete' => false },
+                 JSON.parse(response.body)['data']['meta']['user_access'])
   end
 
   test 'show ISA assay - samples are filtered by authorization' do

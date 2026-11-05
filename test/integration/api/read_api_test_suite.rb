@@ -49,12 +49,48 @@ module ReadApiTestSuite
     FactoryBot.create("max_#{singular_name}".to_sym)
     get collection_url, as: :json
 
-    if model == Sample
-      assert_response :not_implemented
-    else
-      perform_jsonapi_checks
-      assert_nothing_raised { validate_json(response.body, index_response_fragment) }
+    perform_jsonapi_checks
+    assert_nothing_raised { validate_json(response.body, index_response_fragment) }
+  end
+
+  test 'meta includes what the current user can do with the resource' do
+    skip unless model.respond_to?(:authorization_supported?) && model.authorization_supported?
+    res = FactoryBot.create("max_#{singular_name}".to_sym)
+    user_login(res.contributor) if res.respond_to?(:contributor)
+    get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+
+    # some models check the logged in user rather than the user passed in
+    expected = User.with_current_user(@current_user) do
+      actions = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS
+      actions -= [:download] unless res.is_downloadable?
+      actions.to_h do |action|
+        [action.to_s, !!res.can_perform?(action, @current_user)]
+      end
     end
+    assert_equal expected, JSON.parse(response.body)['data']['meta']['user_access']
+  end
+
+  test 'meta does not include user access for resources without a policy' do
+    skip if model.respond_to?(:authorization_supported?) && model.authorization_supported?
+    res = FactoryBot.create("max_#{singular_name}".to_sym)
+    user_login(res.contributor) if res.respond_to?(:contributor)
+    get member_url(res), as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+
+    assert_nil JSON.parse(response.body)['data'].dig('meta', 'user_access')
+  end
+
+  test 'index does not include user access for each item' do
+    skip('skipping index test') if skip_index_test?
+    res = FactoryBot.create("max_#{singular_name}".to_sym)
+    user_login(res.contributor) if res.respond_to?(:contributor)
+    get collection_url, as: :json, headers: { 'Authorization' => read_access_auth }
+    assert_response :success
+
+    items = JSON.parse(response.body)['data']
+    refute_empty items
+    items.each { |item| assert_nil item.dig('meta', 'user_access') }
   end
 
   test 'unauthorized user cannot get resource' do
