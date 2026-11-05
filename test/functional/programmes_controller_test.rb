@@ -412,6 +412,25 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p.is_programme_administrator?(prog)
   end
 
+  test 'user cannot create programme when programme user creation is disabled' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    with_config_value(:programme_user_creation_enabled, false) do
+      refute Programme.can_create?
+
+      get :new
+      assert_redirected_to root_path
+      refute_nil flash[:error]
+
+      assert_no_difference('Programme.count') do
+        post :create, params: { programme: { title: 'A programme' } }
+      end
+      assert_redirected_to root_path
+      refute_nil flash[:error]
+    end
+    refute person.reload.is_programme_administrator_of_any_programme?
+  end
+
   test 'logged out user cannot create' do
     assert_no_difference('Programme.count') do
       post :create, params: { programme: { title: 'A programme' } }
@@ -956,5 +975,55 @@ class ProgrammesControllerTest < ActionController::TestCase
       assert creator.is_programme_administrator_of_any_programme?
       assert creator.has_role?('programme_administrator')
     end
+  end
+
+  test 'instance admin can add project already associated with a programme' do
+    login_as(FactoryBot.create(:admin))
+    prog = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project)
+    other_programme = FactoryBot.create(:programme)
+    other_project = FactoryBot.create(:project, programme: other_programme)
+
+    put :update, params: { id: prog, programme: { project_ids: [project.id, other_project.id] } }
+
+    assert_redirected_to prog
+
+    assert_equal 2, assigns(:programme).projects.length
+    assert_equal assigns(:programme), project.reload.programme
+    assert_equal assigns(:programme), other_project.reload.programme
+  end
+
+  test 'non-instance admin cannot add projects to a programme' do
+    pa = FactoryBot.create(:programme_administrator)
+    login_as(pa)
+    prog = pa.programmes.first
+    project = FactoryBot.create(:project)
+    other_programme = FactoryBot.create(:programme)
+    other_project = FactoryBot.create(:project, programme: other_programme)
+
+    assert_equal 1, prog.projects.length
+
+    put :update, params: { id: prog, programme: { project_ids: [project.id, other_project.id] } }
+
+    assert_redirected_to prog
+
+    assert_equal 1, assigns(:programme).projects.length
+    assert_nil project.reload.programme
+    assert_equal other_programme, other_project.reload.programme
+  end
+
+  test 'non-instance admin cannot remove projects from programme' do
+    pa = FactoryBot.create(:programme_administrator)
+    login_as(pa)
+    prog = pa.programmes.first
+    project = FactoryBot.create(:project, programme: prog)
+    assert_equal 2, prog.projects.length
+
+    put :update, params: { id: prog, programme: { project_ids: [''] } }
+
+    assert_redirected_to prog
+
+    assert_equal 2, assigns(:programme).projects.length
+    assert_equal assigns(:programme), project.reload.programme
   end
 end

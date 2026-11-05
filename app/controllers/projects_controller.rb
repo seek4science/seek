@@ -32,7 +32,8 @@ class ProjectsController < ApplicationController
   before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
 
   before_action :find_assets, only: [:index]
-  before_action :auth_to_create, only: %i[new create, :administer_create_project_request, :administer_import_project_request, :respond_create_project_request, :respond_import_project_request]
+  before_action :auth_to_create, only: %i[new create administer_create_project_request administer_import_project_request
+                                          respond_create_project_request respond_import_project_request]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles destroy update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
@@ -1017,12 +1018,18 @@ class ProjectsController < ApplicationController
 
     if params[:project][:programme_id].present?
       prog = Programme.find_by_id(params[:project][:programme_id])
-      if prog&.can_associate_projects?
+      if prog&.can_associate_projects? && can_change_programme?
         permitted_params += [:programme_id]
       end
     end
 
     params.require(:project).permit(permitted_params)
+  end
+
+  def can_change_programme?
+    return true if @project.new_record? || User.admin_logged_in?
+
+    @project.programme_id.nil? && @project.can_manage?(current_user)
   end
 
   def check_investigations_are_for_this_project
@@ -1048,8 +1055,8 @@ class ProjectsController < ApplicationController
     groups_to_remove = params[:group_memberships_to_remove] || []
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
-      group_membership = GroupMembership.find(group)
-      next unless group_membership && group_membership.person_can_be_removed?
+      group_membership = @project.group_memberships.find_by_id(group)
+      next unless group_membership&.person_can_be_removed?
       # this slightly strange bit of code is required to trigger and after_remove callback, which should be revisted
       #
       # Finn: http://guides.rubyonrails.org/association_basics.html#the-has-many-through-association
