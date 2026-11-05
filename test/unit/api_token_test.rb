@@ -1,6 +1,16 @@
 require 'test_helper'
 
 class ApiTokenTest < ActiveSupport::TestCase
+  test 'recognises what could be an api token' do
+    assert ApiToken.plausible_token?(ApiToken.random_api_token)
+    assert ApiToken.plausible_token?('a-token_of-another-length')
+
+    assert_not ApiToken.plausible_token?('header.payload.signature'), 'a JWT is not an API token'
+    assert_not ApiToken.plausible_token?('')
+    assert_not ApiToken.plausible_token?('a')
+    assert_not ApiToken.plausible_token?(nil)
+  end
+
   test 'plain text token available after create' do
     user = FactoryBot.create(:user)
 

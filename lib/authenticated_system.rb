@@ -12,7 +12,7 @@ module AuthenticatedSystem
     if defined? @current_user
       @current_user
     else
-      self.current_user = (user_from_session || user_from_doorkeeper  || user_from_basic_auth || user_from_cookie || user_from_api_token)
+      self.current_user = (user_from_session || user_from_doorkeeper || user_from_basic_auth || user_from_cookie || user_from_oidc_token || user_from_api_token)
     end
   end
 
@@ -137,11 +137,26 @@ module AuthenticatedSystem
 
   def user_from_api_token
     authenticate_with_http_token do |api_token, _options|
-      return unless api_token.length > 1
+      # A credential that cannot be an API token is declined before the lookup, so that an OpenID
+      # Connect access token - which #user_from_oidc_token has already judged - does not spend two
+      # seconds of a request thread being refused a second time.
+      next unless ApiToken.plausible_token?(api_token)
 
       user = User.from_api_token(api_token)
       sleep 2 if Rails.env.production? && !user # Throttle incorrect login
       user
+    end
+  end
+
+  # Called from #current_user. Attempt to login with an access token issued by the configured
+  # OpenID Connect provider, resolved to a user through a linked identity.
+  def user_from_oidc_token
+    return unless Seek::OIDC::AccessTokenVerifier.enabled?
+
+    authenticate_with_http_token do |token, _options|
+      next if token.blank?
+
+      User.from_oidc_token(token)
     end
   end
 

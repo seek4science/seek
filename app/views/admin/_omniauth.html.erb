@@ -121,6 +121,19 @@
                                "#{t('login.oidc')} Client ID", "The client ID to use to authenticate with the #{t('login.oidc')} provider.") %>
         <%= admin_password_setting(:omniauth_oidc_secret, Seek::Config.omniauth_oidc_secret,
                                    "#{t('login.oidc')} Secret", "The secret to use to authenticate with the #{t('login.oidc')} provider.") %>
+        <%= admin_checkbox_setting(:omniauth_oidc_api_enabled, 1, Seek::Config.omniauth_oidc_api_enabled,
+                                   "Accept #{t('login.oidc')} access tokens for the API",
+                                   "Allows an access token issued by the #{t('login.oidc')} provider to be sent as
+                                   <code>Authorization: Bearer &lt;token&gt;</code> to the #{Seek::Config.instance_name} API, in place of
+                                   an API Token. It must belong to an identity already linked to a user, who the caller then acts as.",
+                                   onchange: toggle_appear_javascript('omniauth_oidc_api_settings')) %>
+        <div id="omniauth_oidc_api_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_oidc_api_enabled) -%>;">
+          <%= admin_text_setting(:omniauth_oidc_api_audiences, Seek::Config.omniauth_oidc_api_audiences,
+                                 'Accepted token audiences',
+                                 "A comma separated list of values that a token's <code>aud</code> or <code>azp</code> claim must
+                                 include, usually the client ID of each application allowed to call the #{Seek::Config.instance_name} API.
+                                 <strong>Required: if left blank then no access tokens will be accepted.</strong>") %>
+        </div>
       </div>
       <div class="col-sm-5">
         <%= panel('Client Info') do %>

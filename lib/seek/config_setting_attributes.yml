@@ -247,6 +247,8 @@ omniauth_oidc_issuer:
 omniauth_oidc_client_id:
 omniauth_oidc_secret:
   encrypt: true
+omniauth_oidc_api_enabled:
+omniauth_oidc_api_audiences:
 ga4gh_trs_api_enabled:
 search_results_limit:
   convert: :to_i
