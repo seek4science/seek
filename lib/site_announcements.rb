@@ -30,6 +30,8 @@ module SiteAnnouncements
       end
     end
 
+    # The receive_notifications flag defaults to true for every profile, including those created by someone else
+    # that have no registered user, so it doesn't on its own mean the person opted in.
     def receive_notifications?
       registered? && self.notifiee_info.try(:receive_notifications?)
     end
