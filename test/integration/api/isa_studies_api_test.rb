@@ -46,7 +46,7 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
     assert collection.present?
     assert_equal [], source['samples']
     assert_equal [], collection['samples']
-    assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => true, 'delete' => true },
+    assert_equal({ 'view' => true, 'edit' => true, 'manage' => true, 'delete' => true },
                  response_body['data']['meta']['user_access'])
   end
 
@@ -57,7 +57,7 @@ class ISAStudiesApiTest < ActionDispatch::IntegrationTest
         headers: { "Authorization": read_access_auth }
     assert_response :success
 
-    assert_equal({ 'view' => true, 'download' => false, 'edit' => false, 'manage' => false, 'delete' => false },
+    assert_equal({ 'view' => true, 'edit' => false, 'manage' => false, 'delete' => false },
                  JSON.parse(response.body)['data']['meta']['user_access'])
   end
 

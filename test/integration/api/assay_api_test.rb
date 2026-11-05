@@ -33,7 +33,7 @@ class AssayApiTest < ActionDispatch::IntegrationTest
 
     get assay_path(@assay), as: :json, headers: { 'Authorization' => read_access_auth }
     assert_response :success
-    assert_equal({ 'view' => true, 'download' => true, 'edit' => true, 'manage' => true, 'delete' => false },
+    assert_equal({ 'view' => true, 'edit' => true, 'manage' => true, 'delete' => false },
                  JSON.parse(response.body)['data']['meta']['user_access'])
   end
 
