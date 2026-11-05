@@ -33,6 +33,10 @@ module Seek
         nil
       end
 
+      def diagram_generation_error?
+        false
+      end
+
       def diagram_extension
         'svg'
       end

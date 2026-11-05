@@ -85,3 +85,12 @@
     padding: 0.2rem 0.5rem;
 }
 
+#extended-metadata .extended-metadata-scrollable {
+    max-height: 40em;
+    overflow-y: auto;
+}
+
+#extended-metadata .extended_metadata {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
