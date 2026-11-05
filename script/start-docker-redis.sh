@@ -26,7 +26,7 @@ fi
 # command line. docker-entrypoint.sh still drops root to the redis user.
 docker rm seek-redis > /dev/null 2>&1 || true
 echo "creating and starting seek-redis container"
-docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" \
+docker run -d --name seek-redis --restart=unless-stopped -p 127.0.0.1:6379:6379 -v "seek-redis-data-volume:/data" \
   ${REDIS_PASSWORD:+-e REDIS_PASSWORD} redis:8.6-alpine \
   sh -c 'exec docker-entrypoint.sh redis-server "$@" ${REDIS_PASSWORD:+--requirepass "$REDIS_PASSWORD"}' sh \
   --appendonly yes --maxmemory "${REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
