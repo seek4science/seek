@@ -17,6 +17,11 @@ settings = services.ValidationSettings(
     requirement_severity=models.Severity.REQUIRED,
 )
 
+profiles = services.detect_profiles(settings)
+
+if profiles:
+    settings.profile_identifier = profiles[0].identifier
+
 result = services.validate(settings)
 
 if result.has_issues():
