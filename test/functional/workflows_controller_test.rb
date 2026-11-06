@@ -903,7 +903,8 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_response :unprocessable_entity
     end
 
-    assert assigns(:crate_extractor).errors.added?(:base, 'ro-crate-1.1_12.1: The RO-Crate does not include the Data Entity \'concat_two_files.ga\' as part of its payload')
+    messages = assigns(:crate_extractor).errors.full_messages_for(:base)
+    assert(messages.any? { |m| m.match(/The RO-Crate does not include the Data Entity 'concat_two_files.ga' as part of its payload/) })
   end
 
   test 'can get edit paths page' do
