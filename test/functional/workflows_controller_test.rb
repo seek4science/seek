@@ -903,8 +903,11 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_response :unprocessable_entity
     end
 
+    # The error message that we need to check has an id number for the specific rule that is broken
+    # but that changes on each release.
+    # So we need to check that one of the messages contains the relevant error string
     messages = assigns(:crate_extractor).errors.full_messages_for(:base)
-    assert(messages.any? { |m| m.match(/The RO-Crate does not include the Data Entity 'concat_two_files.ga' as part of its payload/) })
+    assert(messages.any? { |m| m.ends_with?('The RO-Crate does not include the Data Entity \'concat_two_files.ga\' as part of its payload') })
   end
 
   test 'can get edit paths page' do
