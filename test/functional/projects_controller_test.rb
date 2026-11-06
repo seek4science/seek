@@ -5162,6 +5162,29 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should not show add new button if nothing available to add' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+    assert project.has_member?(person)
+    assert project.can_edit?
+    with_config_values(isa_enabled: false, collections_enabled: false, data_files_enabled: false, documents_enabled: false,
+                       events_enabled: false, file_templates_enabled: false, models_enabled: false,
+                       placeholders_enabled: false, presentations_enabled: false, publications_enabled: false,
+                       samples_enabled: false, sops_enabled: false, organisms_enabled: false,
+                       isa_json_compliance_enabled: false, workflows_enabled: false) do
+      # All "Add new" options should be disabled
+      refute Seek::AddButtons.add_for_item(project).map { |type, _| type.feature_enabled? }.any?
+
+      get :show, params: { id: project.id }
+    end
+
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select '.btn', text: /Add new/, count: 0
+    end
+  end
+
   test 'do not show related templates if isa_compliance disabled' do
     template = FactoryBot.create(:template)
     person = template.contributor
