@@ -11,7 +11,7 @@ class WorkflowCrateExtractor
   validate :not_nil
   validate :remote_crate_handling, if: -> { ro_crate[:data].blank? }
   validate :metadata_validation
-  validate :resolve_crate
+  validate :extract_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
   validate :source_url_and_version_present?, if: -> { detect_workflow && @crate.present? }
   validate :find_workflows_matching_id, if: -> { detect_workflow && @crate.present? }
@@ -139,19 +139,13 @@ class WorkflowCrateExtractor
   end
 
   def extract_crate
-    begin
-      @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
-    rescue Zip::Error
-      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
-    rescue ROCrate::ReadException => e
-      errors.add(:ro_crate, "could not be read: #{e.message}")
-    end
-  end
+    return if @crate.present?
 
-  def resolve_crate
-    
-
-    extract_crate
+    @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
+  rescue Zip::Error
+    errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+  rescue ROCrate::ReadException => e
+    errors.add(:ro_crate, "could not be read: #{e.message}")
   end
 
   def new_version?
