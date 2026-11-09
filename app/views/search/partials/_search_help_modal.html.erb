@@ -1,0 +1,75 @@
+
+<div class="modal fade" id="search-help-modal" tabindex="-1" role="dialog" aria-labelledby="search-help-modal-title">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="search-help-modal-title">
+          <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Search tips
+        </h4>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          <strong>Words match from the start.</strong>
+          For example, <code>metabol</code> already finds <em>metabolomics</em>, so you rarely need a <code>*</code> at the end.
+          To match the end of a word, put the <code>*</code> first, as in <code>*omics</code>.
+          Searches are not case-sensitive, and words with accents, hyphens or other punctuation can be found
+          with or without them (<code>Muller</code> finds <em>Müller</em>, <code>Thy1</code> finds <em>Thy-1</em>).
+        </p>
+
+        <%# Laid out with divs rather than a <table>, because this modal is rendered on every page
+            and a real table would affect tests that count table rows on those pages. %>
+
+        <div class="search-help-examples" role="table" aria-label="Search examples">
+          <div class="search-help-row search-help-header" role="row">
+            <div role="columnheader">To find…</div>
+            <div role="columnheader">Type</div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Items containing both words</div>
+            <div role="cell"><code>wnt AND signalling</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Items containing either word</div>
+            <div role="cell"><code>kinase OR phosphatase</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Items without a word</div>
+            <div role="cell"><code>cell NOT plant</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">A word that must / must not appear</div>
+            <div role="cell"><code>+kinase -yeast</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">An exact phrase</div>
+            <div role="cell"><code>"data file"</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Combined conditions</div>
+            <div role="cell"><code>(kinase OR phosphatase) AND assay</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Wildcards: <code>*</code> for any number of characters, <code>?</code> for exactly one</div>
+            <div role="cell"><code>*omics</code>, <code>d?tafile</code></div>
+          </div>
+          <div class="search-help-row" role="row">
+            <div role="cell">Similar spellings, allowing for typos</div>
+            <div role="cell"><code>charactaristic~</code></div>
+          </div>
+        </div>
+
+        <p class="help-block">
+          <code>AND</code>, <code>OR</code> and <code>NOT</code> must be written in capital letters.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

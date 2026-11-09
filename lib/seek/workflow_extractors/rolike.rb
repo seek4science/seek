@@ -35,6 +35,18 @@ module Seek
         end
       end
 
+      def diagram_generation_error?
+        if diagram_path.present? && file_exists?(diagram_path)
+          false
+        elsif main_workflow_extractor&.can_render_diagram?
+          main_workflow_extractor.diagram_generation_error?
+        elsif abstract_cwl_extractor&.can_render_diagram?
+          abstract_cwl_extractor.diagram_generation_error?
+        else
+          false
+        end
+      end
+
       def metadata
         m = super
         # Use CWL description

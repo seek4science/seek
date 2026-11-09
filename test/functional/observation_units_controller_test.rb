@@ -19,6 +19,7 @@ class ObservationUnitsControllerTest < ActionController::TestCase
     assert_select 'div#overview' do
       assert_select 'div#description', text:/#{unit.description}/
       assert_select 'div#extended-metadata div', text:/Extended Metadata \(simple obs unit extended metadata type\)/
+      assert_select 'div#extended-metadata div.panel-body.extended-metadata-scrollable'
     end
   end
 

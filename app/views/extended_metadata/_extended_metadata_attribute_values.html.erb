@@ -15,7 +15,7 @@
       </div>
       <% end %>
     </div>
-    <div class="panel-body">
+    <div class="panel-body extended-metadata-scrollable">
       <% metadata_type.extended_metadata_attributes.each do |attribute| %>
         <%= render_extended_metadata_value(attribute, resource) %>
       <% end %>
