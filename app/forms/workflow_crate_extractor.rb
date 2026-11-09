@@ -9,6 +9,7 @@ class WorkflowCrateExtractor
   attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params, :detect_workflow
 
   validate :not_nil
+  validate :remote_crate_handling, if: -> { ro_crate[:data].blank? }
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
   validate :source_url_and_version_present?, if: -> { detect_workflow && @crate.present? }
@@ -74,6 +75,26 @@ class WorkflowCrateExtractor
     errors.add(:ro_crate, 'missing') if ro_crate.nil?
   end
 
+  def remote_crate_handling
+    if ro_crate[:data_url].present?
+      begin
+        handler = ContentBlob.remote_content_handler_for(ro_crate[:data_url])
+        info = handler.info
+        data = handler.fetch
+        data.rewind
+        ro_crate[:data] = data
+        ro_crate[:original_filename] = info[:file_name]
+      rescue Seek::DownloadHandling::BadResponseCodeException => e
+        errors.add(:ro_crate, "URL could not be accessed: #{e.message}")
+      rescue StandardError => e
+        Rails.logger.error("#{e} occurred whilst trying to fetch: #{ro_crate[:data_url]}\n\t#{e.backtrace.join("\n\t")}")
+        errors.add(:ro_crate, 'URL could not be accessed')
+      end
+    else
+      errors.add(:ro_crate, 'should be provided as a file or remote URL')
+    end
+  end
+
   def main_workflow_present?
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
   end
@@ -102,28 +123,6 @@ class WorkflowCrateExtractor
   end
 
   def resolve_crate
-    if ro_crate[:data].blank?
-      if ro_crate[:data_url].present?
-        begin
-          handler = ContentBlob.remote_content_handler_for(ro_crate[:data_url])
-          info = handler.info
-          data = handler.fetch
-          data.rewind
-          ro_crate[:data] = data
-          ro_crate[:original_filename] = info[:file_name]
-        rescue Seek::DownloadHandling::BadResponseCodeException => e
-          errors.add(:ro_crate, "URL could not be accessed: #{e.message}")
-          return false
-        rescue StandardError => e
-          Rails.logger.error("#{e} occurred whilst trying to fetch: #{ro_crate[:data_url]}\n\t#{e.backtrace.join("\n\t")}")
-          errors.add(:ro_crate, "URL could not be accessed")
-          return false
-        end
-      else
-        errors.add(:ro_crate, 'should be provided as a file or remote URL')
-        return false
-      end
-    end
 
     do_validation = false
     begin
