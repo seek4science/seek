@@ -8,6 +8,7 @@ class WorkflowCrateExtractor
 
   attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params, :detect_workflow
 
+  validate :not_nil
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
   validate :source_url_and_version_present?, if: -> { detect_workflow }
@@ -69,6 +70,10 @@ class WorkflowCrateExtractor
     Workflow.new(workflow_class: workflow_class)
   end
 
+  def not_nil
+    errors.add(:ro_crate, 'missing') if ro_crate.nil?
+  end
+
   def main_workflow_present?
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
   end
@@ -97,10 +102,7 @@ class WorkflowCrateExtractor
   end
 
   def resolve_crate
-    if ro_crate.nil?
-      errors.add(:ro_crate, 'missing')
-      return false
-    elsif ro_crate[:data].blank?
+    if ro_crate[:data].blank?
       if ro_crate[:data_url].present?
         begin
           handler = ContentBlob.remote_content_handler_for(ro_crate[:data_url])
