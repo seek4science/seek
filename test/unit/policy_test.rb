@@ -355,4 +355,28 @@ class PolicyTest < ActiveSupport::TestCase
       assert policy.errors[:access_type].any? { |m| m.include?('too permissive') }
     end
   end
+
+  test 'update_with_bulk_sharing_policy builds permissions without persisting them' do
+    person = FactoryBot.create(:person)
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:private_policy))
+    policy = df.policy
+    params = { access_type: Policy::NO_ACCESS,
+               permissions_attributes: { '1': { contributor_type: 'Person', contributor_id: person.id,
+                                                 access_type: Policy::MANAGING } } }
+
+    # the permission is built in memory, not written straight to the database
+    assert_no_difference('Permission.count') do
+      policy.update_with_bulk_sharing_policy(params)
+    end
+
+    built = policy.permissions.detect { |p| p.contributor_type == 'Person' && p.contributor_id == person.id }
+    assert built, 'permission should have been built on the policy'
+    assert built.new_record?, 'permission should not be persisted until the owning item is saved'
+    assert_equal Policy::MANAGING, built.access_type
+
+    # it is only persisted when the owning item is saved
+    assert_difference('Permission.count', 1) do
+      disable_authorization_checks { df.save! }
+    end
+  end
 end

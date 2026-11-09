@@ -24,9 +24,16 @@ then
   docker volume create --name=seek-solr-data-volume
 fi
 
+CONFIGSET=/opt/solr/server/solr/configsets/seek_config
+CORE_DIR=/var/solr/data/seek
+
+# solr-precreate only copies the configset when the core doesn't exist yet, so an existing core's conf
+# directory is replaced with the configset on every container start. The index is left untouched.
+START_SOLR="if [ -d $CORE_DIR ]; then rm -rf $CORE_DIR/conf && cp -r $CONFIGSET/conf $CORE_DIR/conf; fi; exec solr-precreate seek $CONFIGSET"
+
 docker rm seek-search > /dev/null 2>&1 || true
 echo "creating and starting seek-search container"
-docker run -d --name seek-search --restart=unless-stopped -p 8983:8983 -v "seek-solr-data-volume:/var/solr/" -v "$REPO_ROOT/solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf" solr:9.10.1 solr-precreate seek /opt/solr/server/solr/configsets/seek_config
+docker run -d --name seek-search --restart=unless-stopped -p 8983:8983 -v "seek-solr-data-volume:/var/solr/" -v "$REPO_ROOT/solr/seek/conf:$CONFIGSET/conf" solr:9.10.1 bash -c "$START_SOLR"
 
 echo "waiting for Solr to be ready ..."
 retries=0

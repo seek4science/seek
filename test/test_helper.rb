@@ -144,6 +144,7 @@ class ActiveSupport::TestCase
   end
 
   def clear_rails_cache
+    Seek::Config.clear_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
   end

@@ -36,6 +36,10 @@ class ApplicationJob < ActiveJob::Base
     default_delay
   end
 
+  before_perform do
+    Seek::Config.settings_cache # Perform config propagation if needed
+  end
+
   around_perform do |job, block|
     Timeout.timeout(job.timelimit) do
       block.call

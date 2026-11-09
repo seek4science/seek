@@ -14,7 +14,8 @@ export SEEK_LOCATION="${RAILS_RELATIVE_URL_ROOT:-/}"
 export SEEK_SUB_URI="${SEEK_LOCATION%/}"
 echo "SEEK_LOCATION: '$SEEK_LOCATION'"
 echo "SEEK_SUB_URI: '$SEEK_SUB_URI'"
-envsubst '${SEEK_LOCATION} ${SEEK_SUB_URI}' < docker/nginx.conf.template > nginx.conf
+configure_nginx_listen
+envsubst '${SEEK_LOCATION} ${SEEK_SUB_URI} ${SEEK_LISTEN}' < docker/nginx.conf.template > nginx.conf
 
 # Precompile assets if using sub URI
 if [ ! -z $SEEK_SUB_URI ]

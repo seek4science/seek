@@ -31,7 +31,8 @@ RUN PYTHON_VERSION=$(cat .python-version) && \
     curl default-mysql-client gettext git graphviz libjemalloc2 libreoffice libvips links locales \
     nodejs openjdk-21-jre poppler-utils postgresql-client python${PYTHON_VERSION} shared-mime-info sqlite3 telnet vim-tiny zip
 
-# Disable ssl from the mysql client
+# Disable ssl from the mysql client; setting MYSQL_SSL_CA turns it back on
+# (see docker/shared_functions.sh and docker/database.docker.mysql.yml)
 RUN echo "[client]\nskip-ssl" > /etc/mysql/conf.d/disable-ssl.cnf
 
 FROM base AS builder
