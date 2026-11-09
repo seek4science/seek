@@ -317,7 +317,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   test 'can submit new version of RO-Crate with ORCID clash' do
     p1 = FactoryBot.create(:person, first_name: 'Jane', last_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1825-0097') # also in the uploaded crate
     p2 = FactoryBot.create(:person, first_name: 'Sam', last_name: 'Williams') # not in the uploaded crate
-    workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow', creators: [p1, p2], contributor: current_person)
+    workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow/', creators: [p1, p2], contributor: current_person)
     assert_no_difference('Workflow.count') do
       assert_difference('Git::Version.count', 1) do
         post submit_workflows_path, params: {
