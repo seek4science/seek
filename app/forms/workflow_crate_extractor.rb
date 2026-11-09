@@ -10,6 +10,7 @@ class WorkflowCrateExtractor
 
   validate :not_nil
   validate :remote_crate_handling, if: -> { ro_crate[:data].blank? }
+  validate :metadata_validation
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
   validate :source_url_and_version_present?, if: -> { detect_workflow && @crate.present? }
@@ -95,6 +96,31 @@ class WorkflowCrateExtractor
     end
   end
 
+  def metadata_validation
+    crate_metadata_found = false
+    begin
+      Zip::File.open(ro_crate[:data].path) do |zip_file|
+        crate_metadata_found = zip_file.find_entry('ro-crate-metadata.json').present?
+      end
+    rescue Zip::Error
+      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+      return false
+    end
+
+    # The validation library does not support version 1.0 crates
+    # They use ro-crate-metadata.jsonld rather than ro-crate-metadata.json
+    # So we only use this library if it contains a ro-crate-metadata.json file
+    # The existing validation can handle version 1.0 crates
+    return unless crate_metadata_found
+
+    Open4.open4(Seek::Util.python_exec("script/validate-ro-crate.py #{ro_crate[:data].path}")) do |_pid, _stdin, stdout, _stderr|
+      until (line = stdout.gets).nil?
+        errors.add(:base, line.strip)
+      end
+      stdout.close
+    end
+  end
+
   def main_workflow_present?
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
   end
@@ -123,30 +149,7 @@ class WorkflowCrateExtractor
   end
 
   def resolve_crate
-
-    do_validation = false
-    begin
-      Zip::File.open(ro_crate[:data].path) do |zip_file|
-        do_validation = zip_file.find_entry('ro-crate-metadata.json').present?
-      end
-    rescue Zip::Error
-      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
-      return false
-    end
-
-    # The validation library does not support version 1.0 crates
-    # They use ro-crate-metadata.jsonld rather than ro-crate-metadata.json
-    # So we only use this library if it contains a ro-crate-metadata.json file
-    if do_validation
-      Open4.open4(Seek::Util.python_exec("script/validate-ro-crate.py #{ro_crate[:data].path}")) do |_pid, _stdin, stdout, _stderr|
-        until (line = stdout.gets).nil?
-          errors.add(:base, line.strip)
-        end
-        stdout.close
-      end
-
-      return false if errors.any?
-    end
+    
 
     extract_crate
   end
