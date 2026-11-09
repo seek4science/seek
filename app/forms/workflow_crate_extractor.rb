@@ -11,8 +11,8 @@ class WorkflowCrateExtractor
   validate :not_nil
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
-  validate :source_url_and_version_present?, if: -> { detect_workflow }
-  validate :find_workflows_matching_id, if: -> { detect_workflow }
+  validate :source_url_and_version_present?, if: -> { detect_workflow && @crate.present? }
+  validate :find_workflows_matching_id, if: -> { detect_workflow && @crate.present? }
 
   def build(update_creators: true)
     if valid?
