@@ -4,6 +4,47 @@
 # Prefixes: jerm = http://jermontology.org/ontology/JERMOntology#
 #           dcterms = http://purl.org/dc/terms/
 #           foaf = http://xmlns.com/foaf/0.1/
+# The schema_* queries use the Schema.org / Bioschemas vocabulary:
+#           schema = https://schema.org/
+#           bioschemas = https://bioschemas.org/terms/
+
+schema_people:
+  title: "List all people (Schema.org)"
+  description: "Find all people with their names and the projects they are members of"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    SELECT DISTINCT ?person ?name ?projectName
+    WHERE {
+      ?person a schema:Person ;
+              schema:name ?name .
+      OPTIONAL {
+        ?person schema:memberOf ?project .
+        ?project a schema:Project ;
+                 schema:name ?projectName .
+      }
+    }
+    ORDER BY ?name
+
+schema_workflows:
+  title: "List all workflows (Schema.org)"
+  description: "Find all computational workflows with their names, workflow language and creators"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT DISTINCT ?workflow ?name ?language ?creatorName
+    WHERE {
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name .
+      OPTIONAL {
+        ?workflow schema:programmingLanguage ?lang .
+        ?lang schema:name ?language .
+      }
+      OPTIONAL {
+        ?workflow schema:creator ?creator .
+        ?creator schema:name ?creatorName .
+      }
+    }
+    ORDER BY ?name
 
 investigations:
   title: "List all investigations"

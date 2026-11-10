@@ -38,22 +38,26 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
     @organism = FactoryBot.create(:organism)
     @strain = FactoryBot.create(:strain, organism: @organism, projects: [@project],
                                          policy: FactoryBot.create(:public_policy))
+    @workflow = FactoryBot.create(:workflow, projects: [@project], contributor: @person,
+                                             creators: [@person], policy: FactoryBot.create(:public_policy))
 
-    rdf_items.each { |item| @repository.send_rdf(item) if item.rdf_supported? }
+    # the workflow's RO-Crate metadata uses the remote RO-Crate JSON-LD context
+    VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
+      rdf_items.each { |item| @repository.send_rdf(item) if item.rdf_supported? }
+    end
   end
 
   def teardown
     return unless @repository&.configured?
 
-    # remove_rdf only deletes triples with the item as the subject, and the store also picks up
-    # triples about related items, so clear the test graphs completely
+    # clear the test graphs completely, so nothing is left behind for other tests
     clear_test_graphs
     rdf_items.each { |item| item.delete_rdf_file if item.rdf_supported? }
   end
 
   def rdf_items
     [@investigation, @study, @assay, @data_file, @model, @sop,
-     @publication, @sample, @organism, @strain, @person, @project, @programme].compact
+     @publication, @sample, @organism, @strain, @person, @project, @programme, @workflow].compact
   end
 
   # Dynamically generate a test for each query in sparql_queries.yml.
@@ -82,5 +86,9 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
       query = @repository.query.delete(%i[s p o]).graph(RDF::URI.new(graph)).where(%i[s p o])
       @repository.delete(query)
     end
+    @repository.delete(<<~SPARQL)
+      DELETE { GRAPH ?g { ?s ?p ?o } }
+      WHERE { GRAPH ?g { ?s ?p ?o } FILTER(STRSTARTS(STR(?g), "#{config.private_graph}/items/")) }
+    SPARQL
   end
 end
