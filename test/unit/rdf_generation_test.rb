@@ -219,6 +219,35 @@ class RDFGenerationTest < ActiveSupport::TestCase
                  graph.query([nil, RDF.type, computational_workflow]).map { |s| s.subject.to_s }.sort
   end
 
+  test 'workflow rdf includes the programming language, inputs and outputs from the bioschemas json-ld' do
+    workflow = FactoryBot.create(:cwl_packed_workflow)
+    workflow.internals = workflow.extractor.metadata[:internals]
+    disable_authorization_checks { workflow.save! }
+    refute_empty workflow.inputs
+    refute_empty workflow.outputs
+    graph = VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
+      parse_rdf(workflow.to_rdf)
+    end
+
+    language = RDF::URI("#{workflow.rdf_seek_id}#cwl")
+    assert graph.has_statement?(RDF::Statement(workflow.rdf_resource, RDF::URI('https://schema.org/programmingLanguage'),
+                                               language))
+    assert graph.has_statement?(RDF::Statement(language, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('Common Workflow Language')))
+
+    formal_parameter = RDF::URI('https://bioschemas.org/terms/FormalParameter')
+    { 'https://bioschemas.org/terms/input' => workflow.inputs,
+      'https://bioschemas.org/terms/output' => workflow.outputs }.each do |property, parameters|
+      values = graph.query([workflow.rdf_resource, RDF::URI(property), nil]).map(&:object)
+      assert_equal parameters.count, values.count
+      values.each do |parameter|
+        assert parameter.uri?
+        assert parameter.to_s.start_with?("#{workflow.rdf_seek_id}#")
+        assert graph.has_statement?(RDF::Statement(parameter, RDF.type, formal_parameter))
+      end
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # Nested extended metadata
   # ---------------------------------------------------------------------------

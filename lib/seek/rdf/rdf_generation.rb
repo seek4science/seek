@@ -51,8 +51,10 @@ module Seek
 
       # Parses the JSON-LD string into statements, with any http://schema.org/ terms (such as those from the RO-Crate
       # context) changed to https://schema.org/, so that all Schema.org statements use the same namespace.
-      def jsonld_statements(json)
-        RDF::Reader.for(:jsonld).new(json).statements.map do |statement|
+      # Relative IRIs (e.g. "#cwl") are resolved against base_uri, the URL the JSON-LD is served from, unless the
+      # JSON-LD sets its own @base. Without a base they would be dropped, along with any statement that uses them.
+      def jsonld_statements(json, base_uri: rdf_resource)
+        RDF::Reader.for(:jsonld).new(json, base_uri: base_uri).statements.map do |statement|
           RDF::Statement.new(*statement.to_triple.map { |term| normalize_schema_org_term(term) })
         end
       end
