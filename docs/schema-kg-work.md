@@ -96,6 +96,16 @@ Bioschemas context to match.
 
 ### 3. Major: stale and orphaned triples build up in the store
 
+> **Status: addressed** in `lib/seek/rdf/rdf_repository.rb`. Each item's statements also go into a per-item named
+> graph (`<private_graph>/items/<Class>/<id>`) that records which aggregate graphs it fed (`dcterms:isPartOf`).
+> Removal deletes from each aggregate graph only the statements no other contributing item graph still holds, then
+> drops the item graph. Blank nodes are skolemized to `<site>/.well-known/genid/<uuid>`. Before this change they
+> were also disconnected, because each statement went in a separate `INSERT`. Inserts are now batched (200 per
+> request). Covered by new tests in `test/integration/rdf_triple_store_test.rb`. Existing stores must be cleared and
+> regenerated, because data sent before this change has no item graph and so can't be removed. A privacy change to a
+> related item still only clears its name from other items' graphs once those items regenerate: `Policy` enqueues
+> with `refresh_dependents: false`.
+
 `remove_rdf` deletes only `<item> ?p ?o`. The old CSV output only ever had the item as subject,
 so that was enough. The JSON-LD output does not:
 

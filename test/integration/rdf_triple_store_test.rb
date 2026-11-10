@@ -22,6 +22,11 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
       q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
       @repository.delete(q)
 
+      @repository.delete(<<~SPARQL)
+        DELETE { GRAPH ?g { ?s ?p ?o } }
+        WHERE { GRAPH ?g { ?s ?p ?o } FILTER(STRSTARTS(STR(?g), "#{@private_graph}/items/")) }
+      SPARQL
+
       @project.delete_rdf_file
     end
   end
@@ -86,13 +91,9 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     count = triple_count(@project)
 
-    q = @repository.query.select.where([@subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count
+    assert_equal count, count_in_graph(@project, @private_graph)
 
-    q = @repository.query.select.where([@subject, :p, :o]).from(@public_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count
+    assert_equal count, count_in_graph(@project, @public_graph)
 
     @repository.remove_rdf(@project)
     q = @repository.query.select.where([@subject, :p, :o]).from(@private_graph)
@@ -115,13 +116,9 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     count = triple_count(sop)
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count
+    assert_equal count, count_in_graph(sop, @private_graph)
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count
+    assert_equal count, count_in_graph(sop, @public_graph)
 
     sop.policy.access_type = Policy::NO_ACCESS
     sop.policy.save!
@@ -150,9 +147,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     count = triple_count(sop)
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count
+    assert_equal count, count_in_graph(sop, @private_graph)
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
@@ -218,9 +213,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     triple_count = triple_count(@project)
 
-    q = @repository.query.select.where([@subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal triple_count, result.count, 'there should be 5 statements in total'
+    assert_equal triple_count, count_in_graph(@project, @private_graph), 'there should be 5 statements in total'
 
     q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@private_graph)
     result = @repository.select(q)
@@ -232,9 +225,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     @repository.update_rdf(@project)
 
-    q = @repository.query.select.where([@subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal triple_count, result.count, "there should be #{triple_count} statements in total"
+    assert_equal triple_count, count_in_graph(@project, @private_graph), "there should be #{triple_count} statements in total"
 
     q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@private_graph)
     result = @repository.select(q)
@@ -257,13 +248,9 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     subject = sop.rdf_resource
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count, "there should be #{count} statements in total"
+    assert_equal count, count_in_graph(sop, @private_graph), "there should be #{count} statements in total"
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count, "there should be #{count} statements in total"
+    assert_equal count, count_in_graph(sop, @public_graph), "there should be #{count} statements in total"
 
     sop.policy.access_type = Policy::NO_ACCESS
     sop.policy.save!
@@ -272,9 +259,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     @repository.update_rdf(sop)
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count, "there should be #{count} statements in total"
+    assert_equal count, count_in_graph(sop, @private_graph), "there should be #{count} statements in total"
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
@@ -293,13 +278,9 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     @repository.update_rdf(sop)
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count, "there should be #{count} statements in total"
+    assert_equal count, count_in_graph(sop, @private_graph), "there should be #{count} statements in total"
 
-    q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count, "there should be #{count} statements in the public graph"
+    assert_equal count, count_in_graph(sop, @public_graph), "there should be #{count} statements in the public graph"
 
     q = @repository.query.select.where([subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@public_graph)
     result = @repository.select(q)
@@ -321,9 +302,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     rdf_resource = data_file.rdf_resource
 
     # check the count, and the type
-    q = @repository.query.select.where([data_file.rdf_resource, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count
+    assert_equal count, count_in_graph(data_file, @private_graph)
     q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
@@ -340,14 +319,106 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     # now check the count is the same, and the type has been updated
     assert_equal count,triple_count(data_file)
     assert_equal rdf_resource,data_file.rdf_resource
-    q = @repository.query.select.where([data_file.rdf_resource, :p, :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal count, result.count
+    assert_equal count, count_in_graph(data_file, @private_graph)
     q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
     assert_equal Seek::Rdf::JERMVocab.Simulation_data, result[0][:o].value
 
+  end
+
+  test 'send rdf records the item contribution in its own named graph' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    @repository.send_rdf(sop)
+    item_graph = @repository.item_graph_uri(sop)
+
+    assert_equal triple_count(sop), item_triple_count(sop)
+    assert_equal triple_count(sop), count_in_graph(sop, @private_graph)
+    assert_equal triple_count(sop), count_in_graph(sop, @public_graph)
+
+    q = @repository.query.select.where([item_graph, RDF::Vocab::DC.isPartOf, :g]).from(item_graph)
+    assert_equal [@private_graph.to_s, @public_graph.to_s].sort, @repository.select(q).map { |r| r[:g].to_s }.sort
+
+    sop.delete_rdf_file
+  end
+
+  test 'update rdf removes stale statements about other subjects' do
+    person = FactoryBot.create(:person, first_name: 'Old', last_name: 'Name')
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy), creators: [person])
+    @repository.send_rdf(sop)
+    assert_equal ['Old Name'], names_of(person, @private_graph)
+    assert_equal ['Old Name'], names_of(person, @public_graph)
+
+    disable_authorization_checks { person.update!(first_name: 'New') }
+    @repository.update_rdf(Sop.find(sop.id))
+
+    assert_equal ['New Name'], names_of(person, @private_graph)
+    assert_equal ['New Name'], names_of(person, @public_graph)
+
+    sop.delete_rdf_file
+  end
+
+  test 'remove rdf keeps statements still asserted by another item' do
+    person = FactoryBot.create(:person, first_name: 'Shared', last_name: 'Creator')
+    sop1 = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy), creators: [person])
+    sop2 = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy), creators: [person])
+    @repository.send_rdf(sop1)
+    @repository.send_rdf(sop2)
+
+    @repository.remove_rdf(sop1)
+    assert_equal 0, item_triple_count(sop1)
+    assert_equal ['Shared Creator'], names_of(person, @private_graph)
+    assert_equal ['Shared Creator'], names_of(person, @public_graph)
+    q = @repository.query.select.where([sop1.rdf_resource, :p, :o]).from(@private_graph)
+    assert_empty @repository.select(q)
+
+    @repository.remove_rdf(sop2)
+    assert_empty names_of(person, @private_graph)
+    assert_empty names_of(person, @public_graph)
+  end
+
+  test 'remove rdf from public graph ignores statements only asserted by private items' do
+    person = FactoryBot.create(:person, first_name: 'Mixed', last_name: 'Visibility')
+    public_sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy), creators: [person])
+    private_sop = FactoryBot.create(:sop, policy: FactoryBot.create(:private_policy), creators: [person])
+    @repository.send_rdf(public_sop)
+    @repository.send_rdf(private_sop)
+
+    @repository.remove_rdf(public_sop)
+    assert_empty names_of(person, @public_graph)
+    assert_equal ['Mixed Visibility'], names_of(person, @private_graph)
+
+    private_sop.delete_rdf_file
+  end
+
+  test 'blank nodes are skolemized and do not accumulate' do
+    data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy))
+    distribution = RDF::URI('https://schema.org/distribution')
+
+    @repository.send_rdf(data_file)
+    @repository.update_rdf(data_file)
+    @repository.update_rdf(data_file)
+
+    q = @repository.query.select.where([data_file.rdf_resource, distribution, :d]).from(@private_graph)
+    result = @repository.select(q)
+    assert_equal 1, result.count
+    skolem = result[0][:d]
+    assert skolem.uri?
+    assert skolem.to_s.start_with?(Seek::Config.site_base_url.join('.well-known/genid/').to_s)
+
+    q = @repository.query.select.where([skolem, :p, :o]).from(@private_graph)
+    refute_empty @repository.select(q)
+    assert_equal triple_count(data_file), count_in_graph(data_file, @private_graph)
+    assert_equal 1, @repository.select(<<~SPARQL)[0][:c].object.to_i
+      SELECT (COUNT(DISTINCT ?d) AS ?c) WHERE {
+        GRAPH #{@private_graph.to_base} { ?d a <https://schema.org/DataDownload> }
+        FILTER(STRSTARTS(STR(?d), "#{Seek::Config.site_base_url.join('.well-known/genid/')}"))
+      }
+    SPARQL
+
+    @repository.remove_rdf(data_file)
+    q = @repository.query.select.where([skolem, :p, :o]).from(@private_graph)
+    assert_empty @repository.select(q)
   end
 
   private
@@ -357,5 +428,32 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   def triple_count(object)
     rdf = object.to_rdf
     RDF::Reader.for(:ttl).new(rdf).statements.count
+  end
+
+  # the number of statements in the item's named graph, excluding the record of which graphs it is part of
+  def item_triple_count(item)
+    item_graph = @repository.item_graph_uri(item)
+    @repository.select(<<~SPARQL)[0][:c].object.to_i
+      SELECT (COUNT(*) AS ?c) WHERE {
+        GRAPH #{item_graph.to_base} { ?s ?p ?o }
+        FILTER(?p != #{RDF::Vocab::DC.isPartOf.to_base})
+      }
+    SPARQL
+  end
+
+  # the number of the item's statements that are present in graph
+  def count_in_graph(item, graph)
+    item_graph = @repository.item_graph_uri(item)
+    @repository.select(<<~SPARQL)[0][:c].object.to_i
+      SELECT (COUNT(*) AS ?c) WHERE {
+        GRAPH #{item_graph.to_base} { ?s ?p ?o }
+        GRAPH #{RDF::URI(graph).to_base} { ?s ?p ?o }
+      }
+    SPARQL
+  end
+
+  def names_of(item, graph)
+    q = @repository.query.select.where([item.rdf_resource, RDF::URI('https://schema.org/name'), :name]).from(graph)
+    @repository.select(q).map { |r| r[:name].to_s }
   end
 end
