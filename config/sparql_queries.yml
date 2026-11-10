@@ -46,6 +46,24 @@ schema_workflows:
     }
     ORDER BY ?name
 
+schema_cwl_workflows:
+  title: "List all CWL workflows (Schema.org)"
+  description: "Find all workflows whose programming language has the identifier https://w3id.org/cwl/v1.0/"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT DISTINCT ?workflow ?name ?language
+    WHERE {
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name ;
+                schema:programmingLanguage ?lang .
+      ?lang schema:identifier <https://w3id.org/cwl/v1.0/> ;
+            schema:name ?language .
+      # exclude the workflow files described in the RO-Crates, to list each workflow once
+      FILTER NOT EXISTS { ?workflow a schema:MediaObject }
+    }
+    ORDER BY ?name
+
 investigations:
   title: "List all investigations"
   description: "Find all investigations with their titles"
