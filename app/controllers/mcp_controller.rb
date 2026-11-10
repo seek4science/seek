@@ -6,7 +6,7 @@ class McpController < ApplicationController
     server = MCP::Server.new(
       name: 'seek_mcp_server', # TODO: Make this configurable
       title: "#{Seek::Config.instance_name} MCP",
-      version: Seek::Version::APP_VERSION,
+      version: Seek::Version::APP_VERSION.to_s,
       tools: tools,
       server_context: { user_id: current_user&.id },
     )

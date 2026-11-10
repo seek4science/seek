@@ -13,6 +13,7 @@ class McpTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal 'seek_mcp_server', response.parsed_body.dig('result', 'serverInfo', 'name')
+    assert_match /\d\..+/, response.parsed_body.dig('result', 'serverInfo', 'version')
   end
 
   test 'lists registered tools' do
