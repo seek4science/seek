@@ -210,7 +210,7 @@ class Workflow < ApplicationRecord
     metadata = latest_version.ro_crate.metadata
     json = metadata.generate
     json = JSON.parse(json)
-    json["@context"] = ['https://w3id.org/ro/crate/1.1/context', { "@base": "#{rdf_seek_id}/crate/" } ]
+    json["@context"] = [json["@context"], { "@base": "#{rdf_seek_id}/crate/" }].flatten
     JSON.generate json
   end
 

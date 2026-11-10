@@ -197,7 +197,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
     refute FactoryBot.create(:document).rdf_supported?
   end
 
-  test 'workflow rdf uses https schema.org for both the bioschemas and ro-crate statements' do
+  test 'workflow rdf uses the same schema.org and bioschemas terms for the bioschemas and ro-crate statements' do
     workflow = FactoryBot.create(:workflow)
     graph = VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
       parse_rdf(workflow.to_rdf)
@@ -210,8 +210,13 @@ class RDFGenerationTest < ActiveSupport::TestCase
     assert graph.has_statement?(RDF::Statement(crate, RDF.type, RDF::URI('https://schema.org/Dataset')))
     assert graph.has_statement?(RDF::Statement(workflow.rdf_resource, RDF::URI('https://schema.org/name'),
                                                RDF::Literal('This Workflow')))
-    assert graph.has_statement?(RDF::Statement(RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl"),
-                                               RDF::URI('https://schema.org/name'), RDF::Literal('This Workflow')))
+    main_file = RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl")
+    assert graph.has_statement?(RDF::Statement(main_file, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('This Workflow')))
+
+    computational_workflow = RDF::URI('https://bioschemas.org/terms/ComputationalWorkflow')
+    assert_equal [workflow.rdf_resource, main_file].map(&:to_s).sort,
+                 graph.query([nil, RDF.type, computational_workflow]).map { |s| s.subject.to_s }.sort
   end
 
   # ---------------------------------------------------------------------------
