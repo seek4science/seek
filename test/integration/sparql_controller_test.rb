@@ -35,7 +35,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_select '#content .container-fluid' do
       assert_select 'div#error_flash', count: 0
       assert_select 'div.sparql-interface' do
-        assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
+        assert_select 'form[action=?][method=?]', query_sparql_index_path, 'get' do
           assert_select 'textarea.sparql-textarea', text: ''
           assert_select 'select#format option[selected=selected][value=?]', 'html'
         end
@@ -51,7 +51,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'div#error_flash', count: 0
     assert_select 'div.sparql-interface' do
-      assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
+      assert_select 'form[action=?][method=?]', query_sparql_index_path, 'get' do
         assert_select 'textarea.sparql-textarea', text: query
         assert_select 'select#format option[selected=selected][value=?]', format
       end
@@ -160,6 +160,27 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     assert_match /SPARQL compiler, line 3: syntax error at 'SEECT'/, json['error']
 
+  end
+
+  # the form is submitted with GET, so the results page can be returned to with the back button without resubmitting
+  test 'get sparql query and html response' do
+    create_some_triples
+    query = 'ask where {?s ?p ?o}'
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+    assert_select 'div#query-error', count: 0
+    assert_select 'form[action=?][method=?]', query_sparql_index_path, 'get' do
+      assert_select 'textarea.sparql-textarea', text: query
+      assert_select 'input[type=submit][name]', count: 0
+    end
+    assert_select 'div#sparql-results table' do
+      assert_select 'tbody td', text: 'true', count: 1
+    end
+
+    get query_sparql_index_path, params: { sparql_query: query, format: 'json' }
+    assert_response :success
+    assert_equal({ 'result' => 'true' }, JSON.parse(@response.body)['results'].first)
   end
 
   test 'handle single result e.g ask' do

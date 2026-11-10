@@ -852,6 +852,7 @@ SEEK::Application.routes.draw do
   ### SPARQL ###
   resources :sparql, only: [:index] do
     collection do
+      get :query
       post :query
     end
   end
