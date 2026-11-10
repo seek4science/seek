@@ -197,6 +197,23 @@ class RDFGenerationTest < ActiveSupport::TestCase
     refute FactoryBot.create(:document).rdf_supported?
   end
 
+  test 'workflow rdf uses https schema.org for both the bioschemas and ro-crate statements' do
+    workflow = FactoryBot.create(:workflow)
+    graph = VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
+      parse_rdf(workflow.to_rdf)
+    end
+
+    terms = graph.statements.flat_map(&:to_triple).select(&:uri?).map(&:to_s)
+    assert_empty terms.select { |t| t.start_with?('http://schema.org/') }
+
+    crate = RDF::URI("#{workflow.rdf_seek_id}/crate/")
+    assert graph.has_statement?(RDF::Statement(crate, RDF.type, RDF::URI('https://schema.org/Dataset')))
+    assert graph.has_statement?(RDF::Statement(workflow.rdf_resource, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('This Workflow')))
+    assert graph.has_statement?(RDF::Statement(RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl"),
+                                               RDF::URI('https://schema.org/name'), RDF::Literal('This Workflow')))
+  end
+
   # ---------------------------------------------------------------------------
   # Nested extended metadata
   # ---------------------------------------------------------------------------

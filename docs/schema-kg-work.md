@@ -84,6 +84,12 @@ already on `main`.
 
 ### 2. Blocking: Schema.org namespace mismatch (`http` vs `https`)
 
+> **Status: addressed.** `RdfGeneration#jsonld_statements` rewrites `http://schema.org/` terms to
+> `https://schema.org/` when JSON-LD is read in, and the `schema` prefix is now `https://schema.org/`. Covered by a
+> unit test in `rdf_generation_test.rb` and a workflow update test in `rdf_triple_store_test.rb`. Still open: the
+> RO-Crate context types the main workflow file as `https://bioschemas.org/ComputationalWorkflow`, while SEEK's
+> Bioschemas output uses `https://bioschemas.org/terms/ComputationalWorkflow`.
+
 The Bioschemas serializer uses `@vocab: https://schema.org/`. The RO-Crate 1.1 context maps terms
 to `http://schema.org/` (for example `"Dataset": "http://schema.org/Dataset"` in the cassette).
 The new `schema` prefix in `ns_prefixes` is also `http://schema.org/`.

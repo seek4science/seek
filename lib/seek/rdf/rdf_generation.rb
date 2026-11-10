@@ -7,6 +7,9 @@ module Seek
       include Rightfield::Rightfield
       include CSVMappingsHandling
 
+      SCHEMA_ORG = 'https://schema.org/'.freeze
+      SCHEMA_ORG_HTTP = 'http://schema.org/'.freeze
+
       def self.included(base)
         base.after_commit :queue_rdf_generation, on: [:create, :update]
         base.before_destroy :remove_rdf
@@ -44,6 +47,20 @@ module Seek
         #rdf_graph = extended_metadata_triples rdf_graph
         #rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
         rdf_graph
+      end
+
+      # Parses the JSON-LD string into statements, with any http://schema.org/ terms (such as those from the RO-Crate
+      # context) changed to https://schema.org/, so that all Schema.org statements use the same namespace.
+      def jsonld_statements(json)
+        RDF::Reader.for(:jsonld).new(json).statements.map do |statement|
+          RDF::Statement.new(*statement.to_triple.map { |term| normalize_schema_org_term(term) })
+        end
+      end
+
+      def normalize_schema_org_term(term)
+        return term unless term.uri? && term.to_s.start_with?(SCHEMA_ORG_HTTP)
+
+        RDF::URI(SCHEMA_ORG + term.to_s.delete_prefix(SCHEMA_ORG_HTTP))
       end
 
       def handle_rightfield_contents(object)
@@ -138,8 +155,7 @@ module Seek
           'uniprot' => 'http://purl.uniprot.org/core/',
           'fairbd' => 'http://fairbydesign.nl/ontology/',
           'xsd' => 'http://www.w3.org/2001/XMLSchema#',
-          'schema' => 'http://schema.org/'
-
+          'schema' => SCHEMA_ORG
         }
       end
 

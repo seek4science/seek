@@ -57,8 +57,7 @@ module Seek
             item = eval(transformation)
           end
           if uri_or_literal.casecmp('j').zero?
-            statements = RDF::Reader.for(:jsonld).new(item).statements
-            rdf_graph << statements
+            rdf_graph.insert(*jsonld_statements(item))
           else
             o = if uri_or_literal.casecmp('u').zero?
                   handle_uri_for_item(item)

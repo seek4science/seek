@@ -84,6 +84,48 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     @repository.send_rdf(inst)
   end
 
+  test 'update rdf for a workflow replaces the bioschemas and ro-crate statements' do
+    workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:public_policy), title: 'Original title')
+    crate = RDF::URI("#{workflow.rdf_seek_id}/crate/")
+    main_file = RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl")
+    name = RDF::URI('https://schema.org/name')
+
+    VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
+      # generating the RO-Crate creates the workflow diagram, which then adds a schema:image statement, so generate
+      # it once first to keep the statement count stable
+      workflow.to_rdf
+      @repository.send_rdf(workflow)
+      count = triple_count(workflow)
+      assert_equal count, count_in_graph(workflow, @private_graph)
+      assert_equal count, count_in_graph(workflow, @public_graph)
+      assert_equal ['Original title'], values_of(workflow.rdf_resource, name, @public_graph)
+      assert_equal ['Original title'], values_of(main_file, name, @public_graph)
+      assert_equal ['Research Object Crate for Original title'], values_of(crate, name, @public_graph)
+
+      disable_authorization_checks { workflow.update!(title: 'Updated title') }
+      workflow = Workflow.find(workflow.id)
+      @repository.update_rdf(workflow)
+
+      assert_equal triple_count(workflow), count_in_graph(workflow, @private_graph)
+      [@private_graph, @public_graph].each do |graph|
+        assert_equal ['Updated title'], values_of(workflow.rdf_resource, name, graph)
+        assert_equal ['Updated title'], values_of(main_file, name, graph)
+        assert_equal ['Research Object Crate for Updated title'], values_of(crate, name, graph)
+      end
+    end
+
+    assert_equal 0, @repository.select(<<~SPARQL)[0][:c].object.to_i
+      SELECT (COUNT(*) AS ?c) WHERE {
+        GRAPH #{@private_graph.to_base} { ?s ?p ?o }
+        FILTER(STRSTARTS(STR(?p), "http://schema.org/") || STRSTARTS(STR(?o), "http://schema.org/"))
+      }
+    SPARQL
+
+    @repository.remove_rdf(workflow)
+    assert_empty values_of(crate, name, @private_graph)
+    assert_empty values_of(main_file, name, @private_graph)
+  end
+
   test 'remove public from store' do
     assert @project.can_view?(nil)
     @repository.send_rdf(@project)
@@ -453,7 +495,11 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   end
 
   def names_of(item, graph)
-    q = @repository.query.select.where([item.rdf_resource, RDF::URI('https://schema.org/name'), :name]).from(graph)
-    @repository.select(q).map { |r| r[:name].to_s }
+    values_of(item.rdf_resource, RDF::URI('https://schema.org/name'), graph)
+  end
+
+  def values_of(subject, predicate, graph)
+    q = @repository.query.select.where([subject, predicate, :value]).from(graph)
+    @repository.select(q).map { |r| r[:value].to_s }
   end
 end
