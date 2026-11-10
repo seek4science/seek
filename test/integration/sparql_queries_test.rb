@@ -41,10 +41,7 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
     @workflow = FactoryBot.create(:workflow, projects: [@project], contributor: @person,
                                              creators: [@person], policy: FactoryBot.create(:public_policy))
 
-    # the workflow's RO-Crate metadata uses the remote RO-Crate JSON-LD context
-    VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
-      rdf_items.each { |item| @repository.send_rdf(item) if item.rdf_supported? }
-    end
+    rdf_items.each { |item| @repository.send_rdf(item) if item.rdf_supported? }
   end
 
   def teardown

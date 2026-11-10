@@ -199,9 +199,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
   test 'workflow rdf uses the same schema.org and bioschemas terms for the bioschemas and ro-crate statements' do
     workflow = FactoryBot.create(:workflow)
-    graph = VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
-      parse_rdf(workflow.to_rdf)
-    end
+    graph = parse_rdf(workflow.to_rdf)
 
     terms = graph.statements.flat_map(&:to_triple).select(&:uri?).map(&:to_s)
     assert_empty terms.select { |t| t.start_with?('http://schema.org/') }
@@ -225,9 +223,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { workflow.save! }
     refute_empty workflow.inputs
     refute_empty workflow.outputs
-    graph = VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
-      parse_rdf(workflow.to_rdf)
-    end
+    graph = parse_rdf(workflow.to_rdf)
 
     language = RDF::URI("#{workflow.rdf_seek_id}#cwl")
     assert graph.has_statement?(RDF::Statement(workflow.rdf_resource, RDF::URI('https://schema.org/programmingLanguage'),
@@ -245,6 +241,20 @@ class RDFGenerationTest < ActiveSupport::TestCase
         assert parameter.to_s.start_with?("#{workflow.rdf_seek_id}#")
         assert graph.has_statement?(RDF::Statement(parameter, RDF.type, formal_parameter))
       end
+    end
+  end
+
+  test 'ro-crate json-ld contexts are preloaded and not fetched' do
+    Seek::Rdf::JSONLdContexts::CONTEXTS.each do |url, filename|
+      document = JSON.parse(File.read(File.join(Seek::Rdf::JSONLdContexts::DIRECTORY, filename)))
+      assert_equal url, document['@id']
+
+      # WebMock blocks any remote request, so this fails if the context would be fetched
+      json = { '@context' => url, '@id' => 'http://example.com/crate/', '@type' => 'Dataset', 'name' => 'A crate' }
+      statements = RDF::Reader.for(:jsonld).new(json.to_json).statements
+      assert_includes statements.map { |st| [st.predicate.to_s, st.object.to_s] }, ['http://schema.org/name', 'A crate']
+      assert_includes statements.map { |st| [st.predicate.to_s, st.object.to_s] },
+                      [RDF.type.to_s, 'http://schema.org/Dataset']
     end
   end
 

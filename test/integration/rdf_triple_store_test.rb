@@ -69,9 +69,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     wf = FactoryBot.create(:max_workflow, projects: [@project], title: 'RDF test workflow')
     df = FactoryBot.create(:data_file, projects: [@project], title: 'RDF test data file')
     @project.reload
-    VCR.use_cassette('workflow/ro_crate_context') do
-      @repository.send_rdf(wf)
-    end
+    @repository.send_rdf(wf)
 
     # @repository.send_rdf(@project)
     @repository.send_rdf(df)
@@ -90,28 +88,26 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     main_file = RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl")
     name = RDF::URI('https://schema.org/name')
 
-    VCR.use_cassette('workflow/ro_crate_context', allow_playback_repeats: true) do
-      # generating the RO-Crate creates the workflow diagram, which then adds a schema:image statement, so generate
-      # it once first to keep the statement count stable
-      workflow.to_rdf
-      @repository.send_rdf(workflow)
-      count = triple_count(workflow)
-      assert_equal count, count_in_graph(workflow, @private_graph)
-      assert_equal count, count_in_graph(workflow, @public_graph)
-      assert_equal ['Original title'], values_of(workflow.rdf_resource, name, @public_graph)
-      assert_equal ['Original title'], values_of(main_file, name, @public_graph)
-      assert_equal ['Research Object Crate for Original title'], values_of(crate, name, @public_graph)
+    # generating the RO-Crate creates the workflow diagram, which then adds a schema:image statement, so generate
+    # it once first to keep the statement count stable
+    workflow.to_rdf
+    @repository.send_rdf(workflow)
+    count = triple_count(workflow)
+    assert_equal count, count_in_graph(workflow, @private_graph)
+    assert_equal count, count_in_graph(workflow, @public_graph)
+    assert_equal ['Original title'], values_of(workflow.rdf_resource, name, @public_graph)
+    assert_equal ['Original title'], values_of(main_file, name, @public_graph)
+    assert_equal ['Research Object Crate for Original title'], values_of(crate, name, @public_graph)
 
-      disable_authorization_checks { workflow.update!(title: 'Updated title') }
-      workflow = Workflow.find(workflow.id)
-      @repository.update_rdf(workflow)
+    disable_authorization_checks { workflow.update!(title: 'Updated title') }
+    workflow = Workflow.find(workflow.id)
+    @repository.update_rdf(workflow)
 
-      assert_equal triple_count(workflow), count_in_graph(workflow, @private_graph)
-      [@private_graph, @public_graph].each do |graph|
-        assert_equal ['Updated title'], values_of(workflow.rdf_resource, name, graph)
-        assert_equal ['Updated title'], values_of(main_file, name, graph)
-        assert_equal ['Research Object Crate for Updated title'], values_of(crate, name, graph)
-      end
+    assert_equal triple_count(workflow), count_in_graph(workflow, @private_graph)
+    [@private_graph, @public_graph].each do |graph|
+      assert_equal ['Updated title'], values_of(workflow.rdf_resource, name, graph)
+      assert_equal ['Updated title'], values_of(main_file, name, graph)
+      assert_equal ['Research Object Crate for Updated title'], values_of(crate, name, graph)
     end
 
     assert_equal 0, @repository.select(<<~SPARQL)[0][:c].object.to_i

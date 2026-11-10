@@ -135,6 +135,12 @@ example by tracking subjects, or deleting by `prov`/`dct:source` provenance).
 
 ### 4. Major: RDF generation makes network calls
 
+> **Status: addressed.** The RO-Crate 1.1, 1.2 and 1.3 JSON-LD contexts (CC0) are kept in
+> `lib/seek/rdf/json_ld_contexts/`, and `Seek::Rdf::JSONLdContexts.preload` registers them with
+> `JSON::LD::Context.add_preloaded` at boot, so they are never fetched. The VCR cassette is gone. A test checks that
+> each context resolves while WebMock blocks HTTP. A crate declaring a newer RO-Crate version would still be fetched
+> until its context is added.
+
 The RO-Crate `@context` is a remote URL (`https://w3id.org/ro/crate/1.1/context`, a 302 redirect
 to researchobject.org). The JSON-LD reader fetches it every time it parses. That is why the test
 needs a VCR cassette. In production, every Workflow RDF generation makes two HTTP requests, and
