@@ -64,6 +64,46 @@ schema_cwl_workflows:
     }
     ORDER BY ?name
 
+schema_ro_crates:
+  title: "List all RO-Crates (Schema.org)"
+  description: "Find all RO-Crates, with the RO-Crate specification version and any profiles they conform to"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX dct: <http://purl.org/dc/terms/>
+    SELECT ?crate ?name ?specification (GROUP_CONCAT(DISTINCT ?profile; separator=", ") AS ?profiles)
+    WHERE {
+      # an RO-Crate is identified by its metadata file, which conforms to an RO-Crate specification
+      ?metadata schema:about ?crate ;
+                dct:conformsTo ?specification .
+      FILTER(STRSTARTS(STR(?specification), "https://w3id.org/ro/crate/"))
+      OPTIONAL { ?crate schema:name ?name }
+      OPTIONAL {
+        ?metadata dct:conformsTo ?profile .
+        FILTER(!STRSTARTS(STR(?profile), "https://w3id.org/ro/crate/"))
+      }
+    }
+    GROUP BY ?crate ?name ?specification
+    ORDER BY ?name
+
+schema_workflow_files:
+  title: "List all workflow files (Schema.org)"
+  description: "Find all workflow files within RO-Crates, with their workflow language and the crate they belong to"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT DISTINCT ?file ?name ?language ?crate
+    WHERE {
+      # within an RO-Crate, a workflow file is both a File (schema:MediaObject) and a ComputationalWorkflow
+      ?file a bioschemas:ComputationalWorkflow , schema:MediaObject .
+      OPTIONAL { ?file schema:name ?name }
+      OPTIONAL { ?file schema:programmingLanguage/schema:name ?language }
+      OPTIONAL {
+        ?metadata schema:about ?crate .
+        ?crate schema:hasPart ?file .
+      }
+    }
+    ORDER BY ?name
+
 investigations:
   title: "List all investigations"
   description: "Find all investigations with their titles"
