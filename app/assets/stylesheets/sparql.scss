@@ -121,3 +121,8 @@
     }
   }
 }
+
+// long values, such as URIs in the SPARQL results, would otherwise run out of the popover
+.popover-content {
+  overflow-wrap: break-word;
+}

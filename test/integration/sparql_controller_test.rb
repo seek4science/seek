@@ -183,6 +183,24 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_equal({ 'result' => 'true' }, JSON.parse(@response.body)['results'].first)
   end
 
+  test 'links in the results have a tooltip with the full value' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    query = 'SELECT ?datafile ?name WHERE {
+        ?datafile a <https://schema.org/Dataset> ;
+                  <https://schema.org/name> ?name .
+        FILTER(?name = "public data file")
+      }'
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+    assert_select 'div#sparql-results table tbody' do
+      assert_select 'td a.external-link[href=?][data-tooltip=?]', data_file.rdf_seek_id, data_file.rdf_seek_id,
+                    text: data_file.rdf_seek_id
+      assert_select 'td', text: 'public data file'
+    end
+  end
+
   test 'handle single result e.g ask' do
       path = query_sparql_index_path
       create_some_triples
