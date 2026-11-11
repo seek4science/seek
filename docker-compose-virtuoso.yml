@@ -111,11 +111,12 @@ services:
     image: openlink/virtuoso-opensource-7:7.2.15
     restart: always
     ports:
-      # HTTP: the SPARQL endpoint (/sparql) and Conductor admin UI (/conductor). Set VIRTUOSO_PORT to use another
-      # host port, e.g. if 8890 is already in use
-      - "${VIRTUOSO_PORT:-8890}:8890"
+      # HTTP: the SPARQL endpoint (/sparql) and Conductor admin UI (/conductor), published on host port 9890 to avoid
+      # clashing with another Virtuoso on 8890. Set VIRTUOSO_PORT to use a different host port. Within the compose
+      # network it is always virtuoso:8890
+      - "${VIRTUOSO_PORT:-9890}:8890"
       # isql admin port, only reachable from the host itself as it accepts the DBA password
-      - "127.0.0.1:${VIRTUOSO_ISQL_PORT:-1111}:1111"
+      - "127.0.0.1:${VIRTUOSO_ISQL_PORT:-9111}:1111"
     environment:
       DBA_PASSWORD: CHANGE_ME
     volumes:
