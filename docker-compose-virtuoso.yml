@@ -1,7 +1,7 @@
 x-shared:
   seek_base: &seek_base
     # build: .
-    image: fairdom/seek:main
+    image: fairdom/seek:kg
 
     restart: always
     environment: &seek_base_env
@@ -14,8 +14,8 @@ x-shared:
       - docker/redis.env
       - docker/virtuoso.env
     volumes:
-      - seek-filestore:/seek/filestore
-      - seek-cache:/seek/tmp/cache
+      - kg-seek-filestore:/seek/filestore
+      - kg-seek-cache:/seek/tmp/cache
     depends_on:
       db:
         condition: service_healthy
@@ -28,7 +28,6 @@ services:
   db:
     # Database implementation, in this case MySQL
     image: mysql:8.4
-    container_name: seek-mysql
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
@@ -42,7 +41,7 @@ services:
     env_file:
       - docker/db.env
     volumes:
-      - seek-mysql-db:/var/lib/mysql
+      - kg-seek-mysql-db:/var/lib/mysql
     healthcheck:
       test:
         [
@@ -56,7 +55,6 @@ services:
 
   redis_store:
     image: redis:8.6-alpine
-    container_name: seek-redis
     command:
       - sh
       - -c
@@ -64,7 +62,7 @@ services:
     env_file:
       - docker/redis.env
     volumes:
-      - seek-redis-data:/data
+      - kg-seek-redis-data:/data
     restart: always
     healthcheck:
       test:
@@ -80,7 +78,6 @@ services:
   seek:
     # The SEEK application
     <<: *seek_base
-    container_name: seek
     command: docker/entrypoint.sh
     ports:
       - "3000:3000"
@@ -97,7 +94,6 @@ services:
   seek_workers:
     # The SEEK delayed job workers
     <<: *seek_base
-    container_name: seek-workers
     environment:
       <<: *seek_base_env
       QUIET_SUPERCRONIC: 1
@@ -105,29 +101,30 @@ services:
 
   solr:
     image: fairdom/seek-solr:main
-    container_name: seek-solr
     restart: always
     environment:
       SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
-      - seek-solr-data:/var/solr/
+      - kg-seek-solr-data:/var/solr/
 
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.15
-    container_name: seek-virtuoso
     restart: always
     ports:
-      - "8890:8890"
-      - "1111:1111"
+      # HTTP: the SPARQL endpoint (/sparql) and Conductor admin UI (/conductor). Set VIRTUOSO_PORT to use another
+      # host port, e.g. if 8890 is already in use
+      - "${VIRTUOSO_PORT:-8890}:8890"
+      # isql admin port, only reachable from the host itself as it accepts the DBA password
+      - "127.0.0.1:${VIRTUOSO_ISQL_PORT:-1111}:1111"
     environment:
       DBA_PASSWORD: CHANGE_ME
     volumes:
-      - seek-virtuoso-data:/database
+      - kg-seek-virtuoso-data:/database
 
 volumes:
-  seek-filestore:
-  seek-mysql-db:
-  seek-solr-data:
-  seek-cache:
-  seek-virtuoso-data:
-  seek-redis-data:
+  kg-seek-filestore:
+  kg-seek-mysql-db:
+  kg-seek-solr-data:
+  kg-seek-cache:
+  kg-seek-virtuoso-data:
+  kg-seek-redis-data:
