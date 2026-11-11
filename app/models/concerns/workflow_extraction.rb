@@ -5,6 +5,20 @@ module WorkflowExtraction
 
   extend ActiveSupport::Concern
 
+  # How an uploaded RO-Crate is regenerated, when Seek::Config.regenerate_workflow_ro_crates is set:
+  #   replace_all - SEEK's values replace those of the uploaded main workflow
+  #   replace_seek - SEEK's values replace those of the uploaded main workflow that describe SEEK's record of it
+  #                  (SEEK_RECORD_PROPERTIES), other properties are only added if missing
+  #   fill_missing - SEEK's values are only added where the uploaded main workflow has none
+  #   new_crate - a new crate holding the uploaded files, described only by SEEK
+  RO_CRATE_REGENERATION_STRATEGIES = %w[replace_all replace_seek fill_missing new_crate].freeze
+
+  SEEK_RECORD_PROPERTIES = %w[url identifier isBasedOn contributor producer creator license version dateCreated
+                              dateModified sdPublisher].freeze
+
+  # Properties of the main workflow that describe the crate's own structure, which are never replaced
+  CRATE_STRUCTURE_PROPERTIES = %w[@id @type image subjectOf].freeze
+
   def workflow_class_title
     workflow_class ? workflow_class.title : 'Unrecognized workflow type'
   end
@@ -43,6 +57,20 @@ module WorkflowExtraction
   # crate, or Seek::Config.regenerate_workflow_ro_crates is set, otherwise it is provided as it was uploaded.
   def should_generate_crate?
     is_basic_ro_crate? || !is_already_ro_crate? || Seek::Config.regenerate_workflow_ro_crates
+  end
+
+  # Whether this is an uploaded (not basic) RO-Crate that SEEK regenerates
+  def regenerating_uploaded_crate?
+    is_already_ro_crate? && !is_basic_ro_crate? && Seek::Config.regenerate_workflow_ro_crates
+  end
+
+  # The strategy for regenerating the crate, see RO_CRATE_REGENERATION_STRATEGIES. Crates that SEEK generates, or
+  # basic crates, only have the missing properties added.
+  def ro_crate_regeneration_strategy
+    return 'fill_missing' unless regenerating_uploaded_crate?
+
+    strategy = Seek::Config.workflow_ro_crate_regeneration_strategy
+    RO_CRATE_REGENERATION_STRATEGIES.include?(strategy) ? strategy : 'replace_all'
   end
 
   def internals
@@ -177,7 +205,7 @@ module WorkflowExtraction
     crate
   end
 
-  def merge_entities(crate, workflow)
+  def merge_entities(crate, workflow, strategy = ro_crate_regeneration_strategy)
     workflow_struct = Seek::BioSchema::Serializer.new(workflow).json_representation
 
     context = {
@@ -192,11 +220,12 @@ module WorkflowExtraction
     flattened = JSON::LD::API.flatten(workflow_struct, context)
     flattened.except!('@context')
 
+    replaced_ids = []
     flattened['@graph'].each do |elem|
       type = elem['@type']
       type = [type] unless type.is_a?(Array)
       if type.include?('ComputationalWorkflow') && crate.main_workflow
-        merge_fields(crate.main_workflow, elem)
+        replaced_ids += merge_fields(crate.main_workflow, elem, strategy)
       else
         entity_class = ROCrate::ContextualEntity.specialize(elem)
         elem['@id'] = URI.decode_www_form_component(elem['@id'])
@@ -204,12 +233,70 @@ module WorkflowExtraction
         crate.add_contextual_entity(entity)
       end
     end
+
+    remove_unlinked_entities(crate, replaced_ids)
   end
 
-  def merge_fields(crate_workflow, bioschemas_workflow)
+  # Adds the properties of the Bioschemas workflow to the crate's main workflow, replacing existing values according
+  # to the strategy (see RO_CRATE_REGENERATION_STRATEGIES). A blank value never replaces an existing one.
+  # Returns the ids of the entities that the replaced values referred to.
+  def merge_fields(crate_workflow, bioschemas_workflow, strategy = 'fill_missing')
+    replaced_ids = []
     bioschemas_workflow.each do |key, value|
-      crate_workflow[key] = value unless crate_workflow[key]
+      next if CRATE_STRUCTURE_PROPERTIES.include?(key)
+
+      existing = crate_workflow[key]
+      if existing.nil?
+        crate_workflow[key] = value
+      elsif value.present? && replace_field?(key, strategy)
+        replaced_ids += Array.wrap(existing).filter_map { |v| v['@id'] if v.is_a?(Hash) }
+        crate_workflow[key] = value
+      end
     end
+    replaced_ids
+  end
+
+  def replace_field?(key, strategy)
+    case strategy
+    when 'replace_all'
+      true
+    when 'replace_seek'
+      SEEK_RECORD_PROPERTIES.include?(key)
+    else
+      false
+    end
+  end
+
+  # Removes the contextual entities with the given ids that nothing in the crate links to any more
+  def remove_unlinked_entities(crate, ids)
+    entities = ids.uniq.filter_map { |id| crate.dereference(id) }
+    return if entities.empty?
+
+    crate.gc { |entity| entities.include?(entity) }
+  end
+
+  # A new crate holding the files of the uploaded crate in source_dir, but none of its metadata, other than which
+  # files are the main workflow, its diagram and its CWL description.
+  def new_crate_from_uploaded(uploaded, source_dir)
+    crate = ROCrate::WorkflowCrate.new
+    crate.add_all(source_dir, false, include_hidden: true)
+    main = uploaded.main_workflow
+    return crate unless main
+
+    crate.main_workflow = ROCrate::Workflow.new(crate, uploaded_entity_source(main, source_dir), main.filepath)
+    if (diagram = uploaded.main_workflow_diagram)
+      crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, uploaded_entity_source(diagram, source_dir),
+                                                                diagram.filepath)
+    end
+    if (cwl = uploaded.main_workflow_cwl)
+      crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, uploaded_entity_source(cwl, source_dir),
+                                                                            cwl.filepath)
+    end
+    crate
+  end
+
+  def uploaded_entity_source(entity, source_dir)
+    Pathname.new(File.join(source_dir, entity.filepath))
   end
 
   def ro_crate
@@ -237,7 +324,14 @@ module WorkflowExtraction
       end
     end
 
-    if is_already_ro_crate?
+    if is_already_ro_crate? && ro_crate_regeneration_strategy == 'new_crate'
+      if is_git_versioned?
+        # populate_ro_crate builds the crate from the git repository
+        ROCrate::WorkflowCrate.new.tap(&inner)
+      else
+        extractor.open_crate { |uploaded, source_dir| inner.call(new_crate_from_uploaded(uploaded, source_dir)) }
+      end
+    elsif is_already_ro_crate?
       extractor.open_crate(&inner)
     else
       ROCrate::WorkflowCrate.new.tap(&inner)

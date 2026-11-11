@@ -459,6 +459,21 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     assert_empty @repository.select(q)
   end
 
+  test 'clear all removes the aggregate and item graphs' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    @repository.send_rdf(sop)
+    @repository.send_rdf(@project)
+    assert item_triple_count(sop) > 0
+    assert_includes @repository.item_graph_uris, @repository.item_graph_uri(sop)
+
+    @repository.clear_all
+
+    assert_empty @repository.item_graph_uris
+    [@private_graph, @public_graph].each do |graph|
+      assert_equal 0, @repository.select("SELECT (COUNT(*) AS ?c) WHERE { GRAPH #{graph.to_base} { ?s ?p ?o } }")[0][:c].object.to_i
+    end
+  end
+
   private
 
   # gets the count of the triples for a resource. This can change as the rdf is updated, so avoids having hard-coded

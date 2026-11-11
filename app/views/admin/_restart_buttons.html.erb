@@ -16,11 +16,11 @@
     <div class="col-sm-8">
       <p>
         The RDF for each item is generated, and sent to the triple store if one is configured, whenever the item changes.
-        After changing how the RDF is generated, or the triple store, the RDF for all items can be regenerated in the
-        background with this button.
+        After changing how the RDF is generated, or the triple store, this button clears the triple store and then
+        regenerates the RDF for all items in the background.
         <%= button_to('Regenerate all RDF', regenerate_rdf_admin_path,
                       class: 'btn btn-danger', id: 'regenerate-rdf',
-                      data: { confirm: 'Are you sure you want to regenerate the RDF for all items? This queues a background job for every item.', disable_with: 'Queuing...' }) %>
+                      data: { confirm: 'Are you sure you want to clear the triple store and regenerate the RDF for all items? The triple store will be incomplete until every item has been regenerated.', disable_with: 'Queuing...' }) %>
       </p>
     </div>
   </div>

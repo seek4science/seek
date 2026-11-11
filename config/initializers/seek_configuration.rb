@@ -274,6 +274,7 @@ def load_seek_config_defaults!
   Seek::Config.default :life_monitor_ui_url, 'https://app.lifemonitor.eu/'
   Seek::Config.default :git_support_enabled, false
   Seek::Config.default :regenerate_workflow_ro_crates, true
+  Seek::Config.default :workflow_ro_crate_regeneration_strategy, 'replace_all'
   Seek::Config.default :bio_tools_enabled, false
   Seek::Config.default :scraper_config, [
     {

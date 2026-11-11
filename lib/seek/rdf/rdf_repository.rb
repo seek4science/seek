@@ -89,6 +89,26 @@ module Seek
         RDF::URI("#{get_configuration.private_graph}/items/#{item.class.name}/#{item.id}")
       end
 
+      # Removes all of SEEK's statements from the repository, by dropping the aggregate graphs and every item graph.
+      def clear_all
+        return unless configured?
+
+        connect_to_repository
+        config = get_configuration
+        graphs = item_graph_uris + [config.public_graph, config.private_graph].compact.map { |graph| RDF::URI(graph) }
+        graphs.each do |graph|
+          Rails.logger.debug(get_repository_object.drop("DROP SILENT GRAPH #{graph.to_base}"))
+        end
+      end
+
+      # The named graphs of all the items in the repository (see #item_graph_uri)
+      def item_graph_uris
+        prefix = "#{get_configuration.private_graph}/items/"
+        select(<<~SPARQL).map { |result| result[:g] }
+          SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } FILTER(STRSTARTS(STR(?g), #{RDF::Literal(prefix).to_base})) }
+        SPARQL
+      end
+
       # updates the rdf in the repository and updates the rdf file.
       def update_rdf(item)
         if configured? && item.rdf_supported?

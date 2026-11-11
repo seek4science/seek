@@ -128,7 +128,21 @@
                                "GA4GH TRS API enabled", "Enable GA4GH Tool Registry Service API endpoints for accessing workflows.") %>
     <%= admin_checkbox_setting(:regenerate_workflow_ro_crates, 1, Seek::Config.regenerate_workflow_ro_crates,
                                'Regenerate workflow RO-Crates',
-                               'If set, SEEK adds its own metadata (creators, license, topics, operations, disciplines and so on) to the RO-Crate of a workflow that was uploaded as an RO-Crate, filling in only what the uploaded crate does not already state. If unset, an uploaded RO-Crate is provided unchanged.') %>
+                               'If set, SEEK adds its own metadata (creators, license, topics, operations, disciplines and so on) to the RO-Crate of a workflow that was uploaded as an RO-Crate, as chosen below. If unset, an uploaded RO-Crate is provided unchanged.',
+                               onchange: toggle_appear_javascript('workflow_ro_crate_regeneration')) %>
+    <div id="workflow_ro_crate_regeneration" class="additional_settings" style="<%= show_or_hide_block Seek::Config.regenerate_workflow_ro_crates -%>">
+      <%= admin_dropdown_setting(:workflow_ro_crate_regeneration_strategy,
+                                 options_for_select([['Replace all of the main workflow\'s metadata', 'replace_all'],
+                                                     ['Replace only the metadata describing SEEK\'s record', 'replace_seek'],
+                                                     ['Only add missing metadata', 'fill_missing'],
+                                                     ['Create a new crate', 'new_crate']],
+                                                    Seek::Config.workflow_ro_crate_regeneration_strategy),
+                                 'How uploaded RO-Crates are regenerated',
+                                 '<b>Replace all</b>: SEEK\'s metadata replaces that of the uploaded main workflow, and the entities it no longer refers to are removed. ' \
+                                 '<b>Replace only SEEK\'s record</b>: as above, but only for the url, identifier, isBasedOn, contributor, producer, creator, license, version, dates and publisher; other metadata is only added if missing. ' \
+                                 '<b>Only add missing</b>: the uploaded metadata is kept, and SEEK\'s is only added where missing. ' \
+                                 '<b>New crate</b>: a new crate holding the uploaded files, described only by SEEK.') %>
+    </div>
   </div>
 
   <h2>Integrations</h2>

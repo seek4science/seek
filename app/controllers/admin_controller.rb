@@ -123,6 +123,9 @@ class AdminController < ApplicationController
 
     Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     Seek::Config.regenerate_workflow_ro_crates = string_to_boolean(params[:regenerate_workflow_ro_crates])
+    if WorkflowExtraction::RO_CRATE_REGENERATION_STRATEGIES.include?(params[:workflow_ro_crate_regeneration_strategy])
+      Seek::Config.workflow_ro_crate_regeneration_strategy = params[:workflow_ro_crate_regeneration_strategy]
+    end
     # Types enabled
     Seek::Config.file_templates_enabled = string_to_boolean params[:file_templates_enabled]
     Seek::Config.placeholders_enabled = string_to_boolean params[:placeholders_enabled]
@@ -391,12 +394,8 @@ class AdminController < ApplicationController
   end
 
   def regenerate_rdf
-    failed = RdfGenerationQueue.enqueue_all
-    if failed.empty?
-      flash[:notice] = 'The RDF for all items has been queued to be regenerated.'
-    else
-      flash[:error] = "There was a problem queuing the RDF to be regenerated for #{failed.join(', ')}."
-    end
+    RdfRegenerateAllJob.perform_later
+    flash[:notice] = 'The triple store will be cleared, and the RDF for all items regenerated, in the background.'
     redirect_to admin_path
   end
 

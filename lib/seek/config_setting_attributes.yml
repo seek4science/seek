@@ -249,6 +249,7 @@ omniauth_oidc_secret:
   encrypt: true
 ga4gh_trs_api_enabled:
 regenerate_workflow_ro_crates:
+workflow_ro_crate_regeneration_strategy:
 search_results_limit:
   convert: :to_i
 life_monitor_enabled:

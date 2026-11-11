@@ -42,27 +42,23 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'admin can regenerate all rdf' do
-    workflow = FactoryBot.create(:workflow)
-    person = FactoryBot.create(:person)
-    RdfGenerationQueue.delete_all
-
-    post :regenerate_rdf
+    assert_enqueued_with(job: RdfRegenerateAllJob) do
+      post :regenerate_rdf
+    end
 
     assert_redirected_to admin_path
     assert_nil flash[:error]
     refute_nil flash[:notice]
-    assert RdfGenerationQueue.where(item: workflow).exists?
-    assert RdfGenerationQueue.where(item: person).exists?
   end
 
   test 'non admin cannot regenerate all rdf' do
     login_as(FactoryBot.create(:user))
-    RdfGenerationQueue.delete_all
 
-    post :regenerate_rdf
+    assert_no_enqueued_jobs(only: RdfRegenerateAllJob) do
+      post :regenerate_rdf
+    end
 
     refute_nil flash[:error]
-    assert_equal 0, RdfGenerationQueue.count
   end
 
   test 'update regenerate workflow ro-crates setting' do
@@ -72,6 +68,16 @@ class AdminControllerTest < ActionController::TestCase
 
       post :update_features_enabled, params: { regenerate_workflow_ro_crates: '1' }
       assert Seek::Config.regenerate_workflow_ro_crates
+    end
+  end
+
+  test 'update workflow ro-crate regeneration strategy' do
+    with_config_value(:workflow_ro_crate_regeneration_strategy, 'replace_all') do
+      post :update_features_enabled, params: { workflow_ro_crate_regeneration_strategy: 'new_crate' }
+      assert_equal 'new_crate', Seek::Config.workflow_ro_crate_regeneration_strategy
+
+      post :update_features_enabled, params: { workflow_ro_crate_regeneration_strategy: 'nonsense' }
+      assert_equal 'new_crate', Seek::Config.workflow_ro_crate_regeneration_strategy
     end
   end
 
