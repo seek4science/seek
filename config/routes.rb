@@ -185,6 +185,7 @@ SEEK::Application.routes.draw do
       post :update_imprint_setting
       post :clear_failed_jobs
       post :clear_cache
+      post :regenerate_rdf
     end
     concerns :has_dashboard, controller: :stats
   end

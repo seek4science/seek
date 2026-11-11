@@ -41,6 +41,40 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
+  test 'admin can regenerate all rdf' do
+    workflow = FactoryBot.create(:workflow)
+    person = FactoryBot.create(:person)
+    RdfGenerationQueue.delete_all
+
+    post :regenerate_rdf
+
+    assert_redirected_to admin_path
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
+    assert RdfGenerationQueue.where(item: workflow).exists?
+    assert RdfGenerationQueue.where(item: person).exists?
+  end
+
+  test 'non admin cannot regenerate all rdf' do
+    login_as(FactoryBot.create(:user))
+    RdfGenerationQueue.delete_all
+
+    post :regenerate_rdf
+
+    refute_nil flash[:error]
+    assert_equal 0, RdfGenerationQueue.count
+  end
+
+  test 'update regenerate workflow ro-crates setting' do
+    with_config_value(:regenerate_workflow_ro_crates, true) do
+      post :update_features_enabled, params: { regenerate_workflow_ro_crates: '0' }
+      refute Seek::Config.regenerate_workflow_ro_crates
+
+      post :update_features_enabled, params: { regenerate_workflow_ro_crates: '1' }
+      assert Seek::Config.regenerate_workflow_ro_crates
+    end
+  end
+
   test 'none admin not get registration form' do
     login_as FactoryBot.create(:user)
     get :registration_form

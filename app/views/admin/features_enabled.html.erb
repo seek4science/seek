@@ -126,6 +126,9 @@
   <div id="workflow_cwl_Settings" class="additional_settings" style="<%= show_or_hide_block Seek::Config.workflows_enabled -%>">
     <%= admin_checkbox_setting(:ga4gh_trs_api_enabled, 1, Seek::Config.ga4gh_trs_api_enabled,
                                "GA4GH TRS API enabled", "Enable GA4GH Tool Registry Service API endpoints for accessing workflows.") %>
+    <%= admin_checkbox_setting(:regenerate_workflow_ro_crates, 1, Seek::Config.regenerate_workflow_ro_crates,
+                               'Regenerate workflow RO-Crates',
+                               'If set, SEEK adds its own metadata (creators, license, topics, operations, disciplines and so on) to the RO-Crate of a workflow that was uploaded as an RO-Crate, filling in only what the uploaded crate does not already state. If unset, an uploaded RO-Crate is provided unchanged.') %>
   </div>
 
   <h2>Integrations</h2>

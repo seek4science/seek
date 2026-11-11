@@ -94,14 +94,32 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'serves existing RO-Crate for RO-Crate workflow' do
-    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
-    refute workflow.should_generate_crate?
+    with_config_value(:regenerate_workflow_ro_crates, false) do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
+      refute workflow.should_generate_crate?
 
-    crate = workflow.ro_crate
+      crate = workflow.ro_crate
 
-    assert_nil crate.author, 'Changes in SEEK should not be reflected in RO-Crate.'
+      assert_nil crate.author, 'Changes in SEEK should not be reflected in RO-Crate.'
 
-    assert_not_equal crate.canonical_id, workflow.ro_crate.canonical_id
+      assert_not_equal crate.canonical_id, workflow.ro_crate.canonical_id
+    end
+  end
+
+  test 'regenerates existing RO-Crate for RO-Crate workflow' do
+    with_config_value(:regenerate_workflow_ro_crates, true) do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
+      assert workflow.should_generate_crate?
+
+      crate = workflow.ro_crate
+
+      assert_equal ['Jane Smith', 'John Smith'], Array.wrap(crate.author).map { |author| author['name'] }.sort
+      assert_equal workflow.ro_crate_url('ro_crate'), crate['url']
+      # the uploaded crate's own content is kept
+      assert crate.main_workflow
+      assert crate.main_workflow_diagram
+      assert_equal 'Galaxy', crate.main_workflow.programming_language['name']
+    end
   end
 
   test 'can get and set source URL' do

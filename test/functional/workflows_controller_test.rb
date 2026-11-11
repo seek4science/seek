@@ -481,17 +481,20 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'generates diagram from CWL workflow in RO-Crate' do
-    wf = FactoryBot.create(:just_cwl_ro_crate_workflow)
-    login_as(wf.contributor)
-    refute wf.diagram_exists?
-    assert_nil wf.ro_crate.main_workflow_diagram
-    assert wf.can_render_diagram?
+    # a regenerated crate would include the generated diagram
+    with_config_value(:regenerate_workflow_ro_crates, false) do
+      wf = FactoryBot.create(:just_cwl_ro_crate_workflow)
+      login_as(wf.contributor)
+      refute wf.diagram_exists?
+      assert_nil wf.ro_crate.main_workflow_diagram
+      assert wf.can_render_diagram?
 
-    get :diagram, params: { id: wf.id }
+      get :diagram, params: { id: wf.id }
 
-    assert_response :success
-    assert_equal 'image/svg+xml', response.headers['Content-Type']
-    assert wf.diagram_exists?
+      assert_response :success
+      assert_equal 'image/svg+xml', response.headers['Content-Type']
+      assert wf.diagram_exists?
+    end
   end
 
   test 'generates diagram from abstract CWL in RO-Crate' do

@@ -39,8 +39,10 @@ module WorkflowExtraction
     content_blob && content_blob.original_filename.end_with?('.basic.crate.zip')
   end
 
+  # Whether SEEK populates the crate with its own metadata. An uploaded RO-Crate is only populated if it is a basic
+  # crate, or Seek::Config.regenerate_workflow_ro_crates is set, otherwise it is provided as it was uploaded.
   def should_generate_crate?
-    is_basic_ro_crate? || !is_already_ro_crate?
+    is_basic_ro_crate? || !is_already_ro_crate? || Seek::Config.regenerate_workflow_ro_crates
   end
 
   def internals
