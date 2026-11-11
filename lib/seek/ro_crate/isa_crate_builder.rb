@@ -40,8 +40,36 @@ module Seek
         crate = ::ROCrate::Crate.new(version: RO_CRATE_VERSION)
         crate.metadata.context = [RO_CRATE_CONTEXT, BIOSCHEMAS_TERMS]
         set(crate, root_properties)
-        keep_root_parts(crate, [])
+        top_level = viewable(investigation.studies).flat_map { |study| add_study(crate, study) }
+        keep_root_parts(crate, top_level.map(&:reference))
         crate
+      end
+
+      # Returns the study entity followed by its assay entities; all of them sit at the crate root.
+      def add_study(crate, study)
+        entity = isa_dataset(crate, "studies/#{slug(study)}/", 'Study', study)
+        assay_trees = viewable(study.assays.where(assay_stream_id: nil)).map { |assay| add_assay(crate, assay) }
+        entity['hasPart'] = assay_trees.map { |tree| tree.first.reference }
+        [entity, *assay_trees.flatten]
+      end
+
+      # Returns the assay entity followed by the entities of the assays in its stream, if it is one.
+      def add_assay(crate, assay)
+        entity = isa_dataset(crate, "assays/#{slug(assay)}/", 'Assay', assay)
+        set(entity, 'measurementMethod' => assay.assay_type_uri,
+                    'measurementTechnique' => assay.technology_type_uri)
+        children = viewable(assay.child_assays).flat_map { |child| add_assay(crate, child) }
+        set(entity, 'hasPart' => children.map(&:reference))
+        [entity, *children]
+      end
+
+      def isa_dataset(crate, id, type_name, resource)
+        entity = ::ROCrate::DataEntity.new(crate)
+        entity.id = id
+        entity.type = 'Dataset'
+        set(entity, isa_properties(type_name, resource))
+        crate.add_data_entity(entity)
+        entity
       end
 
       def root_properties
@@ -52,9 +80,12 @@ module Seek
         )
       end
 
+      # identifier is the bare SEEK id on every level and url the SEEK URL. ARC tools use a study's or
+      # assay's identifier as a directory name and allow only letters, digits, underscore, dash and
+      # space in it, so a URL is rejected there.
       def isa_properties(type_name, resource)
         { 'additionalType' => isa_type(type_name),
-          'identifier' => resource.rdf_seek_id,
+          'identifier' => resource.id.to_s,
           'url' => resource.rdf_seek_id,
           'name' => resource.title,
           'description' => resource.description }
@@ -65,6 +96,16 @@ module Seek
       # string; with the JERM IRI alone they silently skip the entity.
       def isa_type(name)
         ["#{JERM}#{name}", name]
+      end
+
+      # Directory name: SEEK id, then the title lowercased with runs of spaces and punctuation collapsed
+      # to one hyphen and capped in length, e.g. "42-heat-stress-in-barley". The id keeps names unique.
+      def slug(resource)
+        "#{resource.id}-#{resource.title.to_s.parameterize.first(40)}".chomp('-')
+      end
+
+      def viewable(relation)
+        relation.select { |resource| resource.can_view?(user) }
       end
 
       # Assigns only present values, so the crate carries no null or empty properties.

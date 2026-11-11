@@ -45,8 +45,8 @@ class RoCrateExploringTest < ActiveSupport::TestCase
     root = find_entity(graph, './')
     assert_equal 'Dataset', root['@type']
     assert_isa_type root, 'Investigation'
-    assert_equal "#{SITE_BASE_HOST}/investigations/#{investigation.id}", root['identifier']
-    assert_equal root['identifier'], root['url']
+    assert_equal investigation.id.to_s, root['identifier']
+    assert_equal "#{SITE_BASE_HOST}/investigations/#{investigation.id}", root['url']
     assert_equal investigation.title, root['name']
     assert_equal investigation.description, root['description']
     assert_equal DEFAULT_LICENSE, root['license']
@@ -322,11 +322,12 @@ class RoCrateExploringTest < ActiveSupport::TestCase
     entity
   end
 
-  # ARC tools use a study's or assay's identifier as a directory name, so it cannot be a URL: those two
-  # carry the bare SEEK id, and every level carries its SEEK URL under url.
+  # identifier is the bare SEEK id on every level and url the SEEK URL. ARC tools use a study's or
+  # assay's identifier as a directory name and allow only letters, digits, underscore, dash and space
+  # in it, so a URL is rejected there; the investigation follows the same rule for consistency.
   def isa_properties(type_name, resource)
     { 'additionalType' => isa_type(type_name),
-      'identifier' => type_name == 'Investigation' ? resource.rdf_seek_id : resource.id.to_s,
+      'identifier' => resource.id.to_s,
       'url' => resource.rdf_seek_id,
       'name' => resource.title,
       'description' => resource.description }
