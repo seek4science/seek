@@ -61,7 +61,6 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
 
     json = Seek::RoCrate::ISACrateBuilder.new(investigation, person.user).metadata_json
 
-    puts json.inspect
 
     study_entity = isa_entity(json, 'Study')
     assay_entity = isa_entity(json, 'Assay')
@@ -118,6 +117,57 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     assert_equal "studies/#{study.id}-heat-stress-35-c-40-c-pilot/", ids.first
     assert_equal assays.map { |a| "assays/#{a.id}-same-title/" }, ids.drop(1)
     ids.each { |id| assert_match %r{\A[A-Za-z0-9_\-./]+\z}, id }
+  end
+
+  test 'creators become Person entities identified by ORCID' do
+    person = FactoryBot.create(:person, first_name: 'Ada', last_name: 'Lovelace', orcid: 'https://orcid.org/0000-0002-1825-0097')
+    investigation = FactoryBot.create(:investigation, contributor: person, creators: [person])
+
+    json = Seek::RoCrate::ISACrateBuilder.new(investigation, person.user).metadata_json
+
+    person_entity = json['@graph'].detect { |e| e['@id'] == 'https://orcid.org/0000-0002-1825-0097' }
+
+    assert_equal [{ '@id' => 'https://orcid.org/0000-0002-1825-0097' }], root_entity(json)['creator']
+    assert_equal 'Person', person_entity['@type']
+    assert_equal 'Ada Lovelace', person_entity['name']
+    assert_equal 'Ada', person_entity['givenName']
+    assert_equal 'Lovelace', person_entity['familyName']
+    assert_equal 'https://orcid.org/0000-0002-1825-0097', person_entity['identifier']
+  end
+
+  test 'a person without ORCID gets a fragment id and the SEEK URL as identifier' do
+    person = FactoryBot.create(:person, orcid: nil)
+    investigation = FactoryBot.create(:investigation, contributor: person, creators: [person])
+
+    json = Seek::RoCrate::ISACrateBuilder.new(investigation, person.user).metadata_json
+    person_entity = json['@graph'].detect { |e| e['@id'] == "#person-#{person.id}" }
+
+    assert_equal [{ '@id' => "#person-#{person.id}" }], root_entity(json)['creator']
+    assert_equal person.rdf_seek_id, person_entity['identifier']
+  end
+
+  test 'a person creating several items appears once and the contributor stands in for missing creators' do
+    person = FactoryBot.create(:person)
+    investigation = FactoryBot.create(:investigation, contributor: person, creators: [person])
+    FactoryBot.create(:study, investigation: investigation, contributor: person, creators: [])
+
+    json = Seek::RoCrate::ISACrateBuilder.new(investigation, person.user).metadata_json
+    reference = [{ '@id' => person.ro_crate_metadata['@id'] }]
+
+    assert_equal(1, json['@graph'].count { |e| e['@type'] == 'Person' })
+    assert_equal reference, root_entity(json)['creator']
+    assert_equal reference, isa_entity(json, 'Study')['creator']
+  end
+
+  test 'givenName falls back to the full name when the first name is blank' do
+    person = FactoryBot.create(:person, first_name: '', last_name: 'Lovelace')
+    investigation = FactoryBot.create(:investigation, contributor: person, creators: [person])
+
+    json = Seek::RoCrate::ISACrateBuilder.new(investigation, person.user).metadata_json
+    person_entity = json['@graph'].detect { |e| e['@type'] == 'Person' }
+
+    assert_equal 'Lovelace', person_entity['givenName']
+    assert_nil person_entity['first_name']
   end
 
   private
