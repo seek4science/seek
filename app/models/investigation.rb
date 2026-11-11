@@ -69,6 +69,10 @@ class Investigation < ApplicationRecord
   def positioned_studies
     studies.order(position: :asc)
   end
+
+  def to_isa_ro_crate(user = User.current_user)
+    Seek::RoCrate::ISACrateBuilder.new(self, user).crate
+  end
   
   def self.user_creatable?
     Seek::Config.investigations_enabled
