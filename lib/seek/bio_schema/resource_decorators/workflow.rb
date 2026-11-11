@@ -9,6 +9,12 @@ module Seek
         FORMALPARAMETER_TYPE = 'https://bioschemas.org/terms/FormalParameter'.freeze
         INPUT_PROPERTY = 'https://bioschemas.org/terms/input'.freeze
         OUTPUT_PROPERTY = 'https://bioschemas.org/terms/output'.freeze
+        # the DefinedTermSet for the terms of each controlled vocabulary annotation property
+        TERM_SETS = {
+          topics: 'http://edamontology.org',
+          operations: 'http://edamontology.org',
+          disciplines: 'https://openalex.org/fields'
+        }.freeze
 
         associated_items docs_and_sops: %i[documents sops]
 
@@ -17,7 +23,9 @@ module Seek
                         outputs: :output,
                         sd_publisher: :sdPublisher,
                         maturity: :creativeWorkStatus,
-                        docs_and_sops: :documentation
+                        docs_and_sops: :documentation,
+                        subjects: :about,
+                        operations: :featureList
 
         def context
           super.merge(
@@ -68,7 +76,38 @@ module Seek
           DataCatalogMockModel.new.provider
         end
 
+        # the EDAM topics and scientific disciplines the workflow is about
+        def subjects
+          terms = Array(defined_terms(:topics)) + Array(defined_terms(:disciplines))
+          terms.presence
+        end
+
+        # the EDAM operations the workflow performs
+        def operations
+          defined_terms(:operations)
+        end
+
         private
+
+        # the controlled vocabulary annotations for the property, as DefinedTerms identified by their IRI
+        def defined_terms(property)
+          accessor = "#{property.to_s.singularize}_annotation_values"
+          return unless parent_resource.respond_to?(accessor)
+
+          terms = parent_resource.send(accessor).to_a
+          return if terms.empty?
+
+          term_set = TERM_SETS[property]
+          terms.collect do |term|
+            definition = {
+              '@type' => 'DefinedTerm',
+              '@id' => term.iri.presence || ROCrate::ContextualEntity.format_local_id(term.label),
+              'name' => term.label
+            }
+            definition['inDefinedTermSet'] = { '@id' => term_set } if term_set && term.iri&.start_with?(term_set)
+            definition
+          end
+        end
 
         def formal_parameters(properties, group_name)
           wf_name = if title

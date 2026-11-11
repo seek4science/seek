@@ -64,6 +64,39 @@ schema_cwl_workflows:
     }
     ORDER BY ?name
 
+schema_workflow_annotations:
+  title: "List workflows with their disciplines, topics and operations (Schema.org)"
+  description: "Find all workflows, with their scientific disciplines (OpenAlex fields), EDAM topics and EDAM operations"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT ?workflow ?name
+           (GROUP_CONCAT(DISTINCT ?disciplineName; separator=", ") AS ?disciplines)
+           (GROUP_CONCAT(DISTINCT ?topicName; separator=", ") AS ?topics)
+           (GROUP_CONCAT(DISTINCT ?operationName; separator=", ") AS ?operations)
+    WHERE {
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name .
+      # exclude the workflow files described in the RO-Crates, to list each workflow once
+      FILTER NOT EXISTS { ?workflow a schema:MediaObject }
+      OPTIONAL {
+        ?workflow schema:about ?discipline .
+        ?discipline schema:inDefinedTermSet <https://openalex.org/fields> ;
+                    schema:name ?disciplineName .
+      }
+      OPTIONAL {
+        ?workflow schema:about ?topic .
+        ?topic schema:inDefinedTermSet <http://edamontology.org> ;
+               schema:name ?topicName .
+      }
+      OPTIONAL {
+        ?workflow schema:featureList ?operation .
+        ?operation schema:name ?operationName .
+      }
+    }
+    GROUP BY ?workflow ?name
+    ORDER BY ?name
+
 schema_ro_crates:
   title: "List all RO-Crates (Schema.org)"
   description: "Find all RO-Crates, with the RO-Crate specification version and any profiles they conform to"

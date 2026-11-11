@@ -244,6 +244,38 @@ class RDFGenerationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'workflow rdf includes topics and disciplines as about and operations as featureList' do
+    FactoryBot.create(:topics_controlled_vocab)
+    FactoryBot.create(:operations_controlled_vocab)
+    FactoryBot.create(:disciplines_controlled_vocab)
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, contributor: person)
+    User.with_current_user(person.user) do
+      workflow.topic_annotations = 'Chemistry'
+      workflow.operation_annotations = 'Clustering'
+      workflow.discipline_annotations = 'Physics and Astronomy'
+      disable_authorization_checks { workflow.save! }
+    end
+
+    graph = parse_rdf(workflow.reload.to_rdf)
+    main_file = RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl")
+    topic = RDF::URI('http://edamontology.org/topic_3314')
+    discipline = RDF::URI('https://openalex.org/fields/31')
+    operation = RDF::URI('http://edamontology.org/operation_3432')
+    [workflow.rdf_resource, main_file].each do |subject|
+      assert graph.has_statement?(RDF::Statement(subject, RDF::URI('https://schema.org/about'), topic))
+      assert graph.has_statement?(RDF::Statement(subject, RDF::URI('https://schema.org/about'), discipline))
+      assert graph.has_statement?(RDF::Statement(subject, RDF::URI('https://schema.org/featureList'), operation))
+    end
+    in_set = RDF::URI('https://schema.org/inDefinedTermSet')
+    assert graph.has_statement?(RDF::Statement(discipline, in_set, RDF::URI('https://openalex.org/fields')))
+    assert graph.has_statement?(RDF::Statement(topic, in_set, RDF::URI('http://edamontology.org')))
+    assert graph.has_statement?(RDF::Statement(topic, RDF.type, RDF::URI('https://schema.org/DefinedTerm')))
+    assert graph.has_statement?(RDF::Statement(topic, RDF::URI('https://schema.org/name'), RDF::Literal('Chemistry')))
+    assert graph.has_statement?(RDF::Statement(operation, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('Clustering')))
+  end
+
   test 'ro-crate json-ld contexts are preloaded and not fetched' do
     Seek::Rdf::JSONLdContexts::CONTEXTS.each do |url, filename|
       document = JSON.parse(File.read(File.join(Seek::Rdf::JSONLdContexts::DIRECTORY, filename)))

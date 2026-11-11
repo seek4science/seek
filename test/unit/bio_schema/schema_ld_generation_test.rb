@@ -1150,6 +1150,63 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     check_version(sop.latest_version, expected)
   end
 
+  test 'workflow topics and disciplines as about, operations as featureList, also in the ro-crate' do
+    FactoryBot.create(:topics_controlled_vocab)
+    FactoryBot.create(:operations_controlled_vocab)
+    FactoryBot.create(:disciplines_controlled_vocab)
+    workflow = FactoryBot.create(:workflow, contributor: @person)
+    User.with_current_user(@person.user) do
+      workflow.topic_annotations = ['Chemistry', 'Sample collections']
+      workflow.operation_annotations = 'Clustering'
+      workflow.discipline_annotations = ['Physics and Astronomy', 'Secret science']
+      disable_authorization_checks { workflow.save! }
+    end
+    workflow.reload
+
+    edam = { '@id' => 'http://edamontology.org' }
+    openalex = { '@id' => 'https://openalex.org/fields' }
+    expected_subjects = [
+      { '@type' => 'DefinedTerm', '@id' => 'http://edamontology.org/topic_3314', 'name' => 'Chemistry',
+        'inDefinedTermSet' => edam },
+      { '@type' => 'DefinedTerm', '@id' => 'http://edamontology.org/topic_3277', 'name' => 'Sample collections',
+        'inDefinedTermSet' => edam },
+      { '@type' => 'DefinedTerm', '@id' => 'https://openalex.org/fields/31', 'name' => 'Physics and Astronomy',
+        'inDefinedTermSet' => openalex },
+      # a term without an IRI has a local identifier, and isn't part of the OpenAlex term set
+      { '@type' => 'DefinedTerm', '@id' => ROCrate::ContextualEntity.format_local_id('Secret science'),
+        'name' => 'Secret science' }
+    ]
+    expected_operations = [
+      { '@type' => 'DefinedTerm', '@id' => 'http://edamontology.org/operation_3432', 'name' => 'Clustering',
+        'inDefinedTermSet' => edam }
+    ]
+
+    json = JSON.parse(workflow.to_schema_ld)
+    assert_equal expected_subjects, json['about']
+    assert_equal expected_operations, json['featureList']
+    check_schema_org_terms(json)
+
+    crate = workflow.latest_version.ro_crate
+    # flattening the JSON-LD for the crate turns a single value into an object rather than an array
+    assert_equal expected_subjects.first(3).map { |t| t['@id'] },
+                 Array.wrap(crate.main_workflow['about']).map { |t| t['@id'] }.first(3)
+    assert_equal 4, Array.wrap(crate.main_workflow['about']).count
+    assert_equal expected_operations.map { |t| { '@id' => t['@id'] } }, Array.wrap(crate.main_workflow['featureList'])
+    (expected_subjects.first(3) + expected_operations).each do |term|
+      entity = crate.dereference(term['@id'])
+      assert entity, "#{term['@id']} should be a contextual entity in the crate"
+      assert_equal 'DefinedTerm', entity['@type']
+      assert_equal term['name'], entity['name']
+      assert_equal term['inDefinedTermSet'], entity['inDefinedTermSet']
+    end
+  end
+
+  test 'workflow without topics, disciplines or operations has no about or featureList' do
+    json = JSON.parse(FactoryBot.create(:workflow).to_schema_ld)
+    refute json.key?('about')
+    refute json.key?('featureList')
+  end
+
   private
 
   def check_version(version, expected)

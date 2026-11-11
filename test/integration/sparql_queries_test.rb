@@ -40,6 +40,13 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
                                          policy: FactoryBot.create(:public_policy))
     @workflow = FactoryBot.create(:workflow, projects: [@project], contributor: @person,
                                              creators: [@person], policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:topics_controlled_vocab)
+    FactoryBot.create(:operations_controlled_vocab)
+    FactoryBot.create(:disciplines_controlled_vocab)
+    @workflow.topic_annotations = 'Chemistry'
+    @workflow.operation_annotations = 'Clustering, Correlation'
+    @workflow.discipline_annotations = 'Physics and Astronomy'
+    disable_authorization_checks { @workflow.save! }
 
     rdf_items.each { |item| @repository.send_rdf(item) if item.rdf_supported? }
   end
