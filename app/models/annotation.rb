@@ -23,6 +23,9 @@ class Annotation < ApplicationRecord
 
   before_validation :process_value_generation
 
+  # annotations, such as tags, topics and disciplines, are part of the annotated item's RDF
+  after_commit :queue_annotatable_rdf_generation
+
   validates_presence_of :source_type,
                         :source_id,
                         :annotatable,
@@ -366,4 +369,12 @@ class Annotation < ApplicationRecord
   end
 
   # ===========
+
+  # Queues the annotated item's RDF to be regenerated, as the item itself may not have changed
+  def queue_annotatable_rdf_generation
+    item = annotatable
+    return if item.nil? || item.destroyed? || !item.respond_to?(:queue_rdf_generation)
+
+    item.queue_rdf_generation(true, false)
+  end
 end

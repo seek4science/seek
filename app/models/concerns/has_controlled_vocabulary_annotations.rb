@@ -97,7 +97,8 @@ module HasControlledVocabularyAnnotations
 
       annotations = send("#{property.to_s.singularize}_annotations_annotations")
 
-      annotations.delete_all
+      # destroyed, rather than deleted, so that their callbacks run (e.g. to regenerate the RDF)
+      annotations.destroy_all
       values.map do |annotation|
         annotations.build(source: User.current_user, value: annotation)
       end

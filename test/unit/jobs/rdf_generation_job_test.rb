@@ -59,6 +59,39 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'rdf generation queued when only the controlled vocab annotations change' do
+    FactoryBot.create(:disciplines_controlled_vocab)
+    workflow = FactoryBot.create(:workflow)
+
+    User.with_current_user(workflow.contributor.user) do
+      ['Chemistry', 'Physics and Astronomy', ''].each do |disciplines|
+        RdfGenerationQueue.delete_all
+        workflow.discipline_annotations = disciplines
+        disable_authorization_checks { workflow.save! }
+
+        assert_equal disciplines.split(', '), workflow.reload.discipline_annotation_labels
+        entry = RdfGenerationQueue.find_by(item: workflow)
+        assert entry, "rdf generation should be queued after changing the disciplines to '#{disciplines}'"
+        refute entry.refresh_dependents
+      end
+    end
+  end
+
+  test 'rdf generation queued when only the tags change' do
+    workflow = FactoryBot.create(:workflow)
+
+    User.with_current_user(workflow.contributor.user) do
+      [%w[wibble], %w[wobble], []].each do |tags|
+        RdfGenerationQueue.delete_all
+        workflow.tags = tags
+        disable_authorization_checks { workflow.save! }
+
+        assert_equal tags, workflow.reload.tags_as_text_array
+        assert RdfGenerationQueue.where(item: workflow).exists?, "rdf generation should be queued after changing the tags to #{tags}"
+      end
+    end
+  end
+
   test 'create job' do
     item = FactoryBot.create(:assay)
 
