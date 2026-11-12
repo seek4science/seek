@@ -10,7 +10,7 @@ class InvestigationsController < ApplicationController
   before_action :find_and_authorize_requested_item, only: [:edit, :manage, :update, :manage_update, :destroy, :show,
                                                            :update_from_fairdata_station, :submit_fairdata_station, :fair_data_station_update_status,
                                                            :hide_fair_data_station_update_status, :new_object_based_on_existing_one,
-                                                           :export_isa, :export_isatab_json]
+                                                           :export_isa, :export_isatab_json, :export_ro_crate]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   #defined in the application controller
@@ -117,6 +117,14 @@ class InvestigationsController < ApplicationController
   def export_isatab_json
     the_hash = ISATabConverter.convert_investigation(@investigation)
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
+  end
+
+  # The crate is the public view of the investigation, the same for every downloader.
+  def export_ro_crate
+    respond_to do |format|
+      format.json { send_isa_ro_crate_metadata }
+      format.any { send_isa_ro_crate_zip }
+    end
   end
 
   def export_isa
@@ -226,6 +234,19 @@ class InvestigationsController < ApplicationController
 
 
   private
+
+  def send_isa_ro_crate_metadata
+    send_data @investigation.to_isa_ro_crate.metadata.generate, filename: 'ro-crate-metadata.json',
+                                                                  type: 'application/ld+json', disposition: 'attachment'
+  end
+
+  def send_isa_ro_crate_zip
+    Tempfile.create(["investigation-#{@investigation.id}-", '.crate.zip']) do |file|
+      @investigation.write_isa_ro_crate_zip(file.path)
+      send_data File.binread(file.path), filename: "investigation-#{@investigation.id}.crate.zip",
+                                         type: 'application/zip', disposition: 'attachment'
+    end
+  end
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,

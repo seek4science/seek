@@ -353,6 +353,34 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     assert_equal ['Role name.First name', 'Alice'], [first_name['name'], first_name['value']]
   end
 
+  test 'write_zip packs downloadable files and an entry for every directory' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:public_policy))
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:public_policy))
+    packed = FactoryBot.create(:data_file, assays: [assay], policy: FactoryBot.create(:downloadable_public_policy))
+    listed = FactoryBot.create(:data_file, assays: [assay], content_blob: FactoryBot.create(:txt_content_blob),
+                                           policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    FactoryBot.create(:data_file, assays: [assay], policy: FactoryBot.create(:private_policy))
+
+    Tempfile.create(['crate', '.zip']) do |file|
+      Seek::RoCrate::ISACrateBuilder.new(investigation).write_zip(file.path)
+      Zip::File.open(file.path) do |zip|
+        names = zip.entries.map(&:name).sort
+        assay_dir = "assays/#{slug(assay)}/"
+        json = JSON.parse(zip.read('ro-crate-metadata.json'))
+
+        files = json['@graph'].select { |e| e['@type'] == 'File' }
+        listed_entity = files.detect { |e| e['identifier'] == listed.rdf_seek_id }
+
+        assert_equal ['ro-crate-metadata.json', 'studies/', "studies/#{slug(study)}/", 'assays/', assay_dir,
+                      "#{assay_dir}dataset/", "#{assay_dir}dataset/a_pdf_file.pdf"].sort, names
+        assert_equal packed.content_blob.file_size, zip.find_entry("#{assay_dir}dataset/a_pdf_file.pdf").size
+        assert_equal 2, files.size
+        assert_equal "#{assay_dir}dataset/#{listed.content_blob.original_filename}", listed_entity['@id']
+      end
+    end
+  end
+
   private
 
   def slug(resource)

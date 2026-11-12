@@ -31,6 +31,10 @@
 	<%= button_link_to("Export ISA", 'download', export_isa_investigation_path(item)) %>
 <% end %>
 
+<% if item.can_view?(nil) %>
+  <%= button_link_to('Export RO-Crate', 'download', export_ro_crate_investigation_path(item)) %>
+<% end %>
+
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
     <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>

@@ -73,6 +73,10 @@ class Investigation < ApplicationRecord
   def to_isa_ro_crate(user = nil)
     Seek::RoCrate::ISACrateBuilder.new(self, user).crate
   end
+
+  def write_isa_ro_crate_zip(path, user = nil)
+    Seek::RoCrate::ISACrateBuilder.new(self, user).write_zip(path)
+  end
   
   def self.user_creatable?
     Seek::Config.investigations_enabled

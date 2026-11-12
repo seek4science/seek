@@ -7,6 +7,8 @@ module Seek
       RO_CRATE_VERSION = '1.2'.freeze
       RO_CRATE_CONTEXT = "https://w3id.org/ro/crate/#{RO_CRATE_VERSION}/context".freeze
       JERM = 'https://jermontology.org/ontology/JERMOntology#'.freeze
+      # Data files above this size are listed in the metadata but their content is not packed into the zip.
+      MAX_PACKED_FILE_SIZE = 100.megabytes
       # Investigations, studies and assays carry no license in SEEK; only the assets linked to them do,
       # so the root dataset gets a generic statement rather than a license it cannot vouch for.
       DEFAULT_LICENSE = 'No single license applies to this crate as a whole. ' \
@@ -24,6 +26,7 @@ module Seek
       include Samples
       include Processes
       include ExtendedMetadata
+      include Packaging
 
       attr_reader :investigation, :user
 

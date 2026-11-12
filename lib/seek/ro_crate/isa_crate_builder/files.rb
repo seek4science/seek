@@ -6,8 +6,8 @@ module Seek
         private
 
         # The data files the user can view, as File entities at "<assay dir>dataset/<original filename>".
-        # The entity carries metadata only; whether the bytes are packed into the zip is decided when
-        # the crate is written.
+        # A file the user may download, held locally and within the size limit, gets its content packed
+        # into the zip; any other file is listed with its metadata and contentUrl only.
         def file_entities(crate, assay_dir, assay)
           viewable(assay.data_files).map { |data_file| file_entity(crate, assay_dir, data_file) }
         end
@@ -15,9 +15,18 @@ module Seek
         def file_entity(crate, assay_dir, data_file)
           blob = data_file.content_blob
           path = "#{assay_dir}dataset/#{blob&.original_filename.presence || data_file.title}"
-          entity = ::ROCrate::DataEntity.new(crate, nil, path, '@type' => 'File')
+          entity = if packable?(data_file, blob)
+                     ::ROCrate::File.new(crate, blob.filepath, path, '@type' => 'File')
+                   else
+                     ::ROCrate::DataEntity.new(crate, nil, path, '@type' => 'File')
+                   end
           set(entity, file_properties(data_file, blob))
           crate.add_data_entity(entity)
+        end
+
+        def packable?(data_file, blob)
+          blob.present? && blob.file_exists? && blob.file_size.to_i <= MAX_PACKED_FILE_SIZE &&
+            data_file.can_download?(user)
         end
 
         def file_properties(data_file, blob)
