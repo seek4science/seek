@@ -217,6 +217,31 @@ sops:
     GROUP BY ?sop ?name
     ORDER BY ?name
 
+publications:
+  title: "List all publications"
+  description: "Find all publications (scholarly articles), with their authors, journal, publication date and DOI, the most recent first"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    SELECT ?publication ?name ?published ?journal ?doi
+           (GROUP_CONCAT(DISTINCT ?authorName; separator=", ") AS ?authors)
+    WHERE {
+      ?publication a schema:ScholarlyArticle ;
+                   schema:name ?name .
+      OPTIONAL { ?publication schema:datePublished ?published }
+      OPTIONAL {
+        ?publication schema:isPartOf ?periodical .
+        ?periodical a schema:Periodical ;
+                    schema:name ?journal .
+      }
+      OPTIONAL {
+        ?publication schema:identifier ?doi .
+        FILTER(STRSTARTS(STR(?doi), "https://doi.org/"))
+      }
+      OPTIONAL { ?publication schema:author/schema:name ?authorName }
+    }
+    GROUP BY ?publication ?name ?published ?journal ?doi
+    ORDER BY DESC(?published) ?name
+
 projects:
   title: "List all projects"
   description: "Find all projects, with their programme and the number of people and institutions taking part"

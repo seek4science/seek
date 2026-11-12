@@ -6,6 +6,7 @@ class Publication < ApplicationRecord
   class NoEmailConfiguredException < RuntimeError; end;
 
   include Seek::Rdf::RdfGeneration
+  include Seek::BioSchema::Support
   include Seek::ActsAsHavingMiscLinks
   include PublicationsHelper
 

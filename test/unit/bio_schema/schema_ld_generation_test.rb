@@ -38,6 +38,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/presentations', 'name' => 'Presentations' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/programmes', 'name' => 'Programmes' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/projects', 'name' => 'Projects' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/publications', 'name' => 'Publications' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/samples', 'name' => 'Samples' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/sops', 'name' => 'SOPs' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/workflows', 'name' => 'Workflows' }
@@ -107,6 +108,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        organisms_enabled: false,
                        presentations_enabled: false,
                        programmes_enabled: false,
+                       publications_enabled: false,
                        samples_enabled: false,
                        sops_enabled: false,
                        instance_description: 'a lovely project',
@@ -497,6 +499,81 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     fine_json_comparison expected, json
     check_version(document.latest_version, expected)
     check_schema_org_terms(json)
+  end
+
+  test 'publication' do
+    author = FactoryBot.create(:person)
+    publication = travel_to(@current_time) do
+      FactoryBot.create(:publication, contributor: @person, title: 'An Article', abstract: 'What we found',
+                                      journal: 'Journal of Things', published_date: '2017-10-10',
+                                      doi: '10.5072/abcd', pubmed_id: 1234, publisher: 'A Publisher',
+                                      publication_authors: [
+                                        FactoryBot.build(:publication_author, first_name: 'Jane', last_name: 'Doe',
+                                                                              author_index: 0),
+                                        FactoryBot.build(:publication_author, person: author, first_name: author.first_name,
+                                                                              last_name: author.last_name, author_index: 1)
+                                      ])
+    end
+
+    expected = {
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
+      '@type' => 'ScholarlyArticle',
+      '@id' => "http://localhost:3000/publications/#{publication.id}",
+      'name' => 'An Article',
+      'description' => 'What we found',
+      'url' => "http://localhost:3000/publications/#{publication.id}",
+      'keywords' => '',
+      'version' => 1,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'datePublished' => '2017-10-10',
+      'identifier' => ['https://doi.org/10.5072/abcd', 'https://www.ncbi.nlm.nih.gov/pubmed/1234'],
+      'author' => [
+        { '@type' => 'Person', '@id' => '#Jane%20Doe', 'name' => 'Jane Doe' },
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{author.id}", 'name' => author.name }
+      ],
+      'isPartOf' => [{ '@type' => 'Periodical', 'name' => 'Journal of Things' }],
+      'publisher' => { '@type' => 'Organization', 'name' => 'A Publisher' },
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{publication.projects.first.id}",
+          'name' => publication.projects.first.title }
+      ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
+      'subjectOf' => []
+    }
+
+    json = JSON.parse(publication.to_schema_ld)
+    fine_json_comparison expected, json
+    check_schema_org_terms(json)
+  end
+
+  test 'version of publication' do
+    publication = FactoryBot.create(:publication, title: 'An Article', journal: 'Journal of Things',
+                                                  published_date: '2017-10-10', license: 'CC-BY-4.0')
+    version = publication.latest_version
+    assert_equal 'Publication::Version', version.class.name
+
+    json = JSON.parse(version.to_schema_ld)
+    assert_equal 'ScholarlyArticle', json['@type']
+    assert_equal "http://localhost:3000/publications/#{publication.id}?version=1", json['@id']
+    assert_equal 'An Article', json['name']
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', json['license']
+    assert_equal '2017-10-10', json['datePublished']
+    assert_equal [{ '@type' => 'Periodical', 'name' => 'Journal of Things' }], json['isPartOf']
+  end
+
+  test 'publication without journal, date, identifiers or authors omits them' do
+    publication = FactoryBot.create(:publication, pubmed_id: nil, journal: nil, publisher: nil)
+
+    json = JSON.parse(publication.to_schema_ld)
+    assert_equal 'ScholarlyArticle', json['@type']
+    assert_equal [], json['isPartOf']
+    %w[author identifier datePublished publisher creator citation].each do |property|
+      assert_not json.key?(property), "expected '#{property}' to be absent"
+    end
   end
 
   test 'document without contributor omits contributor from schema_ld' do

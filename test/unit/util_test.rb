@@ -213,7 +213,7 @@ Model, ObservationUnit, Organism, Person, Placeholder, Presentation, Programme, 
   end
 
   test 'schema org supported types' do
-    expected = %w[AssetsCreator Collection DataFile Document Event HumanDisease Institution Organism Person Presentation Programme Project Sample Sop Workflow]
+    expected = %w[AssetsCreator Collection DataFile Document Event HumanDisease Institution Organism Person Presentation Programme Project Publication Sample Sop Workflow]
     assert_equal expected, Seek::Util.schema_org_supported_types.map(&:name)
   end
 

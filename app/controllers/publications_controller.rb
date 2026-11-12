@@ -25,6 +25,7 @@ class PublicationsController < ApplicationController
       format.html { render(params[:only_content] ? { layout: false } : {}) }
       format.rdf { render template: 'rdf/show' }
       format.json { render json: @publication, include: [params[:include]] }
+      format.jsonld { render body: @publication.to_schema_ld }
 
       format.any(*Publication::EXPORT_TYPES.keys) do
         with_export_rescue(@publication) do

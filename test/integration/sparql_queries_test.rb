@@ -32,6 +32,13 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
                                    creators: [@person], policy: FactoryBot.create(:public_policy))
     # publication creators are derived from its authors, so can't be set directly here
     @publication = FactoryBot.create(:publication, projects: [@project], contributor: @person,
+                                                   journal: 'Journal of Things', published_date: '2017-10-10',
+                                                   doi: '10.5072/abcd',
+                                                   publication_authors: [
+                                                     FactoryBot.build(:publication_author, person: @person,
+                                                                                           first_name: @person.first_name,
+                                                                                           last_name: @person.last_name)
+                                                   ],
                                                    policy: FactoryBot.create(:public_policy))
     @sample_type = FactoryBot.create(:simple_sample_type, projects: [@project], contributor: @person)
     @sample = FactoryBot.create(:sample, sample_type: @sample_type, projects: [@project],
@@ -75,6 +82,18 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
       results = run_query(config['query'])
       assert results.any?, "Query '#{key}' (#{config['title']}) returned no results — check seed data and RDF propagation"
     end
+  end
+
+  test 'publications query gives the details of a publication' do
+    results = run_query(QUERIES['publications']['query'])
+    assert_equal 1, results.count
+    result = results.first
+    assert_equal @publication.rdf_resource, result[:publication]
+    assert_equal @publication.title, result[:name].to_s
+    assert_equal '2017-10-10', result[:published].to_s
+    assert_equal 'Journal of Things', result[:journal].to_s
+    assert_equal 'https://doi.org/10.5072/abcd', result[:doi].to_s
+    assert_equal @person.name, result[:authors].to_s
   end
 
   private
