@@ -27,7 +27,9 @@ module Seek
 
       attr_reader :investigation, :user
 
-      def initialize(investigation, user = User.current_user)
+      # The crate holds what the given user can view; with no user it is the public view, the same
+      # for everyone.
+      def initialize(investigation, user = nil)
         @investigation = investigation
         @user = user
       end
