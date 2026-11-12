@@ -5,9 +5,8 @@ module Seek
       module Samples
         private
 
-        # The samples the user can view, as references to Sample entities.
-        def sample_references(crate, assay)
-          viewable(assay.samples).map { |sample| sample_entity(crate, sample).reference }
+        def sample_references(crate, samples)
+          samples.map { |sample| sample_entity(crate, sample).reference }
         end
 
         # One Sample entity per sample however many assays use it.

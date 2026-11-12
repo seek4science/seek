@@ -57,7 +57,7 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     person = FactoryBot.create(:person)
     investigation = FactoryBot.create(:investigation, contributor: person)
     study = FactoryBot.create(:study, investigation: investigation, contributor: person, title: 'Growth')
-    assay = FactoryBot.create(:assay, study: study, contributor: person, title: 'Transcriptomics')
+    assay = FactoryBot.create(:experimental_assay, study: study, contributor: person, title: 'Transcriptomics')
 
     json = Seek::RoCrate::ISACrateBuilder.new(investigation, person.user).metadata_json
 
@@ -237,7 +237,8 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     assert_equal 'http://purl.obolibrary.org/obo/PATO_0000011', age_entity['propertyID']
     assert_equal 88.7, weight_entity['value']
     assert_equal %w[g gram], [weight_entity['unitCode'], weight_entity['unitText']]
-    assert_equal [sample_entity['@id']], ids_of(isa_entity(json, 'Assay')['about'])
+    process = json['@graph'].detect { |e| e['@id'] == isa_entity(json, 'Assay')['about'].first['@id'] }
+    assert_equal [sample_entity['@id']], ids_of(process['object'])
   end
 
   test 'a sample shared by two assays appears once and hidden samples are skipped' do
@@ -254,7 +255,74 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     assert_nil samples.first['additionalProperty']
   end
 
+  test 'an assay with samples, data file and SOPs yields one LabProcess linking them' do
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    assay = FactoryBot.create(:assay, contributor: person, samples: [sample])
+    sops = 2.times.map { FactoryBot.create(:sop, contributor: person, assays: [assay], description: 'Extract RNA') }
+    FactoryBot.create(:data_file, contributor: person, assays: [assay])
+
+    json = Seek::RoCrate::ISACrateBuilder.new(assay.investigation, person.user).metadata_json
+
+    puts JSON.pretty_generate(json)
+
+
+    process = json['@graph'].detect { |e| e['@type'] == 'LabProcess' }
+    protocol = json['@graph'].detect { |e| e['@id'] == "#protocol-#{sops.first.id}" }
+
+    assert_equal "#process-assay-#{assay.id}", process['@id']
+    assert_equal "#{assay.title} process", process['name']
+    assert_equal [process['@id']], ids_of(isa_entity(json, 'Assay')['about'])
+    assert_equal ["#sample-#{sample.id}"], ids_of(process['object'])
+    assert_equal ids_of(isa_entity(json, 'Assay')['hasPart']), ids_of(process['result'])
+    assert_equal sops.map { |sop| "#protocol-#{sop.id}" }, ids_of(process['executesLabProtocol'])
+    assert_equal [person.ro_crate_metadata['@id']], ids_of(process['agent'])
+    assert_equal %w[LabProtocol], Array(protocol['@type'])
+    assert_equal [sops.first.title, 'Extract RNA'], protocol.values_at('name', 'description')
+    assert_equal sops.first.rdf_seek_id, protocol['identifier']
+    assert_equal sops.first.version, protocol['version']
+  end
+
+  test 'a bare assay has no LabProcess and an SOP-only assay keeps its protocol' do
+    person = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, contributor: person)
+    bare = FactoryBot.create(:assay, study: study, contributor: person)
+    with_sop = FactoryBot.create(:assay, study: study, contributor: person)
+    sop = FactoryBot.create(:sop, contributor: person, assays: [with_sop])
+
+    json = Seek::RoCrate::ISACrateBuilder.new(study.investigation, person.user).metadata_json
+    bare_entity = json['@graph'].detect { |e| e['@id'] == "assays/#{slug(bare)}/" }
+    process = json['@graph'].detect { |e| e['@type'] == 'LabProcess' }
+
+    assert_nil bare_entity['about']
+    assert_equal "#process-assay-#{with_sop.id}", process['@id']
+    assert_equal ["#protocol-#{sop.id}"], ids_of(process['executesLabProtocol'])
+    assert_nil process['object']
+    assert_nil process['result']
+  end
+
+  test 'outgoing samples are results of the process' do
+    person = FactoryBot.create(:person)
+    assay = FactoryBot.create(:assay, contributor: person)
+    incoming = FactoryBot.create(:sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    outgoing = FactoryBot.create(:sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    User.with_current_user(person.user) do
+      AssayAsset.create!(assay: assay, asset: incoming, direction: AssayAsset::Direction::INCOMING)
+      AssayAsset.create!(assay: assay, asset: outgoing, direction: AssayAsset::Direction::OUTGOING)
+    end
+
+    json = Seek::RoCrate::ISACrateBuilder.new(assay.investigation, person.user).metadata_json
+    process = json['@graph'].detect { |e| e['@type'] == 'LabProcess' }
+
+    assert_equal ["#sample-#{incoming.id}"], ids_of(process['object'])
+    assert_equal ["#sample-#{outgoing.id}"], ids_of(process['result'])
+  end
+
   private
+
+  def slug(resource)
+    "#{resource.id}-#{resource.title.parameterize}"
+  end
 
   def root_entity(json)
     json['@graph'].detect { |e| e['@id'] == './' }

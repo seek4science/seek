@@ -22,6 +22,7 @@ module Seek
       include People
       include Files
       include Samples
+      include Processes
 
       attr_reader :investigation, :user
 
@@ -65,7 +66,7 @@ module Seek
         children = viewable(assay.child_assays).flat_map { |child| add_assay(crate, child) }
         files = file_entities(crate, entity.id, assay)
         set(entity, 'hasPart' => (children + files).map(&:reference),
-                    'about' => sample_references(crate, assay))
+                    'about' => [process_reference(crate, assay, files)].compact)
         [entity, *children]
       end
 
