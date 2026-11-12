@@ -459,6 +459,46 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     assert_empty @repository.select(q)
   end
 
+  test 'update rdf is sent as a single update request' do
+    @repository.send_rdf(@project)
+    requests = []
+    original = @repository.method(:execute_update)
+    @repository.define_singleton_method(:execute_update) { |operations| requests << operations; original.call(operations) }
+    begin
+      @repository.update_rdf(@project)
+    ensure
+      @repository.singleton_class.send(:remove_method, :execute_update)
+    end
+
+    assert_equal 1, requests.size
+    assert(requests.first.any? { |operation| operation.include?('DELETE') })
+    assert(requests.first.any? { |operation| operation.include?('INSERT DATA') })
+    assert item_triple_count(@project) > 0
+  end
+
+  test 'a query never sees an item partly updated' do
+    @repository.send_rdf(@project)
+    count_query = "SELECT (COUNT(*) AS ?c) WHERE { GRAPH #{@private_graph.to_base} { #{@subject.to_base} ?p ?o } }"
+    expected = @repository.select(count_query)[0][:c].object.to_i
+    assert expected > 0
+
+    config = @repository.get_configuration
+    reader_repository = RDF::Virtuoso::Repository.new(config.uri, update_uri: config.update_uri,
+                                                                   username: config.username,
+                                                                   password: config.password, auth_method: 'digest')
+    counts = []
+    done = false
+    reader = Thread.new do
+      counts << reader_repository.select(count_query)[0][:c].object.to_i until done
+    end
+    10.times { @repository.update_rdf(@project) }
+    done = true
+    reader.join
+
+    assert counts.any?
+    assert_equal [expected], counts.uniq
+  end
+
   test 'clear all removes the aggregate and item graphs' do
     sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     @repository.send_rdf(sop)
