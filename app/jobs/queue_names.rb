@@ -7,4 +7,5 @@ class QueueNames
   MAILERS = SEEK::Application.config.action_mailer.deliver_later_queue_name
   INDEXING = 'indexing'.freeze
   TEMPLATES = 'templates'.freeze
+  RDF = 'rdf'.freeze
 end

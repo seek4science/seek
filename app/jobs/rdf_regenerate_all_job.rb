@@ -1,5 +1,6 @@
 # Clears the triple store, if one is configured, and then queues the RDF to be generated for every RDF capable item
 class RdfRegenerateAllJob < ApplicationJob
+  queue_as QueueNames::RDF
   def perform
     repository = Seek::Rdf::RdfRepository.instance
     repository.clear_all if repository.configured?

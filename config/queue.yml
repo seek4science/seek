@@ -32,6 +32,13 @@ default: &default
       threads: 1
       processes: 1
       polling_interval: 1
+    # RDF jobs must run one at a time, in the order queued: updating an item's RDF in the triple store (remove, then
+    # insert) isn't atomic, and RdfRegenerateAllJob clears the store before the items are regenerated. So this queue
+    # always has exactly one worker process with one thread.
+    - queues: <%= QueueNames::RDF %>
+      threads: 1
+      processes: 1
+      polling_interval: 1
     <% if Seek::Config.auth_lookup_enabled %>
     - queues: <%= QueueNames::AUTH_LOOKUP %>
       threads: 1
