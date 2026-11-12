@@ -28,14 +28,9 @@
         min-width: 150px; // Minimum column width
       }
 
-      .sparql-iri,
-      .sparql-bnode {
-        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-        color: #6c757d;
-
-        .external-link {
-          vertical-align: bottom;
-        }
+      // keeps a linked IRI in line with the <> around it, as the link is an inline-block
+      .sparql-iri .external-link {
+        vertical-align: bottom;
       }
 
       .external-link {
