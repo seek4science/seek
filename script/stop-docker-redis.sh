@@ -10,13 +10,13 @@ then
     exit 1
 fi
 
-if ! docker ps -a | grep -qw seek-redis
+if ! docker ps -a | grep -qw seek-cache
 then
-    echo "container named seek-redis does not exist"
+    echo "container named seek-cache does not exist"
     exit 1
 fi
 
-echo "stopping and removing seek-redis container"
-docker stop seek-redis > /dev/null 2>&1 || true
-docker rm seek-redis > /dev/null
+echo "stopping and removing seek-cache container"
+docker stop seek-cache > /dev/null 2>&1 || true
+docker rm seek-cache > /dev/null
 echo "stopped (the seek-redis-data-volume volume is kept)"

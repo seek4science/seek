@@ -54,7 +54,7 @@ bundle exec rake seek:reindex_all     # Rebuild Solr index
 ### Redis (cache + sessions)
 
 ```bash
-script/start-docker-redis.sh          # Start Redis via Docker (seek-redis on :6379)
+script/start-docker-redis.sh          # Start Redis via Docker (seek-cache container on :6379)
 script/stop-docker-redis.sh           # Stop Redis (keeps the seek-redis-data-volume)
 script/reset-docker-redis.sh          # Wipe and restart Redis (clears cache AND sessions)
 script/delete-docker-redis.sh         # Remove the stopped container and its data volume

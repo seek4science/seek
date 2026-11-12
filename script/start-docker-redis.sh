@@ -10,9 +10,9 @@ then
     exit 1
 fi
 
-if docker ps | grep -qw seek-redis
+if docker ps | grep -qw seek-cache
 then
-    echo "container named seek-redis is already running"
+    echo "container named seek-cache is already running"
     exit 1
 fi
 
@@ -24,9 +24,9 @@ fi
 
 # REDIS_PASSWORD, if set, is passed as an env var and expanded in the container to keep it out of the
 # command line. docker-entrypoint.sh still drops root to the redis user.
-docker rm seek-redis > /dev/null 2>&1 || true
-echo "creating and starting seek-redis container"
-docker run -d --name seek-redis --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" \
+docker rm seek-cache > /dev/null 2>&1 || true
+echo "creating and starting seek-cache container"
+docker run -d --name seek-cache --restart=unless-stopped -p 6379:6379 -v "seek-redis-data-volume:/data" \
   ${REDIS_PASSWORD:+-e REDIS_PASSWORD} redis:8.6-alpine \
   sh -c 'exec docker-entrypoint.sh redis-server "$@" ${REDIS_PASSWORD:+--requirepass "$REDIS_PASSWORD"}' sh \
   --appendonly yes --maxmemory "${REDIS_MAXMEMORY:-256mb}" --maxmemory-policy allkeys-lru
@@ -35,7 +35,7 @@ echo "waiting for Redis to be ready ..."
 retries=0
 # REDISCLI_AUTH is set for the docker exec alone and forwarded only when there is a password, so the
 # readiness check authenticates without the password on the redis-cli command line.
-until REDISCLI_AUTH="${REDIS_PASSWORD:-}" docker exec ${REDIS_PASSWORD:+-e REDISCLI_AUTH} seek-redis redis-cli ping 2>/dev/null | grep -q PONG; do
+until REDISCLI_AUTH="${REDIS_PASSWORD:-}" docker exec ${REDIS_PASSWORD:+-e REDISCLI_AUTH} seek-cache redis-cli ping 2>/dev/null | grep -q PONG; do
     sleep 1
     retries=$((retries + 1))
     if [ "$retries" -ge 60 ]; then
