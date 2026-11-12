@@ -84,6 +84,25 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'workflows by country only counts the institutions of the creators that take part in its projects' do
+    # the creator also works for a German institution, but through another project the workflow isn't part of
+    other_institution = FactoryBot.create(:institution, country: 'DE')
+    other_project = FactoryBot.create(:project)
+    disable_authorization_checks { @person.add_to_project_and_institution(other_project, other_institution) }
+    @person.reload
+    assert_includes @person.institutions, other_institution
+    [@person, other_institution, other_project].each { |item| @repository.update_rdf(item) }
+
+    query = QUERIES['schema_workflows_by_country']['query']
+    results = run_query(query)
+    assert_equal [@workflow.rdf_resource], results.map { |result| result[:workflow] }
+    assert_equal @institution.title, results.first[:institutions].to_s
+
+    assert_empty run_query(query.sub('"GB"', '"DE"')).to_a
+  ensure
+    [other_institution, other_project].compact.each { |item| item.delete_rdf_file if item.rdf_supported? }
+  end
+
   test 'publications query gives the details of a publication' do
     results = run_query(QUERIES['publications']['query'])
     assert_equal 1, results.count

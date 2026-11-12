@@ -117,7 +117,7 @@ schema_workflows_by_discipline:
 
 schema_workflows_by_country:
   title: "Find workflows by country"
-  description: "Find the workflows associated with a country, through the institutions of their creators, contributors and projects. Change the country code (ISO 3166-1, e.g. GB, DE, NL) at the top of the query to find others"
+  description: "Find the workflows associated with a country, through the institutions of their creators and contributors that also take part in the workflow's projects. Change the country code (ISO 3166-1, e.g. GB, DE, NL) at the top of the query to find others"
   query: |
     PREFIX schema: <https://schema.org/>
     PREFIX bioschemas: <https://bioschemas.org/terms/>
@@ -129,10 +129,12 @@ schema_workflows_by_country:
                 schema:name ?name .
       # exclude the workflow files described in the RO-Crates, to list each workflow once
       FILTER NOT EXISTS { ?workflow a schema:MediaObject }
-      # the institutions of the workflow's creators and contributors, and those of its projects
-      { ?workflow (schema:creator|schema:contributor)/schema:worksFor ?institution }
-      UNION
-      { ?workflow schema:producer/schema:member ?institution }
+      # the institutions of the workflow's creators and contributors, but only those that take part in the workflow's
+      # projects, as a person may also belong to other institutions
+      ?workflow (schema:creator|schema:contributor)/schema:worksFor ?institution ;
+                schema:producer ?project .
+      ?project a schema:Project ;
+               schema:member ?institution .
       ?institution a schema:ResearchOrganization ;
                    schema:name ?institutionName ;
                    schema:address/schema:addressCountry ?institutionCountry .
