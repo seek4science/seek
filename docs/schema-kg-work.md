@@ -1,6 +1,7 @@
 # Evaluation: `schema-knowledge-graph-messing` branch
 
-Evaluated against `main` at `766000e3a4` (merge base) on 2026-11-10.
+Evaluated against `main` at `766000e3a4` (merge base) on 2026-11-10. Status notes on each problem, and the
+[Work since the evaluation](#work-since-the-evaluation) section, were updated on 2026-11-12 (up to `cd7b338bc2`).
 
 ## Summary
 
@@ -78,9 +79,15 @@ already on `main`.
   - Per-model `to_rdf` tests in about 15 unit test files, plus `rdf_response_test.rb` and
     `sparql_queries_test.rb`.
 
-  I didn't run the tests: the latest `main` merge needs gems that aren't installed locally
-  (`crass-1.0.8`). These failures come from reading the code and should be confirmed with a
-  test run.
+  > **Status: still open.** Test runs since the evaluation confirm these failures (the full suite hasn't been run):
+  > - `sparql_queries_test.rb`: the 15 JERM example queries return nothing. The Schema.org example queries added
+  >   since all pass.
+  > - `rdf_triple_store_test.rb`: `send to store`, `update rdf`, `update rdf after resource type change` and
+  >   `update rdf change visibility`, which all assert `dcterms:title`.
+  > - `sparql_controller_test.rb`: 3 tests, and `rdf_generation_job_test.rb`: 3 tests.
+  > - `rdf_generation_test.rb`: the EMT triples and `rdf_supported?` expectations.
+  > - `workflows_controller_test.rb` `should return 406 when requesting RDF`: Workflow is now RDF capable, so the
+  >   request returns 200.
 
 ### 2. Blocking: Schema.org namespace mismatch (`http` vs `https`)
 
@@ -110,7 +117,8 @@ Bioschemas context to match.
 > drops the item graph. Blank nodes are skolemized to `<site>/.well-known/genid/<uuid>`. Before this change they
 > were also disconnected, because each statement went in a separate `INSERT`. Inserts are now batched (200 per
 > request). Covered by new tests in `test/integration/rdf_triple_store_test.rb`. Existing stores must be cleared and
-> regenerated, because data sent before this change has no item graph and so can't be removed. A privacy change to a
+> regenerated, because data sent before this change has no item graph and so can't be removed. The admin
+> "Regenerate all RDF" button does both. A privacy change to a
 > related item still only clears its name from other items' graphs once those items regenerate: `Policy` enqueues
 > with `refresh_dependents: false`.
 
@@ -153,6 +161,16 @@ Preload the context with `JSON::LD::Context.add_preloaded`, ship the context fil
 
 ### 5. Major: Workflow RO-Crate generation is heavy and unguarded
 
+> **Status: still open.** None of the four points below has been changed. Two related changes since the
+> evaluation:
+> - By default SEEK now regenerates the RO-Crate of a workflow uploaded as a full RO-Crate
+>   (`regenerate_workflow_ro_crates`, see [Work since the evaluation](#work-since-the-evaluation)), so the graph's
+>   copy of the crate now carries SEEK's metadata rather than the uploader's. This adds to the cost per
+>   regeneration, as the uploaded crate is opened and then merged.
+> - The proposed fix for the disconnected nodes (the last point) is to add
+>   `<workflow> schema:workExample <…/crate/main-workflow-file>` and `<workflow> schema:subjectOf <…/crate/>` to the
+>   RDF copy of the crate only, in `Workflow#ro_crate_metadata`. This hasn't been implemented.
+
 - `latest_version.ro_crate.metadata` builds the full RO-Crate model, including walking the git
   tree, on every RDF regeneration. RDF regeneration happens on every save and for dependents.
 - Any error (missing git objects, a bad main workflow path, a remote file) raises from inside
@@ -166,6 +184,8 @@ Preload the context with `JSON::LD::Context.add_preloaded`, ship the context fil
   is disconnected from the item's own node.
 
 ### 6. Minor: the CSV mapping is now vestigial
+
+> **Status: still open.**
 
 With three rows, two of which ignore the `property` column (`nil`) and the subject, the CSV plus
 `eval` machinery adds indirection without benefit. An explicit method would be clearer, for
@@ -192,6 +212,14 @@ but one method name with two contracts is a trap. Rename it, for example
 
 ### 7. Minor: housekeeping
 
+> **Status: partly addressed.**
+> - Done: `pp statement` is gone from `RdfRepository#send_rdf`, and `send_rdf`, `remove_rdf` and `update_rdf` all
+>   gate on `rdf_supported?`.
+> - Still open: the `pp` calls, the missing assertions and the commented-out line in the `send schema to store`
+>   test; the `to_schema_ld` stub in `workflow.rb`; the four commented-out calls in `to_rdf_graph`; the
+>   `rdf_capable_types` / `schema_org_supported_types` aliasing; the unused JERM leftovers; `to_json_ld`; and the
+>   merge history.
+
 - `pp statement` in `RdfRepository#send_rdf`, and `pp person.to_rdf` / `pp inst.to_rdf_graph` in
   the test.
 - The new test has no assertions, so it only checks that nothing raises.
@@ -209,6 +237,76 @@ but one method name with two contracts is a trap. Rename it, for example
 - The merge history (several merges from `seek-1.17` and `main`, plus a revert pair) should be
   squashed or rebased if this becomes a PR.
 
+## Work since the evaluation
+
+All on this branch, in order. Most commits carry `[skip ci]`.
+
+### Triple store
+
+- **Per-item named graphs** (`bb9f93a956`): see problem 3. Each item's statements are also stored in
+  `<private_graph>/items/<Class>/<id>`, so removal is exact. Blank nodes are skolemized and inserts batched.
+- **Clearing the store** (`d05641cfb0`): `RdfRepository#clear_all` drops the public and private graphs and every
+  item graph. `RdfRepository#item_graph_uris` lists the item graphs.
+
+### RDF generation
+
+- **One Schema.org namespace** (`7cc0a73c1f`): see problem 2.
+- **The RO-Crate's own context is kept** (`15144395c7`), so the crate's `ComputationalWorkflow` uses the same
+  Bioschemas IRI as SEEK's own output.
+- **Relative IRIs are resolved against the item's URL** (`741dd2c675`). Before this, statements using relative
+  IRIs such as `#cwl` were dropped, so the workflow's `programmingLanguage`, inputs and outputs were missing from
+  the graph.
+- **Preloaded RO-Crate contexts** (`c30d00ab4a`): see problem 4.
+- **Workflow topics, disciplines and operations** (`1edcf0aa88`): the Bioschemas output now has topics (EDAM) and
+  disciplines (OpenAlex fields) as `schema:about`, and operations (EDAM) as `schema:featureList`. Each is a
+  `DefinedTerm`, with `inDefinedTermSet` (`http://edamontology.org` or `https://openalex.org/fields`) when its IRI
+  belongs to that set. These appear in the page JSON-LD, the knowledge graph and generated RO-Crates.
+
+### Workflow RO-Crates
+
+- **Regenerating uploaded crates** (`9e35220638`, `d05641cfb0`): before this, a workflow uploaded as a full
+  RO-Crate (not a "basic" one) was served exactly as uploaded, with none of SEEK's metadata. Two settings, on the
+  admin Features enabled page under Workflows, now control this:
+  - `regenerate_workflow_ro_crates` (default `true`): whether SEEK adds its metadata to uploaded crates.
+  - `workflow_ro_crate_regeneration_strategy` (default `replace_all`): how it does so.
+
+  | Strategy | Uploaded main workflow metadata |
+  |---|---|
+  | `replace_all` | SEEK's values replace the uploaded ones. Fields only the upload has are kept. |
+  | `replace_seek` | Only the fields describing SEEK's record are replaced (`url`, `identifier`, `isBasedOn`, `contributor`, `producer`, `creator`, `license`, `version`, the dates and `sdPublisher`). Others are only added if missing. |
+  | `fill_missing` | SEEK's values are only added where the upload has none. |
+  | `new_crate` | A new crate holding the uploaded files, described only by SEEK. |
+
+  Blank SEEK values never replace uploaded ones, and `@id`, `@type`, `image` and `subjectOf` are never replaced.
+  With the replace strategies, uploaded entities that nothing refers to any more are removed. Workflows uploaded
+  as plain files, and basic crates, still only get missing values added, as before.
+
+### SPARQL UI
+
+- **Schema.org example queries** (`853e75642a`, `644bc68c78`, `ee805171cb`, `1edcf0aa88`): people, workflows, CWL
+  workflows by language identifier, RO-Crates, workflow files, and workflows with their disciplines, topics and
+  operations. `sparql_queries_test.rb` seeds an annotated public workflow so that each returns results.
+- **Queries use GET** (`bca1417578`), so the back button doesn't resubmit the form.
+- **Tooltips** (`cb48668857`) show the full value of truncated links in the results.
+
+### Admin and configuration
+
+- **Regenerate all RDF** (`9e35220638`, `d05641cfb0`): a button on the admin page queues `RdfRegenerateAllJob`.
+  The job clears the triple store, then queues RDF generation for every RDF capable item through
+  `RdfGenerationQueue.enqueue_all`. `rake seek_rdf:generate` uses the same method, but doesn't clear the store.
+- **New defaults**: `workflows_enabled` (`7da01532a4`) and `git_support_enabled` (`cd7b338bc2`) are now `true`.
+
+### Docker
+
+- **`docker-compose-virtuoso.yml`** (`7da01532a4`, `01751845b4`): the volumes are prefixed `kg-`, and the fixed
+  container names are gone.
+  - Virtuoso's HTTP port (SPARQL and Conductor) is published on host port 9890, and its isql port on
+    127.0.0.1:9111. `VIRTUOSO_PORT` and `VIRTUOSO_ISQL_PORT` change these.
+  - SEEK still reaches it at `virtuoso:8890` within the compose network.
+  - The file shares the default project name `seek` (from the directory) and its service names with
+    `docker-compose.yml`, so starting it replaces the main stack's containers. Give it its own project name
+    (`name:` in the file, or `-p`) to run both.
+
 ## Recommendations
 
 1. **Decide the model before polishing.** Should Schema.org fully *replace* JERM in the graph, or
@@ -220,14 +318,13 @@ but one method name with two contracts is a trap. Rename it, for example
 2. **Restore EMT and sample-attribute triples.** Either keep them as additional triples, or emit
    them as `additionalProperty`/`PropertyValue` in the JSON-LD (this would also make them visible
    on the page).
-3. **Store one named graph per item** (inside the public and private split, or with visibility
-   recorded on the graph), so updates and removals are exact and blank nodes and foreign-subject
-   triples stop accumulating.
-4. **Normalise to a single Schema.org namespace** and add a test that checks it.
-5. **Remove network access from RDF generation** by preloading the RO-Crate context, and wrap
+3. ~~**Store one named graph per item**~~ (done, see problem 3).
+4. ~~**Normalise to a single Schema.org namespace**~~ (done, see problem 2).
+5. ~~**Remove network access from RDF generation**~~ (done, see problem 4). Still to do: wrap
    RO-Crate generation in error handling. Consider caching it per version, since a version's crate
    is immutable once frozen.
-6. **Update or replace the failing tests and `config/sparql_queries.yml`**, and give the new
+6. **Update or replace the failing tests and the JERM queries in `config/sparql_queries.yml`** (the
+   Schema.org example queries are done), and give the new
    triple-store test real assertions, for example a `schema:name` triple per type and namespace
    checks.
 7. **Make the RDF-capable type list and the models that include `RdfGeneration` agree**, so that
