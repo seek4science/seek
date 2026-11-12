@@ -22,15 +22,30 @@ module Ror
       ror_link.split('/').last
     end
 
+    RECORD_CACHE_EXPIRY = 7.days
+
+    # The full ROR record (https://ror.readme.io/docs/data-structure) for the ROR ID, as a Hash, or { error: message }
+    # if it couldn't be fetched. Records are cached, but errors are not.
+    def fetch_record(ror_id)
+      return { error: 'No ROR ID given' } if ror_id.blank?
+
+      key = "ror/v2/organizations/#{ror_id}"
+      cached = Rails.cache.read(key)
+      return cached if cached
+
+      response = request("organizations/#{ror_id}")
+      if response.key?(:error)
+        Rails.logger.warn("Unable to fetch ROR record #{ror_id}: #{response[:error]}")
+      else
+        Rails.cache.write(key, response, expires_in: RECORD_CACHE_EXPIRY)
+      end
+      response
+    end
+
     # Fetch institution details by ROR ID
     def fetch_by_id(ror_id)
-      response = request("organizations/#{ror_id}")
-
-      if response.key?(:error)
-        return { error: response[:error]}
-      else
-        return extract_details(response)
-      end
+      response = fetch_record(ror_id)
+      response.key?(:error) ? response : extract_details(response)
     end
 
     private

@@ -57,7 +57,7 @@ module Seek
             item = eval(transformation)
           end
           if uri_or_literal.casecmp('j').zero?
-            rdf_graph.insert(*jsonld_statements(item))
+            rdf_graph.insert(*jsonld_statements(item)) unless item.nil?
           else
             o = if uri_or_literal.casecmp('u').zero?
                   handle_uri_for_item(item)

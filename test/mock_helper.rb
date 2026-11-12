@@ -103,6 +103,22 @@ module MockHelper
   end
 
   def ror_mock
+    # any other ROR ID, such as the other sub organizations of 027m9bs27, isn't found. Declared first, as later stubs
+    # take precedence
+    stub_request(:get, %r{\Ahttps://api\.ror\.org/v2/organizations/.+})
+      .to_return(
+        status: 404,
+        body: { errors: ['ROR ID not found'] }.to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )
+
+    stub_request(:get, 'https://api.ror.org/v2/organizations/03xxxrq06')
+      .to_return(
+        status: 200,
+        body: File.read("#{Rails.root}/test/fixtures/files/mocking/ror_child_response.json"),
+        headers: { 'Content-Type' => 'application/json' }
+      )
+
     file_path = "#{Rails.root}/test/fixtures/files/mocking/ror_response.json"
     stub_request(:get, "https://api.ror.org/v2/organizations/027m9bs27")
       .to_return(
