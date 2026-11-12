@@ -43,10 +43,12 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
                                              creators: [@person], policy: FactoryBot.create(:public_policy))
     FactoryBot.create(:topics_controlled_vocab)
     FactoryBot.create(:operations_controlled_vocab)
-    FactoryBot.create(:disciplines_controlled_vocab)
+    disciplines = FactoryBot.create(:disciplines_controlled_vocab)
+    disciplines.sample_controlled_vocab_terms.create!(label: 'Computer Science', iri: 'https://openalex.org/fields/17',
+                                                      parent_iri: 'https://openalex.org/domains/3')
     @workflow.topic_annotations = 'Chemistry'
     @workflow.operation_annotations = 'Clustering, Correlation'
-    @workflow.discipline_annotations = 'Physics and Astronomy'
+    @workflow.discipline_annotations = 'Physics and Astronomy, Computer Science'
     disable_authorization_checks { @workflow.save! }
 
     rdf_items.each { |item| @repository.send_rdf(item) if item.rdf_supported? }
