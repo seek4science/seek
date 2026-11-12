@@ -4,6 +4,12 @@ module SparqlHelper
     "<i class=\"glyphicon glyphicon-ok-circle\"></i>&nbsp;Query Results (#{@results.length} results)"
   end
 
+  # The columns of the SPARQL results table: the variables of a SELECT query, otherwise those of all the rows, as a
+  # row doesn't hold the variables that weren't bound for it.
+  def sparql_result_columns(results)
+    @result_columns.presence || results.flat_map(&:keys).uniq
+  end
+
   # Displays a value of the SPARQL results, distinguishing the kind of RDF term. An IRI (a node in the graph) is shown
   # within <>, as in SPARQL and Turtle, a blank node with its _: label, and a literal as its plain value. Any that
   # are http(s) URLs are linked.

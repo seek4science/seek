@@ -1,9 +1,10 @@
 <% if results.present? && results.first.is_a?(Hash) %>
+  <% columns = sparql_result_columns(results) %>
   <div class="table-responsive">
     <table class="table table-striped table-bordered table-condensed">
       <thead>
       <tr>
-        <% results.first.keys.each do |column| %>
+        <% columns.each do |column| %>
           <th><%= column.to_s.humanize %></th>
         <% end %>
       </tr>
@@ -11,8 +12,8 @@
       <tbody>
       <% results.each do |row| %>
         <tr>
-          <% row.values.each do |value| %>
-            <td><%= sparql_result_value(value) %></td>
+          <% columns.each do |column| %>
+            <td><%= sparql_result_value(row[column]) unless row[column].nil? %></td>
           <% end %>
         </tr>
       <% end %>

@@ -290,6 +290,24 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'results table has a column for each variable, in order, even those unbound in the first row' do
+    query = 'SELECT ?first ?second WHERE { VALUES (?second ?first) { ("only second" UNDEF) ("two" "one") } }'
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select '#sparql-results table' do
+      assert_select 'thead th', count: 2
+      assert_select 'thead th:nth-child(1)', text: 'First'
+      assert_select 'thead th:nth-child(2)', text: 'Second'
+      assert_select 'tbody tr', count: 2
+      assert_select 'tbody tr:nth-child(1) td:nth-child(1)', text: ''
+      assert_select 'tbody tr:nth-child(1) td:nth-child(2)', text: 'only second'
+      assert_select 'tbody tr:nth-child(2) td:nth-child(1)', text: 'one'
+      assert_select 'tbody tr:nth-child(2) td:nth-child(2)', text: 'two'
+    end
+  end
+
   test 'respond with json when using content negotiation' do
     path = query_sparql_index_path
     create_some_triples
