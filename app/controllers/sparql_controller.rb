@@ -40,8 +40,8 @@ class SparqlController < ApplicationController
         @example_queries = load_example_queries
         render :index, status: status
       end
-      format.json { render json: { 'results': @results, 'error': @error }.compact, status: status }
-      format.xml { render xml: @results.to_xml, status: status }
+      format.json { render json: { 'results': results_as_strings, 'error': @error }.compact, status: status }
+      format.xml { render xml: results_as_strings.to_xml, status: status }
     end
   end
 
@@ -57,6 +57,8 @@ class SparqlController < ApplicationController
     convert_sparql_results(results)
   end
 
+  # Converts the results to rows, as a Hash of each variable to its value. The values are kept as RDF terms, so that
+  # IRIs, blank nodes and literals can be told apart when displayed.
   def convert_sparql_results(results)
     return [] if results.nil?
 
@@ -67,9 +69,9 @@ class SparqlController < ApplicationController
     if results.respond_to?(:map)
       results.map do |solution|
         if solution.respond_to?(:to_h)
-          solution.to_h.transform_values { |v| v.respond_to?(:to_s) ? v.to_s : v }
+          solution.to_h
         elsif solution.respond_to?(:bindings)
-          solution.bindings.transform_values { |v| v.respond_to?(:to_s) ? v.to_s : v }
+          solution.bindings
         else
           solution.to_s
         end
@@ -78,6 +80,10 @@ class SparqlController < ApplicationController
       # This handles ASK queries (boolean) and any other single values
       [{ 'result' => results.to_s }]
     end
+  end
+
+  def results_as_strings
+    @results.map { |row| row.is_a?(Hash) ? row.transform_values(&:to_s) : row }
   end
 
   def rdf_repository_available?

@@ -28,6 +28,16 @@
         min-width: 150px; // Minimum column width
       }
 
+      .sparql-iri,
+      .sparql-bnode {
+        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        color: #6c757d;
+
+        .external-link {
+          vertical-align: bottom;
+        }
+      }
+
       .external-link {
         word-break: break-all;
         max-width: 300px; // Limit URI column width

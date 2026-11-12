@@ -265,6 +265,31 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_empty expected - described
   end
 
+  test 'results distinguish IRIs from literals, including literals that are URLs' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    iri = data_file.rdf_resource.to_s
+    query = %(SELECT ?datafile ?title ?url
+      WHERE {
+        ?datafile <https://schema.org/name> "public data file" ; <https://schema.org/name> ?title .
+        BIND("#{iri}" AS ?url)
+      })
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select '#sparql-results table tbody tr', count: 1 do
+      assert_select 'td', count: 3
+      assert_select 'td:nth-child(1) span.sparql-iri[title=?]', 'IRI (node)', text: "<#{iri}>" do
+        assert_select 'a.external-link[href=?]', iri, text: iri
+      end
+      assert_select 'td:nth-child(2) span.sparql-literal', text: 'public data file'
+      assert_select 'td:nth-child(3) span.sparql-literal', text: iri do
+        assert_select 'a.external-link[href=?]', iri
+      end
+    end
+  end
+
   test 'respond with json when using content negotiation' do
     path = query_sparql_index_path
     create_some_triples
