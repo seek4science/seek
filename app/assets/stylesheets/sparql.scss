@@ -56,14 +56,10 @@
   }
 
   .sparql-examples {
-    margin-top: 2rem;
+    margin-bottom: 1.5rem;
 
-    .example-query-filter {
-      margin-bottom: 1.5rem;
-      
-      .input-group {
-        max-width: 400px;
-      }
+    #example-query-select {
+      max-width: 600px;
     }
 
     .example-query {
@@ -73,12 +69,8 @@
       padding: 1rem;
       margin-bottom: 1rem;
 
-      .query-title {
+      .example-query-description {
         margin-bottom: 0.5rem;
-
-        .label {
-          margin-left: 0.5rem;
-        }
       }
 
       .query-code {
@@ -91,10 +83,6 @@
         margin: 0.5rem 0;
         white-space: pre-wrap;
         word-wrap: break-word;
-      }
-
-      .use-query {
-        margin-top: 0.5rem;
       }
     }
   }

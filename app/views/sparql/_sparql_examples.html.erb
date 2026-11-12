@@ -1,25 +1,27 @@
-
 <div class="sparql-examples">
-  <%= folding_panel(sparql_examples_panel_title, true, class: 'panel-info') do %>
-    <div class="example-query-filter">
-      <div class="form-group">
-        <div class="input-group">
-                <span class="input-group-addon">
-                  <i class="glyphicon glyphicon-search"></i>
-                </span>
-          <input type="text" class="form-control" id="query-filter" placeholder="Filter example queries..."/>
-        </div>
-      </div>
+  <% if @example_queries.present? %>
+    <div class="form-group">
+      <label for="example-query-select" class="control-label">Example queries:</label>
+      <select id="example-query-select" class="form-control">
+        <option value="">Choose an example query...</option>
+        <% @example_queries.each do |key, example| %>
+          <%= content_tag(:option, example['title'], value: key,
+                          data: { description: example['description'], query: example['query'].strip }) %>
+        <% end %>
+      </select>
     </div>
 
-    <div id="example-queries-container">
-      <%= render partial: "example_queries" %>
+    <div id="example-query-preview" class="example-query" style="display: none;">
+      <p class="example-query-description text-muted"></p>
+      <pre class="query-code"></pre>
+      <button type="button" class="btn btn-sm btn-default" id="use-example-query">
+        <i class="glyphicon glyphicon-arrow-down"></i> Use this query
+      </button>
     </div>
-
-    <div id="no-queries-message" class="alert alert-info" style="display: none;">
+  <% else %>
+    <div class="alert alert-info">
       <i class="glyphicon glyphicon-info-sign"></i>
-      No example queries match your search.
+      No example queries available.
     </div>
-
   <% end %>
 </div>

@@ -13,6 +13,7 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
     @person = FactoryBot.create(:person)
     @project = @person.projects.first
     @programme = @project.programme
+    @institution = @person.institutions.first
 
     User.current_user = @person.user
 
@@ -61,7 +62,7 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
 
   def rdf_items
     [@investigation, @study, @assay, @data_file, @model, @sop,
-     @publication, @sample, @organism, @strain, @person, @project, @programme, @workflow].compact
+     @publication, @sample, @organism, @strain, @person, @project, @programme, @institution, @workflow].compact
   end
 
   # Dynamically generate a test for each query in sparql_queries.yml.

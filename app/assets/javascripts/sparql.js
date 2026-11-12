@@ -72,21 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // Use example query buttons
-    const useQueryButtons = document.querySelectorAll('.use-query');
-    useQueryButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const queryText = this.dataset.query;
-            if (queryTextarea) {
-                queryTextarea.value = queryText;
-                queryTextarea.focus();
-
-                // Scroll to the query form
-                queryTextarea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    });
-
     // Auto-resize textarea
     if (queryTextarea) {
         function autoResize() {
@@ -126,87 +111,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle example query dropdown
-    const exampleQuerySelect = document.getElementById('example-queries');
-    
-    if (exampleQuerySelect && queryTextarea) {
-        exampleQuerySelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            
-            if (selectedOption.value) {
-                const rawQuery = selectedOption.dataset.query;
-                
-                // Decode HTML entities
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = rawQuery;
-                const query = tempDiv.textContent || tempDiv.innerText || '';
-                
-                // Set the decoded query in the textarea
-                queryTextarea.value = query;
-                queryTextarea.focus();
-                
-                // Auto-resize after setting the query
-                queryTextarea.style.height = 'auto';
-                queryTextarea.style.height = Math.max(queryTextarea.scrollHeight, 200) + 'px';
-                
-                // Reset dropdown to default
-                this.selectedIndex = 0;
-                
-                // Scroll to the query form
-                queryTextarea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    }
+    // Example query dropdown: selecting an example shows a preview, and the button copies it into the query
+    const exampleSelect = document.getElementById('example-query-select');
+    const examplePreview = document.getElementById('example-query-preview');
+    const useExampleBtn = document.getElementById('use-example-query');
 
-    // Example query filter functionality
-    const queryFilter = document.getElementById('query-filter');
-    const queriesContainer = document.getElementById('example-queries-container');
-    const noQueriesMessage = document.getElementById('no-queries-message');
-    
-    if (queryFilter && queriesContainer) {
-        queryFilter.addEventListener('input', function() {
-            const filterText = this.value.toLowerCase().trim();
-            const exampleQueries = queriesContainer.querySelectorAll('.example-query');
-            let visibleCount = 0;
-            
-            exampleQueries.forEach(function(query) {
-                const title = query.querySelector('.query-title strong');
-                const description = query.querySelector('.text-muted');
-                const queryCode = query.querySelector('.query-code');
-                
-                const titleText = title ? title.textContent.toLowerCase() : '';
-                const descriptionText = description ? description.textContent.toLowerCase() : '';
-                const codeText = queryCode ? queryCode.textContent.toLowerCase() : '';
-                
-                const matchesFilter = filterText === '' || 
-                    titleText.includes(filterText) || 
-                    descriptionText.includes(filterText) ||
-                    codeText.includes(filterText);
-                
-                if (matchesFilter) {
-                    query.parentElement.style.display = '';
-                    visibleCount++;
-                } else {
-                    query.parentElement.style.display = 'none';
-                }
-            });
-            
-            // Show/hide "no results" message
-            if (noQueriesMessage) {
-                if (visibleCount === 0 && filterText !== '') {
-                    noQueriesMessage.style.display = 'block';
-                } else {
-                    noQueriesMessage.style.display = 'none';
-                }
+    if (exampleSelect && examplePreview && useExampleBtn && queryTextarea) {
+        exampleSelect.addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            if (!option.value) {
+                examplePreview.style.display = 'none';
+                return;
             }
+            // textContent, so the query and description are shown as text rather than parsed as HTML
+            examplePreview.querySelector('.example-query-description').textContent = option.dataset.description || '';
+            examplePreview.querySelector('.query-code').textContent = option.dataset.query;
+            examplePreview.style.display = '';
         });
-        
-        // Clear filter when escape key is pressed
-        queryFilter.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                this.value = '';
-                this.dispatchEvent(new Event('input'));
-            }
+
+        useExampleBtn.addEventListener('click', function() {
+            const option = exampleSelect.options[exampleSelect.selectedIndex];
+            if (!option.value) return;
+
+            queryTextarea.value = option.dataset.query;
+            queryTextarea.dispatchEvent(new Event('input')); // resizes the textarea
+            queryTextarea.focus();
+            queryTextarea.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     }
 });

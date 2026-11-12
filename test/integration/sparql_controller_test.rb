@@ -17,11 +17,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   def teardown
     return unless @repository.configured?
 
-    q = @repository.query.delete(%i[s p o]).graph(@private_graph).where(%i[s p o])
-    @repository.delete(q)
-
-    q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
-    @repository.delete(q)
+    @repository.clear_all
     VCR.configure do |c|
       c.allow_http_connections_when_no_cassette = false
     end
@@ -39,7 +35,31 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
           assert_select 'textarea.sparql-textarea', text: ''
           assert_select 'select#format option[selected=selected][value=?]', 'html'
         end
-        assert_select 'div.sparql-examples div.panel'
+        assert_select 'div.sparql-examples select#example-query-select'
+      end
+    end
+  end
+
+  test 'example queries are listed in a dropdown, with a hidden preview and a button to use them' do
+    examples = YAML.safe_load(File.read(Rails.root.join('config', 'sparql_queries.yml')))
+    get sparql_index_path
+    assert_response :success
+
+    assert_select 'div.sparql-examples' do
+      assert_select 'select#example-query-select' do
+        assert_select 'option', count: examples.size + 1
+        assert_select 'option[value=""]', text: 'Choose an example query...'
+      end
+      examples.each do |key, example|
+        option = css_select("select#example-query-select option[value='#{key}']").first
+        assert option, "no option for #{key}"
+        assert_equal example['title'], option.text
+        assert_equal example['query'].strip, option['data-query']
+        assert_equal example['description'], option['data-description']
+      end
+      assert_select 'div#example-query-preview[style=?]', 'display: none;' do
+        assert_select 'pre.query-code'
+        assert_select 'button#use-example-query', text: /Use this query/
       end
     end
   end
@@ -63,9 +83,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     create_some_triples
     query = 'SELECT ?datafile ?title
       WHERE {
-        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-        ?datafile <http://purl.org/dc/terms/title> "public data file" .
-        ?datafile <http://purl.org/dc/terms/title> ?title .
+        ?datafile a <https://schema.org/Dataset> .
+        ?datafile <https://schema.org/name> "public data file" .
+        ?datafile <https://schema.org/name> ?title .
       }'
 
     post path, params: { sparql_query: query, format: 'json' }
@@ -76,9 +96,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     query = 'SELECT ?datafile ?title
       WHERE {
-        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-        ?datafile <http://purl.org/dc/terms/title> "private data file" .
-        ?datafile <http://purl.org/dc/terms/title> ?title .
+        ?datafile a <https://schema.org/Dataset> .
+        ?datafile <https://schema.org/name> "private data file" .
+        ?datafile <https://schema.org/name> ?title .
       }'
 
     post path, params: { sparql_query: query, format: 'json' }
@@ -94,9 +114,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     create_some_triples
     query = 'SELECT ?datafile ?title
       WHERE {
-        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-        ?datafile <http://purl.org/dc/terms/title> "public data file" .
-        ?datafile <http://purl.org/dc/terms/title> ?title .
+        ?datafile a <https://schema.org/Dataset> .
+        ?datafile <https://schema.org/name> "public data file" .
+        ?datafile <https://schema.org/name> ?title .
       }'
 
     post path, params: { sparql_query: query }
@@ -116,10 +136,12 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     query = 'SELECT ?datafile ?title ?graph
       WHERE {
         GRAPH ?graph {
-          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-          ?datafile <http://purl.org/dc/terms/title> "private data file" .
-          ?datafile <http://purl.org/dc/terms/title> ?title .
+          ?datafile a <https://schema.org/Dataset> .
+          ?datafile <https://schema.org/name> "private data file" .
+          ?datafile <https://schema.org/name> ?title .
         }
+        # leave out the graph that holds just this item\'s statements
+        FILTER(!CONTAINS(STR(?graph), "/items/"))
       }'
 
     post path, params: { sparql_query: query, format: 'json' }
@@ -139,9 +161,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     query = 'SEECT ?datafile ?invalid ?graph
       WHERE {
         GRAPH ?graph {
-          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-          ?datafile <http://purl.org/dc/terms/title> "public data file" .
-          ?datafile <http://purl.org/dc/terms/title> ?title .
+          ?datafile a <https://schema.org/Dataset> .
+          ?datafile <https://schema.org/name> "public data file" .
+          ?datafile <https://schema.org/name> ?title .
         }
       }'
 

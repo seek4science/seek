@@ -1,15 +1,12 @@
 ---
-# SPARQL Example Queries for SEEK
-# Uses JERM ontology: http://jermontology.org/ontology/JERMOntology#
-# Prefixes: jerm = http://jermontology.org/ontology/JERMOntology#
-#           dcterms = http://purl.org/dc/terms/
-#           foaf = http://xmlns.com/foaf/0.1/
-# The schema_* queries use the Schema.org / Bioschemas vocabulary:
-#           schema = https://schema.org/
-#           bioschemas = https://bioschemas.org/terms/
+# SPARQL example queries for SEEK, shown in the SPARQL UI in the order given here.
+# They use the Schema.org / Bioschemas vocabulary that SEEK's knowledge graph is built from:
+#   schema = https://schema.org/
+#   bioschemas = https://bioschemas.org/terms/
+# test/integration/sparql_queries_test.rb checks that each one returns results for its seed data.
 
 schema_people:
-  title: "List all people (Schema.org)"
+  title: "List all people"
   description: "Find all people with their names and the projects they are members of"
   query: |
     PREFIX schema: <https://schema.org/>
@@ -26,7 +23,7 @@ schema_people:
     ORDER BY ?name
 
 schema_workflows:
-  title: "List all workflows (Schema.org)"
+  title: "List all workflows"
   description: "Find all computational workflows with their names, workflow language and creators"
   query: |
     PREFIX schema: <https://schema.org/>
@@ -47,7 +44,7 @@ schema_workflows:
     ORDER BY ?name
 
 schema_cwl_workflows:
-  title: "List all CWL workflows (Schema.org)"
+  title: "List all CWL workflows"
   description: "Find all workflows whose programming language has the identifier https://w3id.org/cwl/v1.0/"
   query: |
     PREFIX schema: <https://schema.org/>
@@ -65,7 +62,7 @@ schema_cwl_workflows:
     ORDER BY ?name
 
 schema_workflow_annotations:
-  title: "List workflows with their disciplines, topics and operations (Schema.org)"
+  title: "List workflows with their disciplines, topics and operations"
   description: "Find all workflows, with their scientific disciplines (OpenAlex fields), EDAM topics and EDAM operations"
   query: |
     PREFIX schema: <https://schema.org/>
@@ -98,7 +95,7 @@ schema_workflow_annotations:
     ORDER BY ?name
 
 schema_ro_crates:
-  title: "List all RO-Crates (Schema.org)"
+  title: "List all RO-Crates"
   description: "Find all RO-Crates, with the RO-Crate specification version and any profiles they conform to"
   query: |
     PREFIX schema: <https://schema.org/>
@@ -119,7 +116,7 @@ schema_ro_crates:
     ORDER BY ?name
 
 schema_workflow_files:
-  title: "List all workflow files (Schema.org)"
+  title: "List all workflow files"
   description: "Find all workflow files within RO-Crates, with their workflow language and the crate they belong to"
   query: |
     PREFIX schema: <https://schema.org/>
@@ -137,204 +134,88 @@ schema_workflow_files:
     }
     ORDER BY ?name
 
-investigations:
-  title: "List all investigations"
-  description: "Find all investigations with their titles"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?investigation ?title
-    WHERE {
-      ?investigation a jerm:Investigation ;
-                     dcterms:title ?title .
-    }
-
-studies:
-  title: "List all studies"
-  description: "Find all studies and which investigation they belong to"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?study ?title ?investigation
-    WHERE {
-      ?study a jerm:Study ;
-             dcterms:title ?title ;
-             jerm:isPartOf ?investigation .
-    }
-
-assays:
-  title: "List all assays"
-  description: "Find all assays with their type and parent study"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?assay ?title ?type ?study
-    WHERE {
-      ?assay a ?class ;
-             dcterms:title ?title ;
-             jerm:isPartOf ?study .
-      FILTER(?class IN (jerm:Experimental_assay, jerm:Modelling_analysis))
-      OPTIONAL { ?assay jerm:hasType ?type }
-    }
-
 data_files:
   title: "List all data files"
-  description: "Find all data files with their titles and associated assays"
+  description: "Find all data files, with the projects they belong to and their creators"
   query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?datafile ?title ?assay
+    PREFIX schema: <https://schema.org/>
+    SELECT ?dataFile ?name
+           (GROUP_CONCAT(DISTINCT ?projectName; separator=", ") AS ?projects)
+           (GROUP_CONCAT(DISTINCT ?creatorName; separator=", ") AS ?creators)
     WHERE {
-      ?datafile a jerm:Data ;
-                dcterms:title ?title .
-      OPTIONAL { ?datafile jerm:isPartOf ?assay }
+      ?dataFile a schema:Dataset ;
+                schema:name ?name .
+      # exclude the RO-Crates, which are also datasets
+      FILTER NOT EXISTS { ?metadata schema:about ?dataFile }
+      OPTIONAL { ?dataFile schema:producer/schema:name ?projectName }
+      OPTIONAL { ?dataFile schema:creator/schema:name ?creatorName }
     }
-
-models:
-  title: "List all models"
-  description: "Find all models with their titles and associated assays"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?model ?title ?assay
-    WHERE {
-      ?model a jerm:Model ;
-             dcterms:title ?title .
-      OPTIONAL { ?model jerm:isPartOf ?assay }
-    }
+    GROUP BY ?dataFile ?name
+    ORDER BY ?name
 
 sops:
   title: "List all SOPs"
-  description: "Find all standard operating procedures"
+  description: "Find all SOPs (Bioschemas lab protocols), with the projects they belong to and their creators"
   query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?sop ?title ?assay
+    PREFIX schema: <https://schema.org/>
+    SELECT ?sop ?name
+           (GROUP_CONCAT(DISTINCT ?projectName; separator=", ") AS ?projects)
+           (GROUP_CONCAT(DISTINCT ?creatorName; separator=", ") AS ?creators)
     WHERE {
-      ?sop a jerm:SOP ;
-           dcterms:title ?title .
-      OPTIONAL { ?sop jerm:isPartOf ?assay }
+      ?sop a <https://bioschemas.org/types/LabProtocol/0.5-DRAFT> ;
+           schema:name ?name .
+      OPTIONAL { ?sop schema:producer/schema:name ?projectName }
+      OPTIONAL { ?sop schema:creator/schema:name ?creatorName }
     }
-
-publications:
-  title: "List all publications"
-  description: "Find all publications and their associated assays"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?publication ?title ?assay
-    WHERE {
-      ?publication a jerm:Publication ;
-                   dcterms:title ?title .
-      OPTIONAL { ?publication jerm:isPartOf ?assay }
-    }
-
-people:
-  title: "List all people"
-  description: "Find all people with their names and associated projects"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    SELECT ?person ?name ?project
-    WHERE {
-      ?person a jerm:Person ;
-              foaf:name ?name .
-      OPTIONAL { ?person jerm:isAssociatedWith ?project }
-    }
+    GROUP BY ?sop ?name
+    ORDER BY ?name
 
 projects:
   title: "List all projects"
-  description: "Find all projects with their people and investigations"
+  description: "Find all projects, with their programme and the number of people and institutions taking part"
   query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?project ?title ?person
+    PREFIX schema: <https://schema.org/>
+    SELECT ?project ?name ?programme
+           (COUNT(DISTINCT ?person) AS ?people) (COUNT(DISTINCT ?institution) AS ?institutions)
     WHERE {
-      ?project a jerm:Project ;
-               dcterms:title ?title .
-      OPTIONAL { ?project jerm:isAssociatedWith ?person }
+      ?project a schema:Project ;
+               schema:name ?name .
+      OPTIONAL { ?project schema:funder/schema:name ?programme }
+      # a project's members are both its people and its institutions
+      OPTIONAL { ?project schema:member ?person . ?person a schema:Person }
+      OPTIONAL { ?project schema:member ?institution . ?institution a schema:ResearchOrganization }
     }
+    GROUP BY ?project ?name ?programme
+    ORDER BY ?name
 
-organisms:
-  title: "List all organisms"
-  description: "Find all organisms with their NCBI taxonomy IDs"
+institutions:
+  title: "List all institutions"
+  description: "Find all institutions, with their location and, where known, their ROR organisation"
   query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?organism ?title ?ncbi
+    PREFIX schema: <https://schema.org/>
+    SELECT ?institution ?name ?city ?country ?ror
     WHERE {
-      ?organism a jerm:Organism ;
-                dcterms:title ?title .
-      OPTIONAL { ?organism jerm:NCBI_ID ?ncbi }
+      ?institution a schema:ResearchOrganization ;
+                   schema:name ?name .
+      OPTIONAL {
+        ?institution schema:address ?address .
+        OPTIONAL { ?address schema:addressLocality ?city }
+        OPTIONAL { ?address schema:addressCountry ?country }
+      }
+      OPTIONAL {
+        ?institution schema:sameAs ?ror .
+        FILTER(STRSTARTS(STR(?ror), "https://ror.org/"))
+      }
     }
-
-samples:
-  title: "List all samples"
-  description: "Find all samples and which assay they belong to"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?sample ?title ?assay
-    WHERE {
-      ?sample a jerm:Sample ;
-              dcterms:title ?title .
-      OPTIONAL { ?sample jerm:hasPart ?assay }
-    }
-
-strains:
-  title: "List all strains"
-  description: "Find all strains with their provider IDs and organism links"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?strain ?title ?providerID
-    WHERE {
-      ?strain a jerm:Strain ;
-              dcterms:title ?title .
-      OPTIONAL { ?strain jerm:externalSupplierID ?providerID }
-    }
-
-isa_graph:
-  title: "Full ISA graph"
-  description: "Show the complete Investigation > Study > Assay hierarchy"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?investigationTitle ?studyTitle ?assayTitle
-    WHERE {
-      ?investigation a jerm:Investigation ;
-                     dcterms:title ?investigationTitle ;
-                     jerm:hasPart ?study .
-      ?study dcterms:title ?studyTitle ;
-             jerm:hasPart ?assay .
-      ?assay dcterms:title ?assayTitle .
-    }
-
-assets_by_person:
-  title: "Assets created by a person"
-  description: "Find all assets that a specific person has created"
-  query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    SELECT ?personName ?asset ?assetTitle
-    WHERE {
-      ?person a jerm:Person ;
-              foaf:name ?personName ;
-              jerm:isCreatorOf ?asset .
-      ?asset dcterms:title ?assetTitle .
-    }
-    ORDER BY ?personName
+    ORDER BY ?name
 
 count_by_type:
   title: "Count entities by type"
-  description: "Count how many entities exist for each JERM class"
+  description: "Count the entities of each type in the knowledge graph"
   query: |
-    PREFIX jerm: <http://jermontology.org/ontology/JERMOntology#>
-    SELECT ?type (COUNT(?entity) as ?count)
+    SELECT ?type (COUNT(DISTINCT ?entity) AS ?count)
     WHERE {
       ?entity a ?type .
-      FILTER(STRSTARTS(STR(?type), STR(jerm:)))
     }
     GROUP BY ?type
     ORDER BY DESC(?count)
