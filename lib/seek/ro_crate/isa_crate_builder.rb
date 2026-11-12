@@ -23,6 +23,7 @@ module Seek
       include Files
       include Samples
       include Processes
+      include ExtendedMetadata
 
       attr_reader :investigation, :user
 
@@ -75,7 +76,7 @@ module Seek
         entity.id = id
         entity.type = 'Dataset'
         set(entity, isa_properties(type_name, resource))
-        set(entity, 'creator' => creator_references(crate, resource))
+        set(entity, linked_properties(crate, type_name, resource))
         crate.add_data_entity(entity)
         entity
       end
@@ -84,9 +85,14 @@ module Seek
         isa_properties('Investigation', investigation).merge(
           'description' => investigation.description.presence || investigation.title,
           'license' => DEFAULT_LICENSE,
-          'datePublished' => Time.now.utc.iso8601,
-          'creator' => creator_references(crate, investigation)
-        )
+          'datePublished' => Time.now.utc.iso8601
+        ).merge(linked_properties(crate, 'Investigation', investigation))
+      end
+
+      # The people and extended metadata of an ISA item, as references to their own entities.
+      def linked_properties(crate, type_name, resource)
+        { 'creator' => creator_references(crate, resource),
+          'additionalProperty' => extended_metadata_references(crate, resource, type_name) }
       end
 
       # identifier is the bare SEEK id on every level and url the SEEK URL. ARC tools use a study's or

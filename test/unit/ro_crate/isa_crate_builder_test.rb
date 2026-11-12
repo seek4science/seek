@@ -263,10 +263,6 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     FactoryBot.create(:data_file, contributor: person, assays: [assay])
 
     json = Seek::RoCrate::ISACrateBuilder.new(assay.investigation, person.user).metadata_json
-
-    puts JSON.pretty_generate(json)
-
-
     process = json['@graph'].detect { |e| e['@type'] == 'LabProcess' }
     protocol = json['@graph'].detect { |e| e['@id'] == "#protocol-#{sops.first.id}" }
 
@@ -316,6 +312,45 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
 
     assert_equal ["#sample-#{incoming.id}"], ids_of(process['object'])
     assert_equal ["#sample-#{outgoing.id}"], ids_of(process['result'])
+  end
+
+  test 'extended metadata becomes PropertyValue entities on the investigation' do
+    type = FactoryBot.create(:simple_investigation_extended_metadata_type)
+    age_pid = 'http://purl.obolibrary.org/obo/PATO_0000011'
+    type.extended_metadata_attributes.detect { |a| a.title == 'age' }.update!(pid: age_pid)
+    record = ExtendedMetadata.new(extended_metadata_type: type, data: { name: 'Fred', age: 25 })
+    investigation = FactoryBot.create(:investigation, extended_metadata: record)
+
+    json = Seek::RoCrate::ISACrateBuilder.new(investigation, investigation.contributor.user).metadata_json
+
+    puts JSON.pretty_generate(json)
+
+    ids = ids_of(root_entity(json)['additionalProperty'])
+    age = json['@graph'].detect { |e| e['@id'] == "#investigation-#{investigation.id}-age" }
+    name = json['@graph'].detect { |e| e['@id'] == "#investigation-#{investigation.id}-name" }
+
+    assert_equal ["#investigation-#{investigation.id}-age", "#investigation-#{investigation.id}-name"], ids
+    assert_equal %w[PropertyValue Age 25], [age['@type'], age['name'], age['value'].to_s]
+    assert_equal age_pid, age['propertyID']
+    assert_equal 'Fred', name['value']
+    assert_equal "#{investigation.rdf_seek_id}#extended_metadata/name", name['propertyID']
+  end
+
+  test 'nested extended metadata is flattened with dotted names' do
+    person = FactoryBot.create(:person)
+    type = FactoryBot.create(:role_extended_metadata_type)
+    data = { role_email: 'alice@example.org', role_phone: '0012345',
+             role_name: { first_name: 'Alice', last_name: 'Liddell' } }
+    record = ExtendedMetadata.new(extended_metadata_type: type, data: data)
+    study = FactoryBot.create(:study, contributor: person, extended_metadata: record)
+
+    json = Seek::RoCrate::ISACrateBuilder.new(study.investigation, person.user).metadata_json
+    study_entity = isa_entity(json, 'Study')
+    first_name = json['@graph'].detect { |e| e['@id'] == "#study-#{study.id}-role-name-first-name" }
+
+    expected = %w[role-email role-phone role-name-first-name role-name-last-name]
+    assert_equal expected.map { |key| "#study-#{study.id}-#{key}" }, ids_of(study_entity['additionalProperty'])
+    assert_equal ['Role name.First name', 'Alice'], [first_name['name'], first_name['value']]
   end
 
   private
