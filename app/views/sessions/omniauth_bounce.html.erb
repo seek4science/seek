@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0;url=<%= h(@post_login_redirect) %>">
+  <title>Signing in…</title>
+  <script>
+    window.location.replace(<%= raw @post_login_redirect.to_json %>);
+  </script>
+</head>
+<body>
+  <p>Signed in. Continuing to <a href="<%= h(@post_login_redirect) %>"><%= h(@post_login_redirect) %></a>…</p>
+</body>
+</html>
