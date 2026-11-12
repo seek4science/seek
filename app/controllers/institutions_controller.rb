@@ -21,6 +21,7 @@ class InstitutionsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
+      format.rdf { render template: 'rdf/show' }
       format.json {render json: @institution, include: [params[:include]]}
       format.jsonld { render body: @institution.to_schema_ld }
     end

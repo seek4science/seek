@@ -5,6 +5,7 @@ class PresentationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
+  include RdfTestCases
 
   def setup
     login_as FactoryBot.create(:user)
@@ -453,14 +454,6 @@ class PresentationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', presentation_path(presentation), text: presentation.title
       assert_select 'a[href=?]', presentation_path(presentation2), text: presentation2.title, count: 0
     end
-  end
-
-  test 'should return 406 when showing presentation as RDF' do
-    presentation = FactoryBot.create :ppt_presentation, contributor: User.current_user.person
-
-    get :show, params: { id: presentation, format: :rdf }
-
-    assert_response :not_acceptable
   end
 
   test 'events should be ordered by start date' do

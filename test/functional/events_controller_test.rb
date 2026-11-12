@@ -5,6 +5,7 @@ class EventsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include GeneralAuthorizationTestCases
   include SharingFormTestHelper
+  include RdfTestCases
 
   def setup
     login_as(:datafile_owner)
@@ -21,15 +22,6 @@ class EventsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:events)
-  end
-
-  test 'should return 406 when requesting RDF' do
-    event = FactoryBot.create :event, contributor: User.current_user.person
-    assert event.can_view?
-
-    get :show, params: { id: event, format: :rdf }
-
-    assert_response :not_acceptable
   end
 
   test 'should have no avatar element in list' do
