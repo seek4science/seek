@@ -66,7 +66,16 @@
   }
 
   .sparql-examples {
-    margin-bottom: 1.5rem;
+    margin-top: 2rem;
+
+    .example-query-toolbar {
+      margin-bottom: 1rem;
+      text-align: right;
+    }
+
+    .example-query-filter .input-group {
+      max-width: 400px;
+    }
 
     #example-query-select {
       max-width: 600px;
@@ -79,6 +88,7 @@
       padding: 1rem;
       margin-bottom: 1rem;
 
+      .query-title,
       .example-query-description {
         margin-bottom: 0.5rem;
       }

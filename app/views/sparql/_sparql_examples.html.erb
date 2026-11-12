@@ -1,27 +1,84 @@
 <div class="sparql-examples">
-  <% if @example_queries.present? %>
-    <div class="form-group">
-      <label for="example-query-select" class="control-label">Example queries:</label>
-      <select id="example-query-select" class="form-control">
-        <option value="">Choose an example query...</option>
-        <% @example_queries.each do |key, example| %>
-          <%= content_tag(:option, example['title'], value: key,
-                          data: { description: example['description'], query: example['query'].strip }) %>
-        <% end %>
-      </select>
-    </div>
+  <%= folding_panel(sparql_examples_panel_title, true, class: 'panel-info') do %>
+    <% if @example_queries.present? %>
+      <div class="example-query-toolbar">
+        <div class="btn-group btn-group-sm example-view-toggle" role="group" aria-label="Example queries view">
+          <button type="button" class="btn btn-default active" data-example-view="panels" aria-pressed="true">
+            <i class="glyphicon glyphicon-th-large"></i> Panels
+          </button>
+          <button type="button" class="btn btn-default" data-example-view="dropdown" aria-pressed="false">
+            <i class="glyphicon glyphicon-list"></i> Dropdown
+          </button>
+        </div>
+      </div>
 
-    <div id="example-query-preview" class="example-query" style="display: none;">
-      <p class="example-query-description text-muted"></p>
-      <pre class="query-code"></pre>
-      <button type="button" class="btn btn-sm btn-default" id="use-example-query">
-        <i class="glyphicon glyphicon-arrow-down"></i> Use this query
-      </button>
-    </div>
-  <% else %>
-    <div class="alert alert-info">
-      <i class="glyphicon glyphicon-info-sign"></i>
-      No example queries available.
-    </div>
+      <div id="example-queries-panels" class="example-queries-view" data-example-view="panels">
+        <div class="example-query-filter">
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon">
+                <i class="glyphicon glyphicon-search"></i>
+              </span>
+              <input type="text" class="form-control" id="query-filter" placeholder="Filter example queries..."/>
+            </div>
+          </div>
+        </div>
+
+        <div id="example-queries-container">
+          <% @example_queries.each_slice(2) do |examples| %>
+            <div class="row">
+              <% examples.each do |_key, example| %>
+                <div class="col-md-6">
+                  <div class="example-query">
+                    <div class="query-title">
+                      <strong><%= example['title'] %></strong>
+                    </div>
+                    <% if example['description'].present? %>
+                      <p class="example-query-description text-muted"><%= example['description'] %></p>
+                    <% end %>
+                    <pre class="query-code"><%= example['query'].strip %></pre>
+                    <%= button_tag(type: 'button', class: 'btn btn-sm btn-default use-query',
+                                   data: { query: example['query'].strip }) do %>
+                      <i class="glyphicon glyphicon-arrow-up"></i> Use this query
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <div id="no-queries-message" class="alert alert-info" style="display: none;">
+          <i class="glyphicon glyphicon-info-sign"></i>
+          No example queries match your search.
+        </div>
+      </div>
+
+      <div id="example-queries-dropdown" class="example-queries-view" data-example-view="dropdown" style="display: none;">
+        <div class="form-group">
+          <label for="example-query-select" class="control-label">Example queries:</label>
+          <select id="example-query-select" class="form-control">
+            <option value="">Choose an example query...</option>
+            <% @example_queries.each do |key, example| %>
+              <%= content_tag(:option, example['title'], value: key,
+                              data: { description: example['description'], query: example['query'].strip }) %>
+            <% end %>
+          </select>
+        </div>
+
+        <div id="example-query-preview" class="example-query" style="display: none;">
+          <p class="example-query-description text-muted"></p>
+          <pre class="query-code"></pre>
+          <button type="button" class="btn btn-sm btn-default" id="use-example-query">
+            <i class="glyphicon glyphicon-arrow-up"></i> Use this query
+          </button>
+        </div>
+      </div>
+    <% else %>
+      <div class="alert alert-info">
+        <i class="glyphicon glyphicon-info-sign"></i>
+        No example queries available.
+      </div>
+    <% end %>
   <% end %>
 </div>

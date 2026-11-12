@@ -11,8 +11,6 @@
     </div>
   </div>
 
-  <%= render partial: 'sparql_examples' %>
-
   <%= form_with url: query_sparql_index_path, method: :get, local: true, class: "sparql-form" do |form| %>
     <div class="row">
       <div class="col-md-12">
@@ -68,6 +66,7 @@
     </div>
   <% end %>
 
+  <%= render partial: 'sparql_examples' %>
 </div>
 
 <!-- Schema Modal -->

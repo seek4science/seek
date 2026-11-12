@@ -40,26 +40,48 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'example queries are listed in a dropdown, with a hidden preview and a button to use them' do
+  test 'example queries are shown in a panel below the query, as panels or in a dropdown' do
     examples = YAML.safe_load(File.read(Rails.root.join('config', 'sparql_queries.yml')))
     get sparql_index_path
     assert_response :success
 
+    # the examples panel follows the query form
+    assert_select 'div.sparql-interface form.sparql-form ~ div.sparql-examples div.panel'
+
     assert_select 'div.sparql-examples' do
-      assert_select 'select#example-query-select' do
-        assert_select 'option', count: examples.size + 1
-        assert_select 'option[value=""]', text: 'Choose an example query...'
+      assert_select 'div.example-view-toggle' do
+        assert_select 'button.active[data-example-view=?]', 'panels', text: /Panels/
+        assert_select 'button[data-example-view=?]', 'dropdown', text: /Dropdown/
       end
-      examples.each do |key, example|
-        option = css_select("select#example-query-select option[value='#{key}']").first
-        assert option, "no option for #{key}"
-        assert_equal example['title'], option.text
-        assert_equal example['query'].strip, option['data-query']
-        assert_equal example['description'], option['data-description']
+
+      # the panels view is shown, with each example and a button to use it
+      assert_select 'div#example-queries-panels:not([style])' do
+        assert_select 'input#query-filter'
+        assert_select 'div.example-query', count: examples.size
+        examples.each_value do |example|
+          assert_select 'div.example-query .query-title', text: example['title']
+        end
+        buttons = css_select('div#example-queries-panels button.use-query')
+        assert_equal examples.values.map { |example| example['query'].strip }, buttons.map { |button| button['data-query'] }
       end
-      assert_select 'div#example-query-preview[style=?]', 'display: none;' do
-        assert_select 'pre.query-code'
-        assert_select 'button#use-example-query', text: /Use this query/
+
+      # the dropdown view is hidden, listing each example, with a hidden preview and a button to use it
+      assert_select 'div#example-queries-dropdown[style=?]', 'display: none;' do
+        assert_select 'select#example-query-select' do
+          assert_select 'option', count: examples.size + 1
+          assert_select 'option[value=""]', text: 'Choose an example query...'
+        end
+        examples.each do |key, example|
+          option = css_select("select#example-query-select option[value='#{key}']").first
+          assert option, "no option for #{key}"
+          assert_equal example['title'], option.text
+          assert_equal example['query'].strip, option['data-query']
+          assert_equal example['description'], option['data-description']
+        end
+        assert_select 'div#example-query-preview[style=?]', 'display: none;' do
+          assert_select 'pre.query-code'
+          assert_select 'button#use-example-query', text: /Use this query/
+        end
       end
     end
   end
