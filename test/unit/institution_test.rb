@@ -318,27 +318,20 @@ class InstitutionTest < ActiveSupport::TestCase
     assert graph.has_statement?(RDF::Statement(ror, RDF.type, schema.EducationalOrganization))
     assert graph.has_statement?(RDF::Statement(ror, schema.name, RDF::Literal('University of Manchester')))
     assert graph.has_statement?(RDF::Statement(ror, schema.sameAs, RDF::URI('http://www.wikidata.org/entity/Q230899')))
-    assert graph.has_statement?(RDF::Statement(ror, schema.subOrganization, RDF::URI('https://ror.org/03xxxrq06')))
   end
 
-  test 'rdf includes the ror sub organizations that could be fetched, but not their sub organizations' do
-    Rails.cache.clear
+  test 'rdf does not include the ror sub organizations, and only the ror organisation is fetched' do
     institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
+    Rails.cache.clear
+    WebMock::RequestRegistry.instance.reset!
+
     graph = institution.to_rdf_graph
     schema = RDF::Vocabulary.new('https://schema.org/')
-    child = RDF::URI('https://ror.org/03xxxrq06')
 
-    # fetched and fully described
-    assert graph.has_statement?(RDF::Statement(child, RDF.type, schema.EducationalOrganization))
-    assert graph.has_statement?(RDF::Statement(child, schema.url, RDF::URI('https://www.msa.ac.uk/')))
-    assert graph.has_statement?(RDF::Statement(child, schema.parentOrganization, RDF::URI('https://ror.org/027m9bs27')))
-    # its other parent is only named, not fetched
-    assert graph.has_statement?(RDF::Statement(RDF::URI('https://ror.org/02hstj355'), schema.name,
-                                               RDF::Literal('Manchester Metropolitan University')))
-    assert_not_requested :get, 'https://api.ror.org/v2/organizations/02hstj355'
-    # not found, so only named by the parent
-    other = RDF::URI('https://ror.org/0094tm228')
-    assert_equal [schema.name], graph.query([other, nil, nil]).map(&:predicate)
+    assert_empty graph.query([nil, schema.subOrganization, nil]).to_a
+    assert_empty graph.query([RDF::URI('https://ror.org/03xxxrq06'), nil, nil]).to_a
+    assert_requested :get, 'https://api.ror.org/v2/organizations/027m9bs27', times: 1
+    assert_requested :get, %r{\Ahttps://api\.ror\.org/}, times: 1
   end
 
   test 'ror record is cached' do

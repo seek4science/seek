@@ -73,27 +73,20 @@ class Institution < ApplicationRecord
   end
 
   # Schema.org JSON-LD describing the institution's ROR organisation, linked from the institution with schema:sameAs,
-  # along with its sub organizations (but not theirs), or nil if the institution has no ROR ID or the ROR record
-  # couldn't be fetched. Used to enrich the institution's RDF.
+  # or nil if the institution has no ROR ID or the ROR record couldn't be fetched. Used to enrich the institution's RDF.
   def ror_json_ld
     return nil if ror_id.blank?
 
-    client = Ror::Client.new
-    record = client.fetch_record(ror_id)
+    record = Ror::Client.new.fetch_record(ror_id)
     return nil if record.key?(:error)
 
     ror = Ror::SchemaOrg.new(record)
-    sub_organizations = ror.sub_organization_ids.filter_map do |iri|
-      sub_record = client.fetch_record(client.extract_ror_id(iri))
-      Ror::SchemaOrg.new(sub_record).to_h.except('@context') unless sub_record.key?(:error)
-    end
-
     {
       '@context' => { '@vocab' => 'https://schema.org/' },
       '@graph' => [
         { '@id' => rdf_seek_id, 'sameAs' => { '@id' => ror.id } },
         ror.to_h.except('@context')
-      ] + sub_organizations
+      ]
     }.to_json
   end
 

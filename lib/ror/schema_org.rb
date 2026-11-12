@@ -10,7 +10,8 @@ module Ror
       'nonprofit' => 'NGO'
     }.freeze
 
-    RELATIONSHIPS = { 'parent' => 'parentOrganization', 'child' => 'subOrganization' }.freeze
+    # the relationships described. Sub organizations (child) are left out, as there can be very many of them.
+    RELATIONSHIPS = { 'parent' => 'parentOrganization' }.freeze
 
     def initialize(record)
       @record = record
@@ -36,11 +37,6 @@ module Ror
 
     def to_json_ld
       to_h.to_json
-    end
-
-    # The ROR IRIs of the sub organizations
-    def sub_organization_ids
-      Array(relationships['subOrganization']).map { |organization| organization['@id'] }
     end
 
     private

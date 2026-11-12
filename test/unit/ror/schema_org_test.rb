@@ -29,11 +29,26 @@ class RorSchemaOrgTest < ActiveSupport::TestCase
     assert_equal 53.48095, place['geo']['latitude']
   end
 
-  test 'parent and child organisations, but not related ones' do
-    assert_includes @json['subOrganization'],
-                    { '@id' => 'https://ror.org/03xxxrq06', 'name' => 'Manchester School of Architecture' }
+  test 'parent organisations, but not child or related ones' do
+    assert_nil @json['subOrganization']
     assert_nil @json['parentOrganization']
     refute(@json.values.flatten.any? { |v| v.is_a?(Hash) && v['@id'] == 'https://ror.org/02j7n9748' })
+  end
+
+  test 'parent organisation of a sub organisation' do
+    record = {
+      'id' => 'https://ror.org/03xxxrq06',
+      'names' => [{ 'value' => 'Manchester School of Architecture', 'types' => ['ror_display'] }],
+      'relationships' => [
+        { 'type' => 'parent', 'id' => 'https://ror.org/027m9bs27', 'label' => 'University of Manchester' },
+        { 'type' => 'child', 'id' => 'https://ror.org/000000000', 'label' => 'A Child' }
+      ]
+    }
+    json = Ror::SchemaOrg.new(record).to_h
+
+    assert_equal [{ '@id' => 'https://ror.org/027m9bs27', 'name' => 'University of Manchester' }],
+                 json['parentOrganization']
+    assert_nil json['subOrganization']
   end
 
   test 'valid json-ld' do
