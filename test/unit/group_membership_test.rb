@@ -2,6 +2,25 @@
 require 'test_helper'
 
 class GroupMembershipTest < ActiveSupport::TestCase
+  test 'adding and removing a membership queues rdf generation for the person and project' do
+    person = FactoryBot.create(:brand_new_person)
+    project = FactoryBot.create(:project)
+    institution = FactoryBot.create(:institution)
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { person.add_to_project_and_institution(project, institution) }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: project).exists?
+
+    RdfGenerationQueue.delete_all
+    membership = person.group_memberships.first
+    disable_authorization_checks { membership.destroy }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: project).exists?
+  end
+
   test 'person_can_be_removed?' do
     admin = FactoryBot.create(:admin)
     person = FactoryBot.create(:person)
