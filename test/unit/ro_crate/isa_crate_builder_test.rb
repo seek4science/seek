@@ -61,7 +61,6 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
 
     json = Seek::RoCrate::ISACrateBuilder.new(investigation, person.user).metadata_json
 
-
     study_entity = isa_entity(json, 'Study')
     assay_entity = isa_entity(json, 'Assay')
 
@@ -168,6 +167,53 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
 
     assert_equal 'Lovelace', person_entity['givenName']
     assert_nil person_entity['first_name']
+  end
+
+  test 'assay data files become File entities in the assay dataset directory' do
+    person = FactoryBot.create(:person)
+    assay = FactoryBot.create(:assay, contributor: person)
+    data_file = FactoryBot.create(:data_file, contributor: person, assays: [assay], description: 'Counts per gene')
+
+    json = Seek::RoCrate::ISACrateBuilder.new(assay.investigation, person.user).metadata_json
+    assay_entity = isa_entity(json, 'Assay')
+    file_entity = json['@graph'].detect { |e| e['@type'] == 'File' }
+
+    assert_equal "#{assay_entity['@id']}dataset/a_pdf_file.pdf", file_entity['@id']
+    assert_equal data_file.title, file_entity['name']
+    assert_equal 'Counts per gene', file_entity['description']
+    assert_equal data_file.rdf_seek_id, file_entity['identifier']
+    assert_equal 'application/pdf', file_entity['encodingFormat']
+    assert_equal data_file.content_blob.file_size, file_entity['contentSize']
+    assert_equal data_file.content_blob.sha1sum, file_entity['sha1']
+    download = %r{/data_files/#{data_file.id}/content_blobs/#{data_file.content_blob.id}/download\z}
+    assert_match download, file_entity['contentUrl']
+    assert_equal [file_entity['@id']], ids_of(assay_entity['hasPart'])
+    assert_not_includes ids_of(root_entity(json)['hasPart']), file_entity['@id']
+  end
+
+  test 'a URL-only data file points at the external link' do
+    person = FactoryBot.create(:person)
+    assay = FactoryBot.create(:assay, contributor: person)
+    blob = FactoryBot.create(:url_content_blob, url: 'https://example.org/counts.csv')
+    FactoryBot.create(:data_file, contributor: person, assays: [assay], content_blob: blob)
+
+    json = Seek::RoCrate::ISACrateBuilder.new(assay.investigation, person.user).metadata_json
+    file_entity = json['@graph'].detect { |e| e['@type'] == 'File' }
+
+    assert_equal 'https://example.org/counts.csv', file_entity['contentUrl']
+    assert_nil file_entity['sha1']
+  end
+
+  test 'data files the user cannot view are skipped' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+    study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:public_policy))
+    assay = FactoryBot.create(:assay, study: study, policy: FactoryBot.create(:public_policy))
+    FactoryBot.create(:data_file, assays: [assay], policy: FactoryBot.create(:private_policy))
+
+    json = Seek::RoCrate::ISACrateBuilder.new(assay.investigation, FactoryBot.create(:person).user).metadata_json
+
+    assert_nil(json['@graph'].detect { |e| e['@type'] == 'File' })
+    assert_nil isa_entity(json, 'Assay')['hasPart']
   end
 
   private
