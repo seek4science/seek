@@ -52,6 +52,8 @@ class SparqlController < ApplicationController
     endpoint = Seek::Rdf::RdfRepository.instance.get_configuration.uri
     sparql_client = SPARQL::Client.new(endpoint, graph: public_graph)
     results = sparql_client.query(query)
+    # DESCRIBE and CONSTRUCT results are a reader over the response, which can only be read through once
+    results = results.to_a if results.is_a?(RDF::Reader)
     convert_sparql_results(results)
   end
 

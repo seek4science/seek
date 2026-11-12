@@ -245,6 +245,26 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
   end
 
+  test 'describe query returns all the statements about the resource' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    resource = data_file.rdf_resource.to_base
+
+    post query_sparql_index_path, params: { sparql_query: "SELECT ?p ?o WHERE { #{resource} ?p ?o }", format: 'json' }
+    assert_response :success
+    expected = JSON.parse(@response.body)['results'].map { |result| [result['p'], result['o']] }
+    assert expected.size > 1
+
+    post query_sparql_index_path, params: { sparql_query: "DESCRIBE #{resource}", format: 'json' }
+    assert_response :success
+    json = JSON.parse(@response.body)
+    assert_nil json['error']
+    described = json['results'].select { |statement| statement['subject'] == data_file.rdf_resource.to_s }
+                               .map { |statement| [statement['predicate'], statement['object']] }
+
+    assert_empty expected - described
+  end
+
   test 'respond with json when using content negotiation' do
     path = query_sparql_index_path
     create_some_triples
