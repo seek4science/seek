@@ -21,6 +21,7 @@ module Seek
 
       include People
       include Files
+      include Samples
 
       attr_reader :investigation, :user
 
@@ -63,7 +64,8 @@ module Seek
                     'measurementTechnique' => assay.technology_type_uri)
         children = viewable(assay.child_assays).flat_map { |child| add_assay(crate, child) }
         files = file_entities(crate, entity.id, assay)
-        set(entity, 'hasPart' => (children + files).map(&:reference))
+        set(entity, 'hasPart' => (children + files).map(&:reference),
+                    'about' => sample_references(crate, assay))
         [entity, *children]
       end
 

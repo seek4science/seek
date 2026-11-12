@@ -216,6 +216,44 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     assert_nil isa_entity(json, 'Assay')['hasPart']
   end
 
+  test 'assay samples become Sample entities with their attributes as PropertyValues' do
+    person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:patient_sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    age = sample.sample_type.sample_attributes.detect { |a| a.title == 'age' }
+    age.update_column(:pid, 'http://purl.obolibrary.org/obo/PATO_0000011')
+    assay = FactoryBot.create(:assay, contributor: person, samples: [sample])
+
+    json = Seek::RoCrate::ISACrateBuilder.new(assay.investigation, person.user).metadata_json
+    sample_entity = json['@graph'].detect { |e| e['@type'] == 'Sample' }
+    age_entity = json['@graph'].detect { |e| e['@id'] == "#sample-#{sample.id}-age" }
+    weight_entity = json['@graph'].detect { |e| e['@id'] == "#sample-#{sample.id}-weight" }
+
+    assert_equal "#sample-#{sample.id}", sample_entity['@id']
+    assert_equal 'Fred Bloggs', sample_entity['name']
+    assert_equal sample.rdf_seek_id, sample_entity['identifier']
+    assert_equal [age_entity['@id'], weight_entity['@id']], ids_of(sample_entity['additionalProperty'])
+    assert_equal %w[PropertyValue CharacteristicValue], [age_entity['@type'], age_entity['additionalType']]
+    assert_equal 44, age_entity['value']
+    assert_equal 'http://purl.obolibrary.org/obo/PATO_0000011', age_entity['propertyID']
+    assert_equal 88.7, weight_entity['value']
+    assert_equal %w[g gram], [weight_entity['unitCode'], weight_entity['unitText']]
+    assert_equal [sample_entity['@id']], ids_of(isa_entity(json, 'Assay')['about'])
+  end
+
+  test 'a sample shared by two assays appears once and hidden samples are skipped' do
+    person = FactoryBot.create(:person)
+    study = FactoryBot.create(:study, contributor: person)
+    shared = FactoryBot.create(:sample, contributor: person, policy: FactoryBot.create(:public_policy))
+    hidden = FactoryBot.create(:sample, policy: FactoryBot.create(:private_policy))
+    2.times { FactoryBot.create(:assay, study: study, contributor: person, samples: [shared, hidden]) }
+
+    json = Seek::RoCrate::ISACrateBuilder.new(study.investigation, person.user).metadata_json
+    samples = json['@graph'].select { |e| e['@type'] == 'Sample' }
+
+    assert_equal(["#sample-#{shared.id}"], samples.map { |e| e['@id'] })
+    assert_nil samples.first['additionalProperty']
+  end
+
   private
 
   def root_entity(json)
