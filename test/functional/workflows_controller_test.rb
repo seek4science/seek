@@ -2,6 +2,7 @@ require 'test_helper'
 require 'minitest/mock'
 
 class WorkflowsControllerTest < ActionController::TestCase
+  include RdfTestCases
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
@@ -9,15 +10,6 @@ class WorkflowsControllerTest < ActionController::TestCase
   def setup
     login_as FactoryBot.create(:user)
     @project = User.current_user.person.projects.first
-  end
-
-  test 'should return 406 when requesting RDF' do
-    wf = FactoryBot.create :workflow, contributor: User.current_user.person
-    assert wf.can_view?
-
-    get :show, params: { id: wf, format: :rdf }
-
-    assert_response :not_acceptable
   end
 
   test 'index' do

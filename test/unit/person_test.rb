@@ -169,13 +169,8 @@ class PersonTest < ActiveSupport::TestCase
     assert graph.statements.count > 1
     assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), graph.statements.first.subject
     assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::Vocab::FOAF.mbox_sha1sum, 'b507549e01d249ee5ed98bd40e4d86d1470a13b8']
-    assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", RDF::Vocab::FOAF.homepage, RDF::Literal::AnyURI.new('http://google.com')]
-
-    #none rdf supported created items are filtered out
-    assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/assays/#{assay.id}"]
-    assert graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/sops/#{sop.id}"]
-    refute graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/documents/#{doc.id}"]
-    refute graph.has_triple? ["http://localhost:3000/people/#{object.id}", Seek::Rdf::JERMVocab.isCreatorOf, "http://localhost:3000/presentations/#{presentation.id}"]
+    assert graph.has_triple? [RDF::URI("http://localhost:3000/people/#{object.id}"), RDF::URI('https://schema.org/url'), 'http://google.com']
+    assert graph.has_triple? [RDF::URI("http://localhost:3000/people/#{object.id}"), RDF::URI('https://schema.org/memberOf'), RDF::URI("http://localhost:3000/projects/#{object.projects.first.id}")]
 
   end
 

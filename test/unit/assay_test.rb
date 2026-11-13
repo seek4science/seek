@@ -10,43 +10,10 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.can_edit?(non_admin)
   end
 
-  test 'to_rdf' do
-    assay = FactoryBot.create :experimental_assay
-    FactoryBot.create :assay_organism, assay: assay, organism: FactoryBot.create(:organism)
-    pub = FactoryBot.create :publication
-    FactoryBot.create :relationship, subject: assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
-    df = (FactoryBot.create :assay_asset, assay: assay).asset
-
-    refute_nil df
-    assert_includes assay.assets,df
-    assay.reload
-    assert_equal 2, assay.assets.size
-    rdf = assay.to_rdf
-    graph = RDF::Graph.new do |graph|
-      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
-    end
-    assert graph.statements.count > 1
-    assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), graph.statements.first.subject
-
-    #check includes the data file due to bug OPSK-1919
-    refute_nil graph.statements.detect{|s| s.object == RDF::URI.new("http://localhost:3000/data_files/#{df.id}") && s.predicate == RDF::URI("http://jermontology.org/ontology/JERMOntology#hasPart")}
-
-
-    # try modelling, with tech type nil
-    assay = FactoryBot.create :modelling_assay, organisms: [FactoryBot.create(:organism)], technology_type_uri: nil
-    rdf = assay.to_rdf
-
-    # assay with suggested assay/technology types
-    suggested_assay_type = FactoryBot.create(:suggested_assay_type)
-    suggested_tech_type = FactoryBot.create(:suggested_technology_type)
-    assay = FactoryBot.create :experimental_assay, suggested_assay_type: suggested_assay_type, suggested_technology_type: suggested_tech_type
-    rdf = assay.to_rdf
-    graph = RDF::Graph.new do |graph|
-      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
-    end
-    graph.statements.map(&:object).include? suggested_assay_type.ontology_uri
-    graph.statements.map(&:object).include? suggested_tech_type.ontology_uri
-
+  test 'no rdf, as there is no schema.org description' do
+    object = FactoryBot.create(:assay)
+    refute object.rdf_supported?
+    refute RdfGenerationQueue.where(item: object).exists?
   end
 
   test 'is_asset?' do

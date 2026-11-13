@@ -28,18 +28,10 @@ class StrainTest < ActiveSupport::TestCase
     assert_equal 'CCTV (del fff;ins ggg / yellow beard)', strain.info
   end
 
-  test 'to_rdf' do
-    object = FactoryBot.create(:strain, organism: FactoryBot.create(:organism, bioportal_concept: FactoryBot.create(:bioportal_concept)), provider_id: 'Dxxu1')
-    FactoryBot.create :assay_organism, strain: object, organism: object.organism
-
-    rdf = object.to_rdf
-    graph = RDF::Graph.new do |graph|
-      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
-    end
-
-    assert graph.statements.count >= 1
-    assert_equal RDF::URI.new("http://localhost:3000/strains/#{object.id}"), graph.statements.first.subject
-
+  test 'no rdf, as there is no schema.org description' do
+    object = FactoryBot.create(:strain)
+    refute object.rdf_supported?
+    refute RdfGenerationQueue.where(item: object).exists?
   end
 
   test 'assays' do

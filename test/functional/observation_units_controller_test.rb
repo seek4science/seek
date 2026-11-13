@@ -5,10 +5,14 @@ class ObservationUnitsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
-  include RdfTestCases
 
-  def rdf_test_object
-    FactoryBot.create(:max_observation_unit)
+  test 'should return 406 when requesting RDF, as there is no schema.org description' do
+    item = FactoryBot.create(:observation_unit, policy: FactoryBot.create(:public_policy))
+    assert item.can_view?
+
+    get :show, params: { id: item, format: :rdf }
+
+    assert_response :not_acceptable
   end
 
   test 'show' do

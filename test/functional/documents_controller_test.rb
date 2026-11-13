@@ -3,21 +3,12 @@ require 'minitest/mock'
 
 class DocumentsControllerTest < ActionController::TestCase
 
+  include RdfTestCases
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  test 'should return 406 when requesting RDF' do
-    login_as(FactoryBot.create(:user))
-    doc = FactoryBot.create :document, contributor: User.current_user.person
-    assert doc.can_view?
-
-    get :show, params: { id: doc, format: :rdf }
-
-    assert_response :not_acceptable
-  end
 
   test 'should get index' do
     FactoryBot.create_list(:public_document, 3)

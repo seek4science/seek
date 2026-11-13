@@ -36,21 +36,10 @@ class ModelTest < ActiveSupport::TestCase
     assert_nil model.model_format
   end
 
-  test 'to_rdf' do
-    User.with_current_user FactoryBot.create(:user) do
-      object = FactoryBot.create :model, assay_ids: [FactoryBot.create(:assay, contributor:User.current_user.person).id], policy: FactoryBot.create(:public_policy)
-      assert object.contains_sbml?
-      pub = FactoryBot.create :publication
-      FactoryBot.create :relationship, subject: object, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
-      object.reload
-      rdf = object.to_rdf
-      graph = RDF::Graph.new do |graph|
-        RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
-      end
-      assert graph.statements.count > 1
-      assert_equal RDF::URI.new("http://localhost:3000/models/#{object.id}"), graph.statements.first.subject
-
-    end
+  test 'no rdf, as there is no schema.org description' do
+    object = FactoryBot.create(:model)
+    refute object.rdf_supported?
+    refute RdfGenerationQueue.where(item: object).exists?
   end
 
   test 'content blob search terms' do

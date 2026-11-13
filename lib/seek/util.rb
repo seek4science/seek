@@ -65,7 +65,7 @@ module Seek
 
     def self.rdf_capable_types
       cache('rdf_capable_types') do
-        schema_org_supported_types
+        schema_org_supported_types.select { |c| c.include?(Seek::Rdf::RdfGeneration) }
       end
     end
 

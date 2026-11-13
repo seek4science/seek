@@ -5,11 +5,19 @@ class ModelsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
-  include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as(:model_owner)
+  end
+
+  test 'should return 406 when requesting RDF, as there is no schema.org description' do
+    item = FactoryBot.create(:model, policy: FactoryBot.create(:public_policy))
+    assert item.can_view?
+
+    get :show, params: { id: item, format: :rdf }
+
+    assert_response :not_acceptable
   end
 
   test 'should get index' do

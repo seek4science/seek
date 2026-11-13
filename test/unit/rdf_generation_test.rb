@@ -188,13 +188,18 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
   test 'rdf_supported?' do
     assert FactoryBot.create(:person).rdf_supported?
-    assert FactoryBot.create(:assay).rdf_supported?
     assert FactoryBot.create(:data_file).rdf_supported?
+    assert FactoryBot.create(:event).rdf_supported?
+    assert FactoryBot.create(:institution).rdf_supported?
+    assert FactoryBot.create(:document).rdf_supported?
 
+    # supported by the Schema.org description, but don't generate RDF
+    refute FactoryBot.create(:assets_creator).rdf_supported?
 
-    refute FactoryBot.create(:event).rdf_supported?
-    refute FactoryBot.create(:institution).rdf_supported?
-    refute FactoryBot.create(:document).rdf_supported?
+    # no Schema.org description
+    refute FactoryBot.create(:assay).rdf_supported?
+    refute FactoryBot.create(:study).rdf_supported?
+    refute FactoryBot.create(:model).rdf_supported?
   end
 
   test 'workflow rdf uses the same schema.org and bioschemas terms for the bioschemas and ro-crate statements' do
@@ -295,6 +300,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   # ---------------------------------------------------------------------------
 
   test 'linked extended metadata single emits blank node with nested triples' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_single_nested_emt))
     em.set_attribute_value('retention_period', { 'start_date' => '2020-01-01', 'end_date' => '2030-12-31' })
     df = FactoryBot.create(:data_file, extended_metadata: em)
@@ -312,6 +319,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'linked extended metadata multi emits one blank node per item' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_multi_nested_emt))
     contacts = [{ 'name' => 'Alice', 'email' => 'alice@example.org' },
                 { 'name' => 'Bob', 'email' => 'bob@example.org' }]
@@ -328,6 +337,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'nested attribute without pid is silently skipped in rdf export' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_partial_pid_emt))
     em.set_attribute_value('period', { 'start_date' => '2020-01-01', 'end_date' => '2030-12-31' })
     df = FactoryBot.create(:data_file, extended_metadata: em)
@@ -341,6 +352,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'flat extended metadata attribute still emits plain literal triple' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_flat_emt))
     em.set_attribute_value('population', 'adults only')
     df = FactoryBot.create(:data_file, extended_metadata: em)
@@ -354,6 +367,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'extended metadata attributes emit correctly typed XSD literals for all scalar base types' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_all_types_emt))
     em.set_attribute_value('str_field', 'hello')
     em.set_attribute_value('text_field', 'some long text')
@@ -396,6 +411,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'date attributes stored in non-XSD lexical formats are normalized when exported' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_date_emt))
     em.set_attribute_value('start_date', '2 Feb 2015')
     em.set_attribute_value('created_at', 'Thu, 11 Feb 2016 15:39:55 +0000')
@@ -413,6 +430,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'blank scalar extended metadata values are skipped in rdf export' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_all_types_emt))
     em.set_attribute_value('str_field', 'present')
     em.set_attribute_value('int_field', '')

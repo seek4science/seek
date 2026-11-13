@@ -162,6 +162,8 @@ module Seek
       end
 
       def queue_rdf_generation(force = false, refresh_dependents = true)
+        return unless rdf_supported?
+
         unless !force && (saved_changes.keys - ['updated_at']).empty?
           RdfGenerationQueue.enqueue(self, refresh_dependents: refresh_dependents)
         end
@@ -174,7 +176,7 @@ module Seek
       end
 
       def queue_dependents_rdf_generation
-        RdfGenerationQueue.enqueue(dependent_items, priority: 3)
+        RdfGenerationQueue.enqueue(dependent_items.select(&:rdf_supported?), priority: 3)
       end
 
       def dependent_items

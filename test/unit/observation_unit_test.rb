@@ -18,18 +18,10 @@ class ObservationUnitTest < ActiveSupport::TestCase
   end
 
 
-  test 'to rdf' do
-    obs_unit = FactoryBot.create(:max_observation_unit)
-    assert obs_unit.rdf_supported?
-    rdf = obs_unit.to_rdf
-    graph = RDF::Graph.new do |graph|
-      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
-    end
-    assert graph.statements.count > 1
-    assert_equal RDF::URI.new("http://localhost:3000/observation_units/#{obs_unit.id}"), graph.statements.first.subject
-    type = graph.statements.detect{|s| s.predicate == RDF.type}
-    assert_equal RDF::URI('http://purl.org/ppeo/PPEO.owl#observation_unit'), type.object
-
+  test 'no rdf, as there is no schema.org description' do
+    object = FactoryBot.create(:observation_unit)
+    refute object.rdf_supported?
+    refute RdfGenerationQueue.where(item: object).exists?
   end
 
   test 'policy' do

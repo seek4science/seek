@@ -52,16 +52,15 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   test 'send to store' do
     @repository.send_rdf(@project)
 
-    q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@private_graph)
+    q = @repository.query.select.where([@subject, RDF::URI.new('https://schema.org/name'), :o]).from(@private_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
     assert_equal 'Test for RDF storage', result[0][:o].value
     assert_equal 'http://www.w3.org/2001/XMLSchema#string', result[0][:o].datatype
 
-    q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/created'), :o]).from(@private_graph)
+    q = @repository.query.select.where([@subject, RDF.type, :o]).from(@private_graph)
     result = @repository.select(q)
-    assert_equal 1, result.count
-    assert_equal 'http://www.w3.org/2001/XMLSchema#dateTime', result[0][:o].datatype
+    assert_equal ['https://schema.org/Organization', 'https://schema.org/Project'], result.map { |r| r[:o].to_s }.sort
   end
 
   test 'send schema to store' do
@@ -253,9 +252,9 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     assert_equal triple_count, count_in_graph(@project, @private_graph), 'there should be 5 statements in total'
 
-    q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@private_graph)
+    q = @repository.query.select.where([@subject, RDF::URI.new('https://schema.org/name'), :o]).from(@private_graph)
     result = @repository.select(q)
-    assert_equal 1, result.count, 'there should only be one title statement'
+    assert_equal 1, result.count, 'there should only be one name statement'
     assert_equal title, result[0][:o].value
 
     @project.title = 'The best project ever'
@@ -265,14 +264,10 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     assert_equal triple_count, count_in_graph(@project, @private_graph), "there should be #{triple_count} statements in total"
 
-    q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@private_graph)
+    q = @repository.query.select.where([@subject, RDF::URI.new('https://schema.org/name'), :o]).from(@private_graph)
     result = @repository.select(q)
-    assert_equal 1, result.count, 'there should only be one title statement'
+    assert_equal 1, result.count, 'there should only be one name statement'
     assert_equal 'The best project ever', result[0][:o].value
-
-    q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/modified'), :o]).from(@private_graph)
-    result = @repository.select(q)
-    assert_equal 1, result.count, 'there should only be one modified statement'
   end
 
   test 'update rdf change visibility' do
@@ -320,7 +315,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     assert_equal count, count_in_graph(sop, @public_graph), "there should be #{count} statements in the public graph"
 
-    q = @repository.query.select.where([subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@public_graph)
+    q = @repository.query.select.where([subject, RDF::URI.new('https://schema.org/name'), :o]).from(@public_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
     assert_equal 'Updated Title', result[0][:o].value
@@ -328,8 +323,8 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     sop.delete_rdf_file
   end
 
-  #checks the the rdf resource type is updated, and there is not a duplicate. This is in particular for when data changes
-  # to simulation data
+  # checks the rdf resource type isn't duplicated when the data changes to simulation data, which the Schema.org
+  # description doesn't distinguish
   test 'update rdf after resource type change' do
     data_file = FactoryBot.create(:data_file)
     refute data_file.simulation_data?
@@ -344,7 +339,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
-    assert_equal Seek::Rdf::JERMVocab.Data, result[0][:o].value
+    assert_equal 'https://schema.org/Dataset', result[0][:o].value
 
     disable_authorization_checks do
       data_file.simulation_data=true
@@ -361,7 +356,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
     result = @repository.select(q)
     assert_equal 1, result.count
-    assert_equal Seek::Rdf::JERMVocab.Simulation_data, result[0][:o].value
+    assert_equal 'https://schema.org/Dataset', result[0][:o].value
 
   end
 

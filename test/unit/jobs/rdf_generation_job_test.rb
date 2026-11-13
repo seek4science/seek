@@ -46,7 +46,7 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   end
 
   test 'rdf generation job not created after policy change for non rdf supported entity' do
-    item = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
+    item = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
     RdfGenerationQueue.delete_all
 
     item.policy.access_type = Policy::NO_ACCESS
@@ -101,9 +101,9 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   end
 
   test 'skip items that dont support rdf' do
-    item = FactoryBot.create(:event)
+    item = FactoryBot.create(:assay)
     refute item.rdf_supported?
-    refute RdfGenerationQueue.where(item_id: item.id, item_type: 'Event').exists?
+    refute RdfGenerationQueue.where(item_id: item.id, item_type: 'Assay').exists?
 
     item = FactoryBot.create(:sop)
     assert item.rdf_supported?
@@ -111,10 +111,10 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   end
 
   test 'perform' do
-    item = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
+    item = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     RdfGenerationQueue.delete_all
 
-    expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Assay-test-#{item.id}.rdf")
+    expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Sop-test-#{item.id}.rdf")
     assert_equal expected_rdf_file, item.rdf_storage_path
     FileUtils.rm expected_rdf_file if File.exist?(expected_rdf_file)
     RdfGenerationQueue.enqueue(item, queue_job: false)
