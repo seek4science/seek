@@ -11,4 +11,11 @@ FactoryBot.define do
     expires_in { 3600 }
     scopes { 'read' }
   end
+
+  factory(:oauth_access_grant, class: Doorkeeper::AccessGrant) do
+    association :application, factory: :oauth_application
+    sequence(:redirect_uri) { |n| "https://localhost:3000/grant_#{n}" }
+    expires_in { 3600 }
+    scopes { 'read' }
+  end
 end
