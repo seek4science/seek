@@ -691,6 +691,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => 'This is a test workflow for bioschema generation',
       'name' => 'This workflow',
       'url' => "http://localhost:3000/workflows/#{workflow.id}",
+      'image' => "http://localhost:3000/workflows/#{workflow.id}/diagram?version=1",
       'keywords' => 'wibble',
       'license' => Seek::License.find('APSL-2.0')&.url,
       'creativeWorkStatus' => 'Stable',
