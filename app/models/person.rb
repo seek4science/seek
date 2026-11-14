@@ -157,10 +157,6 @@ class Person < ApplicationRecord
     Person.unscoped.order(Arel.sql('avatar_id IS NULL'), 'updated_at DESC')
   end
 
-  def receive_notifications
-    member? && super
-  end
-
   def registered?
     !user.nil?
   end

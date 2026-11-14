@@ -7,7 +7,7 @@ class SendAnnouncementEmailsJob < EmailJob
 
     NotifieeInfo.where(receive_notifications: true).offset(offset).limit(BATCHSIZE).each do |notifiee_info|
       begin
-        unless notifiee_info.notifiee.nil?
+        if notifiee_info.notifiee&.receive_notifications?
           Mailer.announcement_notification(announcement, notifiee_info).deliver_later
         end
       rescue Exception => e
