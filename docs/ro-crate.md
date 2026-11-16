@@ -241,6 +241,12 @@ This document describes `main`.
 - **The UI links to an out-of-date description of the format.** Four workflow upload views link to the old wiki
   page `github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate`, and still describe Workflow RO-Crate as "under
   development".
+- **The RO-Crate endpoints are missing from the API reference.** The OpenAPI definition in
+  [`public/api/definitions/_paths.yml`](../public/api/definitions/_paths.yml) does not mention
+  `GET /workflows/{id}/ro_crate`, `GET /workflows/{id}/ro_crate_metadata`, `POST /workflows/submit`, or the
+  `ro_crate` parameter of `POST /workflows` and `POST /workflows/{id}/create_version`. The submission API is
+  documented only on [about.workflowhub.eu](https://about.workflowhub.eu/developer/ro-crate-api/), and `submit` is not documented on
+  either site.
 - **Workflows and RO-Crate are not covered in the SEEK documentation.**
   [docs.seek4science.org](https://docs.seek4science.org/) has no page on enabling or administering these features;
   the only documentation is WorkflowHub's own site.
