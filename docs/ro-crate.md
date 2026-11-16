@@ -394,6 +394,7 @@ detail on RO-Crate of the four:
    An ecosystem of services for FAIR computational workflows. In: Leser U, Hilbrich M, Wilkinson SR, Ferreira da
    Silva R (eds), *Workflow systems for large-scale scientific data analysis*, chapter 4, pp. 113–145. Berlin
    Universities Publishing. ISBN 978-3-98781-067-1. <https://doi.org/10.14279/depositonce-25818>
+   ([PDF](https://depositonce.tu-berlin.de/bitstreams/eca0777c-d7b1-409a-a214-1bb4fe210e04/download))
 
 ## Observations and gaps
 
