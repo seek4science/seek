@@ -53,6 +53,17 @@ Add:
 - Add the minimum a crate needs to be accepted: valid zip, `ro-crate-metadata.json`, `mainEntity` pointing to a
   `ComputationalWorkflow`; for `submit` also a source URL and `version`.
 
+## `Workflow-RO-Crate/1.1/` appendix "Extracted Metadata": incomplete
+
+- It lists `name`, `description`, `author`, `license` and `keywords`. WorkflowHub also reads `creator` (alongside
+  `author`, with `Person` entities becoming linked creators and others becoming "other creators"), `version` (used as
+  the version name, and required by `submit`), the source URL (root `@id` if it is a web URL, else `isBasedOn`,
+  `url` or the main workflow's `url`), the main workflow's `programmingLanguage` (to pick the workflow type), and
+  whether the crate has a test suite.
+- It says the properties are read "from the Crate entity (`./`)". The root may also have an absolute `@id`, as all
+  Galaxy Training Network crates do; this works and could be mentioned.
+- Fallbacks: also `CITATION.cff` and a licence file in the crate, besides `README.md`.
+
 ## `developer/bioschemas.md`: version statement is stale
 
 - "the latest version being 1.0.1 released in November 2021": the profile page now points to Workflow RO-Crate

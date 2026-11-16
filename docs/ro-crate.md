@@ -243,7 +243,11 @@ Consequences for RO-Crate:
 - **On WorkflowHub, workflows are absent from the RDF and SPARQL side.** A workflow has JSON-LD and an RO-Crate, but
   no `.rdf` and nothing in the triple store. The experimental branch below is the first attempt to put workflow (and
   crate) metadata into the knowledge graph, by switching that graph from JERM to Schema.org.
-- **ISA content is the reverse:** it has JERM RDF and SPARQL, but no RO-Crate.
+- **ISA content is the reverse:** it has JERM RDF and SPARQL, but no RO-Crate on `main`. The unmerged
+  [`isa-ro-crate-export`](https://github.com/seek4science/seek/tree/isa-ro-crate-export) branch (November 2026) adds
+  an ISA RO-Crate download for public Investigations, with studies and assays as nested datasets, people, data
+  files, samples, `LabProtocol`/`LabProcess` entities and extended metadata as `PropertyValue`s, shaped so that ARC
+  tools can read it.
 - **The Bioschemas JSON-LD is the bridge.** It already describes workflows and is merged into generated crates
   (section 4), and the experimental branch proposes it as the source for the knowledge graph too.
 
@@ -405,7 +409,9 @@ the `ro-crate-metadata.json` of the **latest version** of every public workflow,
 `/workflows/{id}/ro_crate_metadata` endpoint (version 2026-10-17: 1,581 crates; the site listed 1,629 public
 workflows on 2026-11-16). A crate counts as **generated** when its root `name` starts with "Research Object Crate
 for", which only `merge_entities` (section 4) writes; otherwise it was **supplied** with the workflow and is served as
-uploaded. The supplier was identified from the root `@id`, `isBasedOn` and `url`.
+uploaded. The supplier was identified from the root `@id`, `isBasedOn` and `url`. How suppliers are meant to build
+these crates is described in [How to make a Workflow RO-Crate](https://about.workflowhub.eu/developer/how-to-make-a-workflow-ro-crate/)
+and the [Workflow RO-Crate profile](https://about.workflowhub.eu/Workflow-RO-Crate/).
 
 | | Crates | Share |
 |---|---|---|
@@ -458,7 +464,10 @@ What this shows:
 From a crate, SEEK reads only the root `name`, `description`, `keywords`, `license`, `author`/`creator` (a person's
 `name`, `givenName`, `familyName`, `affiliation` and ORCID `@id`), `version` and the source URL (`@id`, `isBasedOn`,
 `url`), plus the main workflow's `programmingLanguage`, `image` and `subjectOf`, and whether a `TestSuite` exists
-(section 3). Everything else is kept in the served crate, but not stored, shown or searched.
+(section 3). The profile's [Extracted Metadata](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/#extracted-metadata) appendix lists only `name`,
+`description`, `author`, `license` and `keywords`, so it understates what is read: `creator`, `version`, the source
+URL, `programmingLanguage` and the test suite check are missing from it.
+Everything else is kept in the served crate, but not stored, shown or searched.
 
 Counting, in the Knowledge Graph, how many of the 713 supplied crates use each property and type (a crate's entities
 are those under its `…/ro_crate/` base, its root, and entities up to two links away), the most used ones that SEEK
@@ -489,16 +498,63 @@ What this suggests, in order of reach:
 4. **Show declared software requirements** next to the Galaxy-derived tools list.
 5. **Use crate-declared inputs and outputs** for languages SEEK cannot parse.
 
+## Problems found in crates
+
+Known problems with crates on WorkflowHub, from issue trackers and from the Knowledge Graph survey above. Most
+concern **supplied** crates, which WorkflowHub accepts without validation, but some come from SEEK's own generated
+crates.
+
+**Reported in the issue trackers:**
+
+| Problem | Where reported | Effect |
+|---|---|---|
+| A crate lists a data entity (for example a directory) that is not in the uploaded files | [seek#2790](https://github.com/seek4science/seek/issues/2790) (open, 2026-11) | Upload succeeds, but reading the crate later raises "Local Data Entity not found in crate", which breaks the TRS `files` endpoint for that workflow. |
+| Crates with thousands of files listed in the metadata | [seek#2752](https://github.com/seek4science/seek/issues/2752), [seek#2761](https://github.com/seek4science/seek/issues/2761) (COMPSs run crates) | Parsing takes long enough to time out (524) or fail (500), with no explanation to the user. A validator took about two minutes on one such crate. |
+| A licence given as an SPDX URL was replaced with "Other" | [seek#2512](https://github.com/seek4science/seek/issues/2512) (closed) | The licence file detector overrode the crate's `license`. Fixed by normalising to SPDX. |
+| `WorkflowSketch`, a type that is not in the RO-Crate 1.1+ context | [seek#2309](https://github.com/seek4science/seek/issues/2309) (closed) | Becomes a crate-local IRI in RDF. SEEK stopped writing it, but see below. |
+| No validation, and only a generic 500 error for a broken crate | [seek#2190](https://github.com/seek4science/seek/issues/2190) (open); validator in [PR #2686](https://github.com/seek4science/seek/pull/2686) (open) | The PR runs [rocrate-validator](https://github.com/crs4/rocrate-validator) on uploads with RO-Crate 1.1 to 1.3 metadata. |
+| The Workflow RO-Crate profile's own example did not comply with it | [about#55](https://github.com/workflowhub-eu/about/issues/55), [about#75](https://github.com/workflowhub-eu/about/issues/75), [about#52](https://github.com/workflowhub-eu/about/issues/52) (closed) | It typed the main workflow `HowTo` instead of `ComputationalWorkflow` (see [Main Workflow](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/#main-workflow)), and declared the profile on the metadata descriptor instead of the root. Crates modelled on the example inherit both. |
+| Earlier SEEK bugs in generated crates | [seek#766](https://github.com/seek4science/seek/issues/766) unlinked creators, [seek#1829](https://github.com/seek4science/seek/issues/1829) empty files for unfetched remote files, [seek#1883](https://github.com/seek4science/seek/issues/1883) publications missing, [seek#2064](https://github.com/seek4science/seek/issues/2064) duplicated creators | All closed. |
+
+**Seen in the Knowledge Graph (2026-10-17):**
+
+- **Profiles declared on the descriptor, or not at all.** Of 713 supplied crates, 195 declare Workflow RO-Crate on
+  the metadata descriptor and 87 on the root. [Workflow RO-Crate 1.1](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/#declaring-profile-conformance) asks for
+  the root, but [allows the descriptor](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/#backward-compatibility) for RO-Crate 1.1 crates, which most of these are.
+  393 GTN crates and 118 IWC crates declare no profile at all, although IWC crates contain
+  [Workflow Testing RO-Crate](https://w3id.org/ro/wftest) test suites.
+- **The obsolete `WorkflowSketch` type is still in 456 supplied crates**: all 393 GTN crates and 63 COMPSs crates.
+  Their generators still copy the RO-Crate 1.0 type that SEEK dropped.
+- **Older RO-Crate versions.** 657 supplied crates use RO-Crate 1.1, 54 use 1.2 and 2 use 1.3.
+- **SEEK's generated crates have invalid identifiers too.** In 8 generated crates, free text typed as "other
+  creators" (for example "Based on FHIR Resources made by …") becomes a `#…` identifier with spaces, and Galaxy input
+  names that contain URLs become input identifiers such as `#…-inputs-https://…`. Both produce invalid IRIs in RDF.
+  34 crates, all but 2 of them generated, have entity identifiers containing spaces.
+- **Two Bioschemas namespaces for one type**, depending on the RO-Crate version of the context (see the knowledge
+  graph issues below).
+
+What would help most:
+
+1. **Validate on upload** (PR #2686) against the declared profiles ([Workflow RO-Crate](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/), and its
+   [extension profiles](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/#extension-profiles)), reporting problems as warnings first so that existing pipelines keep working,
+   with a size limit or warning for very large file lists.
+2. **Fix the main pipelines.** The GTN and IWC generators produce most supplied crates: declaring the profiles on the
+   root and dropping `WorkflowSketch` there would fix about 500 crates at once.
+3. **Fix SEEK's own identifiers.** Mint identifiers that are valid IRI fragments for free-text creators and for
+   parameters, for example numbered ids such as the `#creator-N` that `populate_ro_crate` already uses in its own
+   `author` list.
+4. **Check that every local data entity exists** when a crate is uploaded, rather than failing later in TRS.
+
 ## Choosing a representation
 
-The same workflow is available in several forms. They differ in what they hold, who wrote it, and what they cost to
+The same workflow is available in several forms (see also WorkflowHub's [developer documentation](https://about.workflowhub.eu/developer/)). They differ in what they hold, who wrote it, and what they cost to
 produce.
 
 | Form | Where | Holds | Written by | Good for | Limits |
 |---|---|---|---|---|---|
-| **RO-Crate zip** (attached crate) | `/workflows/{id}/ro_crate?version=N`, TRS `files?format=zip`; Signposting `item` | Metadata **and all files** | The supplier (supplied crates) or SEEK | Archiving, execution, deposit in other repositories | Built on request: for git workflows SEEK checks out the repository and writes the zip each time ([`ro_crate_zip`](../app/models/concerns/workflow_extraction.rb#L245)). Too heavy for harvesting. |
+| **RO-Crate zip** (attached crate) | `/workflows/{id}/ro_crate?version=N`, [TRS](https://about.workflowhub.eu/developer/trs/) `files?format=zip`; [Signposting](https://about.workflowhub.eu/developer/signposting/) `item` | Metadata **and all files** | The supplier (supplied crates) or SEEK | Archiving, execution, deposit in other repositories | Built on request: for git workflows SEEK checks out the repository and writes the zip each time ([`ro_crate_zip`](../app/models/concerns/workflow_extraction.rb#L245)). Too heavy for harvesting. |
 | **RO-Crate metadata** | `/workflows/{id}/ro_crate_metadata?version=N` | The zip's `ro-crate-metadata.json` only | As above | Harvesting, as the knowledge graph does | It is the *attached* crate's metadata served on its own, **not a detached crate**: data entity `@id`s stay relative (`main.ga`, `./`), so a consumer must choose a `@base`, and the files can't be resolved against it. Served as `application/json` rather than `application/ld+json` with the RO-Crate profile, and not advertised in Signposting. |
-| **Bioschemas JSON-LD** | `<script>` in each page, `.jsonld`; Signposting `describedby` | WorkflowHub's own description: creators, licence, inputs and outputs, topics | SEEK | Web search engines, FAIR checkers, quick harvesting of every SEEK type | No files, tests or runs; does not carry the supplier's own metadata. |
+| **Bioschemas JSON-LD** | `<script>` in each page, `.jsonld`; Signposting `describedby` ([documentation](https://about.workflowhub.eu/developer/bioschemas/)) | WorkflowHub's own description: creators, licence, inputs and outputs, topics | SEEK | Web search engines, FAIR checkers, quick harvesting of every SEEK type | No files, tests or runs; does not carry the supplier's own metadata. |
 | **JERM RDF** | `.rdf`, SPARQL; Signposting `describedby` | SEEK's ISA model in its own vocabulary | SEEK | ISA content, SPARQL queries in SEEK | **No Workflows**; SEEK-specific vocabulary. |
 | **Knowledge graph** | [Zenodo](https://doi.org/10.5281/zenodo.23691282) [[5]](#ref-kg2026), built by [workflowhub-graph](https://github.com/workflowhub-eu/workflowhub-graph) | All latest-version crate metadata merged into one RDF graph, plus ORCID and language enrichments | The supplier or SEEK, as served | Bulk analysis across all workflows offline, as in the survey above | A dated snapshot of latest versions only; see the issues below. |
 
@@ -539,7 +595,8 @@ Found while running the survey above on the 2026-10-17 version:
    `https://w3id.org/ro/terms/#`, which looks like a malformed namespace. The split shows in the types: supplied
    crates (RO-Crate 1.1 context) type the main workflow as `https://bioschemas.org/ComputationalWorkflow` (711
    crates), generated crates (1.3 context) as `https://bioschemas.org/terms/ComputationalWorkflow` (864), so one
-   query finds only half the workflows. 50 supplied crates also have a `Person` typed in the
+   query finds only half the workflows. The profile's [compatibility table](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/#compatibility-table) lists how
+   these terms map in each RO-Crate context version. 50 supplied crates also have a `Person` typed in the
    `https://w3id.org/ro/terms/#` namespace.
 6. **A snapshot of latest versions only.** It shows what each workflow looks like now, not what a cited version
    (with a DOI) contained.
@@ -577,8 +634,8 @@ Found while running the survey above on the 2026-10-17 version:
   `CreateAction` entities, so runs are not shown, searched or linked to their workflow.
 - **"RO-Crate snapshots" is a misnomer.** [`CLAUDE.md`](../CLAUDE.md) uses that phrase, but snapshots of
   Investigations, Studies and Assays ([`lib/seek/research_objects/`](../lib/seek/research_objects/)) are older
-  [RO-Bundle](https://w3id.org/bundle/) zips (`.ro.zip`, `ROBundle::File`), not RO-Crates. ISA objects and
-  DataFiles have no RO-Crate export.
+  [RO-Bundle](https://w3id.org/bundle/) zips (`.ro.zip`, `ROBundle::File`), not RO-Crates. On `main`, ISA objects
+  and DataFiles have no RO-Crate export; the `isa-ro-crate-export` branch is adding one for Investigations.
 - **Uploaded crates are not rewritten.** WorkflowHub's own metadata (DOI, SEEK creators, licence edits) does not
   appear in them, so the downloaded crate can differ from what the landing page shows.
 - **The Bioschemas merge uses a placeholder vocabulary.** It sets `'@vocab' => 'https://somewhere.com/'` as a
@@ -590,7 +647,8 @@ Found while running the survey above on the 2026-10-17 version:
 - **Crates are only lightly checked.** The only checks on upload are that the crate can be read, that it has a main
   workflow, and (for `submit`) that it has a source URL and version
   ([`workflow_crate_extractor.rb#L75`](../app/forms/workflow_crate_extractor.rb#L75)). No RO-Crate or profile
-  validator (such as [rocrate-validator](https://github.com/crs4/rocrate-validator)) is run.
+  validator (such as [rocrate-validator](https://github.com/crs4/rocrate-validator)) is run; an open pull request
+  ([#2686](https://github.com/seek4science/seek/pull/2686)) adds it. See [Problems found in crates](#problems-found-in-crates).
 
 ## Experimental and future work
 
@@ -662,7 +720,8 @@ Gaps above that no branch addresses yet:
   profile, and reporting the result.
 - Documenting the RO-Crate endpoints in the OpenAPI definition, and the RO-Crate settings in the SEEK administration
   guide.
-- RO-Crate export for other SEEK types (ISA, DataFile), in place of the RO-Bundle snapshots.
+- RO-Crate export for other SEEK types, in place of the RO-Bundle snapshots. ISA export is in progress on the
+  `isa-ro-crate-export` branch; DataFiles and other assets have none.
 
 Two projects make these concrete:
 
