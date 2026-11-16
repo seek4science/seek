@@ -1821,10 +1821,10 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select '.seek-description', count: 1
     assert_select '.seek-description img', count: 3
     assert_select '.seek-description img:nth-of-type(1)' do
-      assert_select ":match('src', ?)", %r{/workflows/\d*/git/1/raw/test1/image.png}
+      assert_select ":match('src', ?)", %r{/workflows/[0-9]+/git/1/raw/test1/image.png}
     end
     assert_select '.seek-description img:nth-of-type(2)' do
-      assert_select ":match('src', ?)", %r{/workflows/\d*/git/1/raw/test2/image.png}
+      assert_select ":match('src', ?)", %r{/workflows/[0-9]+/git/1/raw/test2/image.png}
     end
     assert_select '.seek-description img:nth-of-type(3)' do
       assert_select ":match('src', ?)", 'https://example.com/test3/image.png'
