@@ -29,7 +29,9 @@ The crate is both how a workflow arrives in WorkflowHub and how it leaves it.
 
 [REWIRE](https://esciencelab.org.uk/projects/rewire/) widens the problem from publishing a workflow to publishing the whole reproducible research process.
 REWIRE names RO-Crate as its publishing intervention and "an integration layer" between planning (machine-actionable Reproducibility Management Plans), execution ([GNU Guix](https://guix.gnu.org/) computational environments) and publication.
-This story records where WorkflowHub stands today and what it would take for it to carry the RO-Crate profiles REWIRE develops.
+In the UK, the [BioFAIR](https://esciencelab.org.uk/projects/biofair/) Methods Commons, funded by UKRI from July 2026 and led by the University of Manchester with the Earlham Institute and Seqera, aims "to establish a world-leading, standards-based national infrastructure for FAIR computational workflows in the UK life sciences", "making it easy to find high-quality workflows, run them at scale and share them with full provenance".
+It names WorkflowHub as the single access point for workflows, a curated "BioFAIR Workflow Collection", a "Shared Project Space" that records runs as Workflow Run RO-Crates and catalogues them with FAIRDOM-SEEK, a "Workflow Observatory" for trust and quality, and RO-Crate and GA4GH as its API standards.
+This story records where WorkflowHub stands today and what it would take for it to carry the RO-Crate profiles REWIRE develops and the run provenance the Methods Commons depends on.
 
 Scope and boundaries:
 
@@ -128,9 +130,13 @@ Known gaps:
 ## Sustainability
 ### A shared code base maintained across several services
 
+WorkflowHub is supported long-term by ELIXIR and the Australian BioCommons and is a service of the European Open Science Cloud; if it reaches end of service, its published contributions and metadata are to be archived as RO-Crates in Zenodo [Gustafsson 2025].
+That plan relies on RO-Crate export for everything WorkflowHub holds, which the code provides today only for workflows.
 Because WorkflowHub, FAIRDOMHub and other SEEK instances share one code base, maintenance effort on the core platform benefits all of them.
 The RO-Crate support depends on the externally maintained `ro-crate` Ruby gem and on profiles governed by the RO-Crate and WorkflowHub communities.
 REWIRE runs from September 2026 to August 2029, and the University of Manchester leads REWIRE task T2.3 on RO-Crate profiles, which gives a route for keeping WorkflowHub aligned with new profiles during that period.
+The BioFAIR Methods Commons invests up to £4 million over an initial two years (July 2026 to July 2028), with an expected extension to June 2029 and beyond, and makes WorkflowHub part of a UK national infrastructure.
+The two projects overlap in the same need: RO-Crate profiles defined in REWIRE are what the Methods Commons would use for run provenance in practice.
 
 The main risks are drift between the profiles WorkflowHub declares and the current versions of those profiles, and features that are only switched on in WorkflowHub's configuration and so are less exercised by other SEEK deployments.
 
@@ -140,6 +146,13 @@ The story builds on the following material.
 
 - FAIRDOM-SEEK source code: <https://github.com/seek4science/seek>; developer map of RO-Crate support: [`ro-crate.md`](ro-crate.md).
 - Wolstencroft K. *et al.* (2015). SEEK: a systems biology data and model management platform. *BMC Systems Biology* 9:33. <https://doi.org/10.1186/s12918-015-0174-y>
+- [Goble 2023] Goble C, Bacall F, Soiland-Reyes S, Owen S, Eguinoa I, Droesbeke B, Ménager H, Rodriguez-Navas L, Fernández JM, Grüning B, Leo S, Pireddu L, Crusoe M, Gustafsson J, Capella-Gutierrez S, Coppens F (2023). The EOSC-Life Workflow Collaboratory for the Life Sciences. *Proceedings of the Conference on Research Data Infrastructure* 1. <https://doi.org/10.52825/cordi.v1i.352>
+- [Gustafsson 2025] Gustafsson OJR, Wilkinson SR, Bacall F, Soiland-Reyes S, Leo S, Pireddu L, Owen S, Juty N, Fernández JM, Brown T, Ménager H, Grüning B, Capella-Gutierrez S, Coppens F, Goble C (2025). WorkflowHub: a registry for computational workflows. *Scientific Data* 12, 837. <https://doi.org/10.1038/s41597-025-04786-3>
+- [Wilkinson 2025] Wilkinson SR, Aloqalaa M, Belhajjame K, Crusoe MR, de Paula Kinoshita B, Gadelha L, Garijo D, Gustafsson OJR, Juty N, Kanwal S, Khan FZ, Köster J, Peters-von Gehlen K, Pouchard L, Rannow RK, Soiland-Reyes S, Soranzo N, Sufi S, Sun Z, Vilne B, Wouters MA, Yuen D, Goble C (2025). Applying the FAIR Principles to computational workflows. *Scientific Data* 12, 328. <https://doi.org/10.1038/s41597-025-04451-9>
+- [Wilkinson 2026] Wilkinson SR, Gustafsson J, Bacall F, Belhajjame K, Capella S, Fernandez Gonzalez JM, Fosso Tande J, Gadelha L, Garijo D, Grubel P, Grüning B, Khan FZ, Kanwal S, Leo S, Owen S, Pireddu L, Pouchard L, Rodríguez-Navas L, Serrano-Solano B, Soiland-Reyes S, Vilne B, Williams A, Wouters MA, Coppens F, Goble C (2026). An ecosystem of services for FAIR computational workflows. In: Leser U, Hilbrich M, Wilkinson SR, Ferreira da Silva R (eds), *Workflow systems for large-scale scientific data analysis*, chapter 4, pp. 113–145. Berlin Universities Publishing. <https://doi.org/10.14279/depositonce-25818>
+- BioFAIR Methods Commons: <https://esciencelab.org.uk/projects/biofair/>, <https://biofair.uk/updates/2026/biofair-announces-4-million-investment-to-create-a-methods-commons-led-by-the-university-of-manchester/>.
+- Soiland-Reyes S *et al.* (2022). Packaging research artefacts with RO-Crate. *Data Science* 5(2). <https://doi.org/10.3233/DS-210053>
+- How the papers compare with the code: [`ro-crate.md`](ro-crate.md#workflow-ro-crate-in-the-literature).
 - RO-Crate specification: <https://w3id.org/ro/crate>; Workflow RO-Crate profile: <https://about.workflowhub.eu/Workflow-RO-Crate/>; Workflow Run Crate profiles: <https://www.researchobject.org/workflow-run-crate/>.
 - REWIRE project: <https://esciencelab.org.uk/projects/rewire/>, <https://rewire-hub.eu/>, CORDIS <https://doi.org/10.3030/101287431>.
 - GA4GH TRS: <https://ga4gh.github.io/tool-registry-service-schemas/>; FAIR Signposting: <https://signposting.org/FAIR/>; Bioschemas: <https://bioschemas.org/>.
@@ -160,30 +173,37 @@ Whether a registry may rewrite an uploaded crate is a policy question as much as
 
 ## Appendix: Impact
 
-<!-- TODO: number of registered workflows, crates downloaded, TRS imports, and systems integrating through RO-Crate. -->
+In 2023 WorkflowHub had over 380 workflows from over 170 workflow teams, with adoption already extending beyond the life sciences to biodiversity, astronomy, astrophysics and climate change [Goble 2023].
+By the submission of the WorkflowHub paper it had 860 workflows and 958 users from 266 organisations in 36 countries or locations [Gustafsson 2025].
+Workflow RO-Crate is the exchange format between WorkflowHub and execution platforms such as Galaxy, Sapporo and WfExS, testing services such as LifeMonitor, and archives such as Zenodo [Goble 2023; Gustafsson 2025].
+In the wider ecosystem, Galaxy, Snakemake, CWL and Nextflow support the metadata framework natively, including Workflow Run Crates for provenance, and run records are deposited in data repositories as Workflow Run RO-Crates and "occasionally registered in WorkflowHub to be published to support publications" [Wilkinson 2026].
+The FAIR principles for computational workflows use WorkflowHub's RO-Crates as their worked example of a FAIR workflow specification, and a Provenance Run Crate as their example of a FAIR workflow run [Wilkinson 2025].
+
+<!-- TODO: current figures from workflowhub.eu, crate downloads and TRS imports. -->
 
 ## Appendix: Future Directions — the REWIRE blueprint
 
-This appendix maps the gaps in WorkflowHub's RO-Crate support to REWIRE's work packages, as a plan rather than a commitment.
+This appendix maps the gaps in WorkflowHub's RO-Crate support to REWIRE's work packages and to the BioFAIR Methods Commons capabilities, as a plan rather than a commitment.
 
-| Step | What | REWIRE link |
-|---|---|---|
-| 1 | Declare the current Workflow RO-Crate profile (1.1) and a consistent RO-Crate version in generated crates. | T2.3 RO-Crate Profiles |
-| 2 | Validate uploads with rocrate-validator against the profiles a crate declares, and show the result to the submitter. | T2.3, T2.5 PLAYBOOK |
-| 3 | Recognise Process, Workflow and Provenance Run Crates: accept them alongside a workflow version, show recorded runs, and link runs to the workflow they executed. | T2.3 (Process and Workflow Run profiles) |
-| 4 | Accept and link machine-actionable plans (for example from [ARGOS](https://argos.openaire.eu/)) and environment definitions (for example GNU Guix manifests) inside crates, so a crate can connect plan, environment, workflow and runs. | T2.2 Guix, T2.4 Cross-Intervention Integration |
-| 5 | Decide and document whether WorkflowHub may add its own metadata to uploaded crates, building on the experimental regeneration settings, without losing the uploaded original. | T2.3, T1.4 Policy |
-| 6 | Document the RO-Crate endpoints in the OpenAPI reference, and the submission and validation steps as a REWIRE playbook. | T2.5 PLAYBOOK, T1.2 BLUEPRINTS |
-| 7 | Move SEEK's ISA snapshots from Research Object Bundles to RO-Crate (for example the ISA RO-Crate profile), so that SEEK has one packaging format and ISA studies can link to the workflows and runs that produced their data. | T2.3, T2.4 |
-| 8 | Offer WorkflowHub as a publishing target in pilots that use workflows, and feed their experience back into this blueprint. | WP3 pilots (T3.3 Pilot Group B) |
+| Step | What | REWIRE link | BioFAIR Methods Commons |
+|---|---|---|---|
+| 1 | Declare the current Workflow RO-Crate profile (1.1) and a consistent RO-Crate version in generated crates. | T2.3 RO-Crate Profiles | API standards (RO-Crate) |
+| 2 | Validate uploads with rocrate-validator against the profiles a crate declares, and show the result to the submitter. | T2.3, T2.5 PLAYBOOK | Workflow Observatory |
+| 3 | Recognise Process, Workflow and Provenance Run Crates. They can already be registered, and are served as uploaded [Gustafsson 2025], but SEEK does not read them: show recorded runs, make them searchable, and link each run to the workflow version it executed. | T2.3 (Process and Workflow Run profiles) | Shared Project Space (Workflow Run RO-Crate provenance) |
+| 4 | Accept and link machine-actionable plans (for example from [ARGOS](https://argos.openaire.eu/)) and environment definitions (for example GNU Guix manifests) inside crates, so a crate can connect plan, environment, workflow and runs. | T2.2 Guix, T2.4 Cross-Intervention Integration | Containerised workflows on HPC; Concierge Service |
+| 5 | Decide and document whether WorkflowHub may add its own metadata to uploaded crates, building on the experimental regeneration settings, without losing the uploaded original. | T2.3, T1.4 Policy | BioFAIR Workflow Collection (endorsed workflows) |
+| 6 | Document the RO-Crate endpoints in the OpenAPI reference, and the submission and validation steps as a REWIRE playbook. | T2.5 PLAYBOOK, T1.2 BLUEPRINTS | Onboarding playbooks; standardised APIs |
+| 7 | Move SEEK's ISA snapshots from Research Object Bundles to RO-Crate (for example the ISA RO-Crate profile), so that SEEK has one packaging format and ISA studies can link to the workflows and runs that produced their data. | T2.3, T2.4 | BioFAIR DataHub (ISA catalogue) linking to workflow runs |
+| 8 | Offer WorkflowHub as a publishing target in pilots and exemplar use cases that use workflows, and feed their experience back into this blueprint. | WP3 pilots (T3.3 Pilot Group B) | Nine Exemplar Use Cases |
 
 ## Open TODOs
 
 - **Contributors:** confirm the names for the `contributors` front matter and add them to RSQKit's `_data/CONTRIBUTORS.yml`.
 - **User Community:** confirm which REWIRE pilots will use WorkflowHub, and add user numbers or examples of communities.
 - **Developer Community:** confirm how development of SEEK and WorkflowHub is organised and governed, and who maintains the RO-Crate support.
-- **Sustainability:** confirm current and past funding for SEEK and WorkflowHub beyond REWIRE, and plans beyond 2029.
-- **References:** add the WorkflowHub paper and the RO-Crate paper with confirmed citations.
-- **Impact appendix:** add metrics from workflowhub.eu.
+- **Sustainability:** confirm current funding for SEEK development beyond REWIRE, and plans beyond 2029.
+- **References:** confirm the full author list for the RO-Crate paper (taken from a reference list, not the paper itself).
+- **Impact appendix:** add current figures from workflowhub.eu; the cited figures are from 2023 and the 2025 paper's submission.
+- **BioFAIR:** confirm how the Shared Project Space will store and catalogue Workflow Run RO-Crates in SEEK, and which Methods Commons capabilities the blueprint should commit to.
 - **Future Directions:** confirm REWIRE's names for the "Recuperative" and machine-actionable DMP RO-Crate profiles, and whether WorkflowHub should support them.
 - **Export:** add the page to `_data/sidebars/main.yml` if this is submitted to RSQKit, or agree the format for the REWIRE Knowledge Hub.

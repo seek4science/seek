@@ -292,6 +292,109 @@ What this means:
   The JSON-LD, RO-Crate and the experimental knowledge graph all use Schema.org, but replacing JERM loses the ISA
   types until they have Schema.org descriptions (the branch's `next-steps.md` proposes keeping both, chosen per site).
 
+## Workflow RO-Crate in the literature
+
+Four publications describe how Workflow RO-Crate and WorkflowHub are used beyond this code base. This section
+summarises what each says about RO-Crate, and checks it against the code.
+
+**Goble *et al.* (2023), "The EOSC-Life Workflow Collaboratory for the Life Sciences"**
+[[1]](#ref-goble2023) places WorkflowHub in the ecosystem built by the EOSC-Life project: workflow management
+systems, community repositories (Galaxy's Intergalactic Workflow Commission, nf-core), registries (BioContainers,
+bio.tools, WorkflowHub), testing (LifeMonitor, OpenEBench) and execution services (Galaxy Europe, Sapporo, WfExS).
+These are joined by a "Digital Object based Metadata Framework" of Bioschemas, EDAM, abstract CWL, RO-Crate and
+GA4GH TRS. RO-Crate's role is stated as "the unit of currency of exchange between the services, recording the
+provenance of workflow runs and a format for archiving in public repositories such as Zenodo". At the time it
+reports "over 380 workflows ... from over 170 workflow teams", and adoption beyond the life sciences (biodiversity,
+astronomy, astrophysics, climate change).
+
+**Gustafsson *et al.* (2025), "WorkflowHub: a registry for computational workflows"** [[2]](#ref-gustafsson2025)
+is the main WorkflowHub paper. It describes RO-Crate as "a fundamental unit that underpins upload, download, import
+and export", stresses that "a user does not need to know how to create, or work with, RO-Crates as the registry
+automatically builds a crate when a workflow is registered", and names Workflow RO-Crate 1.0 as the exchange format
+with Zenodo and the basis for exposing workflows as FAIR Digital Objects. It also covers registering a
+[Workflow Run RO-Crate](https://www.researchobject.org/workflow-run-crate/) to share a specific execution and its
+provenance (example: [workflow 1072](https://workflowhub.eu/workflows/1072)), LifeMonitor test badges, TRS
+integration with Galaxy, Sapporo and WfExS, CITATION.cff import, and DataCite DOIs. At submission it reports 860
+workflows and 958 users from 266 organisations in 36 countries or locations. Its sustainability statement says that
+at end of service "the published contributions and metadata will be archived as RO-Crates" in Zenodo. Future work
+includes automated Git synchronisation and more TRS launch targets, with "the RO-Crate format ... central to this
+effort".
+
+**Wilkinson *et al.* (2025), "Applying the FAIR Principles to computational workflows"**
+[[3]](#ref-wilkinson2025) interprets each FAIR principle for workflows, distinguishing a *workflow specification*
+from a *workflow run*. Its worked examples use RO-Crate on both sides:
+
+- **Specification:** the Protein MD Setup CWL workflow in WorkflowHub (DOI
+  [10.48546/workflowhub.workflow.29.3](https://doi.org/10.48546/workflowhub.workflow.29.3)). "WorkflowHub's RO-Crate
+  references that the embedded CWL code is archived from the corresponding GitHub source code repository", and the
+  crate is the downloadable provenance for R1.3.
+- **Run:** a digital pathology workflow run whose provenance was "generated using CWLProv in the form of RO-Bundle
+  and then converted to an RO-Crate that follows the Provenance Run Crate profile". This is the RO-Bundle to RO-Crate
+  transition from the history above, applied to run provenance.
+
+It recommends Bioschemas ComputationalWorkflow metadata (as used in the Workflow Run Crate profiles) and points to
+the Workflow RO-Crate profile for packaging a workflow with components "which also need to be FAIR".
+
+**Wilkinson *et al.* (2026), "An ecosystem of services for FAIR computational workflows"**
+[[4]](#ref-wilkinson2026) is chapter 4 of the book *Workflow systems for large-scale scientific data analysis*. It
+combines the FAIR principles for workflows with the EOSC-Life Collaboratory as a worked ecosystem, and gives the most
+detail on RO-Crate of the four:
+
+- **Profiles.** It explains what an RO-Crate profile defines (required metadata, vocabularies, structural
+  constraints, validation rules) and names three: Workflow RO-Crate, Workflow Testing RO-Crate, and Workflow Run
+  RO-Crate (WRROC). Crates are "a currency of exchange" between WorkflowHub, LifeMonitor, OpenEBench and execution
+  platforms.
+- **Persistent identifiers.** "Effectively, RO-Crates are metadata objects referencing PIDs": attached and detached
+  data entities, and contextual entities identified by ORCID, ROR and RAiD. It names "PID multiplicity" as a
+  challenge (WorkflowHub entry, DOI, Git URL, a Zenodo DOI for the crate, a Software Heritage ID) and takes the
+  WorkflowHub PID as the authority that gathers the others.
+- **Signposting.** WorkflowHub is "an early adopter of FAIR signposting", using the Bibliographic Metadata and
+  Publication Boundary patterns "to signpost the Workflow RO-Crate".
+- **Archiving.** "The RO-Crate packaging means that every workflow in WorkflowHub can be deposited in other long
+  term repositories like Zenodo or DataVerse, or even Software Heritage."
+- **Workflow systems.** Galaxy, Snakemake, CWL and Nextflow support the framework natively, with RO-Crate enrichment,
+  Workflow Run Crates for provenance, Git bot registration from IWC and nf-core, and TRS; Galaxy also exports data
+  products as RO-Crates.
+- **Life cycle.** Run records "are deposited in data repositories as Workflow-Run-RO-Crates, and occasionally
+  registered in WorkflowHub to be published to support publications". Testing services gather and analyse
+  provenance in RO-Crates.
+
+### How the papers compare with the code
+
+| Claim in the papers | In this code base (`main`) |
+|---|---|
+| RO-Crate underpins upload, download, import and export; a crate is built automatically [[2]](#ref-gustafsson2025) | Confirmed: sections 2 to 5. Uploaded crates are passed through; other workflows get a generated crate. |
+| Workflow Run RO-Crates can be registered [[2]](#ref-gustafsson2025), and RO-Crate records run provenance [[1]](#ref-goble2023) | Partly. A run crate is accepted as an ordinary Workflow RO-Crate and served as uploaded: workflow 1072's crate declares the Process Run Crate and Workflow Run Crate 0.5 profiles and holds a `CreateAction`. Nothing in SEEK reads the run, so it is not shown, searched or linked. |
+| Exchange with Zenodo and archiving as RO-Crates [[1]](#ref-goble2023), [[2]](#ref-gustafsson2025) | Not a feature. Zenodo deposit exists only for ISA snapshots ([`snapshot.rb#L22`](../app/models/snapshot.rb#L22)), which are RO-Bundles. Workflow crates reach Zenodo by other routes, and the end-of-service archive is a plan rather than code. |
+| Workflow RO-Crate 1.0 [[2]](#ref-gustafsson2025) | Matches what generated crates declare, together with RO-Crate 1.3 from the gem (see the gaps below). |
+| Workflows exposed as FAIR Digital Objects [[2]](#ref-gustafsson2025) | Supported through Signposting `item` links to the crate (section 5). |
+| The crate records where the workflow came from [[3]](#ref-wilkinson2025) | `isBasedOn` and per-file `contentUrl` for git-backed workflows (section 4). |
+| Signposting with the Bibliographic Metadata and Publication Boundary patterns [[4]](#ref-wilkinson2026) | Confirmed: `describedby` links (DataCite XML, JSON-LD, RDF where available) and an `item` link to the crate ([`fair_signposting.rb`](../app/controllers/concerns/fair_signposting.rb)). |
+| Every workflow can be deposited in Zenodo, DataVerse or Software Heritage as an RO-Crate [[4]](#ref-wilkinson2026) | Possible because every version has a downloadable crate, but no deposit is built in (see the Zenodo row above). |
+| The WorkflowHub PID is the authority that gathers the other PIDs [[4]](#ref-wilkinson2026) | Partly: the crate's `identifier` is the DOI if minted, otherwise the WorkflowHub URL, and `isBasedOn` holds the source repository. Zenodo DOIs and Software Heritage IDs are not recorded in the crate. |
+| Contextual entities identified by ORCID and ROR [[4]](#ref-wilkinson2026) | ORCID for people (`Person#ro_crate_metadata`). Projects arrive through the merged Bioschemas `producer`, identified by their SEEK URLs; the workflow's Bioschemas description adds no ROR identifiers. |
+| Growth: over 380 workflows and 170 teams (2023) [[1]](#ref-goble2023) to 860 workflows and 958 users (2025) [[2]](#ref-gustafsson2025) | Not derivable from code. |
+
+### References
+
+1. <a id="ref-goble2023"></a>Goble C, Bacall F, Soiland-Reyes S, Owen S, Eguinoa I, Droesbeke B, Ménager H,
+   Rodriguez-Navas L, Fernández JM, Grüning B, Leo S, Pireddu L, Crusoe M, Gustafsson J, Capella-Gutierrez S,
+   Coppens F (2023). The EOSC-Life Workflow Collaboratory for the Life Sciences. *Proceedings of the Conference on
+   Research Data Infrastructure* 1. <https://doi.org/10.52825/cordi.v1i.352>
+2. <a id="ref-gustafsson2025"></a>Gustafsson OJR, Wilkinson SR, Bacall F, Soiland-Reyes S, Leo S, Pireddu L, Owen S,
+   Juty N, Fernández JM, Brown T, Ménager H, Grüning B, Capella-Gutierrez S, Coppens F, Goble C (2025). WorkflowHub:
+   a registry for computational workflows. *Scientific Data* 12, 837. <https://doi.org/10.1038/s41597-025-04786-3>
+3. <a id="ref-wilkinson2025"></a>Wilkinson SR, Aloqalaa M, Belhajjame K, Crusoe MR, de Paula Kinoshita B, Gadelha L,
+   Garijo D, Gustafsson OJR, Juty N, Kanwal S, Khan FZ, Köster J, Peters-von Gehlen K, Pouchard L, Rannow RK,
+   Soiland-Reyes S, Soranzo N, Sufi S, Sun Z, Vilne B, Wouters MA, Yuen D, Goble C (2025). Applying the FAIR
+   Principles to computational workflows. *Scientific Data* 12, 328. <https://doi.org/10.1038/s41597-025-04451-9>
+4. <a id="ref-wilkinson2026"></a>Wilkinson SR, Gustafsson J, Bacall F, Belhajjame K, Capella S, Fernandez Gonzalez JM,
+   Fosso Tande J, Gadelha L, Garijo D, Grubel P, Grüning B, Khan FZ, Kanwal S, Leo S, Owen S, Pireddu L, Pouchard L,
+   Rodríguez-Navas L, Serrano-Solano B, Soiland-Reyes S, Vilne B, Williams A, Wouters MA, Coppens F, Goble C (2026).
+   An ecosystem of services for FAIR computational workflows. In: Leser U, Hilbrich M, Wilkinson SR, Ferreira da
+   Silva R (eds), *Workflow systems for large-scale scientific data analysis*, chapter 4, pp. 113–145. Berlin
+   Universities Publishing. ISBN 978-3-98781-067-1. <https://doi.org/10.14279/depositonce-25818>
+
 ## Observations and gaps
 
 - **Generated crates mix spec and profile versions.** The base `conformsTo` comes from
@@ -319,8 +422,10 @@ What this means:
   [docs.seek4science.org](https://docs.seek4science.org/) has no page on enabling or administering these features;
   the only documentation is WorkflowHub's own site.
 - **[Workflow Run Crates](https://www.researchobject.org/workflow-run-crate/) (Process, Workflow and Provenance Run
-  Crate) are not recognised.** They are stored and passed through like any other file, but nothing interprets
-  `CreateAction` entities.
+  Crate) are not recognised.** They can be registered as ordinary Workflow RO-Crates and are served as uploaded
+  (see [workflow 1072](https://workflowhub.eu/workflows/1072) and
+  [How the papers compare with the code](#how-the-papers-compare-with-the-code)), but nothing interprets
+  `CreateAction` entities, so runs are not shown, searched or linked to their workflow.
 - **"RO-Crate snapshots" is a misnomer.** [`CLAUDE.md`](../CLAUDE.md) uses that phrase, but snapshots of
   Investigations, Studies and Assays ([`lib/seek/research_objects/`](../lib/seek/research_objects/)) are older
   [RO-Bundle](https://w3id.org/bundle/) zips (`.ro.zip`, `ROBundle::File`), not RO-Crates. ISA objects and
@@ -407,4 +512,15 @@ Gaps above that no branch addresses yet:
   guide.
 - RO-Crate export for other SEEK types (ISA, DataFile), in place of the RO-Bundle snapshots.
 
-These are written up as a plan in [`rewire-blueprint.md`](rewire-blueprint.md).
+Two projects make these concrete:
+
+- **[REWIRE](https://esciencelab.org.uk/projects/rewire/)** (Horizon Europe, 2026–2029) uses RO-Crate as the
+  publishing and integration layer for reproducibility, and adapts the Process Run, Workflow Run and machine-actionable
+  DMP RO-Crate profiles.
+- **The [BioFAIR](https://esciencelab.org.uk/projects/biofair/) Methods Commons** (UKRI, from July 2026) makes
+  WorkflowHub the single access point for UK life-science workflows, with a curated "BioFAIR Workflow Collection", a
+  "Shared Project Space" that uses Workflow Run RO-Crate provenance and FAIRDOM-SEEK cataloguing, a "Workflow
+  Observatory" for quality, and RO-Crate and GA4GH as its API standards. That needs SEEK to read run crates and link
+  them to workflows and data, which `main` does not do.
+
+Both are written up as a plan in [`rewire-blueprint.md`](rewire-blueprint.md).
