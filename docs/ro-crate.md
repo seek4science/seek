@@ -453,6 +453,42 @@ What this shows:
   Crates automatically, which is the scenario REWIRE and the BioFAIR Shared Project Space need. SEEK does not read
   them yet.
 
+## What supplied crates say that WorkflowHub does not use
+
+From a crate, SEEK reads only the root `name`, `description`, `keywords`, `license`, `author`/`creator` (a person's
+`name`, `givenName`, `familyName`, `affiliation` and ORCID `@id`), `version` and the source URL (`@id`, `isBasedOn`,
+`url`), plus the main workflow's `programmingLanguage`, `image` and `subjectOf`, and whether a `TestSuite` exists
+(section 3). Everything else is kept in the served crate, but not stored, shown or searched.
+
+Counting, in the Knowledge Graph, how many of the 713 supplied crates use each property and type (a crate's entities
+are those under its `…/ro_crate/` base, its root, and entities up to two links away), the most used ones that SEEK
+does not read are:
+
+| Purpose | Properties and types (supplied crates using them) | Main suppliers | What WorkflowHub has instead |
+|---|---|---|---|
+| **Test definitions** | `TestSuite`, `TestInstance`, `TestService`, `runsOn`, `resource`, `instance` (192); `TestDefinition`, `engineVersion`, `definition` (118) | IWC, nf-core | Only a yes/no "has tests" and the LifeMonitor badge. Which CI service, test files and engine version are not shown. |
+| **Workflow runs** | `CreateAction` (77), `instrument`, `object`, `result`, `agent`, `actionStatus` (60–76), `startTime`/`endTime` (46–76), `OrganizeAction` (11), `ControlAction` (8), `wfrun:environment`, `wfrun:sha256` (38), `wfrun:resourceUsage` (16) | COMPSs, Autosubmit | Nothing: runs, their inputs and outputs, timings and resource use are invisible. |
+| **Software used** | `SoftwareApplication` (143), `softwareRequirements` (17), `softwareVersion` (14) | COMPSs, Galaxy | Tools come only from parsing Galaxy files (bio.tools annotations). Dependencies declared in the crate are not shown. |
+| **Contacts and maintainers** | `email` (148), `publisher` (96), `contactPoint`/`ContactPoint` (69–70), `maintainer` (53) | nf-core, GTN | Creators and submitter only. |
+| **Citations** | `citation` (79) | GTN, nf-core | SEEK's own links to Publications, which a crate cannot fill. |
+| **Workflow status** | `creativeWorkStatus` (100) | IWC, GTN | SEEK's maturity level, which SEEK writes into generated crates but does not read from supplied ones. |
+| **File formats** | `encodingFormat` (110) | GTN, nf-core | File listings from git, without media types. |
+| **Inputs and outputs** | `input`/`output` with `FormalParameter` (16–22), `PropertyValue`, `propertyID`, `unitCode`, `valueRequired` (10–46) | COMPSs, CWL crates | Inputs, outputs and steps parsed from Galaxy and CWL files only; for other languages, crate-declared parameters would be the only source. |
+| **Related works** | `exampleOfWork` (16), `workExample` (9), `HowToStep`/`step` (8) | Run crates, CWL | Nothing. |
+
+Also not read, but with a SEEK equivalent that is filled another way: `hasPart` and `contentSize` (file tree and
+sizes from git), `datePublished`, `dateCreated` and `dateModified` (SEEK's own timestamps), and `contributor`.
+
+What this suggests, in order of reach:
+
+1. **Show test definitions** (192 crates): CI service, test engine and links, alongside the LifeMonitor badge.
+2. **Read `creativeWorkStatus`, `maintainer`/`contactPoint` and `citation`** into the existing maturity, contact and
+   publication fields, instead of only writing them.
+3. **Show recorded runs** (77 crates): this is the run-crate support that REWIRE and the BioFAIR Shared Project Space
+   need.
+4. **Show declared software requirements** next to the Galaxy-derived tools list.
+5. **Use crate-declared inputs and outputs** for languages SEEK cannot parse.
+
 ## Choosing a representation
 
 The same workflow is available in several forms. They differ in what they hold, who wrote it, and what they cost to
@@ -500,7 +536,11 @@ Found while running the survey above on the 2026-10-17 version:
 5. **Vocabulary variants.** Statements use `http://schema.org/` (as the RO-Crate contexts map it), while SEEK's
    Bioschemas JSON-LD uses `https://schema.org/`. Bioschemas terms appear under four different namespaces
    (`https://bioschemas.org/`, `…/terms/`, `…/properties/`, `…/ComputationalWorkflow#`), and RO-Crate terms under
-   `https://w3id.org/ro/terms/#`, which looks like a malformed namespace.
+   `https://w3id.org/ro/terms/#`, which looks like a malformed namespace. The split shows in the types: supplied
+   crates (RO-Crate 1.1 context) type the main workflow as `https://bioschemas.org/ComputationalWorkflow` (711
+   crates), generated crates (1.3 context) as `https://bioschemas.org/terms/ComputationalWorkflow` (864), so one
+   query finds only half the workflows. 50 supplied crates also have a `Person` typed in the
+   `https://w3id.org/ro/terms/#` namespace.
 6. **A snapshot of latest versions only.** It shows what each workflow looks like now, not what a cited version
    (with a DOI) contained.
 
