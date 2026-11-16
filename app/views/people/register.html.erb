@@ -19,6 +19,7 @@
 
   <%= render partial: 'name_details_form', locals: { f: f } %>
   <%= render partial: 'contact_details_form', locals: { f: f } %>
+  <%= render partial: 'who_am_i_form' if Seek::Config.email_enabled %>
 
   <%= f.submit('Create', data: { disable_with: 'Creating...' }, class: 'btn btn-primary') %>
   <%= render partial: 'cancel_registration' %>

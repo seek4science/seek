@@ -1,4 +1,6 @@
 class PeopleController < ApplicationController
+  WHO_AM_I_MAX_LENGTH = 1000
+
   include Seek::IndexPager
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
@@ -123,7 +125,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
-          Mailer.contact_admin_new_user(current_user).deliver_later
+          Mailer.contact_admin_new_user(current_user,who_am_i_param).deliver_later
         end
         if current_user.active?
           flash[:notice] = 'Person was successfully created.'
@@ -248,6 +250,13 @@ class PeopleController < ApplicationController
   def notification_params
     params.permit({ projects: [] }, { institutions: [] }, :other_projects, :other_institutions)
   end
+
+  # Optional "Who am I" text from the signup form. It is not stored; it is only
+  # included in the email to administrators, so trim it and cap its length.
+  def who_am_i_param
+    params[:who_am_i].to_s.strip.truncate(WHO_AM_I_MAX_LENGTH).presence
+  end
+
 
   def set_tools_and_expertise(person, params)
     exp_changed = person.add_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
