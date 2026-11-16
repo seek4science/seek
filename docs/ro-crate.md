@@ -219,10 +219,78 @@ This file is a map of the code for developers. User and administrator documentat
   (`help/`) and installation and administration guides (`tech/`). It doesn't currently cover workflows or RO-Crate.
 - **The [JSON API documentation](../public/api/index.html)** in this repository (`public/api/`), served at `/api`.
 
-Unmerged proof-of-concept work on the `schema-knowledge-graph-messing` branch (`docs/schema-kg-work.md`) adds
-RO-Crate 1.1, 1.2 and 1.3 JSON-LD contexts for RDF generation, sends each Workflow's RO-Crate metadata to the triple
-store, and makes [`open_crate`](../lib/seek/workflow_extractors/rocrate.rb) also yield the crate's root directory.
-This document describes `main`.
+This document describes `main`. Unmerged experimental work that changes RO-Crate handling is described in
+[Experimental and future work](#experimental-and-future-work).
+
+## RO-Crate alongside SEEK's other linked data
+
+RO-Crate is one of three linked-data outputs in SEEK, and the newest. The other two cover far more of SEEK, but not
+Workflows in the same way.
+
+| Output | Vocabulary | Types covered | How it is served |
+|---|---|---|---|
+| **JERM RDF** (since 2012) | [JERM ontology](http://jermontology.org/ontology/JERMOntology#), Dublin Core, FOAF, SIOC | The types in [`JERMVocab.defined_types`](../lib/seek/rdf/jerm_vocab.rb#L25): Assay, DataFile, Model, Sop, Person, ObservationUnit (as [PPEO](http://purl.org/ppeo/PPEO.owl#observation_unit)), Organism, Project, Programme, Study and others in the ISA family. **Workflow is not one of them.** | `.rdf` on each item page; FAIR Signposting `describedby` with type RDF ([`fair_signposting.rb#L22`](../app/controllers/concerns/fair_signposting.rb#L22)); a Virtuoso triple store ([`virtuoso_repository.rb`](../lib/seek/rdf/virtuoso_repository.rb)) with a SPARQL page ([`sparql_controller.rb`](../app/controllers/sparql_controller.rb), added 2025) and example queries ([`config/sparql_queries.yml`](../config/sparql_queries.yml), 45 uses of `jerm:`) |
+| **Schema.org / Bioschemas JSON-LD** | [Schema.org](https://schema.org/), [Bioschemas](https://bioschemas.org/) profiles | Most public types, including Workflow | `<script>` block in each page, `.jsonld`, Signposting `describedby` with type JSON-LD, data dumps |
+| **RO-Crate** (since 2019) | RO-Crate (Schema.org based) | Workflows only | See section 5 |
+
+The JERM RDF is produced from a CSV mapping table, [`rdf_mappings.csv`](../lib/seek/rdf/rdf_mappings.csv) (about 80
+rows mapping model methods to predicates), by [`rdf_generation.rb`](../lib/seek/rdf/rdf_generation.rb) and
+[`csv_mappings_handling.rb`](../lib/seek/rdf/csv_mappings_handling.rb), and kept up to date in the triple store by
+background jobs. The capable types come from [`Seek::Util.rdf_capable_types`](../lib/seek/util.rb#L66).
+
+Consequences for RO-Crate:
+
+- **On WorkflowHub, workflows are absent from the RDF and SPARQL side.** A workflow has JSON-LD and an RO-Crate, but
+  no `.rdf` and nothing in the triple store. The experimental branch below is the first attempt to put workflow (and
+  crate) metadata into the knowledge graph, by switching that graph from JERM to Schema.org.
+- **ISA content is the reverse:** it has JERM RDF and SPARQL, but no RO-Crate.
+- **The Bioschemas JSON-LD is the bridge.** It already describes workflows and is merged into generated crates
+  (section 4), and the experimental branch proposes it as the source for the knowledge graph too.
+
+### Research Object snapshots (RO-Bundle)
+
+Investigations, Studies and Assays can be frozen as **snapshots**
+([`acts_as_snapshottable.rb`](../lib/seek/research_objects/acts_as_snapshottable.rb),
+[`snapshot.rb`](../app/models/snapshot.rb)). A snapshot is a
+[Research Object Bundle](https://w3id.org/bundle/) (`.ro.zip`, media type `application/vnd.wf4ever.robundle+zip`),
+built with the [`ro-bundle`](https://github.com/fbacall/ruby-ro-bundle) gem
+([`generator.rb`](../lib/seek/research_objects/generator.rb), [`Gemfile#L93`](../Gemfile#L93)):
+
+- The bundle's manifest aggregates each item in the ISA tree, with `pav:importedFrom` pointing back to SEEK.
+- Each item gets a `metadata.json` ([`json_metadata.rb`](../lib/seek/research_objects/json_metadata.rb)) and a
+  `metadata.rdf` holding its **JERM RDF** ([`rdf_metadata.rb`](../lib/seek/research_objects/rdf_metadata.rb)),
+  alongside the files of its assets that the user may download.
+- A snapshot can be given a DataCite DOI and deposited in Zenodo ([`snapshot.rb#L21-L22`](../app/models/snapshot.rb#L21-L22)).
+
+So SEEK has two packaging formats side by side: RO-Bundle (with JERM RDF) for ISA snapshots, and RO-Crate (with
+Schema.org) for workflows.
+
+## History: from Research Objects to RO-Crate
+
+The dates for SEEK below come from this repository's git history.
+
+| When | In SEEK | In the Research Object community |
+|---|---|---|
+| 2008 | SEEK development starts (first commit 2008-10-08). | |
+| 2010–2013 | | The [Wf4Ever](https://www.researchobject.org/) project develops *Research Objects*: aggregations of workflows, data and provenance described with ORE, the RO ontology and PROV. |
+| 2012 | JERM RDF generation added (2012-11), with the JERM vocabulary and per-type RDF. | |
+| 2013 | A first `Workflow` model, with inputs, outputs and an upload form (2013-10). This is the Taverna-era predecessor of today's workflow support. | |
+| 2014 | | The [Research Object Bundle](https://w3id.org/bundle/) specification: a zip with a JSON-LD manifest, used by Taverna. |
+| 2015 | `ro-bundle` gem added (2015-02); Investigation snapshots as RO-Bundles (2015-06), later with DOIs and Zenodo deposit. | |
+| 2018–2019 | | RO-Crate starts, combining the Research Object approach with DataCrate and building on Schema.org rather than ORE. [RO-Crate 1.0](https://w3id.org/ro/crate/1.0) is released in 2019. |
+| 2019 | Workflows downloadable as RO-Crates (2019-11-28): the start of the code described in this document, and of WorkflowHub. | |
+| 2020s | WorkflowHub registers workflows as Workflow RO-Crates; git storage, TRS and Signposting are added around the crate; RO-Crate reading moves to the `ro-crate` gem. | RO-Crate [1.1](https://w3id.org/ro/crate/1.1) and later versions, profiles such as Workflow RO-Crate, Workflow Testing RO-Crate and the Workflow Run Crates. |
+| 2025–2026 | SPARQL query page (2025-08); experimental Schema.org knowledge graph with RO-Crate metadata (branch, 2025-11 onwards). `ro-crate` gem 0.7.0 defaults to RO-Crate 1.3. | [REWIRE](https://esciencelab.org.uk/projects/rewire/) (from 2026-09) uses RO-Crate as the publishing and integration layer for reproducibility. |
+
+What this means:
+
+- **The snapshots are still on the pre-RO-Crate format.** RO-Bundle is superseded by RO-Crate, which most
+  current tools expect. Moving ISA snapshots to RO-Crate would give SEEK one packaging format, and would let ISA
+  content use RO-Crate profiles (for example [ISA RO-Crate](https://github.com/nfdi4plants/isa-ro-crate-profile) or
+  ARC-style crates).
+- **The two linked-data lines are converging on Schema.org.** JERM RDF has been SEEK's own vocabulary since 2012.
+  The JSON-LD, RO-Crate and the experimental knowledge graph all use Schema.org, but replacing JERM loses the ISA
+  types until they have Schema.org descriptions (the branch's `next-steps.md` proposes keeping both, chosen per site).
 
 ## Observations and gaps
 
@@ -266,3 +334,77 @@ This document describes `main`.
   workflow, and (for `submit`) that it has a source URL and version
   ([`workflow_crate_extractor.rb#L75`](../app/forms/workflow_crate_extractor.rb#L75)). No RO-Crate or profile
   validator (such as [rocrate-validator](https://github.com/crs4/rocrate-validator)) is run.
+
+## Experimental and future work
+
+### The `schema-knowledge-graph-messing` branch
+
+[`schema-knowledge-graph-messing`](https://github.com/seek4science/seek/tree/schema-knowledge-graph-messing) is an
+unmerged, experimental branch (reviewed here at `20b0cec542`, 2026-11-16). Its main aim is a knowledge graph:
+replacing the JERM RDF sent to the triple store with the Schema.org / Bioschemas JSON-LD that pages already embed,
+and adding each Workflow's RO-Crate metadata to that graph. The branch documents itself in
+[`docs/schema-kg-work.md`](https://github.com/seek4science/seek/blob/schema-knowledge-graph-messing/docs/schema-kg-work.md)
+(an evaluation that calls it "a proof of concept" that "is not mergeable as it stands") and
+[`next-steps.md`](https://github.com/seek4science/seek/blob/schema-knowledge-graph-messing/next-steps.md) (a staged
+plan, with the vocabulary chosen per site through a `profile` column in the RDF CSV mappings). Those documents cover
+the RDF side in detail; this section covers what the branch changes for RO-Crate.
+
+**What it adds for RO-Crate:**
+
+- **RO-Crate metadata in the knowledge graph.** A new `Workflow#ro_crate_metadata` returns the latest version's
+  `ro-crate-metadata.json` with an extra `@base` of `<workflow URL>/crate/`, so crate entities get absolute IRIs.
+  The RO-Crate 1.1, 1.2 and 1.3 JSON-LD contexts are shipped in `lib/seek/rdf/json_ld_contexts/` and preloaded, so
+  RDF generation doesn't fetch them over the network. `http://schema.org/` is normalised to `https://schema.org/`,
+  and the crate's own context is kept so that `ComputationalWorkflow` gets the same Bioschemas IRI as SEEK's own
+  JSON-LD.
+- **SPARQL example queries** that list RO-Crates, workflow files, and CWL workflows by language identifier.
+- **Richer Bioschemas, which also flows into generated crates** (through `merge_entities`, section 4): workflow
+  topics and operations (EDAM) and disciplines (OpenAlex fields) as `DefinedTerm`s, and a fixed diagram `image` URL.
+  The diagram fix is a bug on `main` that `next-steps.md` recommends for `seek-1.19`.
+- **Regenerating uploaded crates.** Two new settings, on the admin "Features enabled" page:
+  `regenerate_workflow_ro_crates` (default `true`) and `workflow_ro_crate_regeneration_strategy` (default
+  `replace_all`; also `replace_seek`, `fill_missing` and `new_crate`). With these, SEEK writes its own metadata into
+  crates that were uploaded as full RO-Crates, which on `main` are served exactly as uploaded.
+- **New defaults:** `workflows_enabled` and `git_support_enabled` become `true`.
+
+**Points to resolve before any of this is merged.** These are additional to the branch's own list:
+
+1. **Uploaded crates would change by default.** With `regenerate_workflow_ro_crates` on by default, WorkflowHub
+   would serve a different crate from the one that was uploaded, including for versions that already have a DOI.
+   This addresses the "uploaded crates are not rewritten" gap above, but it changes published content. It needs a
+   decision on defaults, and probably a way to keep the uploaded crate available.
+2. **The strategies only govern the main workflow entity.** `populate_ro_crate` is unchanged on the branch and still
+   assigns the crate's root `author`, `license`, `identifier` and `url`, and `merge_entities` sets root `name` and
+   `description`, with every strategy. So `fill_missing` and `replace_seek` don't keep the uploader's root metadata,
+   although the branch's documentation says SEEK's values are "only added where the upload has none".
+3. **The strategy tests don't cover crates stored in git, which is how WorkflowHub stores uploads.** All the
+   regeneration tests use `existing_galaxy_ro_crate_workflow`, a crate kept as a content blob (the legacy path). In
+   the git path, `populate_ro_crate` builds a new main workflow entity from the git blob. The gem's
+   [`add_data_entity`](https://github.com/ResearchObject/ro-crate-ruby/blob/v0.7.0/lib/ro_crate/model/crate.rb#L166-L171)
+   replaces any entity with the same `@id`, so the uploader's main-workflow properties (for example inputs and
+   outputs) would be dropped before any strategy applies. *Not yet verified by running the code;* whether the later
+   `add_all` call also replaces the other file entities is also unchecked.
+4. **The new defaults affect every SEEK site.** Sites that never set `workflows_enabled` or `git_support_enabled`
+   would probably get workflows switched on after upgrading. `next-steps.md` keeps these defaults out of 1.19, but
+   doesn't settle them for `main`.
+5. **Versions and visibility.** The RDF copy uses the latest version's crate regardless of that version's own
+   visibility (noted in the branch's evaluation). The RO-Crate 1.3 / Workflow RO-Crate 1.0 mismatch is unchanged.
+6. **One method name, two contracts.** `Workflow#ro_crate_metadata` returns a JSON-LD string, while
+   `Person#ro_crate_metadata` and `Project#ro_crate_metadata` return hash fragments for embedding in crates. The
+   branch's own plan is to rename the new method.
+
+### Other future work
+
+Gaps above that no branch addresses yet:
+
+- Declaring [Workflow RO-Crate 1.1](https://about.workflowhub.eu/Workflow-RO-Crate/1.1/) (or pinning the RO-Crate
+  version the profile is based on).
+- Recognising [Workflow Run Crates](https://www.researchobject.org/workflow-run-crate/), for example showing recorded
+  runs of a workflow and their provenance.
+- Validating uploads with [rocrate-validator](https://github.com/crs4/rocrate-validator) and its Workflow RO-Crate
+  profile, and reporting the result.
+- Documenting the RO-Crate endpoints in the OpenAPI definition, and the RO-Crate settings in the SEEK administration
+  guide.
+- RO-Crate export for other SEEK types (ISA, DataFile), in place of the RO-Bundle snapshots.
+
+These are written up as a plan in [`rewire-blueprint.md`](rewire-blueprint.md).
