@@ -117,7 +117,7 @@ module Ga4gh
 
           assert_response :not_found
           r = JSON.parse(@response.body)
-          assert r['message'].include?('invalid')
+          assert_equal r['message'], 'Unable to read RO-Crate'
         end
 
         test 'should get main workflow as primary descriptor' do

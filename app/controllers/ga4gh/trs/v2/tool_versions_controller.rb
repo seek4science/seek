@@ -90,7 +90,7 @@ module Ga4gh
         def check_crate
           @tool.ro_crate
         rescue ROCrate::ReadException
-          trs_error(404, 'The crate for this workflow is invalid')
+          trs_error(404, 'Unable to read RO-Crate')
         end
 
         def check_type
