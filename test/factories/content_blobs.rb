@@ -470,6 +470,12 @@ FactoryBot.define do
     content_type { 'application/zip' }
     data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-with-tests.crate.zip", 'rb').read }
   end
+
+  factory(:missing_file_ro_crate, parent: :content_blob) do
+    original_filename { 'missing-file.crate.zip' }
+    content_type { 'application/zip' }
+    data { File.new("#{Rails.root}/test/fixtures/files/workflows/missing-file.crate.zip", 'rb').read }
+  end
   
   factory(:xlsx_population_content_blob, parent: :content_blob) do
     content_type { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
