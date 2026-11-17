@@ -3,6 +3,7 @@ module Ga4gh
     module V2
       class ToolVersionsController < TrsBaseController
         before_action :get_tool
+        before_action :check_crate, only: [:descriptor, :tests, :files, :containerfile]
         before_action :get_version, only: [:show, :descriptor, :tests, :files, :containerfile]
         before_action :check_downloadable, only: [:descriptor, :tests, :files, :containerfile]
         before_action :check_type, only: [:descriptor, :tests, :files]
@@ -84,6 +85,12 @@ module Ga4gh
           workflow_version = @tool.find_version(params[:version_id])
           return trs_error(404, "Couldn't find version with 'id'=#{params[:version_id]} for this tool") unless workflow_version
           @tool_version = ToolVersion.new(@tool, workflow_version)
+        end
+
+        def check_crate
+          @tool.ro_crate
+        rescue ROCrate::ReadException
+          trs_error(404, 'The crate for this workflow is invalid')
         end
 
         def check_type
