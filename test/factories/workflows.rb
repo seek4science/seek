@@ -198,6 +198,10 @@ FactoryBot.define do
   factory(:just_cwl_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :just_cwl_ro_crate
   end
+
+  factory(:missing_file_ro_crate_workflow, parent: :workflow) do
+    association :content_blob, factory: :missing_file_ro_crate
+  end
   
   factory(:workflow_with_tests, parent: :workflow) do
     association :content_blob, factory: :ro_crate_with_tests
