@@ -8,7 +8,7 @@ ahead of `seek-1.19`. This doc covers:
 3. How SEEK could produce the JERM RDF, the Schema.org/RO-Crate RDF, or both, chosen through the CSV
    mappings file.
 
-For the background and the problems found so far, see `docs/schema-kg-work.md`.
+For the background and the problems found so far, see [`schema-kg-work.md`](schema-kg-work.md).
 
 ## 1. Small fixes suitable for `seek-1.19`
 

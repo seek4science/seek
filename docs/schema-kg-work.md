@@ -1,7 +1,9 @@
 # Evaluation: `schema-knowledge-graph-messing` branch
 
 Evaluated against `main` at `766000e3a4` (merge base) on 2026-11-10. Status notes on each problem, and the
-[Work since the evaluation](#work-since-the-evaluation) section, were updated on 2026-11-12 (up to `cd7b338bc2`).
+[Work since the evaluation](#work-since-the-evaluation) section, were updated on 2026-11-17 (up to `20b0cec542`).
+For the fixes worth taking to `seek-1.19` and the plan for merging into `main`, see
+[`next-steps.md`](next-steps.md).
 
 ## Summary
 
@@ -79,15 +81,26 @@ already on `main`.
   - Per-model `to_rdf` tests in about 15 unit test files, plus `rdf_response_test.rb` and
     `sparql_queries_test.rb`.
 
-  > **Status: still open.** Test runs since the evaluation confirm these failures (the full suite hasn't been run):
-  > - `sparql_queries_test.rb`: the 15 JERM example queries return nothing. The Schema.org example queries added
-  >   since all pass.
-  > - `rdf_triple_store_test.rb`: `send to store`, `update rdf`, `update rdf after resource type change` and
-  >   `update rdf change visibility`, which all assert `dcterms:title`.
-  > - `sparql_controller_test.rb`: 3 tests, and `rdf_generation_job_test.rb`: 3 tests.
-  > - `rdf_generation_test.rb`: the EMT triples and `rdf_supported?` expectations.
-  > - `workflows_controller_test.rb` `should return 406 when requesting RDF`: Workflow is now RDF capable, so the
-  >   request returns 200.
+  > **Status: mostly addressed.** The unit, functional and integration tests pass in CI (`14f670ddc9`,
+  > `20b0cec542`).
+  > - The RDF capable types are now the Schema.org supported types that include `Seek::Rdf::RdfGeneration`:
+  >   Collection, DataFile, Document, Event, HumanDisease, Institution, Organism, Person, Presentation, Programme,
+  >   Project, Publication, Sample, Sop and Workflow. Events and presentations now generate RDF (`61734bf7ec`), and
+  >   publications have a Schema.org description (`b0d7986a6f`). So `.rdf` and FAIR Signposting only advertise RDF
+  >   that can be generated.
+  > - Items that aren't RDF capable are never queued for RDF generation, including as dependents and when a
+  >   suggested assay or technology type changes.
+  > - The JERM example queries are replaced with Schema.org ones (`334aeadc5c`).
+  > - The tests check Schema.org terms instead of JERM, Dublin Core and FOAF. The tests for Assay, Study,
+  >   Investigation, Model, ObservationUnit, Strain and CultureGrowthType now expect no RDF and a 406.
+  >
+  > Still open, by decision for now:
+  > - The ISA types, Model and Strain have no RDF, as they have no Schema.org description.
+  > - Extended metadata, sample attribute and SBML triples are left out. Their tests are skipped with
+  >   "extended metadata is left out of the Schema.org RDF". Samples do carry their attributes as
+  >   `additionalProperty` in the JSON-LD.
+  > - Triples for items that were sent before they lost RDF capability stay in the store until it is cleared and
+  >   regenerated.
 
 ### 2. Blocking: Schema.org namespace mismatch (`http` vs `https`)
 
@@ -115,8 +128,9 @@ Bioschemas context to match.
 > graph (`<private_graph>/items/<Class>/<id>`) that records which aggregate graphs it fed (`dcterms:isPartOf`).
 > Removal deletes from each aggregate graph only the statements no other contributing item graph still holds, then
 > drops the item graph. Blank nodes are skolemized to `<site>/.well-known/genid/<uuid>`. Before this change they
-> were also disconnected, because each statement went in a separate `INSERT`. Inserts are now batched (200 per
-> request). Covered by new tests in `test/integration/rdf_triple_store_test.rb`. Existing stores must be cleared and
+> were also disconnected, because each statement went in a separate `INSERT`. Sending, removing and updating an
+> item are each now one SPARQL update request, which Virtuoso applies as one transaction, so a query never sees an
+> item partly updated (`277366b6fc`). RDF jobs run one at a time on their own `rdf` queue (`3c6198999b`). Covered by new tests in `test/integration/rdf_triple_store_test.rb`. Existing stores must be cleared and
 > regenerated, because data sent before this change has no item graph and so can't be removed. The admin
 > "Regenerate all RDF" button does both. A privacy change to a
 > related item still only clears its name from other items' graphs once those items regenerate: `Policy` enqueues
@@ -185,7 +199,10 @@ Preload the context with `JSON::LD::Context.add_preloaded`, ship the context fil
 
 ### 6. Minor: the CSV mapping is now vestigial
 
-> **Status: still open.**
+> **Status: still open, with a different direction proposed.** There are now four rows: an
+> `Institution,ror_json_ld,nil,j` row was added for the ROR enrichment (`e4c0875e1d`). Rather than replace the
+> CSV with an explicit method, [`next-steps.md`](next-steps.md) proposes keeping it and adding a `profile` column,
+> so that the JERM and Schema.org mappings can live side by side and be chosen by a setting.
 
 With three rows, two of which ignore the `property` column (`nil`) and the subject, the CSV plus
 `eval` machinery adds indirection without benefit. An explicit method would be clearer, for
@@ -214,11 +231,11 @@ but one method name with two contracts is a trap. Rename it, for example
 
 > **Status: partly addressed.**
 > - Done: `pp statement` is gone from `RdfRepository#send_rdf`, and `send_rdf`, `remove_rdf` and `update_rdf` all
->   gate on `rdf_supported?`.
+>   gate on `rdf_supported?`. `rdf_capable_types` is no longer an alias: it is the Schema.org supported types that
+>   include `RdfGeneration`.
 > - Still open: the `pp` calls, the missing assertions and the commented-out line in the `send schema to store`
->   test; the `to_schema_ld` stub in `workflow.rb`; the four commented-out calls in `to_rdf_graph`; the
->   `rdf_capable_types` / `schema_org_supported_types` aliasing; the unused JERM leftovers; `to_json_ld`; and the
->   merge history.
+>   test; the `to_schema_ld` stub in `workflow.rb`; the four commented-out calls in `to_rdf_graph`; the unused JERM
+>   leftovers; `to_json_ld`; and the merge history.
 
 - `pp statement` in `RdfRepository#send_rdf`, and `pp person.to_rdf` / `pp inst.to_rdf_graph` in
   the test.
@@ -247,6 +264,11 @@ All on this branch, in order. Most commits carry `[skip ci]`.
   `<private_graph>/items/<Class>/<id>`, so removal is exact. Blank nodes are skolemized and inserts batched.
 - **Clearing the store** (`d05641cfb0`): `RdfRepository#clear_all` drops the public and private graphs and every
   item graph. `RdfRepository#item_graph_uris` lists the item graphs.
+- **Atomic updates** (`277366b6fc`): `update_rdf` removes the item's old statements, replaces its item graph and
+  copies the new statements into the aggregate graphs in one SPARQL update request. `send_rdf` and `remove_rdf` are
+  one request each, and statements are sent once, then copied from the item graph.
+- **Own job queue** (`3c6198999b`): RDF jobs run on the `rdf` queue, with one worker process and one thread, so
+  they apply in the order queued.
 
 ### RDF generation
 
@@ -261,6 +283,22 @@ All on this branch, in order. Most commits carry `[skip ci]`.
   disciplines (OpenAlex fields) as `schema:about`, and operations (EDAM) as `schema:featureList`. Each is a
   `DefinedTerm`, with `inDefinedTermSet` (`http://edamontology.org` or `https://openalex.org/fields`) when its IRI
   belongs to that set. These appear in the page JSON-LD, the knowledge graph and generated RO-Crates.
+- **Institutions enriched from ROR** (`e4c0875e1d`, `29bb3087a7`): an `Institution,ror_json_ld,nil,j` mapping row
+  adds the institution's ROR organisation, described as Schema.org by `Ror::SchemaOrg`: types, names, URL,
+  founding date, `sameAs` (Wikipedia, Wikidata, ISNI, Crossref Funder), location and parent organisations. Sub
+  organisations are left out, as there can be very many. The institution links to it with `schema:sameAs`. ROR
+  records are cached for 7 days; a failed fetch only leaves out the ROR statements.
+- **Publications** (`b0d7986a6f`): described as a `ScholarlyArticle`, with the authors in order, the DOI and
+  PubMed ID as identifiers, the journal as the `Periodical` it is part of, and the publisher. Publications are now
+  in the knowledge graph, and served as `.jsonld`. The JSON-LD describes the version being shown (`14f670ddc9`).
+- **Events and presentations** (`61734bf7ec`) now generate RDF. Events and institutions also respond to `.rdf`.
+- **Workflow image** (`ee0f533f70`): the workflow's diagram is given as its `image` whenever it can be rendered,
+  not only once it has been cached, so the first RDF generated has it too. A version's diagram URL now uses the
+  workflow's id.
+- **Regeneration triggers**: a project membership change regenerates the person's and the project's RDF
+  (`51b8c76ef9`). A changed or removed annotation, such as a tag, topic or discipline, regenerates the RDF of the
+  item it annotates (`751807293b`).
+- **Only RDF capable items are queued** (`14f670ddc9`, `20b0cec542`): see problem 1.
 
 ### Workflow RO-Crates
 
@@ -283,11 +321,24 @@ All on this branch, in order. Most commits carry `[skip ci]`.
 
 ### SPARQL UI
 
-- **Schema.org example queries** (`853e75642a`, `644bc68c78`, `ee805171cb`, `1edcf0aa88`): people, workflows, CWL
-  workflows by language identifier, RO-Crates, workflow files, and workflows with their disciplines, topics and
-  operations. `sparql_queries_test.rb` seeds an annotated public workflow so that each returns results.
+- **Schema.org example queries** (`853e75642a`, `644bc68c78`, `ee805171cb`, `1edcf0aa88`, `334aeadc5c`,
+  `b0d7986a6f`): people, workflows, CWL workflows by language identifier, RO-Crates, workflow files, workflows
+  with their disciplines, topics and operations, data files, SOPs, projects, institutions, publications, and a
+  count of entities by type. The JERM queries are gone. `sparql_queries_test.rb` seeds data so that each returns
+  results.
+- **Workflows by discipline and by country** (`fc2022c9b2`, `b3bfbf7e60`): the discipline (an OpenAlex field) and
+  country (an ISO 3166-1 code) are set at the top of each query. A workflow's country comes from the institutions
+  of its creators and contributors that are members of the workflow's projects.
+- **Example query browser** (`334aeadc5c`, `e17fc6283c`): the examples are in a collapsible panel below the query,
+  shown either as filterable panels or as a dropdown with a preview. The choice is remembered in the browser.
 - **Queries use GET** (`bca1417578`), so the back button doesn't resubmit the form.
-- **Tooltips** (`cb48668857`) show the full value of truncated links in the results.
+- **Results**:
+  - every statement of a DESCRIBE or CONSTRUCT result is shown; the first used to be lost (`8957927262`);
+  - the table has a column for each query variable, in order, so unbound variables don't drop or shift columns
+    (`8023616731`);
+  - IRIs are shown within `<>`, blank nodes with their `_:` label, and literals as their value (`f232da9be1`,
+    `77902a547e`);
+  - tooltips show the full value of truncated links (`cb48668857`).
 
 ### Admin and configuration
 
@@ -298,6 +349,8 @@ All on this branch, in order. Most commits carry `[skip ci]`.
 
 ### Docker
 
+- **Redis scripts** (`0718d33736`): the container started by `script/start-docker-redis.sh` is named `seek-cache`,
+  so it doesn't clash with the `seek-redis` container from docker compose.
 - **`docker-compose-virtuoso.yml`** (`7da01532a4`, `01751845b4`): the volumes are prefixed `kg-`, and the fixed
   container names are gone.
   - Virtuoso's HTTP port (SPARQL and Conductor) is published on host port 9890, and its isql port on
@@ -311,10 +364,12 @@ All on this branch, in order. Most commits carry `[skip ci]`.
 
 1. **Decide the model before polishing.** Should Schema.org fully *replace* JERM in the graph, or
    sit *alongside* it? Replacing it drops ISA types (Assay, Study, Investigation, Model,
-   ObservationUnit, Strain, Publication) that have no Bioschemas decorator. Alongside is the
+   ObservationUnit, Strain) that have no Bioschemas decorator. Alongside is the
    lower-risk route: keep the CSV/JERM triples, add the JSON-LD statements, and
    `rdf_capable_types` stays as it is. Replacing it requires Bioschemas decorators, or an
-   ISA-specific JSON-LD, for every ISA type first.
+   ISA-specific JSON-LD, for every ISA type first. The branch currently replaces JERM, accepting no RDF for those
+   types. [`next-steps.md`](next-steps.md) proposes making the choice a setting, through profiles in the CSV
+   mappings, with JERM as the default.
 2. **Restore EMT and sample-attribute triples.** Either keep them as additional triples, or emit
    them as `additionalProperty`/`PropertyValue` in the JSON-LD (this would also make them visible
    on the page).
@@ -323,10 +378,8 @@ All on this branch, in order. Most commits carry `[skip ci]`.
 5. ~~**Remove network access from RDF generation**~~ (done, see problem 4). Still to do: wrap
    RO-Crate generation in error handling. Consider caching it per version, since a version's crate
    is immutable once frozen.
-6. **Update or replace the failing tests and the JERM queries in `config/sparql_queries.yml`** (the
-   Schema.org example queries are done), and give the new
-   triple-store test real assertions, for example a `schema:name` triple per type and namespace
-   checks.
-7. **Make the RDF-capable type list and the models that include `RdfGeneration` agree**, so that
-   `.rdf` and FAIR Signposting never advertise something that raises.
+6. ~~**Update or replace the failing tests and the JERM queries in `config/sparql_queries.yml`**~~ (done, see
+   problem 1). Still to do: give the `send schema to store` triple-store test real assertions, for example a
+   `schema:name` triple per type and namespace checks.
+7. ~~**Make the RDF-capable type list and the models that include `RdfGeneration` agree**~~ (done, see problem 1).
 8. Tidy up the debug output, the commented code and the `ro_crate_metadata` naming before review.
