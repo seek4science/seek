@@ -109,6 +109,17 @@ module Ga4gh
           assert r['message'].include?('authorized')
         end
 
+        test 'should 404 for broken crate' do
+          workflow = FactoryBot.create(:missing_file_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+          assert 1, workflow.reload.versions.count
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'CWL' }
+
+          assert_response :not_found
+          r = JSON.parse(@response.body)
+          assert r['message'].include?('invalid')
+        end
+
         test 'should get main workflow as primary descriptor' do
           workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
 
