@@ -33,7 +33,7 @@ module SparqlHelper
 
   def sparql_result_link(text)
     if text.match?(%r{\Ahttps?://})
-      link_to(text, text, class: 'external-link')
+      link_to(text, text, class: 'external-link', data: { tooltip: text })
     else
       text
     end
