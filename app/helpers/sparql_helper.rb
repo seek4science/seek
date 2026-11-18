@@ -8,4 +8,10 @@ module SparqlHelper
     '<span class="glyphicon glyphicon-list-alt"></span>&nbsp;Example Queries'
   end
 
+  # The columns of the SPARQL results table: the variables of a SELECT query, otherwise those of all the rows, as a
+  # row doesn't hold the variables that weren't bound for it.
+  def sparql_result_columns(results)
+    @result_columns.presence || results.flat_map(&:keys).uniq
+  end
+
 end
