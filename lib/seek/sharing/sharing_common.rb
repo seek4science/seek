@@ -9,10 +9,15 @@ module Seek
       def batch_change_permission_for_selected_items
         @items_for_sharing = resolve_sharing_params(params[:publish])
         if @items_for_sharing.empty?
-          flash[:error] = "Please choose at least one item!"
+          message = if selected_sharing_item_ids?(params[:publish])
+                      'You do not have permission to manage any of the selected items.'
+                    else
+                      'Please choose at least one item!'
+                    end
           if params[:single_page]
-            render 'single_pages/sample_batch_sharing_permissions_changed', { layout: false }
+            render json: { error: message }, status: :unprocessable_entity
           else
+            flash[:error] = message
             redirect_to batch_sharing_permission_preview_person_url(current_user.person)
           end
         else
@@ -98,6 +103,13 @@ module Seek
           end
           assets.compact.uniq
         end
+      end
+
+      # Whether any item ids were submitted at all, regardless of whether the user may manage them.
+      def selected_sharing_item_ids?(params)
+        return false if params.blank?
+
+        Seek::Util.authorized_types.any? { |klass| params[klass.name]&.keys&.any? }
       end
 
       def sharing_auth

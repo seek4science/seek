@@ -118,6 +118,33 @@ class BatchSharingChangeTest < ActionController::TestCase
   end
 
 
+  test 'should notify when none of the selected items can be managed' do
+    other_person = people(:quentin_person)
+    # Visible to everyone (so it can be selected in the Dynamic Table), but not manageable
+    sample = FactoryBot.create(:sample, contributor: other_person,
+                                        policy: FactoryBot.create(:policy, access_type: Policy::VISIBLE))
+    assert sample.can_view?(@user)
+    refute sample.can_manage?(@user)
+
+    params = { id: @person.id, publish: { 'Sample' => { sample.id.to_s => '1' } } }
+
+    post :batch_change_permission_for_selected_items, params: params
+    assert_redirected_to batch_sharing_permission_preview_person_path(@person)
+    assert_equal 'You do not have permission to manage any of the selected items.', flash[:error]
+
+    # Single page (Dynamic Table) variant returns the error instead of an empty modal
+    post :batch_change_permission_for_selected_items, params: params.merge(single_page: true)
+    assert_response :unprocessable_entity
+    assert_equal 'You do not have permission to manage any of the selected items.',
+                 JSON.parse(response.body)['error']
+  end
+
+  test 'should ask to choose an item when nothing is selected on single page' do
+    post :batch_change_permission_for_selected_items, params: { id: @person.id, publish: {}, single_page: true }
+    assert_response :unprocessable_entity
+    assert_equal 'Please choose at least one item!', JSON.parse(response.body)['error']
+  end
+
   test 'should show warning about missing access types with a disabled confirm button' do
     event = FactoryBot.create(:event, contributor: @person)
     params = { id: @person.id, publish: { 'Event' => { event.id.to_s => '1' } } }
