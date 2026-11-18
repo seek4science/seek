@@ -269,8 +269,10 @@ class  SpreadsheetDownloadTest < ActionController::TestCase
     # if a prompt is longer than 255 characters or a prompt title longer than 32 characters
     data = setup_test_data
     long_description = 'A very long attribute description. ' * 20
-    data[:source_sample_type].sample_attributes.each do |attribute|
-      attribute.update_column(:description, long_description)
+    data[:source_sample_type].sample_attributes.each_with_index do |attribute, i|
+      # Renaming the attribute only blanks the exported sample values, which are looked up by title
+      attribute.update_columns(description: long_description,
+                               title: "Attribute #{i} with a title that is far too long for Excel")
     end
 
     export_params = {
