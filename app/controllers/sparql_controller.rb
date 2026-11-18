@@ -54,6 +54,8 @@ class SparqlController < ApplicationController
     results = sparql_client.query(query)
     # DESCRIBE and CONSTRUCT results are a reader over the response, which can only be read through once
     results = results.to_a if results.is_a?(RDF::Reader)
+    # the variables a SELECT query projects, in the order given. Each row only holds the variables bound in it.
+    @result_columns = results.variable_names if results.respond_to?(:variable_names)
     convert_sparql_results(results)
   end
 
