@@ -65,4 +65,38 @@ class GroupMembershipTest < ActiveSupport::TestCase
     gm.person = admin
     assert gm.person_can_be_removed?
   end
+
+  test 'adding and removing a membership queues rdf generation for the person and project' do
+    person = FactoryBot.create(:brand_new_person)
+    project = FactoryBot.create(:project)
+    institution = FactoryBot.create(:institution)
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { person.add_to_project_and_institution(project, institution) }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: project).exists?
+
+    RdfGenerationQueue.delete_all
+    membership = person.group_memberships.first
+    disable_authorization_checks { membership.destroy }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: project).exists?
+  end
+
+  test 'moving a membership to another project queues rdf generation for both projects' do
+    person = FactoryBot.create(:person)
+    old_project = person.projects.first
+    new_project = FactoryBot.create(:project)
+    work_group = FactoryBot.create(:work_group, project: new_project, institution: person.institutions.first)
+    RdfGenerationQueue.delete_all
+
+    membership = person.group_memberships.first
+    disable_authorization_checks { membership.update!(work_group: work_group) }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: old_project).exists?
+    assert RdfGenerationQueue.where(item: new_project).exists?
+  end
 end
