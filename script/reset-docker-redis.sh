@@ -10,13 +10,15 @@ then
     exit 1
 fi
 
+CONTAINER=seek-redis-cache
+
 # Note: this wipes everything in Redis - cache entries and any sessions, so logged-in users on this
 # instance will be signed out.
-if docker ps -a | grep -qw seek-redis
+if [ -n "$(docker ps -aq --filter "name=^${CONTAINER}$")" ]
 then
-    echo "stopping and removing seek-redis container"
-    docker stop seek-redis > /dev/null 2>&1 || true
-    docker rm seek-redis > /dev/null
+    echo "stopping and removing ${CONTAINER} container"
+    docker stop "$CONTAINER" > /dev/null 2>&1 || true
+    docker rm "$CONTAINER" > /dev/null
 fi
 
 echo "removing seek-redis-data-volume"
