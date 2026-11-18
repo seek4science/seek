@@ -1,11 +1,12 @@
 class McpController < ApplicationController
+  before_action :check_enabled
   before_action :only_post
   after_action :set_content_type
 
   def handle
     server = MCP::Server.new(
-      name: 'seek_mcp_server', # TODO: Make this configurable
-      title: "#{Seek::Config.instance_name} MCP",
+      name: Seek::Config.mcp_server_id,
+      title: Seek::Config.mcp_server_title,
       version: Seek::Version::APP_VERSION.to_s,
       tools: tools,
       server_context: { user_id: current_user&.id },
@@ -30,6 +31,10 @@ class McpController < ApplicationController
 
   def set_content_type
     # Needed because otherwise it wrongly gets the JSON-API MIME type
-    self.content_type = "application/json" if content_type&.start_with?('application/vnd.api+json')
+    self.content_type = 'application/json' if content_type&.start_with?('application/vnd.api+json')
+  end
+
+  def check_enabled
+    head :not_found unless Seek::Config.mcp_server_enabled
   end
 end

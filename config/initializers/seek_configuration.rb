@@ -295,6 +295,10 @@ def load_seek_config_defaults!
   Seek::Config.default :reindex_all_batch_size, 50
   Seek::Config.default :default_citation_style, 'apa'
 
+  Seek::Config.default :mcp_server_enabled, false
+  Seek::Config.default :mcp_server_id, 'seek_mcp_server'
+  Seek::Config.default :mcp_server_title, "#{Seek::Config.instance_name} MCP Server"
+
   load_seek_testing_defaults! if Rails.env.test?
 end
 
