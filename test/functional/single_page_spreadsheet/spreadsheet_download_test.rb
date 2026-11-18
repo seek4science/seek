@@ -264,6 +264,48 @@ class  SpreadsheetDownloadTest < ActionController::TestCase
     assert_equal "Export aborted! Some sample could not be associated with the provided project (\"#{project.id}: #{project.title}\").", flash[:error]
   end
 
+  test 'data validation prompts respect the Excel length limits' do
+    # Excel considers the file damaged and drops all data validations of a sheet
+    # if a prompt is longer than 255 characters or a prompt title longer than 32 characters
+    data = setup_test_data
+    long_description = 'A very long attribute description. ' * 20
+    data[:source_sample_type].sample_attributes.each do |attribute|
+      attribute.update_column(:description, long_description)
+    end
+
+    export_params = {
+      sample_ids: data[:sources].map(&:id).to_json,
+      sample_type_id: data[:source_sample_type].id.to_json,
+      study_id: data[:study].id.to_json,
+      assay_id: nil.to_json,
+      project_id: data[:project].id.to_json
+    }
+
+    post :export_to_spreadsheet, params: export_params, format: :json
+    assert_response :ok
+    cache_uuid = JSON.parse(response.body)['uuid']
+
+    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
+    assert_response :ok
+
+    validations = []
+    Zip::File.open_buffer(response.body) do |zip|
+      zip.glob('xl/worksheets/sheet*.xml').each do |entry|
+        doc = Nokogiri::XML(entry.get_input_stream.read)
+        doc.remove_namespaces!
+        validations.concat(doc.xpath('//dataValidation').to_a)
+      end
+    end
+
+    refute_empty validations
+    validations.each do |validation|
+      assert_operator validation['prompt'].to_s.length, :<=, 255
+      assert_operator validation['promptTitle'].to_s.length, :<=, 32
+    end
+    assert validations.any? { |v| v['prompt'].include?('A very long attribute description.') },
+           'Expected the (truncated) description to be part of the prompt'
+  end
+
   test 'download_spreadsheet fails with invalid cache uuid' do
     # Try to download with a non-existent cache UUID
     get :download_spreadsheet, params: { uuid: 'invalid-uuid-that-does-not-exist' }, format: :xlsx
