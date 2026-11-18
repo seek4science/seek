@@ -10,19 +10,21 @@ then
     exit 1
 fi
 
-if docker ps | grep -qw seek-redis
+CONTAINER=seek-redis-cache
+
+if [ -n "$(docker ps -q --filter "name=^${CONTAINER}$")" ]
 then
-    echo "container named seek-redis is currently running, stop first"
+    echo "container named ${CONTAINER} is currently running, stop first"
     exit 1
 fi
 
-echo "deleting seek-redis container and seek-redis-data-volume volume"
-if docker ps -a | grep -qw seek-redis
+echo "deleting ${CONTAINER} container and seek-redis-data-volume volume"
+if [ -n "$(docker ps -aq --filter "name=^${CONTAINER}$")" ]
 then
-    docker rm seek-redis > /dev/null
+    docker rm "$CONTAINER" > /dev/null
     echo "deleted container"
 else
-    echo "container seek-redis does not exist, skipping"
+    echo "container ${CONTAINER} does not exist, skipping"
 fi
 docker volume rm seek-redis-data-volume > /dev/null 2>&1 || true
 echo "deleted volume"
