@@ -30,6 +30,7 @@
        <%= render partial: 'sharing/permissions_table', locals: { object: Study.new, policy: Policy.new, projects: [] } %>
     <% end %>
   <% end %>
+  <%= render partial: 'sharing/missing_access_types_warning' %>
   <%= submit_tag "Confirm", data: { disable_with: 'Confirm....' }, :class => 'btn btn-primary confirm-button', disabled: true  -%>
   or
   <%= cancel_button(resource) %>
@@ -42,17 +43,7 @@
     $j(document).ready(function () {
         $j(".permission-column:contains('Download')").addClass('sharing-color');
 
-        $j('#permissions-table').on("DOMSubtreeModified", function(){
-                if  ($j(".confirm-button").prop("disabled") ){
-                    $j(".confirm-button").prop("disabled", false);
-                }
-        });
-
-        $j("#permissions-table").on('click', function() {
-                if  ($j(".confirm-button").prop("disabled") ){
-                    $j(".confirm-button").prop("disabled", false);
-                }
-        });
+        Sharing.requireAllAccessTypes(".confirm-button", ".missing-access-types-warning");
     });
 
 </script>

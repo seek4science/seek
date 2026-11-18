@@ -118,6 +118,26 @@ class BatchSharingChangeTest < ActionController::TestCase
   end
 
 
+  test 'should show warning about missing access types with a disabled confirm button' do
+    event = FactoryBot.create(:event, contributor: @person)
+    params = { id: @person.id, publish: { 'Event' => { event.id.to_s => '1' } } }
+
+    post :batch_change_permission_for_selected_items, params: params
+    assert_response :success
+    assert_select '.missing-access-types-warning', count: 1 do
+      assert_select 'ul.missing-access-types', count: 1
+    end
+    assert_select 'input.confirm-button[disabled]', count: 1
+
+    # Single page (Dynamic Table) variant
+    post :batch_change_permission_for_selected_items, params: params.merge(single_page: true)
+    assert_response :success
+    assert_select '.missing-access-types-warning', count: 1 do
+      assert_select 'ul.missing-access-types', count: 1
+    end
+    assert_select 'input.confirm-button[disabled]', count: 1
+  end
+
   test 'should bulk change sharing permissions of selected items' do
 
     model = FactoryBot.create(:model, contributor: @person, projects: [@person.projects.first], policy: FactoryBot.create(:private_policy))
