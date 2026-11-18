@@ -122,9 +122,20 @@ module Seek
             elsif a['givenName'] && a['familyName']
               Seek::Doi::Author.new(first_name: a['givenName'], last_name: a['familyName'])
             elsif a['name']
-              Seek::Doi::Author.new(first_name: a['name'], last_name: '')
+              author_from_name(a)
             end
           end.compact
+        end
+
+        # Builds an author from a single 'name' field. Personal names in "Family, Given" form
+        # (exactly one comma) are split; anything else is kept whole as the first name.
+        def author_from_name(a)
+          name = a['name'].to_s.strip
+          if a['nameType'] != 'Organizational' && name.count(',') == 1
+            family, given = name.split(',', 2).map(&:strip)
+            return Seek::Doi::Author.new(first_name: given, last_name: family) if family.present? && given.present?
+          end
+          Seek::Doi::Author.new(first_name: name, last_name: '')
         end
 
         def extract_editors(list)

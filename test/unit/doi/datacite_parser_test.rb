@@ -53,5 +53,43 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
     end
   end
 
+  # === Creators given only as "Family, Given" in the name field (issue #2809) ===
+  test 'parses DOI (DataCite) with comma-separated creator names' do
+    VCR.use_cassette('doi/doi_datacite_response_comma_name') do
+      doi = '10.14279/eceasst.v86.1.2784'
+      result = Seek::Doi::Parser.parse(doi)
+      author = result.authors.first
+      assert_equal 'Christine', author.first_name
+      assert_equal 'Schulz', author.last_name
+      assert_equal 'Christine Schulz', author.full_name
+      result.authors.each do |a|
+        refute_includes a.first_name, ',', "first name should not contain a comma: #{a.first_name}"
+      end
+    end
+  end
+
+  test 'extract_authors_as_objects handles name-only creators' do
+    parser = Seek::Doi::Parsers::DataciteParser.new
+    authors = parser.send(:extract_authors_as_objects, [
+      { 'name' => 'Schulz, Christine', 'nameType' => 'Personal' },
+      { 'name' => ' Doe ,  Jane ' },
+      { 'name' => 'Christine Schulz' },
+      { 'name' => 'Institute of Things, Inc.', 'nameType' => 'Organizational' },
+      { 'name' => 'A, B, C' },
+      { 'name' => 'Schulz,' },
+      { 'name' => 'Ignored, Name', 'givenName' => 'Jane', 'familyName' => 'Smith' }
+    ])
+
+    assert_equal [
+      %w[Christine Schulz],
+      %w[Jane Doe],
+      ['Christine Schulz', ''],
+      ['Institute of Things, Inc.', ''],
+      ['A, B, C', ''],
+      ['Schulz,', ''],
+      %w[Jane Smith]
+    ], authors.map { |a| [a.first_name, a.last_name] }
+  end
+
 end
 
