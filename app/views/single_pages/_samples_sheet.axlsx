@@ -53,35 +53,11 @@ workbook.add_worksheet(name: 'Samples') do |sheet|
     terms = sample_attribute_value_map[attribute.title]
     sa_terms_size = terms.size
 
-    # Prepare a different prompt text for these types of attributes:
-    # - List attributes
-    # - Attributes that require data validation in the spreadsheet
-    # - Other attributes
-    # All prompts will have the description of the attribute
-    guidance_text = +''
-
-    if attribute.sample_attribute_type.seek_cv_list? || attribute.sample_attribute_type.seek_sample_multi?
-      guidance_text << "Any valid combination of the terms on sheet 'Controlled Vocabularies'#{attribute.allow_cv_free_text ? ', as well as free text,' : ''} are accepted.\n\r"
-    end
-
-    if requires_data_validation?(attribute)
-      guidance_text << "Choose a valid option from the 'Controlled Vocabularies' sheet #{attribute.allow_cv_free_text ? 'or add free text' : ''}.\n\r"
-    end
-
-    guidance_text << (attribute.required ? 'This field is REQUIRED!' : 'This field is optional.')
-
-    # Excel rejects data validations whose prompt exceeds 255 characters or whose title exceeds 32 characters:
-    # it reports the file as damaged and drops ALL data validations of the sheet while repairing it.
-    # Keep the guidance text intact and truncate the description to fit.
-    description_room = 255 - guidance_text.length - "\n\r".length
-    description_text = attribute.description.to_s.strip
-    prompt_text = if description_text.blank? || description_room < 10
-                    guidance_text
-                  else
-                    "#{description_text.truncate(description_room)}\n\r#{guidance_text}"
-                  end
-    prompt_text = prompt_text.truncate(255)
-    prompt_title = attribute.title.truncate(32)
+    # The prompt (tooltip) and its title must stay within Excel's limits and be XML-escaped by us,
+    # otherwise Excel reports the file as damaged and drops all data validations of the sheet.
+    # See Seek::Templates::SpreadsheetExportCheck
+    prompt_title = Seek::Templates::SpreadsheetExportCheck.xml_attribute(export_check.prompt_title(attribute))
+    prompt_text = Seek::Templates::SpreadsheetExportCheck.xml_attribute(export_check.prompt(attribute))
 
     # Apply the Data Validation on the attribute from row 2 until 100000
     col_ref = Axlsx.cell_r(col_nr, 1).gsub(/\d+/, '')

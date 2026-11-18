@@ -79,6 +79,7 @@ class  SpreadsheetDownloadTest < ActionController::TestCase
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{study.id} - #{study.title} sources table.xlsx\"")
+    assert_excel_compatible(response.body)
   end
 
   test 'generates a valid export of assay samples in single page' do
@@ -111,6 +112,7 @@ class  SpreadsheetDownloadTest < ActionController::TestCase
     response_cd = response.headers["Content-Disposition"]
     assert_response :ok
     assert response_cd.include?("filename=\"#{assay.id} - #{assay.title} table.xlsx\"")
+    assert_excel_compatible(response.body)
   end
 
   test 'Should sanitize spreadsheet name' do
@@ -217,6 +219,7 @@ class  SpreadsheetDownloadTest < ActionController::TestCase
     assert_response :ok
     response_cd = response.headers['Content-Disposition']
     assert response_cd.include?('sources table.xlsx'), 'Expected sources table filename'
+    assert_excel_compatible(response.body)
   end
 
   test 'download_spreadsheet fails when mixing samples from different projects' do
@@ -285,27 +288,86 @@ class  SpreadsheetDownloadTest < ActionController::TestCase
 
     post :export_to_spreadsheet, params: export_params, format: :json
     assert_response :ok
-    cache_uuid = JSON.parse(response.body)['uuid']
+    response_body = JSON.parse(response.body)
 
-    get :download_spreadsheet, params: { uuid: cache_uuid }, format: :xlsx
+    # The user is told about what was shortened
+    attribute_count = data[:source_sample_type].sample_attributes.count
+    warnings = response_body['warnings']
+    assert_equal attribute_count * 2, warnings.length
+    assert_includes warnings, "The name of attribute 'Attribute 0 with a title that is far too long for Excel' is " \
+                              'longer than 32 characters and was shortened in its Excel tooltip.'
+    assert_includes warnings, "The description of attribute 'Attribute 0 with a title that is far too long for Excel' " \
+                              'is too long for an Excel tooltip (max. 255 characters) and was shortened.'
+
+    get :download_spreadsheet, params: { uuid: response_body['uuid'] }, format: :xlsx
     assert_response :ok
 
-    validations = []
-    Zip::File.open_buffer(response.body) do |zip|
-      zip.glob('xl/worksheets/sheet*.xml').each do |entry|
-        doc = Nokogiri::XML(entry.get_input_stream.read)
-        doc.remove_namespaces!
-        validations.concat(doc.xpath('//dataValidation').to_a)
-      end
-    end
-
-    refute_empty validations
-    validations.each do |validation|
-      assert_operator validation['prompt'].to_s.length, :<=, 255
-      assert_operator validation['promptTitle'].to_s.length, :<=, 32
-    end
+    validations = assert_excel_compatible(response.body)
+    assert_equal attribute_count, validations.length
     assert validations.any? { |v| v['prompt'].include?('A very long attribute description.') },
            'Expected the (truncated) description to be part of the prompt'
+    assert validations.any? { |v| v['promptTitle'].start_with?('Attribute 0 with a title') },
+           'Expected the (truncated) attribute title to be the prompt title'
+  end
+
+  test 'data validation prompts with XML special characters produce a valid file' do
+    # caxlsx doesn't escape data validation attributes, so these characters used to make the file invalid
+    data = setup_test_data
+    attribute = data[:source_sample_type].sample_attributes.first
+    attribute.update_column(:description, %(Use "pH < 7" & check the\r\nresult \v twice))
+
+    post :export_to_spreadsheet, params: {
+      sample_ids: data[:sources].map(&:id).to_json,
+      sample_type_id: data[:source_sample_type].id.to_json,
+      study_id: data[:study].id.to_json,
+      assay_id: nil.to_json,
+      project_id: data[:project].id.to_json
+    }, format: :json
+    assert_response :ok
+    response_body = JSON.parse(response.body)
+    assert_empty response_body['warnings']
+
+    get :download_spreadsheet, params: { uuid: response_body['uuid'] }, format: :xlsx
+    assert_response :ok
+
+    validations = assert_excel_compatible(response.body)
+    prompt = validations.map { |v| v['prompt'] }.find { |p| p.start_with?('Use "pH') }
+    assert prompt, 'Expected the description to be part of a prompt'
+    # Line breaks are kept, the vertical tab (invalid in XML) is removed
+    assert prompt.start_with?(%(Use "pH < 7" & check the\nresult  twice\n)), "Unexpected prompt: #{prompt.inspect}"
+  end
+
+  test 'export_to_spreadsheet returns no warnings for a regular sample type' do
+    data = setup_test_data
+
+    post :export_to_spreadsheet, params: {
+      sample_ids: data[:sources].map(&:id).to_json,
+      sample_type_id: data[:source_sample_type].id.to_json,
+      study_id: data[:study].id.to_json,
+      assay_id: nil.to_json,
+      project_id: data[:project].id.to_json
+    }, format: :json
+    assert_response :ok
+    response_body = JSON.parse(response.body)
+    assert response_body['uuid'].present?
+    assert_equal [], response_body['warnings']
+  end
+
+  test 'export_to_spreadsheet does not leak warnings about a sample type the user cannot view' do
+    data = setup_test_data
+    data[:source_sample_type].sample_attributes.first
+                             .update_column(:title, 'An attribute title that is far too long for Excel')
+    login_as(FactoryBot.create(:person))
+
+    post :export_to_spreadsheet, params: {
+      sample_ids: data[:sources].map(&:id).to_json,
+      sample_type_id: data[:source_sample_type].id.to_json,
+      study_id: data[:study].id.to_json,
+      assay_id: nil.to_json,
+      project_id: data[:project].id.to_json
+    }, format: :json
+    assert_response :ok
+    assert_equal [], JSON.parse(response.body)['warnings']
   end
 
   test 'download_spreadsheet fails with invalid cache uuid' do

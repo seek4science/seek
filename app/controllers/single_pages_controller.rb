@@ -77,8 +77,10 @@ class SinglePagesController < ApplicationController
     Rails.cache.write(cache_uuid, { "project_id": project_id, "sample_ids": sample_ids.compact, "sample_type_id": sample_type_id, "study_id": study_id, "assay_id": assay_id },
                       expires_in: 1.minute)
 
+    warnings = spreadsheet_export_warnings(sample_type_id, sample_ids.compact)
+
     respond_to do |format|
-      format.json { render json: { uuid: cache_uuid } }
+      format.json { render json: { uuid: cache_uuid, warnings: warnings } }
     end
   rescue StandardError => e
     render json: { error: e.message }, status: :unprocessable_entity
@@ -274,6 +276,20 @@ class SinglePagesController < ApplicationController
   end
 
   private
+
+  # Things the user should know about the spreadsheet they are about to download, e.g. tooltips that had to be
+  # shortened to keep the file valid for Excel. Only reported for what the user is allowed to see.
+  def spreadsheet_export_warnings(sample_type_id, sample_ids)
+    sample_type = SampleType.find_by(id: sample_type_id)
+    return [] unless sample_type&.can_view?
+
+    samples = Sample.where(id: sample_ids, sample_type: sample_type).authorized_for(:view)
+    Seek::Templates::SpreadsheetExportCheck.new(sample_type, samples).warnings
+  rescue StandardError => e
+    # The check must never block the export itself
+    Rails.logger.error("Spreadsheet export check failed for sample type #{sample_type_id}: #{e.message}")
+    []
+  end
 
   def project_folders
     return unless Seek::Config.project_single_page_folders_enabled
