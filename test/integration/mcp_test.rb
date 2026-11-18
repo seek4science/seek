@@ -24,6 +24,15 @@ class McpTest < ActionDispatch::IntegrationTest
     assert_includes names, 'search_tool'
   end
 
+  test 'does not list disabled tools' do
+    with_config_value(:solr_enabled, false) do
+      mcp_request 'tools/list'
+    end
+
+    names = response.parsed_body.dig('result', 'tools').map { _1['name'] }
+    assert_not_includes names, 'search_tool'
+  end
+
   test 'calls a tool' do
     workflows = FactoryBot.create_list(:public_workflow, 3, title: 'Workflow Result')
     Workflow.stub(:solr_cache, -> (q) { workflows.map(&:id) }) do

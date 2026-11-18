@@ -13,4 +13,12 @@ class SearchToolTest < ActiveSupport::TestCase
     assert_not result[:isError]
     assert_includes result[:content].first[:text], 'Workflow Result - http://'
   end
+
+  test 'disabled if search disabled' do
+    assert Tools::SearchTool.enabled?
+
+    with_config_value(:solr_enabled, false) do
+      refute Tools::SearchTool.enabled?
+    end
+  end
 end

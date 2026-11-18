@@ -1,5 +1,5 @@
 module Tools
-  class SearchTool < MCP::Tool
+  class SearchTool < ApplicationTool
     title 'Search Tool'
     description 'Searches the given resource type for the given query'
     input_schema(
@@ -40,6 +40,10 @@ module Tools
           puts e.backtrace.join("\n")
           raise e
         end
+      end
+
+      def enabled?
+        Seek::Config.solr_enabled
       end
     end
   end

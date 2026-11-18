@@ -22,7 +22,7 @@ class McpController < ApplicationController
   private
 
   def tools
-    [Tools::SearchTool]
+    [Tools::SearchTool].select(&:enabled?)
   end
 
   def only_post
