@@ -13,14 +13,7 @@
       <% results.each do |row| %>
         <tr>
           <% columns.each do |column| %>
-            <% value = row[column] %>
-            <td>
-              <% if value.to_s.start_with?('http') %>
-                <%= link_to value, value, class: 'external-link' %>
-              <% else %>
-                <%= value %>
-              <% end %>
-            </td>
+            <td><%= sparql_result_value(row[column]) unless row[column].nil? %></td>
           <% end %>
         </tr>
       <% end %>

@@ -273,6 +273,36 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'results distinguish IRIs from literals, including literals that are URLs' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    iri = data_file.rdf_resource.to_s
+    query = %(SELECT ?datafile ?title ?url
+      WHERE {
+        ?datafile <http://purl.org/dc/terms/title> "public data file" ; <http://purl.org/dc/terms/title> ?title .
+        BIND("#{iri}" AS ?url)
+      })
+
+    post query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select '#sparql-results table tbody tr', count: 1 do
+      assert_select 'td', count: 3
+      assert_select 'td:nth-child(1) span.sparql-iri[title=?]', 'IRI (node)', text: "<#{iri}>" do
+        assert_select 'a.external-link[href=?]', iri, text: iri
+      end
+      assert_select 'td:nth-child(2) span.sparql-literal', text: 'public data file'
+      assert_select 'td:nth-child(3) span.sparql-literal', text: iri do
+        assert_select 'a.external-link[href=?]', iri
+      end
+    end
+
+    post query_sparql_index_path, params: { sparql_query: query, format: 'json' }
+    assert_response :success
+    result = JSON.parse(@response.body)['results'].first
+    assert_equal({ 'datafile' => iri, 'title' => 'public data file', 'url' => iri }, result)
+  end
+
   test 'repository not available' do
     path = query_sparql_index_path
     Seek::Rdf::RdfRepository.instance.stub(:available?, ->(){ false }) do
