@@ -20,7 +20,9 @@ class SparqlController < ApplicationController
   def query
     @sparql_query = params[:sparql_query] || ''
 
-    if rdf_repository_available?
+    if @sparql_query.blank?
+      @error = t('sparql.blank_query_error')
+    elsif rdf_repository_available?
       begin
         @results = execute_sparql_query(@sparql_query)
       rescue StandardError => e

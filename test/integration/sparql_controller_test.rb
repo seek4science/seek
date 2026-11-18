@@ -303,6 +303,25 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_equal({ 'datafile' => iri, 'title' => 'public data file', 'url' => iri }, result)
   end
 
+  test 'blank query gives an error without querying the endpoint' do
+    path = query_sparql_index_path
+    SPARQL::Client.stub(:new, ->(*) { raise 'the endpoint should not be queried' }) do
+      ['', "  \n ", nil].each do |query|
+        post path, params: { sparql_query: query }
+        assert_response :unprocessable_entity
+        assert_nil flash[:error]
+        assert_select 'div#query-error.alert-danger pre', text: I18n.t('sparql.blank_query_error')
+        assert_select 'div#sparql-results', count: 0
+
+        post path, params: { sparql_query: query, format: 'json' }
+        assert_response :unprocessable_entity
+        json = JSON.parse(@response.body)
+        assert_equal I18n.t('sparql.blank_query_error'), json['error']
+        assert_empty json['results']
+      end
+    end
+  end
+
   test 'repository not available' do
     path = query_sparql_index_path
     Seek::Rdf::RdfRepository.instance.stub(:available?, ->(){ false }) do
