@@ -9,11 +9,13 @@ class SparqlHelperTest < ActionView::TestCase
     assert_equal %i[b a], sparql_result_columns(results)
   end
 
-  test 'an IRI is shown within <> and linked' do
+  test 'an IRI is shown within <> and linked, with a tooltip' do
     span = Nokogiri::HTML.fragment(sparql_result_value(RDF::URI('https://example.com/thing'))).at_css('span.sparql-iri')
     assert_equal '<https://example.com/thing>', span.text
     assert_equal 'IRI (node)', span['title']
-    assert_equal 'https://example.com/thing', span.at_css('a.external-link')['href']
+    link = span.at_css('a.external-link')
+    assert_equal 'https://example.com/thing', link['href']
+    assert_equal 'https://example.com/thing', link['data-tooltip']
   end
 
   test 'an IRI that is not an http URL is not linked' do

@@ -273,7 +273,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'results distinguish IRIs from literals, including literals that are URLs' do
+  test 'results distinguish IRIs from literals, including literals that are URLs, and links have a tooltip' do
     create_some_triples
     data_file = DataFile.find_by(title: 'public data file')
     iri = data_file.rdf_resource.to_s
@@ -289,7 +289,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_select '#sparql-results table tbody tr', count: 1 do
       assert_select 'td', count: 3
       assert_select 'td:nth-child(1) span.sparql-iri[title=?]', 'IRI (node)', text: "<#{iri}>" do
-        assert_select 'a.external-link[href=?]', iri, text: iri
+        assert_select 'a.external-link[href=?][data-tooltip=?]', iri, iri, text: iri
       end
       assert_select 'td:nth-child(2) span.sparql-literal', text: 'public data file'
       assert_select 'td:nth-child(3) span.sparql-literal', text: iri do
