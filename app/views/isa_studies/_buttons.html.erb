@@ -65,7 +65,7 @@ uploadExcel||="studySampleUploadExcel()"
       },
       error: (err) => {
         console.log(err);
-        alert("An error occurred while fetching data from the server.")
+        alert(err.responseJSON?.error || "An error occurred while fetching data from the server.")
       }
     });
 
