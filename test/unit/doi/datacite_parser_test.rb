@@ -65,35 +65,52 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
   end
 
   test 'extract_authors_as_objects handles name-only creators' do
+    orcid = [{ 'nameIdentifierScheme' => 'ORCID', 'nameIdentifier' => 'https://orcid.org/0000-0002-0340-6212' }]
+    ror = [{ 'nameIdentifierScheme' => 'ROR', 'nameIdentifier' => 'https://ror.org/038t36y30' }]
     parser = Seek::Doi::Parsers::DataciteParser.new
     authors = parser.send(:extract_authors_as_objects, [
+      # "Family, Given"
       { 'name' => 'Schulz, Christine', 'nameType' => 'Personal' },
       { 'name' => ' Doe ,  Jane ' },
+      { 'name' => 'Ignored, Name', 'givenName' => 'Jane', 'familyName' => 'Smith' },
+      # "Given Family", with no comma
       { 'name' => 'Christine Schulz' },
-      { 'name' => 'Institute of Things, Inc.', 'nameType' => 'Organizational' },
+      { 'name' => 'Maria Anna Schmidt', 'nameType' => 'Personal' },
+      { 'name' => 'Ludwig van Beethoven' },
+      # names that can't be split are kept whole
       { 'name' => 'A, B, C' },
       { 'name' => 'Schulz,' },
-      { 'name' => 'Ignored, Name', 'givenName' => 'Jane', 'familyName' => 'Smith' },
-      # organisations with a comma but no nameType are kept whole
+      { 'name' => 'Schulz' },
+      # organisations are kept whole: by nameType, ROR id or organisation word
+      { 'name' => 'Institute of Things, Inc.', 'nameType' => 'Organizational' },
+      { 'name' => 'Human Cell Atlas', 'nameIdentifiers' => ror },
       { 'name' => 'Heidelberg University, Institute of Pharmacy' },
       { 'name' => 'Smith, Jones Ltd' },
       { 'name' => 'Human Cell Atlas Consortium, Europe' },
-      # an explicit Personal nameType wins over the organisation word check
-      { 'name' => 'Group, Anna', 'nameType' => 'Personal' }
+      { 'name' => 'Heidelberg Institute for Theoretical Studies' },
+      # a Personal nameType or an ORCID wins over the organisation word check
+      { 'name' => 'Group, Anna', 'nameType' => 'Personal' },
+      { 'name' => 'Mary Hospital', 'nameIdentifiers' => orcid }
     ])
 
     assert_equal [
       %w[Christine Schulz],
       %w[Jane Doe],
-      ['Christine Schulz', ''],
-      ['Institute of Things, Inc.', ''],
+      %w[Jane Smith],
+      %w[Christine Schulz],
+      ['Maria Anna', 'Schmidt'],
+      ['Ludwig', 'van Beethoven'],
       ['A, B, C', ''],
       ['Schulz,', ''],
-      %w[Jane Smith],
+      ['Schulz', ''],
+      ['Institute of Things, Inc.', ''],
+      ['Human Cell Atlas', ''],
       ['Heidelberg University, Institute of Pharmacy', ''],
       ['Smith, Jones Ltd', ''],
       ['Human Cell Atlas Consortium, Europe', ''],
-      %w[Anna Group]
+      ['Heidelberg Institute for Theoretical Studies', ''],
+      %w[Anna Group],
+      %w[Mary Hospital]
     ], authors.map { |a| [a.first_name, a.last_name] }
   end
 
