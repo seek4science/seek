@@ -52,7 +52,7 @@
 
 <% end -%>
 
-<%= form_submit_buttons(@isa_study.study) %>
+<%= form_submit_buttons(@isa_study.study, cancel_path: isa_study_cancel_path(@isa_study)) %>
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
                                                                     select_id: '#isa_study_study_investigation_id',

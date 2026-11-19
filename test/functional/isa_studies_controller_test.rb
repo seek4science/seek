@@ -65,6 +65,33 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_redirected_to single_page_path(id: project, item_type: 'study', item_id: study.id)
   end
 
+  test 'cancel button redirects to the right resource in the single page view' do
+    person = User.current_user.person
+    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+
+    source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
+    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
+                                                                                   linked_sample_type: source_type)
+    study = FactoryBot.create(:study, investigation:, contributor: person,
+                                      sample_types: [source_type, sample_collection_type])
+
+    # New study -> back to the investigation
+    get :new, params: { investigation_id: investigation.id }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'investigation', item_id: investigation.id), text: 'Cancel'
+
+    # Edit study -> back to the study
+    get :edit, params: { id: study.id }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'study', item_id: study.id), text: 'Cancel'
+
+    # Failed update re-renders the edit form -> still back to the study
+    put :update, params: { id: study.id, isa_study: { study: { title: '' } } }
+    assert_response :unprocessable_entity
+    assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'study', item_id: study.id), text: 'Cancel'
+  end
+
   test 'should create an isa study with extended metadata' do
     person = User.current_user.person
     project = person.projects.first

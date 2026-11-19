@@ -63,7 +63,7 @@
   <% end %>
 <% end %>
 
-<%= form_submit_buttons(@isa_assay.assay) %>
+<%= form_submit_buttons(@isa_assay.assay, cancel_path: isa_assay_cancel_path(@isa_assay)) %>
 
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: action,

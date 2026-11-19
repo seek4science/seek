@@ -307,6 +307,39 @@ class ISAAssaysControllerTest < ActionController::TestCase
     assert_select 'div.panel-heading', text: /Define Sample type for Assay/i, count: 1
   end
 
+  test 'cancel button redirects to the right resource in the single page view' do
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person, projects: [@project])
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: )
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: @person, position: 0)
+    first_assay_st = FactoryBot.create(:isa_assay_material_sample_type, contributor: @person, projects: [@project], linked_sample_type: study.sample_types.second)
+    first_assay = FactoryBot.create(:assay, contributor: @person, study: , assay_stream: , position: 1, sample_type: first_assay_st)
+
+    # New assay stream -> back to the study
+    get :new, params: { study_id: study.id, is_assay_stream: true }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: @project, item_type: 'study', item_id: study.id), text: 'Cancel'
+
+    # New experimental assay -> back to the assay stream
+    get :new, params: { study_id: study.id, assay_stream_id: assay_stream.id, source_assay_id: first_assay.id }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: @project, item_type: 'assay', item_id: assay_stream.id), text: 'Cancel'
+
+    # Edit assay stream -> back to the assay stream
+    get :edit, params: { id: assay_stream.id }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: @project, item_type: 'assay', item_id: assay_stream.id), text: 'Cancel'
+
+    # Edit experimental assay -> back to the assay
+    get :edit, params: { id: first_assay.id }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: @project, item_type: 'assay', item_id: first_assay.id), text: 'Cancel'
+
+    # Failed update re-renders the edit form -> still back to the assay
+    put :update, params: { id: first_assay.id, isa_assay: { assay: { title: '' } } }
+    assert_response :unprocessable_entity
+    assert_select 'a.btn[href=?]', single_page_path(id: @project, item_type: 'assay', item_id: first_assay.id), text: 'Cancel'
+  end
+
   test 'insert assay between assay stream and experimental assay' do
     investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person)
     study = FactoryBot.create(:isa_json_compliant_study, investigation: , contributor: @person )

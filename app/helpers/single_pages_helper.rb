@@ -27,6 +27,36 @@ module SinglePagesHelper
     Seek::Samples::BaseType::SEEK_SOP,
   ]
 
+  # Path for the cancel button on the ISA assay new/edit forms.
+  # Editing: back to the assay itself. Creating: back to its parent (assay stream, or study for a new assay stream).
+  def isa_assay_cancel_path(isa_assay)
+    assay = isa_assay.assay
+    target = if assay.persisted?
+               assay
+             else
+               assay.assay_stream || assay.study
+             end
+    single_page_item_path(target) || assays_path
+  end
+
+  # Path for the cancel button on the ISA study new/edit forms.
+  # Editing: back to the study itself. Creating: back to its investigation.
+  def isa_study_cancel_path(isa_study)
+    study = isa_study.study
+    target = study.persisted? ? study : study.investigation
+    single_page_item_path(target) || studies_path
+  end
+
+  # Single page path that selects the given investigation, study or assay in the tree.
+  def single_page_item_path(item)
+    return if item.nil? || item.new_record?
+
+    project = item.projects.first
+    return if project.nil?
+
+    single_page_path(id: project, item_type: item.class.name.underscore, item_id: item.id)
+  end
+
   def requires_data_validation?(sample_attribute)
     ATTRIBUTES_WITH_DATA_VALIDATION.include?(sample_attribute.sample_attribute_type.base_type)
   end
