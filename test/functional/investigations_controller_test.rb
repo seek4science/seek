@@ -167,6 +167,26 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_redirected_to single_page_path(id: project1, item_type: 'investigation', item_id: investigation.id)
   end
 
+  test 'cancel and update fall back to the investigation page when the single page is unavailable' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
+
+    %i[project_single_page_enabled isa_json_compliance_enabled].each do |setting|
+      with_config_value(setting, false) do
+        # single_page param set, so form_submit_buttons' own default would also point at the single page
+        get :edit, params: { id: investigation, single_page: project.id }
+        assert_response :success
+        assert_select 'a.btn[href=?]', investigation_path(investigation), text: 'Cancel'
+        assert_select 'a.btn[href*=?]', 'single_pages', count: 0
+
+        put :update, params: { id: investigation.id, investigation: { title: "title without #{setting}" }, single_page: project.id }
+        assert_redirected_to investigation_path(investigation)
+      end
+    end
+  end
+
   test 'should create' do
     login_as(FactoryBot.create :user)
     assert_difference('Investigation.count') do
