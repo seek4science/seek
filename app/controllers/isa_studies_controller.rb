@@ -192,9 +192,9 @@ class ISAStudiesController < ApplicationController
   end
 
   # Single page view of the study, in the project the user came from (see SinglePagesHelper#single_page_item_path).
-  # Falls back to the studies index when the study or its project cannot be found.
+  # Falls back to the study page when the single page is unavailable, or the studies index when the study is missing.
   def single_page_redirect_path
-    helpers.single_page_item_path(@isa_study.study) || studies_path
+    helpers.single_page_or_item_path(@isa_study.study, studies_path)
   end
 
   def respond_with_error(status=:unprocessable_entity)

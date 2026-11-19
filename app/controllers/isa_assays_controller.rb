@@ -238,9 +238,9 @@ class ISAAssaysController < ApplicationController
   end
 
   # Single page view of the assay, in the project the user came from (see SinglePagesHelper#single_page_item_path).
-  # Falls back to the assays index when the assay or its project cannot be found.
+  # Falls back to the assay page when the single page is unavailable, or the assays index when the assay is missing.
   def single_page_redirect_path
-    helpers.single_page_item_path(@isa_assay.assay) || assays_path
+    helpers.single_page_or_item_path(@isa_assay.assay, assays_path)
   end
 
   def old_attributes

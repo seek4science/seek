@@ -36,7 +36,7 @@ module SinglePagesHelper
              else
                assay.assay_stream || assay.study
              end
-    single_page_item_path(target) || assays_path
+    single_page_or_item_path(target, assays_path)
   end
 
   # Path for the cancel button on the ISA study new/edit forms.
@@ -44,18 +44,16 @@ module SinglePagesHelper
   def isa_study_cancel_path(isa_study)
     study = isa_study.study
     target = study.persisted? ? study : study.investigation
-    single_page_item_path(target) || studies_path
+    single_page_or_item_path(target, studies_path)
   end
 
   # Path for the cancel button on the investigation new/edit forms.
-  # ISA-JSON compliant investigations being edited go back to the single page view, or to the
-  # investigation page when the single page is unavailable.
-  # Returns nil otherwise, so form_submit_buttons falls back to its default cancel path.
+  # Only ISA-JSON compliant investigations being edited get a path here; returns nil otherwise,
+  # so form_submit_buttons falls back to its default cancel path.
   def investigation_cancel_path(investigation)
     return unless investigation.persisted? && investigation.is_isa_json_compliant_in_database
-    return investigation_path(investigation) unless single_page_available?
 
-    single_page_item_path(investigation) || investigation_path(investigation)
+    single_page_or_item_path(investigation, investigation_path(investigation))
   end
 
   # SinglePagesController rejects requests unless both features are enabled.
@@ -63,10 +61,18 @@ module SinglePagesHelper
     Seek::Config.project_single_page_enabled && Seek::Config.isa_json_compliance_enabled
   end
 
+  # The item in the single page view when available, otherwise the item's own page.
+  # Uses fallback when the item is missing or not saved yet.
+  def single_page_or_item_path(item, fallback)
+    single_page_item_path(item) || (item&.persisted? ? polymorphic_path(item) : fallback)
+  end
+
   # Single page path that selects the given investigation, study or assay in the tree.
   # Stays in the project the user came from (params[:single_page]) when the item belongs to it,
   # otherwise falls back to the item's first project.
+  # Returns nil when the single page is unavailable, or the item or its project is missing.
   def single_page_item_path(item)
+    return unless single_page_available?
     return if item.nil? || item.new_record?
 
     projects = item.projects

@@ -5,11 +5,22 @@ class ISAAssaysControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
+    # The single page view these controllers redirect to requires both features
+    @old_single_page_config = { project_single_page_enabled: Seek::Config.project_single_page_enabled,
+                                isa_json_compliance_enabled: Seek::Config.isa_json_compliance_enabled }
+    Seek::Config.project_single_page_enabled = true
+    Seek::Config.isa_json_compliance_enabled = true
+    Seek::Util.clear_cached
     @person = FactoryBot.create :person
     login_as @person
     @project = @person.projects.first
     @material_template = FactoryBot.create(:isa_assay_material_template, projects: [@project], contributor:@person)
     @data_file_template = FactoryBot.create(:isa_assay_data_file_template, projects: [@project], contributor:@person)
+  end
+
+  def teardown
+    @old_single_page_config.each { |setting, value| Seek::Config.send("#{setting}=", value) }
+    Seek::Util.clear_cached
   end
 
   test 'should get new' do
@@ -338,6 +349,37 @@ class ISAAssaysControllerTest < ActionController::TestCase
     put :update, params: { id: first_assay.id, isa_assay: { assay: { title: '' } } }
     assert_response :unprocessable_entity
     assert_select 'a.btn[href=?]', single_page_path(id: @project, item_type: 'assay', item_id: first_assay.id), text: 'Cancel'
+  end
+
+  test 'cancel and update fall back to the assay page when the single page is unavailable' do
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, contributor: @person, projects: [@project])
+    study = FactoryBot.create(:isa_json_compliant_study, contributor: @person, investigation: )
+    assay_stream = FactoryBot.create(:assay_stream, study: , contributor: @person, position: 0)
+    first_assay_st = FactoryBot.create(:isa_assay_material_sample_type, contributor: @person, projects: [@project], linked_sample_type: study.sample_types.second)
+    first_assay = FactoryBot.create(:assay, contributor: @person, study: , assay_stream: , position: 1, sample_type: first_assay_st)
+
+    %i[project_single_page_enabled isa_json_compliance_enabled].each do |setting|
+      with_config_value(setting, false) do
+        # New assay stream -> the study page
+        get :new, params: { study_id: study.id, is_assay_stream: true, single_page: @project.id }
+        assert_response :success
+        assert_select 'a.btn[href=?]', study_path(study), text: 'Cancel'
+
+        # New experimental assay -> the assay stream page
+        get :new, params: { study_id: study.id, assay_stream_id: assay_stream.id, source_assay_id: first_assay.id, single_page: @project.id }
+        assert_response :success
+        assert_select 'a.btn[href=?]', assay_path(assay_stream), text: 'Cancel'
+
+        # Edit assay -> the assay page
+        get :edit, params: { id: first_assay.id, single_page: @project.id }
+        assert_response :success
+        assert_select 'a.btn[href=?]', assay_path(first_assay), text: 'Cancel'
+        assert_select 'a.btn[href*=?]', 'single_pages', count: 0
+
+        put :update, params: { id: first_assay.id, isa_assay: { assay: { title: "title without #{setting}" } }, single_page: @project.id }
+        assert_redirected_to assay_path(first_assay)
+      end
+    end
   end
 
   test 'insert assay between assay stream and experimental assay' do

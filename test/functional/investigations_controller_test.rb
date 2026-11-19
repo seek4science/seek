@@ -11,6 +11,10 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(:quentin)
   end
 
+  def with_single_page_enabled(&block)
+    with_config_values(project_single_page_enabled: true, isa_json_compliance_enabled: true, &block)
+  end
+
   def test_title
     get :index
     assert_select 'title', text: I18n.t('investigation').pluralize, count: 1
@@ -97,24 +101,26 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'cancel button on edit redirects to single page for ISA-JSON compliant investigations' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    project = person.projects.first
+    with_single_page_enabled do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      project = person.projects.first
 
-    isa_investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
-    get :edit, params: { id: isa_investigation }
-    assert_response :success
-    assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'investigation', item_id: isa_investigation.id), text: 'Cancel'
+      isa_investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
+      get :edit, params: { id: isa_investigation }
+      assert_response :success
+      assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'investigation', item_id: isa_investigation.id), text: 'Cancel'
 
-    # Failed update re-renders the edit form -> still back to the single page
-    put :update, params: { id: isa_investigation.id, investigation: { title: '' } }
-    assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'investigation', item_id: isa_investigation.id), text: 'Cancel'
+      # Failed update re-renders the edit form -> still back to the single page
+      put :update, params: { id: isa_investigation.id, investigation: { title: '' } }
+      assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'investigation', item_id: isa_investigation.id), text: 'Cancel'
 
-    # Non ISA-JSON compliant investigations keep the default cancel path
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: false, projects: [project], contributor: person)
-    get :edit, params: { id: investigation }
-    assert_response :success
-    assert_select 'a.btn[href=?]', investigation_path(investigation), text: 'Cancel'
+      # Non ISA-JSON compliant investigations keep the default cancel path
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: false, projects: [project], contributor: person)
+      get :edit, params: { id: investigation }
+      assert_response :success
+      assert_select 'a.btn[href=?]', investigation_path(investigation), text: 'Cancel'
+    end
   end
 
   test "shouldn't show edit for unauthorized user" do
@@ -135,54 +141,60 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should redirect to single page after updating an ISA-JSON compliant investigation' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    project = person.projects.first
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
+    with_single_page_enabled do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      project = person.projects.first
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
 
-    put :update, params: { id: investigation.id, investigation: { title: 'new title' } }
+      put :update, params: { id: investigation.id, investigation: { title: 'new title' } }
 
-    assert_redirected_to single_page_path(id: project, item_type: 'investigation', item_id: investigation.id)
-    assert_equal 'new title', investigation.reload.title
+      assert_redirected_to single_page_path(id: project, item_type: 'investigation', item_id: investigation.id)
+      assert_equal 'new title', investigation.reload.title
+    end
   end
 
   test 'cancel and update stay in the originating project of a multi-project ISA-JSON investigation' do
-    person = FactoryBot.create(:person)
-    project1 = person.projects.first
-    project2 = FactoryBot.create(:project)
-    person.add_to_project_and_institution(project2, person.institutions.first)
-    login_as(person)
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project1, project2], contributor: person)
+    with_single_page_enabled do
+      person = FactoryBot.create(:person)
+      project1 = person.projects.first
+      project2 = FactoryBot.create(:project)
+      person.add_to_project_and_institution(project2, person.institutions.first)
+      login_as(person)
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project1, project2], contributor: person)
 
-    get :edit, params: { id: investigation, single_page: project2.id }
-    assert_response :success
-    assert_select 'a.btn[href=?]', single_page_path(id: project2, item_type: 'investigation', item_id: investigation.id), text: 'Cancel'
+      get :edit, params: { id: investigation, single_page: project2.id }
+      assert_response :success
+      assert_select 'a.btn[href=?]', single_page_path(id: project2, item_type: 'investigation', item_id: investigation.id), text: 'Cancel'
 
-    put :update, params: { id: investigation.id, investigation: { title: 'new title' }, single_page: project2.id }
-    assert_redirected_to single_page_path(id: project2, item_type: 'investigation', item_id: investigation.id)
+      put :update, params: { id: investigation.id, investigation: { title: 'new title' }, single_page: project2.id }
+      assert_redirected_to single_page_path(id: project2, item_type: 'investigation', item_id: investigation.id)
 
-    # A project the investigation doesn't belong to is ignored
-    other_project = FactoryBot.create(:project)
-    put :update, params: { id: investigation.id, investigation: { title: 'newer title' }, single_page: other_project.id }
-    assert_redirected_to single_page_path(id: project1, item_type: 'investigation', item_id: investigation.id)
+      # A project the investigation doesn't belong to is ignored
+      other_project = FactoryBot.create(:project)
+      put :update, params: { id: investigation.id, investigation: { title: 'newer title' }, single_page: other_project.id }
+      assert_redirected_to single_page_path(id: project1, item_type: 'investigation', item_id: investigation.id)
+    end
   end
 
   test 'cancel and update fall back to the investigation page when the single page is unavailable' do
-    person = FactoryBot.create(:person)
-    login_as(person)
-    project = person.projects.first
-    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
+    with_single_page_enabled do
+      person = FactoryBot.create(:person)
+      login_as(person)
+      project = person.projects.first
+      investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
 
-    %i[project_single_page_enabled isa_json_compliance_enabled].each do |setting|
-      with_config_value(setting, false) do
-        # single_page param set, so form_submit_buttons' own default would also point at the single page
-        get :edit, params: { id: investigation, single_page: project.id }
-        assert_response :success
-        assert_select 'a.btn[href=?]', investigation_path(investigation), text: 'Cancel'
-        assert_select 'a.btn[href*=?]', 'single_pages', count: 0
+      %i[project_single_page_enabled isa_json_compliance_enabled].each do |setting|
+        with_config_value(setting, false) do
+          # single_page param set, so form_submit_buttons' own default would also point at the single page
+          get :edit, params: { id: investigation, single_page: project.id }
+          assert_response :success
+          assert_select 'a.btn[href=?]', investigation_path(investigation), text: 'Cancel'
+          assert_select 'a.btn[href*=?]', 'single_pages', count: 0
 
-        put :update, params: { id: investigation.id, investigation: { title: "title without #{setting}" }, single_page: project.id }
-        assert_redirected_to investigation_path(investigation)
+          put :update, params: { id: investigation.id, investigation: { title: "title without #{setting}" }, single_page: project.id }
+          assert_redirected_to investigation_path(investigation)
+        end
       end
     end
   end

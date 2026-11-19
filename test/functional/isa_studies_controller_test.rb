@@ -4,7 +4,18 @@ class ISAStudiesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
+    # The single page view these controllers redirect to requires both features
+    @old_single_page_config = { project_single_page_enabled: Seek::Config.project_single_page_enabled,
+                                isa_json_compliance_enabled: Seek::Config.isa_json_compliance_enabled }
+    Seek::Config.project_single_page_enabled = true
+    Seek::Config.isa_json_compliance_enabled = true
+    Seek::Util.clear_cached
     login_as FactoryBot.create(:admin).user
+  end
+
+  def teardown
+    @old_single_page_config.each { |setting, value| Seek::Config.send("#{setting}=", value) }
+    Seek::Util.clear_cached
   end
 
   test 'should get new' do
@@ -118,6 +129,35 @@ class ISAStudiesControllerTest < ActionController::TestCase
     # Successful update redirects to the originating project
     put :update, params: { id: study.id, isa_study: { study: { title: 'new title' } }, single_page: project2.id }
     assert_redirected_to single_page_path(id: project2, item_type: 'study', item_id: study.id)
+  end
+
+  test 'cancel and update fall back to the study page when the single page is unavailable' do
+    person = User.current_user.person
+    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, projects: [project], contributor: person)
+    source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project])
+    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project],
+                                                                                   linked_sample_type: source_type)
+    study = FactoryBot.create(:study, investigation:, contributor: person,
+                                      sample_types: [source_type, sample_collection_type])
+
+    %i[project_single_page_enabled isa_json_compliance_enabled].each do |setting|
+      with_config_value(setting, false) do
+        # New study -> the investigation page
+        get :new, params: { investigation_id: investigation.id, single_page: project.id }
+        assert_response :success
+        assert_select 'a.btn[href=?]', investigation_path(investigation), text: 'Cancel'
+
+        # Edit study -> the study page
+        get :edit, params: { id: study.id, single_page: project.id }
+        assert_response :success
+        assert_select 'a.btn[href=?]', study_path(study), text: 'Cancel'
+        assert_select 'a.btn[href*=?]', 'single_pages', count: 0
+
+        put :update, params: { id: study.id, isa_study: { study: { title: "title without #{setting}" } }, single_page: project.id }
+        assert_redirected_to study_path(study)
+      end
+    end
   end
 
   test 'should create an isa study with extended metadata' do

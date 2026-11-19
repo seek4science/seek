@@ -229,9 +229,9 @@ class InvestigationsController < ApplicationController
 
   # ISA-JSON compliant investigations are shown in the single page view, like ISA studies and assays.
   def investigation_redirect_path_after_update
-    return investigation_path(@investigation) unless @investigation.is_isa_json_compliant? && helpers.single_page_available?
+    return investigation_path(@investigation) unless @investigation.is_isa_json_compliant?
 
-    helpers.single_page_item_path(@investigation) || investigation_path(@investigation)
+    helpers.single_page_or_item_path(@investigation, investigation_path(@investigation))
   end
 
   def investigation_params
