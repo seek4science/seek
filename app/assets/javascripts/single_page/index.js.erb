@@ -229,7 +229,7 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
   const statusDetails = statusElement.find(`#export-status-detail-${sampleTypeId}`);
 
   statusElement
-    .removeClass('alert-info alert-success alert-danger')
+    .removeClass('alert-info alert-success alert-warning alert-danger')
     .addClass("alert-info")
     .show();
 
@@ -303,13 +303,23 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
   })
   .done( function(response) {
     window.location.href = `<%= download_spreadsheet_single_pages_path(format: :xlsx) %>?uuid=${response.uuid}`;
+    const warnings = response.warnings || [];
     statusElement
-      .removeClass('alert-info alert-success alert-danger')
-      .addClass("alert-success");
+      .removeClass('alert-info alert-success alert-warning alert-danger')
+      .addClass(warnings.length > 0 ? "alert-warning" : "alert-success");
 
     statusDetails
       .empty()
       .append("<p>Your export has been generated. A download should start soon.</p>");
+
+    if (warnings.length > 0) {
+      const warningList = $j("<ul>");
+      // Use .text() as the warnings contain user provided attribute and sample names
+      warnings.forEach((warning) => warningList.append($j("<li>").text(warning)));
+      statusDetails
+        .append($j("<p>").html(`<b>${warnings.length === 1 ? 'Warning' : `${warnings.length} warnings`}:</b>`))
+        .append(warningList);
+    }
 
     if(sampleIds.length < 1) {
       statusDetails
@@ -324,7 +334,7 @@ function exportToExcel(tableName, studyId, assayId, sampleTypeId, projectId) {
   })
   .fail( function(response) {
     statusElement
-      .removeClass('alert-info alert-success alert-danger')
+      .removeClass('alert-info alert-success alert-warning alert-danger')
       .addClass("alert-danger");
 
     statusDetails

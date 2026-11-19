@@ -73,4 +73,5 @@ render partial: 'samples_sheet', locals: { workbook: workbook,
                                            secret_pwd: secret_pwd,
                                            sample_data: sample_data,
                                            sample_attribute_value_map: sample_attribute_value_map,
-                                           sample_attributes: sample_attributes }
+                                           sample_attributes: sample_attributes,
+                                           export_check: Seek::Templates::SpreadsheetExportCheck.new(@sample_type) }
