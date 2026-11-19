@@ -2,7 +2,7 @@ name: Update Ruby patch version
 
 on:
   schedule:
-    - cron: '0 8 * * 1'
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 permissions:
@@ -17,12 +17,17 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-      - name: Update .ruby-version
-        run: echo "ruby-$(ruby -e 'print RUBY_VERSION')" > .ruby-version
+      - name: Update .ruby-version and Dockerfile
+        run: |
+          version=$(ruby -e 'print RUBY_VERSION')
+          echo "ruby-${version}" > .ruby-version
+          sed -i -E "s/^FROM ruby:[0-9]+\.[0-9]+\.[0-9]+-/FROM ruby:${version}-/" Dockerfile
       - uses: peter-evans/create-pull-request@v8.1.1
         with:
-          add-paths: .ruby-version
+          add-paths: |
+            .ruby-version
+            Dockerfile
           branch: automation/update-ruby-patch
           commit-message: Update Ruby patch version
           title: Update Ruby patch version
-          body: Update the Ruby 3.3 patch version in `.ruby-version`.
+          body: Update the Ruby 3.3 patch version in `.ruby-version` and the `Dockerfile`.
