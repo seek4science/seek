@@ -16,6 +16,7 @@ class SparqlHelperTest < ActionView::TestCase
     link = span.at_css('a.external-link')
     assert_equal 'https://example.com/thing', link['href']
     assert_equal 'https://example.com/thing', link['data-tooltip']
+    assert_includes Nokogiri::HTML.fragment(link['data-template']).at_css('div.popover')['class'], 'sparql-popover'
   end
 
   test 'an IRI that is not an http URL is not linked' do
