@@ -718,6 +718,22 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     check_schema_org_terms(json)
   end
 
+  test 'workflow image links to the diagram of the workflow, for both the workflow and its version' do
+    # an extra version record on another workflow, so the version and workflow ids are out of step
+    other_workflow = FactoryBot.create(:cwl_workflow)
+    disable_authorization_checks { other_workflow.save_as_new_version('new version') }
+
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow)
+    version = workflow.latest_version
+    assert_not_equal workflow.id, version.id
+    assert version.diagram
+    assert version.diagram_exists?
+
+    expected_image = "http://localhost:3000/workflows/#{workflow.id}/diagram?version=#{version.version}"
+    assert_equal expected_image, JSON.parse(workflow.to_schema_ld)['image']
+    assert_equal expected_image, JSON.parse(version.to_schema_ld)['image']
+  end
+
   test 'collection' do
     collection = travel_to(@current_time) do
       collection = FactoryBot.create(:max_collection, contributor: @person)
