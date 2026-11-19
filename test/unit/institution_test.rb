@@ -301,4 +301,71 @@ class InstitutionTest < ActiveSupport::TestCase
     assert institution.valid?
   end
 
+
+  test 'ror_json_ld is nil without a ror id' do
+    institution = FactoryBot.create(:institution, ror_id: nil)
+    assert_nil institution.ror_json_ld
+  end
+
+  test 'rdf is enriched with the ror organisation, linked with sameAs' do
+    Rails.cache.clear
+    institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
+    graph = institution.to_rdf_graph
+    schema = RDF::Vocabulary.new('https://schema.org/')
+    ror = RDF::URI('https://ror.org/027m9bs27')
+
+    assert graph.has_statement?(RDF::Statement(institution.rdf_resource, schema.sameAs, ror))
+    assert graph.has_statement?(RDF::Statement(ror, RDF.type, schema.EducationalOrganization))
+    assert graph.has_statement?(RDF::Statement(ror, schema.name, RDF::Literal('University of Manchester')))
+    assert graph.has_statement?(RDF::Statement(ror, schema.sameAs, RDF::URI('http://www.wikidata.org/entity/Q230899')))
+  end
+
+  test 'rdf does not include the ror sub organizations, and only the ror organisation is fetched' do
+    institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
+    Rails.cache.clear
+    WebMock::RequestRegistry.instance.reset!
+
+    graph = institution.to_rdf_graph
+    schema = RDF::Vocabulary.new('https://schema.org/')
+
+    assert_empty graph.query([nil, schema.subOrganization, nil]).to_a
+    assert_empty graph.query([RDF::URI('https://ror.org/03xxxrq06'), nil, nil]).to_a
+    assert_requested :get, 'https://api.ror.org/v2/organizations/027m9bs27', times: 1
+    assert_requested :get, %r{\Ahttps://api\.ror\.org/}, times: 1
+  end
+
+  test 'ror record is cached' do
+    institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
+    Rails.cache.clear
+    WebMock::RequestRegistry.instance.reset!
+
+    institution.to_rdf_graph
+    institution.to_rdf_graph
+
+    assert_requested :get, 'https://api.ror.org/v2/organizations/027m9bs27', times: 1
+  end
+
+  test 'rdf is still generated when the ror record cannot be fetched' do
+    institution = FactoryBot.create(:institution, ror_id: '027m9bs27')
+    Rails.cache.clear
+    stub_request(:get, 'https://api.ror.org/v2/organizations/027m9bs27').to_return(status: 500, body: '')
+
+    graph = institution.to_rdf_graph
+
+    refute_empty graph.query([institution.rdf_resource, nil, nil]).to_a
+    assert_empty graph.query([RDF::URI('https://ror.org/027m9bs27'), nil, nil]).to_a
+    assert_nil Rails.cache.read('ror/v2/organizations/027m9bs27'), 'failures should not be cached'
+  end
+
+  test 'fetching the ror details when saving an institution uses the cached record' do
+    Rails.cache.clear
+    WebMock::RequestRegistry.instance.reset!
+
+    FactoryBot.create(:institution, ror_id: '027m9bs27')
+    institution = FactoryBot.create(:institution, ror_id: '027m9bs27', department: 'Another department')
+
+    assert_equal 'University of Manchester', institution.base_title
+    assert_requested :get, 'https://api.ror.org/v2/organizations/027m9bs27', times: 1
+  end
+
 end

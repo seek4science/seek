@@ -4,6 +4,11 @@
     <p class="text-center"><%= link_to "Sign out", logout_url %></p>
 <% else %>
     <div class="container">
-        <%= render :partial => "gadgets/sign_in", :locals => {:original_path => params[:return_to]} %>
+      <% if (auto_strategy = auto_login_strategy) %>
+          <%= render partial: 'sessions/auto_login',
+                     locals: { strategy: auto_strategy, original_path: params[:return_to] } %>
+      <% else %>
+          <%= render :partial => "gadgets/sign_in", :locals => {:original_path => params[:return_to]} %>
+      <% end %>
     </div>
 <% end %>

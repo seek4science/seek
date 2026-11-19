@@ -242,9 +242,9 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
     RdfGenerationQueue.destroy_all
 
-    # checks that rdf generation jobs have been created, to update the RDF for the assays
-    assert_enqueued_jobs(1, only: RdfGenerationJob) do
-      assert_difference('RdfGenerationQueue.count', 2) do
+    # assays have no RDF, as there is no schema.org description, so no rdf generation is queued for them
+    assert_no_enqueued_jobs(only: RdfGenerationJob) do
+      assert_no_difference('RdfGenerationQueue.count') do
         type.ontology_uri = 'http://wibble.com/ontology#fish'
         type.save!
         assay.reload
@@ -254,7 +254,6 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
         assert_equal 'http://wibble.com/ontology#fish', assay2.assay_type_uri
       end
     end
-    assert_equal [assay, assay2].sort, RdfGenerationQueue.last(2).map(&:item).sort
   end
 
   test 'assay adopts ontology uri if suggested type destroyed' do
@@ -265,9 +264,9 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
     RdfGenerationQueue.destroy_all
 
-    # checks that rdf generation jobs have been created, to update the RDF for the assays
-    assert_enqueued_jobs(1, only: RdfGenerationJob) do
-      assert_difference('RdfGenerationQueue.count', 1) do
+    # assays have no RDF, as there is no schema.org description, so no rdf generation is queued for them
+    assert_no_enqueued_jobs(only: RdfGenerationJob) do
+      assert_no_difference('RdfGenerationQueue.count') do
         type.destroy
         assay.reload
 
@@ -275,7 +274,5 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
         assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
       end
     end
-
-    assert_equal assay, RdfGenerationQueue.last.item
   end
 end

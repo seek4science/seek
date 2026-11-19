@@ -18,16 +18,10 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics', study.assays.first.assay_type_uri
   end
 
-  test 'to_rdf' do
-    object = FactoryBot.create(:study, description: 'My famous study')
-    FactoryBot.create_list(:assay, 2, contributor: object.contributor, study: object)
-    rdf = object.to_rdf
-    graph = RDF::Graph.new do |graph|
-      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
-    end
-    assert graph.statements.count > 1
-    assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), graph.statements.first.subject
-
+  test 'no rdf, as there is no schema.org description' do
+    object = FactoryBot.create(:study)
+    refute object.rdf_supported?
+    refute RdfGenerationQueue.where(item: object).exists?
   end
 
   test 'supports extended metadata?' do
@@ -36,6 +30,8 @@ class StudyTest < ActiveSupport::TestCase
   end
 
   test 'include extended metadata in rdf' do
+    skip 'studies have no RDF, as there is no Schema.org description'
+
     object = FactoryBot.create(:study, description: 'My famous study',
                                extended_metadata_attributes:{
                                  extended_metadata_type: FactoryBot.create(:fairdata_virtual_demo_study_extended_metadata_partial),

@@ -12,6 +12,27 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'h1', /seek.*funding/i
   end
 
+  test 'search help button and modal are shown when search is enabled' do
+    with_config_value(:solr_enabled, true) do
+      get :index
+      assert_response :success
+      assert_select '#search_box button#search-help-btn[data-target=?]', '#search-help-modal'
+      assert_select 'div#search-help-modal.modal' do
+        assert_select '.modal-title', text: /Search tips/
+        assert_select 'code', text: '*omics'
+      end
+    end
+  end
+
+  test 'search help is not shown when search is disabled' do
+    with_config_value(:solr_enabled, false) do
+      get :index
+      assert_response :success
+      assert_select 'button#search-help-btn', count: 0
+      assert_select 'div#search-help-modal', count: 0
+    end
+  end
+
   test 'test should be accessible to seek even if not logged in' do
     get :index
     assert_response :success
@@ -810,6 +831,21 @@ class HomesControllerTest < ActionController::TestCase
     with_config_value(:metadata_license, 'CC0-1.0') do
       get :index
       assert_select '.ft-info', text: /Metadata is licensed under Creative Commons Zero v1.0 Universal \(CC0-1.0\)/
+    end
+  end
+
+
+  test 'should hide the register button when registration is disabled' do
+    with_config_value(:home_show_features, true) do
+      get :index
+      assert_response :success
+      assert_select '#home-features a[href=?]', signup_path, 1
+
+      with_config_value(:registration_disabled, true) do
+        get :index
+        assert_response :success
+        assert_select '#home-features a[href=?]', signup_path, count: 0
+      end
     end
   end
 

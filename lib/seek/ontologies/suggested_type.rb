@@ -176,7 +176,9 @@ module Seek
       # creates a job to update rdf if the suggested ontology uri changes
       def queue_rdf_generation
         return unless saved_changes.include?(:ontology_uri)
-        RdfGenerationQueue.enqueue(assays)
+
+        supported_assays = assays.select(&:rdf_supported?)
+        RdfGenerationQueue.enqueue(supported_assays) unless supported_assays.empty?
       end
     end
   end

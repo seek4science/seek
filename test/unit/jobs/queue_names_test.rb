@@ -8,6 +8,7 @@ class QueueNamesTest < ActiveSupport::TestCase
     assert_equal 'authlookup', QueueNames::AUTH_LOOKUP
     assert_equal 'default', QueueNames::DEFAULT
     assert_equal 'mailers', QueueNames::MAILERS
+    assert_equal 'rdf', QueueNames::RDF
   end
 
 end

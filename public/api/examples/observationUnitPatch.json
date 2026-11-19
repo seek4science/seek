@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "32",
+    "id": "81",
     "type": "observation_units",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022252612",
+              "id": "1022267315",
               "type": "projects"
             },
             "access": "edit"
@@ -23,7 +23,7 @@
         "tag3"
       ],
       "extended_attributes": {
-        "extended_metadata_type_id": "76",
+        "extended_metadata_type_id": "449",
         "attribute_map": {
           "name": "unit 2",
           "strain": "strain 2"
@@ -40,21 +40,21 @@
       "creators": {
         "data": [
           {
-            "id": "1039988561",
+            "id": "1040003326",
             "type": "people"
           }
         ]
       },
       "study": {
         "data": {
-          "id": "1060385257",
+          "id": "1060386020",
           "type": "studies"
         }
       },
       "samples": {
         "data": [
           {
-            "id": "190",
+            "id": "10434",
             "type": "samples"
           }
         ]
@@ -62,7 +62,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883654476",
+            "id": "1055250962",
             "type": "data_files"
           }
         ]

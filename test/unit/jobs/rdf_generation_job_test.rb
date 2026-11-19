@@ -46,7 +46,7 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   end
 
   test 'rdf generation job not created after policy change for non rdf supported entity' do
-    item = FactoryBot.create(:event, policy: FactoryBot.create(:public_policy))
+    item = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
     RdfGenerationQueue.delete_all
 
     item.policy.access_type = Policy::NO_ACCESS
@@ -55,6 +55,39 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
         assert_no_difference('RdfGenerationQueue.count') do
           item.policy.save!
         end
+      end
+    end
+  end
+
+  test 'rdf generation queued when only the controlled vocab annotations change' do
+    FactoryBot.create(:disciplines_controlled_vocab)
+    workflow = FactoryBot.create(:workflow)
+
+    User.with_current_user(workflow.contributor.user) do
+      ['Chemistry', 'Physics and Astronomy', ''].each do |disciplines|
+        RdfGenerationQueue.delete_all
+        workflow.discipline_annotations = disciplines
+        disable_authorization_checks { workflow.save! }
+
+        assert_equal disciplines.split(', '), workflow.reload.discipline_annotation_labels
+        entry = RdfGenerationQueue.find_by(item: workflow)
+        assert entry, "rdf generation should be queued after changing the disciplines to '#{disciplines}'"
+        refute entry.refresh_dependents
+      end
+    end
+  end
+
+  test 'rdf generation queued when only the tags change' do
+    workflow = FactoryBot.create(:workflow)
+
+    User.with_current_user(workflow.contributor.user) do
+      [%w[wibble], %w[wobble], []].each do |tags|
+        RdfGenerationQueue.delete_all
+        workflow.tags = tags
+        disable_authorization_checks { workflow.save! }
+
+        assert_equal tags, workflow.reload.tags_as_text_array
+        assert RdfGenerationQueue.where(item: workflow).exists?, "rdf generation should be queued after changing the tags to #{tags}"
       end
     end
   end
@@ -68,9 +101,9 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   end
 
   test 'skip items that dont support rdf' do
-    item = FactoryBot.create(:event)
+    item = FactoryBot.create(:assay)
     refute item.rdf_supported?
-    refute RdfGenerationQueue.where(item_id: item.id, item_type: 'Event').exists?
+    refute RdfGenerationQueue.where(item_id: item.id, item_type: 'Assay').exists?
 
     item = FactoryBot.create(:sop)
     assert item.rdf_supported?
@@ -78,10 +111,10 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
   end
 
   test 'perform' do
-    item = FactoryBot.create(:assay, policy: FactoryBot.create(:public_policy))
+    item = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
     RdfGenerationQueue.delete_all
 
-    expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Assay-test-#{item.id}.rdf")
+    expected_rdf_file = File.join(Rails.root, 'tmp/testing-filestore/rdf/public', "Sop-test-#{item.id}.rdf")
     assert_equal expected_rdf_file, item.rdf_storage_path
     FileUtils.rm expected_rdf_file if File.exist?(expected_rdf_file)
     RdfGenerationQueue.enqueue(item, queue_job: false)

@@ -94,14 +94,106 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'serves existing RO-Crate for RO-Crate workflow' do
-    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
-    refute workflow.should_generate_crate?
+    with_config_value(:regenerate_workflow_ro_crates, false) do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
+      refute workflow.should_generate_crate?
 
-    crate = workflow.ro_crate
+      crate = workflow.ro_crate
 
-    assert_nil crate.author, 'Changes in SEEK should not be reflected in RO-Crate.'
+      assert_nil crate.author, 'Changes in SEEK should not be reflected in RO-Crate.'
 
-    assert_not_equal crate.canonical_id, workflow.ro_crate.canonical_id
+      assert_not_equal crate.canonical_id, workflow.ro_crate.canonical_id
+    end
+  end
+
+  test 'regenerates existing RO-Crate for RO-Crate workflow' do
+    with_config_value(:regenerate_workflow_ro_crates, true) do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
+      assert workflow.should_generate_crate?
+
+      crate = workflow.ro_crate
+
+      assert_equal ['Jane Smith', 'John Smith'], Array.wrap(crate.author).map { |author| author['name'] }.sort
+      assert_equal workflow.ro_crate_url('ro_crate'), crate['url']
+      # the uploaded crate's own content is kept
+      assert crate.main_workflow
+      assert crate.main_workflow_diagram
+      assert_equal 'Galaxy', crate.main_workflow.programming_language['name']
+    end
+  end
+
+  test 'regenerating an uploaded RO-Crate replacing all of the main workflow metadata' do
+    with_config_values(regenerate_workflow_ro_crates: true, workflow_ro_crate_regeneration_strategy: 'replace_all') do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'SEEK title')
+      assert_equal 'replace_all', workflow.ro_crate_regeneration_strategy
+
+      main = workflow.ro_crate.main_workflow
+
+      assert_equal '1-PreProcessing.ga', main.id
+      assert_equal 'SEEK title', main['name']
+      assert_equal seek_schema(workflow)['url'], main['url']
+      # not given by SEEK, so kept
+      assert_equal 'all_covid_tools.yaml', main['dependencies'].first['@id']
+      assert_equal 'pp_wf.png', main['image']['@id']
+      assert_equal seek_schema(workflow)['programmingLanguage']['@id'], main['programmingLanguage']['@id']
+    end
+  end
+
+  test 'regenerating an uploaded RO-Crate replacing only the metadata describing the SEEK record' do
+    with_config_values(regenerate_workflow_ro_crates: true, workflow_ro_crate_regeneration_strategy: 'replace_seek') do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'SEEK title')
+
+      main = workflow.ro_crate.main_workflow
+
+      assert_equal '1 - read pre-processing', main['name']
+      assert_equal seek_schema(workflow)['url'], main['url']
+      assert_equal '#galaxy', main['programmingLanguage']['@id']
+      refute_nil main.crate.dereference('#galaxy')
+    end
+  end
+
+  test 'regenerating an uploaded RO-Crate only adding missing metadata' do
+    with_config_values(regenerate_workflow_ro_crates: true, workflow_ro_crate_regeneration_strategy: 'fill_missing') do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'SEEK title')
+
+      main = workflow.ro_crate.main_workflow
+
+      assert_equal '1 - read pre-processing', main['name']
+      assert_equal '#galaxy', main['programmingLanguage']['@id']
+      # missing from the uploaded crate
+      assert_equal seek_schema(workflow)['url'], main['url']
+    end
+  end
+
+  test 'regenerating an uploaded RO-Crate as a new crate' do
+    with_config_values(regenerate_workflow_ro_crates: true, workflow_ro_crate_regeneration_strategy: 'new_crate') do
+      workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, title: 'SEEK title')
+
+      crate = workflow.ro_crate
+      main = crate.main_workflow
+
+      assert_equal '1-PreProcessing.ga', main.id
+      assert_equal 'SEEK title', main['name']
+      assert_nil main['dependencies']
+      assert_nil crate.dereference('README.md'), 'files should not be described by the uploaded metadata'
+      assert_equal 'pp_wf.png', crate.main_workflow_diagram.id
+
+      # the uploaded files are all still in the crate
+      Zip::File.open(workflow.ro_crate_zip) do |zip|
+        assert_equal %w[1-PreProcessing.ga README.md all_covid_tools.yaml pp_wf.png ro-crate-metadata.json
+                        ro-crate-preview.html],
+                     (zip.entries.map(&:name) - ['ro-crate-metadata.jsonld']).sort
+        metadata = JSON.parse(zip.read('ro-crate-metadata.json'))
+        assert_equal 'SEEK title', metadata['@graph'].detect { |e| e['@id'] == '1-PreProcessing.ga' }['name']
+      end
+    end
+  end
+
+  test 'workflows not uploaded as an RO-Crate only have missing metadata added' do
+    with_config_values(regenerate_workflow_ro_crates: true, workflow_ro_crate_regeneration_strategy: 'new_crate') do
+      assert_equal 'fill_missing', FactoryBot.create(:cwl_workflow).ro_crate_regeneration_strategy
+      assert_equal 'fill_missing', FactoryBot.create(:generated_galaxy_ro_crate_workflow).ro_crate_regeneration_strategy
+    end
   end
 
   test 'can get and set source URL' do
@@ -988,4 +1080,34 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal '2021-03-31 15:01:47 UTC', FactoryBot.create(:remote_git_workflow).ro_crate['datePublished'].utc.to_s,
                  'Should set datePublished to time of git commit'
   end
+
+  test 'sets contentUrl in RO-Crate metadata' do
+    workflow = FactoryBot.create(:local_git_workflow)
+    disable_authorization_checks do
+      gv = workflow.git_version
+      c = gv.add_file('concat_two_files.cwl', StringIO.new(SecureRandom.random_bytes(50)))
+      gv.update_column(:commit, c)
+      gv.abstract_cwl_path = 'concat_two_files.cwl'
+      gv.save!
+    end
+
+    assert workflow.ro_crate.main_workflow.present?
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.ga",
+                 workflow.ro_crate.main_workflow.properties[:contentUrl]
+
+    assert workflow.ro_crate.main_workflow_diagram.present?
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/diagram.png",
+                 workflow.ro_crate.main_workflow_diagram.properties[:contentUrl]
+
+    assert workflow.ro_crate.main_workflow_cwl.present?
+    assert_equal "http://localhost:3000/workflows/#{workflow.id}/git/1/download/concat_two_files.cwl",
+                 workflow.ro_crate.main_workflow_cwl.properties[:contentUrl]
+  end
+
+  private
+
+  def seek_schema(workflow)
+    Seek::BioSchema::Serializer.new(workflow).json_representation
+  end
+
 end

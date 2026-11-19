@@ -28,6 +28,11 @@
         min-width: 150px; // Minimum column width
       }
 
+      // keeps a linked IRI in line with the <> around it, as the link is an inline-block
+      .sparql-iri .external-link {
+        vertical-align: bottom;
+      }
+
       .external-link {
         word-break: break-all;
         max-width: 300px; // Limit URI column width
@@ -58,12 +63,17 @@
   .sparql-examples {
     margin-top: 2rem;
 
-    .example-query-filter {
-      margin-bottom: 1.5rem;
-      
-      .input-group {
-        max-width: 400px;
-      }
+    .example-query-toolbar {
+      margin-bottom: 1rem;
+      text-align: right;
+    }
+
+    .example-query-filter .input-group {
+      max-width: 400px;
+    }
+
+    #example-query-select {
+      max-width: 600px;
     }
 
     .example-query {
@@ -73,12 +83,9 @@
       padding: 1rem;
       margin-bottom: 1rem;
 
-      .query-title {
+      .query-title,
+      .example-query-description {
         margin-bottom: 0.5rem;
-
-        .label {
-          margin-left: 0.5rem;
-        }
       }
 
       .query-code {
@@ -91,10 +98,6 @@
         margin: 0.5rem 0;
         white-space: pre-wrap;
         word-wrap: break-word;
-      }
-
-      .use-query {
-        margin-top: 0.5rem;
       }
     }
   }
@@ -120,4 +123,9 @@
       margin-left: 0.5rem;
     }
   }
+}
+
+// long values, such as URIs in the SPARQL results, would otherwise run out of the popover
+.popover-content {
+  overflow-wrap: break-word;
 }

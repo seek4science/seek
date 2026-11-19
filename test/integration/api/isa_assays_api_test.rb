@@ -1,0 +1,443 @@
+require 'test_helper'
+
+class ISAAssaysApiTest < ActionDispatch::IntegrationTest
+  include ApiTestHelper
+  def setup
+    user_login
+    @old_isa_json_compliance_config = Seek::Config.isa_json_compliance_enabled
+    @old_single_pages_config = Seek::Config.project_single_page_folders_enabled
+    Seek::Config.isa_json_compliance_enabled = true
+    Seek::Config.project_single_page_folders_enabled = true
+    @project = current_person.projects.first
+    @study = FactoryBot.create(:isa_json_compliant_study, contributor: current_person)
+    @assay_stream = FactoryBot.create(:assay_stream, contributor: current_person)
+    @material_assay_template = FactoryBot.create(:isa_assay_material_template, contributor: current_person)
+    @data_file_assay_template = FactoryBot.create(:isa_assay_data_file_template, contributor: current_person)
+    @sample_multi_sample_attribute_type = FactoryBot.create(:sample_multi_sample_attribute_type)
+    @string_sample_attribute_type = FactoryBot.create(:string_sample_attribute_type)
+
+    # ISA tags
+    @other_material_isa_tag = ISATag.find_by(title: 'other_material') || FactoryBot.create(:other_material_isa_tag)
+    @other_material_characteristic_isa_tag = ISATag.find_by(title: 'other_material_characteristic') || FactoryBot.create(:other_material_characteristic_isa_tag)
+    @protocol_isa_tag = ISATag.find_by(title: 'protocol') || FactoryBot.create(:protocol_isa_tag)
+    @parameter_value_isa_tag = ISATag.find_by(title: 'parameter_value') || FactoryBot.create(:parameter_value_isa_tag)
+    @input_isa_tag = ISATag.find_by(title: 'input') || FactoryBot.create(:input_isa_tag)
+
+    @experimental_assay_class = AssayClass.experimental
+  end
+
+  def teardown
+    Seek::Config.isa_json_compliance_enabled = @old_isa_json_compliance_config
+    Seek::Config.project_single_page_folders_enabled = @old_single_pages_config
+  end
+
+  test 'show ISA assay' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                               linked_sample_type: @study.sample_types.last)
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    response_body = JSON.parse(response.body)
+    assert_equal 'isa_assays', response_body['data']['type']
+    assert_equal assay.id.to_s, response_body['data']['id']
+    assert response_body['data']['attributes']['assay'].present?
+    sample_type = response_body['data']['attributes']['sample_type']
+    assert sample_type.present?
+    assert response_body['data']['attributes']['input_sample_type_id'].present?
+    assert_equal [], sample_type['samples']
+  end
+
+  test 'show ISA assay - samples are filtered by authorization' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                               linked_sample_type: @study.sample_types.last)
+    assay_sample_type = assay.sample_type
+    source_type = @study.sample_types.first
+    collection_type = @study.sample_types.last
+
+    source_vocab_term = source_type.sample_attributes.find_by_title('Source Characteristic 2')
+                                    .sample_controlled_vocab.sample_controlled_vocab_terms.first.label
+    source_sample = FactoryBot.create(:sample, sample_type: source_type,
+                                               contributor: current_person,
+                                               project_ids: current_person.projects.map(&:id),
+                                               data: { 'Source Name' => 'Source 1',
+                                                       'Source Characteristic 1' => 'c1',
+                                                       'Source Characteristic 2' => source_vocab_term })
+
+    collection_sample = FactoryBot.create(:sample, sample_type: collection_type,
+                                                    contributor: current_person,
+                                                    project_ids: current_person.projects.map(&:id),
+                                                    data: { 'Input' => [source_sample.id],
+                                                            'sample collection' => 'protocol 1',
+                                                            'sample collection parameter value 1' => 'pv1',
+                                                            'Sample Name' => 'Sample 1',
+                                                            'sample characteristic 1' => 'char1' })
+
+    assay_data = { 'Input' => [collection_sample.id], 'Protocol Assay 1' => 'prot',
+                   'Assay 1 parameter value 1' => 'pv1', 'Extract Name' => 'Extract 1',
+                   'other material characteristic 1' => 'mc1' }
+
+    viewable_sample = FactoryBot.create(:sample, sample_type: assay_sample_type,
+                                                  contributor: current_person,
+                                                  project_ids: current_person.projects.map(&:id),
+                                                  data: assay_data,
+                                                  policy: FactoryBot.create(:public_policy))
+    private_sample = FactoryBot.create(:sample, sample_type: assay_sample_type,
+                                                 contributor: FactoryBot.create(:person),
+                                                 project_ids: current_person.projects.map(&:id),
+                                                 data: assay_data.merge('Extract Name' => 'Extract 2'),
+                                                 policy: FactoryBot.create(:private_policy))
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    assay_samples = JSON.parse(response.body)['data']['attributes']['sample_type']['samples']
+    sample_ids = assay_samples.map { |s| s['id'] }
+    assert_includes sample_ids, viewable_sample.id.to_s
+    refute_includes sample_ids, private_sample.id.to_s
+    assert assay_samples.first['data'].present?
+  end
+
+  test 'show ISA assay - not found' do
+    get isa_assay_path(0, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :not_found
+  end
+
+  test 'show ISA assay - unauthorized' do
+    other_person = FactoryBot.create(:person)
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: other_person,
+                               linked_sample_type: @study.sample_types.last,
+                               policy: FactoryBot.create(:private_policy))
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :forbidden
+  end
+
+  test 'create ISA assay' do
+    sample_collection_sample_type_id = @study.sample_types.last.id
+
+    assay_params = {
+      "title": "My new Material ISA Assay via API",
+      "description": "This Material ISA Assay was created via the DataHub API",
+      "study_id": @study.id,
+      "assay_stream_id": @assay_stream.id,
+      "assay_class_id": @experimental_assay_class.id
+    }
+
+    sample_type_params = {
+      "title": "Material Assay sample type API",
+      "description": "Material Assay sample type created via the DataHub API",
+      "template_id": @material_assay_template.id,
+      "sample_attributes_attributes":{
+        "1":{
+          "pos": 1,
+          "sample_attribute_type_id": @sample_multi_sample_attribute_type.id,  # Registered sample multi type
+          "title": "Input (collected sample)",
+          "isa_tag_id": @input_isa_tag.id,  # Input
+          "required": true,
+          "is_title": false,
+          "linked_sample_type_id": sample_collection_sample_type_id
+        },
+        "2": {
+          "pos": 2,
+          "sample_attribute_type_id": @string_sample_attribute_type.id,  # String type
+          "isa_tag_id": @other_material_isa_tag.id,  # other_material
+          "title": "Other material Name",
+          "required": true,
+          "is_title": true
+        },
+        "3": {
+          "pos": 3,
+          "sample_attribute_type_id": @string_sample_attribute_type.id,  # String type
+          "isa_tag_id": @other_material_characteristic_isa_tag.id,  # other_material_characteristic
+          "title": "Sample Characteristic",
+          "required": false,
+          "is_title": false
+        },
+        "4":{
+          "pos": 4,
+          "sample_attribute_type_id": @string_sample_attribute_type.id,  # String type
+          "isa_tag_id": @protocol_isa_tag.id,  # Protocol
+          "title": "Protocol used",
+          "required": true,
+          "is_title": false
+        },
+        "5":{
+          "pos": 5,
+          "sample_attribute_type_id": @string_sample_attribute_type.id,  # String type
+          "isa_tag_id": @parameter_value_isa_tag.id,  # Parameter value
+          "title": "Parameter Value",
+          "required": false,
+          "is_title": false
+        }
+      }
+    }
+
+    params = {
+      "data": {
+        "type": "isa_assays",
+        "attributes": {
+          "assay": assay_params,
+          "sample_type": sample_type_params,
+          "input_sample_type_id": sample_collection_sample_type_id
+        }
+      }
+    }
+    assert_difference('Assay.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_difference('SampleAttribute.count', 5) do
+          post isa_assays_path(format: :json), params: params, as: :json, headers: { "Authorization": write_access_auth }
+        end
+      end
+    end
+    assert_response :created
+  end
+
+  test 'update ISA assay' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                                                                   linked_sample_type: @study.sample_types.last)
+    # Ensure the sample type is editable by the current person
+    assay.sample_type.update_column(:contributor_id, current_person.id)
+
+    params = {
+      "data": {
+        "id": assay.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": {
+            "description": "Updated description via API"
+          },
+          "sample_type": {
+            "title": "Updated Sample Type Title"
+          }
+        }
+      }
+    }
+
+    assert_changes -> { assay.reload.description }, to: "Updated description via API" do
+      assert_changes -> { assay.sample_type.reload.title }, to: "Updated Sample Type Title" do
+        patch isa_assay_path(assay.id, format: :json), params: params, as: :json,
+              headers: { "Authorization": write_access_auth }
+      end
+    end
+
+    assert_response :ok
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+  end
+
+  test 'show ISA assay - response conforms to the documented schema' do
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: current_person,
+                               linked_sample_type: @study.sample_types.last)
+
+    get isa_assay_path(assay.id, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :success
+
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+  end
+
+  test 'show ISA assay - not found response conforms to the documented schema' do
+    get isa_assay_path(0, format: :json), as: :json,
+        headers: { "Authorization": read_access_auth }
+    assert_response :not_found
+
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
+  end
+
+  test 'update ISA assay - forbidden when not authorized to edit' do
+    other_person = FactoryBot.create(:person)
+    assay = FactoryBot.create(:isa_json_compliant_material_assay, contributor: other_person,
+                               linked_sample_type: @study.sample_types.last,
+                               policy: FactoryBot.create(:publicly_viewable_policy))
+
+    params = {
+      "data": {
+        "id": assay.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated description via API" }
+        }
+      }
+    }
+
+    assert_no_changes -> { assay.reload.description } do
+      patch isa_assay_path(assay.id, format: :json), params: params, as: :json,
+            headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :forbidden
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/forbiddenResponse') }
+  end
+
+  test 'update ISA assay - assay stream has no sample type' do
+    assay_stream = FactoryBot.create(:assay_stream, contributor: current_person, study: @study)
+
+    params = {
+      "data": {
+        "id": assay_stream.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated stream description via API" }
+        }
+      }
+    }
+
+    assert_changes -> { assay_stream.reload.description }, to: 'Updated stream description via API' do
+      patch isa_assay_path(assay_stream.id, format: :json), params: params, as: :json,
+            headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :ok
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+    assert_nil JSON.parse(response.body)['data']['attributes']['sample_type']
+  end
+
+  test 'update ISA assay - not found' do
+    params = {
+      "data": {
+        "id": "0",
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated description via API" }
+        }
+      }
+    }
+
+    patch isa_assay_path(0, format: :json), params: params, as: :json,
+          headers: { "Authorization": write_access_auth }
+
+    assert_response :not_found
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
+  end
+
+  test 'update ISA assay - not found when the assay has no sample type' do
+    plain_assay = FactoryBot.create(:assay, contributor: current_person)
+
+    params = {
+      "data": {
+        "id": plain_assay.id.to_s,
+        "type": "isa_assays",
+        "attributes": {
+          "assay": { "description": "Updated description via API" }
+        }
+      }
+    }
+
+    patch isa_assay_path(plain_assay.id, format: :json), params: params, as: :json,
+          headers: { "Authorization": write_access_auth }
+
+    assert_response :not_found
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/notFoundResponse') }
+  end
+
+  # The documented request shape uses a `sample_attributes` array with a nested `sample_attribute_type`
+  # object, rather than the `sample_attributes_attributes` hash the UI form posts.
+  test 'create ISA assay - using the documented request shape' do
+    params = documented_isa_assay_post_params
+
+    assert_nothing_raised { validate_json(params.to_json, '#/components/schemas/isaAssayPost') }
+
+    assert_difference('Assay.count', 1) do
+      assert_difference('SampleType.count', 1) do
+        assert_difference('SampleAttribute.count', 4) do
+          post isa_assays_path(format: :json), params: params, as: :json,
+               headers: { "Authorization": write_access_auth }
+        end
+      end
+    end
+
+    assert_response :created
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/isaAssayResponse') }
+
+    assay = Assay.last
+    assert_equal 'My documented ISA Assay', assay.title
+    assert_equal 'Extract Name', assay.sample_type.sample_attributes.detect(&:is_title).title
+  end
+
+  test 'create ISA assay - top level policy is applied to the assay and its sample type' do
+    params = documented_isa_assay_post_params
+    params[:data][:attributes][:policy] = { access: 'download', permissions: [] }
+
+    post isa_assays_path(format: :json), params: params, as: :json,
+         headers: { "Authorization": write_access_auth }
+    assert_response :created
+
+    assay = Assay.last
+    assert_equal Policy::ACCESSIBLE, assay.policy.access_type
+    assert_equal Policy::ACCESSIBLE, assay.sample_type.policy.access_type
+  end
+
+  test 'create ISA assay - sample type without a protocol tagged attribute is rejected' do
+    params = documented_isa_assay_post_params
+    attributes = params[:data][:attributes][:sample_type][:sample_attributes]
+    protocol_attribute = attributes.detect { |a| a[:isa_tag_id] == @protocol_isa_tag.id.to_s }
+    protocol_attribute[:isa_tag_id] = @parameter_value_isa_tag.id.to_s
+
+    assert_no_difference('Assay.count') do
+      post isa_assays_path(format: :json), params: params, as: :json,
+           headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :unprocessable_entity
+    assert_nothing_raised { validate_json(response.body, '#/components/schemas/unprocessableEntityResponse') }
+    assert_includes response.body, "exactly one attribute with the 'protocol' ISA Tag"
+  end
+
+  # Regression test: an attribute with no ISA tag used to raise NoMethodError in the protocol
+  # tag check, returning a 500 instead of a validation error.
+  test 'create ISA assay - sample attribute without an ISA tag is rejected' do
+    params = documented_isa_assay_post_params
+    params[:data][:attributes][:sample_type][:sample_attributes].each { |a| a.delete(:isa_tag_id) }
+
+    assert_no_difference('Assay.count') do
+      post isa_assays_path(format: :json), params: params, as: :json,
+           headers: { "Authorization": write_access_auth }
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.body, 'All attributes should have an ISA Tag'
+  end
+
+  private
+
+  def documented_isa_assay_post_params
+    {
+      data: {
+        type: 'isa_assays',
+        attributes: {
+          assay: {
+            title: 'My documented ISA Assay',
+            description: 'Created using the shape described in the API documentation',
+            study_id: @study.id.to_s,
+            assay_class_id: @experimental_assay_class.id.to_s,
+            assay_stream_id: @assay_stream.id.to_s
+          },
+          sample_type: {
+            title: 'Documented Assay Sample Type',
+            sample_attributes: [
+              { title: 'Input (collected sample)', pos: 1, required: true, is_title: false,
+                sample_attribute_type: { title: @sample_multi_sample_attribute_type.title },
+                linked_sample_type_id: @study.sample_types.last.id.to_s,
+                isa_tag_id: @input_isa_tag.id.to_s },
+              { title: 'Protocol used', pos: 2, required: true, is_title: false,
+                sample_attribute_type: { title: 'String' }, isa_tag_id: @protocol_isa_tag.id.to_s },
+              { title: 'Extract Name', pos: 3, required: true, is_title: true,
+                sample_attribute_type: { title: 'String' },
+                isa_tag_id: @other_material_isa_tag.id.to_s },
+              { title: 'Parameter Value', pos: 4, required: false, is_title: false,
+                sample_attribute_type: { title: 'String' },
+                isa_tag_id: @parameter_value_isa_tag.id.to_s }
+            ]
+          },
+          input_sample_type_id: @study.sample_types.last.id.to_s
+        }
+      }
+    }
+  end
+end
+
+

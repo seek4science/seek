@@ -1,6 +1,7 @@
 x-shared:
-  seek_base: &seek_base # build: .
-    image: fairdom/seek:1.18
+  seek_base: &seek_base
+    # build: .
+    image: fairdom/seek:kg
 
     restart: always
     environment: &seek_base_env
@@ -10,10 +11,11 @@ x-shared:
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
     env_file:
       - docker/db.env
+      - docker/redis.env
       - docker/virtuoso.env
     volumes:
-      - seek-filestore:/seek/filestore
-      - seek-cache:/seek/tmp/cache
+      - kg-seek-filestore:/seek/filestore
+      - kg-seek-cache:/seek/tmp/cache
     depends_on:
       db:
         condition: service_healthy
@@ -26,7 +28,6 @@ services:
   db:
     # Database implementation, in this case MySQL
     image: mysql:8.4
-    container_name: seek-mysql
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
@@ -40,7 +41,7 @@ services:
     env_file:
       - docker/db.env
     volumes:
-      - seek-mysql-db:/var/lib/mysql
+      - kg-seek-mysql-db:/var/lib/mysql
     healthcheck:
       test:
         [
@@ -52,10 +53,31 @@ services:
       retries: 5
       start_period: 20s
 
+  redis_store:
+    image: redis:8.6-alpine
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$$REDIS_MAXMEMORY" --maxmemory-policy allkeys-lru
+    env_file:
+      - docker/redis.env
+    volumes:
+      - kg-seek-redis-data:/data
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
   seek:
     # The SEEK application
     <<: *seek_base
-    container_name: seek
     command: docker/entrypoint.sh
     ports:
       - "3000:3000"
@@ -72,48 +94,38 @@ services:
   seek_workers:
     # The SEEK delayed job workers
     <<: *seek_base
-    container_name: seek-workers
     environment:
       <<: *seek_base_env
       QUIET_SUPERCRONIC: 1
     command: docker/start_workers.sh
 
   solr:
-    image: solr:8.11.4
-    container_name: seek-solr
+    image: fairdom/seek-solr:main
     restart: always
     environment:
       SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
-      - seek-solr-data:/var/solr/
-      - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
-    healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/seek/admin/ping"]
-      interval: 30s
-      timeout: 5s
-      retries: 6
-      start_period: 30s
-    entrypoint:
-      - docker-entrypoint.sh
-      - solr-precreate
-      - seek
-      - /opt/solr/server/solr/configsets/seek_config
+      - kg-seek-solr-data:/var/solr/
 
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.15
-    container_name: seek-virtuoso
     restart: always
     ports:
-      - "8890:8890"
-      - "1111:1111"
+      # HTTP: the SPARQL endpoint (/sparql) and Conductor admin UI (/conductor), published on host port 9890 to avoid
+      # clashing with another Virtuoso on 8890. Set VIRTUOSO_PORT to use a different host port. Within the compose
+      # network it is always virtuoso:8890
+      - "${VIRTUOSO_PORT:-9890}:8890"
+      # isql admin port, only reachable from the host itself as it accepts the DBA password
+      - "127.0.0.1:${VIRTUOSO_ISQL_PORT:-9111}:1111"
     environment:
       DBA_PASSWORD: CHANGE_ME
     volumes:
-      - seek-virtuoso-data:/database
+      - kg-seek-virtuoso-data:/database
 
 volumes:
-  seek-filestore:
-  seek-mysql-db:
-  seek-solr-data:
-  seek-cache:
-  seek-virtuoso-data:
+  kg-seek-filestore:
+  kg-seek-mysql-db:
+  kg-seek-solr-data:
+  kg-seek-cache:
+  kg-seek-virtuoso-data:
+  kg-seek-redis-data:

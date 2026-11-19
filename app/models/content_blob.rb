@@ -318,7 +318,15 @@ class ContentBlob < ApplicationRecord
   end
 
   def clear_sample_type_matches
-    Rails.cache.delete_matched("st-match-#{id}*") if changed?
+    return unless changed? && id
+
+    # SampleType#matches_content_blob? caches results under the array key
+    # ['st-match', blob, content_blob, ...], which normalizes to
+    # "st-match/content_blobs/<blob.id>-.../content_blobs/<content_blob.id>-.../...". This blob can
+    # appear in either the matched-blob or the sample-type-template position, so match its own
+    # "content_blobs/<id>-" segment anywhere within an st-match key. The trailing "-" bounds the id
+    # (cache_key is "content_blobs/<id>-<sha1sum>") so blob 12 doesn't also clear blob 120.
+    Rails.cache.delete_matched(%r{st-match/.*content_blobs/#{id}-})
   end
 
   # cleans up any files converted to txt or pdf, if they exist

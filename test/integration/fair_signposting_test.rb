@@ -44,9 +44,10 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 3, links.size
+    assert_equal 4, links.size
     assert_link(links, workflow_url(wf, version: 1), rel: 'describedby', type: :datacite_xml)
     assert_link(links, workflow_url(wf, version: 1), rel: 'describedby', type: :jsonld)
+    assert_link(links, workflow_url(wf, version: 1), rel: 'describedby', type: :rdf)
     assert_link(links, ro_crate_workflow_url(wf, version: 1), rel: 'item', type: :zip, profile: 'https://w3id.org/ro/crate')
   end
 
@@ -58,8 +59,9 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 2, links.size
+    assert_equal 3, links.size
     assert_link(links, 'https://doi.org/10.5075/abcd', rel: 'cite-as')
+    assert_link(links, publication_url(pub, version: 1), rel: 'describedby', type: :jsonld)
     assert_link(links, publication_url(pub, version: 1), rel: 'describedby', type: :rdf)
   end
 
@@ -72,9 +74,8 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 3, links.size
+    assert_equal 2, links.size
     assert_link(links, model_url(mod, version: 1), rel: 'describedby', type: :datacite_xml)
-    assert_link(links, model_url(mod, version: 1), rel: 'describedby', type: :rdf)
     assert_link(links, download_model_url(mod, version: 1), rel: 'item', type: :zip)
   end
 
@@ -101,10 +102,10 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     get assay_path(a)
 
-    links = parse_link_header
     assert_response :success
-    assert_equal 1, links.size
-    assert_link(links, assay_url(a), rel: 'describedby', type: :rdf)
+    # an assay has no schema.org description, so no RDF either
+    links = parse_link_header
+    assert_empty links.select { |_url, props| props[:rel] == 'describedby' }
   end
 
   test 'fair signposting for home' do

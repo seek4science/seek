@@ -72,6 +72,24 @@ class Institution < ApplicationRecord
     "https://ror.org/#{ror_id}"
   end
 
+  # Schema.org JSON-LD describing the institution's ROR organisation, linked from the institution with schema:sameAs,
+  # or nil if the institution has no ROR ID or the ROR record couldn't be fetched. Used to enrich the institution's RDF.
+  def ror_json_ld
+    return nil if ror_id.blank?
+
+    record = Ror::Client.new.fetch_record(ror_id)
+    return nil if record.key?(:error)
+
+    ror = Ror::SchemaOrg.new(record)
+    {
+      '@context' => { '@vocab' => 'https://schema.org/' },
+      '@graph' => [
+        { '@id' => rdf_seek_id, 'sameAs' => { '@id' => ror.id } },
+        ror.to_h.except('@context')
+      ]
+    }.to_json
+  end
+
   private
 
   def validate_base_title_presence

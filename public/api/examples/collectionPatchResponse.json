@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "37",
+    "id": "119",
     "type": "collections",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022252755",
+              "id": "1022263647",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximally Patched Collection",
       "license": "CC-BY-4.0",
       "description": "A collection of very interesting things",
@@ -26,14 +24,14 @@
         "tag2",
         "tag3"
       ],
-      "created_at": "2026-06-16T14:29:03.875Z",
-      "updated_at": "2026-06-16T14:29:04.086Z",
+      "created_at": "2026-08-27T08:36:30.580Z",
+      "updated_at": "2026-08-27T08:36:30.645Z",
       "creators": [
         {
-          "profile": "/people/1039988704",
+          "profile": "/people/1039999598",
           "family_name": "Last",
-          "given_name": "Person1923",
-          "affiliation": "An Institution: 2239",
+          "given_name": "Person342",
+          "affiliation": "An Institution: 409",
           "orcid": null
         }
       ],
@@ -43,7 +41,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039988704",
+            "id": "1039999598",
             "type": "people"
           }
         ]
@@ -51,7 +49,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039988702",
+            "id": "1039999596",
             "type": "people"
           }
         ]
@@ -59,11 +57,11 @@
       "people": {
         "data": [
           {
-            "id": "1039988702",
+            "id": "1039999596",
             "type": "people"
           },
           {
-            "id": "1039988704",
+            "id": "1039999598",
             "type": "people"
           }
         ]
@@ -71,32 +69,31 @@
       "projects": {
         "data": [
           {
-            "id": "1022252755",
+            "id": "1022263647",
             "type": "projects"
           }
         ]
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "items": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/collections/37",
-      "items": "/collections/37/items"
+      "self": "/collections/119",
+      "items": "/collections/119/items"
     },
     "meta": {
-      "created": "2026-06-16T14:29:03.875Z",
-      "modified": "2026-06-16T14:29:04.086Z",
+      "created": "2026-08-27T08:36:30.580Z",
+      "modified": "2026-08-27T08:36:30.645Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "aeecf87f-910c-40d8-acaf-dda25b118c1f"
+      "uuid": "3fa8773c-335e-40a1-8ecb-619ace513a3d",
+      "metrics": {
+        "view_count": 0
+      }
     }
   },
   "jsonapi": {

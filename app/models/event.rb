@@ -17,6 +17,7 @@ class Event < ApplicationRecord
   include Seek::Subscribable
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
+  include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
   include Seek::Collectable
 

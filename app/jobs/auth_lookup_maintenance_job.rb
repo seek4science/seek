@@ -1,6 +1,4 @@
 class AuthLookupMaintenanceJob < ApplicationJob
-  RUN_PERIOD = 8.hours.freeze
-
   queue_as QueueNames::AUTH_LOOKUP
   queue_with_priority  3
 

@@ -29,14 +29,16 @@ if [ ! -d "$location/filestore" ];then
 fi
 
 docker-compose down
-docker volume rm seek-filestore 
+docker volume rm seek-filestore
 docker volume rm seek-solr-data
 docker volume rm seek-mysql-db
 docker volume rm seek-cache
+docker volume rm seek-redis-data
 docker volume create --name=seek-filestore
 docker volume create --name=seek-solr-data
 docker volume create --name=seek-mysql-db
 docker volume create --name=seek-cache
+docker volume create --name=seek-redis-data
 docker-compose up --no-start
 docker-compose start seek db
 
@@ -57,6 +59,7 @@ docker exec seek bash -c 'mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h$MYSQL_HOST $M
 
 echo "cleaning up"
 docker exec seek bash -c 'bundle exec rake tmp:clear'
+docker exec seek bash -c 'bundle exec rake seek:clear_cache'
 docker exec seek bash -c 'bundle exec rake seek:reindex_all'
 docker exec seek bash -c 'rm /seek/filestore/seek.sql'
 

@@ -216,6 +216,18 @@ FactoryBot.define do
     original_filename { 'binary.bin' }
     data { File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read }
   end
+
+  factory(:little_file_content_blob, parent: :content_blob) do
+    content_type { 'text/plain' }
+    original_filename { 'little_file.txt' }
+    data { File.open("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb') { |f| f.read } }
+  end
+
+  factory(:little_file_v2_content_blob, parent: :content_blob) do
+    content_type { 'text/plain' }
+    original_filename { 'little_file_v2.txt' }
+    data { File.open("#{Rails.root}/test/fixtures/files/little_file_v2.txt", 'rb') { |f| f.read } }
+  end
   
   factory(:study_template_content_blob, parent: :content_blob) do
     original_filename { 'study_batch.zip' }
@@ -392,6 +404,12 @@ FactoryBot.define do
     original_filename { 'rp2-to-rp2path.cwl' }
     content_type { 'application/x-yaml' }
     data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl", 'rb').read }
+  end
+
+  factory(:cwl_content_blob_broken_diagram, parent: :content_blob) do
+    original_filename { 'broken_cwl.cwl' }
+    content_type { 'application/x-yaml' }
+    data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/broken_cwl.cwl", 'rb').read }
   end
   
   factory(:cwl_packed_content_blob, parent: :content_blob) do

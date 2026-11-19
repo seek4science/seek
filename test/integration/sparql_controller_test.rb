@@ -17,11 +17,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   def teardown
     return unless @repository.configured?
 
-    q = @repository.query.delete(%i[s p o]).graph(@private_graph).where(%i[s p o])
-    @repository.delete(q)
-
-    q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
-    @repository.delete(q)
+    @repository.clear_all
     VCR.configure do |c|
       c.allow_http_connections_when_no_cassette = false
     end
@@ -35,11 +31,57 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_select '#content .container-fluid' do
       assert_select 'div#error_flash', count: 0
       assert_select 'div.sparql-interface' do
-        assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
+        assert_select 'form[action=?][method=?]', query_sparql_index_path, 'get' do
           assert_select 'textarea.sparql-textarea', text: ''
           assert_select 'select#format option[selected=selected][value=?]', 'html'
         end
-        assert_select 'div.sparql-examples div.panel'
+        assert_select 'div.sparql-examples select#example-query-select'
+      end
+    end
+  end
+
+  test 'example queries are shown in a panel below the query, as panels or in a dropdown' do
+    examples = YAML.safe_load(File.read(Rails.root.join('config', 'sparql_queries.yml')))
+    get sparql_index_path
+    assert_response :success
+
+    # the examples panel follows the query form
+    assert_select 'div.sparql-interface form.sparql-form ~ div.sparql-examples div.panel'
+
+    assert_select 'div.sparql-examples' do
+      assert_select 'div.example-view-toggle' do
+        assert_select 'button.active[data-example-view=?]', 'panels', text: /Panels/
+        assert_select 'button[data-example-view=?]', 'dropdown', text: /Dropdown/
+      end
+
+      # the panels view is shown, with each example and a button to use it
+      assert_select 'div#example-queries-panels:not([style])' do
+        assert_select 'input#query-filter'
+        assert_select 'div.example-query', count: examples.size
+        examples.each_value do |example|
+          assert_select 'div.example-query .query-title', text: example['title']
+        end
+        buttons = css_select('div#example-queries-panels button.use-query')
+        assert_equal examples.values.map { |example| example['query'].strip }, buttons.map { |button| button['data-query'] }
+      end
+
+      # the dropdown view is hidden, listing each example, with a hidden preview and a button to use it
+      assert_select 'div#example-queries-dropdown[style=?]', 'display: none;' do
+        assert_select 'select#example-query-select' do
+          assert_select 'option', count: examples.size + 1
+          assert_select 'option[value=""]', text: 'Choose an example query...'
+        end
+        examples.each do |key, example|
+          option = css_select("select#example-query-select option[value='#{key}']").first
+          assert option, "no option for #{key}"
+          assert_equal example['title'], option.text
+          assert_equal example['query'].strip, option['data-query']
+          assert_equal example['description'], option['data-description']
+        end
+        assert_select 'div#example-query-preview[style=?]', 'display: none;' do
+          assert_select 'pre.query-code'
+          assert_select 'button#use-example-query', text: /Use this query/
+        end
       end
     end
   end
@@ -51,7 +93,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'div#error_flash', count: 0
     assert_select 'div.sparql-interface' do
-      assert_select 'form[action=?][method=?]', query_sparql_index_path, 'post' do
+      assert_select 'form[action=?][method=?]', query_sparql_index_path, 'get' do
         assert_select 'textarea.sparql-textarea', text: query
         assert_select 'select#format option[selected=selected][value=?]', format
       end
@@ -63,9 +105,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     create_some_triples
     query = 'SELECT ?datafile ?title
       WHERE {
-        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-        ?datafile <http://purl.org/dc/terms/title> "public data file" .
-        ?datafile <http://purl.org/dc/terms/title> ?title .
+        ?datafile a <https://schema.org/Dataset> .
+        ?datafile <https://schema.org/name> "public data file" .
+        ?datafile <https://schema.org/name> ?title .
       }'
 
     post path, params: { sparql_query: query, format: 'json' }
@@ -76,9 +118,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     query = 'SELECT ?datafile ?title
       WHERE {
-        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-        ?datafile <http://purl.org/dc/terms/title> "private data file" .
-        ?datafile <http://purl.org/dc/terms/title> ?title .
+        ?datafile a <https://schema.org/Dataset> .
+        ?datafile <https://schema.org/name> "private data file" .
+        ?datafile <https://schema.org/name> ?title .
       }'
 
     post path, params: { sparql_query: query, format: 'json' }
@@ -94,9 +136,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     create_some_triples
     query = 'SELECT ?datafile ?title
       WHERE {
-        ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-        ?datafile <http://purl.org/dc/terms/title> "public data file" .
-        ?datafile <http://purl.org/dc/terms/title> ?title .
+        ?datafile a <https://schema.org/Dataset> .
+        ?datafile <https://schema.org/name> "public data file" .
+        ?datafile <https://schema.org/name> ?title .
       }'
 
     post path, params: { sparql_query: query }
@@ -116,10 +158,12 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     query = 'SELECT ?datafile ?title ?graph
       WHERE {
         GRAPH ?graph {
-          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-          ?datafile <http://purl.org/dc/terms/title> "private data file" .
-          ?datafile <http://purl.org/dc/terms/title> ?title .
+          ?datafile a <https://schema.org/Dataset> .
+          ?datafile <https://schema.org/name> "private data file" .
+          ?datafile <https://schema.org/name> ?title .
         }
+        # leave out the graph that holds just this item\'s statements
+        FILTER(!CONTAINS(STR(?graph), "/items/"))
       }'
 
     post path, params: { sparql_query: query, format: 'json' }
@@ -139,9 +183,9 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     query = 'SEECT ?datafile ?invalid ?graph
       WHERE {
         GRAPH ?graph {
-          ?datafile a <http://jermontology.org/ontology/JERMOntology#Data> .
-          ?datafile <http://purl.org/dc/terms/title> "public data file" .
-          ?datafile <http://purl.org/dc/terms/title> ?title .
+          ?datafile a <https://schema.org/Dataset> .
+          ?datafile <https://schema.org/name> "public data file" .
+          ?datafile <https://schema.org/name> ?title .
         }
       }'
 
@@ -160,6 +204,45 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     assert_match /SPARQL compiler, line 3: syntax error at 'SEECT'/, json['error']
 
+  end
+
+  # the form is submitted with GET, so the results page can be returned to with the back button without resubmitting
+  test 'get sparql query and html response' do
+    create_some_triples
+    query = 'ask where {?s ?p ?o}'
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+    assert_select 'div#query-error', count: 0
+    assert_select 'form[action=?][method=?]', query_sparql_index_path, 'get' do
+      assert_select 'textarea.sparql-textarea', text: query
+      assert_select 'input[type=submit][name]', count: 0
+    end
+    assert_select 'div#sparql-results table' do
+      assert_select 'tbody td', text: 'true', count: 1
+    end
+
+    get query_sparql_index_path, params: { sparql_query: query, format: 'json' }
+    assert_response :success
+    assert_equal({ 'result' => 'true' }, JSON.parse(@response.body)['results'].first)
+  end
+
+  test 'links in the results have a tooltip with the full value' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    query = 'SELECT ?datafile ?name WHERE {
+        ?datafile a <https://schema.org/Dataset> ;
+                  <https://schema.org/name> ?name .
+        FILTER(?name = "public data file")
+      }'
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+    assert_select 'div#sparql-results table tbody' do
+      assert_select 'td a.external-link[href=?][data-tooltip=?]', data_file.rdf_seek_id, data_file.rdf_seek_id,
+                    text: data_file.rdf_seek_id
+      assert_select 'td', text: 'public data file'
+    end
   end
 
   test 'handle single result e.g ask' do
@@ -182,6 +265,69 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
         assert_select 'thead th', text:'Result', count: 1
       end
 
+  end
+
+  test 'describe query returns all the statements about the resource' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    resource = data_file.rdf_resource.to_base
+
+    post query_sparql_index_path, params: { sparql_query: "SELECT ?p ?o WHERE { #{resource} ?p ?o }", format: 'json' }
+    assert_response :success
+    expected = JSON.parse(@response.body)['results'].map { |result| [result['p'], result['o']] }
+    assert expected.size > 1
+
+    post query_sparql_index_path, params: { sparql_query: "DESCRIBE #{resource}", format: 'json' }
+    assert_response :success
+    json = JSON.parse(@response.body)
+    assert_nil json['error']
+    described = json['results'].select { |statement| statement['subject'] == data_file.rdf_resource.to_s }
+                               .map { |statement| [statement['predicate'], statement['object']] }
+
+    assert_empty expected - described
+  end
+
+  test 'results distinguish IRIs from literals, including literals that are URLs' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    iri = data_file.rdf_resource.to_s
+    query = %(SELECT ?datafile ?title ?url
+      WHERE {
+        ?datafile <https://schema.org/name> "public data file" ; <https://schema.org/name> ?title .
+        BIND("#{iri}" AS ?url)
+      })
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select '#sparql-results table tbody tr', count: 1 do
+      assert_select 'td', count: 3
+      assert_select 'td:nth-child(1) span.sparql-iri[title=?]', 'IRI (node)', text: "<#{iri}>" do
+        assert_select 'a.external-link[href=?]', iri, text: iri
+      end
+      assert_select 'td:nth-child(2) span.sparql-literal', text: 'public data file'
+      assert_select 'td:nth-child(3) span.sparql-literal', text: iri do
+        assert_select 'a.external-link[href=?]', iri
+      end
+    end
+  end
+
+  test 'results table has a column for each variable, in order, even those unbound in the first row' do
+    query = 'SELECT ?first ?second WHERE { VALUES (?second ?first) { ("only second" UNDEF) ("two" "one") } }'
+
+    get query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select '#sparql-results table' do
+      assert_select 'thead th', count: 2
+      assert_select 'thead th:nth-child(1)', text: 'First'
+      assert_select 'thead th:nth-child(2)', text: 'Second'
+      assert_select 'tbody tr', count: 2
+      assert_select 'tbody tr:nth-child(1) td:nth-child(1)', text: ''
+      assert_select 'tbody tr:nth-child(1) td:nth-child(2)', text: 'only second'
+      assert_select 'tbody tr:nth-child(2) td:nth-child(1)', text: 'one'
+      assert_select 'tbody tr:nth-child(2) td:nth-child(2)', text: 'two'
+    end
   end
 
   test 'respond with json when using content negotiation' do

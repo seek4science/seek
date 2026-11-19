@@ -5,10 +5,6 @@ class RegularMaintenanceJobTest < ActiveSupport::TestCase
     ContentBlob.destroy_all
   end
 
-  test 'run period' do
-    assert_equal 4.hours, RegularMaintenanceJob::RUN_PERIOD
-  end
-
   test 'removes dangling content blobs' do
     assert_equal 8.hours, RegularMaintenanceJob::REMOVE_DANGLING_BLOB_GRACE_PERIOD
     to_go, keep1, keep2, keep3, keep4 = nil

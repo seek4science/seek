@@ -1,6 +1,7 @@
 x-shared:
-  seek_base: &seek_base # build: .
-    image: fairdom/seek:1.18
+  seek_base: &seek_base
+    # build: .
+    image: fairdom/seek:main
 
     restart: always
     environment: &seek_base_env
@@ -10,6 +11,7 @@ x-shared:
       RAILS_LOG_LEVEL: info # debug, info, warn, error or fatal
     env_file:
       - docker/db.env
+      - docker/redis.env
     volumes:
       - seek-filestore:/seek/filestore
       - seek-cache:/seek/tmp/cache
@@ -17,6 +19,8 @@ x-shared:
       db:
         condition: service_healthy
       solr:
+        condition: service_healthy
+      redis_store:
         condition: service_healthy
 
 services:
@@ -49,6 +53,29 @@ services:
       retries: 5
       start_period: 20s
 
+  redis_store:
+    image: redis:8.6-alpine
+    container_name: seek-redis
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD" --maxmemory "$$REDIS_MAXMEMORY" --maxmemory-policy allkeys-lru
+    env_file:
+      - docker/redis.env
+    volumes:
+      - seek-redis-data:/data
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
   seek:
     # The SEEK application
     <<: *seek_base
@@ -67,7 +94,7 @@ services:
       start_period: 20s
 
   seek_workers:
-    # The SEEK delayed job workers
+    # The SEEK Solid Queue workers
     <<: *seek_base
     container_name: seek-workers
     environment:
@@ -79,25 +106,13 @@ services:
       retries: 5
 
   solr:
-    image: solr:8.11.4
+    image: fairdom/seek-solr:main
     container_name: seek-solr
     restart: always
     environment:
       SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
       - seek-solr-data:/var/solr/
-      - ./solr/seek/conf:/opt/solr/server/solr/configsets/seek_config/conf
-    healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:8983/solr/seek/admin/ping"]
-      interval: 30s
-      timeout: 5s
-      retries: 6
-      start_period: 30s
-    entrypoint:
-      - docker-entrypoint.sh
-      - solr-precreate
-      - seek
-      - /opt/solr/server/solr/configsets/seek_config
 
 volumes:
   seek-filestore:
@@ -107,4 +122,6 @@ volumes:
   seek-solr-data:
     external: true
   seek-cache:
+    external: true
+  seek-redis-data:
     external: true

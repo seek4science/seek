@@ -832,3 +832,26 @@ ul.attributions_list {
     list-style-type: none;
   }
 }
+/* Search help pop-up: table-style layout without a <table> (see _search_help_modal.html.erb) */
+#search-help-modal .search-help-examples {
+  display: table;
+  width: 100%;
+  margin-bottom: 15px;
+}
+#search-help-modal .search-help-row {
+  display: table-row;
+}
+#search-help-modal .search-help-row > div {
+  display: table-cell;
+  padding: 5px;
+  vertical-align: top;
+  border-top: 1px solid #ddd;
+}
+#search-help-modal .search-help-header > div {
+  font-weight: bold;
+  border-top: none;
+  border-bottom: 2px solid #ddd;
+}
+#search-help-modal .search-help-header + .search-help-row > div {
+  border-top: none;
+}

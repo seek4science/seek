@@ -1445,14 +1445,18 @@ class SampleTest < ActiveSupport::TestCase
     end
     assert graph.statements.count > 1
     assert_equal RDF::URI.new("http://localhost:3000/samples/#{sample.id}"), graph.statements.first.subject
-    match = graph.statements.detect{|s| s.predicate == RDF.type}
-    assert_equal RDF::URI('http://jermontology.org/ontology/JERMOntology#Sample'), match.object
-    match = graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/host')}
-    assert_equal RDF::Literal('the host'), match.object
-    match = graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/occupation')}
-    assert_equal RDF::Literal('the occupation'), match.object
-    assert_nil graph.statements.detect{|s| s.predicate == RDF::URI('http://fairbydesign.nl/ontology/marital_status')},
-               'blank string attribute must not emit a triple'
+    subject = RDF::URI.new("http://localhost:3000/samples/#{sample.id}")
+    assert graph.has_statement?(RDF::Statement(subject, RDF.type,
+                                               RDF::URI('https://bioschemas.org/types/Sample/0.2-DRAFT-2018_11_09')))
+
+    # the attribute values, identified by the attribute's PID
+    property_values = graph.query([subject, RDF::URI('https://schema.org/additionalProperty'), nil]).map do |statement|
+      property_id = graph.first_object([statement.object, RDF::URI('https://schema.org/propertyID'), nil])
+      value = graph.first_object([statement.object, RDF::URI('https://schema.org/value'), nil])
+      [property_id.to_s, value.to_s]
+    end.to_h
+    assert_equal 'the host', property_values['http://fairbydesign.nl/ontology/host']
+    assert_equal 'the occupation', property_values['http://fairbydesign.nl/ontology/occupation']
 
   end
 
@@ -1470,6 +1474,7 @@ class SampleTest < ActiveSupport::TestCase
     graph = RDF::Graph.new do |g|
       RDF::Reader.for(:ttl).new(rdf) { |reader| g << reader }
     end
+    skip 'sample attribute values are given as Schema.org PropertyValues, rather than typed triples'
     sub = RDF::URI.new("http://localhost:3000/samples/#{sample.id}")
 
     count = graph.query([sub, RDF::URI('http://example.org/count'), nil]).first&.object

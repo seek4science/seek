@@ -10,3 +10,7 @@ production:
   database: <%= ENV["MYSQL_DATABASE"] %>
   username: <%= ENV["MYSQL_USER"] %>
   password: <%= ENV["MYSQL_PASSWORD"] %>
+<% if ENV["MYSQL_SSL_CA"].present? %>
+  ssl_mode: verify_identity
+  sslca: <%= ENV["MYSQL_SSL_CA"] %>
+<% end %>

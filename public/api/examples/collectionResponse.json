@@ -1,17 +1,15 @@
 {
   "data": {
-    "id": "36",
+    "id": "118",
     "type": "collections",
     "attributes": {
       "policy": {
         "access": "download",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
-          "id": "70",
+          "id": "171",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -26,11 +24,11 @@
         "Collection-tag4",
         "Collection-tag5"
       ],
-      "created_at": "2026-06-16T14:29:02.166Z",
-      "updated_at": "2026-06-16T14:29:03.019Z",
+      "created_at": "2026-08-27T08:36:28.906Z",
+      "updated_at": "2026-08-27T08:36:29.888Z",
       "creators": [
         {
-          "profile": "/people/1039988693",
+          "profile": "/people/1039999587",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -43,7 +41,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039988693",
+            "id": "1039999587",
             "type": "people"
           }
         ]
@@ -51,7 +49,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039988694",
+            "id": "1039999588",
             "type": "people"
           }
         ]
@@ -59,11 +57,11 @@
       "people": {
         "data": [
           {
-            "id": "1039988693",
+            "id": "1039999587",
             "type": "people"
           },
           {
-            "id": "1039988694",
+            "id": "1039999588",
             "type": "people"
           }
         ]
@@ -71,7 +69,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022252747",
+            "id": "1022263639",
             "type": "projects"
           }
         ]
@@ -79,7 +77,7 @@
       "publications": {
         "data": [
           {
-            "id": "179",
+            "id": "187",
             "type": "publications"
           }
         ]
@@ -87,47 +85,50 @@
       "items": {
         "data": [
           {
-            "id": "19",
+            "id": "39",
             "type": "collection_items"
           },
           {
-            "id": "20",
+            "id": "40",
             "type": "collection_items"
           },
           {
-            "id": "21",
+            "id": "41",
             "type": "collection_items"
           },
           {
-            "id": "22",
+            "id": "42",
             "type": "collection_items"
           },
           {
-            "id": "23",
+            "id": "43",
             "type": "collection_items"
           },
           {
-            "id": "24",
+            "id": "44",
             "type": "collection_items"
           }
         ]
       }
     },
     "links": {
-      "self": "/collections/36",
-      "items": "/collections/36/items"
+      "self": "/collections/118",
+      "items": "/collections/118/items"
     },
     "meta": {
-      "created": "2026-06-16T14:29:02.166Z",
-      "modified": "2026-06-16T14:29:03.019Z",
+      "created": "2026-08-27T08:36:28.906Z",
+      "modified": "2026-08-27T08:36:29.888Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "d77c2675-5d1b-4a0f-850e-79001af5bcf9"
+      "uuid": "69371633-4efe-4b07-bb14-41d7cea90c89",
+      "metrics": {
+        "view_count": 0
+      }
     }
   },
   "included": [
     {
-      "id": "19",
+      "id": "39",
       "type": "collection_items",
       "attributes": {
         "comment": "Readme!",
@@ -136,13 +137,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "36",
+            "id": "118",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "119",
+            "id": "388",
             "type": "documents"
           },
           "meta": {
@@ -151,17 +152,17 @@
         }
       },
       "links": {
-        "self": "/collections/36/items/19"
+        "self": "/collections/118/items/39"
       },
       "meta": {
-        "created": "2026-06-16T14:29:02.333Z",
-        "modified": "2026-06-16T14:29:02.333Z",
+        "created": "2026-08-27T08:36:29.088Z",
+        "modified": "2026-08-27T08:36:29.088Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
     },
     {
-      "id": "20",
+      "id": "40",
       "type": "collection_items",
       "attributes": {
         "comment": "Secret info",
@@ -170,23 +171,23 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "36",
+            "id": "118",
             "type": "collections"
           }
         }
       },
       "links": {
-        "self": "/collections/36/items/20"
+        "self": "/collections/118/items/40"
       },
       "meta": {
-        "created": "2026-06-16T14:29:02.473Z",
-        "modified": "2026-06-16T14:29:02.473Z",
+        "created": "2026-08-27T08:36:29.254Z",
+        "modified": "2026-08-27T08:36:29.254Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
     },
     {
-      "id": "21",
+      "id": "41",
       "type": "collection_items",
       "attributes": {
         "comment": "The protocol",
@@ -195,13 +196,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "36",
+            "id": "118",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "1055250580",
+            "id": "1055250781",
             "type": "sops"
           },
           "meta": {
@@ -210,17 +211,17 @@
         }
       },
       "links": {
-        "self": "/collections/36/items/21"
+        "self": "/collections/118/items/41"
       },
       "meta": {
-        "created": "2026-06-16T14:29:02.609Z",
-        "modified": "2026-06-16T14:29:02.609Z",
+        "created": "2026-08-27T08:36:29.410Z",
+        "modified": "2026-08-27T08:36:29.410Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
     },
     {
-      "id": "22",
+      "id": "42",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 1",
@@ -229,13 +230,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "36",
+            "id": "118",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "883654486",
+            "id": "1055250739",
             "type": "data_files"
           },
           "meta": {
@@ -244,17 +245,17 @@
         }
       },
       "links": {
-        "self": "/collections/36/items/22"
+        "self": "/collections/118/items/42"
       },
       "meta": {
-        "created": "2026-06-16T14:29:02.743Z",
-        "modified": "2026-06-16T14:29:02.743Z",
+        "created": "2026-08-27T08:36:29.570Z",
+        "modified": "2026-08-27T08:36:29.570Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
     },
     {
-      "id": "23",
+      "id": "43",
       "type": "collection_items",
       "attributes": {
         "comment": "Data 2",
@@ -263,13 +264,13 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "36",
+            "id": "118",
             "type": "collections"
           }
         },
         "asset": {
           "data": {
-            "id": "883654487",
+            "id": "1055250740",
             "type": "data_files"
           },
           "meta": {
@@ -278,17 +279,17 @@
         }
       },
       "links": {
-        "self": "/collections/36/items/23"
+        "self": "/collections/118/items/43"
       },
       "meta": {
-        "created": "2026-06-16T14:29:02.880Z",
-        "modified": "2026-06-16T14:29:02.880Z",
+        "created": "2026-08-27T08:36:29.726Z",
+        "modified": "2026-08-27T08:36:29.726Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }
     },
     {
-      "id": "24",
+      "id": "44",
       "type": "collection_items",
       "attributes": {
         "comment": "Bad data",
@@ -297,17 +298,17 @@
       "relationships": {
         "collection": {
           "data": {
-            "id": "36",
+            "id": "118",
             "type": "collections"
           }
         }
       },
       "links": {
-        "self": "/collections/36/items/24"
+        "self": "/collections/118/items/44"
       },
       "meta": {
-        "created": "2026-06-16T14:29:03.017Z",
-        "modified": "2026-06-16T14:29:03.017Z",
+        "created": "2026-08-27T08:36:29.886Z",
+        "modified": "2026-08-27T08:36:29.886Z",
         "api_version": "0.3",
         "base_url": "http://localhost:3000"
       }

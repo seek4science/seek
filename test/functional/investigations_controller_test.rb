@@ -4,11 +4,19 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
-  include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as(:quentin)
+  end
+
+  test 'should return 406 when requesting RDF, as there is no schema.org description' do
+    item = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+    assert item.can_view?
+
+    get :show, params: { id: item, format: :rdf }
+
+    assert_response :not_acceptable
   end
 
   def test_title

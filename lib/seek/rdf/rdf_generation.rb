@@ -7,6 +7,9 @@ module Seek
       include Rightfield::Rightfield
       include CSVMappingsHandling
 
+      SCHEMA_ORG = 'https://schema.org/'.freeze
+      SCHEMA_ORG_HTTP = 'http://schema.org/'.freeze
+
       def self.included(base)
         base.after_commit :queue_rdf_generation, on: [:create, :update]
         base.before_destroy :remove_rdf
@@ -38,12 +41,28 @@ module Seek
 
       def to_rdf_graph
         rdf_graph = RDF::Graph.new
-        rdf_graph = describe_type(rdf_graph)
+        #rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
-        rdf_graph = additional_triples rdf_graph
-        rdf_graph = extended_metadata_triples rdf_graph
-        rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
+        #rdf_graph = additional_triples rdf_graph
+        #rdf_graph = extended_metadata_triples rdf_graph
+        #rdf_graph = sample_metadata_triples(rdf_graph) if self.is_a?(Sample)
         rdf_graph
+      end
+
+      # Parses the JSON-LD string into statements, with any http://schema.org/ terms (such as those from the RO-Crate
+      # context) changed to https://schema.org/, so that all Schema.org statements use the same namespace.
+      # Relative IRIs (e.g. "#cwl") are resolved against base_uri, the URL the JSON-LD is served from, unless the
+      # JSON-LD sets its own @base. Without a base they would be dropped, along with any statement that uses them.
+      def jsonld_statements(json, base_uri: rdf_resource)
+        RDF::Reader.for(:jsonld).new(json, base_uri: base_uri).statements.map do |statement|
+          RDF::Statement.new(*statement.to_triple.map { |term| normalize_schema_org_term(term) })
+        end
+      end
+
+      def normalize_schema_org_term(term)
+        return term unless term.uri? && term.to_s.start_with?(SCHEMA_ORG_HTTP)
+
+        RDF::URI(SCHEMA_ORG + term.to_s.delete_prefix(SCHEMA_ORG_HTTP))
       end
 
       def handle_rightfield_contents(object)
@@ -137,11 +156,14 @@ module Seek
           'mixs' => 'https://w3id.org/mixs/',
           'uniprot' => 'http://purl.uniprot.org/core/',
           'fairbd' => 'http://fairbydesign.nl/ontology/',
-          'xsd' => 'http://www.w3.org/2001/XMLSchema#'
+          'xsd' => 'http://www.w3.org/2001/XMLSchema#',
+          'schema' => SCHEMA_ORG
         }
       end
 
       def queue_rdf_generation(force = false, refresh_dependents = true)
+        return unless rdf_supported?
+
         unless !force && (saved_changes.keys - ['updated_at']).empty?
           RdfGenerationQueue.enqueue(self, refresh_dependents: refresh_dependents)
         end
@@ -154,7 +176,7 @@ module Seek
       end
 
       def queue_dependents_rdf_generation
-        RdfGenerationQueue.enqueue(dependent_items, priority: 3)
+        RdfGenerationQueue.enqueue(dependent_items.select(&:rdf_supported?), priority: 3)
       end
 
       def dependent_items

@@ -120,6 +120,12 @@ tags:
   - name: ISA tags
     description:
       $ref: ../descriptions/isaTags.md
+  - name: isaStudies
+    description:
+      $ref: ../descriptions/isaStudies.md
+  - name: isaAssays
+    description:
+      $ref: ../descriptions/isaAssays.md
 x-tagGroups:
   - name: operation types
     tags:
@@ -144,6 +150,8 @@ x-tagGroups:
       - investigations
       - studies
       - assays
+      - isaStudies
+      - isaAssays
   - name: Assets
     tags:
       - collections

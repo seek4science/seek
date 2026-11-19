@@ -28,6 +28,8 @@
   </div>
   <div class="clearfix">
     <%= link_to 'Learn more', Seek::Config.instance_link, target: '_blank', rel: 'noopener', class: 'btn btn-primary btn-lg pull-left' %>
-    <%= link_to 'Register', signup_path, class: 'btn btn-primary btn-lg pull-right' %>
+    <% unless Seek::Config.registration_disabled %>
+      <%= link_to 'Register', signup_path, class: 'btn btn-primary btn-lg pull-right' %>
+    <% end %>
   </div>
 </div>

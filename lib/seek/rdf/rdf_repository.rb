@@ -38,47 +38,78 @@ module Seek
         get_repository_object.delete(*args)
       end
 
-      # send the rdf related to item to the repository, and update the rdf file
+      # Send the rdf related to item to the repository, and update the rdf file.
+      #
+      # The statements are written to the item's own named graph (see #item_graph_uri), which records exactly what
+      # this item contributed, and to each of the aggregate graphs (public and/or private) that are queried.
+      # The item graph also records which aggregate graphs it contributed to (<item graph> dcterms:isPartOf <graph>),
+      # which #remove_rdf uses to avoid removing a statement that another item still asserts.
+      #
+      # Blank nodes are skolemized into IRIs so that the copies in the item graph and the aggregate graphs are the
+      # same terms, and so they can be removed again.
+      #
+      # The statements are sent in a single update request, which Virtuoso applies as one transaction.
       def send_rdf(item, graphs = rdf_graph_uris(item), save_file = true)
         if configured? && item.rdf_supported?
           connect_to_repository
-          Rails.logger.debug("RDF about to be sent for item: #{item.to_rdf}")
-          with_statements(item) do |statement|
-            if statement.valid?
-              graphs.each do |graph_uri|
-                send_statement_to_repository statement, graph_uri
-              end
-            else
-              Rails.logger.error("Invalid statement - '#{statement}'")
-            end
-          end
+          execute_update(insert_item_operations(item, graphs))
           item.save_rdf_file if save_file
         else
           Rails.logger.warn 'Attempting to send rdf, but not configured'
         end
       end
 
-      # remove the rdf related to item from the repository, and delete the rdf file
-      def remove_rdf(item, graphs = [get_configuration.public_graph, get_configuration.private_graph].compact, delete_file = true)
+      # Remove the rdf related to item from the repository, and delete the rdf file.
+      #
+      # Removes from each aggregate graph the statements recorded in the item's named graph, except for those that
+      # another item graph contributing to the same aggregate graph also holds, then removes the item graph, in a single
+      # update request.
+      def remove_rdf(item, graphs = aggregate_graph_uris, delete_file = true)
         if configured? && item.rdf_supported?
           connect_to_repository
-          graphs.each do |graph|
-            q = query.delete([item.rdf_resource, :p, :o]).where([item.rdf_resource, :p, :o]).graph(RDF::URI(graph))
-            Rails.logger.debug("Remove all SPARQL: #{q}")
-            result = delete(q)
-            Rails.logger.debug(result)
-          end
+          execute_update(remove_item_operations(item, graphs))
           item.delete_rdf_file if delete_file
         end
       end
 
-      # updates the rdf in the repository and updates the rdf file.
+      # The named graph holding exactly the statements generated for item, along with the aggregate graphs it was
+      # sent to. Kept within the namespace of the configured private graph so that environments sharing the same
+      # store don't clash.
+      def item_graph_uri(item)
+        RDF::URI("#{get_configuration.private_graph}/items/#{item.class.name}/#{item.id}")
+      end
+
+      # Removes all of SEEK's statements from the repository, by dropping the aggregate graphs and every item graph.
+      def clear_all
+        return unless configured?
+
+        connect_to_repository
+        config = get_configuration
+        graphs = item_graph_uris + [config.public_graph, config.private_graph].compact.map { |graph| RDF::URI(graph) }
+        graphs.each do |graph|
+          Rails.logger.debug(get_repository_object.drop("DROP SILENT GRAPH #{graph.to_base}"))
+        end
+      end
+
+      # The named graphs of all the items in the repository (see #item_graph_uri)
+      def item_graph_uris
+        prefix = "#{get_configuration.private_graph}/items/"
+        select(<<~SPARQL).map { |result| result[:g] }
+          SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } FILTER(STRSTARTS(STR(?g), #{RDF::Literal(prefix).to_base})) }
+        SPARQL
+      end
+
+      # Replaces the item's rdf in the repository, and updates the rdf file.
+      #
+      # The removal of the old statements (from all the aggregate graphs, in case the item's visibility changed) and
+      # the insertion of the new ones are sent as a single update request, which Virtuoso applies as one transaction,
+      # so a query never sees the item partly updated.
       def update_rdf(item)
         if configured? && item.rdf_supported?
-          Rails.logger.debug("About to remove RDF for item #{item.inspect}")
-          remove_rdf(item)
-          Rails.logger.debug("About to add RDF for item #{item.inspect}")
-          send_rdf(item)
+          connect_to_repository
+          execute_update(remove_item_operations(item, aggregate_graph_uris) +
+                         insert_item_operations(item, rdf_graph_uris(item)))
+          item.save_rdf_file
         end
       end
 
@@ -143,13 +174,74 @@ module Seek
         path
       end
 
-      def send_statement_to_repository(statement, graph_uri)
-        Rails.logger.debug("sending statement #{statement} to graph #{graph_uri}")
-        graph = RDF::URI.new graph_uri
-        q = query.insert_data([statement.subject, statement.predicate, statement.object]).graph(graph)
-        Rails.logger.debug("Insert statement SPARQL: #{q}")
-        result = insert(q)
-        Rails.logger.debug(result)
+      def aggregate_graph_uris
+        [get_configuration.public_graph, get_configuration.private_graph].compact
+      end
+
+      # Sends the operations as one SPARQL update request
+      def execute_update(operations)
+        q = operations.join(" ;\n")
+        Rails.logger.debug("Update SPARQL: #{q}")
+        Rails.logger.debug(get_repository_object.update(q))
+      end
+
+      # Operations that insert the item's statements into its item graph, along with which aggregate graphs it is part
+      # of, and then copy them from the item graph into each of those aggregate graphs.
+      def insert_item_operations(item, graphs)
+        item_graph = item_graph_uri(item)
+        statements = skolemize(valid_statements(item))
+        membership = graphs.map { |graph| RDF::Statement.new(item_graph, RDF::Vocab::DC.isPartOf, RDF::URI(graph)) }
+        triples = (statements + membership).map { |statement| RDF::NTriples::Writer.serialize(statement) }.join
+
+        ["INSERT DATA { GRAPH #{item_graph.to_base} {\n#{triples}} }"] + graphs.map do |graph|
+          <<~SPARQL
+            INSERT { GRAPH #{RDF::URI(graph).to_base} { ?s ?p ?o } }
+            WHERE { GRAPH #{item_graph.to_base} { ?s ?p ?o } FILTER (?s != #{item_graph.to_base}) }
+          SPARQL
+        end
+      end
+
+      # Operations that remove the item's contribution from each of the graphs, and then remove its item graph.
+      def remove_item_operations(item, graphs)
+        item_graph = item_graph_uri(item)
+        graphs.map { |graph| remove_item_contribution_query(item_graph, RDF::URI(graph)) } +
+          ["DROP SILENT GRAPH #{item_graph.to_base}"]
+      end
+
+      # Deletes from graph the statements held in item_graph, unless another item graph that is part of graph also
+      # holds them.
+      def remove_item_contribution_query(item_graph, graph)
+        is_part_of = RDF::Vocab::DC.isPartOf.to_base
+        <<~SPARQL
+          DELETE { GRAPH #{graph.to_base} { ?s ?p ?o } }
+          WHERE {
+            GRAPH #{item_graph.to_base} { ?s ?p ?o }
+            GRAPH #{graph.to_base} { ?s ?p ?o }
+            FILTER NOT EXISTS {
+              GRAPH ?other { ?s ?p ?o . ?other #{is_part_of} #{graph.to_base} }
+              FILTER (?other != #{item_graph.to_base})
+            }
+          }
+        SPARQL
+      end
+
+      def valid_statements(item)
+        item.to_rdf_graph.statements.select do |statement|
+          statement.valid?.tap do |valid|
+            Rails.logger.error("Invalid statement - '#{statement}'") unless valid
+          end
+        end
+      end
+
+      # Replaces blank nodes with skolem IRIs (https://www.w3.org/TR/rdf11-concepts/#section-skolemization), keeping
+      # the same IRI for each occurrence of the same blank node.
+      def skolemize(statements)
+        skolem_iris = Hash.new do |hash, node|
+          hash[node] = RDF::URI(Seek::Config.site_base_url.join(".well-known/genid/#{SecureRandom.uuid}").to_s)
+        end
+        statements.map do |statement|
+          RDF::Statement.new(*statement.to_triple.map { |term| term.node? ? skolem_iris[term] : term })
+        end
       end
 
       def rdf_graph_uris(item)
@@ -158,14 +250,6 @@ module Seek
         else
           [get_configuration.private_graph]
         end.compact
-      end
-
-      def with_statements(item)
-        RDF::Reader.for(:ttl).new(item.to_rdf) do |reader|
-          reader.each_statement do |statement|
-            yield(statement)
-          end
-        end
       end
 
       def config_path

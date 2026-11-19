@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022253708",
+    "id": "1022267972",
     "type": "projects",
     "attributes": {
       "avatar": null,
@@ -14,21 +14,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039989654",
+              "id": "1040003945",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022253708",
+              "id": "1022267972",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980194172",
+              "id": "980208604",
               "type": "institutions"
             },
             "access": "view"
@@ -36,7 +36,7 @@
         ]
       },
       "extended_attributes": {
-        "extended_metadata_type_id": "203",
+        "extended_metadata_type_id": "569",
         "attribute_map": {
           "dad": {
             "first_name": "john",
@@ -73,7 +73,7 @@
       "programmes": {
         "data": [
           {
-            "id": "34",
+            "id": "306",
             "type": "programmes"
           }
         ]
@@ -81,7 +81,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234394",
+            "id": "627234525",
             "type": "organisms"
           }
         ]

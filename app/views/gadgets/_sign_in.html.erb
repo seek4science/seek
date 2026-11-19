@@ -13,7 +13,7 @@
         <%# tabs if omniauth authentication with providers is enabled %>
         <% if show_omniauth_login? %>
           <ul class="nav nav-tabs" role="tablist">
-            <% if show_standard_password_login? %>
+            <% if show_password_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'password' ? 'active' : nil) do %>
                 <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
               <% end %>
@@ -42,7 +42,7 @@
         <% end #omniauth enabled and providers available %>
 
         <div class="tab-content">
-          <% if show_standard_password_login? %>
+          <% if show_password_login? %>
             <%= content_tag(:div, id: 'password_login', role: 'tabpanel', class: strategy == 'password' ? 'tab-pane active' : 'tab-pane') do %>
               <%= form_tag main_app.session_path do %>
                 <%= hidden_field_tag "called_from[path]", original_path -%>
@@ -103,10 +103,15 @@
         </div>
       </div>
 
-      <div class="panel-footer">
-        <%= link_to "Register an account", signup_path %> or
-        <%= link_to "Forgotten your password?", forgot_password_path %>
-      </div>
+      <% show_registration_link = !Seek::Config.registration_disabled %>
+      <% show_forgotten_password_link = show_password_login? %>
+      <% if show_registration_link || show_forgotten_password_link %>
+        <div class="panel-footer">
+          <%= link_to "Register an account", signup_path if show_registration_link %>
+          <%= "or" if show_registration_link && show_forgotten_password_link %>
+          <%= link_to "Forgotten your password?", forgot_password_path if show_forgotten_password_link %>
+        </div>
+      <% end %>
 
     </div>
 <% end -%>

@@ -3,21 +3,12 @@ require 'minitest/mock'
 
 class DocumentsControllerTest < ActionController::TestCase
 
+  include RdfTestCases
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  test 'should return 406 when requesting RDF' do
-    login_as(FactoryBot.create(:user))
-    doc = FactoryBot.create :document, contributor: User.current_user.person
-    assert doc.can_view?
-
-    get :show, params: { id: doc, format: :rdf }
-
-    assert_response :not_acceptable
-  end
 
   test 'should get index' do
     FactoryBot.create_list(:public_document, 3)
@@ -266,7 +257,7 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'create, update and show a document with extended metadata' do
+  test 'create a document with extended metadata' do
     cmt = FactoryBot.create(:simple_document_extended_metadata_type)
 
     person = FactoryBot.create(:person)
@@ -296,7 +287,19 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a document with extended metadata' do
+    cmt = FactoryBot.create(:simple_document_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    document = FactoryBot.create(:document, contributor: person, policy: FactoryBot.create(:public_policy),
+                                 extended_metadata: cm)
 
     get :show, params: { id: document }
     assert_response :success
@@ -1104,6 +1107,23 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'filter query is passed to Solr with its original case' do
+    # Solr's analysers lowercase for matching; the query must keep its case so uppercase
+    # boolean operators (AND/OR/NOT) are recognised by edismax rather than downcased away.
+    FactoryBot.create(:public_document)
+
+    received = []
+    with_config_value(:solr_enabled, true) do
+      Document.stub(:solr_cache, -> (q) { received << q; Document.pluck(:id) }) do
+        get :index, params: { filter: { query: 'cosmo OR headings' } }
+      end
+    end
+
+    assert_response :success
+    assert_includes received, 'cosmo OR headings'
+    refute_includes received, 'cosmo or headings'
+  end
+
   test 'filtering by creation date' do
     programme = FactoryBot.create(:programme)
     project = FactoryBot.create(:project, programme: programme)
@@ -1721,6 +1741,24 @@ class DocumentsControllerTest < ActionController::TestCase
         end
       end
     end
+  end
+
+  test 'json api does not escape html characters in the response body' do
+    title = 'Fish <b>&</b> chips'
+    doc = FactoryBot.create(:public_document, title: title)
+
+    get :show, params: { id: doc.id }, format: :json
+
+    assert_response :success
+
+    # config.action_controller.escape_json_responses is false, so <, > and & are emitted
+    # raw. They need no escaping to be valid JSON - only ", \ and control characters do.
+    assert_includes response.body, title
+    assert_not_includes response.body, '\u003cb\u003e'
+    assert_not_includes response.body, '\u0026'
+
+    # The parsed value must round-trip intact.
+    assert_equal title, JSON.parse(response.body)['data']['attributes']['title']
   end
 
   private

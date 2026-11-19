@@ -19,7 +19,7 @@ module Rightfield
     end
 
     def generate_rightfield_csv(datafile)
-      Rails.cache.fetch("#{datafile.content_blob.filepath}_rf_csv") do
+      Rails.cache.fetch("#{datafile.content_blob.filepath}_rf_csv", expires_in: 30.days) do
         cmd = invoke_csv_command datafile
 
         output = ''
@@ -43,7 +43,7 @@ module Rightfield
     end
 
     def generate_rightfield_rdf(datafile)
-      Rails.cache.fetch("#{datafile.content_blob.filepath}_rf_rdf") do
+      Rails.cache.fetch("#{datafile.content_blob.filepath}_rf_rdf", expires_in: 30.days) do
         cmd = invoke_rdf_command datafile
 
         output = ''

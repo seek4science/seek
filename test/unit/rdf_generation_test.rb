@@ -188,13 +188,111 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
   test 'rdf_supported?' do
     assert FactoryBot.create(:person).rdf_supported?
-    assert FactoryBot.create(:assay).rdf_supported?
     assert FactoryBot.create(:data_file).rdf_supported?
+    assert FactoryBot.create(:event).rdf_supported?
+    assert FactoryBot.create(:institution).rdf_supported?
+    assert FactoryBot.create(:document).rdf_supported?
 
+    # supported by the Schema.org description, but don't generate RDF
+    refute FactoryBot.create(:assets_creator).rdf_supported?
 
-    refute FactoryBot.create(:event).rdf_supported?
-    refute FactoryBot.create(:institution).rdf_supported?
-    refute FactoryBot.create(:document).rdf_supported?
+    # no Schema.org description
+    refute FactoryBot.create(:assay).rdf_supported?
+    refute FactoryBot.create(:study).rdf_supported?
+    refute FactoryBot.create(:model).rdf_supported?
+  end
+
+  test 'workflow rdf uses the same schema.org and bioschemas terms for the bioschemas and ro-crate statements' do
+    workflow = FactoryBot.create(:workflow)
+    graph = parse_rdf(workflow.to_rdf)
+
+    terms = graph.statements.flat_map(&:to_triple).select(&:uri?).map(&:to_s)
+    assert_empty terms.select { |t| t.start_with?('http://schema.org/') }
+
+    crate = RDF::URI("#{workflow.rdf_seek_id}/crate/")
+    assert graph.has_statement?(RDF::Statement(crate, RDF.type, RDF::URI('https://schema.org/Dataset')))
+    assert graph.has_statement?(RDF::Statement(workflow.rdf_resource, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('This Workflow')))
+    main_file = RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl")
+    assert graph.has_statement?(RDF::Statement(main_file, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('This Workflow')))
+
+    computational_workflow = RDF::URI('https://bioschemas.org/terms/ComputationalWorkflow')
+    assert_equal [workflow.rdf_resource, main_file].map(&:to_s).sort,
+                 graph.query([nil, RDF.type, computational_workflow]).map { |s| s.subject.to_s }.sort
+  end
+
+  test 'workflow rdf includes the programming language, inputs and outputs from the bioschemas json-ld' do
+    workflow = FactoryBot.create(:cwl_packed_workflow)
+    workflow.internals = workflow.extractor.metadata[:internals]
+    disable_authorization_checks { workflow.save! }
+    refute_empty workflow.inputs
+    refute_empty workflow.outputs
+    graph = parse_rdf(workflow.to_rdf)
+
+    language = RDF::URI("#{workflow.rdf_seek_id}#cwl")
+    assert graph.has_statement?(RDF::Statement(workflow.rdf_resource, RDF::URI('https://schema.org/programmingLanguage'),
+                                               language))
+    assert graph.has_statement?(RDF::Statement(language, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('Common Workflow Language')))
+
+    formal_parameter = RDF::URI('https://bioschemas.org/terms/FormalParameter')
+    { 'https://bioschemas.org/terms/input' => workflow.inputs,
+      'https://bioschemas.org/terms/output' => workflow.outputs }.each do |property, parameters|
+      values = graph.query([workflow.rdf_resource, RDF::URI(property), nil]).map(&:object)
+      assert_equal parameters.count, values.count
+      values.each do |parameter|
+        assert parameter.uri?
+        assert parameter.to_s.start_with?("#{workflow.rdf_seek_id}#")
+        assert graph.has_statement?(RDF::Statement(parameter, RDF.type, formal_parameter))
+      end
+    end
+  end
+
+  test 'workflow rdf includes topics and disciplines as about and operations as featureList' do
+    FactoryBot.create(:topics_controlled_vocab)
+    FactoryBot.create(:operations_controlled_vocab)
+    FactoryBot.create(:disciplines_controlled_vocab)
+    person = FactoryBot.create(:person)
+    workflow = FactoryBot.create(:workflow, contributor: person)
+    User.with_current_user(person.user) do
+      workflow.topic_annotations = 'Chemistry'
+      workflow.operation_annotations = 'Clustering'
+      workflow.discipline_annotations = 'Physics and Astronomy'
+      disable_authorization_checks { workflow.save! }
+    end
+
+    graph = parse_rdf(workflow.reload.to_rdf)
+    main_file = RDF::URI("#{workflow.rdf_seek_id}/crate/workflow.cwl")
+    topic = RDF::URI('http://edamontology.org/topic_3314')
+    discipline = RDF::URI('https://openalex.org/fields/31')
+    operation = RDF::URI('http://edamontology.org/operation_3432')
+    [workflow.rdf_resource, main_file].each do |subject|
+      assert graph.has_statement?(RDF::Statement(subject, RDF::URI('https://schema.org/about'), topic))
+      assert graph.has_statement?(RDF::Statement(subject, RDF::URI('https://schema.org/about'), discipline))
+      assert graph.has_statement?(RDF::Statement(subject, RDF::URI('https://schema.org/featureList'), operation))
+    end
+    in_set = RDF::URI('https://schema.org/inDefinedTermSet')
+    assert graph.has_statement?(RDF::Statement(discipline, in_set, RDF::URI('https://openalex.org/fields')))
+    assert graph.has_statement?(RDF::Statement(topic, in_set, RDF::URI('http://edamontology.org')))
+    assert graph.has_statement?(RDF::Statement(topic, RDF.type, RDF::URI('https://schema.org/DefinedTerm')))
+    assert graph.has_statement?(RDF::Statement(topic, RDF::URI('https://schema.org/name'), RDF::Literal('Chemistry')))
+    assert graph.has_statement?(RDF::Statement(operation, RDF::URI('https://schema.org/name'),
+                                               RDF::Literal('Clustering')))
+  end
+
+  test 'ro-crate json-ld contexts are preloaded and not fetched' do
+    Seek::Rdf::JSONLdContexts::CONTEXTS.each do |url, filename|
+      document = JSON.parse(File.read(File.join(Seek::Rdf::JSONLdContexts::DIRECTORY, filename)))
+      assert_equal url, document['@id']
+
+      # WebMock blocks any remote request, so this fails if the context would be fetched
+      json = { '@context' => url, '@id' => 'http://example.com/crate/', '@type' => 'Dataset', 'name' => 'A crate' }
+      statements = RDF::Reader.for(:jsonld).new(json.to_json).statements
+      assert_includes statements.map { |st| [st.predicate.to_s, st.object.to_s] }, ['http://schema.org/name', 'A crate']
+      assert_includes statements.map { |st| [st.predicate.to_s, st.object.to_s] },
+                      [RDF.type.to_s, 'http://schema.org/Dataset']
+    end
   end
 
   # ---------------------------------------------------------------------------
@@ -202,6 +300,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   # ---------------------------------------------------------------------------
 
   test 'linked extended metadata single emits blank node with nested triples' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_single_nested_emt))
     em.set_attribute_value('retention_period', { 'start_date' => '2020-01-01', 'end_date' => '2030-12-31' })
     df = FactoryBot.create(:data_file, extended_metadata: em)
@@ -219,6 +319,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'linked extended metadata multi emits one blank node per item' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_multi_nested_emt))
     contacts = [{ 'name' => 'Alice', 'email' => 'alice@example.org' },
                 { 'name' => 'Bob', 'email' => 'bob@example.org' }]
@@ -235,6 +337,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'nested attribute without pid is silently skipped in rdf export' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_partial_pid_emt))
     em.set_attribute_value('period', { 'start_date' => '2020-01-01', 'end_date' => '2030-12-31' })
     df = FactoryBot.create(:data_file, extended_metadata: em)
@@ -248,6 +352,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'flat extended metadata attribute still emits plain literal triple' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_flat_emt))
     em.set_attribute_value('population', 'adults only')
     df = FactoryBot.create(:data_file, extended_metadata: em)
@@ -261,6 +367,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'extended metadata attributes emit correctly typed XSD literals for all scalar base types' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_all_types_emt))
     em.set_attribute_value('str_field', 'hello')
     em.set_attribute_value('text_field', 'some long text')
@@ -303,6 +411,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'date attributes stored in non-XSD lexical formats are normalized when exported' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_date_emt))
     em.set_attribute_value('start_date', '2 Feb 2015')
     em.set_attribute_value('created_at', 'Thu, 11 Feb 2016 15:39:55 +0000')
@@ -320,6 +430,8 @@ class RDFGenerationTest < ActiveSupport::TestCase
   end
 
   test 'blank scalar extended metadata values are skipped in rdf export' do
+    skip 'extended metadata is left out of the Schema.org RDF'
+
     em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_all_types_emt))
     em.set_attribute_value('str_field', 'present')
     em.set_attribute_value('int_field', '')

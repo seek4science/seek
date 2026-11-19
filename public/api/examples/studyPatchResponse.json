@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1060384929",
+    "id": "1060385929",
     "type": "studies",
     "attributes": {
       "policy": {
@@ -8,27 +8,23 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022250823",
+              "id": "1022266651",
               "type": "projects"
             },
             "access": "view"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "extended_attributes": {
-        "extended_metadata_type_id": "30",
+        "extended_metadata_type_id": "423",
         "attribute_map": {
           "age": 44,
           "name": "Fred Bloggs",
           "datetime": "2024-01-01"
         }
       },
-      "snapshots": [
-
-      ],
+      "snapshots": [],
       "title": "A Maximal Study",
       "description": "The Study of many things",
       "experimentalists": "Wet lab people",
@@ -36,10 +32,10 @@
       "position": null,
       "creators": [
         {
-          "profile": "/people/1039986665",
+          "profile": "/people/1040002577",
           "family_name": "Last",
-          "given_name": "Person162",
-          "affiliation": "An Institution: 197",
+          "given_name": "Person2931",
+          "affiliation": "An Institution: 3410",
           "orcid": null
         }
       ]
@@ -48,7 +44,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039986665",
+            "id": "1040002577",
             "type": "people"
           }
         ]
@@ -56,7 +52,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039986665",
+            "id": "1040002577",
             "type": "people"
           }
         ]
@@ -64,7 +60,7 @@
       "people": {
         "data": [
           {
-            "id": "1039986665",
+            "id": "1040002577",
             "type": "people"
           }
         ]
@@ -72,60 +68,50 @@
       "projects": {
         "data": [
           {
-            "id": "1022250823",
+            "id": "1022266651",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "973654892",
+          "id": "973656104",
           "type": "investigations"
         }
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
         "data": [
           {
-            "id": "30",
+            "id": "386",
             "type": "publications"
           }
         ]
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/studies/1060384929"
+      "self": "/studies/1060385929"
     },
     "meta": {
-      "created": "2026-06-16T14:21:06.578Z",
-      "modified": "2026-06-16T14:21:06.714Z",
+      "created": "2026-08-27T08:45:14.801Z",
+      "modified": "2026-08-27T08:45:14.873Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "3ac67666-b61a-4823-8c48-428a9f332c5d"
+      "uuid": "bca7dd2a-0a26-44d5-975e-ab1e1f600db4"
     }
   },
   "jsonapi": {

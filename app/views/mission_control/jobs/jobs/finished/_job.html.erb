@@ -1,0 +1,5 @@
+<%# Overrides the Mission Control partial of the same name, to add the Duration column that
+    Seek::JobDashboard::FinishedJobDuration adds a heading for. %>
+<td><%= link_to job.queue_name, application_queue_path(@application, job.queue) %></td>
+<td><div class="has-text-grey"><%= time_distance_in_words_with_title(job.finished_at) %> ago</div></td>
+<td><div class="has-text-grey" title="<%= t('tooltips.job_duration') %>"><%= job_duration(job) %></div></td>

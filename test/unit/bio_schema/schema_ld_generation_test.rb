@@ -38,6 +38,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/presentations', 'name' => 'Presentations' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/programmes', 'name' => 'Programmes' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/projects', 'name' => 'Projects' },
+        { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/publications', 'name' => 'Publications' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/samples', 'name' => 'Samples' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/sops', 'name' => 'SOPs' },
         { '@type' => 'Dataset', '@id' => 'http://fairyhub.org/workflows', 'name' => 'Workflows' }
@@ -107,6 +108,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        organisms_enabled: false,
                        presentations_enabled: false,
                        programmes_enabled: false,
+                       publications_enabled: false,
                        samples_enabled: false,
                        sops_enabled: false,
                        instance_description: 'a lovely project',
@@ -499,6 +501,81 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     check_schema_org_terms(json)
   end
 
+  test 'publication' do
+    author = FactoryBot.create(:person)
+    publication = travel_to(@current_time) do
+      FactoryBot.create(:publication, contributor: @person, title: 'An Article', abstract: 'What we found',
+                                      journal: 'Journal of Things', published_date: '2017-10-10',
+                                      doi: '10.5072/abcd', pubmed_id: 1234, publisher: 'A Publisher',
+                                      publication_authors: [
+                                        FactoryBot.build(:publication_author, first_name: 'Jane', last_name: 'Doe',
+                                                                              author_index: 0),
+                                        FactoryBot.build(:publication_author, person: author, first_name: author.first_name,
+                                                                              last_name: author.last_name, author_index: 1)
+                                      ])
+    end
+
+    expected = {
+      '@context' => {
+        '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+        'dct' => Seek::BioSchema::Serializer::DCT
+      },
+      '@type' => 'ScholarlyArticle',
+      '@id' => "http://localhost:3000/publications/#{publication.id}",
+      'name' => 'An Article',
+      'description' => 'What we found',
+      'url' => "http://localhost:3000/publications/#{publication.id}",
+      'keywords' => '',
+      'version' => 1,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'datePublished' => '2017-10-10',
+      'identifier' => ['https://doi.org/10.5072/abcd', 'https://www.ncbi.nlm.nih.gov/pubmed/1234'],
+      'author' => [
+        { '@type' => 'Person', '@id' => '#Jane%20Doe', 'name' => 'Jane Doe' },
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{author.id}", 'name' => author.name }
+      ],
+      'isPartOf' => [{ '@type' => 'Periodical', 'name' => 'Journal of Things' }],
+      'publisher' => { '@type' => 'Organization', 'name' => 'A Publisher' },
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{publication.projects.first.id}",
+          'name' => publication.projects.first.title }
+      ],
+      'contributor' => { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
+      'subjectOf' => []
+    }
+
+    json = JSON.parse(publication.to_schema_ld)
+    fine_json_comparison expected, json
+    check_schema_org_terms(json)
+  end
+
+  test 'version of publication' do
+    publication = FactoryBot.create(:publication, title: 'An Article', journal: 'Journal of Things',
+                                                  published_date: '2017-10-10', license: 'CC-BY-4.0')
+    version = publication.latest_version
+    assert_equal 'Publication::Version', version.class.name
+
+    json = JSON.parse(version.to_schema_ld)
+    assert_equal 'ScholarlyArticle', json['@type']
+    assert_equal "http://localhost:3000/publications/#{publication.id}?version=1", json['@id']
+    assert_equal 'An Article', json['name']
+    assert_equal 'https://spdx.org/licenses/CC-BY-4.0', json['license']
+    assert_equal '2017-10-10', json['datePublished']
+    assert_equal [{ '@type' => 'Periodical', 'name' => 'Journal of Things' }], json['isPartOf']
+  end
+
+  test 'publication without journal, date, identifiers or authors omits them' do
+    publication = FactoryBot.create(:publication, pubmed_id: nil, journal: nil, publisher: nil)
+
+    json = JSON.parse(publication.to_schema_ld)
+    assert_equal 'ScholarlyArticle', json['@type']
+    assert_equal [], json['isPartOf']
+    %w[author identifier datePublished publisher creator citation].each do |property|
+      assert_not json.key?(property), "expected '#{property}' to be absent"
+    end
+  end
+
   test 'document without contributor omits contributor from schema_ld' do
     document = travel_to(@current_time) do
       document = FactoryBot.create(:document)
@@ -614,6 +691,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => 'This is a test workflow for bioschema generation',
       'name' => 'This workflow',
       'url' => "http://localhost:3000/workflows/#{workflow.id}",
+      'image' => "http://localhost:3000/workflows/#{workflow.id}/diagram?version=1",
       'keywords' => 'wibble',
       'license' => Seek::License.find('APSL-2.0')&.url,
       'creativeWorkStatus' => 'Stable',
@@ -1148,6 +1226,63 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_equal expected, json
     check_schema_org_terms(json)
     check_version(sop.latest_version, expected)
+  end
+
+  test 'workflow topics and disciplines as about, operations as featureList, also in the ro-crate' do
+    FactoryBot.create(:topics_controlled_vocab)
+    FactoryBot.create(:operations_controlled_vocab)
+    FactoryBot.create(:disciplines_controlled_vocab)
+    workflow = FactoryBot.create(:workflow, contributor: @person)
+    User.with_current_user(@person.user) do
+      workflow.topic_annotations = ['Chemistry', 'Sample collections']
+      workflow.operation_annotations = 'Clustering'
+      workflow.discipline_annotations = ['Physics and Astronomy', 'Secret science']
+      disable_authorization_checks { workflow.save! }
+    end
+    workflow.reload
+
+    edam = { '@id' => 'http://edamontology.org' }
+    openalex = { '@id' => 'https://openalex.org/fields' }
+    expected_subjects = [
+      { '@type' => 'DefinedTerm', '@id' => 'http://edamontology.org/topic_3314', 'name' => 'Chemistry',
+        'inDefinedTermSet' => edam },
+      { '@type' => 'DefinedTerm', '@id' => 'http://edamontology.org/topic_3277', 'name' => 'Sample collections',
+        'inDefinedTermSet' => edam },
+      { '@type' => 'DefinedTerm', '@id' => 'https://openalex.org/fields/31', 'name' => 'Physics and Astronomy',
+        'inDefinedTermSet' => openalex },
+      # a term without an IRI has a local identifier, and isn't part of the OpenAlex term set
+      { '@type' => 'DefinedTerm', '@id' => ROCrate::ContextualEntity.format_local_id('Secret science'),
+        'name' => 'Secret science' }
+    ]
+    expected_operations = [
+      { '@type' => 'DefinedTerm', '@id' => 'http://edamontology.org/operation_3432', 'name' => 'Clustering',
+        'inDefinedTermSet' => edam }
+    ]
+
+    json = JSON.parse(workflow.to_schema_ld)
+    assert_equal expected_subjects, json['about']
+    assert_equal expected_operations, json['featureList']
+    check_schema_org_terms(json)
+
+    crate = workflow.latest_version.ro_crate
+    # flattening the JSON-LD for the crate turns a single value into an object rather than an array
+    assert_equal expected_subjects.first(3).map { |t| t['@id'] },
+                 Array.wrap(crate.main_workflow['about']).map { |t| t['@id'] }.first(3)
+    assert_equal 4, Array.wrap(crate.main_workflow['about']).count
+    assert_equal expected_operations.map { |t| { '@id' => t['@id'] } }, Array.wrap(crate.main_workflow['featureList'])
+    (expected_subjects.first(3) + expected_operations).each do |term|
+      entity = crate.dereference(term['@id'])
+      assert entity, "#{term['@id']} should be a contextual entity in the crate"
+      assert_equal 'DefinedTerm', entity['@type']
+      assert_equal term['name'], entity['name']
+      assert_equal term['inDefinedTermSet'], entity['inDefinedTermSet']
+    end
+  end
+
+  test 'workflow without topics, disciplines or operations has no about or featureList' do
+    json = JSON.parse(FactoryBot.create(:workflow).to_schema_ld)
+    refute json.key?('about')
+    refute json.key?('featureList')
   end
 
   private

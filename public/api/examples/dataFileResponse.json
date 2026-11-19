@@ -1,17 +1,15 @@
 {
   "data": {
-    "id": "883654313",
+    "id": "1055250927",
     "type": "data_files",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
-          "id": "14",
+          "id": "353",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +29,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/883654313?version=1",
+          "url": "http://localhost:3000/data_files/1055250927?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:21:58.894Z",
-      "updated_at": "2026-06-16T14:21:58.894Z",
+      "created_at": "2026-08-27T08:45:53.650Z",
+      "updated_at": "2026-08-27T08:45:53.650Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +45,13 @@
           "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
           "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/883654313/content_blobs/1050452632",
+          "link": "http://localhost:3000/data_files/1055250927/content_blobs/1050456604",
           "size": 8827
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039986933",
+          "profile": "/people/1040002821",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -78,7 +76,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039986933",
+            "id": "1040002821",
             "type": "people"
           }
         ]
@@ -86,7 +84,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039986934",
+            "id": "1040002822",
             "type": "people"
           }
         ]
@@ -94,11 +92,11 @@
       "people": {
         "data": [
           {
-            "id": "1039986933",
+            "id": "1040002821",
             "type": "people"
           },
           {
-            "id": "1039986934",
+            "id": "1040002822",
             "type": "people"
           }
         ]
@@ -106,7 +104,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022251008",
+            "id": "1022266812",
             "type": "projects"
           }
         ]
@@ -114,7 +112,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973654925",
+            "id": "973656137",
             "type": "investigations"
           }
         ]
@@ -122,7 +120,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060384961",
+            "id": "1060385961",
             "type": "studies"
           }
         ]
@@ -130,7 +128,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386711",
+            "id": "1035387598",
             "type": "assays"
           }
         ]
@@ -138,7 +136,7 @@
       "publications": {
         "data": [
           {
-            "id": "62",
+            "id": "418",
             "type": "publications"
           }
         ]
@@ -146,7 +144,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618685",
+            "id": "1025618834",
             "type": "events"
           }
         ]
@@ -154,7 +152,7 @@
       "workflows": {
         "data": [
           {
-            "id": "32",
+            "id": "1474",
             "type": "workflows"
           }
         ]
@@ -167,14 +165,18 @@
       }
     },
     "links": {
-      "self": "/data_files/883654313?version=1"
+      "self": "/data_files/1055250927?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:21:58.830Z",
-      "modified": "2026-06-16T14:21:58.894Z",
+      "created": "2026-08-27T08:45:53.595Z",
+      "modified": "2026-08-27T08:45:53.650Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c28aa80c-f69a-4215-8ec9-5e674f466245"
+      "uuid": "27b00609-fab8-45f2-ad13-0f9ac61a5a41",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

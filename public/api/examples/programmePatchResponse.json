@@ -1,11 +1,9 @@
 {
   "data": {
-    "id": "76",
+    "id": "277",
     "type": "programmes",
     "attributes": {
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "avatar": null,
       "title": "Changed title",
       "description": "A very exciting programme patched!",
@@ -19,7 +17,7 @@
       "administrators": {
         "data": [
           {
-            "id": "1039990010",
+            "id": "1040001808",
             "type": "people"
           }
         ]
@@ -27,7 +25,7 @@
       "people": {
         "data": [
           {
-            "id": "1039990010",
+            "id": "1040001808",
             "type": "people"
           }
         ]
@@ -35,86 +33,60 @@
       "projects": {
         "data": [
           {
-            "id": "1022254120",
+            "id": "1022265962",
             "type": "projects"
           }
         ]
       },
       "institutions": {
-        "data": [
-
-        ]
+        "data": []
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       },
       "collections": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/programmes/76"
+      "self": "/programmes/277"
     },
     "meta": {
-      "created": "2026-06-16T14:33:45.357Z",
-      "modified": "2026-06-16T14:33:45.430Z",
+      "created": "2026-08-27T08:43:07.148Z",
+      "modified": "2026-08-27T08:43:07.221Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "ad39a5dd-29e6-4d07-bcac-3e9ff45cd71b"
+      "uuid": "c962b11f-b654-4bc6-ab3b-6638fd4a74b1"
     }
   },
   "jsonapi": {

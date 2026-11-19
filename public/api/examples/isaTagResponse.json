@@ -1,12 +1,12 @@
 {
   "data": {
-    "id": "929390540",
+    "id": "929393073",
     "type": "isa_tags",
     "attributes": {
       "title": "Maximum isa tag"
     },
     "links": {
-      "self": "/isa_tags/929390540"
+      "self": "/isa_tags/929393073"
     }
   },
   "jsonapi": {

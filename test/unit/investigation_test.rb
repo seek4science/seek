@@ -40,16 +40,10 @@ class InvestigationTest < ActiveSupport::TestCase
     assert assays.include?(assays(:metabolomics_assay3))
   end
 
-  test 'to_rdf' do
-    object = FactoryBot.create(:investigation, description: 'Big investigation')
-    FactoryBot.create_list(:study, 2, contributor: object.contributor, investigation: object)
-    rdf = object.to_rdf
-    graph = RDF::Graph.new do |graph|
-      RDF::Reader.for(:ttl).new(rdf) {|reader| graph << reader}
-    end
-    assert graph.statements.count > 1
-    assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), graph.statements.first.subject
-
+  test 'no rdf, as there is no schema.org description' do
+    object = FactoryBot.create(:investigation)
+    refute object.rdf_supported?
+    refute RdfGenerationQueue.where(item: object).exists?
   end
 
   test 'to_isatab' do

@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class ConfigTest < ActiveSupport::TestCase
   # Features enabled
@@ -455,6 +456,14 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
+  test 'cache_max_redis_item_size default and persistence' do
+    assert_equal 1 * 1024 * 1024, Seek::Config.default_cache_max_redis_item_size
+    with_config_value(:cache_max_redis_item_size, '2097152') do
+      assert_equal 2097152, Seek::Config.cache_max_redis_item_size
+      assert_equal Integer, Seek::Config.cache_max_redis_item_size.class
+    end
+  end
+
   test 'attr encrypted key' do
     assert_equal "#{Rails.root}/tmp/testing-filestore/attr_encrypted/key", Seek::Config.attr_encrypted_key_path
     FileUtils.rm(Seek::Config.attr_encrypted_key_path) if File.exist?(Seek::Config.attr_encrypted_key_path)
@@ -722,6 +731,20 @@ class ConfigTest < ActiveSupport::TestCase
 
     # Once the database and table exist, values come from the database again
     assert Seek::Config.settings_table_available?
+  end
+
+  test 'propagate_all does not fail at first exception' do
+    calls = []
+
+    Seek::Config.stub(:application_name_propagate, -> () { calls << 1; raise 'oh no!' }) do
+      Seek::Config.stub(:exception_notification_recipients_propagate, -> () { calls << 2; raise 'oh no!'}) do
+        assert_raises(RuntimeError) do
+          Seek::Config.propagate_all
+        end
+
+        assert_equal [1, 2], calls, 'Both methods should have been called despite exceptions'
+      end
+    end
   end
 
   private

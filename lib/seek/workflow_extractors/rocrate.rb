@@ -28,6 +28,14 @@ module Seek
         nil
       end
 
+      def diagram_generation_error?
+        open_crate do
+          super
+        end
+      rescue ::ROCrate::ReadException => e
+        nil
+      end
+
       def metadata
         open_crate do |crate|
           meta = super
@@ -35,9 +43,10 @@ module Seek
         end
       end
 
+      # Yields the crate, and the directory holding its files
       def open_crate
         if @opened_crate
-          v = yield @opened_crate
+          v = yield @opened_crate, @opened_crate_dir
           return v
         end
 
@@ -48,10 +57,13 @@ module Seek
           else
             @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@obj.is_a?(ContentBlob) ? @obj.data_io_object : @obj, target_dir: dir)
           end
-          yield @opened_crate
+          # the crate may be within a sub-directory of the zip
+          @opened_crate_dir = ::ROCrate::Reader.detect_root_directory(dir).to_s
+          yield @opened_crate, @opened_crate_dir
         end
 
         @opened_crate = nil
+        @opened_crate_dir = nil
 
         v
       end

@@ -30,21 +30,38 @@ class SearchController < ApplicationController
   end
 
   def perform_search(sources)
-    downcase_query = @search_query.downcase
-
     sources.each do |source|
-      @results[source.to_s] = source.with_search_query(downcase_query).authorized_for('view')
+      @results[source.to_s] = source.with_search_query(@search_query).authorized_for('view')
     end
 
     if search_params[:include_external_search] == '1'
       @include_external_search = true
-      @external_results = Seek::ExternalSearch.instance.external_search(downcase_query, @search_type&.downcase)
+      @external_results = Seek::ExternalSearch.instance.external_search(@search_query, @search_type&.downcase)
     end
+
+    @spelling_suggestion = spelling_suggestion(@search_query, sources) unless request.format.json?
 
     @results
   end
 
   private
+
+  # Asks Solr for a corrected spelling of the query, returning it only if it differs from what was typed.
+  # A suggestion is a nicety, so any problem talking to Solr is logged and ignored rather than failing the search.
+  def spelling_suggestion(query, sources)
+    search = Sunspot.new_search(*sources) do |s|
+      s.keywords(query)
+      s.spellcheck(q: query, collate: true)
+      s.paginate(page: 1, per_page: 1)
+    end
+    search.execute
+
+    collation = Array(search.solr_spellcheck['collations']).last
+    collation if collation.present? && collation.downcase != query.downcase
+  rescue StandardError => e
+    Rails.logger.warn("Unable to fetch spelling suggestions from Solr: #{e.message}")
+    nil
+  end
 
   def jump_straight_to_filtered_view?(sources)
     !request.format.json? && sources.count == 1 && search_params[:include_external_search] != '1'

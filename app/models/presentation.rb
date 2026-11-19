@@ -1,5 +1,6 @@
 class Presentation < ApplicationRecord
 
+  include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
   attr_accessor :orig_data_file_id

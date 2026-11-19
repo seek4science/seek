@@ -26,8 +26,7 @@ class CollectionTest < ActiveSupport::TestCase
     assert_equal RDF::URI.new("http://localhost:3000/collections/#{object.id}"), graph.statements.first.subject
 
     #check for OPSK-1281 - where the creators weren't appearing
-    assert_includes graph.statements.collect(&:predicate),"http://jermontology.org/ontology/JERMOntology#hasCreator"
-    assert_includes graph.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
+    assert_includes graph.statements.collect(&:predicate), RDF::URI('https://schema.org/creator')
 
   end
 

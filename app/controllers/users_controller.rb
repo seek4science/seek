@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_action :is_current_user_auth, only: %i[edit update]
   before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy activate_other]
+  before_action :redirect_if_registration_disabled, only: :create
 
   skip_before_action :project_membership_required
 
@@ -195,6 +196,13 @@ class UsersController < ApplicationController
     permitted_params += %i[login email] if action_name == 'create'
 
     params.require(:user).permit(permitted_params)
+  end
+
+  def redirect_if_registration_disabled
+    return unless Seek::Config.registration_disabled
+
+    flash[:error] = Seek::Config.registration_disabled_description
+    redirect_to main_app.root_path
   end
 
   def check_registration

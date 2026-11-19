@@ -5,6 +5,7 @@ class PresentationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
+  include RdfTestCases
 
   def setup
     login_as FactoryBot.create(:user)
@@ -40,7 +41,7 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'create, update and show a presentation with extended metadata' do
+  test 'create a presentation with extended metadata' do
 
     cmt = FactoryBot.create(:simple_presentation_extended_metadata_type)
 
@@ -68,7 +69,20 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal 'fred',cm.get_attribute_value('name')
     assert_equal 22,cm.get_attribute_value('age')
     assert_nil cm.get_attribute_value('datetime')
+  end
 
+  test 'show and update a presentation with extended metadata' do
+
+    cmt = FactoryBot.create(:simple_presentation_extended_metadata_type)
+
+    person = FactoryBot.create(:person)
+    login_as(person)
+
+    cm = ExtendedMetadata.new(extended_metadata_type: cmt)
+    cm.set_attribute_value('name', 'fred')
+    cm.set_attribute_value('age', 22)
+    presentation = FactoryBot.create(:presentation, contributor: person, policy: FactoryBot.create(:public_policy),
+                                     extended_metadata: cm)
 
     get :show, params: { id: presentation }
     assert_response :success
@@ -440,14 +454,6 @@ class PresentationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', presentation_path(presentation), text: presentation.title
       assert_select 'a[href=?]', presentation_path(presentation2), text: presentation2.title, count: 0
     end
-  end
-
-  test 'should return 406 when showing presentation as RDF' do
-    presentation = FactoryBot.create :ppt_presentation, contributor: User.current_user.person
-
-    get :show, params: { id: presentation, format: :rdf }
-
-    assert_response :not_acceptable
   end
 
   test 'events should be ordered by start date' do

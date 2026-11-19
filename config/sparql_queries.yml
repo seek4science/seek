@@ -1,109 +1,295 @@
 ---
-# SPARQL Example Queries
-# Format: 
-#   query_name:
-#     title: "Human readable title"
-#     description: "Optional description"
-#     query: |
-#       SPARQL query here
+# SPARQL example queries for SEEK, shown in the SPARQL UI in the order given here.
+# They use the Schema.org / Bioschemas vocabulary that SEEK's knowledge graph is built from:
+#   schema = https://schema.org/
+#   bioschemas = https://bioschemas.org/terms/
+# test/integration/sparql_queries_test.rb checks that each one returns results for its seed data.
 
-basic_exploration:
-  title: "List all classes"
-  description: "Find all RDF classes used in the dataset"
+schema_people:
+  title: "List all people"
+  description: "Find all people with their names and the projects they are members of"
   query: |
-    SELECT DISTINCT ?class
+    PREFIX schema: <https://schema.org/>
+    SELECT DISTINCT ?person ?name ?projectName
     WHERE {
-      [] a ?class
+      ?person a schema:Person ;
+              schema:name ?name .
+      OPTIONAL {
+        ?person schema:memberOf ?project .
+        ?project a schema:Project ;
+                 schema:name ?projectName .
+      }
     }
-    LIMIT 20
+    ORDER BY ?name
 
-basic_triples:
-  title: "Sample triples"
-  description: "Show basic subject-predicate-object patterns"
+schema_workflows:
+  title: "List all workflows"
+  description: "Find all computational workflows with their names, workflow language and creators"
   query: |
-    SELECT ?subject ?predicate ?object
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT DISTINCT ?workflow ?name ?language ?creatorName
     WHERE {
-      ?subject ?predicate ?object .
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name .
+      OPTIONAL {
+        ?workflow schema:programmingLanguage ?lang .
+        ?lang schema:name ?language .
+      }
+      OPTIONAL {
+        ?workflow schema:creator ?creator .
+        ?creator schema:name ?creatorName .
+      }
     }
-    LIMIT 10
+    ORDER BY ?name
 
-properties:
-  title: "List all properties"
-  description: "Find all predicates/properties used"
+schema_cwl_workflows:
+  title: "List all CWL workflows"
+  description: "Find all workflows whose programming language has the identifier https://w3id.org/cwl/v1.0/"
   query: |
-    SELECT DISTINCT ?property
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT DISTINCT ?workflow ?name ?language
     WHERE {
-      [] ?property []
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name ;
+                schema:programmingLanguage ?lang .
+      ?lang schema:identifier <https://w3id.org/cwl/v1.0/> ;
+            schema:name ?language .
+      # exclude the workflow files described in the RO-Crates, to list each workflow once
+      FILTER NOT EXISTS { ?workflow a schema:MediaObject }
     }
-    LIMIT 20
+    ORDER BY ?name
+
+schema_workflow_annotations:
+  title: "List workflows with their disciplines, topics and operations"
+  description: "Find all workflows, with their scientific disciplines (OpenAlex fields), EDAM topics and EDAM operations"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT ?workflow ?name
+           (GROUP_CONCAT(DISTINCT ?disciplineName; separator=", ") AS ?disciplines)
+           (GROUP_CONCAT(DISTINCT ?topicName; separator=", ") AS ?topics)
+           (GROUP_CONCAT(DISTINCT ?operationName; separator=", ") AS ?operations)
+    WHERE {
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name .
+      # exclude the workflow files described in the RO-Crates, to list each workflow once
+      FILTER NOT EXISTS { ?workflow a schema:MediaObject }
+      OPTIONAL {
+        ?workflow schema:about ?discipline .
+        ?discipline schema:inDefinedTermSet <https://openalex.org/fields> ;
+                    schema:name ?disciplineName .
+      }
+      OPTIONAL {
+        ?workflow schema:about ?topic .
+        ?topic schema:inDefinedTermSet <http://edamontology.org> ;
+               schema:name ?topicName .
+      }
+      OPTIONAL {
+        ?workflow schema:featureList ?operation .
+        ?operation schema:name ?operationName .
+      }
+    }
+    GROUP BY ?workflow ?name
+    ORDER BY ?name
+
+schema_workflows_by_discipline:
+  title: "Find workflows by discipline"
+  description: "Find the workflows in a scientific discipline (an OpenAlex field). Change the discipline at the top of the query to find others"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT DISTINCT ?workflow ?name ?discipline
+    WHERE {
+      # the discipline to find workflows for, matched ignoring case
+      VALUES ?wanted { "Computer Science" }
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name ;
+                schema:about ?field .
+      ?field schema:inDefinedTermSet <https://openalex.org/fields> ;
+             schema:name ?discipline .
+      FILTER(LCASE(STR(?discipline)) = LCASE(?wanted))
+      # exclude the workflow files described in the RO-Crates, to list each workflow once
+      FILTER NOT EXISTS { ?workflow a schema:MediaObject }
+    }
+    ORDER BY ?name
+
+schema_workflows_by_country:
+  title: "Find workflows by country"
+  description: "Find the workflows associated with a country, through the institutions of their creators and contributors that also take part in the workflow's projects. Change the country code (ISO 3166-1, e.g. GB, DE, NL) at the top of the query to find others"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT ?workflow ?name (GROUP_CONCAT(DISTINCT ?institutionName; separator=", ") AS ?institutions)
+    WHERE {
+      # the country to find workflows for, as its ISO 3166-1 two letter code
+      VALUES ?country { "GB" }
+      ?workflow a bioschemas:ComputationalWorkflow ;
+                schema:name ?name .
+      # exclude the workflow files described in the RO-Crates, to list each workflow once
+      FILTER NOT EXISTS { ?workflow a schema:MediaObject }
+      # the institutions of the workflow's creators and contributors, but only those that take part in the workflow's
+      # projects, as a person may also belong to other institutions
+      ?workflow (schema:creator|schema:contributor)/schema:worksFor ?institution ;
+                schema:producer ?project .
+      ?project a schema:Project ;
+               schema:member ?institution .
+      ?institution a schema:ResearchOrganization ;
+                   schema:name ?institutionName ;
+                   schema:address/schema:addressCountry ?institutionCountry .
+      FILTER(UCASE(STR(?institutionCountry)) = UCASE(?country))
+    }
+    GROUP BY ?workflow ?name
+    ORDER BY ?name
+
+schema_ro_crates:
+  title: "List all RO-Crates"
+  description: "Find all RO-Crates, with the RO-Crate specification version and any profiles they conform to"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX dct: <http://purl.org/dc/terms/>
+    SELECT ?crate ?name ?specification (GROUP_CONCAT(DISTINCT ?profile; separator=", ") AS ?profiles)
+    WHERE {
+      # an RO-Crate is identified by its metadata file, which conforms to an RO-Crate specification
+      ?metadata schema:about ?crate ;
+                dct:conformsTo ?specification .
+      FILTER(STRSTARTS(STR(?specification), "https://w3id.org/ro/crate/"))
+      OPTIONAL { ?crate schema:name ?name }
+      OPTIONAL {
+        ?metadata dct:conformsTo ?profile .
+        FILTER(!STRSTARTS(STR(?profile), "https://w3id.org/ro/crate/"))
+      }
+    }
+    GROUP BY ?crate ?name ?specification
+    ORDER BY ?name
+
+schema_workflow_files:
+  title: "List all workflow files"
+  description: "Find all workflow files within RO-Crates, with their workflow language and the crate they belong to"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    PREFIX bioschemas: <https://bioschemas.org/terms/>
+    SELECT DISTINCT ?file ?name ?language ?crate
+    WHERE {
+      # within an RO-Crate, a workflow file is both a File (schema:MediaObject) and a ComputationalWorkflow
+      ?file a bioschemas:ComputationalWorkflow , schema:MediaObject .
+      OPTIONAL { ?file schema:name ?name }
+      OPTIONAL { ?file schema:programmingLanguage/schema:name ?language }
+      OPTIONAL {
+        ?metadata schema:about ?crate .
+        ?crate schema:hasPart ?file .
+      }
+    }
+    ORDER BY ?name
+
+data_files:
+  title: "List all data files"
+  description: "Find all data files, with the projects they belong to and their creators"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    SELECT ?dataFile ?name
+           (GROUP_CONCAT(DISTINCT ?projectName; separator=", ") AS ?projects)
+           (GROUP_CONCAT(DISTINCT ?creatorName; separator=", ") AS ?creators)
+    WHERE {
+      ?dataFile a schema:Dataset ;
+                schema:name ?name .
+      # exclude the RO-Crates, which are also datasets
+      FILTER NOT EXISTS { ?metadata schema:about ?dataFile }
+      OPTIONAL { ?dataFile schema:producer/schema:name ?projectName }
+      OPTIONAL { ?dataFile schema:creator/schema:name ?creatorName }
+    }
+    GROUP BY ?dataFile ?name
+    ORDER BY ?name
+
+sops:
+  title: "List all SOPs"
+  description: "Find all SOPs (Bioschemas lab protocols), with the projects they belong to and their creators"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    SELECT ?sop ?name
+           (GROUP_CONCAT(DISTINCT ?projectName; separator=", ") AS ?projects)
+           (GROUP_CONCAT(DISTINCT ?creatorName; separator=", ") AS ?creators)
+    WHERE {
+      ?sop a <https://bioschemas.org/types/LabProtocol/0.5-DRAFT> ;
+           schema:name ?name .
+      OPTIONAL { ?sop schema:producer/schema:name ?projectName }
+      OPTIONAL { ?sop schema:creator/schema:name ?creatorName }
+    }
+    GROUP BY ?sop ?name
+    ORDER BY ?name
+
+publications:
+  title: "List all publications"
+  description: "Find all publications (scholarly articles), with their authors, journal, publication date and DOI, the most recent first"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    SELECT ?publication ?name ?published ?journal ?doi
+           (GROUP_CONCAT(DISTINCT ?authorName; separator=", ") AS ?authors)
+    WHERE {
+      ?publication a schema:ScholarlyArticle ;
+                   schema:name ?name .
+      OPTIONAL { ?publication schema:datePublished ?published }
+      OPTIONAL {
+        ?publication schema:isPartOf ?periodical .
+        ?periodical a schema:Periodical ;
+                    schema:name ?journal .
+      }
+      OPTIONAL {
+        ?publication schema:identifier ?doi .
+        FILTER(STRSTARTS(STR(?doi), "https://doi.org/"))
+      }
+      OPTIONAL { ?publication schema:author/schema:name ?authorName }
+    }
+    GROUP BY ?publication ?name ?published ?journal ?doi
+    ORDER BY DESC(?published) ?name
+
+projects:
+  title: "List all projects"
+  description: "Find all projects, with their programme and the number of people and institutions taking part"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    SELECT ?project ?name ?programme
+           (COUNT(DISTINCT ?person) AS ?people) (COUNT(DISTINCT ?institution) AS ?institutions)
+    WHERE {
+      ?project a schema:Project ;
+               schema:name ?name .
+      OPTIONAL { ?project schema:funder/schema:name ?programme }
+      # a project's members are both its people and its institutions
+      OPTIONAL { ?project schema:member ?person . ?person a schema:Person }
+      OPTIONAL { ?project schema:member ?institution . ?institution a schema:ResearchOrganization }
+    }
+    GROUP BY ?project ?name ?programme
+    ORDER BY ?name
+
+institutions:
+  title: "List all institutions"
+  description: "Find all institutions, with their location and, where known, their ROR organisation"
+  query: |
+    PREFIX schema: <https://schema.org/>
+    SELECT ?institution ?name ?city ?country ?ror
+    WHERE {
+      ?institution a schema:ResearchOrganization ;
+                   schema:name ?name .
+      OPTIONAL {
+        ?institution schema:address ?address .
+        OPTIONAL { ?address schema:addressLocality ?city }
+        OPTIONAL { ?address schema:addressCountry ?country }
+      }
+      OPTIONAL {
+        ?institution schema:sameAs ?ror .
+        FILTER(STRSTARTS(STR(?ror), "https://ror.org/"))
+      }
+    }
+    ORDER BY ?name
 
 count_by_type:
   title: "Count entities by type"
-  description: "Count how many entities exist for each class"
+  description: "Count the entities of each type in the knowledge graph"
   query: |
-    SELECT ?type (COUNT(?entity) as ?count)
+    SELECT ?type (COUNT(DISTINCT ?entity) AS ?count)
     WHERE {
-      ?entity a ?type
+      ?entity a ?type .
     }
     GROUP BY ?type
     ORDER BY DESC(?count)
-
-describe_example:
-  title: "Describe a resource"
-  description: "Get all information about a specific resource (replace with actual URI)"
-  query: |
-    DESCRIBE <http://example.org/resource>
-
-organisms:
-  title: "Find organisms"
-  description: "Look for organism-related data"
-  query: |
-    SELECT DISTINCT ?organism ?label
-    WHERE {
-      ?organism a ?type .
-      FILTER(CONTAINS(LCASE(STR(?type)), "organism") || 
-             CONTAINS(LCASE(STR(?type)), "species") ||
-             CONTAINS(LCASE(STR(?type)), "taxon"))
-      OPTIONAL { ?organism rdfs:label ?label }
-    }
-    LIMIT 10
-
-projects:
-  title: "Find projects"
-  description: "Look for project-related data"
-  query: |
-    SELECT DISTINCT ?project ?title
-    WHERE {
-      ?project a ?type .
-      FILTER(CONTAINS(LCASE(STR(?type)), "project"))
-      OPTIONAL { ?project dc:title ?title }
-      OPTIONAL { ?project dcterms:title ?title }
-      OPTIONAL { ?project rdfs:label ?title }
-    }
-    LIMIT 10
-
-studies:
-  title: "Find studies"
-  description: "Look for study-related data"
-  query: |
-    SELECT DISTINCT ?study ?title
-    WHERE {
-      ?study a ?type .
-      FILTER(CONTAINS(LCASE(STR(?type)), "study"))
-      OPTIONAL { ?study dc:title ?title }
-      OPTIONAL { ?study dcterms:title ?title }
-      OPTIONAL { ?study rdfs:label ?title }
-    }
-    LIMIT 10
-
-graph_exploration:
-  title: "List named graphs"
-  description: "Show all named graphs in the dataset"
-  query: |
-    SELECT DISTINCT ?graph
-    WHERE {
-      GRAPH ?graph {
-        ?s ?p ?o
-      }
-    }
-    LIMIT 10

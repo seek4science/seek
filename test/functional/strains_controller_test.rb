@@ -3,12 +3,20 @@ require 'test_helper'
 class StrainsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RdfTestCases
   include GeneralAuthorizationTestCases
   include HtmlHelper
 
   def setup
     login_as :owner_of_fully_public_policy
+  end
+
+  test 'should return 406 when requesting RDF, as there is no schema.org description' do
+    item = FactoryBot.create(:strain, policy: FactoryBot.create(:public_policy))
+    assert item.can_view?
+
+    get :show, params: { id: item, format: :rdf }
+
+    assert_response :not_acceptable
   end
 
   test 'should get index' do

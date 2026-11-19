@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class AdminControllerTest < ActionController::TestCase
 
@@ -29,15 +30,55 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'non admin cannot restart the delayed job' do
+  test 'non admin cannot restart the job workers' do
     login_as(FactoryBot.create(:user))
-    post :restart_delayed_job
+    post :restart_job_workers
     refute_nil flash[:error]
   end
 
-  test 'admin can restart the delayed job' do
-    post :restart_delayed_job
+  test 'admin can restart the job workers' do
+    post :restart_job_workers
     assert_nil flash[:error]
+  end
+
+  test 'admin can regenerate all rdf' do
+    assert_enqueued_with(job: RdfRegenerateAllJob) do
+      post :regenerate_rdf
+    end
+
+    assert_redirected_to admin_path
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
+  end
+
+  test 'non admin cannot regenerate all rdf' do
+    login_as(FactoryBot.create(:user))
+
+    assert_no_enqueued_jobs(only: RdfRegenerateAllJob) do
+      post :regenerate_rdf
+    end
+
+    refute_nil flash[:error]
+  end
+
+  test 'update regenerate workflow ro-crates setting' do
+    with_config_value(:regenerate_workflow_ro_crates, true) do
+      post :update_features_enabled, params: { regenerate_workflow_ro_crates: '0' }
+      refute Seek::Config.regenerate_workflow_ro_crates
+
+      post :update_features_enabled, params: { regenerate_workflow_ro_crates: '1' }
+      assert Seek::Config.regenerate_workflow_ro_crates
+    end
+  end
+
+  test 'update workflow ro-crate regeneration strategy' do
+    with_config_value(:workflow_ro_crate_regeneration_strategy, 'replace_all') do
+      post :update_features_enabled, params: { workflow_ro_crate_regeneration_strategy: 'new_crate' }
+      assert_equal 'new_crate', Seek::Config.workflow_ro_crate_regeneration_strategy
+
+      post :update_features_enabled, params: { workflow_ro_crate_regeneration_strategy: 'nonsense' }
+      assert_equal 'new_crate', Seek::Config.workflow_ro_crate_regeneration_strategy
+    end
   end
 
   test 'none admin not get registration form' do
@@ -170,6 +211,28 @@ class AdminControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'settings form includes cache_max_redis_item_size field' do
+    get :settings
+    assert_response :success
+    assert_select "input[name=?]", 'cache_max_redis_item_size'
+  end
+
+  test 'update cache_max_redis_item_size converts KB to bytes' do
+    post :update_settings, params: { cache_max_redis_item_size: '2048' }
+    assert_equal 2048 * 1024, Seek::Config.cache_max_redis_item_size
+  end
+
+  test 'update max_cachable_size and hard_max_cachable_size convert KB to bytes' do
+    post :update_settings, params: { max_cachable_size: '20480', hard_max_cachable_size: '102400' }
+    assert_equal 20480 * 1024, Seek::Config.max_cachable_size
+    assert_equal 102400 * 1024, Seek::Config.hard_max_cachable_size
+  end
+
+  test 'update cache_max_redis_item_size accepts a fractional KB value' do
+    post :update_settings, params: { cache_max_redis_item_size: '9765.6' }
+    assert_equal (9765.6 * 1024).round, Seek::Config.cache_max_redis_item_size
+  end
+
   test 'should input integer' do
     post :update_home_settings, params: { tag_threshold: '', max_visible_tags: '20' }
     refute_nil flash[:error]
@@ -227,6 +290,25 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'redis cache stats reports when the cache is not redis-backed' do
+    # the test environment uses :memory_store, which has no redis_memory_stats
+    get :get_stats, xhr: true, params: { page: 'redis_stats' }
+    assert_response :success
+    assert_select 'p.none_text', text: /does not use Redis/
+  end
+
+  test 'redis cache stats renders evicted keys when the cache is redis-backed' do
+    fake_stats = { 'used_memory_human' => '2.50M', 'maxmemory_human' => '256.00M',
+                   'maxmemory_policy' => 'allkeys-lru', 'evicted_keys' => '42',
+                   'expired_keys' => '1000', 'keyspace_hits' => '5000', 'keyspace_misses' => '250' }
+    @controller.stub(:redis_cache_stats, fake_stats) do
+      get :get_stats, xhr: true, params: { page: 'redis_stats' }
+    end
+    assert_response :success
+    assert_select 'table#redis-stats'
+    assert_select 'span.label-warning', text: /memory pressure/
+  end
+
   test 'The configuration should stay the same after test_email_configuration' do
     smtp_hash = ActionMailer::Base.smtp_settings
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
@@ -257,20 +339,19 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'job statistics stats' do
-    Delayed::Job.destroy_all
-    dj = Delayed::Job.create(run_at: '2010 September 12', locked_at: '2010 September 13', failed_at: nil)
-    dj.created_at = '2010 September 11'
-    assert dj.save
+    SolidQueue::Job.destroy_all
+    job = SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob', scheduled_at: '2010 September 12')
+    job.update_column(:created_at, '2010 September 11')
 
     get :get_stats, xhr: true, params: { page: 'job_queue' }
     assert_response :success
 
-    assert_select 'h4', text: 'Total delayed jobs waiting = 1'
+    assert_select 'h4', text: 'Total jobs waiting = 1'
     assert_select 'tr' do
       assert_select 'td', text: /11th Sep 2010 at/, count: 1
       assert_select 'td', text: /12th Sep 2010 at/, count: 1
-      assert_select 'td', text: /13th Sep 2010 at/, count: 1
-      assert_select "td > span[class='none_text']", text: /No date defined/, count: 1
+      assert_select 'td', text: 'default', count: 1
+      assert_select 'td', text: 'TestJob', count: 1
     end
   end
 
@@ -425,41 +506,41 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'clear failed jobs' do
-    Delayed::Job.destroy_all
-    job = Delayed::Job.create!
-    job.update_column(:failed_at,Time.now)
-    Delayed::Job.create!
-    assert_equal 2,Delayed::Job.count
-    assert_difference('Delayed::Job.count',-1) do
+    SolidQueue::Job.destroy_all
+    job = SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    SolidQueue::FailedExecution.create!(job: job, error: 'boom')
+    SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    assert_equal 2, SolidQueue::Job.count
+    assert_difference('SolidQueue::Job.count', -1) do
       post :clear_failed_jobs, format: 'json'
     end
 
-    assert_equal 1,Delayed::Job.count
-    assert_equal 0,Delayed::Job.where('failed_at IS NOT NULL').count
+    assert_equal 1, SolidQueue::Job.count
+    assert_equal 0, SolidQueue::Job.failed.count
   end
 
   test 'admin required to clear failed jobs' do
     logout
     person = FactoryBot.create(:person)
 
-    Delayed::Job.destroy_all
-    job = Delayed::Job.create!
-    job.update_column(:failed_at,Time.now)
-    Delayed::Job.create!
-    assert_equal 2,Delayed::Job.count
+    SolidQueue::Job.destroy_all
+    job = SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    SolidQueue::FailedExecution.create!(job: job, error: 'boom')
+    SolidQueue::Job.create!(queue_name: 'default', class_name: 'TestJob')
+    assert_equal 2, SolidQueue::Job.count
 
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_difference('SolidQueue::Job.count') do
       post :clear_failed_jobs, format: 'json'
     end
 
     login_as(person)
 
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_difference('SolidQueue::Job.count') do
       post :clear_failed_jobs, format: 'json'
     end
 
-    assert_equal 2,Delayed::Job.count
-    assert_equal 1,Delayed::Job.where('failed_at IS NOT NULL').count
+    assert_equal 2, SolidQueue::Job.count
+    assert_equal 1, SolidQueue::Job.failed.count
   end
 
   test 'update branding' do

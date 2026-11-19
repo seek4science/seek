@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "107",
+    "id": "179",
     "type": "presentations",
     "attributes": {
       "policy": {
@@ -8,16 +8,14 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022254392",
+              "id": "1022266083",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
-
-      ],
+      "discussion_links": [],
       "title": "A Maximal Presentation",
       "license": "CC-BY-4.0",
       "description": "This is the description",
@@ -30,14 +28,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/presentations/107?version=1",
+          "url": "http://localhost:3000/presentations/179?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:34:59.533Z",
-      "updated_at": "2026-06-16T14:34:59.533Z",
+      "created_at": "2026-08-27T08:43:32.503Z",
+      "updated_at": "2026-08-27T08:43:32.503Z",
       "doi": null,
       "content_blobs": [
         {
@@ -46,16 +44,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/presentations/107/content_blobs/1050453676",
+          "link": "http://localhost:3000/presentations/179/content_blobs/1050456393",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039990352",
+          "profile": "/people/1040001999",
           "family_name": "Last",
-          "given_name": "Person3256",
-          "affiliation": "An Institution: 3931",
+          "given_name": "Person2430",
+          "affiliation": "An Institution: 2832",
           "orcid": null
         }
       ],
@@ -65,7 +63,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039990352",
+            "id": "1040001999",
             "type": "people"
           }
         ]
@@ -73,7 +71,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039990350",
+            "id": "1040001997",
             "type": "people"
           }
         ]
@@ -81,11 +79,11 @@
       "people": {
         "data": [
           {
-            "id": "1039990350",
+            "id": "1040001997",
             "type": "people"
           },
           {
-            "id": "1039990352",
+            "id": "1040001999",
             "type": "people"
           }
         ]
@@ -93,30 +91,24 @@
       "projects": {
         "data": [
           {
-            "id": "1022254392",
+            "id": "1022266083",
             "type": "projects"
           }
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
         "data": [
           {
-            "id": "260",
+            "id": "321",
             "type": "publications"
           }
         ]
@@ -124,7 +116,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618792",
+            "id": "1025618797",
             "type": "events"
           }
         ]
@@ -132,21 +124,25 @@
       "workflows": {
         "data": [
           {
-            "id": "191",
+            "id": "1437",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/presentations/107?version=1"
+      "self": "/presentations/179?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:34:59.510Z",
-      "modified": "2026-06-16T14:34:59.533Z",
+      "created": "2026-08-27T08:43:32.473Z",
+      "modified": "2026-08-27T08:43:32.503Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "8087ebc2-a95c-4910-ae29-54e0c6773d67"
+      "uuid": "fb17f22d-9fc9-4a09-9d49-532466d7cd04",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

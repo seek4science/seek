@@ -1,17 +1,15 @@
 {
   "data": {
-    "id": "104",
+    "id": "1515",
     "type": "workflows",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
-          "id": "43",
+          "id": "372",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +29,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/workflows/104?version=1",
+          "url": "http://localhost:3000/workflows/1515?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2026-06-16T14:25:20.185Z",
-      "updated_at": "2026-06-16T14:25:20.185Z",
+      "created_at": "2026-08-27T08:51:33.053Z",
+      "updated_at": "2026-08-27T08:51:33.053Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +45,13 @@
           "md5sum": "ef2ea32522098acc937199f6c2b64f41",
           "sha1sum": "a5133ccdb0376324d039431e4eff4f7d21a751cd",
           "content_type": "application/x-yaml",
-          "link": "http://localhost:3000/workflows/104/content_blobs/1050453036",
+          "link": "http://localhost:3000/workflows/1515/content_blobs/1050456810",
           "size": 732
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039987828",
+          "profile": "/people/1040003484",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -78,8 +76,7 @@
           "identifier": "http://edamontology.org/topic_3314"
         }
       ],
-      "internals": {
-      },
+      "internals": {},
       "tools": [
         {
           "name": "WorkflowHub",
@@ -99,7 +96,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039987828",
+            "id": "1040003484",
             "type": "people"
           }
         ]
@@ -107,7 +104,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039987829",
+            "id": "1040003485",
             "type": "people"
           }
         ]
@@ -115,11 +112,11 @@
       "people": {
         "data": [
           {
-            "id": "1039987828",
+            "id": "1040003484",
             "type": "people"
           },
           {
-            "id": "1039987829",
+            "id": "1040003485",
             "type": "people"
           }
         ]
@@ -127,7 +124,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022251881",
+            "id": "1022267452",
             "type": "projects"
           }
         ]
@@ -135,7 +132,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655101",
+            "id": "973656225",
             "type": "investigations"
           }
         ]
@@ -143,7 +140,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385133",
+            "id": "1060386049",
             "type": "studies"
           }
         ]
@@ -151,7 +148,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035386857",
+            "id": "1035387635",
             "type": "assays"
           }
         ]
@@ -159,41 +156,37 @@
       "publications": {
         "data": [
           {
-            "id": "160",
+            "id": "447",
             "type": "publications"
           }
         ]
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/workflows/104?version=1"
+      "self": "/workflows/1515?version=1"
     },
     "meta": {
-      "created": "2026-06-16T14:25:20.130Z",
-      "modified": "2026-06-16T14:25:20.185Z",
+      "created": "2026-08-27T08:51:32.904Z",
+      "modified": "2026-08-27T08:51:33.053Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "b9e71233-8593-4328-bf41-667bed78ddbd"
+      "uuid": "d7009859-b6f5-4e06-bb0c-1d2117161edd",
+      "metrics": {
+        "view_count": 0,
+        "download_count": 0
+      }
     }
   },
   "jsonapi": {

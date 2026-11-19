@@ -173,11 +173,22 @@ class Workflow < ApplicationRecord
   attr_reader :extraction_warnings
   attr_reader :extraction_errors
 
-  def provide_metadata(metadata)
+  def provide_metadata(metadata, update_creators: false)
     @extraction_warnings = metadata.delete(:warnings) || []
     @extraction_errors = metadata.delete(:errors) || []
     @extracted_metadata = metadata
     assign_attributes(@extracted_metadata)
+
+    return unless update_creators
+
+    update_creators(@extracted_metadata)
+  end
+
+  def update_creators(metadata)
+    updated_assets_creators_attrs = metadata[:assets_creators_attributes]&.values || []
+    return if updated_assets_creators_attrs.empty?
+
+    retained_and_new_creators(updated_assets_creators_attrs)
   end
 
   def workflow_data_files_attributes=(attributes)
@@ -194,6 +205,18 @@ class Workflow < ApplicationRecord
       end
     end
   end
+
+  def ro_crate_metadata
+    metadata = latest_version.ro_crate.metadata
+    json = metadata.generate
+    json = JSON.parse(json)
+    json["@context"] = [json["@context"], { "@base": "#{rdf_seek_id}/crate/" }].flatten
+    JSON.generate json
+  end
+
+  # def to_schema_ld
+  #   { }
+  # end
 
   def defines_own_avatar?
     workflow_class ? workflow_class.defines_own_avatar? : super
