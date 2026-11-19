@@ -236,4 +236,46 @@ module SinglePageTestUtils
       FactoryBot.create(:sop, id: 10_080 + n, title: lab_protocols[n-1], projects: [project], contributor: person)
     end
   end
+
+  # The SpreadsheetML schema shipped with caxlsx, as used by Axlsx::Package#validate. Loaded once, it's large.
+  def self.spreadsheetml_schema
+    @spreadsheetml_schema ||= Nokogiri::XML::Schema(File.open(Axlsx::SML_XSD))
+  end
+
+  # Checks a generated xlsx against the SpreadsheetML schema and against limits Excel enforces but neither
+  # caxlsx nor the schema do (e.g. prompt lengths, the cause of #2808).
+  # Breaking any of them makes Excel report the file as damaged and silently drop content while repairing it.
+  # Returns all data validation nodes, for further assertions.
+  def assert_excel_compatible(xlsx_body)
+    check = Seek::Templates::SpreadsheetExportCheck
+    validations = []
+    Zip::File.open_buffer(xlsx_body) do |zip|
+      zip.glob('xl/{workbook.xml,worksheets/sheet*.xml}').each do |entry|
+        doc = begin
+          Nokogiri::XML(entry.get_input_stream.read, &:strict)
+        rescue Nokogiri::XML::SyntaxError => e
+          flunk "#{entry.name} is not valid XML: #{e.message}"
+        end
+
+        schema_errors = SinglePageTestUtils.spreadsheetml_schema.validate(doc)
+        assert_empty schema_errors, "#{entry.name} does not match the SpreadsheetML schema: " \
+                                    "#{schema_errors.first(3).map(&:message).join('; ')}"
+
+        doc.remove_namespaces!
+
+        doc.xpath('//dataValidation').each do |validation|
+          assert_operator validation['prompt'].to_s.length, :<=, check::PROMPT_MAX_LENGTH,
+                          "Data validation prompt in #{entry.name} is too long for Excel"
+          assert_operator validation['promptTitle'].to_s.length, :<=, check::PROMPT_TITLE_MAX_LENGTH,
+                          "Data validation prompt title in #{entry.name} is too long for Excel"
+          validations << validation
+        end
+
+        doc.xpath('//c//t').each do |text|
+          assert_operator text.text.length, :<=, check::CELL_MAX_LENGTH, "Cell text in #{entry.name} is too long for Excel"
+        end
+      end
+    end
+    validations
+  end
 end
