@@ -92,6 +92,30 @@ class ISAStudiesControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'study', item_id: study.id), text: 'Cancel'
   end
 
+  test 'cancel button stays in the originating project of a multi-project study' do
+    person = User.current_user.person
+    project1 = person.projects.first
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, person.institutions.first)
+    investigation = FactoryBot.create(:investigation, projects: [project1, project2], contributor: person)
+
+    source_type = FactoryBot.create(:isa_source_sample_type, contributor: person, projects: [project1, project2])
+    sample_collection_type = FactoryBot.create(:isa_sample_collection_sample_type, contributor: person, projects: [project1, project2],
+                                                                                   linked_sample_type: source_type)
+    study = FactoryBot.create(:study, investigation:, contributor: person,
+                                      sample_types: [source_type, sample_collection_type])
+
+    get :edit, params: { id: study.id, single_page: project2.id }
+    assert_response :success
+    assert_select 'input[type=hidden][name=single_page][value=?]', project2.id.to_s
+    assert_select 'a.btn[href=?]', single_page_path(id: project2, item_type: 'study', item_id: study.id), text: 'Cancel'
+
+    # Failed update keeps the originating project
+    put :update, params: { id: study.id, isa_study: { study: { title: '' } }, single_page: project2.id }
+    assert_response :unprocessable_entity
+    assert_select 'a.btn[href=?]', single_page_path(id: project2, item_type: 'study', item_id: study.id), text: 'Cancel'
+  end
+
   test 'should create an isa study with extended metadata' do
     person = User.current_user.person
     project = person.projects.first

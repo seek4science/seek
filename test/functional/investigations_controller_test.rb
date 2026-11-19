@@ -146,6 +146,27 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal 'new title', investigation.reload.title
   end
 
+  test 'cancel and update stay in the originating project of a multi-project ISA-JSON investigation' do
+    person = FactoryBot.create(:person)
+    project1 = person.projects.first
+    project2 = FactoryBot.create(:project)
+    person.add_to_project_and_institution(project2, person.institutions.first)
+    login_as(person)
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project1, project2], contributor: person)
+
+    get :edit, params: { id: investigation, single_page: project2.id }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: project2, item_type: 'investigation', item_id: investigation.id), text: 'Cancel'
+
+    put :update, params: { id: investigation.id, investigation: { title: 'new title' }, single_page: project2.id }
+    assert_redirected_to single_page_path(id: project2, item_type: 'investigation', item_id: investigation.id)
+
+    # A project the investigation doesn't belong to is ignored
+    other_project = FactoryBot.create(:project)
+    put :update, params: { id: investigation.id, investigation: { title: 'newer title' }, single_page: other_project.id }
+    assert_redirected_to single_page_path(id: project1, item_type: 'investigation', item_id: investigation.id)
+  end
+
   test 'should create' do
     login_as(FactoryBot.create :user)
     assert_difference('Investigation.count') do

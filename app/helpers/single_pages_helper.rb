@@ -57,10 +57,14 @@ module SinglePagesHelper
   end
 
   # Single page path that selects the given investigation, study or assay in the tree.
+  # Stays in the project the user came from (params[:single_page]) when the item belongs to it,
+  # otherwise falls back to the item's first project.
   def single_page_item_path(item)
     return if item.nil? || item.new_record?
 
-    project = item.projects.first
+    projects = item.projects
+    project = projects.detect { |p| p.id.to_s == params[:single_page].to_s } if params[:single_page].present?
+    project ||= projects.first
     return if project.nil?
 
     single_page_path(id: project, item_type: item.class.name.underscore, item_id: item.id)
