@@ -273,6 +273,22 @@ module Seek
           assert_equal  'Preprint. https://doi.org/10.20944/preprints201909.0043.v1', result.citation
         end
       end
+
+      # In Crossref, 'name' is only used for organisations, so it is never split on a comma (issue #2809)
+      test 'name-only Crossref authors are kept whole' do
+        parser = Seek::Doi::Parsers::CrossrefParser.new
+        authors = parser.send(:extract_authors_as_objects, [
+          { 'given' => 'Jane', 'family' => 'Smith' },
+          { 'name' => 'Some Consortium, Europe' },
+          { 'name' => 'Schulz, Christine' }
+        ])
+
+        assert_equal [
+          %w[Jane Smith],
+          ['Some Consortium, Europe', ''],
+          ['Schulz, Christine', '']
+        ], authors.map { |a| [a.first_name, a.last_name] }
+      end
     end
   end
 end

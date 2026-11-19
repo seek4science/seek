@@ -127,15 +127,11 @@ module Seek
           end.compact
         end
 
-        # Builds an author from a single 'name' field. Personal names in "Family, Given" form
-        # (exactly one comma) are split; anything else is kept whole as the first name.
+        # Builds an author from a single 'name' field, kept whole as the first name.
+        # In Crossref, 'name' is only used for organisations, so it is never split.
+        # Parsers whose single names may be personal (e.g. DataCite) override this.
         def author_from_name(a)
-          name = a['name'].to_s.strip
-          if a['nameType'] != 'Organizational' && name.count(',') == 1
-            family, given = name.split(',', 2).map(&:strip)
-            return Seek::Doi::Author.new(first_name: given, last_name: family) if family.present? && given.present?
-          end
-          Seek::Doi::Author.new(first_name: name, last_name: '')
+          Seek::Doi::Author.new(first_name: a['name'].to_s.strip, last_name: '')
         end
 
         def extract_editors(list)

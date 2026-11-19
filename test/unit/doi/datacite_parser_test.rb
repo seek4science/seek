@@ -58,13 +58,9 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
     VCR.use_cassette('doi/doi_datacite_response_comma_name') do
       doi = '10.14279/eceasst.v86.1.2784'
       result = Seek::Doi::Parser.parse(doi)
-      author = result.authors.first
-      assert_equal 'Christine', author.first_name
-      assert_equal 'Schulz', author.last_name
-      assert_equal 'Christine Schulz', author.full_name
-      result.authors.each do |a|
-        refute_includes a.first_name, ',', "first name should not contain a comma: #{a.first_name}"
-      end
+      assert_equal [%w[Christine Schulz], %w[Inga Ulusoy], %w[Rebecca Wade]],
+                   result.authors.map { |a| [a.first_name, a.last_name] }
+      assert_equal 'Christine Schulz', result.authors.first.full_name
     end
   end
 
@@ -77,7 +73,13 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
       { 'name' => 'Institute of Things, Inc.', 'nameType' => 'Organizational' },
       { 'name' => 'A, B, C' },
       { 'name' => 'Schulz,' },
-      { 'name' => 'Ignored, Name', 'givenName' => 'Jane', 'familyName' => 'Smith' }
+      { 'name' => 'Ignored, Name', 'givenName' => 'Jane', 'familyName' => 'Smith' },
+      # organisations with a comma but no nameType are kept whole
+      { 'name' => 'Heidelberg University, Institute of Pharmacy' },
+      { 'name' => 'Smith, Jones Ltd' },
+      { 'name' => 'Human Cell Atlas Consortium, Europe' },
+      # an explicit Personal nameType wins over the organisation word check
+      { 'name' => 'Group, Anna', 'nameType' => 'Personal' }
     ])
 
     assert_equal [
@@ -87,7 +89,11 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
       ['Institute of Things, Inc.', ''],
       ['A, B, C', ''],
       ['Schulz,', ''],
-      %w[Jane Smith]
+      %w[Jane Smith],
+      ['Heidelberg University, Institute of Pharmacy', ''],
+      ['Smith, Jones Ltd', ''],
+      ['Human Cell Atlas Consortium, Europe', ''],
+      %w[Anna Group]
     ], authors.map { |a| [a.first_name, a.last_name] }
   end
 

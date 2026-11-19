@@ -4,7 +4,35 @@ module Seek
       class DataciteParser < BaseParser
         DATACITE_API_ENDPOINT = 'https://api.datacite.org/dois'.freeze
 
+        # Words that suggest a creator name belongs to an organisation rather than a person.
+        ORGANISATION_PATTERN = /\b(
+          universit\w* | institut\w* | cent(?:er|re)s? | laborator(?:y|ies) | department | faculty |
+          consortium | foundation | society | association | network | project | initiative |
+          group | team | hospital | college | school | academy | ministry | agency | council |
+          inc\.? | ltd\.? | gmbh | llc | e\.\s?v\.? | corporation
+        )(?=\W|\z)/ix
+
         private
+
+        # DataCite creators may give a personal name only as "Family, Given" in 'name'.
+        # Split it when the creator is personal: either explicitly (nameType 'Personal'), or
+        # implicitly (no nameType) when the name doesn't look like an organisation.
+        def author_from_name(a)
+          name = a['name'].to_s.strip
+          if personal_name?(a, name) && name.count(',') == 1
+            family, given = name.split(',', 2).map(&:strip)
+            return Seek::Doi::Author.new(first_name: given, last_name: family) if family.present? && given.present?
+          end
+          super
+        end
+
+        def personal_name?(a, name)
+          case a['nameType']
+          when 'Personal' then true
+          when 'Organizational' then false
+          else !name.match?(ORGANISATION_PATTERN)
+          end
+        end
 
         def build_url(doi)
           URI("#{DATACITE_API_ENDPOINT}/#{doi}")
