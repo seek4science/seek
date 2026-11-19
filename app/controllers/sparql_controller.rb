@@ -72,7 +72,10 @@ class SparqlController < ApplicationController
     # Handle different result formats
     if results.respond_to?(:map)
       results.map do |solution|
-        if solution.respond_to?(:to_h)
+        if solution.is_a?(RDF::Statement)
+          # the statements of a DESCRIBE or CONSTRUCT query, which have no graph name
+          { subject: solution.subject, predicate: solution.predicate, object: solution.object }
+        elsif solution.respond_to?(:to_h)
           solution.to_h
         elsif solution.respond_to?(:bindings)
           solution.bindings

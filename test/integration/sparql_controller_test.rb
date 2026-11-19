@@ -249,10 +249,16 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(@response.body)
     assert_nil json['error']
+    assert_equal [%w[object predicate subject]], json['results'].map { |statement| statement.keys.sort }.uniq
     described = json['results'].select { |statement| statement['subject'] == data_file.rdf_resource.to_s }
                                .map { |statement| [statement['predicate'], statement['object']] }
 
     assert_empty expected - described
+
+    post query_sparql_index_path, params: { sparql_query: "DESCRIBE #{resource}" }
+    assert_response :success
+    assert_select '#sparql-results table thead th', count: 3
+    assert_select '#sparql-results table thead th', text: 'Graph name', count: 0
   end
 
   test 'results table has a column for each variable, in order, even those unbound in the first row' do
