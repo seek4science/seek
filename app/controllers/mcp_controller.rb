@@ -12,7 +12,8 @@ class McpController < ApplicationController
       server_context: { user_id: current_user&.id },
     )
 
-    transport = MCP::Server::Transports::StreamableHTTPTransport.new(server, dns_rebinding_protection: false, stateless: true)
+    transport = MCP::Server::Transports::StreamableHTTPTransport.new(server, dns_rebinding_protection: false,
+                                                                     stateless: true, serve_subscriptions_listen: false)
 
     status, headers, body = transport.handle_request(request)
 
