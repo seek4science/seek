@@ -1,4 +1,7 @@
 module SparqlHelper
+  # the template for the tooltips of links in the SPARQL results, with a class so that only these wrap long values
+  SPARQL_POPOVER_TEMPLATE = '<div class="popover sparql-popover" role="tooltip"><div class="arrow"></div>' \
+                            '<h3 class="popover-title"></h3><div class="popover-content"></div></div>'.freeze
 
   def sparql_results_panel_title
     "<i class=\"glyphicon glyphicon-ok-circle\"></i>&nbsp;Query Results (#{@results.length} results)"
@@ -33,7 +36,7 @@ module SparqlHelper
 
   def sparql_result_link(text)
     if text.match?(%r{\Ahttps?://})
-      link_to(text, text, class: 'external-link', data: { tooltip: text })
+      link_to(text, text, class: 'external-link', data: { tooltip: text, template: SPARQL_POPOVER_TEMPLATE })
     else
       text
     end
