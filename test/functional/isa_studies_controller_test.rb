@@ -114,6 +114,10 @@ class ISAStudiesControllerTest < ActionController::TestCase
     put :update, params: { id: study.id, isa_study: { study: { title: '' } }, single_page: project2.id }
     assert_response :unprocessable_entity
     assert_select 'a.btn[href=?]', single_page_path(id: project2, item_type: 'study', item_id: study.id), text: 'Cancel'
+
+    # Successful update redirects to the originating project
+    put :update, params: { id: study.id, isa_study: { study: { title: 'new title' } }, single_page: project2.id }
+    assert_redirected_to single_page_path(id: project2, item_type: 'study', item_id: study.id)
   end
 
   test 'should create an isa study with extended metadata' do
