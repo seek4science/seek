@@ -96,6 +96,27 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert assigns(:investigation)
   end
 
+  test 'cancel button on edit redirects to single page for ISA-JSON compliant investigations' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    project = person.projects.first
+
+    isa_investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
+    get :edit, params: { id: isa_investigation }
+    assert_response :success
+    assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'investigation', item_id: isa_investigation.id), text: 'Cancel'
+
+    # Failed update re-renders the edit form -> still back to the single page
+    put :update, params: { id: isa_investigation.id, investigation: { title: '' } }
+    assert_select 'a.btn[href=?]', single_page_path(id: project, item_type: 'investigation', item_id: isa_investigation.id), text: 'Cancel'
+
+    # Non ISA-JSON compliant investigations keep the default cancel path
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: false, projects: [project], contributor: person)
+    get :edit, params: { id: investigation }
+    assert_response :success
+    assert_select 'a.btn[href=?]', investigation_path(investigation), text: 'Cancel'
+  end
+
   test "shouldn't show edit for unauthorized user" do
     i = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy))
     login_as(FactoryBot.create(:user))
@@ -111,6 +132,18 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_redirected_to investigation_path(i)
     assert assigns(:investigation)
     assert_equal 'test', assigns(:investigation).title
+  end
+
+  test 'should redirect to single page after updating an ISA-JSON compliant investigation' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    project = person.projects.first
+    investigation = FactoryBot.create(:investigation, is_isa_json_compliant: true, projects: [project], contributor: person)
+
+    put :update, params: { id: investigation.id, investigation: { title: 'new title' } }
+
+    assert_redirected_to single_page_path(id: project, item_type: 'investigation', item_id: investigation.id)
+    assert_equal 'new title', investigation.reload.title
   end
 
   test 'should create' do

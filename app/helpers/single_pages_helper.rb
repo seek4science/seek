@@ -47,6 +47,15 @@ module SinglePagesHelper
     single_page_item_path(target) || studies_path
   end
 
+  # Path for the cancel button on the investigation new/edit forms.
+  # Only ISA-JSON compliant investigations being edited go back to the single page view;
+  # returns nil otherwise, so form_submit_buttons falls back to its default cancel path.
+  def investigation_cancel_path(investigation)
+    return unless investigation.persisted? && investigation.is_isa_json_compliant_in_database
+
+    single_page_item_path(investigation)
+  end
+
   # Single page path that selects the given investigation, study or assay in the tree.
   def single_page_item_path(item)
     return if item.nil? || item.new_record?
