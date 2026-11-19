@@ -1,4 +1,5 @@
 
+require 'minitest/mock'
 require 'test_helper'
 
 class GroupMembershipTest < ActiveSupport::TestCase
@@ -83,6 +84,27 @@ class GroupMembershipTest < ActiveSupport::TestCase
 
     assert RdfGenerationQueue.where(item: person).exists?
     assert RdfGenerationQueue.where(item: project).exists?
+  end
+
+  test 'destroying the last membership of a work group queues rdf generation for its project' do
+    person = FactoryBot.create(:brand_new_person)
+    project = FactoryBot.create(:project)
+    institution = FactoryBot.create(:institution)
+    disable_authorization_checks { person.add_to_project_and_institution(project, institution) }
+    membership = GroupMembership.find(person.group_memberships.first.id)
+    work_group_id = membership.work_group_id
+
+    # the work group also queues its project as it is destroyed, so only the membership's own enqueue is recorded
+    queued = []
+    RdfGenerationQueue.stub(:enqueue, lambda { |*items, refresh_dependents: false, **|
+      queued.concat(items.flatten) unless refresh_dependents
+    }) do
+      disable_authorization_checks { membership.destroy }
+    end
+
+    refute WorkGroup.exists?(work_group_id)
+    assert_includes queued, person
+    assert_includes queued, project
   end
 
   test 'moving a membership to another project queues rdf generation for both projects' do
