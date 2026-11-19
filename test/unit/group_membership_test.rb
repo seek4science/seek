@@ -107,6 +107,17 @@ class GroupMembershipTest < ActiveSupport::TestCase
     assert_includes queued, project
   end
 
+  test 'leaving a project does not queue rdf generation, as the person is still associated with it' do
+    person = FactoryBot.create(:person)
+    membership = person.group_memberships.first
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { membership.update!(time_left_at: 1.day.ago, has_left: true) }
+
+    refute RdfGenerationQueue.where(item: person).exists?
+    refute RdfGenerationQueue.where(item: person.projects.first).exists?
+  end
+
   test 'moving a membership to another project queues rdf generation for both projects' do
     person = FactoryBot.create(:person)
     old_project = person.projects.first

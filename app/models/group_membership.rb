@@ -6,6 +6,7 @@ class GroupMembership < ApplicationRecord
 
   before_save :unset_has_left
   after_save :remember_previous_person
+  after_save :remember_rdf_change
   after_update { remove_former_project_roles if has_left }
   after_commit :queue_update_auth_table
   # the person's and project's RDF include the membership (jerm:isAssociatedWith)
@@ -40,6 +41,11 @@ class GroupMembership < ApplicationRecord
     @previous_work_group_id = work_group_id_before_last_save
   end
 
+  # a membership can be saved more than once before the commit, and only the last save's changes are known then
+  def remember_rdf_change
+    @rdf_changed ||= saved_change_to_person_id? || saved_change_to_work_group_id?
+  end
+
   def remember_project
     @project_id = work_group&.project_id
   end
@@ -52,6 +58,10 @@ class GroupMembership < ApplicationRecord
   end
 
   def queue_rdf_generation
+    return unless destroyed? || @rdf_changed
+
+    @rdf_changed = false
+
     people = [Person.find_by_id(person_id)]
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
     projects = [Project.find_by_id(@project_id || work_group&.project_id)]
