@@ -16,8 +16,7 @@ class ISAStudiesController < ApplicationController
       format.json { render json: @isa_study, include: [params[:include]] }
       format.html do
         flash[:notice] = "You have been redirected to the #{t('single_page')} view"
-        redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                     item_id: @isa_study.study)
+        redirect_to single_page_redirect_path
       end
     end
   end
@@ -44,8 +43,7 @@ class ISAStudiesController < ApplicationController
 
       respond_to do |format|
         format.html do
-          redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                       item_id: @isa_study.study)
+          redirect_to single_page_redirect_path
         end
         format.json { render json: @isa_study, include: [params[:include]], status: :created }
       end
@@ -86,8 +84,7 @@ class ISAStudiesController < ApplicationController
       respond_to do |format|
         format.html do
           flash[:notice] = "The #{t('isa_study')} was successfully updated"
-          redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                       item_id: @isa_study.study.id)
+          redirect_to single_page_redirect_path
 
         end
 
@@ -194,6 +191,12 @@ class ISAStudiesController < ApplicationController
     @single_page = true
   end
 
+  # Single page view of the study, in the project the user came from (see SinglePagesHelper#single_page_item_path).
+  # Falls back to the study page when the single page is unavailable, or the studies index when the study is missing.
+  def single_page_redirect_path
+    helpers.single_page_or_item_path(@isa_study.study, studies_path)
+  end
+
   def respond_with_error(status=:unprocessable_entity)
     respond_to do |format|
       format.html do
@@ -205,13 +208,7 @@ class ISAStudiesController < ApplicationController
         flash[:error] = helpers.content_tag(:ul) do
           helpers.safe_join(error_messages)
         end.html_safe
-        path = if @isa_study.study.nil?
-                 studies_path
-               else
-                 single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                  item_id: @isa_study.study)
-               end
-        redirect_to path
+        redirect_to single_page_redirect_path
       end
 
       format.json { render json: json_api_errors(@isa_study), status: status }

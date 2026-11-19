@@ -27,6 +27,62 @@ module SinglePagesHelper
     Seek::Samples::BaseType::SEEK_SOP,
   ]
 
+  # Path for the cancel button on the ISA assay new/edit forms.
+  # Editing: back to the assay itself. Creating: back to its parent (assay stream, or study for a new assay stream).
+  def isa_assay_cancel_path(isa_assay)
+    assay = isa_assay.assay
+    target = if assay.persisted?
+               assay
+             else
+               assay.assay_stream || assay.study
+             end
+    single_page_or_item_path(target, assays_path)
+  end
+
+  # Path for the cancel button on the ISA study new/edit forms.
+  # Editing: back to the study itself. Creating: back to its investigation.
+  def isa_study_cancel_path(isa_study)
+    study = isa_study.study
+    target = study.persisted? ? study : study.investigation
+    single_page_or_item_path(target, studies_path)
+  end
+
+  # Path for the cancel button on the investigation new/edit forms.
+  # Only ISA-JSON compliant investigations being edited get a path here; returns nil otherwise,
+  # so form_submit_buttons falls back to its default cancel path.
+  def investigation_cancel_path(investigation)
+    return unless investigation.persisted? && investigation.is_isa_json_compliant_in_database
+
+    single_page_or_item_path(investigation, investigation_path(investigation))
+  end
+
+  # SinglePagesController rejects requests unless both features are enabled.
+  def single_page_available?
+    Seek::Config.project_single_page_enabled && Seek::Config.isa_json_compliance_enabled
+  end
+
+  # The item in the single page view when available, otherwise the item's own page.
+  # Uses fallback when the item is missing or not saved yet.
+  def single_page_or_item_path(item, fallback)
+    single_page_item_path(item) || (item&.persisted? ? polymorphic_path(item) : fallback)
+  end
+
+  # Single page path that selects the given investigation, study or assay in the tree.
+  # Stays in the project the user came from (params[:single_page]) when the item belongs to it,
+  # otherwise falls back to the item's first project.
+  # Returns nil when the single page is unavailable, or the item or its project is missing.
+  def single_page_item_path(item)
+    return unless single_page_available?
+    return if item.nil? || item.new_record?
+
+    projects = item.projects
+    project = projects.detect { |p| p.id.to_s == params[:single_page].to_s } if params[:single_page].present?
+    project ||= projects.first
+    return if project.nil?
+
+    single_page_path(id: project, item_type: item.class.name.underscore, item_id: item.id)
+  end
+
   def requires_data_validation?(sample_attribute)
     ATTRIBUTES_WITH_DATA_VALIDATION.include?(sample_attribute.sample_attribute_type.base_type)
   end
