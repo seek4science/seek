@@ -37,4 +37,22 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'perform does not email unregistered profiles' do
+    Person.destroy_all
+
+    registered = FactoryBot.create(:person)
+    unregistered = FactoryBot.create(:person_in_project)
+    refute unregistered.registered?
+    assert unregistered.notifiee_info.receive_notifications?
+    refute unregistered.receive_notifications?
+
+    site_announcement = SiteAnnouncement.create(title: 'test announcement', body: 'test', email_notification: true)
+
+    expected_count = NotifieeInfo.count - 1
+    assert_enqueued_emails(expected_count) do
+      SendAnnouncementEmailsJob.perform_now(site_announcement)
+    end
+    assert_enqueued_email_with Mailer, :announcement_notification, args: [site_announcement, registered.notifiee_info]
+  end
 end
