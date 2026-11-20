@@ -16,5 +16,6 @@ SEEK::Application.configure do
     inflect.acronym "KNIME"
     inflect.acronym "CFF"
     inflect.acronym "ISA"
+    inflect.acronym "OIDC"
   end
 end
