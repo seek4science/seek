@@ -235,6 +235,99 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_match /SECURITY: No permission to execute procedure/, json['error']
   end
 
+  test 'describe query returns all the statements about the resource' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    resource = data_file.rdf_resource.to_base
+
+    post query_sparql_index_path, params: { sparql_query: "SELECT ?p ?o WHERE { #{resource} ?p ?o }", format: 'json' }
+    assert_response :success
+    expected = JSON.parse(@response.body)['results'].map { |result| [result['p'], result['o']] }
+    assert expected.size > 1
+
+    post query_sparql_index_path, params: { sparql_query: "DESCRIBE #{resource}", format: 'json' }
+    assert_response :success
+    json = JSON.parse(@response.body)
+    assert_nil json['error']
+    assert_equal [%w[object predicate subject]], json['results'].map { |statement| statement.keys.sort }.uniq
+    described = json['results'].select { |statement| statement['subject'] == data_file.rdf_resource.to_s }
+                               .map { |statement| [statement['predicate'], statement['object']] }
+
+    assert_empty expected - described
+
+    post query_sparql_index_path, params: { sparql_query: "DESCRIBE #{resource}" }
+    assert_response :success
+    assert_select '#sparql-results table thead th', count: 3
+    assert_select '#sparql-results table thead th', text: 'Graph name', count: 0
+  end
+
+  test 'results table has a column for each variable, in order, even those unbound in the first row' do
+    query = 'SELECT ?first ?second WHERE { VALUES (?second ?first) { ("only second" UNDEF) ("two" "one") } }'
+
+    post query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select '#sparql-results table' do
+      assert_select 'thead th', count: 2
+      assert_select 'thead th:nth-child(1)', text: 'First'
+      assert_select 'thead th:nth-child(2)', text: 'Second'
+      assert_select 'tbody tr', count: 2
+      assert_select 'tbody tr:nth-child(1) td:nth-child(1)', text: ''
+      assert_select 'tbody tr:nth-child(1) td:nth-child(2)', text: 'only second'
+      assert_select 'tbody tr:nth-child(2) td:nth-child(1)', text: 'one'
+      assert_select 'tbody tr:nth-child(2) td:nth-child(2)', text: 'two'
+    end
+  end
+
+  test 'results distinguish IRIs from literals, including literals that are URLs, and links have a tooltip' do
+    create_some_triples
+    data_file = DataFile.find_by(title: 'public data file')
+    iri = data_file.rdf_resource.to_s
+    query = %(SELECT ?datafile ?title ?url
+      WHERE {
+        ?datafile <http://purl.org/dc/terms/title> "public data file" ; <http://purl.org/dc/terms/title> ?title .
+        BIND("#{iri}" AS ?url)
+      })
+
+    post query_sparql_index_path, params: { sparql_query: query }
+    assert_response :success
+
+    assert_select '#sparql-results table tbody tr', count: 1 do
+      assert_select 'td', count: 3
+      assert_select 'td:nth-child(1) span.sparql-iri[title=?]', 'IRI (node)', text: "<#{iri}>" do
+        assert_select 'a.external-link[href=?][data-tooltip=?]', iri, iri, text: iri
+      end
+      assert_select 'td:nth-child(2) span.sparql-literal', text: 'public data file'
+      assert_select 'td:nth-child(3) span.sparql-literal', text: iri do
+        assert_select 'a.external-link[href=?]', iri
+      end
+    end
+
+    post query_sparql_index_path, params: { sparql_query: query, format: 'json' }
+    assert_response :success
+    result = JSON.parse(@response.body)['results'].first
+    assert_equal({ 'datafile' => iri, 'title' => 'public data file', 'url' => iri }, result)
+  end
+
+  test 'blank query gives an error without querying the endpoint' do
+    path = query_sparql_index_path
+    SPARQL::Client.stub(:new, ->(*) { raise 'the endpoint should not be queried' }) do
+      ['', "  \n ", nil].each do |query|
+        post path, params: { sparql_query: query }
+        assert_response :unprocessable_entity
+        assert_nil flash[:error]
+        assert_select 'div#query-error.alert-danger pre', text: I18n.t('sparql.blank_query_error')
+        assert_select 'div#sparql-results', count: 0
+
+        post path, params: { sparql_query: query, format: 'json' }
+        assert_response :unprocessable_entity
+        json = JSON.parse(@response.body)
+        assert_equal I18n.t('sparql.blank_query_error'), json['error']
+        assert_empty json['results']
+      end
+    end
+  end
+
   test 'repository not available' do
     path = query_sparql_index_path
     Seek::Rdf::RdfRepository.instance.stub(:available?, ->(){ false }) do

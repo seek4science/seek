@@ -6,8 +6,13 @@ class GroupMembership < ApplicationRecord
 
   before_save :unset_has_left
   after_save :remember_previous_person
+  after_save :remember_rdf_change
   after_update { remove_former_project_roles if has_left }
   after_commit :queue_update_auth_table
+  # the person's and project's RDF include the membership (jerm:isAssociatedWith)
+  after_commit :queue_rdf_generation
+  # destroying the last membership also destroys its work group, so the project is found before then
+  before_destroy :remember_project
 
   after_destroy do
     remove_former_project_roles
@@ -33,6 +38,16 @@ class GroupMembership < ApplicationRecord
 
   def remember_previous_person
     @previous_person_id = person_id_before_last_save
+    @previous_work_group_id = work_group_id_before_last_save
+  end
+
+  # a membership can be saved more than once before the commit, and only the last save's changes are known then
+  def remember_rdf_change
+    @rdf_changed ||= saved_change_to_person_id? || saved_change_to_work_group_id?
+  end
+
+  def remember_project
+    @project_id = work_group&.project_id
   end
 
   def queue_update_auth_table
@@ -40,6 +55,19 @@ class GroupMembership < ApplicationRecord
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
 
     AuthLookupUpdateQueue.enqueue(people.compact.uniq)
+  end
+
+  def queue_rdf_generation
+    return unless destroyed? || @rdf_changed
+
+    @rdf_changed = false
+
+    people = [Person.find_by_id(person_id)]
+    people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
+    projects = [Project.find_by_id(@project_id || work_group&.project_id)]
+    projects << WorkGroup.find_by_id(@previous_work_group_id)&.project unless @previous_work_group_id.blank?
+
+    RdfGenerationQueue.enqueue((people + projects).compact.uniq, refresh_dependents: false)
   end
 
   #whether the person can remove this person from the project. If they are an administrator and related programme administrator they can, but otherwise they cannot remove themself.

@@ -20,7 +20,9 @@ class SparqlController < ApplicationController
   def query
     @sparql_query = params[:sparql_query] || ''
 
-    if rdf_repository_available?
+    if @sparql_query.blank?
+      @error = t('sparql.blank_query_error')
+    elsif rdf_repository_available?
       begin
         @results = execute_sparql_query(@sparql_query)
       rescue StandardError => e
@@ -40,8 +42,8 @@ class SparqlController < ApplicationController
         @example_queries = load_example_queries
         render :index, status: status
       end
-      format.json { render json: { 'results': @results, 'error': @error }.compact, status: status }
-      format.xml { render xml: @results.to_xml, status: status }
+      format.json { render json: { 'results': results_as_strings, 'error': @error }.compact, status: status }
+      format.xml { render xml: results_as_strings.to_xml, status: status }
     end
   end
 
@@ -52,9 +54,15 @@ class SparqlController < ApplicationController
     endpoint = Seek::Rdf::RdfRepository.instance.get_configuration.uri
     sparql_client = SPARQL::Client.new(endpoint, graph: public_graph)
     results = sparql_client.query(query)
+    # DESCRIBE and CONSTRUCT results are a reader over the response, which can only be read through once
+    results = results.to_a if results.is_a?(RDF::Reader)
+    # the variables a SELECT query projects, in the order given. Each row only holds the variables bound in it.
+    @result_columns = results.variable_names if results.respond_to?(:variable_names)
     convert_sparql_results(results)
   end
 
+  # Converts the results to rows, as a Hash of each variable to its value. The values are kept as RDF terms, so that
+  # IRIs, blank nodes and literals can be told apart when displayed.
   def convert_sparql_results(results)
     return [] if results.nil?
 
@@ -64,10 +72,13 @@ class SparqlController < ApplicationController
     # Handle different result formats
     if results.respond_to?(:map)
       results.map do |solution|
-        if solution.respond_to?(:to_h)
-          solution.to_h.transform_values { |v| v.respond_to?(:to_s) ? v.to_s : v }
+        if solution.is_a?(RDF::Statement)
+          # the statements of a DESCRIBE or CONSTRUCT query, which have no graph name
+          { subject: solution.subject, predicate: solution.predicate, object: solution.object }
+        elsif solution.respond_to?(:to_h)
+          solution.to_h
         elsif solution.respond_to?(:bindings)
-          solution.bindings.transform_values { |v| v.respond_to?(:to_s) ? v.to_s : v }
+          solution.bindings
         else
           solution.to_s
         end
@@ -76,6 +87,10 @@ class SparqlController < ApplicationController
       # This handles ASK queries (boolean) and any other single values
       [{ 'result' => results.to_s }]
     end
+  end
+
+  def results_as_strings
+    @results.map { |row| row.is_a?(Hash) ? row.transform_values(&:to_s) : row }
   end
 
   def rdf_repository_available?

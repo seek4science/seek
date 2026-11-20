@@ -1,4 +1,5 @@
 
+require 'minitest/mock'
 require 'test_helper'
 
 class GroupMembershipTest < ActiveSupport::TestCase
@@ -64,5 +65,71 @@ class GroupMembershipTest < ActiveSupport::TestCase
 
     gm.person = admin
     assert gm.person_can_be_removed?
+  end
+
+  test 'adding and removing a membership queues rdf generation for the person and project' do
+    person = FactoryBot.create(:brand_new_person)
+    project = FactoryBot.create(:project)
+    institution = FactoryBot.create(:institution)
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { person.add_to_project_and_institution(project, institution) }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: project).exists?
+
+    RdfGenerationQueue.delete_all
+    membership = person.group_memberships.first
+    disable_authorization_checks { membership.destroy }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: project).exists?
+  end
+
+  test 'destroying the last membership of a work group queues rdf generation for its project' do
+    person = FactoryBot.create(:brand_new_person)
+    project = FactoryBot.create(:project)
+    institution = FactoryBot.create(:institution)
+    disable_authorization_checks { person.add_to_project_and_institution(project, institution) }
+    membership = GroupMembership.find(person.group_memberships.first.id)
+    work_group_id = membership.work_group_id
+
+    # the work group also queues its project as it is destroyed, so only the membership's own enqueue is recorded
+    queued = []
+    RdfGenerationQueue.stub(:enqueue, lambda { |*items, refresh_dependents: false, **|
+      queued.concat(items.flatten) unless refresh_dependents
+    }) do
+      disable_authorization_checks { membership.destroy }
+    end
+
+    refute WorkGroup.exists?(work_group_id)
+    assert_includes queued, person
+    assert_includes queued, project
+  end
+
+  test 'leaving a project does not queue rdf generation, as the person is still associated with it' do
+    person = FactoryBot.create(:person)
+    membership = person.group_memberships.first
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { membership.update!(time_left_at: 1.day.ago, has_left: true) }
+
+    refute RdfGenerationQueue.where(item: person).exists?
+    refute RdfGenerationQueue.where(item: person.projects.first).exists?
+  end
+
+  test 'moving a membership to another project queues rdf generation for both projects' do
+    person = FactoryBot.create(:person)
+    old_project = person.projects.first
+    new_project = FactoryBot.create(:project)
+    work_group = FactoryBot.create(:work_group, project: new_project, institution: person.institutions.first)
+    RdfGenerationQueue.delete_all
+
+    membership = person.group_memberships.first
+    disable_authorization_checks { membership.update!(work_group: work_group) }
+
+    assert RdfGenerationQueue.where(item: person).exists?
+    assert RdfGenerationQueue.where(item: old_project).exists?
+    assert RdfGenerationQueue.where(item: new_project).exists?
   end
 end

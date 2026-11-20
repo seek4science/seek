@@ -1,4 +1,7 @@
 module SparqlHelper
+  # the template for the tooltips of links in the SPARQL results, with a class so that only these wrap long values
+  SPARQL_POPOVER_TEMPLATE = '<div class="popover sparql-popover" role="tooltip"><div class="arrow"></div>' \
+                            '<h3 class="popover-title"></h3><div class="popover-content"></div></div>'.freeze
 
   def sparql_results_panel_title
     "<i class=\"glyphicon glyphicon-ok-circle\"></i>&nbsp;Query Results (#{@results.length} results)"
@@ -8,4 +11,46 @@ module SparqlHelper
     '<span class="glyphicon glyphicon-list-alt"></span>&nbsp;Example Queries'
   end
 
+  # The columns of the SPARQL results table: the variables of a SELECT query, otherwise those of all the rows, as a
+  # row doesn't hold the variables that weren't bound for it.
+  def sparql_result_columns(results)
+    @result_columns.presence || results.flat_map(&:keys).uniq
+  end
+
+  # Displays a value of the SPARQL results, distinguishing the kind of RDF term. An IRI (a node in the graph) is shown
+  # within <>, as in SPARQL and Turtle, a blank node with its _: label, and a literal as its plain value. Any that
+  # are http(s) URLs are linked.
+  def sparql_result_value(value)
+    case value
+    when RDF::URI
+      content = safe_join(['<', sparql_result_link(value.to_s), '>'])
+      content_tag(:span, content, class: 'sparql-iri', title: 'IRI (node)')
+    when RDF::Node
+      content_tag(:span, value.to_s, class: 'sparql-bnode', title: 'Blank node')
+    else
+      content_tag(:span, sparql_result_link(value.to_s), class: 'sparql-literal', title: sparql_literal_title(value))
+    end
+  end
+
+  private
+
+  def sparql_result_link(text)
+    if text.match?(%r{\Ahttps?://})
+      link_to(text, text, class: 'external-link', data: { tooltip: text, template: SPARQL_POPOVER_TEMPLATE })
+    else
+      text
+    end
+  end
+
+  def sparql_literal_title(value)
+    return 'Literal' unless value.is_a?(RDF::Literal)
+
+    if value.language?
+      "Literal (@#{value.language})"
+    elsif value.datatype? && value.datatype != RDF::XSD.string
+      "Literal (#{value.datatype.pname})"
+    else
+      'Literal'
+    end
+  end
 end
