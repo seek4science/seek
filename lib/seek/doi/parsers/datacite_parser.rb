@@ -12,25 +12,18 @@ module Seek
           inc\.? | ltd\.? | gmbh | llc | e\.\s?v\.? | corporation
         )(?=\W|\z)/ix
 
-        # Lowercase surname particles that belong to the family name, e.g. "Ludwig van Beethoven".
-        SURNAME_PARTICLES = %w[van von der den de del della di da das dos du la le ten ter].freeze
-
         private
 
-        # DataCite creators may give a personal name only in 'name', either as "Family, Given"
-        # (the DataCite convention) or as "Given Family". Split it when the creator is personal;
-        # otherwise keep the whole name as the first name.
+        # DataCite creators may give a personal name only as "Family, Given" in 'name'.
+        # Split it when the creator is personal. Names without a comma are kept whole,
+        # because a space doesn't tell which part is the family name.
         def author_from_name(a)
           name = a['name'].to_s.strip
-          return super unless personal_name?(a, name)
-
-          given, family = case name.count(',')
-                          when 1 then name.split(',', 2).map(&:strip).reverse
-                          when 0 then split_given_family(name)
-                          end
-          return super if given.blank? || family.blank?
-
-          Seek::Doi::Author.new(first_name: given, last_name: family)
+          if personal_name?(a, name) && name.count(',') == 1
+            family, given = name.split(',', 2).map(&:strip)
+            return Seek::Doi::Author.new(first_name: given, last_name: family) if family.present? && given.present?
+          end
+          super
         end
 
         # Personal if stated by nameType or an ORCID; organisational if stated by nameType or a ROR id;
@@ -46,16 +39,6 @@ module Seek
 
             !name.match?(ORGANISATION_PATTERN)
           end
-        end
-
-        # "Given Middle Family" -> ["Given Middle", "Family"], keeping surname particles with the family name.
-        def split_given_family(name)
-          words = name.split(/\s+/)
-          return if words.size < 2
-
-          index = words.size - 1
-          index -= 1 while index > 1 && SURNAME_PARTICLES.include?(words[index - 1])
-          [words[0...index].join(' '), words[index..].join(' ')]
         end
 
         def build_url(doi)

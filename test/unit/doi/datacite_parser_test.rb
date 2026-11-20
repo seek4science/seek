@@ -73,38 +73,38 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
       { 'name' => 'Schulz, Christine', 'nameType' => 'Personal' },
       { 'name' => ' Doe ,  Jane ' },
       { 'name' => 'Ignored, Name', 'givenName' => 'Jane', 'familyName' => 'Smith' },
-      # "Given Family", with no comma
+      # names without a comma are not split, since a space doesn't tell which part is the family name
       { 'name' => 'Christine Schulz' },
       { 'name' => 'Maria Anna Schmidt', 'nameType' => 'Personal' },
       { 'name' => 'Ludwig van Beethoven' },
-      # names that can't be split are kept whole
+      # other names that can't be split are kept whole
       { 'name' => 'A, B, C' },
       { 'name' => 'Schulz,' },
       { 'name' => 'Schulz' },
       # organisations are kept whole: by nameType, ROR id or organisation word
       { 'name' => 'Institute of Things, Inc.', 'nameType' => 'Organizational' },
-      { 'name' => 'Human Cell Atlas', 'nameIdentifiers' => ror },
+      { 'name' => 'Acme, Europe', 'nameIdentifiers' => ror },
       { 'name' => 'Heidelberg University, Institute of Pharmacy' },
       { 'name' => 'Smith, Jones Ltd' },
       { 'name' => 'Human Cell Atlas Consortium, Europe' },
       { 'name' => 'Heidelberg Institute for Theoretical Studies' },
       # a Personal nameType or an ORCID wins over the organisation word check
       { 'name' => 'Group, Anna', 'nameType' => 'Personal' },
-      { 'name' => 'Mary Hospital', 'nameIdentifiers' => orcid }
+      { 'name' => 'Hospital, Mary', 'nameIdentifiers' => orcid }
     ])
 
     assert_equal [
       %w[Christine Schulz],
       %w[Jane Doe],
       %w[Jane Smith],
-      %w[Christine Schulz],
-      ['Maria Anna', 'Schmidt'],
-      ['Ludwig', 'van Beethoven'],
+      ['Christine Schulz', ''],
+      ['Maria Anna Schmidt', ''],
+      ['Ludwig van Beethoven', ''],
       ['A, B, C', ''],
       ['Schulz,', ''],
       ['Schulz', ''],
       ['Institute of Things, Inc.', ''],
-      ['Human Cell Atlas', ''],
+      ['Acme, Europe', ''],
       ['Heidelberg University, Institute of Pharmacy', ''],
       ['Smith, Jones Ltd', ''],
       ['Human Cell Atlas Consortium, Europe', ''],
