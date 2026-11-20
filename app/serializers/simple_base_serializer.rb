@@ -14,19 +14,37 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   def relationship_related_link(attribute_name); end
 
   def _meta
-    meta = if object.respond_to?(:created_at)
-      created = object.created_at
-      updated = object.updated_at
+    item = meta_item
+    meta = if item.respond_to?(:created_at)
+      created = item.created_at
+      updated = item.updated_at
       {
         created: created || '',
         modified: updated || ''
       }
     else
       {}
-           end
+    end
     meta[:api_version] = ActiveModel::Serializer.config.api_version
     meta[:base_url] = base_url
+    meta[:uuid] = item.uuid if item.respond_to?('uuid')
+    meta[:user_access] = current_user_permissions if item.try(:authorization_supported?)
     meta
+  end
+
+  # the item described by the meta block, which can differ from the object being serialized
+  def meta_item
+    object
+  end
+
+  # what the user making the request is allowed to do with the item; download is only included for items that
+  # have something to download
+  def current_user_permissions
+    actions = Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS
+    actions -= [:download] unless meta_item.is_downloadable?
+    actions.index_with do |action|
+      !!meta_item.can_perform?(action, User.current_user)
+    end
   end
 
   def serialize_annotations(object, context = nil)
