@@ -28,6 +28,25 @@ is small enough to redo by hand.
 | `0718d33736` | Name the Redis container started by the scripts `seek-cache` | The `script/*-docker-redis.sh` scripts and `docker-compose.yml` (`seek-redis`) clash on 1.19 too. Scripts only. |
 | `ee0f533f70` (one line of it) | A workflow version's diagram URL uses the workflow's id | `Seek::BioSchema::ResourceDecorators::Workflow#image` passes the `Workflow::Version` to `diagram_workflow_url`, so the URL contains the version record's id. That is a broken link in the JSON-LD served on 1.19. Take only the `parent_resource` change. The `can_render_diagram?` change matters only for RDF generation. |
 
+### Not yet fixed
+
+- **A workflow's plain-text creators have a broken link in its RO-Crate.** In a generated crate, the
+  main workflow refers to a creator with no ORCID or SEEK profile by its encoded id, for example
+  `{"@id": "#Mar%20Batlle"}`, but the Person entity's id is decoded, `"#Mar Batlle"`, so the
+  reference doesn't resolve. `WorkflowExtraction#merge_entities`
+  (`app/models/concerns/workflow_extraction.rb`) decodes each contextual entity's id with
+  `URI.decode_www_form_component` before adding it, while `merge_fields` copies the references
+  unchanged. On this branch it also means the crate's creator is missing from the RDF: `#Mar Batlle`
+  isn't a valid IRI, so its statements are dropped, leaving `<…/workflows/2/crate/#Mar%20Batlle>`
+  with no description. Creators with an ORCID or a SEEK profile have absolute ids, so aren't affected.
+  - **Fix:** remove the decode. The entity is created with a `nil` id, so the ro-crate gem keeps the
+    id as given and doesn't encode it again.
+  - **Tests:** `workflow_ro_crate_test.rb` looks Jane up as `'#Jane Bloggs'`; change it to
+    `'#Jane%20Bloggs'`, and check that each of the main workflow's creators resolves to an entity.
+    On this branch, also check the RDF has the crate's creator with its `schema:name`.
+  - The bug has been there since 2021, so 1.19 produces the same broken crates. Commit the fix on its
+    own so it can be taken across.
+
 ### Triple store updates through named graphs, and the regenerate all RDF button
 
 These are bigger than the fixes above, but they don't depend on the vocabulary and they fix a real
@@ -161,6 +180,13 @@ section 1).
 - **Extended metadata and sample attributes as `additionalProperty`/`PropertyValue`** in the
   JSON-LD. Samples already do this. Doing it for extended metadata would make it visible on the page
   as well.
+- **Regenerate a collection's RDF when its items change.** Adding or removing a `CollectionItem`
+  only touches the collection (`belongs_to :collection, touch: true`), so its only change is
+  `updated_at`, and `queue_rdf_generation` skips it. The same happens when items are changed through
+  the collection's `items_attributes`. So the collection's `schema:hasPart`, and the added or removed
+  item's `schema:isPartOf`, go stale until something else changes them. Queue the collection and the
+  item from `CollectionItem` after commit, in the same way as `GroupMembership` and `Annotation`, with
+  `refresh_dependents: false`. This only matters for Schema.org: collections have no JERM RDF.
 - **Wrap RO-Crate generation in error handling,** and consider caching each frozen version's crate.
 - **Rename `Workflow#ro_crate_metadata`** (for example to `ro_crate_metadata_jsonld`). It returns a
   JSON-LD string, but `Project#ro_crate_metadata` and `Person#ro_crate_metadata` return Hash
