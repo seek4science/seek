@@ -406,12 +406,18 @@ class ApplicationController < ActionController::Base
         end
       when *Seek::Util.authorized_types.map { |t|
  t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'create_metadata' || action == 'create_from_template'|| action == 'create_from_fair_ds_ttl'
-        action = 'update' if action == 'create_version'
-        action = 'inline_view' if action == 'explore'
-        action = 'download' if action == 'ro_crate'
-        action = 'run' if action == 'simulate'
-        action = 'run' if action == 'copasi_simulate'
+        case action
+        when 'create_metadata', 'create_from_template', 'create_from_fair_ds_ttl'
+          action = 'create'
+        when 'create_version'
+          action = 'update'
+        when 'explore'
+          action = 'inline_view'
+        when 'ro_crate'
+          action = 'download'
+        when 'simulate', 'copasi_simulate'
+          action = 'run'
+        end
         if %w(show create update destroy download inline_view run).include?(action)
           check_log_exists(action, controller_name, object)
           ActivityLog.create(action: action,
