@@ -409,7 +409,7 @@ class ApplicationController < ActionController::Base
         case action
         when 'create_metadata', 'create_from_template', 'create_from_fair_ds_ttl'
           action = 'create'
-        when 'create_version'
+        when 'create_version', 'create_version_metadata', 'create_version_from_git', 'create_version_from_ro_crate'
           action = 'update'
         when 'explore'
           action = 'inline_view'
