@@ -366,6 +366,10 @@ module Seek
       organisms_enabled
     end
 
+    def sample_types_enabled
+      samples_enabled
+    end
+
     def omniauth_elixir_aai_config
       if omniauth_elixir_aai_legacy_mode
         {

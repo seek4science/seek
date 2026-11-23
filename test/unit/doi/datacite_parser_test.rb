@@ -53,5 +53,66 @@ class Seek::Doi::DataciteParserTest < ActiveSupport::TestCase
     end
   end
 
+  # === Creators given only as "Family, Given" in the name field (issue #2809) ===
+  test 'parses DOI (DataCite) with comma-separated creator names' do
+    VCR.use_cassette('doi/doi_datacite_response_comma_name') do
+      doi = '10.14279/eceasst.v86.1.2784'
+      result = Seek::Doi::Parser.parse(doi)
+      assert_equal [%w[Christine Schulz], %w[Inga Ulusoy], %w[Rebecca Wade]],
+                   result.authors.map { |a| [a.first_name, a.last_name] }
+      assert_equal 'Christine Schulz', result.authors.first.full_name
+    end
+  end
+
+  test 'extract_authors_as_objects handles name-only creators' do
+    orcid = [{ 'nameIdentifierScheme' => 'ORCID', 'nameIdentifier' => 'https://orcid.org/0000-0002-0340-6212' }]
+    ror = [{ 'nameIdentifierScheme' => 'ROR', 'nameIdentifier' => 'https://ror.org/038t36y30' }]
+    parser = Seek::Doi::Parsers::DataciteParser.new
+    authors = parser.send(:extract_authors_as_objects, [
+      # "Family, Given"
+      { 'name' => 'Schulz, Christine', 'nameType' => 'Personal' },
+      { 'name' => ' Doe ,  Jane ' },
+      { 'name' => 'Ignored, Name', 'givenName' => 'Jane', 'familyName' => 'Smith' },
+      # names without a comma are not split, since a space doesn't tell which part is the family name
+      { 'name' => 'Christine Schulz' },
+      { 'name' => 'Maria Anna Schmidt', 'nameType' => 'Personal' },
+      { 'name' => 'Ludwig van Beethoven' },
+      # other names that can't be split are kept whole
+      { 'name' => 'A, B, C' },
+      { 'name' => 'Schulz,' },
+      { 'name' => 'Schulz' },
+      # organisations are kept whole: by nameType, ROR id or organisation word
+      { 'name' => 'Institute of Things, Inc.', 'nameType' => 'Organizational' },
+      { 'name' => 'Acme, Europe', 'nameIdentifiers' => ror },
+      { 'name' => 'Heidelberg University, Institute of Pharmacy' },
+      { 'name' => 'Smith, Jones Ltd' },
+      { 'name' => 'Human Cell Atlas Consortium, Europe' },
+      { 'name' => 'Heidelberg Institute for Theoretical Studies' },
+      # a Personal nameType or an ORCID wins over the organisation word check
+      { 'name' => 'Group, Anna', 'nameType' => 'Personal' },
+      { 'name' => 'Hospital, Mary', 'nameIdentifiers' => orcid }
+    ])
+
+    assert_equal [
+      %w[Christine Schulz],
+      %w[Jane Doe],
+      %w[Jane Smith],
+      ['Christine Schulz', ''],
+      ['Maria Anna Schmidt', ''],
+      ['Ludwig van Beethoven', ''],
+      ['A, B, C', ''],
+      ['Schulz,', ''],
+      ['Schulz', ''],
+      ['Institute of Things, Inc.', ''],
+      ['Acme, Europe', ''],
+      ['Heidelberg University, Institute of Pharmacy', ''],
+      ['Smith, Jones Ltd', ''],
+      ['Human Cell Atlas Consortium, Europe', ''],
+      ['Heidelberg Institute for Theoretical Studies', ''],
+      %w[Anna Group],
+      %w[Mary Hospital]
+    ], authors.map { |a| [a.first_name, a.last_name] }
+  end
+
 end
 

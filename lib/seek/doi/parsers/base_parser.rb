@@ -122,9 +122,16 @@ module Seek
             elsif a['givenName'] && a['familyName']
               Seek::Doi::Author.new(first_name: a['givenName'], last_name: a['familyName'])
             elsif a['name']
-              Seek::Doi::Author.new(first_name: a['name'], last_name: '')
+              author_from_name(a)
             end
           end.compact
+        end
+
+        # Builds an author from a single 'name' field, kept whole as the first name.
+        # In Crossref, 'name' is only used for organisations, so it is never split.
+        # Parsers whose single names may be personal (e.g. DataCite) override this.
+        def author_from_name(a)
+          Seek::Doi::Author.new(first_name: a['name'].to_s.strip, last_name: '')
         end
 
         def extract_editors(list)
