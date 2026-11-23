@@ -235,6 +235,15 @@ class WorkflowsController < ApplicationController
     end
 
     if valid
+      object = object_for_request
+      ActivityLog.create(action: 'update',
+                         culprit: current_user,
+                         referenced: object.projects.first,
+                         controller_name: controller_name,
+                         activity_loggable: object,
+                         data: object.title,
+                         user_agent: request.env['HTTP_USER_AGENT'])
+
       update_relationships(@workflow, params)
 
       respond_to do |format|
