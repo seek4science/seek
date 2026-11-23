@@ -331,6 +331,14 @@ class WorkflowsController < ApplicationController
       new_version = !@workflow.id.nil?
 
       if @workflow.save && (!new_version || @workflow.git_version.save)
+        object = object_for_request
+        ActivityLog.create(action: new_version ? 'update' : 'create',
+                           culprit: current_user,
+                           referenced: object.projects.first,
+                           controller_name: controller_name,
+                           activity_loggable: object,
+                           data: object.title,
+                           user_agent: request.env['HTTP_USER_AGENT'])
         render json: @workflow, include: json_api_include_param
       else
         render json: json_api_errors(@workflow), status: :unprocessable_entity
