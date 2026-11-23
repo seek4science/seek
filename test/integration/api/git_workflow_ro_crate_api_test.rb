@@ -270,6 +270,26 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'creating a version adds an activity log entry' do
+    workflow = FactoryBot.create(:ro_crate_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
+
+    assert_difference('ActivityLog.count') do
+      post submit_workflows_path, params: {
+        ro_crate: fixture_file_upload('workflows/ro-crate-with-id.crate.zip'),
+        workflow: {
+          project_ids: [@project.id]
+        }
+      }, headers: { 'Authorization' => write_access_auth }
+    end
+
+    assert_response :success
+
+    al = ActivityLog.last
+    assert_equal 'update', al.action
+    assert_equal workflow, al.activity_loggable
+    assert_equal 'workflows', al.controller_name
+  end
+
   test 'duplicate version ignored when submitting RO-Crate' do
     workflow = FactoryBot.create(:local_git_workflow, source_link_url: 'https://example.com/my-workflow', contributor: current_person)
     disable_authorization_checks { workflow.git_version.update!(name: '1.0.0') }
