@@ -12,9 +12,12 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     zip = workflow.ro_crate_zip
 
     crate = ROCrate::WorkflowCrateReader.read_zip(zip)
-    jane = crate.get('#Jane Bloggs')
+    jane = crate.get('#Jane%20Bloggs')
     assert jane
     assert_equal 'Jane Bloggs', jane.name
+    creator_refs = Array(crate.main_workflow['creator'])
+    assert_includes creator_refs.map { |ref| ref['@id'] }, '#Jane%20Bloggs'
+    assert_includes creator_refs.map { |ref| crate.dereference(ref['@id']) }, jane
 
     workflow = crate.get('Genomics-1-PreProcessing_without_downloading_from_SRA.ga')
     assert workflow
