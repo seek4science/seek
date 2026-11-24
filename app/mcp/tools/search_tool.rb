@@ -1,25 +1,31 @@
 module Tools
   class SearchTool < ApplicationTool
-    title 'Search Tool'
-    description 'Searches the given resource type for the given query'
-    input_schema(
-      properties: {
-        type: {
-          type: 'string',
-          'enum': Seek::Util.searchable_types.map { |t| t.model_name.plural },
-        },
-        query: { type: 'string' },
-      },
-      required: ['type', 'query'],
-      )
-    annotations(
-      destructive_hint: false,
-      idempotent_hint: true,
-      open_world_hint: false,
-      read_only_hint: true,
-    )
-
     class << self
+      # We define the tool dynamically because its schema looks at `Seek::Util.searchable_types` which can change.
+      def build
+        MCP::Tool.define(
+          name: 'search_tool',
+          title: 'Search Tool',
+          description: 'Searches the given resource type for the given query',
+          input_schema: {
+            properties: {
+              type: {
+                type: 'string',
+                enum: Seek::Util.searchable_types.map { |t| t.model_name.plural },
+              },
+              query: { type: 'string' },
+            },
+            required: ['type', 'query'],
+          },
+          annotations: {
+            destructive_hint: false,
+            idempotent_hint: true,
+            open_world_hint: false,
+            read_only_hint: true
+          },
+          &method(:call))
+      end
+
       def call(type:, query:, server_context:)
         begin
           type_name = type.singularize.camelize

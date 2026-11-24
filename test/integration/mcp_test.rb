@@ -41,7 +41,7 @@ class McpTest < ActionDispatch::IntegrationTest
     end
 
     result = response.parsed_body['result']
-    assert_not result[:isError]
+    refute result[:isError]
     assert_includes result[:content].first[:text], 'Workflow Result - http://'
   end
 
