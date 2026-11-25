@@ -7,7 +7,7 @@ class CacheOverflowCallSitesTest < ActiveSupport::TestCase
   CALL_SITES = {
     'lib/seek/templates/reader.rb' => /Rails\.cache\.fetch\("blob_ss_xml-.*expires_in:/,
     'lib/seek/data/spreadsheet_explorer_representation.rb' =>
-      [/Rails\.cache\.fetch\("blob_ss_xml-.*expires_in:/, /Rails\.cache\.fetch\("blob_ss_csv-.*expires_in:/],
+      [/Rails\.cache\.fetch\("blob_ss_xml-.*expires_in:/],
     'app/helpers/search_helper.rb' => /Rails\.cache\.fetch\(object\.content_blob\.cache_key, expires_in:/,
     'lib/seek/assets_standard_controller_actions.rb' =>
       /Rails\.cache\.fetch\("spreadsheet-workbook-.*expires_in:/,
