@@ -213,6 +213,15 @@ class MailerTest < ActionMailer::TestCase
                  encode_mail(Mailer.contact_admin_new_user(new_registree.user))
   end
 
+  test 'contact_admin_new_user includes who am i text when given' do
+    new_registree = FactoryBot.create(:person, first_name: 'Fred', last_name: 'Jones', email: 'fredjones@email.com')
+
+    body = Mailer.contact_admin_new_user(new_registree.user, 'I am a PhD student at Example University.').body.to_s
+
+    assert_match(/They wrote a few words about themselves:\s+I am a PhD student at Example University\./, body)
+    assert_includes body, 'This is an automated email.'
+  end
+
 
   test 'welcome' do
     @expected.subject = 'Welcome to Sysmo SEEK'

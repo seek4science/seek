@@ -85,10 +85,11 @@ class Mailer < ActionMailer::Base
          subject: "Welcome to #{Seek::Config.instance_name}")
   end
 
-  def contact_admin_new_user(user)
+  def contact_admin_new_user(user, who_am_i = nil)
 
     @person = user.person
     @user = user
+    @who_am_i = who_am_i
 
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
