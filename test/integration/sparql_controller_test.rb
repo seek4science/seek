@@ -1,7 +1,9 @@
 require 'test_helper'
 require 'minitest/mock'
+require 'triple_store_test_helper'
 
 class SparqlControllerTest < ActionDispatch::IntegrationTest
+  include TripleStoreTestHelper
 
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
@@ -17,11 +19,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
   def teardown
     return unless @repository.configured?
 
-    q = @repository.query.delete(%i[s p o]).graph(@private_graph).where(%i[s p o])
-    @repository.delete(q)
-
-    q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
-    @repository.delete(q)
+    clear_triple_store(@repository)
     VCR.configure do |c|
       c.allow_http_connections_when_no_cassette = false
     end
@@ -112,7 +110,7 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
   test 'demonstrate that the default public graph can be worked around' do
     path = query_sparql_index_path
-    create_some_triples
+    private_df, _public_df = create_some_triples
     query = 'SELECT ?datafile ?title ?graph
       WHERE {
         GRAPH ?graph {
@@ -126,9 +124,10 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(@response.body)
 
-    assert_equal 1, json['results'].length
-    assert_equal 'private data file', json['results'].first['title']
-    assert_equal 'seek-testing:private', json['results'].first['graph']
+    # found in both the private graph and the data file's own item graph
+    assert_equal ['private data file'], json['results'].map { |result| result['title'] }.uniq
+    assert_equal ['seek-testing:private', @repository.item_graph_uri(private_df).to_s].sort,
+                 json['results'].map { |result| result['graph'] }.sort
     assert_nil json['error']
   end
 
@@ -360,6 +359,8 @@ class SparqlControllerTest < ActionDispatch::IntegrationTest
 
     public_df = FactoryBot.create(:max_data_file, title: 'public data file', policy: FactoryBot.create(:public_policy))
     public_df.send_rdf_to_repository
+
+    [private_df, public_df]
   end
 
   def all_triples_count

@@ -1,7 +1,10 @@
 require 'test_helper'
 require 'minitest/mock'
+require 'triple_store_test_helper'
 
 class RdfTripleStoreTest < ActionDispatch::IntegrationTest
+  include TripleStoreTestHelper
+
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
     @project = FactoryBot.create(:project, title: 'Test for RDF storage')
@@ -15,14 +18,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
   def teardown
     unless @subject.nil?
-      q = @repository.query.delete(%i[s p o]).graph(@private_graph).where(%i[s p o])
-      @repository.delete(q)
-
-      q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
-      @repository.delete(q)
-
-      item_graphs.each { |graph| @repository.update("DROP SILENT GRAPH #{graph.to_base}") }
-      @repository.update("DROP SILENT GRAPH #{@repository.item_index_graph_uri.to_base}")
+      clear_triple_store(@repository)
 
       @project.delete_rdf_file
     end
@@ -507,11 +503,6 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     q = @repository.query.select
                    .where([@repository.item_graph_uri(item), RDF::Vocab::DC.isPartOf, :g])
                    .from(@repository.item_index_graph_uri)
-    @repository.select(q).map { |result| result[:g] }
-  end
-
-  def item_graphs
-    q = @repository.query.select.distinct.where([:g, RDF::Vocab::DC.isPartOf, :o]).from(@repository.item_index_graph_uri)
     @repository.select(q).map { |result| result[:g] }
   end
 
