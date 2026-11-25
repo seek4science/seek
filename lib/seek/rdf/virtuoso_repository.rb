@@ -9,7 +9,7 @@ module Seek
 
       class Config < Struct.new(:username, :password, :uri, :update_uri, :private_graph, :public_graph, :timeout); end
 
-      # seconds to wait for a response, long enough for an update request holding all of a large item's rdf
+      # seconds to wait for a response, allowing for an update holding a large item's rdf
       DEFAULT_TIMEOUT = 60
       QUERY = RDF::Virtuoso::Query
 

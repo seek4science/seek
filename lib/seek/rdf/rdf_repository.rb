@@ -43,11 +43,8 @@ module Seek
         get_repository_object.update(*args)
       end
 
-      # Sends the rdf related to item to the repository, and updates the rdf file.
-      #
-      # The statements are stored in the item's own named graph (see #item_graph_uri), and copied from there into each
-      # of the given graphs. Which of those graphs the item contributed to is recorded in the item index graph (see
-      # #item_index_graph_uri), so #remove_rdf can later remove exactly what was sent.
+      # Sends the item's rdf to its own named graph, and copies it into each of the graphs, recording them in the index
+      # graph. Also updates the rdf file.
       def send_rdf(item, graphs = rdf_graph_uris(item), save_file = true)
         if configured? && item.rdf_supported?
           connect_to_repository
@@ -58,10 +55,8 @@ module Seek
         end
       end
 
-      # Removes the rdf related to item from the repository, and deletes the rdf file.
-      #
-      # From each of the graphs the item contributed to, removes the statements in the item's named graph that no other
-      # item's graph contributing to it still holds, and then drops the item's graph.
+      # Removes the item's statements from the graphs it was sent to, except those another item also sent, and drops
+      # its named graph. Also deletes the rdf file.
       def remove_rdf(item, graphs = aggregate_graph_uris, delete_file = true)
         if configured? && item.rdf_supported?
           connect_to_repository
@@ -70,11 +65,8 @@ module Seek
         end
       end
 
-      # Replaces the rdf related to item in the repository, and updates the rdf file.
-      #
-      # The removal and the sending are made in a single update request. The store may apply its operations one at a
-      # time, so if one fails the item can be left partly removed or sent; the next update repairs it, as the removal
-      # works from what the item graph and index record rather than from the item's current rdf.
+      # Replaces the item's rdf in a single update request, and updates the rdf file. The store may not apply the
+      # request atomically, but a partial failure is repaired by the next update.
       def update_rdf(item)
         if configured? && item.rdf_supported?
           connect_to_repository
@@ -84,14 +76,12 @@ module Seek
         end
       end
 
-      # The named graph holding exactly the statements sent for item. It is within the namespace of #fullest_graph, so
-      # that different SEEK instances sharing a store don't clash.
+      # The named graph holding exactly the statements sent for item, named under #fullest_graph to keep it per instance
       def item_graph_uri(item)
         RDF::URI("#{item_graphs_prefix}#{item.class.base_class.name}/#{item.id}")
       end
 
-      # The named graph recording, for each item graph, which of the public and private graphs it contributed to, as
-      #   <item graph> dcterms:isPartOf <graph>
+      # The named graph recording which graphs each item graph was sent to, as <item graph> dcterms:isPartOf <graph>
       def item_index_graph_uri
         RDF::URI(item_graphs_prefix.chomp('/'))
       end
@@ -109,8 +99,7 @@ module Seek
         false
       end
 
-      # provides the URI's of any items related to the item - discovered by querying the private graph, or the public
-      # graph if there is no private graph, to find both:
+      # provides the URI's of any items related to the item - discovered by querying #fullest_graph to find both:
       #  <this_item> ?predicate <related_item>
       # or
       # <related_item> ?predicate <this_item>
@@ -183,9 +172,8 @@ module Seek
         Rails.logger.debug(result)
       end
 
-      # Operations that store the item's statements in its own graph, record which graphs it is part of, and then copy
-      # its statements into each of those graphs. Nothing is stored if there are no graphs to send to, such as for a
-      # private item when only a public graph is configured.
+      # Stores the item's statements in its graph, records the graphs in the index, and copies the statements into them.
+      # Stores nothing if there are no graphs, e.g. a private item with only a public graph configured.
       def send_operations(item, graphs)
         return [] if graphs.empty?
 
@@ -202,8 +190,7 @@ module Seek
           end
       end
 
-      # Operations that remove the item's statements from each of the graphs it contributed to, and then drop the item's
-      # graph and its index entry.
+      # Removes the item's statements from each graph, then drops its graph and index entry.
       def remove_operations(item, graphs)
         item_graph = item_graph_uri(item)
         graphs.map { |graph| remove_from_graph_operation(item_graph, RDF::URI(graph)) } +
@@ -211,8 +198,7 @@ module Seek
            "DROP SILENT GRAPH #{item_graph.to_base}"]
       end
 
-      # Removes from graph the statements in item_graph, if item_graph is recorded as part of graph, unless another item
-      # graph that is part of graph also holds them.
+      # Removes item_graph's statements from graph, if it was sent there, keeping those another item graph there holds.
       def remove_from_graph_operation(item_graph, graph)
         index_graph = item_index_graph_uri.to_base
         part_of = RDF::Vocab::DC.isPartOf.to_base
@@ -236,9 +222,8 @@ module Seek
         end
       end
 
-      # Replaces each blank node with an IRI (https://www.w3.org/TR/rdf11-concepts/#section-skolemization), the same
-      # IRI for every occurrence of the same blank node. A blank node can't be referred to in later requests, so would
-      # otherwise be disconnected from the item and couldn't be removed.
+      # Replaces blank nodes with IRIs (https://www.w3.org/TR/rdf11-concepts/#section-skolemization), so they stay
+      # connected across requests and can be removed.
       def skolemize(statements)
         iris = Hash.new do |hash, node|
           hash[node] = RDF::URI("#{skolem_iri_prefix}#{SecureRandom.uuid}")
