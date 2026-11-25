@@ -909,15 +909,41 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute File.exist?(txt_path)
   end
 
-  test 'extract_csv transcodes non utf-8 content' do
+  test 'open_as_utf8 transcodes non utf-8 content' do
     # ISO-8859-1 encoded CSV contains bytes that are invalid as UTF-8 (e.g. the degree symbol)
     blob = FactoryBot.create(:iso_8859_1_csv_content_blob)
     refute File.read(blob.filepath).valid_encoding?, 'fixture should contain invalid UTF-8 bytes'
+    refute blob.valid_utf8_file?
 
-    csv = blob.extract_csv
-    assert csv.valid_encoding?, 'extract_csv should return valid UTF-8'
+    csv = blob.open_as_utf8(&:read)
+    assert_equal Encoding::UTF_8, csv.encoding
+    assert csv.valid_encoding?, 'open_as_utf8 should read valid UTF-8'
+    assert_includes csv, 'Temp, °C()'
     # should not raise CSV::InvalidEncodingError
-    assert_nothing_raised { CSV.parse(csv, quote_char: "\x00") }
+    assert_nothing_raised { blob.open_as_utf8 { |io| CSV.new(io, quote_char: "\x00").each { |_row| } } }
+  end
+
+  test 'open_as_utf8 reads utf-8 content unchanged' do
+    blob = FactoryBot.create(:content_blob, original_filename: 'utf8.csv', content_type: 'text/csv',
+                                            data: "name,temp\nCafé,20°C\n")
+    assert blob.valid_utf8_file?
+    assert_equal "name,temp\nCafé,20°C\n", blob.open_as_utf8(&:read)
+  end
+
+  test 'valid_utf8_file? handles multi-byte characters split across chunks' do
+    # '°' and 'é' are 2 bytes and '€' is 3 bytes, so small chunk sizes split them at every possible point
+    blob = FactoryBot.create(:content_blob, original_filename: 'utf8.csv', content_type: 'text/csv',
+                                            data: 'a°bé€c' * 20)
+    (1..7).each do |chunk_size|
+      assert blob.valid_utf8_file?(chunk_size), "should be valid with chunk size #{chunk_size}"
+    end
+
+    # a Latin-1 byte at the very end, which could be mistaken for the start of an incomplete character
+    blob = FactoryBot.create(:content_blob, original_filename: 'latin1.csv', content_type: 'text/csv',
+                                            data: "abc\xB0".b)
+    (1..5).each do |chunk_size|
+      refute blob.valid_utf8_file?(chunk_size), "should be invalid with chunk size #{chunk_size}"
+    end
   end
 
   test 'tmp_io_objects in tmp dir are deleted' do

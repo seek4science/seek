@@ -7,6 +7,9 @@ module Seek
 
       MIN_ROWS = 35
       MIN_COLS = 10
+      DEFAULT_COLUMN_WIDTH = '2964'.freeze
+      # shared by every CSV/TSV cell, rather than allocating a new 'default' string per cell
+      DEFAULT_STYLE = 'default'.freeze
 
       def supported_spreadsheet_format?
         content_blob && content_blob.is_supported_spreadsheet_format?
@@ -44,21 +47,15 @@ module Seek
         end
       end
 
-      def spreadsheet_csv
-        Rails.cache.fetch("blob_ss_csv-#{content_blob.cache_key}", expires_in: 30.days) do
-          content_blob.extract_csv
-        end
-      end
-
       private
 
       def parse_spreadsheet
         if content_blob.is_excel?
           parse_spreadsheet_xml(spreadsheet_xml)
         elsif content_blob.is_csv?
-          parse_spreadsheet_csv(spreadsheet_csv)
+          content_blob.open_as_utf8 { |io| parse_spreadsheet_csv(io) }
         elsif content_blob.is_tsv?
-          parse_spreadsheet_csv(spreadsheet_csv, "\t")
+          content_blob.open_as_utf8 { |io| parse_spreadsheet_csv(io, "\t") }
         end
       end
 
@@ -116,7 +113,7 @@ module Seek
             r.find('./ss:cell').each do |c|
               col_index = c['column'].to_i
               content = c.content
-              cell = Cell.new(content, row_index, col_index, c['formula'], c['style'])
+              cell = Cell.new(content, c['formula'], c['style'])
               row.cells[col_index] = cell
             end
           end
@@ -137,80 +134,56 @@ module Seek
         workbook
       end
 
-      # Takes in a string containing the csv representation of a spreadsheet and returns
-      # a Workbook object
-      def parse_spreadsheet_csv(spreadsheet_csv, col_sep = nil)
+      # Reads CSV (or TSV, with col_sep "\t") rows from an IO and returns a Workbook object.
+      # Rows are read one at a time rather than parsing the whole file into an array first, so only the
+      # Workbook itself is held in memory.
+      def parse_spreadsheet_csv(io, col_sep = ',')
         workbook = Workbook.new
-
-        csv = if col_sep.nil?
-                CSV.parse(spreadsheet_csv, quote_char: "\x00")
-              else
-                CSV.parse(spreadsheet_csv, col_sep: col_sep, quote_char: "\x00")
-              end
-
         sheet = Sheet.new('Sheet1')
         workbook.sheets << sheet
 
         # set a default style
-        style = Style.new('default')
+        style = Style.new(DEFAULT_STYLE)
         style.attributes['font-size'] = '11pt'
         style.attributes['color'] = '#000000'
         workbook.styles[style.name] = style
 
-        # Load into memory
-        min_rows = MIN_ROWS
-        min_cols = MIN_COLS
-
-        # Initialise column width to default width
-        col_index = 0
-        csv[0].each_with_index do |_c, index|
-          col_index = index + 1
-          col = Column.new(col_index, 2964.to_s)
-          sheet.columns << col
-        end
-
-        # Pad columns (so it's at least 10 cols wide)
-        if csv[0].length < min_cols
-          ((col_index + 1)..min_cols).each do |i|
-            col = Column.new(i, 2964.to_s)
-            sheet.columns << col
-          end
-        else
-          min_cols = csv[0].length
-        end
-
-        # Grab rows
+        # quoting is disabled, so every line is one row
+        csv = CSV.new(io, col_sep: col_sep, quote_char: "\x00")
         row_index = 0
-        csv.each_with_index do |r, index|
-          # row = Row.new(row_index, r['height'])
-          row_index = index + 1
+        csv.each do |r|
+          # the first row determines the column headings
+          add_csv_columns(sheet, r.length) if row_index.zero?
+          row_index += 1
           row = Row.new(row_index)
           sheet.rows[row_index] = row
-          # Add cells
-          r.each_with_index do |c, index|
-            # col_index = c['column'].to_i
-            col_index = index + 1
-            content = c
-            # csv won't have formulas or style
-            cell = Cell.new(content, row_index, col_index, nil, 'default')
-            row.cells[col_index] = cell
+          # csv won't have formulas or style
+          r.each_with_index do |content, index|
+            row.cells[index + 1] = Cell.new(content, nil, DEFAULT_STYLE)
           end
         end
+        add_csv_columns(sheet, 0) if row_index.zero?
 
         # Pad rows
-        if row_index < min_rows
-          ((row_index + 1)..min_rows).each do |i|
-            row = Row.new(i, 1000.to_s)
-            sheet.rows << row
+        if row_index < MIN_ROWS
+          ((row_index + 1)..MIN_ROWS).each do |i|
+            sheet.rows << Row.new(i, 1000.to_s)
           end
-          min_rows = MIN_ROWS
+          sheet.last_row = MIN_ROWS
         else
-          min_rows = row_index
+          sheet.last_row = row_index
         end
-        sheet.last_row = min_rows
-        sheet.last_col = min_cols
 
         workbook
+      end
+
+      # Adds a column for each of the column_count columns in the first row, padded so the sheet is at
+      # least MIN_COLS wide
+      def add_csv_columns(sheet, column_count)
+        (1..[column_count, MIN_COLS].max).each do |i|
+          sheet.columns << Column.new(i, DEFAULT_COLUMN_WIDTH)
+        end
+        sheet.last_col = [column_count, MIN_COLS].max
       end
 
       # Turns a numeric column ID into an Excel letter representation
@@ -342,13 +315,13 @@ module Seek
         end
       end
 
+      # The cell's position is given by where it is stored (sheet.rows[row].cells[column]), so isn't
+      # duplicated here - for a large sheet that saves two references in every one of millions of cells
       class Cell
-        attr_accessor :value, :row, :column, :formula, :style
+        attr_accessor :value, :formula, :style
 
-        def initialize(v = nil, r = nil, c = nil, f = nil, s = nil)
+        def initialize(v = nil, f = nil, s = nil)
           @value = v
-          @row = r
-          @column = c
           @formula = f
           @style = s unless s.blank?
         end

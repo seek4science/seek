@@ -156,6 +156,9 @@ def load_seek_config_defaults!
 
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
   Seek::Config.default :max_extractable_spreadsheet_size,10
+  #the maximum size, in Mb, for a CSV or TSV file that can be explored. These are parsed entirely in memory
+  #(over 10 times the file size), so keep this modest
+  Seek::Config.default :max_extractable_csv_size,10
   Seek::Config.default :jvm_memory_allocation,'512M'
 
   #the maximum size, in Mb, for a text file that can be indexed for search (too high and the indexing will timeout)

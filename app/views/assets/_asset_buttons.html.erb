@@ -94,7 +94,7 @@
       <% if display_asset.contains_extractable_spreadsheet? %>
         <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, version: version, action: :explore, code: params[:code])) %>
       <% else %>
-        <% explanation = "This spreadsheet is too big to be explored (larger than #{Seek::Config.max_extractable_spreadsheet_size} MB), or the file does not exist." %>
+        <% explanation = "This spreadsheet is too big to be explored (larger than #{display_asset.content_blob.extractable_spreadsheet_size_limit} MB), or the file does not exist." %>
         <%= button_link_to('Explore', 'spreadsheet', nil, disabled_reason: explanation) %>
       <% end %>
     <% elsif show_view_content_btn %>

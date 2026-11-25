@@ -4,6 +4,8 @@ module Seek
     include SysMODB::SpreadsheetExtractor
     include ContentSplit
 
+    UTF8_CHECK_CHUNK_SIZE = 1024 * 1024
+
     def pdf_contents_for_search
       content = []
       if file_exists?
@@ -81,13 +83,25 @@ module Seek
       spreadsheet_to_csv(filepath, sheet, trim, Seek::Config.jvm_memory_allocation)
     end
 
-    def extract_csv()
-      content = File.read(filepath)
-      # Some CSV files are not UTF-8 (e.g. ISO-8859-1/Latin-1), which would cause
-      # CSV parsing to raise CSV::InvalidEncodingError. Fall back to interpreting
-      # the bytes as ISO-8859-1 and transcode to UTF-8 when they aren't valid UTF-8.
-      content = content.encode('UTF-8', 'ISO-8859-1') unless content.valid_encoding?
-      content
+    # Opens the file as UTF-8 text, yielding the IO to the block. Some CSV files are not UTF-8
+    # (e.g. ISO-8859-1/Latin-1), which would cause CSV parsing to raise CSV::InvalidEncodingError, so
+    # if the bytes aren't valid UTF-8 they are read as ISO-8859-1 and transcoded to UTF-8 as they are
+    # read. Unlike reading the whole file into a String, this never holds the full contents in memory.
+    def open_as_utf8(&block)
+      mode = valid_utf8_file? ? 'r:UTF-8' : 'r:ISO-8859-1:UTF-8'
+      File.open(filepath, mode, &block)
+    end
+
+    # Checks the file is valid UTF-8, reading it in chunks rather than all at once
+    def valid_utf8_file?(chunk_size = UTF8_CHECK_CHUNK_SIZE)
+      File.open(filepath, 'rb') do |file|
+        pending = ''.b
+        while (chunk = file.read(chunk_size))
+          pending = valid_utf8_prefix_remainder(pending << chunk)
+          return false if pending.nil?
+        end
+        pending.empty?
+      end
     end
 
     def to_spreadsheet_xml
@@ -95,6 +109,17 @@ module Seek
     end
 
     private
+
+    # A chunk may end part way through a multi-byte character. Returns the trailing bytes (at most 3) of
+    # an incomplete character, to be prepended to the next chunk, or nil if the data is not valid UTF-8.
+    def valid_utf8_prefix_remainder(data)
+      (0..3).each do |tail|
+        break if tail > data.bytesize
+        prefix = data.byteslice(0, data.bytesize - tail).force_encoding(Encoding::UTF_8)
+        return data.byteslice(data.bytesize - tail, tail) if prefix.valid_encoding?
+      end
+      nil
+    end
 
     def resolve_sheet_name_to_index(sheet_name)
 

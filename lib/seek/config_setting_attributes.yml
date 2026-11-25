@@ -106,6 +106,7 @@ datacite_url:
 doi_prefix:
 doi_suffix:
 max_extractable_spreadsheet_size:
+max_extractable_csv_size:
 jvm_memory_allocation:
 max_indexable_text_size:
 show_announcements:

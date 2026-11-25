@@ -23,7 +23,7 @@
       <% url = polymorphic_path([asset], action: 'explore', code: params[:code], version: asset_version) %>
       <% options = { title: 'Explore the contents of this file' } %>
     <% else %>
-      <% options = { disabled_reason: "This spreadsheet is too big to be explored (larger than #{Seek::Config.max_extractable_spreadsheet_size} MB), or the file does not exist." } %>
+      <% options = { disabled_reason: "This spreadsheet is too big to be explored (larger than #{content_blob.extractable_spreadsheet_size_limit} MB), or the file does not exist." } %>
     <% end %>
   <% elsif !asset.is_a?(Model) && asset.is_downloadable_asset? %>
     <% if content_blob.file_exists? %>

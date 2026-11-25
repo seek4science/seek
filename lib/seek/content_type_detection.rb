@@ -51,7 +51,22 @@ module Seek
 
     # is any spreadsheet format, including csv and tsv, that can be extracted from
     def is_extractable_spreadsheet?(blob = self)
-      blob.file_exists? && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
+      blob.file_exists? && (is_extractable_excel?(blob) || is_extractable_csv?(blob))
+    end
+
+    # is a CSV or TSV file small enough to be explored. These are parsed entirely in memory, so are
+    # limited by max_extractable_csv_size rather than the Excel limit
+    def is_extractable_csv?(blob = self)
+      (is_csv?(blob) || is_tsv?(blob)) && within_csv_extraction_size_limit?(blob)
+    end
+
+    # the size limit, in MB, that applies to exploring this file
+    def extractable_spreadsheet_size_limit(blob = self)
+      if is_csv?(blob) || is_tsv?(blob)
+        Seek::Config.max_extractable_csv_size
+      else
+        Seek::Config.max_extractable_spreadsheet_size
+      end
     end
     
     # is any zipped format, that can be extracted from
@@ -208,6 +223,10 @@ module Seek
       !blob.file_size.nil? && blob.file_size < max_extractable_spreadsheet_size
     end
 
+    def within_csv_extraction_size_limit?(blob = self)
+      !blob.file_size.nil? && blob.file_size < max_extractable_csv_size
+    end
+
     # the max_indexable_text_size in bytes, defaulting to 10Mb
     def max_indexible_text_size
       (Seek::Config.max_indexable_text_size || 10).to_i * 1024 * 1024
@@ -216,6 +235,11 @@ module Seek
     # the max_extractable_spreadsheet_size in bytes, defaulting to 10Mb
     def max_extractable_spreadsheet_size
       (Seek::Config.max_extractable_spreadsheet_size || 10).to_i * 1024 * 1024
+    end
+
+    # the max_extractable_csv_size in bytes, defaulting to 10Mb
+    def max_extractable_csv_size
+      (Seek::Config.max_extractable_csv_size || 10).to_i * 1024 * 1024
     end
 
     def check_content(blob, str, max_length = 1500)

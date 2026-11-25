@@ -73,6 +73,36 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     end
   end
 
+  test 'csv and tsv have their own extraction size limit' do
+    csv_blob = FactoryBot.create :csv_content_blob
+    tsv_blob = FactoryBot.create :tsv_content_blob
+    xlsx_blob = FactoryBot.create :xlsx_content_blob
+
+    with_config_value(:max_extractable_csv_size, 0) do
+      refute csv_blob.is_extractable_csv?
+      refute csv_blob.is_extractable_spreadsheet?
+      refute is_extractable_spreadsheet?(tsv_blob)
+      assert xlsx_blob.is_extractable_spreadsheet?, 'Excel files should not be affected by the CSV limit'
+    end
+
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      assert csv_blob.is_extractable_csv?
+      assert csv_blob.is_extractable_spreadsheet?, 'CSV files should not be affected by the Excel limit'
+      assert is_extractable_spreadsheet?(tsv_blob)
+      refute xlsx_blob.is_extractable_spreadsheet?
+    end
+
+    refute xlsx_blob.is_extractable_csv?
+
+    with_config_value(:max_extractable_csv_size, 3) do
+      with_config_value(:max_extractable_spreadsheet_size, 7) do
+        assert_equal 3, csv_blob.extractable_spreadsheet_size_limit
+        assert_equal 3, extractable_spreadsheet_size_limit(tsv_blob)
+        assert_equal 7, xlsx_blob.extractable_spreadsheet_size_limit
+      end
+    end
+  end
+
   test 'is_extractable_excel' do
     blob = FactoryBot.create :spreadsheet_content_blob
     assert blob.is_extractable_excel?
