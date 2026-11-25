@@ -83,8 +83,8 @@ module Seek
         end
       end
 
-      # The named graph holding exactly the statements sent for item. It is within the namespace of the private graph,
-      # or the public graph if there is no private graph, so that different SEEK instances sharing a store don't clash.
+      # The named graph holding exactly the statements sent for item. It is within the namespace of #fullest_graph, so
+      # that different SEEK instances sharing a store don't clash.
       def item_graph_uri(item)
         RDF::URI("#{item_graphs_prefix}#{item.class.base_class.name}/#{item.id}")
       end
@@ -108,15 +108,17 @@ module Seek
         false
       end
 
-      # provides the URI's of any items related to the item - discovered by querying the triple store to find both:
+      # provides the URI's of any items related to the item - discovered by querying the private graph, or the public
+      # graph if there is no private graph, to find both:
       #  <this_item> ?predicate <related_item>
       # or
       # <related_item> ?predicate <this_item>
       def uris_of_items_related_to(item)
-        q = query.select.where([:s, :p, item.rdf_resource]).from(RDF::URI.new(get_configuration.private_graph))
+        graph = RDF::URI.new(fullest_graph)
+        q = query.select.where([:s, :p, item.rdf_resource]).from(graph)
         results = select(q).collect { |result| result[:s] }
 
-        q = query.select.where([item.rdf_resource, :p, :o]).from(RDF::URI.new(get_configuration.private_graph))
+        q = query.select.where([item.rdf_resource, :p, :o]).from(graph)
         results |= select(q).collect { |result| result[:o] }
 
         results.select { |result| result.is_a?(RDF::URI) }.collect(&:to_s).uniq
@@ -160,8 +162,13 @@ module Seek
         [get_configuration.public_graph, get_configuration.private_graph].compact
       end
 
+      # The private graph, which holds every item, or the public graph if there is no private graph
+      def fullest_graph
+        get_configuration.private_graph || get_configuration.public_graph
+      end
+
       def item_graphs_prefix
-        "#{get_configuration.private_graph || get_configuration.public_graph}/items/"
+        "#{fullest_graph}/items/"
       end
 
       def execute_operations(operations)

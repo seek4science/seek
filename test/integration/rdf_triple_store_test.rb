@@ -193,6 +193,23 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     assert_equal ["http://localhost:3000/data_files/#{data_file.id}", "http://localhost:3000/people/#{person.id}", "http://localhost:3000/sops/#{sop.id}"], uris.sort
   end
 
+  test 'uris of items related to with only a public graph' do
+    config = @repository.get_configuration.dup
+    config.private_graph = nil
+    person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop)
+
+    q = @repository.query.insert([person.rdf_resource, RDF::URI.new('http://is/member_of'), @project.rdf_resource]).graph(@public_graph)
+    @repository.insert(q)
+    q = @repository.query.insert([@project.rdf_resource, RDF::URI.new('http://produced'), sop.rdf_resource]).graph(@public_graph)
+    @repository.insert(q)
+
+    @repository.stub(:get_configuration, config) do
+      uris = @repository.uris_of_items_related_to @project
+      assert_equal ["http://localhost:3000/people/#{person.id}", "http://localhost:3000/sops/#{sop.id}"], uris.sort
+    end
+  end
+
   test 'update rdf' do
     @repository.send_rdf(@project)
 
