@@ -66,8 +66,7 @@ class ISAAssaysController < ApplicationController
       flash[:notice] = "The #{t('isa_assay')} was successfully created.<br/>".html_safe
       respond_to do |format|
         format.html do
-          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                       item_id: @isa_assay.assay)
+          redirect_to single_page_redirect_path
         end
         format.json { render json: @isa_assay, include: [params[:include]], status: :created }
       end
@@ -84,8 +83,7 @@ class ISAAssaysController < ApplicationController
       format.json { render json: @isa_assay, include: [params[:include]] }
       format.html do
         flash[:notice] = "You have been redirected to the #{t('single_page')} view"
-        redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                     item_id: @isa_assay.assay.id)
+        redirect_to single_page_redirect_path
       end
     end
   end
@@ -110,8 +108,7 @@ class ISAAssaysController < ApplicationController
       respond_to do |format|
         format.html do
           flash[:notice] = "The #{t('isa_assay')} was successfully updated"
-          redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                   item_id: @isa_assay.assay.id)
+          redirect_to single_page_redirect_path
         end
         format.json { render json: @isa_assay, include: [params[:include]], status: :ok }
       end
@@ -240,6 +237,12 @@ class ISAAssaysController < ApplicationController
     @single_page = true
   end
 
+  # Single page view of the assay, in the project the user came from (see SinglePagesHelper#single_page_item_path).
+  # Falls back to the assay page when the single page is unavailable, or the assays index when the assay is missing.
+  def single_page_redirect_path
+    helpers.single_page_or_item_path(@isa_assay.assay, assays_path)
+  end
+
   def old_attributes
     return if @isa_assay.assay.is_assay_stream? || @isa_assay.sample_type.nil?
 
@@ -273,13 +276,7 @@ class ISAAssaysController < ApplicationController
         flash[:error] = helpers.content_tag(:ul) do
           helpers.safe_join(error_messages)
         end.html_safe
-        path = if @isa_assay.assay.nil?
-                 assays_path
-               else
-                 single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
-                                  item_id: @isa_assay.assay)
-               end
-        redirect_to path
+        redirect_to single_page_redirect_path
       end
 
       format.json { render json: json_api_errors(@isa_assay), status: status }
