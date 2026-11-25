@@ -6,7 +6,8 @@ module Seek
     class ISACrateBuilder
       RO_CRATE_VERSION = '1.2'.freeze
       RO_CRATE_CONTEXT = "https://w3id.org/ro/crate/#{RO_CRATE_VERSION}/context".freeze
-      JERM = 'https://jermontology.org/ontology/JERMOntology#'.freeze
+      JERM_ONTOLOGY = 'https://jermontology.org/ontology/JERMOntology'.freeze
+      JERM = "#{JERM_ONTOLOGY}#".freeze
       # Data files above this size are listed in the metadata but their content is not packed into the zip.
       MAX_PACKED_FILE_SIZE = 100.megabytes
       # Investigations, studies and assays carry no license in SEEK; only the assets linked to them do,
@@ -21,6 +22,7 @@ module Seek
         'executesLabProtocol' => 'https://bioschemas.org/properties/executesLabProtocol'
       }.freeze
 
+      include Terms
       include People
       include Files
       include Samples
@@ -80,14 +82,14 @@ module Seek
         entity = ::ROCrate::DataEntity.new(crate)
         entity.id = id
         entity.type = 'Dataset'
-        set(entity, isa_properties(type_name, resource))
+        set(entity, isa_properties(crate, type_name, resource))
         set(entity, linked_properties(crate, type_name, resource))
         crate.add_data_entity(entity)
         entity
       end
 
       def root_properties(crate)
-        isa_properties('Investigation', investigation).merge(
+        isa_properties(crate, 'Investigation', investigation).merge(
           'description' => investigation.description.presence || investigation.title,
           'license' => DEFAULT_LICENSE,
           'datePublished' => Time.now.utc.iso8601
@@ -103,19 +105,12 @@ module Seek
       # identifier is the bare SEEK id on every level and url the SEEK URL. ARC tools use a study's or
       # assay's identifier as a directory name and allow only letters, digits, underscore, dash and
       # space in it, so a URL is rejected there.
-      def isa_properties(type_name, resource)
-        { 'additionalType' => isa_type(type_name),
+      def isa_properties(crate, type_name, resource)
+        { 'additionalType' => isa_type(crate, type_name),
           'identifier' => resource.id.to_s,
           'url' => resource.rdf_seek_id,
           'name' => resource.title,
           'description' => resource.description }
-      end
-
-      # additionalType is a list: the IRI of the JERM ontology term, plus the bare name ("Investigation",
-      # "Study" or "Assay"). ARC tools only recognise a Dataset as a study or an assay by that exact
-      # string; with the JERM IRI alone they silently skip the entity.
-      def isa_type(name)
-        ["#{JERM}#{name}", name]
       end
 
       # Directory name: SEEK id, then the title lowercased with runs of spaces and punctuation collapsed
