@@ -210,6 +210,24 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'uris of items related to leave out skolemized blank nodes' do
+    data_file = data_file_with_nested_extended_metadata('2020-01-01')
+    @repository.send_rdf(data_file)
+    assert_equal 1, nested_start_dates(data_file, @private_graph).count
+
+    uris = @repository.uris_of_items_related_to(data_file)
+    assert uris.any?, 'the data file should be related to other items'
+    assert_empty uris.select { |uri| uri.include?('/.well-known/genid/') }
+
+    assert_nothing_raised { data_file.related_items_from_sparql }
+
+    data_file.delete_rdf_file
+  end
+
+  test 'timeout defaults to 60 seconds' do
+    assert_equal 60, @repository.get_configuration.timeout
+  end
+
   test 'update rdf' do
     @repository.send_rdf(@project)
 

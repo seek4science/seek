@@ -72,8 +72,9 @@ module Seek
 
       # Replaces the rdf related to item in the repository, and updates the rdf file.
       #
-      # The removal and the sending are made in a single update request, which the store applies as one transaction,
-      # so a query never sees the item missing or partly sent.
+      # The removal and the sending are made in a single update request. The store may apply its operations one at a
+      # time, so if one fails the item can be left partly removed or sent; the next update repairs it, as the removal
+      # works from what the item graph and index record rather than from the item's current rdf.
       def update_rdf(item)
         if configured? && item.rdf_supported?
           connect_to_repository
@@ -121,7 +122,9 @@ module Seek
         q = query.select.where([item.rdf_resource, :p, :o]).from(graph)
         results |= select(q).collect { |result| result[:o] }
 
-        results.select { |result| result.is_a?(RDF::URI) }.collect(&:to_s).uniq
+        results.select { |result| result.is_a?(RDF::URI) }.collect(&:to_s).uniq.reject do |uri|
+          uri.start_with?(skolem_iri_prefix)
+        end
       end
 
       # Abstract methods
@@ -238,11 +241,15 @@ module Seek
       # otherwise be disconnected from the item and couldn't be removed.
       def skolemize(statements)
         iris = Hash.new do |hash, node|
-          hash[node] = RDF::URI(Seek::Config.site_base_url.join(".well-known/genid/#{SecureRandom.uuid}").to_s)
+          hash[node] = RDF::URI("#{skolem_iri_prefix}#{SecureRandom.uuid}")
         end
         statements.map do |statement|
           RDF::Statement.new(*statement.to_triple.map { |term| term.node? ? iris[term] : term })
         end
+      end
+
+      def skolem_iri_prefix
+        Seek::Config.site_base_url.join('.well-known/genid/').to_s
       end
 
       def ntriples(statements)

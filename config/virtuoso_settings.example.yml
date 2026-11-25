@@ -10,6 +10,9 @@ production:
   private_graph: seek:private
   public_graph: seek:public
 
+  # seconds to wait for a response from the store (default 60)
+  # timeout: 60
+
 development:
   #if disabled is missing, the default is setting false.
   disabled: false
