@@ -681,6 +681,58 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'a', text: /fish/
   end
 
+  test 'filtering for association forms only includes viewable samples' do
+    owner = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+    FactoryBot.create(:sample, contributor: owner, policy: FactoryBot.create(:public_policy), title: 'public fish')
+    FactoryBot.create(:sample, contributor: owner, policy: FactoryBot.create(:private_policy), title: 'private fish')
+
+    # anonymous
+    get :filter, params: { filter: 'fish' }
+    assert_response :success
+    assert_select 'a', count: 1
+    assert_select 'a', text: /public fish/
+
+    login_as(other_person.user)
+    get :filter, params: { filter: 'fish' }
+    assert_response :success
+    assert_select 'a', count: 1
+    assert_select 'a', text: /public fish/
+
+    login_as(owner.user)
+    get :filter, params: { filter: 'fish' }
+    assert_response :success
+    assert_select 'a', count: 2
+    assert_select 'a', text: /private fish/
+  end
+
+  test 'filtering for association forms does not reveal associations of a hidden assay' do
+    owner = FactoryBot.create(:person)
+    other_person = FactoryBot.create(:person)
+    sample = FactoryBot.create(:sample, contributor: owner, policy: FactoryBot.create(:public_policy), title: 'public fish')
+    assay = FactoryBot.create(:assay, contributor: owner, policy: FactoryBot.create(:private_policy))
+    disable_authorization_checks { assay.samples << sample }
+
+    login_as(other_person.user)
+    get :filter, params: { filter: 'fish', assay_id: assay.id }
+    assert_response :success
+    assert_select 'a', count: 1
+    assert_select 'a.list-group-item-success', count: 0
+
+    login_as(owner.user)
+    get :filter, params: { filter: 'fish', assay_id: assay.id }
+    assert_response :success
+    assert_select 'a.list-group-item-success', count: 1, text: /public fish/
+  end
+
+  test 'filtering for association forms with a missing assay' do
+    FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy), title: 'public fish')
+
+    get :filter, params: { filter: 'fish', assay_id: (Assay.maximum(:id) || 0) + 100 }
+    assert_response :success
+    assert_select 'a', count: 1
+  end
+
   test 'turns strain attributes into links' do
     person = FactoryBot.create(:person)
     login_as(person.user)
