@@ -32,6 +32,8 @@
     <% end %>
   <% end %>
 
+  <%= render partial: 'sharing/missing_access_types_warning' %>
+
   <%= submit_tag "Confirm", data: { disable_with: 'Confirm....' }, :class => 'btn btn-primary confirm-button',
     disabled: true, onclick: "submitBatchPermissionForm()"  -%>
   or
@@ -44,13 +46,7 @@
     $j(document).ready(function () {
         $j(".permission-column:contains('Download')").addClass('sharing-color');
 
-        $j('#permissions-table').on("DOMSubtreeModified", function(){
-          $j(".confirm-button").prop("disabled", false);
-        });
-
-        $j("#permissions-table").on('click', function() {
-          $j(".confirm-button").prop("disabled", false);
-        });
+        Sharing.requireAllAccessTypes(".confirm-button", ".missing-access-types-warning");
 
         $j("#change-permission-form").submit(function(){
           return false;

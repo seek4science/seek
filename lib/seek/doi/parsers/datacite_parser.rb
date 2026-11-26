@@ -4,7 +4,42 @@ module Seek
       class DataciteParser < BaseParser
         DATACITE_API_ENDPOINT = 'https://api.datacite.org/dois'.freeze
 
+        # Words that suggest a creator name belongs to an organisation rather than a person.
+        ORGANISATION_PATTERN = /\b(
+          universit\w* | institut\w* | cent(?:er|re)s? | laborator(?:y|ies) | department | faculty |
+          consortium | foundation | society | association | network | project | initiative |
+          group | team | hospital | college | school | academy | ministry | agency | council |
+          inc\.? | ltd\.? | gmbh | llc | e\.\s?v\.? | corporation
+        )(?=\W|\z)/ix
+
         private
+
+        # DataCite creators may give a personal name only as "Family, Given" in 'name'.
+        # Split it when the creator is personal. Names without a comma are kept whole,
+        # because a space doesn't tell which part is the family name.
+        def author_from_name(a)
+          name = a['name'].to_s.strip
+          if personal_name?(a, name) && name.count(',') == 1
+            family, given = name.split(',', 2).map(&:strip)
+            return Seek::Doi::Author.new(first_name: given, last_name: family) if family.present? && given.present?
+          end
+          super
+        end
+
+        # Personal if stated by nameType or an ORCID; organisational if stated by nameType or a ROR id;
+        # otherwise personal unless the name contains a typical organisation word.
+        def personal_name?(a, name)
+          schemes = Array(a['nameIdentifiers']).map { |i| i['nameIdentifierScheme'].to_s.upcase }
+          case a['nameType']
+          when 'Personal' then true
+          when 'Organizational' then false
+          else
+            return true if schemes.include?('ORCID')
+            return false if schemes.include?('ROR')
+
+            !name.match?(ORGANISATION_PATTERN)
+          end
+        end
 
         def build_url(doi)
           URI("#{DATACITE_API_ENDPOINT}/#{doi}")

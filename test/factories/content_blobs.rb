@@ -405,6 +405,12 @@ FactoryBot.define do
     content_type { 'application/x-yaml' }
     data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl", 'rb').read }
   end
+
+  factory(:cwl_content_blob_broken_diagram, parent: :content_blob) do
+    original_filename { 'broken_cwl.cwl' }
+    content_type { 'application/x-yaml' }
+    data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/broken_cwl.cwl", 'rb').read }
+  end
   
   factory(:cwl_packed_content_blob, parent: :content_blob) do
     original_filename { 'rp2-to-rp2path-packed.cwl' }
@@ -463,6 +469,12 @@ FactoryBot.define do
     original_filename { 'ro_crate_with_tests.crate.zip' }
     content_type { 'application/zip' }
     data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-with-tests.crate.zip", 'rb').read }
+  end
+
+  factory(:missing_file_ro_crate, parent: :content_blob) do
+    original_filename { 'missing-file.crate.zip' }
+    content_type { 'application/zip' }
+    data { File.new("#{Rails.root}/test/fixtures/files/workflows/missing-file.crate.zip", 'rb').read }
   end
   
   factory(:xlsx_population_content_blob, parent: :content_blob) do

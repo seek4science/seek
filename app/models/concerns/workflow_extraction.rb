@@ -82,13 +82,21 @@ module WorkflowExtraction
     path && File.exist?(path)
   end
 
+  def diagram_generation_error?
+    @diagram_generation_error = extractor.diagram_generation_error? if @diagram_generation_error.nil?
+    @diagram_generation_error
+  end
+
   def diagram
     path = Dir.glob(cached_diagram_path('*')).last
 
     unless path && File.exist?(path)
       e = extractor
       diagram = e.generate_diagram
-      return nil if diagram.nil? || diagram.length <= 1
+      if diagram.nil? || diagram.length <= 1
+        @diagram_generation_error = e.diagram_generation_error?
+        return nil
+      end
       path = Pathname.new(cached_diagram_path(e.diagram_extension))
       path.parent.mkdir unless path.parent.exist?
       File.binwrite(path, diagram)
@@ -102,7 +110,7 @@ module WorkflowExtraction
       remotes = git_version.remote_sources
       m = main_workflow_blob
       if m
-        crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow)
+        crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow, properties: { contentUrl: content_url(m) })
         remotes.delete(main_workflow_blob.path)
         crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA)
       end
@@ -110,7 +118,7 @@ module WorkflowExtraction
       d = diagram_blob
       if d
         remotes.delete(d.path)
-        diagram_entity = d.to_crate_entity(crate, type: ROCrate::WorkflowDiagram)
+        diagram_entity = d.to_crate_entity(crate, type: ROCrate::WorkflowDiagram, properties: { contentUrl: content_url(d) })
         crate.add_data_entity(diagram_entity)
         crate.main_workflow.diagram = diagram_entity if crate.main_workflow
       else # Was the diagram generated?
@@ -125,7 +133,7 @@ module WorkflowExtraction
       c = abstract_cwl_blob
       if c
         remotes.delete(c.path)
-        cwl_entity = c.to_crate_entity(crate, type: ROCrate::WorkflowDescription)
+        cwl_entity = c.to_crate_entity(crate, type: ROCrate::WorkflowDescription, properties: { contentUrl: content_url(c) })
         crate.add_data_entity(cwl_entity)
         crate.main_workflow.cwl_description = cwl_entity if crate.main_workflow
       end
@@ -252,6 +260,17 @@ module WorkflowExtraction
     resource = is_a_version? ? parent : self
     resource = [action.to_sym, resource] if action
     Seek::Util.routes.polymorphic_url(resource, version: version)
+  end
+
+  def content_url(blob)
+    return unless is_git_versioned?
+
+    return unless blob
+
+    return blob.url if blob.remote? && blob.fetched?
+
+    resource = is_a_version? ? parent : self
+    Seek::Util.routes.polymorphic_url([resource, :git_download], version: version, path: blob.path)
   end
 
   [:main_workflow, :diagram, :abstract_cwl].each do |type|

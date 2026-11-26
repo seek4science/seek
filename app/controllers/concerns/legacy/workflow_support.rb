@@ -81,7 +81,7 @@ module Legacy
                                    content_type: crate_upload.content_type,
                                    asset_version: version)
       if old_content_blob
-        old_content_blob.update_column(:asset_id, @workflow.id)
+        old_content_blob.update_columns(asset_id: @workflow.id, asset_type: @workflow.class.polymorphic_name)
       end
 
       if new_version

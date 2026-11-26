@@ -146,7 +146,7 @@ class WorkflowsController < ApplicationController
 
   def create_version_from_ro_crate
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params.merge(workflow: @workflow))
-    @workflow = @crate_extractor.build
+    @workflow = @crate_extractor.build(update_creators: false)
 
     respond_to do |format|
       if @crate_extractor.valid?
@@ -224,8 +224,9 @@ class WorkflowsController < ApplicationController
       old_content_blob = @workflow.content_blob
       @content_blob.asset_version = new_version
       @workflow.content_blob = @content_blob
-      # asset_id on the previous content blob gets blanked out after the above command is run, so need to do:
-      old_content_blob.update_column(:asset_id, @workflow.id) if old_content_blob
+      # asset_id and asset_type on the previous content blob get blanked out after the above command is run,
+      # so need to restore them:
+      old_content_blob&.update_columns(asset_id: @workflow.id, asset_type: @workflow.class.polymorphic_name)
       valid = @content_blob && @workflow.save_as_new_version(params[:revision_comments]) && @content_blob.save
       @content_blob.update_column(:asset_id, nil) unless valid # Have to do this otherwise the content blob keeps the workflow's ID
     elsif @workflow.git_version_attributes.present?
@@ -327,8 +328,10 @@ class WorkflowsController < ApplicationController
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params, detect_workflow: true)
 
     if @crate_extractor.valid?
-      @workflow = @crate_extractor.build
-      if @workflow.save && @workflow.git_version.save
+      @workflow = @crate_extractor.build(update_creators: true)
+      new_version = !@workflow.id.nil?
+
+      if @workflow.save && (!new_version || @workflow.git_version.save)
         render json: @workflow, include: json_api_include_param
       else
         render json: json_api_errors(@workflow), status: :unprocessable_entity

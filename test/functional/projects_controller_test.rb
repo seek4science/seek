@@ -1290,6 +1290,101 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person2.institutions, new_institution
   end
 
+  test 'programme administrator who is a project member cannot move project from another programme' do
+    other_programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: other_programme)
+    pa = FactoryBot.create(:programme_administrator)
+    prog = pa.programmes.first
+    pa.add_to_project_and_institution(project, FactoryBot.create(:institution))
+    pa.save!
+    assert project.can_edit?(pa.user)
+    refute project.can_manage?(pa.user)
+    login_as(pa)
+
+    put :update, params: { id: project, project: { programme_id: prog.id } }
+    assert_redirected_to project
+
+    assert_equal other_programme, project.reload.programme
+  end
+
+  test 'project administrator cannot move project to another open programme' do
+    person = FactoryBot.create(:project_administrator)
+    project = person.projects.first
+    original_programme = FactoryBot.create(:programme, projects: [project])
+    open_programme = FactoryBot.create(:programme, open_for_projects: true)
+    login_as(person)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert open_programme.can_associate_projects?(person.user)
+      put :update, params: { id: project, project: { programme_id: open_programme.id } }
+      assert_redirected_to project
+    end
+
+    assert_equal original_programme, project.reload.programme
+  end
+
+  test 'project administrator can associate project without programme to open programme' do
+    person = FactoryBot.create(:project_administrator)
+    project = person.projects.first
+    assert_nil project.programme
+    open_programme = FactoryBot.create(:programme, open_for_projects: true)
+    login_as(person)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      put :update, params: { id: project, project: { programme_id: open_programme.id } }
+      assert_redirected_to project
+    end
+
+    assert_equal open_programme, project.reload.programme
+  end
+
+  test 'project member cannot associate project without programme to open programme' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    assert_nil project.programme
+    refute project.can_manage?(person.user)
+    open_programme = FactoryBot.create(:programme, open_for_projects: true)
+    login_as(person)
+
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      put :update, params: { id: project, project: { programme_id: open_programme.id } }
+      assert_redirected_to project
+    end
+
+    assert_nil project.reload.programme
+  end
+
+  test 'instance admin can move project to another programme' do
+    other_programme = FactoryBot.create(:programme)
+    project = FactoryBot.create(:project, programme: other_programme)
+    prog = FactoryBot.create(:programme)
+    login_as(FactoryBot.create(:admin))
+
+    put :update, params: { id: project, project: { programme_id: prog.id } }
+    assert_redirected_to project
+
+    assert_equal prog, project.reload.programme
+  end
+
+  test 'cannot remove other project members as project administrator' do
+    other_person = FactoryBot.create(:person)
+    other_project = other_person.projects.first
+    person = FactoryBot.create(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    assert_no_difference('GroupMembership.count') do
+      assert_no_difference('WorkGroup.count') do
+        post :update_members, params: { id: project, group_memberships_to_remove: [other_person.group_memberships.first] }
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    assert_includes other_project.reload.people, other_person
+  end
+
   test 'can flag and unflag members as leaving as project administrator' do
     person = FactoryBot.create(:project_administrator)
     project = person.projects.first
@@ -5159,6 +5254,29 @@ class ProjectsControllerTest < ActionController::TestCase
       for type in directly_linked_types
         assert_select 'a[href=?]', Seek::Util.routes.polymorphic_path(type, action: :new, "#{type.name.underscore}": params)
       end
+    end
+  end
+
+  test 'should not show add new button if nothing available to add' do
+    person = FactoryBot.create(:person)
+    project = person.projects.first
+    login_as(person)
+    assert project.has_member?(person)
+    assert project.can_edit?
+    with_config_values(isa_enabled: false, collections_enabled: false, data_files_enabled: false, documents_enabled: false,
+                       events_enabled: false, file_templates_enabled: false, models_enabled: false,
+                       placeholders_enabled: false, presentations_enabled: false, publications_enabled: false,
+                       samples_enabled: false, sops_enabled: false, organisms_enabled: false,
+                       isa_json_compliance_enabled: false, workflows_enabled: false) do
+      # All "Add new" options should be disabled
+      refute Seek::AddButtons.add_for_item(project).map { |type, _| type.feature_enabled? }.any?
+
+      get :show, params: { id: project.id }
+    end
+
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select '.btn', text: /Add new/, count: 0
     end
   end
 

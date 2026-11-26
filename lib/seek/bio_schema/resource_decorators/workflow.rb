@@ -41,7 +41,7 @@ module Seek
         def image
           return unless resource.diagram_exists?
 
-          diagram_workflow_url(resource, version: resource.version, **Seek::Config.site_url_options)
+          diagram_workflow_url(parent_resource, version: resource.version, **Seek::Config.site_url_options)
         end
 
         def schema_type

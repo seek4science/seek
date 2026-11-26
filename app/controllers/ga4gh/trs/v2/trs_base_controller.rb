@@ -23,6 +23,10 @@ module Ga4gh
           trs_error(406, "Not acceptable.")
         end
 
+        rescue_from ROCrate::ReadException do |_e|
+          trs_error(404, 'Unable to read RO-Crate')
+        end
+
         private
 
         def set_format

@@ -128,6 +128,10 @@ FactoryBot.define do
   factory(:cwl_workflow, parent: :workflow) do
     association :content_blob, factory: :cwl_content_blob
   end
+
+  factory(:cwl_workflow_broken_diagram, parent: :workflow) do
+    association :content_blob, factory: :cwl_content_blob_broken_diagram
+  end
   
   factory(:cwl_packed_workflow, parent: :workflow) do
     association :content_blob, factory: :cwl_packed_content_blob
@@ -194,6 +198,10 @@ FactoryBot.define do
   factory(:just_cwl_ro_crate_workflow, parent: :workflow) do
     association :content_blob, factory: :just_cwl_ro_crate
   end
+
+  factory(:missing_file_ro_crate_workflow, parent: :workflow) do
+    association :content_blob, factory: :missing_file_ro_crate
+  end
   
   factory(:workflow_with_tests, parent: :workflow) do
     association :content_blob, factory: :ro_crate_with_tests
@@ -219,11 +227,11 @@ FactoryBot.define do
         ref: 'refs/heads/main',
         commit: 'b6312caabe582d156dd351fab98ce78356c4b74c',
         main_workflow_path: 'concat_two_files.ga',
-        diagram_path: 'diagram.png',
+        diagram_path: 'diagram.png'
       }
     }
   end
-  
+
   factory(:annotationless_local_git_workflow, class: Workflow) do
     title { 'Concat two files' }
     with_project_contributor

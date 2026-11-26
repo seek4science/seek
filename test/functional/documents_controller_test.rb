@@ -1116,6 +1116,23 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'filter query is passed to Solr with its original case' do
+    # Solr's analysers lowercase for matching; the query must keep its case so uppercase
+    # boolean operators (AND/OR/NOT) are recognised by edismax rather than downcased away.
+    FactoryBot.create(:public_document)
+
+    received = []
+    with_config_value(:solr_enabled, true) do
+      Document.stub(:solr_cache, -> (q) { received << q; Document.pluck(:id) }) do
+        get :index, params: { filter: { query: 'cosmo OR headings' } }
+      end
+    end
+
+    assert_response :success
+    assert_includes received, 'cosmo OR headings'
+    refute_includes received, 'cosmo or headings'
+  end
+
   test 'filtering by creation date' do
     programme = FactoryBot.create(:programme)
     project = FactoryBot.create(:project, programme: programme)

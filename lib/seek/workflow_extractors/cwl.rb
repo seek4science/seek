@@ -23,27 +23,31 @@ module Seek
       end
 
       def generate_diagram
-        begin
-          f = Tempfile.new('diagram.dot')
-          wf = WorkflowInternals::Structure.new(metadata[:internals])
-          Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
-          f.rewind
-          out = ''
-          err = ''
-          Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
-            stdin.puts(f.read)
-            stdin.close
-            out = stdout.read
-            err = stderr.read
-            stdout.close
-            stderr.close
-          end
-          Rails.logger.error(err) if err.length > 0
-          out
-        rescue StandardError => e
-          Rails.logger.error(e)
-          nil
+        return @diagram if @diagram
+
+        if @invalid_diagram.nil?
+          @diagram = extract_diagram
+          @invalid_diagram = false
         end
+
+        @diagram
+      rescue StandardError => e
+        Rails.logger.error(e)
+        @invalid_diagram = true
+        nil
+      end
+
+      def diagram_generation_error?
+        if @invalid_diagram.nil?
+          @diagram = extract_diagram
+          @invalid_diagram = false
+        end
+
+        @invalid_diagram
+      rescue StandardError => e
+        Rails.logger.error(e)
+        @invalid_diagram = true
+        @invalid_diagram
       end
 
       def metadata
@@ -88,6 +92,25 @@ module Seek
       end
 
       private
+
+      def extract_diagram
+        f = Tempfile.new('diagram.dot')
+        wf = WorkflowInternals::Structure.new(metadata[:internals])
+        Seek::WorkflowExtractors::CWLDotGenerator.new(f).write_graph(wf)
+        f.rewind
+        out = ''
+        err = ''
+        Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
+          stdin.puts(f.read)
+          stdin.close
+          out = stdout.read
+          err = stderr.read
+          stdout.close
+          stderr.close
+        end
+        Rails.logger.error(err) if err.length > 0
+        out
+      end
 
       def parse_metadata(existing_metadata, yaml_or_json_string)
         cwl = YAML.load(yaml_or_json_string)

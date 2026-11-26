@@ -28,6 +28,14 @@ module Seek
         nil
       end
 
+      def diagram_generation_error?
+        open_crate do
+          super
+        end
+      rescue ::ROCrate::ReadException => e
+        nil
+      end
+
       def metadata
         open_crate do |crate|
           meta = super

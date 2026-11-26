@@ -1821,10 +1821,10 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select '.seek-description', count: 1
     assert_select '.seek-description img', count: 3
     assert_select '.seek-description img:nth-of-type(1)' do
-      assert_select ":match('src', ?)", %r{/workflows/\d*/git/1/raw/test1/image.png}
+      assert_select ":match('src', ?)", %r{/workflows/[0-9]+/git/1/raw/test1/image.png}
     end
     assert_select '.seek-description img:nth-of-type(2)' do
-      assert_select ":match('src', ?)", %r{/workflows/\d*/git/1/raw/test2/image.png}
+      assert_select ":match('src', ?)", %r{/workflows/[0-9]+/git/1/raw/test2/image.png}
     end
     assert_select '.seek-description img:nth-of-type(3)' do
       assert_select ":match('src', ?)", 'https://example.com/test3/image.png'
@@ -2147,5 +2147,34 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_select 'strong', text: /Runs/, count: 0
     end
   end
-end
 
+  test 'display non .svg workflow diagram' do
+    workflow = FactoryBot.create(:existing_galaxy_ro_crate_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'img[src=?]', diagram_workflow_path(workflow, version: 1)
+    end
+  end
+
+  test 'display .svg workflow diagram' do
+    workflow = FactoryBot.create(:cwl_workflow, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'embed[src=?]', diagram_workflow_path(workflow, version: 1)
+    end
+  end
+
+  test 'display message if cwl diagram has an error when generating' do
+    workflow = FactoryBot.create(:cwl_workflow_broken_diagram, policy: FactoryBot.create(:public_policy))
+
+    get :show, params: { id: workflow }
+
+    assert_select '.workflow-diagram', count: 1 do
+      assert_select 'div', 'An error ocurred when generating the diagram'
+    end
+  end
+end

@@ -4,6 +4,7 @@ class ProgrammesController < ApplicationController
 
   before_action :programmes_enabled?
   before_action :login_required, except: [:show, :index]
+  before_action :auth_to_create, only: [:new, :create]
   before_action :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
   before_action :find_requested_item, only: [:show, :admin,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
   before_action :find_assets, only: [:index]
@@ -160,11 +161,15 @@ class ProgrammesController < ApplicationController
     end
     params[:programme][:programme_administrator_ids].uniq! if params[:programme][:programme_administrator_ids]
 
-    params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
-                                      { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
+    permitted = [:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
+                 :funding_details, { programme_administrator_ids: [] },
                                       :activation_rejection_reason, { funding_codes: [] },
                                       :open_for_projects,
-                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy]]
+
+    permitted << { project_ids: [] } if User.admin_logged_in?
+
+    params.require(:programme).permit(permitted)
   end
 
 end

@@ -33,7 +33,7 @@ START_SOLR="if [ -d $CORE_DIR ]; then rm -rf $CORE_DIR/conf && cp -r $CONFIGSET/
 
 docker rm seek-search > /dev/null 2>&1 || true
 echo "creating and starting seek-search container"
-docker run -d --name seek-search --restart=unless-stopped -p 8983:8983 -v "seek-solr-data-volume:/var/solr/" -v "$REPO_ROOT/solr/seek/conf:$CONFIGSET/conf" solr:9.10.1 bash -c "$START_SOLR"
+docker run -d --name seek-search --restart=unless-stopped -p 127.0.0.1:8983:8983 -v "seek-solr-data-volume:/var/solr/" -v "$REPO_ROOT/solr/seek/conf:$CONFIGSET/conf" solr:9.10.1 bash -c "$START_SOLR"
 
 echo "waiting for Solr to be ready ..."
 retries=0
