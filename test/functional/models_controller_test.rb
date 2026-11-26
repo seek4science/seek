@@ -1162,6 +1162,37 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'cannot compare with a hidden version' do
+    person = FactoryBot.create(:person)
+    model = FactoryBot.create(:teusink_model, contributor: person, policy: FactoryBot.create(:downloadable_public_policy))
+    disable_authorization_checks do
+      model.save_as_new_version
+      FactoryBot.create(:cronwright_model_content_blob, asset_version: model.version, asset: model)
+      model.find_version(1).update!(visibility: :private)
+    end
+    model.reload
+    assert_equal 2, model.version
+    assert model.can_download?(nil)
+    refute model.find_version(1).visible?(nil)
+    assert model.find_version(2).visible?(nil)
+
+    logout
+    get :compare_versions, params: { id: model, version: 2, other_version: 1 }
+    assert_redirected_to model_path(model, version: 2)
+    refute_nil flash[:error]
+    assert_nil assigns(:comparison_html)
+
+    login_as(FactoryBot.create(:person))
+    get :compare_versions, params: { id: model, version: 2, other_version: 1 }
+    assert_redirected_to model_path(model, version: 2)
+    assert_nil assigns(:comparison_html)
+
+    login_as(person)
+    get :compare_versions, params: { id: model, version: 2, other_version: 1 }
+    assert_response :success
+    assert_equal 1, assigns(:other_version).version
+  end
+
   test 'gracefully handle error when other version missing' do
     model = FactoryBot.create :model, contributor: User.current_user.person
     assert model.contains_sbml?, 'model should contain sbml'

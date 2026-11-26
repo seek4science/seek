@@ -211,6 +211,10 @@ class GitController < ApplicationController
   def fetch_git_version
     @git_version = params[:version] ? @parent_resource.find_git_version(params[:version]) : @parent_resource.git_version
     raise ActiveRecord::RecordNotFound unless @git_version
+
+    unless @git_version.visible?
+      render_git_error('This version is not available', status: 403, redirect: @parent_resource)
+    end
   end
 
   def git_version_params
