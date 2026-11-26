@@ -10,7 +10,7 @@ class InvestigationsController < ApplicationController
   before_action :find_and_authorize_requested_item, only: [:edit, :manage, :update, :manage_update, :destroy, :show,
                                                            :update_from_fairdata_station, :submit_fairdata_station, :fair_data_station_update_status,
                                                            :hide_fair_data_station_update_status, :new_object_based_on_existing_one,
-                                                           :export_isa, :export_isatab_json, :export_ro_crate,
+                                                           :export_isa, :export_isatab_json, :ro_crate,
                                                            :ro_crate_metadata]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
@@ -121,7 +121,7 @@ class InvestigationsController < ApplicationController
   end
 
   # The crate is the public view of the investigation, the same for every downloader.
-  def export_ro_crate
+  def ro_crate
     Tempfile.create(["investigation-#{@investigation.id}-", '.crate.zip']) do |file|
       @investigation.write_isa_ro_crate_zip(file.path)
       send_data File.binread(file.path), filename: "investigation-#{@investigation.id}.crate.zip",

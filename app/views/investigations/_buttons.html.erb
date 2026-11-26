@@ -32,7 +32,7 @@
 <% end %>
 
 <% if item.can_view?(nil) %>
-  <%= button_link_to('Export RO-Crate', 'download', export_ro_crate_investigation_path(item)) %>
+  <%= button_link_to('Export RO-Crate', 'download', ro_crate_investigation_path(item)) %>
   <%= button_link_to('RO-Crate metadata', 'show', ro_crate_metadata_investigation_path(item), target: '_blank') %>
 <% end %>
 

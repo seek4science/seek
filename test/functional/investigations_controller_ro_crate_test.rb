@@ -9,7 +9,7 @@ class InvestigationsControllerRoCrateTest < ActionController::TestCase
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
     study = FactoryBot.create(:study, investigation: investigation, policy: FactoryBot.create(:public_policy))
 
-    get :export_ro_crate, params: { id: investigation.id }
+    get :ro_crate, params: { id: investigation.id }
 
     assert_response :success
     assert_equal 'application/zip', response.media_type
@@ -47,7 +47,7 @@ class InvestigationsControllerRoCrateTest < ActionController::TestCase
   test 'export ro crate denied for a hidden investigation' do
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy))
 
-    get :export_ro_crate, params: { id: investigation.id }
+    get :ro_crate, params: { id: investigation.id }
 
     assert_redirected_to investigation_path(investigation)
     assert_match(/not authorized/, flash[:error])
