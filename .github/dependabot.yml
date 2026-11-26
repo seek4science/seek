@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # Only track Ruby patch releases; minor/major upgrades are done manually
+      - dependency-name: "ruby"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]

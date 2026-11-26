@@ -370,6 +370,30 @@ module Ga4gh
           assert_equal 1000, @response.headers['current_limit']
           assert_equal 1, @response.headers['current_offset']
         end
+
+        test 'should not include hidden versions in tool' do
+          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:downloadable_public_policy))
+          disable_authorization_checks do
+            workflow.save_as_new_version
+            workflow.find_version(1).update!(visibility: :private)
+          end
+          assert workflow.reload.can_download?(nil)
+          refute workflow.find_version(1).visible?(nil)
+
+          get :show, params: { id: workflow.id }
+          assert_response :success
+          assert_equal ['2'], JSON.parse(@response.body)['versions'].map { |v| v['id'] }
+
+          get :index, params: { id: workflow.id }
+          assert_response :success
+          tool = JSON.parse(@response.body).detect { |t| t['id'] == workflow.id.to_s }
+          assert_equal ['2'], tool['versions'].map { |v| v['id'] }
+
+          login_as(workflow.contributor)
+          get :show, params: { id: workflow.id }
+          assert_response :success
+          assert_equal %w[1 2], JSON.parse(@response.body)['versions'].map { |v| v['id'] }.sort
+        end
       end
     end
   end

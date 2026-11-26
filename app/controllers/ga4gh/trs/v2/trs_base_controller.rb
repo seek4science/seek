@@ -49,6 +49,10 @@ module Ga4gh
           respond_to do |format|
             format.json { render json: { code: code, message: message }, adapter: :attributes, root: '', status: code }
             format.text { render plain: "Error #{code} - #{message}", status: code }
+            format.any do
+              render json: { code: code, message: message }, adapter: :attributes, root: '', status: code,
+                     content_type: 'application/json'
+            end
           end
         end
       end

@@ -998,6 +998,87 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert assigns(:warning_msg)
   end
 
+  test 'cannot access content blob of a hidden version' do
+    person = FactoryBot.create(:person)
+    df = FactoryBot.create(:data_file, contributor: person, policy: FactoryBot.create(:downloadable_public_policy),
+                                       content_blob: FactoryBot.create(:csv_content_blob))
+    hidden_blob = df.content_blob
+    disable_authorization_checks do
+      df.save_as_new_version
+      FactoryBot.create(:txt_content_blob, asset: df, asset_version: df.version)
+      df.find_version(1).update!(visibility: :private)
+    end
+    df.reload
+    visible_blob = df.content_blob
+    assert_equal 1, hidden_blob.asset_version
+    assert_equal 2, visible_blob.asset_version
+
+    logout
+
+    get :download, params: { data_file_id: df.id, id: hidden_blob.id }
+    assert_redirected_to df
+    assert_equal 'This version is not available', flash[:error]
+
+    get :download, params: { data_file_id: df.id, id: hidden_blob.id, format: 'json' }
+    assert_response :forbidden
+
+    get :view_content, params: { data_file_id: df.id, id: hidden_blob.id }
+    assert_redirected_to df
+
+    get :get_pdf, params: { data_file_id: df.id, id: hidden_blob.id }
+    assert_redirected_to df
+
+    get :show, params: { data_file_id: df.id, id: hidden_blob.id, format: 'json' }
+    assert_response :forbidden
+    refute_includes @response.body, hidden_blob.original_filename
+
+    get :show, params: { data_file_id: df.id, id: hidden_blob.id, format: 'csv' }
+    assert_response :forbidden
+    refute_includes @response.body, '1,2,3,4,5'
+
+    get :download, params: { data_file_id: df.id, id: visible_blob.id }
+    assert_response :success
+
+    get :show, params: { data_file_id: df.id, id: visible_blob.id, format: 'json' }
+    assert_response :success
+
+    login_as(FactoryBot.create(:person))
+    get :download, params: { data_file_id: df.id, id: hidden_blob.id }
+    assert_redirected_to df
+
+    login_as(person)
+    get :download, params: { data_file_id: df.id, id: hidden_blob.id }
+    assert_response :success
+
+    get :show, params: { data_file_id: df.id, id: hidden_blob.id, format: 'csv' }
+    assert_response :success
+    assert_includes @response.body, '1,2,3,4,5'
+  end
+
+  test 'registered users only version content blob' do
+    df = FactoryBot.create(:data_file, policy: FactoryBot.create(:downloadable_public_policy))
+    hidden_blob = df.content_blob
+    disable_authorization_checks do
+      df.save_as_new_version
+      FactoryBot.create(:txt_content_blob, asset: df, asset_version: df.version)
+      df.find_version(1).update!(visibility: :registered_users)
+    end
+
+    logout
+    get :download, params: { data_file_id: df.id, id: hidden_blob.id }
+    assert_redirected_to df
+
+    get :show, params: { data_file_id: df.id, id: hidden_blob.id, format: 'json' }
+    assert_response :forbidden
+
+    login_as(FactoryBot.create(:person))
+    get :download, params: { data_file_id: df.id, id: hidden_blob.id }
+    assert_response :success
+
+    get :show, params: { data_file_id: df.id, id: hidden_blob.id, format: 'json' }
+    assert_response :success
+  end
+
   private
 
   def mock_http
