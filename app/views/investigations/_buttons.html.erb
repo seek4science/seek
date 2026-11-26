@@ -32,7 +32,9 @@
 <% end %>
 
 <% if item.can_view?(nil) %>
-  <%= button_link_to('Export RO-Crate', 'download', ro_crate_investigation_path(item)) %>
+  <%= button_link_to('Export RO-Crate', 'ro_crate_file', ro_crate_investigation_path(item),
+                     'data-tooltip' => tooltip('The ISA RO-Crate is a package containing the metadata of the investigation, ' \
+                                               'its studies and assays, and their publicly downloadable files')) %>
   <%= button_link_to('RO-Crate metadata', 'show', ro_crate_metadata_investigation_path(item), target: '_blank') %>
 <% end %>
 
