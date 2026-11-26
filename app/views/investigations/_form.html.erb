@@ -61,7 +61,7 @@
 
 <!-- extended metadata experiment end -->
 
-<%= form_submit_buttons(@investigation) %>
+<%= form_submit_buttons(@investigation, cancel_path: investigation_cancel_path(@investigation)) %>
 
 <script>
   $j(document).ready(function () {

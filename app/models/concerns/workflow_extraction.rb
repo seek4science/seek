@@ -197,7 +197,6 @@ module WorkflowExtraction
         merge_fields(crate.main_workflow, elem)
       else
         entity_class = ROCrate::ContextualEntity.specialize(elem)
-        elem['@id'] = URI.decode_www_form_component(elem['@id'])
         entity = entity_class.new(crate, nil, elem)
         crate.add_contextual_entity(entity)
       end

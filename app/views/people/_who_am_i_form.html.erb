@@ -1,0 +1,11 @@
+<%= panel("Who am I") do %>
+  <div class="form-group">
+    <%= label_tag :who_am_i, 'Tell us a little about yourself (optional)' %>
+    <p class="help-block">
+      For example, who you are, where you work, and what you plan to use <%= Seek::Config.instance_name %> for.
+      This is only included in the email sent to the administrators when you sign up. It is not stored or shown anywhere.
+    </p>
+    <%= text_area_tag :who_am_i, params[:who_am_i], class: 'form-control', rows: 4,
+                      maxlength: PeopleController::WHO_AM_I_MAX_LENGTH %>
+  </div>
+<% end %>

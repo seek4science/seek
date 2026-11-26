@@ -213,7 +213,7 @@ class InvestigationsController < ApplicationController
       respond_to do |format|
         if @investigation.save
           flash[:notice] = "#{t('investigation')} was successfully updated."
-          format.html {redirect_to(@investigation)}
+          format.html { redirect_to(investigation_redirect_path_after_update) }
           format.json {render json: @investigation}
         else
           format.html {render :action => 'edit'}
@@ -226,6 +226,13 @@ class InvestigationsController < ApplicationController
 
 
   private
+
+  # ISA-JSON compliant investigations are shown in the single page view, like ISA studies and assays.
+  def investigation_redirect_path_after_update
+    return investigation_path(@investigation) unless @investigation.is_isa_json_compliant?
+
+    helpers.single_page_or_item_path(@investigation, investigation_path(@investigation))
+  end
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
