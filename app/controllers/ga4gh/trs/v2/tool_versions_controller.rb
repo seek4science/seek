@@ -82,7 +82,7 @@ module Ga4gh
 
         def get_version
           workflow_version = @tool.find_version(params[:version_id])
-          return trs_error(404, "Couldn't find version with 'id'=#{params[:version_id]} for this tool") unless workflow_version
+          return trs_error(404, "Couldn't find version with 'id'=#{params[:version_id]} for this tool") unless workflow_version&.visible?
           @tool_version = ToolVersion.new(@tool, workflow_version)
         end
 

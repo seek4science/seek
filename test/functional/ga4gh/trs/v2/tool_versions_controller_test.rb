@@ -489,6 +489,68 @@ module Ga4gh
           assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
           assert @response.body.include?("# Non-ASCII stuff ↳ 🐈")
         end
+
+        test 'should not list or get hidden tool version' do
+          workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow,
+                                       policy: FactoryBot.create(:downloadable_public_policy))
+          disable_authorization_checks do
+            workflow.save_as_new_version
+            workflow.find_version(1).update!(visibility: :private)
+          end
+          workflow.reload
+          assert_equal 2, workflow.version
+          assert workflow.can_download?(nil)
+          refute workflow.find_version(1).visible?(nil)
+          assert workflow.find_version(2).visible?(nil)
+
+          get :index, params: { id: workflow.id }
+          assert_response :success
+          assert_equal ['2'], JSON.parse(@response.body).map { |t| t['id'] }
+
+          get :show, params: { id: workflow.id, version_id: 1 }
+          assert_response :not_found
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+          assert_response :not_found
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY', format: 'zip' }
+          assert_response :not_found
+
+          get :show, params: { id: workflow.id, version_id: 2 }
+          assert_response :success
+
+          login_as(FactoryBot.create(:person))
+          get :show, params: { id: workflow.id, version_id: 1 }
+          assert_response :not_found
+
+          login_as(workflow.contributor)
+          get :index, params: { id: workflow.id }
+          assert_response :success
+          assert_equal %w[1 2], JSON.parse(@response.body).map { |t| t['id'] }.sort
+
+          get :show, params: { id: workflow.id, version_id: 1 }
+          assert_response :success
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY', format: 'zip' }
+          assert_response :success
+        end
+
+        test 'registered users only tool version' do
+          workflow = FactoryBot.create(:workflow, policy: FactoryBot.create(:downloadable_public_policy))
+          disable_authorization_checks do
+            workflow.save_as_new_version
+            workflow.find_version(1).update!(visibility: :registered_users)
+          end
+          assert workflow.reload.can_download?(nil)
+          refute workflow.find_version(1).visible?(nil)
+
+          get :show, params: { id: workflow.id, version_id: 1 }
+          assert_response :not_found
+
+          login_as(FactoryBot.create(:person))
+          get :show, params: { id: workflow.id, version_id: 1 }
+          assert_response :success
+        end
       end
     end
   end

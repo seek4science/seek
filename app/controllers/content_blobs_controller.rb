@@ -1,7 +1,8 @@
 class ContentBlobsController < ApplicationController
   before_action :find_and_authorize_associated_asset, only: %i[get_pdf view_content download show update]
   before_action :find_and_authorize_content_blob, only: %i[get_pdf view_content download show update]
-  before_action :set_asset_version, only: %i[get_pdf download]
+  before_action :set_asset_version, only: %i[get_pdf view_content download show]
+  before_action :check_asset_version_visible, only: %i[get_pdf view_content download show]
 
   skip_before_action :check_json_id_type, only: [:update]
 
@@ -231,6 +232,23 @@ class ContentBlobsController < ApplicationController
         return false
       end
     end
+  end
+
+  def check_asset_version_visible
+    return if @asset_version.nil? || @asset_version.visible?
+
+    message = 'This version is not available'
+    respond_to do |format|
+      format.html do
+        flash[:error] = message
+        redirect_to @asset
+      end
+      format.json do
+        render json: { "title": 'Forbidden', "detail": message }, status: :forbidden
+      end
+      format.any { render plain: message, status: :forbidden }
+    end
+    false
   end
 
   def get_request_payload

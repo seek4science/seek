@@ -858,6 +858,74 @@ class GitControllerTest < ActionController::TestCase
     assert_equal :public, @workflow.find_version(1).reload.visibility,'Should not have changed visibility - latest version'
   end
 
+  test 'cannot access hidden version' do
+    disable_authorization_checks do
+      @workflow.update!(policy: FactoryBot.create(:downloadable_public_policy))
+      @workflow.save_as_new_git_version
+      @workflow.find_version(1).update!(visibility: :private)
+    end
+    assert_equal 2, @workflow.reload.version
+    assert @workflow.can_download?(nil)
+    refute @workflow.find_version(1).visible?(nil)
+    assert @workflow.find_version(2).visible?(nil)
+
+    logout
+
+    get :browse, params: { workflow_id: @workflow.id, version: 1 }
+    assert_redirected_to @workflow
+    assert_equal 'This version is not available', flash[:error]
+
+    get :tree, params: { workflow_id: @workflow.id, version: 1 }
+    assert_redirected_to @workflow
+
+    get :tree, params: { workflow_id: @workflow.id, version: 1, format: :json }
+    assert_response :forbidden
+
+    get :blob, params: { workflow_id: @workflow.id, version: 1, path: 'concat_two_files.ga' }
+    assert_redirected_to @workflow
+
+    get :raw, params: { workflow_id: @workflow.id, version: 1, path: 'concat_two_files.ga' }
+    assert_redirected_to @workflow
+
+    get :download, params: { workflow_id: @workflow.id, version: 1, path: 'concat_two_files.ga' }
+    assert_redirected_to @workflow
+
+    get :raw, params: { workflow_id: @workflow.id, version: 2, path: 'concat_two_files.ga' }
+    assert_response :success
+
+    get :raw, params: { workflow_id: @workflow.id, path: 'concat_two_files.ga' }
+    assert_response :success
+
+    login_as(FactoryBot.create(:person))
+    get :raw, params: { workflow_id: @workflow.id, version: 1, path: 'concat_two_files.ga' }
+    assert_redirected_to @workflow
+
+    login_as(@person)
+    get :raw, params: { workflow_id: @workflow.id, version: 1, path: 'concat_two_files.ga' }
+    assert_response :success
+
+    get :tree, params: { workflow_id: @workflow.id, version: 1, format: :json }
+    assert_response :success
+  end
+
+  test 'registered users only version' do
+    disable_authorization_checks do
+      @workflow.update!(policy: FactoryBot.create(:downloadable_public_policy))
+      @workflow.save_as_new_git_version
+      @workflow.find_version(1).update!(visibility: :registered_users)
+    end
+    assert @workflow.reload.can_download?(nil)
+    refute @workflow.find_version(1).visible?(nil)
+
+    logout
+    get :raw, params: { workflow_id: @workflow.id, version: 1, path: 'concat_two_files.ga' }
+    assert_redirected_to @workflow
+
+    login_as(FactoryBot.create(:person))
+    get :raw, params: { workflow_id: @workflow.id, version: 1, path: 'concat_two_files.ga' }
+    assert_response :success
+  end
+
   test 'actions are logged' do
     @git_version.add_file('file.md', FactoryBot.create(:markdown_content_blob))
     disable_authorization_checks { @git_version.save! }
