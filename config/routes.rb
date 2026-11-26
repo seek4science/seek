@@ -430,6 +430,7 @@ SEEK::Application.routes.draw do
       get :export_isatab_json
       get :export_isa, action: :export_isa
       get :export_ro_crate
+      get :ro_crate_metadata
       get :manage
       get :order_studies
       patch :manage_update

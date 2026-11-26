@@ -19,24 +19,26 @@ class InvestigationsControllerRoCrateTest < ActionController::TestCase
     end
   end
 
-  test 'export ro crate metadata as json' do
+  test 'ro crate metadata is shown as json without the zip' do
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
 
-    get :export_ro_crate, params: { id: investigation.id, format: :json }
+    get :ro_crate_metadata, params: { id: investigation.id }
 
     assert_response :success
+    assert_equal 'application/json', response.media_type
+    assert_match(/\Ainline; filename="ro-crate-metadata.json"/, response.headers['Content-Disposition'])
     root = JSON.parse(response.body)['@graph'].detect { |e| e['@id'] == './' }
     assert_equal investigation.title, root['name']
   end
 
-  test 'export ro crate is the public view even for a logged in viewer' do
+  test 'ro crate metadata is the public view even for a logged in viewer' do
     person = FactoryBot.create(:person)
     investigation = FactoryBot.create(:investigation, contributor: person, policy: FactoryBot.create(:public_policy))
     FactoryBot.create(:study, investigation: investigation, contributor: person,
                               policy: FactoryBot.create(:private_policy))
     login_as(person)
 
-    get :export_ro_crate, params: { id: investigation.id, format: :json }
+    get :ro_crate_metadata, params: { id: investigation.id }
 
     assert_response :success
     assert_equal [], JSON.parse(response.body)['@graph'].detect { |e| e['@id'] == './' }['hasPart']
@@ -51,7 +53,16 @@ class InvestigationsControllerRoCrateTest < ActionController::TestCase
     assert_match(/not authorized/, flash[:error])
   end
 
-  test 'export button shown only for a public investigation' do
+  test 'ro crate metadata denied for a hidden investigation' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:private_policy))
+
+    get :ro_crate_metadata, params: { id: investigation.id }
+
+    assert_redirected_to investigation_path(investigation)
+    assert_match(/not authorized/, flash[:error])
+  end
+
+  test 'export buttons shown only for a public investigation' do
     person = FactoryBot.create(:person)
     login_as(person)
     public_policy = FactoryBot.create(:public_policy)
@@ -61,8 +72,10 @@ class InvestigationsControllerRoCrateTest < ActionController::TestCase
 
     get :show, params: { id: public_investigation }
     assert_select 'a', text: 'Export RO-Crate', count: 1
+    assert_select 'a[href=?]', ro_crate_metadata_investigation_path(public_investigation), count: 1
 
     get :show, params: { id: private_investigation }
     assert_select 'a', text: 'Export RO-Crate', count: 0
+    assert_select 'a[href=?]', ro_crate_metadata_investigation_path(private_investigation), count: 0
   end
 end
