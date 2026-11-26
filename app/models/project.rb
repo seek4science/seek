@@ -95,6 +95,8 @@ class Project < ApplicationRecord
 
   before_save :check_disciplines
   after_save :propagate_disciplines
+  # the programmes' RDF include their projects (jerm:hasPart), and the people in them
+  after_save :queue_programmes_rdf_generation, if: :saved_change_to_programme_id?
 
   def assets
     data_files | sops | models | publications | presentations | documents | workflows | collections
@@ -300,5 +302,10 @@ class Project < ApplicationRecord
         end
       end
     end
+  end
+
+  def queue_programmes_rdf_generation
+    programmes = Programme.where(id: saved_change_to_programme_id.compact)
+    RdfGenerationQueue.enqueue(programmes.to_a, refresh_dependents: false)
   end
 end

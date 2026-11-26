@@ -572,4 +572,30 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert_includes prog.related_people, p
     end
   end
+
+  test 'adding a project queues rdf generation for the project and its old and new programme' do
+    programme = FactoryBot.create(:programme)
+    old_programme = FactoryBot.create(:programme)
+    project = old_programme.projects.first
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { programme.update!(project_ids: programme.project_ids + [project.id]) }
+
+    assert_equal programme, project.reload.programme
+    assert RdfGenerationQueue.where(item: project).exists?
+    assert RdfGenerationQueue.where(item: programme).exists?
+    assert RdfGenerationQueue.where(item: old_programme).exists?
+  end
+
+  test 'removing a project queues rdf generation for the programme and the project' do
+    programme = FactoryBot.create(:programme)
+    project = programme.projects.first
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { programme.update!(project_ids: []) }
+
+    assert_nil project.reload.programme
+    assert RdfGenerationQueue.where(item: project).exists?
+    assert RdfGenerationQueue.where(item: programme).exists?
+  end
 end

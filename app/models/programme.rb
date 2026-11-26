@@ -12,7 +12,8 @@ class Programme < ApplicationRecord
   acts_as_yellow_pages
 
   # associations
-  has_many :projects, dependent: :nullify
+  # a project removed from the programme is nullified without being saved, so it doesn't queue its own RDF generation
+  has_many :projects, dependent: :nullify, after_remove: :queue_removed_project_rdf_generation
   has_many :work_groups, through: :projects
   has_many :group_memberships, through: :work_groups
   has_many :people, -> { distinct }, through: :group_memberships
@@ -139,5 +140,9 @@ class Programme < ApplicationRecord
                           true
                         end
     true
+  end
+
+  def queue_removed_project_rdf_generation(project)
+    RdfGenerationQueue.enqueue([self, project].select(&:persisted?), refresh_dependents: false)
   end
 end

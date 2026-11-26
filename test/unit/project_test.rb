@@ -1010,4 +1010,22 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal ['Chemistry'], workflow.discipline_annotation_labels
     assert_equal ['Physics and Astronomy'], workflow_with_disciplines.reload.discipline_annotation_labels
   end
+
+  test 'moving to another programme queues rdf generation for both programmes' do
+    old_programme = FactoryBot.create(:programme)
+    new_programme = FactoryBot.create(:programme)
+    project = old_programme.projects.first
+    RdfGenerationQueue.delete_all
+
+    disable_authorization_checks { project.update!(programme: new_programme) }
+
+    assert RdfGenerationQueue.where(item: project).exists?
+    assert RdfGenerationQueue.where(item: old_programme).exists?
+    assert RdfGenerationQueue.where(item: new_programme).exists?
+
+    RdfGenerationQueue.delete_all
+    disable_authorization_checks { project.update!(title: 'a new title') }
+
+    refute RdfGenerationQueue.where(item_type: 'Programme').exists?
+  end
 end
