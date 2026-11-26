@@ -94,13 +94,11 @@ module Seek
 
     # Checks the file is valid UTF-8, reading it in chunks rather than all at once
     def valid_utf8_file?(chunk_size = UTF8_CHECK_CHUNK_SIZE)
-      File.open(filepath, 'rb') do |file|
-        pending = ''.b
-        while (chunk = file.read(chunk_size))
-          pending = valid_utf8_prefix_remainder(pending << chunk)
-          return false if pending.nil?
+      File.open(filepath, 'r:UTF-8') do |file|
+        while (chunk = file.gets(nil, chunk_size))
+          return false unless chunk.valid_encoding?
         end
-        pending.empty?
+        true
       end
     end
 
@@ -109,17 +107,6 @@ module Seek
     end
 
     private
-
-    # A chunk may end part way through a multi-byte character. Returns the trailing bytes (at most 3) of
-    # an incomplete character, to be prepended to the next chunk, or nil if the data is not valid UTF-8.
-    def valid_utf8_prefix_remainder(data)
-      (0..3).each do |tail|
-        break if tail > data.bytesize
-        prefix = data.byteslice(0, data.bytesize - tail).force_encoding(Encoding::UTF_8)
-        return data.byteslice(data.bytesize - tail, tail) if prefix.valid_encoding?
-      end
-      nil
-    end
 
     def resolve_sheet_name_to_index(sheet_name)
 
