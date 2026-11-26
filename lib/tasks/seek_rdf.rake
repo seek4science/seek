@@ -5,14 +5,10 @@ require 'rake'
 require 'rightfield/rightfield'
 
 namespace :seek_rdf do
-  desc 'Queues background jobs, which will update or create the RDF (including sending to a configured triple store) for every compatible asset.'
+  desc 'Clears the triple store, if one is configured, and queues background jobs to regenerate the RDF (including sending to the triple store) for every compatible item.'
   task(generate: :environment) do
-    Seek::Util.rdf_capable_types.sort_by(&:name).each do |type|
-      begin
-        RdfGenerationQueue.enqueue(type.all, refresh_dependents: false)
-      rescue Exception => e
-        puts("Error generating rdf for #{type.name}} - #{e.message}")
-      end
-    end
+    Seek::Rdf::RdfRepository.instance.clear_all
+    failed = RdfGenerationQueue.enqueue_all
+    puts("Error queuing RDF generation for #{failed.join(', ')} - see the log for details") if failed.any?
   end
 end

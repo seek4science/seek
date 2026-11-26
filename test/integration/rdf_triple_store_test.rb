@@ -42,6 +42,24 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     assert @project.rdf_repository_configured?
   end
 
+  test 'clear all' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    @repository.send_rdf(@project)
+    @repository.send_rdf(sop)
+
+    q = @repository.query.select.where(%i[s p o]).from(@public_graph)
+    refute_empty @repository.select(q)
+
+    @repository.clear_all
+
+    [@private_graph, @public_graph].each do |graph|
+      q = @repository.query.select.where(%i[s p o]).from(graph)
+      assert_empty @repository.select(q)
+    end
+
+    sop.delete_rdf_file
+  end
+
   test 'send to store' do
     @repository.send_rdf(@project)
 

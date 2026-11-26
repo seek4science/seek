@@ -109,6 +109,18 @@ module Seek
         results.select { |result| result.is_a?(RDF::URI) }.collect(&:to_s).uniq
       end
 
+      # removes all of SEEK's statements from the repository, by dropping the public and private graphs
+      def clear_all
+        return unless configured?
+
+        connect_to_repository
+        config = get_configuration
+        [config.public_graph, config.private_graph].compact.each do |graph|
+          result = get_repository_object.drop("DROP SILENT GRAPH #{RDF::URI(graph).to_base}")
+          Rails.logger.debug(result)
+        end
+      end
+
       # Abstract methods
 
       def get_configuration

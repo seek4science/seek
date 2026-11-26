@@ -41,6 +41,26 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
+  test 'admin can regenerate all rdf' do
+    assert_enqueued_with(job: RdfRegenerateAllJob) do
+      post :regenerate_rdf
+    end
+
+    assert_redirected_to admin_path
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
+  end
+
+  test 'non admin cannot regenerate all rdf' do
+    login_as(FactoryBot.create(:user))
+
+    assert_no_enqueued_jobs(only: RdfRegenerateAllJob) do
+      post :regenerate_rdf
+    end
+
+    refute_nil flash[:error]
+  end
+
   test 'none admin not get registration form' do
     login_as FactoryBot.create(:user)
     get :registration_form

@@ -389,6 +389,12 @@ class AdminController < ApplicationController
     redirect_to action: :show
   end
 
+  def regenerate_rdf
+    RdfRegenerateAllJob.perform_later
+    flash[:notice] = 'The triple store, if configured, will be cleared and the RDF for all items regenerated in the background.'
+    redirect_to admin_path
+  end
+
   def clear_cache
     Rails.cache.clear
     flash[:notice] = "Cache cleared"
