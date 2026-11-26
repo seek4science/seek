@@ -9,7 +9,7 @@ class GroupMembership < ApplicationRecord
   after_save :remember_rdf_change
   after_update { remove_former_project_roles if has_left }
   after_commit :queue_update_auth_table
-  # the person's and project's RDF include the membership (jerm:isAssociatedWith)
+  # the person's, project's and programme's RDF include the membership (jerm:isAssociatedWith)
   after_commit :queue_rdf_generation
   # destroying the last membership also destroys its work group, so the project is found before then
   before_destroy :remember_project
@@ -66,8 +66,10 @@ class GroupMembership < ApplicationRecord
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
     projects = [Project.find_by_id(@project_id || work_group&.project_id)]
     projects << WorkGroup.find_by_id(@previous_work_group_id)&.project unless @previous_work_group_id.blank?
+    projects.compact!
+    programmes = projects.map(&:programme)
 
-    RdfGenerationQueue.enqueue((people + projects).compact.uniq, refresh_dependents: false)
+    RdfGenerationQueue.enqueue((people + projects + programmes).compact.uniq, refresh_dependents: false)
   end
 
   #whether the person can remove this person from the project. If they are an administrator and related programme administrator they can, but otherwise they cannot remove themself.

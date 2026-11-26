@@ -67,9 +67,10 @@ class GroupMembershipTest < ActiveSupport::TestCase
     assert gm.person_can_be_removed?
   end
 
-  test 'adding and removing a membership queues rdf generation for the person and project' do
+  test 'adding and removing a membership queues rdf generation for the person, project and programme' do
     person = FactoryBot.create(:brand_new_person)
-    project = FactoryBot.create(:project)
+    programme = FactoryBot.create(:programme)
+    project = programme.projects.first
     institution = FactoryBot.create(:institution)
     RdfGenerationQueue.delete_all
 
@@ -77,6 +78,7 @@ class GroupMembershipTest < ActiveSupport::TestCase
 
     assert RdfGenerationQueue.where(item: person).exists?
     assert RdfGenerationQueue.where(item: project).exists?
+    assert RdfGenerationQueue.where(item: programme).exists?
 
     RdfGenerationQueue.delete_all
     membership = person.group_memberships.first
@@ -84,11 +86,13 @@ class GroupMembershipTest < ActiveSupport::TestCase
 
     assert RdfGenerationQueue.where(item: person).exists?
     assert RdfGenerationQueue.where(item: project).exists?
+    assert RdfGenerationQueue.where(item: programme).exists?
   end
 
-  test 'destroying the last membership of a work group queues rdf generation for its project' do
+  test 'destroying the last membership of a work group queues rdf generation for its project and programme' do
     person = FactoryBot.create(:brand_new_person)
-    project = FactoryBot.create(:project)
+    programme = FactoryBot.create(:programme)
+    project = programme.projects.first
     institution = FactoryBot.create(:institution)
     disable_authorization_checks { person.add_to_project_and_institution(project, institution) }
     membership = GroupMembership.find(person.group_memberships.first.id)
@@ -105,6 +109,7 @@ class GroupMembershipTest < ActiveSupport::TestCase
     refute WorkGroup.exists?(work_group_id)
     assert_includes queued, person
     assert_includes queued, project
+    assert_includes queued, programme
   end
 
   test 'leaving a project does not queue rdf generation, as the person is still associated with it' do
@@ -118,10 +123,12 @@ class GroupMembershipTest < ActiveSupport::TestCase
     refute RdfGenerationQueue.where(item: person.projects.first).exists?
   end
 
-  test 'moving a membership to another project queues rdf generation for both projects' do
+  test 'moving a membership to another project queues rdf generation for both projects and their programmes' do
     person = FactoryBot.create(:person)
     old_project = person.projects.first
-    new_project = FactoryBot.create(:project)
+    old_programme = FactoryBot.create(:programme, projects: [old_project])
+    new_programme = FactoryBot.create(:programme)
+    new_project = new_programme.projects.first
     work_group = FactoryBot.create(:work_group, project: new_project, institution: person.institutions.first)
     RdfGenerationQueue.delete_all
 
@@ -131,5 +138,7 @@ class GroupMembershipTest < ActiveSupport::TestCase
     assert RdfGenerationQueue.where(item: person).exists?
     assert RdfGenerationQueue.where(item: old_project).exists?
     assert RdfGenerationQueue.where(item: new_project).exists?
+    assert RdfGenerationQueue.where(item: old_programme).exists?
+    assert RdfGenerationQueue.where(item: new_programme).exists?
   end
 end
