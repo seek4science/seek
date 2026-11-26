@@ -6,8 +6,7 @@ module Seek
     class ISACrateBuilder
       RO_CRATE_VERSION = '1.2'.freeze
       RO_CRATE_CONTEXT = "https://w3id.org/ro/crate/#{RO_CRATE_VERSION}/context".freeze
-      JERM_ONTOLOGY = 'https://jermontology.org/ontology/JERMOntology'.freeze
-      JERM = "#{JERM_ONTOLOGY}#".freeze
+      JERM = 'https://jermontology.org/ontology/JERMOntology#'.freeze
       # Data files above this size are listed in the metadata but their content is not packed into the zip.
       MAX_PACKED_FILE_SIZE = 100.megabytes
       # Investigations, studies and assays carry no license in SEEK; only the assets linked to them do,

@@ -26,23 +26,13 @@ module Seek
           ["#{JERM}#{name}", name]
         end
 
-        # One DefinedTerm per ISA level in use, identified by its JERM IRI and grouped in a
-        # DefinedTermSet for the ontology.
+        # One DefinedTerm per ISA level in use, identified by its JERM IRI.
         def isa_term(crate, name)
           @isa_terms ||= {}
           @isa_terms[name] ||= begin
             term = ::ROCrate::ContextualEntity.new(crate, "#{JERM}#{name}", '@type' => 'DefinedTerm')
-            set(term, 'name' => name, 'description' => ISA_TERM_DESCRIPTIONS[name],
-                      'inDefinedTermSet' => jerm_term_set(crate).reference)
+            set(term, 'name' => name, 'description' => ISA_TERM_DESCRIPTIONS[name])
             crate.add_contextual_entity(term)
-          end
-        end
-
-        def jerm_term_set(crate)
-          @jerm_term_set ||= begin
-            entity = ::ROCrate::ContextualEntity.new(crate, JERM_ONTOLOGY, '@type' => 'DefinedTermSet')
-            set(entity, 'name' => 'JERM ontology', 'url' => JERM_ONTOLOGY)
-            crate.add_contextual_entity(entity)
           end
         end
       end

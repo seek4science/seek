@@ -89,11 +89,7 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     assert_equal(%W[#{JERM}Investigation #{JERM}Study #{JERM}Assay], terms.map { |t| t['@id'] })
     assert_equal(%w[Investigation Study Assay], terms.map { |t| t['name'] })
     assert(terms.all? { |t| t['description'].start_with?("An ISA #{t['name']}:") })
-    assert(terms.all? { |t| t['inDefinedTermSet'] == { '@id' => jerm_ontology } })
-    sets = json['@graph'].select { |e| e['@type'] == 'DefinedTermSet' }
-    assert_equal([jerm_ontology], sets.map { |s| s['@id'] })
-    assert_equal 'JERM ontology', sets.first['name']
-    assert_equal jerm_ontology, sets.first['url']
+    assert(terms.all? { |t| t.keys == %w[@id @type name description] })
   end
 
   test 'only the ISA levels present in the crate get a DefinedTerm' do
@@ -103,7 +99,6 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     terms = json['@graph'].select { |e| e['@type'] == 'DefinedTerm' }
 
     assert_equal(["#{JERM}Investigation"], terms.map { |t| t['@id'] })
-    assert_equal(1, json['@graph'].count { |e| e['@type'] == 'DefinedTermSet' })
   end
 
   test 'studies and assays the user cannot view are skipped' do
@@ -414,10 +409,6 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
 
   def slug(resource)
     "#{resource.id}-#{resource.title.parameterize}"
-  end
-
-  def jerm_ontology
-    Seek::RoCrate::ISACrateBuilder::JERM_ONTOLOGY
   end
 
   def root_entity(json)
