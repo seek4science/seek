@@ -71,11 +71,11 @@ class InvestigationsControllerRoCrateTest < ActionController::TestCase
     private_investigation = FactoryBot.create(:investigation, contributor: person, policy: private_policy)
 
     get :show, params: { id: public_investigation }
-    assert_select 'a', text: 'Export RO-Crate', count: 1
+    assert_select 'a', text: 'Export ISA RO-Crate', count: 1
     assert_select 'a[href=?]', ro_crate_metadata_investigation_path(public_investigation), count: 1
 
     get :show, params: { id: private_investigation }
-    assert_select 'a', text: 'Export RO-Crate', count: 0
+    assert_select 'a', text: 'Export ISA RO-Crate', count: 0
     assert_select 'a[href=?]', ro_crate_metadata_investigation_path(private_investigation), count: 0
   end
 end
