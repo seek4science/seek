@@ -137,7 +137,7 @@ class SamplesController < ApplicationController
   end
 
   def filter
-    assay = Assay.find_by(id: params[:assay_id]) if params[:assay_id].present?
+    assay = Assay.find(params[:assay_id]) if params[:assay_id].present?
     @associated_samples = assay&.can_view? ? assay.samples.authorized_for('view') : []
     @samples = Sample.where('title LIKE ?', "%#{params[:filter]}%").authorized_for('view').first(20)
 

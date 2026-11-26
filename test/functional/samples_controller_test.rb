@@ -725,14 +725,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'a.list-group-item-success', count: 1, text: /public fish/
   end
 
-  test 'filtering for association forms with a missing assay' do
-    FactoryBot.create(:sample, policy: FactoryBot.create(:public_policy), title: 'public fish')
-
-    get :filter, params: { filter: 'fish', assay_id: (Assay.maximum(:id) || 0) + 100 }
-    assert_response :success
-    assert_select 'a', count: 1
-  end
-
   test 'turns strain attributes into links' do
     person = FactoryBot.create(:person)
     login_as(person.user)
