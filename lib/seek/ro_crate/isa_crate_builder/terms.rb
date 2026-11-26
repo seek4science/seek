@@ -16,14 +16,10 @@ module Seek
 
         private
 
-        # additionalType is a list: the IRI of the JERM ontology term, plus the bare name ("Investigation",
-        # "Study" or "Assay"). ARC tools only recognise a Dataset as a study or an assay by that exact
-        # string; with the JERM IRI alone they silently skip the entity, and an {"@id": ...} reference in
-        # the list makes them reject the whole crate. So the IRI stays a plain string, and the term it
-        # names is described by a DefinedTerm entity in the graph instead.
+        # additionalType is a list: the bare name ("Investigation", "Study" or "Assay"), plus a reference
+        # to the JERM ontology term.
         def isa_type(crate, name)
-          isa_term(crate, name)
-          ["#{JERM}#{name}", name]
+          [name, isa_term(crate, name).reference]
         end
 
         # One DefinedTerm per ISA level in use, identified by its JERM IRI.

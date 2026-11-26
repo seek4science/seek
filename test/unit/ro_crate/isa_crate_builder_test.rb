@@ -10,7 +10,7 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
     root = root_entity(json)
 
     assert_equal 'Dataset', root['@type']
-    assert_equal ["#{JERM}Investigation", 'Investigation'], root['additionalType']
+    assert_equal ['Investigation', { '@id' => "#{JERM}Investigation" }], root['additionalType']
     assert_equal 'Heat stress in barley', root['name']
     assert_equal 'Pilot study', root['description']
     assert_equal investigation.id.to_s, root['identifier']
@@ -416,7 +416,7 @@ class ISACrateBuilderTest < ActiveSupport::TestCase
   end
 
   def isa_entity(json, type_name)
-    json['@graph'].detect { |e| e['additionalType'] == ["#{JERM}#{type_name}", type_name] }
+    json['@graph'].detect { |e| e['additionalType'] == [type_name, { '@id' => "#{JERM}#{type_name}" }] }
   end
 
   def ids_of(references)
