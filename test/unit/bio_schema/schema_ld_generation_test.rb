@@ -151,6 +151,51 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     check_schema_org_terms(json)
   end
 
+  test 'assets creator' do
+    sop = FactoryBot.create(:public_sop)
+    registered_creator, creator = disable_authorization_checks do
+      [sop.assets_creators.create!(creator: @person, pos: 1),
+       sop.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', affiliation: 'University of Somewhere',
+                                   orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 2)]
+    end
+    context = {
+      '@vocab' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      'dct' => Seek::BioSchema::Serializer::DCT
+    }
+
+    expected = {
+      '@context' => context,
+      '@id' => "http://localhost:3000/people/#{@person.id}",
+      '@type' => 'Person',
+      'name' => @person.name,
+      'url' => "http://localhost:3000/people/#{@person.id}",
+      'givenName' => @person.first_name,
+      'familyName' => @person.last_name,
+      'identifier' => 'https://orcid.org/0000-0001-9842-9718',
+      'worksFor' => @person.institutions.first.title
+    }
+
+    json = JSON.parse(Seek::BioSchema::Serializer.new(registered_creator).json_ld)
+    assert_equal expected, json
+    check_schema_org_terms(json)
+
+    expected = {
+      '@context' => context,
+      '@id' => 'https://orcid.org/0000-0002-1694-233X',
+      '@type' => 'Person',
+      'name' => 'Steve Smith',
+      'url' => 'https://orcid.org/0000-0002-1694-233X',
+      'givenName' => 'Steve',
+      'familyName' => 'Smith',
+      'identifier' => 'https://orcid.org/0000-0002-1694-233X',
+      'worksFor' => 'University of Somewhere'
+    }
+
+    json = JSON.parse(Seek::BioSchema::Serializer.new(creator).json_ld)
+    assert_equal expected, json
+    check_schema_org_terms(json)
+  end
+
   test 'data file' do
     df = travel_to(@current_time) do
       df = FactoryBot.create(:max_data_file, description: 'short desc', contributor: @person, projects: [@project],
