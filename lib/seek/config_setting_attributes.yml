@@ -284,4 +284,6 @@ reindex_all_batch_size:
   convert: :to_i
 default_citation_style:
 obfuscate_filters:
-  
+mcp_server_enabled:
+mcp_server_id:
+mcp_server_title:

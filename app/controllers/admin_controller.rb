@@ -195,6 +195,10 @@ class AdminController < ApplicationController
 
     Seek::Config.bio_tools_enabled = string_to_boolean(params[:bio_tools_enabled])
 
+    Seek::Config.mcp_server_enabled = string_to_boolean params[:mcp_server_enabled]
+    Seek::Config.mcp_server_id = params[:mcp_server_id]&.strip
+    Seek::Config.mcp_server_title = params[:mcp_server_title]&.strip
+
     time_lock_is_integer = true
     if params.key?(:time_lock_doi_for)
       time_lock_doi_for = params[:time_lock_doi_for]

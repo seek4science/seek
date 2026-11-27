@@ -243,6 +243,16 @@
   <%= admin_checkbox_setting(:bio_tools_enabled, 1, Seek::Config.bio_tools_enabled,
                              "bio.tools integration enabled", "Whether linking to tools on #{link_to('bio.tools', 'https://bio.tools', target: :_blank)} is enabled.") %>
 
+  <%= admin_checkbox_setting(:mcp_server_enabled, 1, Seek::Config.mcp_server_enabled,
+                             "MCP server enabled", "Whether the MCP server at #{link_to(mcp_path, mcp_path, target: :_blank)} is enabled.",
+                             onchange: toggle_appear_javascript('mcp_server_details')) %>
+  <div id="mcp_server_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.mcp_server_enabled -%>">
+    <%= admin_text_setting(:mcp_server_id, Seek::Config.mcp_server_id,
+                           'MCP server ID', 'The machine-readable ID for the MCP server.') %>
+    <%= admin_text_setting(:mcp_server_title, Seek::Config.mcp_server_title,
+                           'MCP server title', 'The human-readable title for the MCP server.') %>
+  </div>
+
   <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path-%>
 <% end -%>
