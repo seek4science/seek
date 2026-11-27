@@ -99,6 +99,60 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal 'Jane Smith', graph.detect { |e| e['@id'] == '#Jane%20Smith' }['name']
   end
 
+  test 'generated RO-Crate context defines the Bioschemas terms of linked items' do
+    workflow = FactoryBot.create(:cwl_workflow)
+    sop = FactoryBot.create(:public_sop)
+    disable_authorization_checks { workflow.sops << sop }
+
+    sop_decorator = Seek::BioSchema::ResourceDecorators::Sop
+
+    crate = workflow.ro_crate
+
+    json = JSON.parse(crate.metadata.generate)
+    context = json['@context']
+    assert_equal 2, context.length
+    assert_equal ROCrate::Metadata::CONTEXT, context.first
+    assert_equal sop_decorator::LAB_PROTOCOL_TYPE, context.last['LabProtocol']
+    assert_equal sop_decorator::COMPUTATIONAL_TOOL_PROPERTY, context.last['computationalTool']
+    assert_equal Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE, context.last['ComputationalWorkflow']
+    refute context.last.key?('@vocab')
+
+    sop_entity = json['@graph'].detect { |e| e['@id'] == Seek::Util.routes.sop_url(sop) }
+    assert sop_entity
+    assert_equal 'LabProtocol', sop_entity['@type']
+  end
+
+  test 'RO-Crate generated from a basic RO-Crate keeps its own context' do
+    workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow)
+    assert workflow.should_generate_crate?
+
+    context = nil
+    workflow.ro_crate { |crate| context = crate.metadata.context }
+
+    assert_equal 2, context.length
+    assert_equal 'https://w3id.org/ro/crate/1.0/context', context.first
+    assert_equal Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_TYPE, context.last['ComputationalWorkflow']
+    assert_equal Seek::BioSchema::ResourceDecorators::Workflow::INPUT_PROPERTY, context.last['input']
+  end
+
+  test 'adding Bioschemas terms keeps terms already defined in the RO-Crate context' do
+    workflow = FactoryBot.create(:cwl_workflow)
+    sop_decorator = Seek::BioSchema::ResourceDecorators::Sop
+    crate = ROCrate::WorkflowCrate.new
+    crate.metadata.context = [ROCrate::Metadata::CONTEXT, { 'LabProtocol' => 'http://example.com/LabProtocol' }]
+
+    workflow.add_context_terms(crate, { 'LabProtocol' => sop_decorator::LAB_PROTOCOL_TYPE,
+                                        'computationalTool' => sop_decorator::COMPUTATIONAL_TOOL_PROPERTY })
+    assert_equal [ROCrate::Metadata::CONTEXT,
+                  { 'LabProtocol' => 'http://example.com/LabProtocol' },
+                  { 'computationalTool' => sop_decorator::COMPUTATIONAL_TOOL_PROPERTY }],
+                 crate.metadata.context
+
+    # all already defined, so nothing more is added
+    workflow.add_context_terms(crate, { 'computationalTool' => sop_decorator::COMPUTATIONAL_TOOL_PROPERTY })
+    assert_equal 3, crate.metadata.context.length
+  end
+
   test 'generates fresh RO-Crate for workflow/diagram/abstract workflow' do
     workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
     assert workflow.should_generate_crate?

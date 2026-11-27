@@ -177,6 +177,7 @@ module WorkflowExtraction
 
   def merge_entities(crate, workflow)
     workflow_struct = Seek::BioSchema::Serializer.new(workflow).json_representation
+    add_context_terms(crate, workflow_struct['@context'].except('@vocab'))
 
     context = {
       '@vocab' => 'https://somewhere.com/'
@@ -201,6 +202,16 @@ module WorkflowExtraction
         crate.add_contextual_entity(entity)
       end
     end
+  end
+
+  # Adds the Bioschemas terms used by the entities to the crate's @context, as the RO-Crate context only defines
+  # those for ComputationalWorkflow. Terms the crate's own context already defines inline are left as they are.
+  def add_context_terms(crate, terms)
+    context = Array.wrap(crate.metadata.context)
+    terms = terms.except(*context.grep(Hash).flat_map(&:keys))
+    return if terms.empty?
+
+    crate.metadata.context = context + [terms]
   end
 
   def merge_fields(crate_workflow, bioschemas_workflow)
