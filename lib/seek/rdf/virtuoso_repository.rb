@@ -7,7 +7,10 @@ module Seek
     class VirtuosoRepository < RdfRepository
       include Singleton
 
-      class Config < Struct.new(:username, :password, :uri, :update_uri, :private_graph, :public_graph); end
+      class Config < Struct.new(:username, :password, :uri, :update_uri, :private_graph, :public_graph, :timeout); end
+
+      # seconds to wait for a response, allowing for an update holding a large item's rdf
+      DEFAULT_TIMEOUT = 60
       QUERY = RDF::Virtuoso::Query
 
       def get_query_object
@@ -35,6 +38,7 @@ module Seek
           @config.update_uri = yaml[Rails.env]['update_uri']
           @config.private_graph = yaml[Rails.env]['private_graph']
           @config.public_graph = yaml[Rails.env]['public_graph']
+          @config.timeout = yaml[Rails.env]['timeout'] || DEFAULT_TIMEOUT
         else
           raise Exception, "No configuration file found at #{config_path}"
         end
@@ -45,7 +49,8 @@ module Seek
                                               update_uri: get_configuration.update_uri,
                                               username: get_configuration.username,
                                               password: get_configuration.password,
-                                              auth_method: 'digest')
+                                              auth_method: 'digest',
+                                              timeout: get_configuration.timeout)
       end
 
       def enabled_for_environment?

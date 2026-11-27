@@ -38,48 +38,52 @@ module Seek
         get_repository_object.delete(*args)
       end
 
-      # send the rdf related to item to the repository, and update the rdf file
+      # execute a SPARQL update request, which may hold several operations separated by ';'
+      def update(*args)
+        get_repository_object.update(*args)
+      end
+
+      # Sends the item's rdf to its own named graph, and copies it into each of the graphs, recording them in the index
+      # graph. Also updates the rdf file.
       def send_rdf(item, graphs = rdf_graph_uris(item), save_file = true)
         if configured? && item.rdf_supported?
           connect_to_repository
-          Rails.logger.debug("RDF about to be sent for item: #{item.to_rdf}")
-          with_statements(item) do |statement|
-            if statement.valid?
-              graphs.each do |graph_uri|
-                send_statement_to_repository statement, graph_uri
-              end
-            else
-              Rails.logger.error("Invalid statement - '#{statement}'")
-            end
-          end
+          execute_operations(send_operations(item, graphs))
           item.save_rdf_file if save_file
         else
           Rails.logger.warn 'Attempting to send rdf, but not configured'
         end
       end
 
-      # remove the rdf related to item from the repository, and delete the rdf file
-      def remove_rdf(item, graphs = [get_configuration.public_graph, get_configuration.private_graph].compact, delete_file = true)
+      # Removes the item's statements from the graphs it was sent to, except those another item also sent, and drops
+      # its named graph. Also deletes the rdf file.
+      def remove_rdf(item, graphs = aggregate_graph_uris, delete_file = true)
         if configured? && item.rdf_supported?
           connect_to_repository
-          graphs.each do |graph|
-            q = query.delete([item.rdf_resource, :p, :o]).where([item.rdf_resource, :p, :o]).graph(RDF::URI(graph))
-            Rails.logger.debug("Remove all SPARQL: #{q}")
-            result = delete(q)
-            Rails.logger.debug(result)
-          end
+          execute_operations(remove_operations(item, graphs))
           item.delete_rdf_file if delete_file
         end
       end
 
-      # updates the rdf in the repository and updates the rdf file.
+      # Replaces the item's rdf in a single update request, and updates the rdf file. The store may not apply the
+      # request atomically, but a partial failure is repaired by the next update.
       def update_rdf(item)
         if configured? && item.rdf_supported?
-          Rails.logger.debug("About to remove RDF for item #{item.inspect}")
-          remove_rdf(item)
-          Rails.logger.debug("About to add RDF for item #{item.inspect}")
-          send_rdf(item)
+          connect_to_repository
+          execute_operations(remove_operations(item, aggregate_graph_uris) +
+                             send_operations(item, rdf_graph_uris(item)))
+          item.save_rdf_file
         end
+      end
+
+      # The named graph holding exactly the statements sent for item, named under #fullest_graph to keep it per instance
+      def item_graph_uri(item)
+        RDF::URI("#{item_graphs_prefix}#{item.class.base_class.name}/#{item.id}")
+      end
+
+      # The named graph recording which graphs each item graph was sent to, as <item graph> dcterms:isPartOf <graph>
+      def item_index_graph_uri
+        RDF::URI(item_graphs_prefix.chomp('/'))
       end
 
       def configured?
@@ -95,18 +99,21 @@ module Seek
         false
       end
 
-      # provides the URI's of any items related to the item - discovered by querying the triple store to find both:
+      # provides the URI's of any items related to the item - discovered by querying #fullest_graph to find both:
       #  <this_item> ?predicate <related_item>
       # or
       # <related_item> ?predicate <this_item>
       def uris_of_items_related_to(item)
-        q = query.select.where([:s, :p, item.rdf_resource]).from(RDF::URI.new(get_configuration.private_graph))
+        graph = RDF::URI.new(fullest_graph)
+        q = query.select.where([:s, :p, item.rdf_resource]).from(graph)
         results = select(q).collect { |result| result[:s] }
 
-        q = query.select.where([item.rdf_resource, :p, :o]).from(RDF::URI.new(get_configuration.private_graph))
+        q = query.select.where([item.rdf_resource, :p, :o]).from(graph)
         results |= select(q).collect { |result| result[:o] }
 
-        results.select { |result| result.is_a?(RDF::URI) }.collect(&:to_s).uniq
+        results.select { |result| result.is_a?(RDF::URI) }.collect(&:to_s).uniq.reject do |uri|
+          uri.start_with?(skolem_iri_prefix)
+        end
       end
 
       # Abstract methods
@@ -143,13 +150,95 @@ module Seek
         path
       end
 
-      def send_statement_to_repository(statement, graph_uri)
-        Rails.logger.debug("sending statement #{statement} to graph #{graph_uri}")
-        graph = RDF::URI.new graph_uri
-        q = query.insert_data([statement.subject, statement.predicate, statement.object]).graph(graph)
-        Rails.logger.debug("Insert statement SPARQL: #{q}")
-        result = insert(q)
+      def aggregate_graph_uris
+        [get_configuration.public_graph, get_configuration.private_graph].compact
+      end
+
+      # The private graph, which holds every item, or the public graph if there is no private graph
+      def fullest_graph
+        get_configuration.private_graph || get_configuration.public_graph
+      end
+
+      def item_graphs_prefix
+        "#{fullest_graph}/items/"
+      end
+
+      def execute_operations(operations)
+        return if operations.empty?
+
+        request = operations.join(" ;\n")
+        Rails.logger.debug("SPARQL update: #{request}")
+        result = update(request)
         Rails.logger.debug(result)
+      end
+
+      # Stores the item's statements in its graph, records the graphs in the index, and copies the statements into them.
+      # Stores nothing if there are no graphs, e.g. a private item with only a public graph configured.
+      def send_operations(item, graphs)
+        return [] if graphs.empty?
+
+        item_graph = item_graph_uri(item)
+        part_of = graphs.map { |graph| RDF::Statement.new(item_graph, RDF::Vocab::DC.isPartOf, RDF::URI(graph)) }
+
+        ["INSERT DATA {\n" \
+         "  GRAPH #{item_graph.to_base} {\n#{ntriples(skolemize(valid_statements(item)))}  }\n" \
+         "  GRAPH #{item_index_graph_uri.to_base} {\n#{ntriples(part_of)}  }\n" \
+         '}'] +
+          graphs.map do |graph|
+            "INSERT { GRAPH #{RDF::URI(graph).to_base} { ?s ?p ?o } } " \
+              "WHERE { GRAPH #{item_graph.to_base} { ?s ?p ?o } }"
+          end
+      end
+
+      # Removes the item's statements from each graph, then drops its graph and index entry.
+      def remove_operations(item, graphs)
+        item_graph = item_graph_uri(item)
+        graphs.map { |graph| remove_from_graph_operation(item_graph, RDF::URI(graph)) } +
+          ["DELETE WHERE { GRAPH #{item_index_graph_uri.to_base} { #{item_graph.to_base} ?p ?o } }",
+           "DROP SILENT GRAPH #{item_graph.to_base}"]
+      end
+
+      # Removes item_graph's statements from graph, if it was sent there, keeping those another item graph there holds.
+      def remove_from_graph_operation(item_graph, graph)
+        index_graph = item_index_graph_uri.to_base
+        part_of = RDF::Vocab::DC.isPartOf.to_base
+        <<~SPARQL.chomp
+          DELETE { GRAPH #{graph.to_base} { ?s ?p ?o } }
+          WHERE {
+            GRAPH #{index_graph} { #{item_graph.to_base} #{part_of} #{graph.to_base} }
+            GRAPH #{item_graph.to_base} { ?s ?p ?o }
+            FILTER NOT EXISTS {
+              GRAPH #{index_graph} { ?other #{part_of} #{graph.to_base} }
+              FILTER (?other != #{item_graph.to_base})
+              GRAPH ?other { ?s ?p ?o }
+            }
+          }
+        SPARQL
+      end
+
+      def valid_statements(item)
+        item.to_rdf_graph.statements.select do |statement|
+          statement.valid?.tap { |valid| Rails.logger.error("Invalid statement - '#{statement}'") unless valid }
+        end
+      end
+
+      # Replaces blank nodes with IRIs (https://www.w3.org/TR/rdf11-concepts/#section-skolemization), so they stay
+      # connected across requests and can be removed.
+      def skolemize(statements)
+        iris = Hash.new do |hash, node|
+          hash[node] = RDF::URI("#{skolem_iri_prefix}#{SecureRandom.uuid}")
+        end
+        statements.map do |statement|
+          RDF::Statement.new(*statement.to_triple.map { |term| term.node? ? iris[term] : term })
+        end
+      end
+
+      def skolem_iri_prefix
+        Seek::Config.site_base_url.join('.well-known/genid/').to_s
+      end
+
+      def ntriples(statements)
+        statements.map { |statement| "    #{RDF::NTriples::Writer.serialize(statement)}" }.join
       end
 
       def rdf_graph_uris(item)
@@ -158,14 +247,6 @@ module Seek
         else
           [get_configuration.private_graph]
         end.compact
-      end
-
-      def with_statements(item)
-        RDF::Reader.for(:ttl).new(item.to_rdf) do |reader|
-          reader.each_statement do |statement|
-            yield(statement)
-          end
-        end
       end
 
       def config_path

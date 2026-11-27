@@ -1,6 +1,10 @@
 require 'test_helper'
+require 'minitest/mock'
+require 'triple_store_test_helper'
 
 class RdfTripleStoreTest < ActionDispatch::IntegrationTest
+  include TripleStoreTestHelper
+
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
     @project = FactoryBot.create(:project, title: 'Test for RDF storage')
@@ -14,11 +18,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
   def teardown
     unless @subject.nil?
-      q = @repository.query.delete(%i[s p o]).graph(@private_graph).where(%i[s p o])
-      @repository.delete(q)
-
-      q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
-      @repository.delete(q)
+      clear_triple_store(@repository)
 
       @project.delete_rdf_file
     end
@@ -189,6 +189,41 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     assert_equal ["http://localhost:3000/data_files/#{data_file.id}", "http://localhost:3000/people/#{person.id}", "http://localhost:3000/sops/#{sop.id}"], uris.sort
   end
 
+  test 'uris of items related to with only a public graph' do
+    config = @repository.get_configuration.dup
+    config.private_graph = nil
+    person = FactoryBot.create(:person)
+    sop = FactoryBot.create(:sop)
+
+    q = @repository.query.insert([person.rdf_resource, RDF::URI.new('http://is/member_of'), @project.rdf_resource]).graph(@public_graph)
+    @repository.insert(q)
+    q = @repository.query.insert([@project.rdf_resource, RDF::URI.new('http://produced'), sop.rdf_resource]).graph(@public_graph)
+    @repository.insert(q)
+
+    @repository.stub(:get_configuration, config) do
+      uris = @repository.uris_of_items_related_to @project
+      assert_equal ["http://localhost:3000/people/#{person.id}", "http://localhost:3000/sops/#{sop.id}"], uris.sort
+    end
+  end
+
+  test 'uris of items related to leave out skolemized blank nodes' do
+    data_file = data_file_with_nested_extended_metadata('2020-01-01')
+    @repository.send_rdf(data_file)
+    assert_equal 1, nested_start_dates(data_file, @private_graph).count
+
+    uris = @repository.uris_of_items_related_to(data_file)
+    assert uris.any?, 'the data file should be related to other items'
+    assert_empty uris.select { |uri| uri.include?('/.well-known/genid/') }
+
+    assert_nothing_raised { data_file.related_items_from_sparql }
+
+    data_file.delete_rdf_file
+  end
+
+  test 'timeout defaults to 60 seconds' do
+    assert_equal 60, @repository.get_configuration.timeout
+  end
+
   test 'update rdf' do
     @repository.send_rdf(@project)
 
@@ -328,7 +363,148 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
   end
 
+  test 'send stores the statements in the item graph and records the graphs it is part of' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    @repository.send_rdf(sop)
+
+    item_graph = @repository.item_graph_uri(sop)
+    assert_equal RDF::URI("#{@private_graph}/items/Sop/#{sop.id}"), item_graph
+    q = @repository.query.select.where([sop.rdf_resource, :p, :o]).from(item_graph)
+    assert_equal triple_count(sop), @repository.select(q).count
+
+    assert_equal [@private_graph, @public_graph].map(&:to_s).sort, part_of(sop).map(&:to_s).sort
+
+    sop.policy.update!(access_type: Policy::NO_ACCESS)
+    sop = Sop.find(sop.id)
+    @repository.update_rdf(sop)
+    assert_equal [@private_graph.to_s], part_of(sop).map(&:to_s)
+
+    @repository.remove_rdf(sop)
+    assert_empty part_of(sop)
+    assert_equal 0, graph_count(item_graph)
+
+    sop.delete_rdf_file
+  end
+
+  test 'nested extended metadata stays connected to the item' do
+    data_file = data_file_with_nested_extended_metadata('2020-01-01')
+    @repository.send_rdf(data_file)
+
+    [@private_graph, @public_graph].each do |graph|
+      assert_equal ['2020-01-01'], nested_start_dates(data_file, graph)
+    end
+
+    data_file.delete_rdf_file
+  end
+
+  test 'nested extended metadata is replaced on update and removed' do
+    data_file = data_file_with_nested_extended_metadata('2020-01-01')
+    @repository.send_rdf(data_file)
+    count = graph_count(@private_graph)
+
+    disable_authorization_checks do
+      data_file.extended_metadata.set_attribute_value('retention_period',
+                                                      { 'start_date' => '2021-06-01', 'end_date' => '2030-12-31' })
+      data_file.extended_metadata.save!
+    end
+    @repository.update_rdf(data_file)
+    @repository.update_rdf(data_file)
+
+    assert_equal count, graph_count(@private_graph)
+    assert_equal ['2021-06-01'], nested_start_dates(data_file, @private_graph)
+
+    @repository.remove_rdf(data_file)
+    assert_equal 0, graph_count(@private_graph)
+    assert_equal 0, graph_count(@public_graph)
+  end
+
+  test 'remove keeps statements that another item also sent' do
+    sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    shared = [RDF::URI('http://example.org/shared'), RDF::URI('http://example.org/p'), RDF::URI('http://example.org/o')]
+    sop.define_singleton_method(:to_rdf_graph) { super() << shared }
+    @project.define_singleton_method(:to_rdf_graph) { super() << shared }
+
+    @repository.send_rdf(sop)
+    @repository.send_rdf(@project)
+    @repository.remove_rdf(sop)
+
+    [@private_graph, @public_graph].each do |graph|
+      q = @repository.query.select.where(shared).from(graph)
+      assert_equal 1, @repository.select(q).count, "the shared statement should remain in #{graph}"
+      q = @repository.query.select.where([sop.rdf_resource, :p, :o]).from(graph)
+      assert_equal 0, @repository.select(q).count
+    end
+
+    @repository.remove_rdf(@project)
+    [@private_graph, @public_graph].each do |graph|
+      assert_equal 0, graph_count(graph)
+    end
+  end
+
+  test 'only a public graph configured' do
+    config = @repository.get_configuration.dup
+    config.private_graph = nil
+    public_sop = FactoryBot.create(:sop, policy: FactoryBot.create(:public_policy))
+    private_sop = FactoryBot.create(:sop, policy: FactoryBot.create(:private_policy))
+
+    @repository.stub(:get_configuration, config) do
+      assert_equal RDF::URI("#{@public_graph}/items/Sop/#{public_sop.id}"), @repository.item_graph_uri(public_sop)
+
+      @repository.send_rdf(public_sop)
+      @repository.send_rdf(private_sop)
+
+      q = @repository.query.select.where([public_sop.rdf_resource, :p, :o]).from(@public_graph)
+      assert_equal triple_count(public_sop), @repository.select(q).count
+      assert_equal [@public_graph.to_s], part_of(public_sop).map(&:to_s)
+
+      q = @repository.query.select.where([private_sop.rdf_resource, :p, :o]).from(@public_graph)
+      assert_equal 0, @repository.select(q).count
+      assert_equal 0, graph_count(@repository.item_graph_uri(private_sop)), 'a private item should not be stored'
+      assert_empty part_of(private_sop)
+
+      public_sop.policy.update!(access_type: Policy::NO_ACCESS)
+      public_sop = Sop.find(public_sop.id)
+      @repository.update_rdf(public_sop)
+
+      assert_equal 0, graph_count(@public_graph)
+      assert_equal 0, graph_count(@repository.item_graph_uri(public_sop))
+      assert_empty part_of(public_sop)
+    end
+
+    public_sop.delete_rdf_file
+    private_sop.delete_rdf_file
+  end
+
   private
+
+  def data_file_with_nested_extended_metadata(start_date)
+    em = ExtendedMetadata.new(extended_metadata_type: FactoryBot.create(:rdf_test_data_file_single_nested_emt))
+    em.set_attribute_value('retention_period', { 'start_date' => start_date, 'end_date' => '2030-12-31' })
+    FactoryBot.create(:data_file, extended_metadata: em, policy: FactoryBot.create(:public_policy))
+  end
+
+  # the start dates reached by following the item's retention period link, in the given graph
+  def nested_start_dates(data_file, graph)
+    results = @repository.select(<<~SPARQL)
+      SELECT ?date FROM #{graph.to_base} WHERE {
+        #{data_file.rdf_resource.to_base} <http://example.org/retentionPeriod> ?period .
+        ?period <http://example.org/startDate> ?date
+      }
+    SPARQL
+    results.map { |result| result[:date].to_s }
+  end
+
+  def graph_count(graph)
+    q = @repository.query.select.where(%i[s p o]).from(RDF::URI(graph))
+    @repository.select(q).count
+  end
+
+  def part_of(item)
+    q = @repository.query.select
+                   .where([@repository.item_graph_uri(item), RDF::Vocab::DC.isPartOf, :g])
+                   .from(@repository.item_index_graph_uri)
+    @repository.select(q).map { |result| result[:g] }
+  end
 
   # gets the count of the triples for a resource. This can change as the rdf is updated, so avoids having hard-coded
   # variables making the tests fragile

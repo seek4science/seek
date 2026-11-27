@@ -1,6 +1,9 @@
 require 'test_helper'
+require 'triple_store_test_helper'
 
 class SparqlQueriesTest < ActionDispatch::IntegrationTest
+  include TripleStoreTestHelper
+
   QUERIES = YAML.load_file(Rails.root.join('config', 'sparql_queries.yml')).freeze
 
   def setup
@@ -8,7 +11,7 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
     skip('these tests need a configured triple store') unless @repository.configured?
 
     # start from an empty store, so that leftovers from elsewhere can't mask a missing triple
-    clear_test_graphs
+    clear_triple_store(@repository)
 
     @person = FactoryBot.create(:person)
     @project = @person.projects.first
@@ -45,9 +48,7 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
   def teardown
     return unless @repository&.configured?
 
-    # remove_rdf only deletes triples with the item as the subject, and the store also picks up
-    # triples about related items, so clear the test graphs completely
-    clear_test_graphs
+    clear_triple_store(@repository)
     rdf_items.each { |item| item.delete_rdf_file if item.rdf_supported? }
   end
 
@@ -74,13 +75,5 @@ class SparqlQueriesTest < ActionDispatch::IntegrationTest
     client = SPARQL::Client.new(@repository.get_configuration.uri,
                                 graph: @repository.get_configuration.private_graph)
     client.query(sparql)
-  end
-
-  def clear_test_graphs
-    config = @repository.get_configuration
-    [config.private_graph, config.public_graph].compact.each do |graph|
-      query = @repository.query.delete(%i[s p o]).graph(RDF::URI.new(graph)).where(%i[s p o])
-      @repository.delete(query)
-    end
   end
 end
