@@ -45,6 +45,11 @@ FactoryBot.define do
     provider { 'ldap' }
     sequence(:uid) { |n| "ldap-user-#{n}" }
   end
+
+  factory(:oidc_identity, parent: :identity) do
+    provider { 'oidc' }
+    sequence(:uid) { |n| "oidc-subject-#{n}" }
+  end
   
   # ApiToken
   factory(:api_token) do

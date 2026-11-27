@@ -103,6 +103,10 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_oidc_issuer = params[:omniauth_oidc_issuer]
     Seek::Config.omniauth_oidc_client_id = params[:omniauth_oidc_client_id]
     Seek::Config.omniauth_oidc_secret = params[:omniauth_oidc_secret]
+    Seek::Config.omniauth_oidc_api_audiences = params[:omniauth_oidc_api_audiences]
+    oidc_api_audiences_given = check_oidc_api_audiences(params[:omniauth_oidc_api_enabled])
+    Seek::Config.omniauth_oidc_api_enabled = string_to_boolean(params[:omniauth_oidc_api_enabled]) &&
+                                             oidc_api_audiences_given
 
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     # Per-adaptor external search toggles (map: key => {'enabled' =>boolean})
@@ -204,7 +208,8 @@ class AdminController < ApplicationController
 
     Seek::Util.clear_cached
 
-    validation_flag = time_lock_is_integer && port_is_integer && eg_log_base_is_pos_int
+    validation_flag = time_lock_is_integer && port_is_integer && eg_log_base_is_pos_int &&
+                      oidc_api_audiences_given
     update_redirect_to validation_flag, 'features_enabled'
   end
 
@@ -642,6 +647,17 @@ class AdminController < ApplicationController
     Rails.cache.redis_memory_stats
   rescue StandardError => e
     { 'error' => e.message }
+  end
+
+  # Accepting the provider's access tokens without naming an audience would admit any token it
+  # signed, for any application, as the user that token names. Blank is refused rather than taken
+  # to mean "accept anything", and the setting is left off until an audience is given.
+  def check_oidc_api_audiences(enabled)
+    return true unless string_to_boolean(enabled)
+    return true if Seek::Config.omniauth_oidc_api_audience_list.any?
+
+    flash[:error] = 'Accepted token audiences must be given before access tokens can be accepted for the API'
+    false
   end
 
   def check_valid_email(email_address, field)
