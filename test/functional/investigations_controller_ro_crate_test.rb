@@ -19,6 +19,21 @@ class InvestigationsControllerRoCrateTest < ActionController::TestCase
     end
   end
 
+  test 'the zip is logged as a download and the metadata view is not logged' do
+    investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
+
+    assert_difference('ActivityLog.count', 1) do
+      get :ro_crate, params: { id: investigation.id }
+    end
+    log = ActivityLog.last
+    assert_equal 'download', log.action
+    assert_equal investigation, log.activity_loggable
+
+    assert_no_difference('ActivityLog.count') do
+      get :ro_crate_metadata, params: { id: investigation.id }
+    end
+  end
+
   test 'ro crate metadata is shown as json without the zip' do
     investigation = FactoryBot.create(:investigation, policy: FactoryBot.create(:public_policy))
 
