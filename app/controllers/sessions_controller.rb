@@ -97,19 +97,40 @@ class SessionsController < ApplicationController
     self.current_user = @user
 
     flash[:notice] = notice || "You have successfully logged in, #{@user.display_name}."
-    if params[:remember_me] == 'on'
+
+    # Always persist OmniAuth logins via remember-me cookie. OIDC returns through a
+    # cross-site top-level redirect; concurrent same-origin requests (e.g. browser
+    # probes) can refresh an older anonymous session cookie and wipe the new one.
+    # auth_token survives that race because those responses don't clear it.
+    omniauth_login = request.env['omniauth.auth'].present?
+    if omniauth_login || params[:remember_me] == 'on'
       @user.remember_me unless @user.remember_token?
-      cookies[:auth_token] = { value: @user.remember_token, expires: @user.remember_token_expires_at, same_site: :strict }
+      cookies[:auth_token] = {
+        value: @user.remember_token,
+        expires: @user.remember_token_expires_at,
+        same_site: :lax,
+        httponly: true
+      }
     end
+
+    return_to_path = determine_return_path_after_login
+    is_search = return_to_path&.normalize_trailing_slash == search_path.normalize_trailing_slash
+    default_path = is_search ? root_path : return_to_path || root_path
+
     respond_to do |format|
-      return_to_path = determine_return_path_after_login
       format.html do
-        is_search = return_to_path&.normalize_trailing_slash == search_path.normalize_trailing_slash
-        default_path = is_search ? root_path : return_to_path || root_path
-        redirect_back_or_default(default_path)
+        if omniauth_login
+          # 200 + same-origin JS redirect is more reliable than Set-Cookie on a 302
+          # after a cross-site IdP callback.
+          @post_login_redirect = session[:return_to].presence || default_path
+          clear_return_to
+          render 'sessions/omniauth_bounce', layout: false
+        else
+          redirect_back_or_default(default_path)
+          clear_return_to
+        end
       end
     end
-    clear_return_to
   end
 
   def determine_return_path_after_login
@@ -149,6 +170,7 @@ class SessionsController < ApplicationController
 
     if @identity.user # The identity has a user.
       @user = @identity.user
+      sync_oidc_group_projects(auth)
       check_login
     else # The identity does not have an associated user.
       # *** LEGACY SUPPORT ***
@@ -157,6 +179,7 @@ class SessionsController < ApplicationController
         if @user
           @identity.user = @user
           @identity.save! # Update identity so we don't have to do this again.
+          sync_oidc_group_projects(auth)
           check_login
           return
         end
@@ -193,9 +216,17 @@ class SessionsController < ApplicationController
       @identity.user = @user
       @identity.save!
       person_params = auth.info.with_indifferent_access.slice(:first_name, :last_name, :email, :name)
+      # Group→project sync runs on a later login once a Person profile exists (stock registration flow).
       check_login(nil, person_params: person_params)
     else # An unexpected error occurred whilst saving the user.
       failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
     end
+  end
+
+  def sync_oidc_group_projects(auth)
+    return unless auth.provider.to_s == 'oidc'
+    return unless @user&.person
+
+    Seek::Omniauth::OidcGroupProjectSync.call(person: @user.person, auth: auth)
   end
 end
