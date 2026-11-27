@@ -814,13 +814,15 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = FactoryBot.create(:workflow, contributor: person)
     blob = FactoryBot.create(:nf_core_ro_crate)
     session[:uploaded_content_blob_id] = blob.id
-    workflow_params =  { title: 'workflow', project_ids: [person.projects.first.id] }
+    workflow_params = { title: 'workflow', project_ids: [person.projects.first.id] }
     assert_equal 1, workflow.version
     old_blob = workflow.content_blob
 
-    assert_no_difference('ContentBlob.count') do
-      assert_difference('Workflow::Version.count') do
-        post :create_version_metadata, params: { id: workflow.id, workflow: workflow_params, content_blob_uuid: blob.uuid.to_s }
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('ContentBlob.count') do
+        assert_difference('Workflow::Version.count') do
+          post :create_version_metadata, params: { id: workflow.id, workflow: workflow_params, content_blob_uuid: blob.uuid.to_s }
+        end
       end
     end
 
@@ -828,6 +830,27 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 2, workflow.version
     assert_equal old_blob, workflow.versions.first.content_blob
     assert_equal blob, workflow.versions.last.content_blob
+
+    al = ActivityLog.last
+    assert_equal 'update', al.action
+    assert_equal workflow, al.activity_loggable
+    assert_equal 'workflows', al.controller_name
+  end
+
+  test 'does not create workflow version if no content provided' do
+    person = FactoryBot.create(:person)
+    login_as(person)
+    workflow = FactoryBot.create(:workflow, contributor: person)
+    workflow_params = { title: 'workflow', project_ids: [person.projects.first.id] }
+    assert_equal 1, workflow.version
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('Workflow::Version.count') do
+        post :create_version_metadata, params: { id: workflow.id, workflow: workflow_params }
+      end
+    end
+
+    assert_response :unprocessable_entity
   end
 
   test 'should be able to handle remote files in existing RO-Crate' do
