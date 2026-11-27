@@ -683,6 +683,21 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'show disabled explore button if csv too big' do
+    df = FactoryBot.create(:csv_spreadsheet_datafile)
+    login_as(df.contributor.user)
+    with_config_value(:max_extractable_csv_size, 0) do
+      with_config_value(:max_extractable_spreadsheet_size, 100) do
+        get :show, params: { id: df }
+      end
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
+      assert_select 'span[data-tooltip=?] a.disabled', 'This spreadsheet is too big to be explored (larger than 0 MB), or the file does not exist.', text: 'Explore', count: 1
+    end
+  end
+
   test 'should download datafile from standard route' do
     df = FactoryBot.create :rightfield_datafile, policy: FactoryBot.create(:public_policy)
     login_as(df.contributor.user)

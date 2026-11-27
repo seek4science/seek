@@ -470,7 +470,8 @@ class DataFilesController < ApplicationController
   # ajax call to check if data file has matching sample type ( used to check if button should be shown)
   def has_matching_sample_type
     return false unless @data_file.content_blob && SampleType.any?
-    key = ['has_matching_sample_type', @data_file.content_blob, SampleType.order(:updated_at).last.template, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size]
+    key = ['has_matching_sample_type', @data_file.content_blob, SampleType.order(:updated_at).last.template, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size,
+           Seek::Config.max_extractable_csv_size]
     result = Rails.cache.fetch(key) do
       @data_file.matching_sample_type?
     end

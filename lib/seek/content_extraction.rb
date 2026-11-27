@@ -4,6 +4,8 @@ module Seek
     include SysMODB::SpreadsheetExtractor
     include ContentSplit
 
+    UTF8_CHECK_CHUNK_SIZE = 1024 * 1024
+
     def pdf_contents_for_search
       content = []
       if file_exists?
@@ -81,13 +83,23 @@ module Seek
       spreadsheet_to_csv(filepath, sheet, trim, Seek::Config.jvm_memory_allocation)
     end
 
-    def extract_csv()
-      content = File.read(filepath)
-      # Some CSV files are not UTF-8 (e.g. ISO-8859-1/Latin-1), which would cause
-      # CSV parsing to raise CSV::InvalidEncodingError. Fall back to interpreting
-      # the bytes as ISO-8859-1 and transcode to UTF-8 when they aren't valid UTF-8.
-      content = content.encode('UTF-8', 'ISO-8859-1') unless content.valid_encoding?
-      content
+    # Opens the file as UTF-8 text, yielding the IO to the block. Some CSV files are not UTF-8
+    # (e.g. ISO-8859-1/Latin-1), which would cause CSV parsing to raise CSV::InvalidEncodingError, so
+    # if the bytes aren't valid UTF-8 they are read as ISO-8859-1 and transcoded to UTF-8 as they are
+    # read. Unlike reading the whole file into a String, this never holds the full contents in memory.
+    def open_as_utf8(&block)
+      mode = valid_utf8_file? ? 'r:UTF-8' : 'r:ISO-8859-1:UTF-8'
+      File.open(filepath, mode, &block)
+    end
+
+    # Checks the file is valid UTF-8, reading it in chunks rather than all at once
+    def valid_utf8_file?(chunk_size = UTF8_CHECK_CHUNK_SIZE)
+      File.open(filepath, 'r:UTF-8') do |file|
+        while (chunk = file.gets(nil, chunk_size))
+          return false unless chunk.valid_encoding?
+        end
+        true
+      end
     end
 
     def to_spreadsheet_xml

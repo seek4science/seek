@@ -45,7 +45,8 @@ module Seek
 
       def matches_content_blob?(blob)
         return false unless content_blob && blob
-        key = ['st-match', blob, content_blob, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size]
+        key = ['st-match', blob, content_blob, Seek::Config.jvm_memory_allocation, Seek::Config.max_extractable_spreadsheet_size,
+               Seek::Config.max_extractable_csv_size]
         Rails.cache.fetch(key) do
           template_reader.matches?(blob)
         end
