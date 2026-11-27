@@ -1,5 +1,6 @@
 require 'ro_crate'
 require 'seek/download_handling/http_streamer'
+require 'open4'
 
 # A kind of "form object" to create a Git repository + version + annotations from a Workflow RO-Crate.
 class WorkflowCrateExtractor
@@ -7,10 +8,13 @@ class WorkflowCrateExtractor
 
   attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params, :detect_workflow
 
-  validate :resolve_crate
+  validate :not_nil
+  validate :remote_crate_handling, if: -> { ro_crate[:data].blank? }
+  validate :metadata_validation
+  validate :extract_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
-  validate :source_url_and_version_present?, if: -> { detect_workflow }
-  validate :find_workflows_matching_id, if: -> { detect_workflow }
+  validate :source_url_and_version_present?, if: -> { detect_workflow && @crate.present? }
+  validate :find_workflows_matching_id, if: -> { detect_workflow && @crate.present? }
 
   def build(update_creators: true)
     if valid?
@@ -68,6 +72,55 @@ class WorkflowCrateExtractor
     Workflow.new(workflow_class: workflow_class)
   end
 
+  def not_nil
+    errors.add(:ro_crate, 'missing') if ro_crate.nil?
+  end
+
+  def remote_crate_handling
+    if ro_crate[:data_url].present?
+      begin
+        handler = ContentBlob.remote_content_handler_for(ro_crate[:data_url])
+        info = handler.info
+        data = handler.fetch
+        data.rewind
+        ro_crate[:data] = data
+        ro_crate[:original_filename] = info[:file_name]
+      rescue Seek::DownloadHandling::BadResponseCodeException => e
+        errors.add(:ro_crate, "URL could not be accessed: #{e.message}")
+      rescue StandardError => e
+        Rails.logger.error("#{e} occurred whilst trying to fetch: #{ro_crate[:data_url]}\n\t#{e.backtrace.join("\n\t")}")
+        errors.add(:ro_crate, 'URL could not be accessed')
+      end
+    else
+      errors.add(:ro_crate, 'should be provided as a file or remote URL')
+    end
+  end
+
+  def metadata_validation
+    crate_metadata_found = false
+    begin
+      Zip::File.open(ro_crate[:data].path) do |zip_file|
+        crate_metadata_found = zip_file.find_entry('ro-crate-metadata.json').present?
+      end
+    rescue Zip::Error
+      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+      return false
+    end
+
+    # The validation library does not support version 1.0 crates
+    # They use ro-crate-metadata.jsonld rather than ro-crate-metadata.json
+    # So we only use this library if it contains a ro-crate-metadata.json file
+    # The existing validation can handle version 1.0 crates
+    return unless crate_metadata_found
+
+    Open4.open4(Seek::Util.python_exec("script/validate-ro-crate.py #{ro_crate[:data].path}")) do |_pid, _stdin, stdout, _stderr|
+      until (line = stdout.gets).nil?
+        errors.add(:base, line.strip)
+      end
+      stdout.close
+    end
+  end
+
   def main_workflow_present?
     errors.add(:ro_crate, 'did not specify a main workflow.') unless @crate.main_workflow.present?
   end
@@ -86,43 +139,13 @@ class WorkflowCrateExtractor
   end
 
   def extract_crate
-    begin
-      @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
-    rescue Zip::Error
-      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
-    rescue ROCrate::ReadException => e
-      errors.add(:ro_crate, "could not be read: #{e.message}")
-    end
-  end
+    return if @crate.present?
 
-  def resolve_crate
-    if ro_crate.nil?
-      errors.add(:ro_crate, 'missing')
-      return false
-    elsif ro_crate[:data].blank?
-      if ro_crate[:data_url].present?
-        begin
-          handler = ContentBlob.remote_content_handler_for(ro_crate[:data_url])
-          info = handler.info
-          data = handler.fetch
-          data.rewind
-          ro_crate[:data] = data
-          ro_crate[:original_filename] = info[:file_name]
-        rescue Seek::DownloadHandling::BadResponseCodeException => e
-          errors.add(:ro_crate, "URL could not be accessed: #{e.message}")
-          return false
-        rescue StandardError => e
-          Rails.logger.error("#{e} occurred whilst trying to fetch: #{ro_crate[:data_url]}\n\t#{e.backtrace.join("\n\t")}")
-          errors.add(:ro_crate, "URL could not be accessed")
-          return false
-        end
-      else
-        errors.add(:ro_crate, 'should be provided as a file or remote URL')
-        return false
-      end
-    end
-
-    extract_crate
+    @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
+  rescue Zip::Error
+    errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+  rescue ROCrate::ReadException => e
+    errors.add(:ro_crate, "could not be read: #{e.message}")
   end
 
   def new_version?
