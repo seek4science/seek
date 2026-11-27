@@ -25,6 +25,12 @@
       <%= render :partial => 'layouts/navbar/search_bar' if Seek::Config.solr_enabled %>
 
       <ul class="nav navbar-nav navbar-right">
+        <% if Seek::Config.isa_json_compliance_enabled %>
+          <li>
+            <%= link_to "<span class='glyphicon glyphicon-list-alt' aria-hidden='true'></span> Query by #{t('template').pluralize}".html_safe, query_form_samples_path %>
+          </li>
+        <% end %>
+
         <% if defined?(Seek::Rdf::RdfRepository) && Seek::Rdf::RdfRepository.instance.configured? %>
           <li><%= link_to 'SPARQL', sparql_index_path %></li>
         <% end %>
