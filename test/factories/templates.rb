@@ -8,14 +8,14 @@ FactoryBot.define do
 
 
   factory(:min_template, parent: :template) do
-    title { 'A Minimal Template' }
+    sequence(:title) { |n| "Minimal template #{n}" }
     after(:build) do |template|
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'full_name', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type), required: true, template: template, isa_tag_id: FactoryBot.create(:default_isa_tag).id)
-    end
+      template.template_attributes << FactoryBot.build(:template_attribute, title: 'Source Name', isa_tag_id: FactoryBot.create(:source_isa_tag).id, sample_attribute_type: FactoryBot.create(:string_sample_attribute_type), required: true, is_title: true, pos: 0)
+      end
   end
 
-  factory(:max_template, parent: :template) do
-    title { 'A Maximal Template' }
+  factory(:max_template, parent: :isa_sample_collection_template) do
+    sequence(:title) { |n| "Maximal template #{n}" }
     description { 'A very new research' }
     group { 'arrayexpress' }
     group_order { 4 }
@@ -26,24 +26,12 @@ FactoryBot.define do
     isa_technology_type { 'transcription profiling' }
     repo_schema_id { 'transcription profiling' }
     organism { 'any' }
-    level { 'assay' }
-
-    after(:build) do |template|
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'full_name', sample_attribute_type: FactoryBot.create(:full_name_sample_attribute_type),
-                   required: true, short_name: 'full_name short_name', description: 'full_name description', ontology_version:"1.1", template: template, isa_tag_id: FactoryBot.create(:default_isa_tag).id)
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'address', sample_attribute_type: FactoryBot.create(:address_sample_attribute_type),
-                   required: false, short_name: 'address short_name', description: 'address description', ontology_version:"2.1", template: template, isa_tag_id: FactoryBot.create(:default_isa_tag).id)
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'postcode', sample_attribute_type: FactoryBot.create(:postcode_sample_attribute_type),
-                   required: false, short_name: 'postcode short_name', description: 'postcode description', ontology_version:"4", template: template, isa_tag_id: FactoryBot.create(:default_isa_tag).id)
-      template.template_attributes << FactoryBot.build(:template_attribute, title: 'CAPITAL key', sample_attribute_type: FactoryBot.create(:string_sample_attribute_type, title:'String'),
-                   required: false, short_name: 'CAPITAL key short_name', description: 'CAPITAL key description', ontology_version:"v0.0.9", template: template, isa_tag_id: FactoryBot.create(:default_isa_tag).id)
-    end
   end
 
   factory(:apples_controlled_vocab_template, parent: :template) do
     sequence(:title) { |n| "apples controlled vocab template #{n}" }
     after(:build) do |template|
-      template.template_attributes << FactoryBot.build(:apples_controlled_vocab_template_attribute, title: 'apples', isa_tag_id: FactoryBot.create(:default_isa_tag).id, required: true, template: template)
+      template.template_attributes << FactoryBot.build(:apples_controlled_vocab_template_attribute, title: 'apples', isa_tag_id: FactoryBot.create(:source_isa_tag).id, required: true, is_title: true, template: template)
     end
   end
 
