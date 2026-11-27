@@ -32,13 +32,16 @@
            be dropped and so never match a query containing them, e.g. the "c" in "vitamin c" -->
       <filter class="solr.EdgeNGramFilterFactory" minGramSize="2" maxGramSize="50" preserveOriginal="true"/>
     </analyzer>
+    <!-- catenateWords and catenateNumbers are left off at query time because each run they catenate adds a branch
+         to the token graph, and the query gets a clause per path through it. Identifiers with many delimiters, such
+         as InChI identifiers, would otherwise exceed maxClauseCount. The index-time catenations still match. -->
     <analyzer type="query">
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
       <filter class="solr.WordDelimiterGraphFilterFactory"
               generateWordParts="1"
               generateNumberParts="1"
-              catenateWords="1"
-              catenateNumbers="1"
+              catenateWords="0"
+              catenateNumbers="0"
               catenateAll="1"
               preserveOriginal="1"
               splitOnCaseChange="0"/>

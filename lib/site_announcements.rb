@@ -16,8 +16,9 @@ module SiteAnnouncements
   end
 
   module SingletonMethods
+    # Those who receive notifications, matching receive_notifications?: registered, with the flag set
     def notifiable
-      includes(:notifiee_info).where(notifiee_infos: { receive_notifications: true })
+      joins(:user).includes(:notifiee_info).where(notifiee_infos: { receive_notifications: true })
     end
   end
 
@@ -30,8 +31,10 @@ module SiteAnnouncements
       end
     end
 
+    # The receive_notifications flag defaults to true for every profile, including those created by someone else
+    # that have no registered user, so it doesn't on its own mean the person opted in.
     def receive_notifications?
-      self.notifiee_info.try(:receive_notifications?)
+      registered? && self.notifiee_info.try(:receive_notifications?)
     end
 
   end

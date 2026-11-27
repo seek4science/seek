@@ -180,6 +180,11 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     FactoryBot.create(:project_subscription, person: p2_monthly_subscriber_without_notification, project_id: p2.id, frequency: 'monthly').subscribe_to_all_in_project
     refute p2_monthly_subscriber_without_notification.receive_notifications?
 
+    p1_daily_subscriber_unregistered = FactoryBot.create(:person_in_project)
+    FactoryBot.create(:project_subscription, person: p1_daily_subscriber_unregistered, project_id: p1.id, frequency: 'daily').subscribe_to_all_in_project
+    assert p1_daily_subscriber_unregistered.subscriptions.any?
+    refute p1_daily_subscriber_unregistered.receive_notifications?
+
     # Daily
     freq = 'daily'
     job = PeriodicSubscriptionEmailJob.new(freq)

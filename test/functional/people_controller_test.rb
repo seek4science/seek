@@ -117,6 +117,61 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 1,person.activation_email_logs.count
   end
 
+  test 'who am i text is passed to the admin signup email' do
+    FactoryBot.create(:person) # make sure a person is present, first person would otherwise be the admin
+    user = FactoryBot.create(:brand_new_user)
+    login_as(user)
+
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_email_with(Mailer, :contact_admin_new_user, args: [user, 'I am a PhD student']) do
+        post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' },
+                                who_am_i: "  I am a PhD student \n " }
+      end
+    end
+  end
+
+  test 'blank who am i text is not passed to the admin signup email' do
+    FactoryBot.create(:person)
+    user = FactoryBot.create(:brand_new_user)
+    login_as(user)
+
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_email_with(Mailer, :contact_admin_new_user, args: [user, nil]) do
+        post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' }, who_am_i: '   ' }
+      end
+    end
+  end
+
+  test 'who am i text is limited in length' do
+    FactoryBot.create(:person)
+    user = FactoryBot.create(:brand_new_user)
+    login_as(user)
+    long_text = 'a' * (PeopleController::WHO_AM_I_MAX_LENGTH + 500)
+
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_email_with(Mailer, :contact_admin_new_user,
+                                 args: [user, long_text.truncate(PeopleController::WHO_AM_I_MAX_LENGTH)]) do
+        post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' }, who_am_i: long_text }
+      end
+    end
+  end
+
+  test 'register page shows who am i box only when email is enabled' do
+    login_as(FactoryBot.create(:brand_new_user))
+
+    with_config_value(:email_enabled, true) do
+      get :register
+      assert_response :success
+      assert_select 'textarea#who_am_i[maxlength=?]', PeopleController::WHO_AM_I_MAX_LENGTH.to_s
+    end
+
+    with_config_value(:email_enabled, false) do
+      get :register
+      assert_response :success
+      assert_select 'textarea#who_am_i', count: 0
+    end
+  end
+
   test 'cannot access select form as registered user, even admin' do
     login_as FactoryBot.create(:admin)
     get :register

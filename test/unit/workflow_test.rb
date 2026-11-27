@@ -79,6 +79,26 @@ class WorkflowTest < ActiveSupport::TestCase
                  crate.main_workflow['producer']['@id']
   end
 
+  test 'plain-text creators in generated RO-Crate resolve to their Person entities' do
+    workflow = FactoryBot.create(:cwl_workflow, other_creators: 'Fred Bloggs, Jane Smith')
+
+    crate = workflow.ro_crate
+
+    graph = JSON.parse(crate.metadata.generate)['@graph']
+    main_workflow = graph.detect { |e| e['@id'] == crate.main_workflow.id }
+    creator_ids = main_workflow['creator'].map { |ref| ref['@id'] }
+    assert_includes creator_ids, '#Fred%20Bloggs'
+    assert_includes creator_ids, '#Jane%20Smith'
+
+    creator_ids.each do |id|
+      person = graph.detect { |e| e['@id'] == id }
+      assert person, "Creator reference #{id} does not match an entity in the crate"
+      assert_equal 'Person', person['@type']
+    end
+    assert_equal 'Fred Bloggs', graph.detect { |e| e['@id'] == '#Fred%20Bloggs' }['name']
+    assert_equal 'Jane Smith', graph.detect { |e| e['@id'] == '#Jane%20Smith' }['name']
+  end
+
   test 'generates fresh RO-Crate for workflow/diagram/abstract workflow' do
     workflow = FactoryBot.create(:generated_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
     assert workflow.should_generate_crate?

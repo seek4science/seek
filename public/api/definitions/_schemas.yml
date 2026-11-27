@@ -337,12 +337,35 @@ meta:
       $ref: "#/components/schemas/nonEmptyString"
     metrics:
       $ref: '#/components/schemas/metrics'
+    user_access:
+      $ref: '#/components/schemas/userAccess'
   required:
     - created
     - modified
     - uuid
     - base_url
     - api_version
+  additionalProperties: false
+userAccess:
+  type: object
+  description: What the user making the request is allowed to do with the item
+  properties:
+    view:
+      type: boolean
+    download:
+      type: boolean
+      description: Only included for items that have something to download
+    edit:
+      type: boolean
+    manage:
+      type: boolean
+    delete:
+      type: boolean
+  required:
+    - view
+    - edit
+    - manage
+    - delete
   additionalProperties: false
 metrics:
   type: object

@@ -3,5 +3,11 @@ Hi Admin,
 The new user <%= @person.name %> just signed up.
 
 For the person details: <%= person_url(@person) -%>, whose email address is <%= @person.email -%> .
+<% if @who_am_i.present? -%>
+
+They wrote a few words about themselves:
+
+<%= @who_am_i %>
+<% end -%>
 
 This is an automated email.
