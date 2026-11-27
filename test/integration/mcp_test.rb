@@ -77,6 +77,42 @@ class McpTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'reports error during tool call' do
+    notified = []
+    with_config_value(:exception_notification_enabled, true) do
+      ExceptionNotifier.stub(:notify_exception, ->(e, opts) { notified << [e, opts] }) do
+        Workflow.stub(:solr_cache, ->(_q) { raise 'oh no' }) do
+          mcp_request 'tools/call',
+                      { name: 'search_tool', arguments: { query: 'test 123', type: 'workflows' } }
+        end
+      end
+    end
+
+    error = response.parsed_body['error']
+    assert error
+    assert_equal -32603, error['code'] # Internal error
+    refute_includes error.to_json, 'oh no', 'Internal error details should not be leaked to the client'
+
+    assert_equal 1, notified.length
+    exception, opts = notified.first
+    assert_equal RuntimeError, exception.class
+    assert_equal 'oh no', exception.message
+    assert opts[:env].present?
+    assert_includes opts.dig(:data, :mcp, :request), '"name":"search_tool"'
+  end
+
+  test 'does not report client errors' do
+    notified = []
+    with_config_value(:exception_notification_enabled, true) do
+      ExceptionNotifier.stub(:notify_exception, ->(e, opts) { notified << [e, opts] }) do
+        mcp_request 'tools/call', { name: 'not_a_tool', arguments: {} }
+      end
+    end
+
+    assert_equal -32602, response.parsed_body.dig('error', 'code') # Invalid params
+    assert_empty notified
+  end
+
   private
 
   def mcp_request(method, params = {}, id: 1, headers: {})

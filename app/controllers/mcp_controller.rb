@@ -11,6 +11,9 @@ class McpController < ApplicationController
       version: Seek::Version::APP_VERSION.to_s,
       tools: tools,
       server_context: { user_id: current_user&.id },
+      configuration: MCP::Configuration.new(
+        exception_reporter: Seek::Errors::McpExceptionReporter.new(env: request.env)
+      )
     )
 
     transport = MCP::Server::Transports::StreamableHTTPTransport.new(server, dns_rebinding_protection: false,
